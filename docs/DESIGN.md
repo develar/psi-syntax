@@ -17,6 +17,11 @@ before every commit:
 - the same with nesting limit 3 (`--nesting-limit 3`) on the community files and the mutations, so the too-deep paths
   run on ordinary code: every tree lossless, every body exact.
 
+For Java the contract is the same against IntelliJ 271's Java PSI: `java_syntax::dump::psi_to_string` prints
+`DebugUtil.psiToString(file, true, false).trim()` and `node_tree_to_string` the `_node.txt` dump. The gate checks both
+dumps on the 1036 goldens (`KS_STRICT=1`), the 68 260 UTF-8 community `.java` files, the 19 116 golden mutations and
+the 20 000 lexer fuzz inputs, and the Java lexers' token lines on the same corpora (see "Java", "Oracle").
+
 Speed work therefore changes only three things, none of which changes a parser decision:
 
 - how the cursor and the markers are represented;
@@ -171,7 +176,20 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
   parser-partial goldens under `test.java.file` with "Unparsed tokens" over what is left, as
   `JavaParsingTestConfiguratorBase` runs them.
 - **Dumps.** `node_tree_to_string` prints the element types (`DOC_SPACE` as PSI's `WHITE_SPACE`); `psi_to_string` the
-  PSI class of each node and its `toString()` (`NodeKind::label`, from the goldens' 1036 dumps).
+  PSI class of each node and its `toString()` (`NodeKind::label`, from the goldens' 1036 dumps). Where a `toString()`
+  computes its text, the dump ports that computation: `PsiPackageStatementImpl.getPackageName()` is
+  `JavaSourceUtil.getReferenceText` (`push_reference_text`), the module name
+  `PsiJavaModuleReferenceElementImpl.getReferenceText()`, and a `PsiInlineDocTag` without a name prints `null`.
+- **Oracle.** `tools/java-oracle/JavaPsiOracle.java` runs IntelliJ 271's real Java PSI (java-syntax converted to PSI by
+  `PsiSyntaxBuilderFactoryImpl`, as the IDE does) from 23 IDE jars pinned by sha256 (`fetch-jars.sh`), on a
+  `CoreApplicationEnvironment` with the parsing part of `JavaCoreApplicationEnvironment`; a list line carries the
+  level (set as `FILE_LANGUAGE_LEVEL_KEY`, as the tests do), the entry and the trim of each file. It reproduces all
+  1036 vendored goldens of IntelliJ's Java parsing tests byte for byte, both dumps, which is what makes its dumps of
+  other corpora the reference. `JavaLexOracle.java` prints `JavaLexer`'s and `JavaDocLexer`'s tokens as
+  `ksdump --lex` does. Its cached dumps are listed in `tools/java-oracle/README.md`.
+- **Bench.** `ksdump --bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, every one a file). Java's parse counts
+  no nesting levels yet (see "Open items"), so the Java bench threads run on a 64 MB stack; `--check-bodies` still
+  refuses Java.
 
 ### Parser driver and chameleons (`psi-builder` `src/tree.rs`, `kotlin-syntax` `src/language.rs`)
 
@@ -398,6 +416,42 @@ comments; it walked into a doc comment's tokens before, no input had shown it). 
 (both kinds, 5.8 s; 17 604 of 20 000 with a `PsiErrorElement`) are cached and gated: 0 differing files of either dump,
 as for the 68 260 community files and the 19 116 golden mutations; goldens 1036/1036 `.txt` and `_node.txt`.
 
+### Java parse throughput (child of 75baa59), 2026-11-02
+
+`ksdump --bench` over the 68 263 community `.java` files (215.75 MB, `java-community-3caa0bf.list`, all parsed as files
+at `JDK_28`; the 3 that are not UTF-8 parse as bytes), alternating in each round with tree-sitter-java 0.23.5 on
+tree-sitter 0.25.10 (C core; `/tmp/ts-java-bench`, not committed: one `tree_sitter::Parser` per thread, the same files
+with the same CRLF normalization read before timing, `parse(text, None)`, fat LTO). Each run is `--repeat 3` and gives
+its median; one thread reports the summed parse time, 16 threads the wall time. 5 rounds of ours 1 thread,
+tree-sitter 1 thread, ours 16 threads, tree-sitter 16 threads, ours body-less 1 thread. The machine was heavily shared:
+load 14-37 (1-minute average at the start of each run), so these are lower bounds, not a quiet figure.
+
+| measure | rounds | median |
+|---|---|---|
+| parse, 1 thread | 59.3 / 54.5 / 51.6 / 54.5 / 52.7 MB/s | **54.5 MB/s** |
+| tree-sitter-java, 1 thread | 23.1 / 23.5 / 22.3 / 20.3 / 16.5 MB/s | **22.3 MB/s**; per-round ratio ours/tree-sitter 2.32-3.19, median **2.57×** |
+| parse, 16 threads | 545.7 / 498.9 / 591.3 / 480.7 / 437.4 MB/s | **498.9 MB/s** |
+| tree-sitter-java, 16 threads | 150.0 / 163.7 / 153.4 / 135.0 / 122.7 MB/s | **150.0 MB/s**; per-round ratio 3.05-3.85, median **3.56×** |
+| body-less parse, 1 thread | 98.7 / 97.5 / 22.9 / 93.4 / 63.2 MB/s | **93.4 MB/s** (round 3 ran during a load spike) |
+
+A single earlier pair at load 13.5: ours 62.2 MB/s 1 thread (`--repeat 3`), 680.0 MB/s 16 threads; tree-sitter-java
+25.3 and 175.7 MB/s right after it at load 23. The deterministic figures:
+
+- 85 270 521 nodes; 8.12 MB of tree per source MB; 20.6 bytes a node; 395.2 nodes per source KB; the largest tree
+  9.3 MB;
+- body-less: 38 558 344 nodes, 4.23 MB per source MB;
+- preorder walk 2.12 ns/node (5.2 % of the parse), linear scan 1.63 ns/node (4.0 %), `--walk` checksum
+  `c7e0ef63cac45006` (one run at load 13.5);
+- tree-sitter-java reports an error (`has_error`) in 1898 files; PSI has a `PsiErrorElement` in 990.
+
+Kotlin's 75.3 MB/s (c796e73) was measured at load 10-24 with one round at load 4 and is not comparable to these
+figures; a Java profile and a quiet round are open items. The bench change itself leaves the Kotlin parse alone:
+instructions retired per Kotlin parse round (half the difference of `--repeat 3` and `--repeat 1` processes, two runs
+each) 53.4 and 54.1 G on 75baa59, 54.7 and 53.9 G with the generic bench; `scripts/ab.sh`, 9 rounds at load 37-62,
+gave B/A 0.909 with per-round values from 9.0 to 58.6 MB/s, which resolves nothing.
+
+The gate passed.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -440,8 +494,14 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 - **Java nesting guard.** Java's recursive entry points (Pratt `parse`/`parse_unary`, `parse_statement`, JavaDoc
   `parse_data_item`, the declaration, reference and annotation recursion) count no levels: 20 000 nested parentheses
-  in an initializer overflow the stack. Until a guard like Kotlin's `enter_nesting` exists, `ksdump --bench` and
-  `--check-bodies` refuse Java files.
+  in an initializer overflow the stack. Until a guard like Kotlin's `enter_nesting` exists, `ksdump --bench` runs Java
+  on 64 MB thread stacks, `--check-bodies` refuses Java files, and a consumer cannot parse arbitrary Java on a 1 MB
+  stack.
+- **Java bodies.** `CODE_BLOCK` is a body and `--no-bodies` parses without it (measured above), but no check compares
+  `parse_body` of a Java body with the full parse, as `--check-bodies` does for Kotlin.
+- **Java speed.** One thread at 54.5 MB/s (load 14-37) against Kotlin's 75.3 (load 4-24): Java has 395 nodes per
+  source KB against Kotlin's 369 and no profile yet. Take one (`scripts/profile.py`) and a quiet round before speed
+  work; the Java builder path has no `--features counters` output.
 - **`JavaParserUtil.stoppingBuilder(builder, condition)`** is a `todo!` stub: no parser calls it, and porting it needs
   a condition adapter in `SyntaxTreeBuilder`, a check on every `token_type()`.
 

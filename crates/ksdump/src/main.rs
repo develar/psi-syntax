@@ -1,8 +1,10 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
-//! `--lex` and `--out` take Java files (`crates/java-syntax`); `--bench` and `--check-bodies` refuse one with exit
-//! status 2 before anything runs (Java's parse has no nesting guard yet, and its bodies are not checked).
+//! `--lex`, `--out` and `--bench` take Java files (`crates/java-syntax`); a `--bench` list is of one language, and
+//! `--check-bodies` and `--lex --bench` refuse a Java file with exit status 2 before anything runs (Java's bodies are
+//! not checked yet; the lexer bench is Kotlin's). Java's parse has no nesting guard yet, so its bench threads get a
+//! 64 MB stack (`JAVA_BENCH_STACK`).
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -16,6 +18,7 @@
 //!   scans its nodes in id order (`descendants`) reading kind and range, each timed apart; `--no-bodies` parses
 //!   with `ParseOptions { expand_bodies: false }`, as a declaration-only pass does;
 //!   `--repeat K` runs K rounds and prints their median; `--file-stats` writes one line per file of the last round.
+//!   A Java list line may carry `<TAB>LEVEL` (default `LanguageLevel.HIGHEST`); every file parses as a file.
 //!   Built with `--features alloc-stats`, a counting allocator adds the allocations per file (exact with one thread)
 //!   and the bytes allocated per source MB; it slows the parse, so time without it. With `--features counters`, the
 //!   builder's calls (`tt()`, lookahead, markers, rollbacks) and the tokens lexed, reused and skipped, per file token. Peak RSS: run under
@@ -44,8 +47,9 @@ use kotlin_syntax::dump::subtree_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
+use kotlin_syntax::psi_builder::{self, Language};
 use kotlin_syntax::tokens::TokenKind;
-use kotlin_syntax::{ElementType, FileKind, NodeId, ParseOptions, Parser, Tree};
+use kotlin_syntax::{FileKind, Kotlin, NodeId, ParseOptions, Parser};
 
 /// Counts every allocation of the process (`--features alloc-stats` only).
 #[cfg(feature = "alloc-stats")]
@@ -342,10 +346,17 @@ fn main() {
         }
         return;
     }
-    if (args.bench || args.check_bodies)
-        && let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java)
+    // A Java list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
+    let is_java = |line: &&String| Lang::of(line.split('\t').next().unwrap_or(line), args.lang) == Lang::Java;
+    let java_files = paths.iter().filter(is_java).count();
+    if (args.check_bodies || args.lex)
+        && let Some(java) = paths.iter().find(is_java)
     {
-        eprintln!("{java}: Java is not benchmarked or body-checked yet");
+        eprintln!("{java}: Java bodies are not checked and the Java lexer is not benchmarked yet");
+        std::process::exit(2);
+    }
+    if args.bench && java_files != 0 && java_files != paths.len() {
+        eprintln!("--bench: the list mixes Java and Kotlin files ({java_files} of {} are Java)", paths.len());
         std::process::exit(2);
     }
     let stdout = std::io::stdout();
@@ -357,7 +368,11 @@ fn main() {
     }
 
     if args.bench {
-        bench(&args, root, &paths, &mut stdout);
+        if java_files == 0 {
+            bench::<Kotlin>(&args, root, &paths, &mut stdout);
+        } else {
+            bench::<java_syntax::Java>(&args, root, &paths, &mut stdout);
+        }
         return;
     }
 
@@ -369,7 +384,7 @@ fn main() {
 
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
-    let mut parser = new_parser(args.nesting_limit);
+    let mut parser: Parser = new_parser(args.nesting_limit);
     let mut java_parser = java_syntax::Parser::new();
     for line in &paths {
         let path = line.split('\t').next().unwrap_or(line);
@@ -398,10 +413,51 @@ fn main() {
 }
 
 /// A source file of the bench, read before timing.
-struct Source {
+struct Source<K> {
     path: String,
-    kind: FileKind,
+    kind: K,
     text: Vec<u8>,
+}
+
+/// The stack of a Java bench thread: Java's parse counts no nesting levels yet (DESIGN, "Open items"), so it runs on
+/// a stack as large as the deepest corpus file could want; the pages are committed only as they are used.
+const JAVA_BENCH_STACK: usize = 64 << 20;
+
+/// What `--bench` asks of a language beyond `psi_builder::Language`.
+trait BenchLanguage: Language {
+    /// A bench thread's stack size, `None` for the default.
+    const STACK: Option<usize>;
+    /// The path of a list line and how its file is parsed.
+    fn file_kind(line: &str) -> (&str, Self::FileKind);
+    /// This thread's counters in `kotlin_syntax::counters::ALL` order, empty when the language has none.
+    fn counters() -> Vec<u64>;
+}
+
+impl BenchLanguage for Kotlin {
+    const STACK: Option<usize> = None;
+    fn file_kind(line: &str) -> (&str, FileKind) {
+        (line, FileKind::from_file_name(file_name(line)))
+    }
+    fn counters() -> Vec<u64> {
+        kotlin_syntax::counters::snapshot()
+    }
+}
+
+impl BenchLanguage for java_syntax::Java {
+    const STACK: Option<usize> = Some(JAVA_BENCH_STACK);
+    /// `PATH[<TAB>LEVEL]`: a file at LEVEL, else at `LanguageLevel.HIGHEST`.
+    fn file_kind(line: &str) -> (&str, java_syntax::FileKind) {
+        let mut columns = line.split('\t');
+        let path = columns.next().unwrap_or(line);
+        let level = columns
+            .next()
+            .and_then(java_syntax::LanguageLevel::from_name)
+            .unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+        (path, java_syntax::FileKind::file(level))
+    }
+    fn counters() -> Vec<u64> {
+        Vec::new()
+    }
 }
 
 /// What one file of a bench round measured.
@@ -448,18 +504,14 @@ fn alloc_snapshot() -> (u64, u64, i64) {
     (0, 0, 0)
 }
 
-fn element_index(kind: ElementType) -> u64 {
-    kind.index() as u64
-}
-
 /// The walk an extractor does: every node in preorder, its kind, its range and its depth; returns a checksum so it is
 /// not optimized away.
-fn walk(tree: &Tree) -> u64 {
+fn walk<L: Language>(tree: &psi_builder::Tree<L>) -> u64 {
     let mut acc = 0u64;
     for (id, depth) in tree.preorder(tree.root()) {
         let range = tree.range(id);
         acc = acc.wrapping_mul(0x100000001b3)
-            ^ element_index(tree.kind(id))
+            ^ tree.kind(id).index() as u64
             ^ ((range.start as u64) << 9)
             ^ ((range.end as u64) << 37)
             ^ depth as u64;
@@ -468,31 +520,31 @@ fn walk(tree: &Tree) -> u64 {
 }
 
 /// What a pass that needs no depth does: every node in id order (document order), its kind and its range.
-fn linear_walk(tree: &Tree) -> u64 {
+fn linear_walk<L: Language>(tree: &psi_builder::Tree<L>) -> u64 {
     let mut acc = 0u64;
     for id in tree.descendants(tree.root()) {
         let range = tree.range(id);
         acc = acc.wrapping_mul(0x100000001b3)
-            ^ element_index(tree.kind(id))
+            ^ tree.kind(id).index() as u64
             ^ ((range.start as u64) << 9)
             ^ ((range.end as u64) << 37);
     }
     acc
 }
 
-/// `--check-bodies`: returns the number of differing bodies.
 /// A parser, with `--nesting-limit` when given.
-fn new_parser(nesting_limit: Option<u32>) -> Parser {
-    let mut parser = Parser::new();
+fn new_parser<L: Language>(nesting_limit: Option<u32>) -> psi_builder::Parser<L> {
+    let mut parser = psi_builder::Parser::new();
     if let Some(limit) = nesting_limit {
         parser.set_nesting_limit(limit);
     }
     parser
 }
 
+/// `--check-bodies`: returns the number of differing bodies.
 fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdout: &mut impl Write) -> usize {
-    let mut parser = new_parser(nesting_limit);
-    let mut body_parser = new_parser(nesting_limit);
+    let mut parser: Parser = new_parser(nesting_limit);
+    let mut body_parser: Parser = new_parser(nesting_limit);
     let (mut bodies, mut differing) = (0usize, 0usize);
     for path in paths {
         let Some(text) = read_source(root, path, false) else { continue };
@@ -532,8 +584,8 @@ fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdou
     differing
 }
 
-fn bench_thread(
-    sources: &[Source],
+fn bench_thread<L: BenchLanguage>(
+    sources: &[Source<L::FileKind>],
     next: &AtomicUsize,
     do_walk: bool,
     options: ParseOptions,
@@ -541,13 +593,13 @@ fn bench_thread(
 ) -> ThreadResult {
     let mut r = ThreadResult::default();
     // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
-    let mut parser = new_parser(nesting_limit);
+    let mut parser = new_parser::<L>(nesting_limit);
     loop {
         let i = next.fetch_add(1, Ordering::Relaxed);
         let Some(source) = sources.get(i) else { break };
         let (calls0, allocated0, live0) = alloc_snapshot();
         let start = Instant::now();
-        let tree: Tree = parser.parse_with_options(&source.text, source.kind, options);
+        let tree = parser.parse_with_options(&source.text, source.kind, options);
         let parsed = Instant::now();
         let (calls1, allocated1, live1) = alloc_snapshot();
         let mut f = FileResult {
@@ -575,7 +627,7 @@ fn bench_thread(
         r.linear_walk_seconds += f.linear_walk_ns as f64 / 1e9;
         r.results.push((i, f));
     }
-    r.counters = kotlin_syntax::counters::snapshot();
+    r.counters = L::counters();
     r
 }
 
@@ -616,15 +668,12 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write
     }
 }
 
-fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
-    let sources: Vec<Source> = paths
+fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
+    let sources: Vec<Source<L::FileKind>> = paths
         .iter()
-        .filter_map(|p| {
-            read_source(root, p, args.trim).map(|text| Source {
-                path: p.clone(),
-                kind: FileKind::from_file_name(file_name(p)),
-                text,
-            })
+        .filter_map(|line| {
+            let (path, kind) = L::file_kind(line);
+            read_source(root, path, args.trim).map(|text| Source { path: path.to_owned(), kind, text })
         })
         .collect();
     let bytes: usize = sources.iter().map(|s| s.text.len()).sum();
@@ -642,9 +691,20 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
         let start = Instant::now();
         let per_thread: Vec<ThreadResult> = std::thread::scope(|scope| {
             let handles: Vec<_> = (0..threads)
-                .map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk, options, args.nesting_limit)))
+                .map(|_| {
+                    let mut thread = std::thread::Builder::new();
+                    if let Some(size) = L::STACK {
+                        thread = thread.stack_size(size);
+                    }
+                    thread.spawn_scoped(scope, || {
+                        bench_thread::<L>(&sources, &next, args.walk, options, args.nesting_limit)
+                    })
+                })
                 .collect();
-            handles.into_iter().map(|h| h.join().unwrap_or_default()).collect()
+            handles
+                .into_iter()
+                .map(|h| h.ok().and_then(|h| h.join().ok()).unwrap_or_default())
+                .collect()
         });
         let wall = start.elapsed().as_secs_f64();
         let mut results = vec![FileResult::default(); sources.len()];
@@ -703,7 +763,7 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
                 100.0 * linear_seconds / parse_seconds.max(1e-9)
             );
         }
-        if counters::ENABLED {
+        if counters::ENABLED && !per_thread.iter().all(|t| t.counters.is_empty()) {
             let mut total = vec![0u64; counters::ALL.len()];
             for t in &per_thread {
                 for (sum, c) in total.iter_mut().zip(&t.counters) {
@@ -749,7 +809,7 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
             live as f64 / bytes.max(1) as f64
         );
     }
-    if counters::ENABLED {
+    if counters::ENABLED && !last_counters.is_empty() {
         let file_tokens_at = counters::ALL.iter().position(|&c| c == AnyCounter::Builder(BuilderCounter::FileTokens));
         let file_tokens = file_tokens_at.map_or(0, |i| last_counters[i]).max(1) as f64;
         let _ = writeln!(stdout, "counters (last round; per file token):");
