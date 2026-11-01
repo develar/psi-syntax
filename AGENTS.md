@@ -41,6 +41,7 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
 | `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT`: parse-only throughput in MB/s |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
+| `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic |
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
@@ -63,6 +64,10 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 3. The lexer oracle: `java -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list LIST
    --root ROOT` prints a hash of each file's tokens (Kotlin, and KDoc inside each doc comment) as `ksdump --lex` does;
    `diff` the `cut -f1,2` of both. `scripts/lex-fuzz.py` makes mutated inputs for it.
+4. Error recovery: `scripts/parse-fuzz.py LIST ROOT OUT [SEED]` mutates files at token boundaries (punctuation,
+   keywords, modifiers) for the PSI oracle and `scripts/compare.py`; `scripts/lex-fuzz.py`'s inputs serve it too.
+   `scripts/psi-reduce.py FILE OUT` shrinks a differing file to a small input; a fixed case goes to `tests/oracle/`
+   (`NAME.kt` and the oracle's dump `NAME.txt`), which `cargo test --release --test oracle` compares.
 
 Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java says
 otherwise.
