@@ -152,17 +152,20 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `tt()`.
+    #[inline(always)]
     fn tt(&mut self) -> Option<TokenKind> {
         self.my_builder().get_token_type()
     }
 
     /// `_at(expectation)`: side-effect-free version of `at()`.
+    #[inline(always)]
     fn _at(&mut self, expectation: TokenKind) -> bool {
         let token = self.tt();
         self.token_matches(token, expectation)
     }
 
     /// `tokenMatches(token, expectation)`.
+    #[inline(always)]
     fn token_matches(&mut self, token: Option<TokenKind>, expectation: TokenKind) -> bool {
         if token == expectation {
             return true;
@@ -182,6 +185,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `at(expectation)`: like `_at`, remapping a soft keyword's identifier to the keyword or back when expected.
+    #[inline(always)]
     fn at(&mut self, expectation: TokenKind) -> bool {
         if self._at(expectation) {
             return true;
@@ -208,6 +212,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `_atSet(set)`: side-effect-free version of `atSet()`.
+    #[inline(always)]
     fn _at_set(&mut self, set: &TokenSet) -> bool {
         let token = self.tt();
         if set.contains(token) {

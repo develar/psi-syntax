@@ -363,6 +363,7 @@ impl PsiBuilderImpl {
     }
 
     /// `getTokenType()`: the current token after skipping whitespace and comments; `None` at the end.
+    #[inline(always)]
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
         crate::counters::add(crate::counters::Counter::RawTokenType, 1);
         if self.eof() {
@@ -570,6 +571,7 @@ impl PsiBuilderImpl {
     }
 
     /// `eof()`: skips whitespace and comments the first time after the cursor moved.
+    #[inline(always)]
     pub fn eof(&mut self) -> bool {
         if !self.token_type_checked {
             self.token_type_checked = true;
@@ -1264,6 +1266,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
 
     /// `getTokenType()`: `?` before `.` is `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
     /// The raw type and `getJoinedTokenType(raw, 1)` come from the delegate's per-position cache (`current_types`).
+    #[inline(always)]
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
         let (raw, joined) = self.delegate.current_types();
         if !self.join_complex_tokens() {
@@ -1454,6 +1457,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
 
     /// `eof()`: the stream's end, or the current offset at or beyond a truncation's end. Any truncation in the chain
     /// ends the stream, so the smallest non-negative `eof_position` (`min_eof`) decides.
+    #[inline(always)]
     pub fn eof(&mut self) -> bool {
         if self.imp.delegate.eof() {
             return true;
@@ -1465,6 +1469,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     }
 
     /// `getTokenType()`.
+    #[inline(always)]
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
         crate::counters::add(crate::counters::Counter::TokenType, 1);
         if self.top_truncated().is_some() && self.eof() {
