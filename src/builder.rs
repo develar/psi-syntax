@@ -352,6 +352,7 @@ impl PsiBuilderImpl {
 
     /// `getTokenType()`: the current token after skipping whitespace and comments; `None` at the end.
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
+        crate::counters::add(crate::counters::Counter::RawTokenType, 1);
         if self.eof() {
             return None;
         }
@@ -377,6 +378,8 @@ impl PsiBuilderImpl {
 
     /// `lookAhead(steps)`: the token `steps` non-whitespace tokens ahead of the current one.
     pub fn look_ahead(&self, mut steps: i32) -> Option<TokenKind> {
+        crate::counters::add(crate::counters::Counter::LookAhead, 1);
+        crate::counters::add(crate::counters::Counter::LookAheadSteps, steps.max(0) as u64);
         let mut cur = self.shift_over_whitespace_forward(self.current_lexeme);
         while steps > 0 {
             cur = self.shift_over_whitespace_forward(cur + 1);
@@ -394,6 +397,7 @@ impl PsiBuilderImpl {
 
     /// `rawLookup(steps)`: the raw token `steps` away from the current lexeme (whitespace and comments included).
     pub fn raw_lookup(&self, steps: i32) -> Option<TokenKind> {
+        crate::counters::add(crate::counters::Counter::RawLookup, 1);
         let cur = self.current_lexeme as i64 + steps as i64;
         if cur >= 0 && (cur as usize) < self.lexeme_count { Some(self.lex_types[cur as usize]) } else { None }
     }
@@ -432,6 +436,7 @@ impl PsiBuilderImpl {
 
     /// `advanceLexer()`.
     pub fn advance_lexer(&mut self) {
+        crate::counters::add(crate::counters::Counter::Advance, 1);
         if self.eof() {
             return;
         }
@@ -463,6 +468,7 @@ impl PsiBuilderImpl {
 
     /// `getTokenText()` as bytes.
     pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
+        crate::counters::add(crate::counters::Counter::TokenText, 1);
         if self.eof() {
             return None;
         }
@@ -473,6 +479,7 @@ impl PsiBuilderImpl {
 
     /// `mark()`.
     pub fn mark(&mut self) -> Marker {
+        crate::counters::add(crate::counters::Counter::Mark, 1);
         if !self.production.is_empty() {
             self.skip_whitespace();
         }
@@ -564,6 +571,7 @@ impl PsiBuilderImpl {
                 return Some(i);
             }
         }
+        crate::counters::add(crate::counters::Counter::IndexOfSearch, 1);
         let lexeme_index = self.marker(marker_id).get_lexeme_index(false);
         let from = self.find_marker_at_lexeme(lexeme_index).unwrap_or(0);
         (from..size).find(|&i| self.production[i] == id)
@@ -642,6 +650,7 @@ impl PsiBuilderImpl {
 
     /// `Marker.precede()`.
     pub fn precede(&mut self, marker: Marker) -> Marker {
+        crate::counters::add(crate::counters::Counter::Precede, 1);
         let lexeme_index = self.marker(marker.0).lexeme_index.max(0);
         let pre = self.create_marker(lexeme_index);
         self.add_before(pre.0, marker.0);
@@ -650,6 +659,7 @@ impl PsiBuilderImpl {
 
     /// `Marker.drop()`.
     pub fn drop(&mut self, marker: Marker) {
+        crate::counters::add(crate::counters::Counter::Drop, 1);
         self.drop_marker(marker.0);
     }
 
@@ -659,6 +669,11 @@ impl PsiBuilderImpl {
         if lexeme_index < 0 {
             return;
         }
+        crate::counters::add(crate::counters::Counter::Rollback, 1);
+        crate::counters::add(
+            crate::counters::Counter::RollbackLexemes,
+            self.current_lexeme.saturating_sub(lexeme_index as usize) as u64,
+        );
         if !self.tokens_to_restore_on_rollback.is_empty() {
             let restored = self.tokens_to_restore_on_rollback.split_off(&(lexeme_index as usize));
             for (index, element_type) in restored {
@@ -727,6 +742,7 @@ impl PsiBuilderImpl {
     }
 
     fn process_done(&mut self, marker_id: u32, error_message: Option<Cow<'static, str>>, before: Option<u32>) {
+        crate::counters::add(crate::counters::Counter::Done, 1);
         // doValidityChecks: "Marker already done." is only logged in Java.
         if let Some(message) = error_message {
             self.markers[marker_id as usize].message = Some(message);
@@ -1127,6 +1143,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
 
     /// `newlineBeforeCurrentToken()`: whether the whitespace before the current token (comments skipped) has a newline.
     pub fn newline_before_current_token(&mut self) -> bool {
+        crate::counters::add(crate::counters::Counter::NewlineBefore, 1);
         if !self.newlines_enabled.last().copied().unwrap_or(true) {
             return false;
         }
@@ -1384,6 +1401,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
 
     /// `getTokenType()`.
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
+        crate::counters::add(crate::counters::Counter::TokenType, 1);
         if self.top_truncated().is_some() && self.eof() {
             return None;
         }

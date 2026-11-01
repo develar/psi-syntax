@@ -271,6 +271,7 @@ impl TokenKind {
 
     /// `AbstractKotlinParsing.SOFT_KEYWORD_TEXTS.get(text)`: the soft keyword whose value is `text`.
     pub fn soft_keyword_by_text(text: &[u8]) -> Option<TokenKind> {
+        crate::counters::add(crate::counters::Counter::SoftKeywordLookup, 1);
         SOFT_KEYWORDS.iter().find(|t| t.value().is_some_and(|v| v.as_bytes() == text))
     }
 

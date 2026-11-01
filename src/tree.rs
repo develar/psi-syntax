@@ -135,6 +135,7 @@ impl Tree {
     ) -> Tree {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
         let lexed = lexer::tokenize(&text);
+        crate::counters::add(crate::counters::Counter::FileTokens, lexed.len() as u64);
         let mut data = TreeData::default();
         let mut pending = Vec::new();
 
@@ -170,6 +171,24 @@ impl Tree {
 
     pub fn is_empty(&self) -> bool {
         self.data.nodes.is_empty()
+    }
+
+    /// The heap bytes this tree holds: its copy of the text, the node arena and the error list with their owned
+    /// messages, by capacity. What a consumer pays to keep the tree; `ksdump --bench` reports it per source MB.
+    pub fn heap_bytes(&self) -> usize {
+        let messages: usize = self
+            .data
+            .errors
+            .iter()
+            .map(|(_, m)| match m {
+                Cow::Borrowed(_) => 0,
+                Cow::Owned(s) => s.capacity(),
+            })
+            .sum();
+        self.text.len()
+            + self.data.nodes.capacity() * size_of::<Node>()
+            + self.data.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
+            + messages
     }
 
     fn node(&self, id: NodeId) -> &Node {
@@ -324,13 +343,19 @@ impl Iterator for Preorder<'_> {
 
 /// Expands one chameleon: parses its text with a new builder and appends the result under its node.
 fn expand(text: &Arc<[u8]>, file_tokens: &Lexed, data: &mut TreeData, p: Pending, pending: &mut Vec<Pending>) {
+    use crate::counters::{Counter, add};
     let len = p.end - p.start;
     match p.kind {
         LazyKind::Block | LazyKind::Lambda => {
+            add(if p.kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
             let (types, starts, file_token) = match reusable_tokens(file_tokens, &p) {
-                Some(tokens) => tokens,
+                Some(tokens) => {
+                    add(Counter::ReusedTokens, tokens.0.len() as u64);
+                    tokens
+                }
                 None => {
                     let lexed = lexer::tokenize(&text[p.start..p.end]);
+                    add(Counter::RelexedTokens, lexed.len() as u64);
                     (lexed.types, lexed.starts, None)
                 }
             };
@@ -345,12 +370,16 @@ fn expand(text: &Arc<[u8]>, file_tokens: &Lexed, data: &mut TreeData, p: Pending
         }
         LazyKind::KDoc => {
             let (types, starts) = crate::kdoc::lexer::tokenize(&text[p.start..p.end]);
+            add(Counter::KDocChameleons, 1);
+            add(Counter::KDocTokens, types.len() as u64);
             let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, types, starts, None);
             crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
             builder.build_tree(data, Some(p.node), pending);
         }
         LazyKind::KDocLink => {
             let lexed = lexer::tokenize(&text[p.start..p.end]);
+            add(Counter::KDocLinkChameleons, 1);
+            add(Counter::RelexedTokens, lexed.len() as u64);
             let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, lexed.types, lexed.starts, None);
             crate::kdoc::parser::parse_markdown_link(ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK), &mut builder);
             builder.build_tree(data, Some(p.node), pending);

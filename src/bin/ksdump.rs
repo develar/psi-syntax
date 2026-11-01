@@ -2,8 +2,16 @@
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
-//! - `ksdump --bench --list LIST --root ROOT`: reads every file, then parses them all on one thread and prints the
-//!   files, megabytes, seconds and MB/s of the parse alone.
+//! - `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--repeat K] [--file-stats OUT.tsv]`: reads
+//!   every file, then parses them all and prints the files, megabytes, seconds and MB/s of the parse alone (the first
+//!   line, one per round), then the tree's heap bytes per source MB. `--threads N` parses on N threads taking files
+//!   from a shared counter, as an indexer does, and prints the wall MB/s and each thread's own parse MB/s; `--walk`
+//!   also walks every tree in preorder reading each node's kind and range, as an extractor does, timed apart;
+//!   `--repeat K` runs K rounds and prints their median; `--file-stats` writes one line per file of the last round.
+//!   Built with `--features alloc-stats`, a counting allocator adds the allocations per file (exact with one thread)
+//!   and the bytes allocated per source MB; it slows the parse, so time without it. With `--features counters`, the
+//!   builder's calls (`tt()`, lookahead, markers, rollbacks) and the tokens lexed, reused and skipped, per file token. Peak RSS: run under
+//!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
 //! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it.
 //!
 //! The text is read as bytes with CRLF and CR converted to LF, as the oracles do; `--trim` also trims it (what the
@@ -12,19 +20,27 @@
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
 
+use kotlin_syntax::counters::{self, Counter};
 use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::tokens::TokenKind;
-use kotlin_syntax::{FileKind, Tree};
+use kotlin_syntax::{ElementType, FileKind, Tree};
+
+/// Counts every allocation of the process (`--features alloc-stats` only).
+#[cfg(feature = "alloc-stats")]
+#[global_allocator]
+static GLOBAL: stats_alloc::StatsAlloc<std::alloc::System> = stats_alloc::StatsAlloc::system();
 
 fn usage() -> ! {
     eprintln!(
         "usage:\n  \
          ksdump --list LIST --root ROOT --out OUT [--trim]   write OUT/<path>.psi.txt per listed file\n  \
-         ksdump --bench --list LIST --root ROOT [--trim]     parse-only throughput, one thread\n  \
+         ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--repeat K] [--file-stats OUT]\n  \
+                                                             parse throughput, tree bytes, walk cost\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them"
     );
     std::process::exit(2)
@@ -39,10 +55,16 @@ struct Args {
     lex: bool,
     dump: bool,
     trim: bool,
+    threads: usize,
+    walk: bool,
+    repeat: usize,
+    file_stats: Option<PathBuf>,
 }
 
 fn parse_args() -> Args {
-    let mut args = Args::default();
+    let mut args = Args { threads: 1, repeat: 1, ..Args::default() };
+    let count =
+        |v: Option<String>| v.and_then(|v| v.parse::<usize>().ok()).filter(|&n| n > 0).unwrap_or_else(|| usage());
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
         match a.as_str() {
@@ -53,6 +75,10 @@ fn parse_args() -> Args {
             "--lex" => args.lex = true,
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
+            "--threads" => args.threads = count(it.next()),
+            "--walk" => args.walk = true,
+            "--repeat" => args.repeat = count(it.next()),
+            "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             _ => usage(),
         }
     }
@@ -173,27 +199,7 @@ fn main() {
     }
 
     if args.bench {
-        let sources: Vec<(FileKind, Vec<u8>)> = paths
-            .iter()
-            .filter_map(|p| read_source(root, p, args.trim).map(|t| (FileKind::from_file_name(file_name(p)), t)))
-            .collect();
-        let bytes: usize = sources.iter().map(|(_, t)| t.len()).sum();
-        let start = Instant::now();
-        let mut nodes = 0usize;
-        for (kind, text) in &sources {
-            nodes += Tree::parse(text, *kind).len();
-        }
-        let seconds = start.elapsed().as_secs_f64();
-        let mb = bytes as f64 / 1e6;
-        let _ = writeln!(
-            stdout,
-            "files {}  MB {:.2}  seconds {:.3}  MB/s {:.1}  nodes {}",
-            sources.len(),
-            mb,
-            seconds,
-            mb / seconds.max(1e-9),
-            nodes
-        );
+        bench(&args, root, &paths, &mut stdout);
         return;
     }
 
@@ -218,4 +224,269 @@ fn main() {
         }
     }
     let _ = writeln!(stdout, "dumped {} of {} files to {}", paths.len() - failed, paths.len(), out.display());
+}
+
+/// A source file of the bench, read before timing.
+struct Source {
+    path: String,
+    kind: FileKind,
+    text: Vec<u8>,
+}
+
+/// What one file of a bench round measured.
+#[derive(Default, Clone, Copy)]
+struct FileResult {
+    parse_ns: u64,
+    walk_ns: u64,
+    nodes: usize,
+    tree_bytes: usize,
+    /// Allocations and reallocations during `Tree::parse` (`alloc-stats`; exact with one thread).
+    allocs: u64,
+    /// Bytes allocated during `Tree::parse`, and the bytes still live when it returns (the tree).
+    alloc_bytes: u64,
+    live_bytes: i64,
+}
+
+/// What one thread of a bench round measured.
+#[derive(Default)]
+struct ThreadResult {
+    bytes: usize,
+    files: usize,
+    parse_seconds: f64,
+    walk_seconds: f64,
+    checksum: u64,
+    results: Vec<(usize, FileResult)>,
+    /// This thread's `kotlin_syntax::counters` (`--features counters`).
+    counters: Vec<u64>,
+}
+
+#[cfg(feature = "alloc-stats")]
+fn alloc_snapshot() -> (u64, u64, i64) {
+    let s = GLOBAL.stats();
+    // A growing realloc counts its growth in `bytes_allocated`, a shrinking one in `bytes_deallocated`.
+    let calls = (s.allocations + s.reallocations) as u64;
+    let allocated = s.bytes_allocated as u64;
+    let live = s.bytes_allocated as i64 - s.bytes_deallocated as i64;
+    (calls, allocated, live)
+}
+
+#[cfg(not(feature = "alloc-stats"))]
+fn alloc_snapshot() -> (u64, u64, i64) {
+    (0, 0, 0)
+}
+
+fn element_index(kind: ElementType) -> u64 {
+    match kind {
+        ElementType::Token(t) => t as u64,
+        ElementType::Node(n) => 256 + n as u64,
+    }
+}
+
+/// The walk an extractor does: every node in preorder, its kind and its range; returns a checksum so it is not
+/// optimized away.
+fn walk(tree: &Tree) -> u64 {
+    let mut acc = 0u64;
+    for (id, depth) in tree.preorder(tree.root()) {
+        let range = tree.range(id);
+        acc = acc.wrapping_mul(0x100000001b3)
+            ^ element_index(tree.kind(id))
+            ^ ((range.start as u64) << 9)
+            ^ ((range.end as u64) << 37)
+            ^ depth as u64;
+    }
+    acc
+}
+
+fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool) -> ThreadResult {
+    let mut r = ThreadResult::default();
+    loop {
+        let i = next.fetch_add(1, Ordering::Relaxed);
+        let Some(source) = sources.get(i) else { break };
+        let (calls0, allocated0, live0) = alloc_snapshot();
+        let start = Instant::now();
+        let tree = Tree::parse(&source.text, source.kind);
+        let parsed = Instant::now();
+        let (calls1, allocated1, live1) = alloc_snapshot();
+        let mut f = FileResult {
+            parse_ns: (parsed - start).as_nanos() as u64,
+            nodes: tree.len(),
+            tree_bytes: tree.heap_bytes(),
+            allocs: calls1 - calls0,
+            alloc_bytes: allocated1 - allocated0,
+            live_bytes: live1 - live0,
+            ..FileResult::default()
+        };
+        if do_walk {
+            let walk_start = Instant::now();
+            r.checksum ^= walk(&tree);
+            f.walk_ns = walk_start.elapsed().as_nanos() as u64;
+        }
+        drop(tree);
+        r.bytes += source.text.len();
+        r.files += 1;
+        r.parse_seconds += f.parse_ns as f64 / 1e9;
+        r.walk_seconds += f.walk_ns as f64 / 1e9;
+        r.results.push((i, f));
+    }
+    r.counters = kotlin_syntax::counters::snapshot();
+    r
+}
+
+fn median(values: &mut [f64]) -> f64 {
+    values.sort_by(f64::total_cmp);
+    if values.is_empty() { 0.0 } else { values[values.len() / 2] }
+}
+
+fn percentile(sorted: &[u64], p: f64) -> u64 {
+    if sorted.is_empty() { 0 } else { sorted[((sorted.len() - 1) as f64 * p).round() as usize] }
+}
+
+fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
+    let sources: Vec<Source> = paths
+        .iter()
+        .filter_map(|p| {
+            read_source(root, p, args.trim).map(|text| Source {
+                path: p.clone(),
+                kind: FileKind::from_file_name(file_name(p)),
+                text,
+            })
+        })
+        .collect();
+    let bytes: usize = sources.iter().map(|s| s.text.len()).sum();
+    let mb = bytes as f64 / 1e6;
+    let threads = args.threads;
+    if cfg!(feature = "alloc-stats") {
+        let _ = writeln!(stdout, "alloc-stats: timings include the counting allocator");
+    }
+    let mut round_mbs = Vec::new();
+    let mut last: Vec<FileResult> = Vec::new();
+    let mut last_counters: Vec<u64> = Vec::new();
+    for round in 1..=args.repeat {
+        let next = AtomicUsize::new(0);
+        let start = Instant::now();
+        let per_thread: Vec<ThreadResult> = std::thread::scope(|scope| {
+            let handles: Vec<_> =
+                (0..threads).map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk))).collect();
+            handles.into_iter().map(|h| h.join().unwrap_or_default()).collect()
+        });
+        let wall = start.elapsed().as_secs_f64();
+        let mut results = vec![FileResult::default(); sources.len()];
+        for t in &per_thread {
+            for &(i, f) in &t.results {
+                results[i] = f;
+            }
+        }
+        let nodes: usize = results.iter().map(|f| f.nodes).sum();
+        let parse_seconds: f64 = per_thread.iter().map(|t| t.parse_seconds).sum();
+        // One thread: the summed parse time, as before; more: the wall time of the round.
+        let seconds = if threads == 1 { parse_seconds } else { wall };
+        let mbs = mb / seconds.max(1e-9);
+        round_mbs.push(mbs);
+        let prefix = if args.repeat > 1 { format!("round {round}  ") } else { String::new() };
+        let _ = writeln!(
+            stdout,
+            "{prefix}files {}  MB {:.2}  seconds {:.3}  MB/s {:.1}  nodes {}",
+            sources.len(),
+            mb,
+            seconds,
+            mbs,
+            nodes
+        );
+        if threads > 1 {
+            let mut each: Vec<f64> =
+                per_thread.iter().map(|t| t.bytes as f64 / 1e6 / t.parse_seconds.max(1e-9)).collect();
+            let min = each.iter().copied().fold(f64::INFINITY, f64::min);
+            let max = each.iter().copied().fold(0.0, f64::max);
+            let _ = writeln!(
+                stdout,
+                "  threads {threads}  wall {wall:.3}  parse-busy {parse_seconds:.3}  per-thread parse MB/s min {min:.1} \
+                 median {:.1} max {max:.1}  sum {:.1}",
+                median(&mut each),
+                each.iter().sum::<f64>()
+            );
+        }
+        if args.walk {
+            let walk_seconds: f64 = per_thread.iter().map(|t| t.walk_seconds).sum();
+            let checksum = per_thread.iter().fold(0, |a, t| a ^ t.checksum);
+            let _ = writeln!(
+                stdout,
+                "  walk seconds {walk_seconds:.3} (summed over threads)  MB/s {:.1}  ns/node {:.2}  of parse {:.1}%  \
+                 checksum {checksum:x}",
+                mb / walk_seconds.max(1e-9),
+                walk_seconds * 1e9 / nodes.max(1) as f64,
+                100.0 * walk_seconds / parse_seconds.max(1e-9)
+            );
+        }
+        if counters::ENABLED {
+            let mut total = vec![0u64; Counter::ALL.len()];
+            for t in &per_thread {
+                for (sum, c) in total.iter_mut().zip(&t.counters) {
+                    *sum += c;
+                }
+            }
+            last_counters = total;
+        }
+        last = results;
+    }
+    if args.repeat > 1 {
+        let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
+    }
+
+    let nodes: usize = last.iter().map(|f| f.nodes).sum();
+    let tree_bytes: usize = last.iter().map(|f| f.tree_bytes).sum();
+    let max_tree = last.iter().map(|f| f.tree_bytes).max().unwrap_or(0);
+    let _ = writeln!(
+        stdout,
+        "tree bytes {tree_bytes}  per source MB {:.2} MB  bytes/node {:.1}  nodes per source KB {:.1}  largest tree {:.1} MB",
+        tree_bytes as f64 / bytes.max(1) as f64,
+        tree_bytes as f64 / nodes.max(1) as f64,
+        nodes as f64 * 1e3 / bytes.max(1) as f64,
+        max_tree as f64 / 1e6
+    );
+    if cfg!(feature = "alloc-stats") {
+        let mut allocs: Vec<u64> = last.iter().map(|f| f.allocs).collect();
+        allocs.sort_unstable();
+        let total: u64 = allocs.iter().sum();
+        let allocated: u64 = last.iter().map(|f| f.alloc_bytes).sum();
+        let live: i64 = last.iter().map(|f| f.live_bytes).sum();
+        let exact = if threads == 1 { "" } else { " (other threads' allocations mixed in: use --threads 1)" };
+        let _ = writeln!(
+            stdout,
+            "allocations {total}  per file median {} p90 {} p99 {} max {}  per source KB {:.2}  allocated bytes per \
+             source byte {:.2}  live after parse per source byte {:.2}{exact}",
+            percentile(&allocs, 0.5),
+            percentile(&allocs, 0.9),
+            percentile(&allocs, 0.99),
+            allocs.last().copied().unwrap_or(0),
+            total as f64 * 1e3 / bytes.max(1) as f64,
+            allocated as f64 / bytes.max(1) as f64,
+            live as f64 / bytes.max(1) as f64
+        );
+    }
+    if counters::ENABLED {
+        let file_tokens = last_counters[Counter::FileTokens as usize].max(1) as f64;
+        let _ = writeln!(stdout, "counters (last round; per file token):");
+        for (k, v) in Counter::ALL.iter().zip(&last_counters) {
+            let _ = writeln!(stdout, "  {:<20} {:>12}  {:>8.3}", format!("{k:?}"), v, *v as f64 / file_tokens);
+        }
+    }
+    if let Some(out) = &args.file_stats {
+        let mut text = String::from("path\tbytes\tparse_us\twalk_us\tnodes\ttree_bytes\tallocs\talloc_bytes\n");
+        for (s, f) in sources.iter().zip(&last) {
+            text.push_str(&format!(
+                "{}\t{}\t{:.1}\t{:.1}\t{}\t{}\t{}\t{}\n",
+                s.path,
+                s.text.len(),
+                f.parse_ns as f64 / 1e3,
+                f.walk_ns as f64 / 1e3,
+                f.nodes,
+                f.tree_bytes,
+                f.allocs,
+                f.alloc_bytes
+            ));
+        }
+        if let Err(e) = std::fs::write(out, text) {
+            eprintln!("cannot write {}: {e}", out.display());
+        }
+    }
 }

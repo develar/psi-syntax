@@ -39,7 +39,8 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 | `src/tree.rs` | the lossless tree: one arena (`Vec`) of nodes, `u32` ids, every node a kind and a byte range, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. The public API consumers read: `Tree::parse(text, FileKind::{Kt,Kts})`, `root()`, `kind()`, `range()`, `children()`, `parent()`, `text()`, `first_child_of_kind()`, an iterator over tokens. `Send + Sync`, no lifetimes in the stored tree |
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
-| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT`: parse-only throughput in MB/s |
+| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk, tree bytes per source MB; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token |
+| `src/counters.rs` | per-thread event counters (cursor calls, markers, rollbacks, lexed/reused/skipped tokens) behind the `counters` feature; without it every `add` compiles to nothing |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic |
@@ -97,6 +98,9 @@ otherwise.
   input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes) and never panics.
 - Speed is a goal: no allocation per token beyond the arena, no `String` per leaf (texts are ranges), no recursion
   depth that a 4 MB file of nested expressions can overflow without a guard (PSI's own limits apply).
+- Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
+  the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
+  `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy, `KS_STRICT=1 cargo test --release`, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle. A faster change that fails it is
   not a change.

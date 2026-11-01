@@ -2,6 +2,7 @@
 //! PSI builds, `dump::psi_to_string` prints what `DebugUtil.psiToString(file, true, false)` prints.
 
 pub mod builder;
+pub mod counters;
 pub mod dump;
 pub mod kdoc;
 pub mod lexer;

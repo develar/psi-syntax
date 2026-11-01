@@ -9,6 +9,14 @@ repository = "https://github.com/develar/kotlin-syntax"
 publish = false
 
 [dependencies]
+# Only `ksdump --bench` with `--features alloc-stats`: a counting global allocator (allocations per file); it is
+# opt-in because its atomic counters slow the parse and contend across threads.
+stats_alloc = { version = "0.1.10", optional = true }
+
+[features]
+alloc-stats = ["dep:stats_alloc"]
+# `counters::add` counts the builder's cursor calls, markers and lexed tokens per thread (`ksdump --bench` prints them).
+counters = []
 
 [dev-dependencies]
 
