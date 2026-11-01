@@ -1,0 +1,1 @@
+switch (i) { case 1 -> 1; default -> 2; }

@@ -1,0 +1,1 @@
+(f ? list.map(String::length) : Collections.emptyList())::iterator

@@ -1,0 +1,1 @@
+{ @ANNOTATION A(10) }

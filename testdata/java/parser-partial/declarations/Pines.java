@@ -1,0 +1,1 @@
+{ class A<T extends List<String>> extends List<List<Integer>> { } }

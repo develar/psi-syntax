@@ -1,0 +1,1 @@
+{ Class foo() default String.class; }

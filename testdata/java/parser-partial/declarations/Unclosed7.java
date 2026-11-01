@@ -1,0 +1,1 @@
+{ void f() default {return 42;} }

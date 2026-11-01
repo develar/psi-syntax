@@ -1,0 +1,1 @@
+NamedRecord(String s) name

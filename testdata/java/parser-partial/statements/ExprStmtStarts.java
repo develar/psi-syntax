@@ -1,0 +1,1 @@
+col < allCells[0]

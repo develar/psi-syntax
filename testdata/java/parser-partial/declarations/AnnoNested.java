@@ -1,0 +1,1 @@
+{ @interface Inner { String bar () default "<unspecified>"; } }

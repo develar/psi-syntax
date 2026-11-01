@@ -1,0 +1,1 @@
+{ @Nullable <T> T bar() {} }

@@ -1,0 +1,1 @@
+yield switch (0) { default: yield 42; };

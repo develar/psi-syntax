@@ -1,0 +1,1 @@
+case R(int i) when true -> {}

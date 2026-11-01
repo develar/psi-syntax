@@ -1,0 +1,2 @@
+{ <X IntelliJIdeaRulezz>
+ String s = ""; }

@@ -1,0 +1,1 @@
+C.<T extends S>foo()

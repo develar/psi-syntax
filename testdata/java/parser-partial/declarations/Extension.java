@@ -1,0 +1,1 @@
+{ default int f() throws E { return 42; } }

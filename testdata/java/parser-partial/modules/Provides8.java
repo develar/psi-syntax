@@ -1,0 +1,1 @@
+module M { provides Spi with Impl1, Impl2, }

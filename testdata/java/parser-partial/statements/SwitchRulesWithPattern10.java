@@ -1,0 +1,1 @@
+case when(boolean when) when when -> {}

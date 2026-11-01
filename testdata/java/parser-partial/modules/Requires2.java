@@ -1,0 +1,1 @@
+module M { requires transitive static X; }

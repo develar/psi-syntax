@@ -1,0 +1,1 @@
+module M { uses java.nio.file.spi.FileSystemProvider; }

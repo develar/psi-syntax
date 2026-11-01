@@ -1,0 +1,1 @@
+x instanceof @Ann() final Foo v

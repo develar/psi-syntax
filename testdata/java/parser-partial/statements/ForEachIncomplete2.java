@@ -1,0 +1,1 @@
+for (Point(var x, var y) : ) ;

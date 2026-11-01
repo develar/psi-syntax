@@ -1,0 +1,3 @@
+module X {
+ some junk
+}

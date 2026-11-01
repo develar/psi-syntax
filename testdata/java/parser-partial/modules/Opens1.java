@@ -1,0 +1,1 @@
+module M { opens pkg to A, B; }

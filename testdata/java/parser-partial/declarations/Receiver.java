@@ -1,0 +1,1 @@
+{ void m1(C this);  void m2(T T.this);  void m3(X Y.Z);  T f1 = (T this) -> { };  T f2 = (T T.this) -> { }; }

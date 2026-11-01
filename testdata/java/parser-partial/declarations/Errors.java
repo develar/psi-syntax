@@ -1,0 +1,1 @@
+{ public static <error descr="2">protected int f1 = 0; }

@@ -1,0 +1,1 @@
+(new O()).<T>super()

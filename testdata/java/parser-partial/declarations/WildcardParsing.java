@@ -1,0 +1,1 @@
+{ List<? extends B> x(Collection<? super B> x); }

@@ -1,0 +1,1 @@
+case A when when when.foo() -> {}

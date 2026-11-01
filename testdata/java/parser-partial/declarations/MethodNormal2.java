@@ -1,0 +1,1 @@
+{ default public void f() { } }

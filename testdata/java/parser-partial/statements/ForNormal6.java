@@ -1,0 +1,1 @@
+for (getI(getS()); a; b = true)
