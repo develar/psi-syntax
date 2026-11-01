@@ -1,0 +1,17 @@
+kotlin-syntax
+Copyright 2026 Vladimir Krivosheev
+
+This product is a Rust port of the Kotlin compiler's lexer and parser:
+compiler/psi/parser/src/org/jetbrains/kotlin/lexer/Kotlin.flex and
+compiler/psi/parser/src/org/jetbrains/kotlin/parsing/*.java of
+https://github.com/JetBrains/kotlin at commit 9180ce6a7a7d3627f88b424717583f28ddca052d (Kotlin 2.4.21),
+and of the parts of IntelliJ Platform's PsiBuilderImpl the Kotlin parser relies on
+(https://github.com/JetBrains/intellij-community, platform/core-impl/src/com/intellij/lang/impl/PsiBuilderImpl.java).
+
+Kotlin
+Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
+Licensed under the Apache License, Version 2.0.
+
+IntelliJ Platform
+Copyright 2000-2026 JetBrains s.r.o. and contributors.
+Licensed under the Apache License, Version 2.0.
