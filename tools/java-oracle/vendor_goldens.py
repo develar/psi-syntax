@@ -3,9 +3,9 @@
 
     tools/java-oracle/vendor_goldens.py [--repo IDEA_CHECKOUT] [--rev REV] [--out testdata/java]
 
-Reads community/java/java-tests/testData/psi/parser-{full,partial} and the test classes that use
-them (community/java/java-frontback-tests/testSrc/com/intellij/java/parser and the concrete
-classes in community/java/java-tests/testSrc/com/intellij/java/parser) at REV with `git show`,
+Reads java/java-tests/testData/psi/parser-{full,partial} and the test classes that use
+them (java/java-frontback-tests/testSrc/com/intellij/java/parser and the concrete
+classes in java/java-tests/testSrc/com/intellij/java/parser) at REV with `git show`,
 never from the working tree.
 
 For every test method that checks a golden it writes, under OUT/<parser-full|parser-partial>/<dir>/:
@@ -22,18 +22,19 @@ and one manifest line `PATH<TAB>LEVEL<TAB>ENTRY<TAB>TRIM<TAB>TEST` in OUT/manife
 JShell goldens (parser-full/jshell, JShellParserDefinition) are not vendored.
 """
 
+import pathlib
 import argparse
 import os
 import re
 import subprocess
 import sys
 
-REV = "3d034e2526507767a19528888066e47ad2898bb1"
-DATA = "community/java/java-tests/testData/psi/"
-ABSTRACT = "community/java/java-frontback-tests/testSrc/com/intellij/java/parser/"
-LEVELS = "community/java/java-syntax/src/com/intellij/pom/java/LanguageLevel.kt"
+REV = "decc943674edfe7ecc620d2d60b61be38f876994"
+DATA = "java/java-tests/testData/psi/"
+ABSTRACT = "java/java-frontback-tests/testSrc/com/intellij/java/parser/"
+LEVELS = "java/java-syntax/src/com/intellij/pom/java/LanguageLevel.kt"
 
-# The concrete partial tests (community/java/java-tests/testSrc/.../parser/partial/*Test.java)
+# The concrete partial tests (java/java-tests/testSrc/.../parser/partial/*Test.java)
 # implement each abstract helper with one parser call; ENTRY names that call.
 PARTIAL_ENTRIES = {
     ("AbstractBasicAnnotationParserTest", "doParserTest", 1): lambda a: "annotations",
@@ -188,7 +189,7 @@ def test_name(method):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--repo", default="/Users/develar/projects/idea-1")
+    parser.add_argument("--repo", default=str(pathlib.Path.home() / ".cache/psi-syntax/intellij-community"))
     parser.add_argument("--rev", default=REV)
     parser.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "..", "testdata", "java"))
     options = parser.parse_args()

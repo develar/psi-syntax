@@ -1,9 +1,9 @@
 # Java PSI oracle
 
 IntelliJ's own Java parser, run on a list of files, printing what its Java parsing tests compare: the
-reference for the Rust port of `community/java/java-syntax`. The parser is the one IntelliJ 2027.1
-(build 271.SNAPSHOT) ships, built from the IntelliJ monorepo at
-`3d034e2526507767a19528888066e47ad2898bb1`: java-syntax on the platform syntax builder, converted to
+reference for the Rust port of `java/java-syntax`. The parser is the one IntelliJ 2027.1
+(build 271.SNAPSHOT) ships, whose java-syntax and platform/syntax equal JetBrains/intellij-community at
+`decc943674edfe7ecc620d2d60b61be38f876994`: java-syntax on the platform syntax builder, converted to
 real PSI by `PsiSyntaxBuilderFactoryImpl`, the same path the IDE takes. The dump is not imitated: it
 is `DebugUtil.psiToString` of the `PsiJavaFile`.
 
@@ -11,7 +11,7 @@ is `DebugUtil.psiToString` of the `PsiJavaFile`.
 |---|---|
 | `JavaPsiOracle.java` | the oracle: a single-file `java` program on the jars of `jars.sha256` |
 | `fetch-jars.sh` | copies those 23 jars from `/Applications/Idea.app/Contents` to `~/.cache/psi-syntax/java-oracle/lib` and checks their sha256, so an IDE update cannot change the oracle silently |
-| `vendor_goldens.py` | writes `testdata/java/` from the monorepo at the revision (`git cat-file`, never the working tree) |
+| `vendor_goldens.py` | writes `testdata/java/` from intellij-community at the revision (`git cat-file`, never the working tree) |
 | `check-goldens.py` | compares an oracle run over `testdata/java/manifest.tsv` with the goldens, byte for byte |
 | `unmarked.py` | the tracked `.java` files of a checkout without IDE test markup, as psi-tools' `unmarked.py` does for Kotlin |
 | `mutate.py` | one-place mutations of the PSI-clean goldens, after psi-tools' `mutate.js` |

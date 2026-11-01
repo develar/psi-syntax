@@ -1,9 +1,9 @@
 # Java parsing goldens
 
-IntelliJ's Java parsing goldens from `community/java/java-tests/testData/psi/parser-{full,partial}` of
-the IntelliJ monorepo at `3d034e2526507767a19528888066e47ad2898bb1`, written by
-`tools/java-oracle/vendor_goldens.py` (Apache 2.0, as the monorepo). One entry per test method of
-`community/java/java-frontback-tests/testSrc/com/intellij/java/parser/**/AbstractBasic*Test.java`
+IntelliJ's Java parsing goldens from `java/java-tests/testData/psi/parser-{full,partial}` of
+JetBrains/intellij-community at `decc943674edfe7ecc620d2d60b61be38f876994`, written by
+`tools/java-oracle/vendor_goldens.py` (Apache 2.0, as intellij-community). One entry per test method of
+`java/java-frontback-tests/testSrc/com/intellij/java/parser/**/AbstractBasic*Test.java`
 that compares a dump: 504 parser-full, 532 parser-partial.
 
 | file | is |

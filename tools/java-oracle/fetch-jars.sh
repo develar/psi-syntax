@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copies the jars the Java PSI oracle runs on from an IntelliJ installation into the cache and checks
-# them against jars.sha256 (IntelliJ 2027.1, build 271.SNAPSHOT, built from the IntelliJ monorepo at
-# 3d034e2526507767a19528888066e47ad2898bb1). A mismatch means the installation changed: the dumps
+# them against jars.sha256 (IntelliJ 2027.1, build 271.SNAPSHOT, whose java-syntax and platform/syntax equal JetBrains/intellij-community at
+# decc943674edfe7ecc620d2d60b61be38f876994). A mismatch means the installation changed: the dumps
 # would come from another parser, so the script refuses.
 #
 #   tools/java-oracle/fetch-jars.sh [IDEA_CONTENTS] [LIB_DIR]

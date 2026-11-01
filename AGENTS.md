@@ -37,10 +37,10 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 
 ### Java (not ported yet)
 
-IntelliJ at 3d034e2526507767a19528888066e47ad2898bb1: `community/java/java-syntax` (`_JavaLexer.flex`, `_JavaDocLexer.flex`,
+JetBrains/intellij-community at decc943674edfe7ecc620d2d60b61be38f876994: `java/java-syntax` (`_JavaLexer.flex`, `_JavaDocLexer.flex`,
 `JavaParser` and its `*Parser.kt`, `JavaSyntaxElementType`, `JavaSyntaxTokenType`, `JavaDocSyntax*`), on the builder of
-`community/platform/syntax/*` (`SyntaxTreeBuilderImpl`, `MarkerProduction`, `WhitespacesBinders`). Read them with
-`git -C /Users/develar/projects/idea-1 show 3d034e2526507767a19528888066e47ad2898bb1:<path>`, never from the moving
+`platform/syntax/*` (`SyntaxTreeBuilderImpl`, `MarkerProduction`, `WhitespacesBinders`). Read them with
+`git -C ~/.cache/psi-syntax/intellij-community show decc943674edfe7ecc620d2d60b61be38f876994:<path>`, never from the moving
 working tree. The live oracle is the installed IntelliJ 2027.1 (build 271.SNAPSHOT, built from that revision):
 `/Applications/Idea.app/Contents/plugins/java/lib/intellij.java.syntax.jar` with
 `/Applications/Idea.app/Contents/lib/intellij.platform.syntax*.jar` and the Kotlin stdlib and util jars beside them.
