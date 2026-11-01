@@ -2426,8 +2426,12 @@ impl<'b> KotlinParsing<'b> {
         }
     }
 
-    /// `advanceBalancedBlock()`.
+    /// `advanceBalancedBlock()`. Without a truncation the builder skips the block in one scan of its raw tokens
+    /// (`SemanticWhitespaceAwarePsiBuilder::skip_balanced_block` says why that is exact); the loop below is the Java.
     pub fn advance_balanced_block(&mut self) {
+        if self.my_builder().skip_balanced_block() {
+            return;
+        }
         let mut brace_count = 1;
         while !self.eof() {
             if self._at(LBRACE) {

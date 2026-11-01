@@ -283,7 +283,8 @@ pub struct PsiBuilderImpl {
     /// The current token, cached for `current_types` (not in the Java): `get_token_type()` and its join with the next
     /// raw token as `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(raw, 1)` computes it. `tt_valid` is
     /// cleared wherever `current_lexeme` moves or `lex_types` is written: `advance_lexer`, `raw_advance_lexer` (and
-    /// `advance_to_eof` through it), `rollback_to` (which also restores remapped tokens) and `remap_current_token`.
+    /// `advance_to_eof` through it), `rollback_to` (which also restores remapped tokens), `remap_current_token` and
+    /// `skip_balanced_block`.
     /// `skip_whitespace` only steps over whitespace and comments up to the token both values describe, so it keeps
     /// them valid. It lives here, not in the semantic layer, because markers mutate this builder directly.
     tt_raw: Option<TokenKind>,
@@ -491,6 +492,36 @@ impl PsiBuilderImpl {
         self.token_type_checked = false;
         self.tt_valid = false;
         self.current_lexeme += 1;
+    }
+
+    /// `KotlinParsing.advanceBalancedBlock()` over the raw tokens, for `SemanticWhitespaceAwarePsiBuilder::
+    /// skip_balanced_block` (not in the Java): counts `{` and `}` from the current lexeme (the block's `{` consumed) and
+    /// puts the cursor after the `}` that closes the block, or at the end. Whitespace and comments are never braces,
+    /// and a joined `?.`/`?:`/`!!` is two lexemes neither of which is one, so the braces counted and the lexeme the
+    /// cursor stops at are the Java loop's.
+    fn skip_balanced_block(&mut self) {
+        let start = self.current_lexeme;
+        let mut brace_count = 1i32;
+        let mut i = start;
+        while i < self.lexeme_count {
+            let t = self.lex_types[i];
+            i += 1;
+            if t == TokenKind::LBRACE {
+                brace_count += 1;
+            } else if t == TokenKind::RBRACE {
+                brace_count -= 1;
+                if brace_count == 0 {
+                    break;
+                }
+            }
+        }
+        if cfg!(feature = "counters") {
+            let stepped = self.lex_types[start..i].iter().filter(|t| !t.is_whitespace_or_comment()).count();
+            crate::counters::add(crate::counters::Counter::BalancedSkipTokens, stepped as u64);
+        }
+        self.current_lexeme = i;
+        self.token_type_checked = false;
+        self.tt_valid = false;
     }
 
     fn skip_whitespace(&mut self) {
@@ -1543,6 +1574,28 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     /// `remapCurrentToken(type)`.
     pub fn remap_current_token(&mut self, element_type: TokenKind) {
         self.imp.delegate.remap_current_token(element_type);
+    }
+
+    /// `KotlinParsing.advanceBalancedBlock()` as one scan of the raw tokens (`PsiBuilderImpl::skip_balanced_block`)
+    /// when no truncation applies; false, with nothing done, under a `TruncatedSemanticWhitespaceAwarePsiBuilder`,
+    /// whose end the Java loop must check on every token.
+    ///
+    /// The Java loop advances token by token, so with complex tokens joined each `?.`, `?:` and `!!` in the block
+    /// becomes a collapse marker (`advance_lexer`); the scan adds none, and no output can show it. Both callers collapse
+    /// the marker around the block (`parseBlock` into `BLOCK`, `parseFunctionLiteral` into `LAMBDA_EXPRESSION`), and
+    /// `bind` steps over a collapsed marker's children without reading them; the block is parsed again from its text
+    /// when the tree expands it. The omitted markers create no error item, so neither `error`'s check of the last
+    /// production item nor `prepareLightTree`'s error dedup changes. In `balanceWhiteSpaces` they would sit at their own
+    /// lexemes, a mark on the `?`/`!` and a done right after the joined pair, in lexeme order: each keeps its position,
+    /// `last_index` never exceeds the enclosing done, and the walk back of that done's right edge stops at the last
+    /// non-whitespace token before reaching any of them, so every edge the tree uses is the same. Production stays
+    /// sorted by lexeme, so `index_of` and `find_marker_at_lexeme` find the same markers.
+    pub fn skip_balanced_block(&mut self) -> bool {
+        if self.top_truncated().is_some() {
+            return false;
+        }
+        self.imp.delegate.skip_balanced_block();
+        true
     }
 
     /// `rawLookup(steps)`.
