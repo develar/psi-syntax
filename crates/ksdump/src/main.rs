@@ -1,8 +1,8 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
-//! Java's parsers are being ported (`crates/java-syntax`): `--lex` and `--out` take Java files (`--out` panics in a
-//! parser method not yet ported), `--bench` and `--check-bodies` refuse one with exit status 2 before anything runs.
+//! `--lex` and `--out` take Java files (`crates/java-syntax`); `--bench` and `--check-bodies` refuse one with exit
+//! status 2 before anything runs (Java's parse has no nesting guard yet, and its bodies are not checked).
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -345,7 +345,7 @@ fn main() {
     if (args.bench || args.check_bodies)
         && let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java)
     {
-        eprintln!("{java}: Java is not benchmarked or body-checked yet (its parsers are being ported)");
+        eprintln!("{java}: Java is not benchmarked or body-checked yet");
         std::process::exit(2);
     }
     let stdout = std::io::stdout();

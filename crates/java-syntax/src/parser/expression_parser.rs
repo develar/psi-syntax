@@ -1,16 +1,10 @@
 //! `ExpressionParser.kt`: the facade over `PrattExpressionParser` the other parsers call.
-#![allow(unused_variables, unused_imports, dead_code, clippy::too_many_arguments)] // the skeleton's stubs: remove with the last `TODO(port)`
-
-use std::borrow::Cow;
 
 use psi_builder::Marker;
 
 use crate::builder::SyntaxTreeBuilder;
-use crate::language_level::LanguageLevel;
 use crate::node_kind::NodeKind;
-use crate::parser::java_parser::JavaParser;
 use crate::parser::pratt_expression_parser::{CONDITIONAL_EXPR_PRECEDENCE, PrattExpressionParser};
-use crate::tokens::{ElementType, TokenKind, TokenSet};
 
 /// `ExpressionParser(myNewExpressionParser)`, made by `JavaParser::expression_parser` over
 /// `PrattExpressionParser(this)`.

@@ -33,7 +33,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 |---|---|---|
 | `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters | nothing |
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
-| `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers (a skeleton being ported) | `psi-builder` |
+| `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers | `psi-builder` |
 | `ksdump` | the binary | `kotlin-syntax`, `java-syntax` |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
@@ -371,6 +371,22 @@ The gate passed on the split.
 
 The gate passed (including the Java lexer checks).
 
+### The Java parsers (the merge of the declaration and statement lanes, child of 0f619c0), 2026-11-01
+
+`DeclarationParser`, `FileParser`, `ModuleParser`, `ReferenceParser`, `PatternParser`, `JShellParser` (one lane),
+`StatementParser`, `PrattExpressionParser`, `JavaDocParser` (the other), merged without conflicts; one method stays a
+stub, `JavaParserUtil.stoppingBuilder(builder, condition)`, which no parser calls. Against IntelliJ 271's Java PSI:
+
+- the goldens (`tests/goldens.rs`): 1036/1036 `.txt` and 1036/1036 `_node.txt`; `tests/doc_comments.rs`: 224/224
+  doc comments of 219 goldens;
+- the community `.java` files (`ksdump --node --out`): 68 260 of 68 263 dumped (3 not UTF-8, failures on both sides),
+  0 differing files of either dump; 35.4 s wall, 557 MB peak RSS (one run, file writes included);
+- the 19 116 golden mutations: 0 differing files of either dump;
+- the 20 000 lexer fuzz inputs (`lex_fuzz.py`, seed `java-lex`, no cached PSI dumps; the oracle run once for this):
+  parse without a panic, 19 989 equal, 11 differ in a dump label only (see "Open items").
+
+The gate passed, with the community and mutation dumps of both kinds added to it.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -411,12 +427,16 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **The Java parsers.** 163 methods of `crates/java-syntax/src/parser` are `TODO(port)` stubs. Points to check against
-  the oracle while porting: `SyntaxTreeBuilderImpl` and the PSI tree build (`PsiSyntaxBuilderImpl`, `ToAstMarkers`)
-  against `PsiBuilderImpl` (`mark()` skipping whitespace only after the first marker, error dedup, `processDone`'s
-  left-bound rule, the whitespace balancer's `lexemeIndex < wsStartIndex` case); whether a code block's chameleon reuses
-  the file's tokens even where they do not lex alone the same (platform/syntax reuses collapsed tokens); the PSI labels
-  of the types no golden has.
+- **Java nesting guard.** Java's recursive entry points (Pratt `parse`/`parse_unary`, `parse_statement`, JavaDoc
+  `parse_data_item`, the declaration, reference and annotation recursion) count no levels: 20 000 nested parentheses
+  in an initializer overflow the stack. Until a guard like Kotlin's `enter_nesting` exists, `ksdump --bench` and
+  `--check-bodies` refuse Java files.
+- **Java dump labels of the lexer fuzz.** 11 of the 20 000 `java-lex` inputs differ from the oracle: an inline doc tag
+  with no name prints `PsiInlineDocTag:` where PSI prints `PsiInlineDocTag:null` (9), and a package statement with an
+  annotation in its name prints `pack1.@codepack2` where PSI's `getPackageName` prints `pack1.pack2` (2). Cache the
+  oracle's dumps of that corpus and gate them once fixed.
+- **`JavaParserUtil.stoppingBuilder(builder, condition)`** is a `todo!` stub: no parser calls it, and porting it needs
+  a condition adapter in `SyntaxTreeBuilder`, a check on every `token_type()`.
 
 - **The split's speed on a quiet machine.** Its A/B ran at load 6-18; repeat `scripts/ab.sh` against 26d5703 at load
   under 4 before attributing a later change's small delta.

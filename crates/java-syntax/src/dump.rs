@@ -62,6 +62,23 @@ fn push_text(out: &mut String, text: &[u8]) {
     out.push_str(&String::from_utf8_lossy(text));
 }
 
+/// `PsiSnippetAttributeValueImpl.getValue()`: the text without one leading and one trailing quote (`"` or `'`), the
+/// whole text when nothing would remain.
+fn snippet_attribute_value(text: &[u8]) -> &[u8] {
+    let mut start = 0;
+    let mut end = text.len();
+    if text.first().is_some_and(|&b| b == b'"' || b == b'\'') {
+        start += 1;
+    }
+    if text.last().is_some_and(|&b| b == b'"' || b == b'\'') {
+        end -= 1;
+    }
+    if end <= start {
+        return text;
+    }
+    &text[start..end]
+}
+
 /// The text of the subtree's leaves that are not whitespace or comments (a reference's canonical text, as far as the
 /// dump needs it).
 fn push_significant_text(tree: &Tree, id: NodeId, out: &mut String) {
@@ -133,6 +150,11 @@ fn node_label(tree: &Tree, id: NodeId, n: NodeKind, file_name: &str, out: &mut S
     let class = n.psi_class();
     match n.label() {
         Label::Plain => out.push_str(class),
+        Label::Text if n == NodeKind::DOC_SNIPPET_ATTRIBUTE_VALUE => {
+            out.push_str(class);
+            out.push(':');
+            push_text(out, snippet_attribute_value(tree.text(id)));
+        }
         Label::Text => {
             out.push_str(class);
             out.push(':');
@@ -179,7 +201,7 @@ fn node_label(tree: &Tree, id: NodeId, n: NodeKind, file_name: &str, out: &mut S
             out.push_str(": ");
             match tree.children(id).find(|&c| EXPRESSION_BIT_SET.contains(tree.kind(c))) {
                 Some(selector) => push_text(out, tree.text(selector)),
-                None => out.push_str("null"),
+                None => out.push_str("(incomplete)"),
             }
         }
         Label::DocTagName => {

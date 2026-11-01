@@ -1,7 +1,8 @@
 //! The ports of java-syntax's parsers (`com.intellij.java.syntax.parser`), one Rust file per Kotlin file, one function
 //! per method in the same order (see AGENTS.md, "Porting conventions"). `JavaParser` wires them as `JavaParser.kt` does:
 //! each parser is a view of its `JavaParser` and reaches the others through it (`self.my_parser.reference_parser()`).
-//! Every method still to be ported says `TODO(port): <File>.kt:<line>` and panics with `todo!`.
+//! One method is not ported, `JavaParserUtil.stoppingBuilder(builder, condition)`, which no parser calls: its stub says
+//! `TODO(port): JavaParserUtil.kt:133` and panics with `todo!`.
 
 pub mod declaration_parser;
 pub mod expression_parser;

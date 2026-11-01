@@ -1,7 +1,7 @@
 //! Every golden of `testdata/java/manifest.tsv` parsed at its level through its entry: `dump::psi_to_string` against
 //! `NAME.txt` and `dump::node_tree_to_string` against `NAME_node.txt`, byte for byte. A parse that reaches a parser
 //! method not yet ported (`TODO(port)`, a `todo!` panic) counts apart. Prints the counts and the first differing line
-//! of each mismatch; fails with `JAVA_STRICT=1` (with `KS_STRICT=1` once the parsers are ported) unless all match.
+//! of each mismatch; fails with `JAVA_STRICT=1` or `KS_STRICT=1` (the gate's) unless all match.
 
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::{Path, PathBuf};
@@ -86,7 +86,7 @@ fn goldens() {
     println!(
         "java goldens: {psi}/{total} .txt, {node}/{total} _node.txt ({unported} reach a parser method not yet ported)"
     );
-    if std::env::var_os("JAVA_STRICT").is_some_and(|v| v == "1") {
+    if ["JAVA_STRICT", "KS_STRICT"].iter().any(|k| std::env::var_os(k).is_some_and(|v| v == "1")) {
         assert_eq!((psi, node), (total, total));
     }
 }
