@@ -160,10 +160,15 @@ nodes! {
 }
 
 impl NodeKind {
-    /// `IElementType.isLeftBound()`: the `KtLeftBoundNodeType`s. An empty marker of such a type binds the whitespace
-    /// before it to its left (PsiBuilderImpl.processDone).
+    /// `IElementType.isLeftBound()`: the `KtLeftBoundNodeType`s and `TokenType.ERROR_ELEMENT`. An empty marker of such
+    /// a type binds the whitespace before it to its left (PsiBuilderImpl.processDone).
     pub const fn is_left_bound(self) -> bool {
-        matches!(self, NodeKind::CONSTRUCTOR_DELEGATION_CALL | NodeKind::CONSTRUCTOR_DELEGATION_REFERENCE)
+        matches!(
+            self,
+            NodeKind::CONSTRUCTOR_DELEGATION_CALL
+                | NodeKind::CONSTRUCTOR_DELEGATION_REFERENCE
+                | NodeKind::ERROR_ELEMENT
+        )
     }
 
     /// A collapsed marker of this type is a chameleon the tree reparses from its text, as PSI does when it expands a
