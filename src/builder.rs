@@ -264,6 +264,21 @@ pub(crate) struct Pending {
     pub file_tokens: Option<(usize, usize)>,
 }
 
+/// The buffers builders work in, kept by a `Parser` from one builder to the next (cleared, not freed): the token
+/// types a builder parses (filled by its caller), the marker pool with its free lists, the production, and the
+/// semantic layer's state stacks and adapters. A builder takes them in `new` and gives them back in `release`.
+#[derive(Default)]
+pub(crate) struct BuilderBuffers {
+    pub lex_types: Vec<TokenKind>,
+    markers: Vec<MarkerData>,
+    free_start_markers: Vec<u32>,
+    free_error_items: Vec<u32>,
+    production: Vec<i32>,
+    join_complex_tokens: Vec<bool>,
+    newlines_enabled: Vec<bool>,
+    adapters: Vec<Adapter>,
+}
+
 /// `PsiBuilderImpl`.
 pub struct PsiBuilderImpl {
     text: Arc<[u8]>,
@@ -313,16 +328,27 @@ impl AsPsiBuilder for PsiBuilderImpl {
 const LINEAR_SEARCH_LIMIT: usize = 20;
 
 impl PsiBuilderImpl {
-    /// A builder over `text[base..base + len]` with the given tokens (`lex_starts` relative to `base`, one more entry
-    /// than `lex_types`, the last being `len`).
+    /// A builder over `text[base..base + len]` with the token types in `bufs.lex_types` and their starts (relative to
+    /// `base`, one more entry than the types, the last being `len`). It works in `bufs`, emptied until `release`;
+    /// the marker pool starts afresh (id 0, no marker), whatever the previous builder left.
     pub(crate) fn new(
         text: Arc<[u8]>,
         base: usize,
         len: usize,
-        lex_types: Vec<TokenKind>,
+        bufs: &mut BuilderBuffers,
         mut lex_starts: Vec<u32>,
         file_token: Option<usize>,
     ) -> Self {
+        let lex_types = std::mem::take(&mut bufs.lex_types);
+        let mut markers = std::mem::take(&mut bufs.markers);
+        markers.clear();
+        markers.push(MarkerData::new(MarkerKind::Start));
+        let mut free_start_markers = std::mem::take(&mut bufs.free_start_markers);
+        free_start_markers.clear();
+        let mut free_error_items = std::mem::take(&mut bufs.free_error_items);
+        free_error_items.clear();
+        let mut production = std::mem::take(&mut bufs.production);
+        production.clear();
         let lexeme_count = lex_types.len();
         lex_starts.resize(lexeme_count + 1, len as u32);
         lex_starts[lexeme_count] = len as u32;
@@ -340,11 +366,21 @@ impl PsiBuilderImpl {
             tt_raw: None,
             tt_joined: None,
             tt_valid: false,
-            markers: vec![MarkerData::new(MarkerKind::Start)],
-            free_start_markers: Vec::new(),
-            free_error_items: Vec::new(),
-            production: Vec::with_capacity(256),
+            markers,
+            free_start_markers,
+            free_error_items,
+            production,
         }
+    }
+
+    /// Gives the buffers back to `bufs` and returns the token starts.
+    pub(crate) fn release(self, bufs: &mut BuilderBuffers) -> Vec<u32> {
+        bufs.lex_types = self.lex_types;
+        bufs.markers = self.markers;
+        bufs.free_start_markers = self.free_start_markers;
+        bufs.free_error_items = self.free_error_items;
+        bufs.production = self.production;
+        self.lex_starts
     }
 
     /// `getOriginalText()`: this builder's text.
@@ -1204,13 +1240,25 @@ impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilderImpl {
 }
 
 impl SemanticWhitespaceAwarePsiBuilderImpl {
-    pub fn new(delegate: PsiBuilderImpl) -> Self {
-        SemanticWhitespaceAwarePsiBuilderImpl {
-            delegate,
-            join_complex_tokens: vec![true],
-            newlines_enabled: vec![true],
-            adapters: Vec::new(),
-        }
+    /// The semantic layer over `delegate`, its stacks and adapters in `bufs` (emptied until `release`).
+    pub(crate) fn new(delegate: PsiBuilderImpl, bufs: &mut BuilderBuffers) -> Self {
+        let mut join_complex_tokens = std::mem::take(&mut bufs.join_complex_tokens);
+        join_complex_tokens.clear();
+        join_complex_tokens.push(true);
+        let mut newlines_enabled = std::mem::take(&mut bufs.newlines_enabled);
+        newlines_enabled.clear();
+        newlines_enabled.push(true);
+        let mut adapters = std::mem::take(&mut bufs.adapters);
+        adapters.clear();
+        SemanticWhitespaceAwarePsiBuilderImpl { delegate, join_complex_tokens, newlines_enabled, adapters }
+    }
+
+    /// Gives this layer's and the delegate's buffers back to `bufs` and returns the delegate's token starts.
+    pub(crate) fn release(self, bufs: &mut BuilderBuffers) -> Vec<u32> {
+        bufs.join_complex_tokens = self.join_complex_tokens;
+        bufs.newlines_enabled = self.newlines_enabled;
+        bufs.adapters = self.adapters;
+        self.delegate.release(bufs)
     }
 
     /// A handle without adapters: what `KotlinParser` passes to `KotlinParsing.createForTopLevel`.

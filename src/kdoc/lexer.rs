@@ -742,15 +742,21 @@ fn is_valid_code_fence(s: &[u8]) -> bool {
 
 /// The merged KDoc tokens of `text` (kinds and start offsets plus the end), as the PsiBuilder of a doc comment sees them.
 pub fn tokenize(text: &[u8]) -> (Vec<TokenKind>, Vec<u32>) {
-    let mut types = Vec::new();
-    let mut starts = Vec::new();
+    let (mut types, mut starts) = (Vec::new(), Vec::new());
+    tokenize_into(text, &mut types, &mut starts);
+    (types, starts)
+}
+
+/// `tokenize` into `types` and `starts`, which are cleared first (their buffers are reused).
+pub fn tokenize_into(text: &[u8], types: &mut Vec<TokenKind>, starts: &mut Vec<u32>) {
+    types.clear();
+    starts.clear();
     let mut lexer = KDocLexer::new(text);
     while let Some(token) = lexer.advance() {
         types.push(token.kind);
         starts.push(token.start as u32);
     }
     starts.push(text.len() as u32);
-    (types, starts)
 }
 
 #[cfg(test)]

@@ -8,7 +8,7 @@ use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{LazyKind, Pending, PsiBuilderImpl, SemanticWhitespaceAwarePsiBuilderImpl};
+use crate::builder::{BuilderBuffers, LazyKind, Pending, PsiBuilderImpl, SemanticWhitespaceAwarePsiBuilderImpl};
 use crate::lexer::{self, Lexed};
 use crate::node_kind::NodeKind;
 use crate::parsing::kotlin_parser;
@@ -120,34 +120,143 @@ pub struct Tree {
     root: u32,
 }
 
-impl Tree {
-    /// Parses `text` as a `.kt` file or a script. Any bytes parse; invalid UTF-8 lexes as `BAD_CHARACTER`s. At most
-    /// `u32::MAX - 1` bytes are parsed.
-    pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
-        Self::parse_with(text.as_ref(), file_kind, |builder| kotlin_parser::parse(builder, file_kind))
+/// A reusable parser: owns the buffers every builder of a parse works in (the file's tokens, a chameleon's tokens, the
+/// marker pool, the production, the state stacks, the chameleon worklist), cleared and reused from one file to the
+/// next instead of freed. Keep one per thread; `Tree::parse` makes a fresh one per call.
+#[derive(Default)]
+pub struct Parser {
+    bufs: BuilderBuffers,
+    /// The file's tokens as the lexer made them (a chameleon reuses a slice of them).
+    file: Lexed,
+    /// A chameleon's text lexed afresh.
+    relexed: Lexed,
+    /// The token starts the current builder reads.
+    starts: Vec<u32>,
+    pending: Vec<Pending>,
+}
+
+impl Parser {
+    pub fn new() -> Parser {
+        Parser::default()
+    }
+
+    /// Parses `text` as a `.kt` file or a script (see `Tree::parse`).
+    pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        self.parse_with(text.as_ref(), file_kind, |builder| kotlin_parser::parse(builder, file_kind))
     }
 
     /// Lexes `text`, runs `parse` on its builder, builds and expands the tree.
     pub(crate) fn parse_with(
+        &mut self,
         text: &[u8],
         file_kind: FileKind,
         parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl),
     ) -> Tree {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
-        let lexed = lexer::tokenize(&text);
-        crate::counters::add(crate::counters::Counter::FileTokens, lexed.len() as u64);
+        lexer::tokenize_into(&text, &mut self.file);
+        crate::counters::add(crate::counters::Counter::FileTokens, self.file.len() as u64);
         let mut data = TreeData::default();
-        let mut pending = Vec::new();
+        self.pending.clear();
 
-        let file = PsiBuilderImpl::new(text.clone(), 0, text.len(), lexed.types.clone(), lexed.starts.clone(), Some(0));
-        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file);
+        self.bufs.lex_types.clear();
+        self.bufs.lex_types.extend_from_slice(&self.file.types);
+        let mut starts = std::mem::take(&mut self.starts);
+        starts.clear();
+        starts.extend_from_slice(&self.file.starts);
+        let file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut self.bufs, starts, Some(0));
+        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, &mut self.bufs);
         parse(&mut builder);
-        let root = builder.delegate.build_tree(&mut data, None, &mut pending);
+        let root = builder.delegate.build_tree(&mut data, None, &mut self.pending);
+        self.starts = builder.release(&mut self.bufs);
 
-        while let Some(p) = pending.pop() {
-            expand(&text, &lexed, &mut data, p, &mut pending);
+        while let Some(p) = self.pending.pop() {
+            self.expand(&text, &mut data, p);
         }
         Tree { text, file_kind, data, root }
+    }
+
+    /// Expands one chameleon: parses its text with a new builder and appends the result under its node.
+    fn expand(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) {
+        use crate::counters::{Counter, add};
+        let len = p.end - p.start;
+        let mut starts = std::mem::take(&mut self.starts);
+        match p.kind {
+            LazyKind::Block | LazyKind::Lambda => {
+                add(if p.kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
+                let file_token = match reusable_tokens(&self.file, &p) {
+                    Some((first, last)) => {
+                        add(Counter::ReusedTokens, (last - first) as u64);
+                        self.bufs.lex_types.clear();
+                        self.bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
+                        starts.clear();
+                        starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
+                        Some(first)
+                    }
+                    None => {
+                        lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
+                        add(Counter::RelexedTokens, self.relexed.len() as u64);
+                        self.bufs.lex_types.clear();
+                        self.bufs.lex_types.extend_from_slice(&self.relexed.types);
+                        starts.clear();
+                        starts.extend_from_slice(&self.relexed.starts);
+                        None
+                    }
+                };
+                let delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, file_token);
+                let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, &mut self.bufs);
+                if p.kind == LazyKind::Block {
+                    kotlin_parser::parse_block_expression(&mut builder);
+                } else {
+                    kotlin_parser::parse_lambda_expression(&mut builder);
+                }
+                builder.delegate.build_tree(data, Some(p.node), &mut self.pending);
+                self.starts = builder.release(&mut self.bufs);
+            }
+            LazyKind::KDoc => {
+                crate::kdoc::lexer::tokenize_into(&text[p.start..p.end], &mut self.bufs.lex_types, &mut starts);
+                add(Counter::KDocChameleons, 1);
+                add(Counter::KDocTokens, self.bufs.lex_types.len() as u64);
+                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, None);
+                crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
+                builder.build_tree(data, Some(p.node), &mut self.pending);
+                self.starts = builder.release(&mut self.bufs);
+            }
+            LazyKind::KDocLink => {
+                lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
+                add(Counter::KDocLinkChameleons, 1);
+                add(Counter::RelexedTokens, self.relexed.len() as u64);
+                self.bufs.lex_types.clear();
+                self.bufs.lex_types.extend_from_slice(&self.relexed.types);
+                starts.clear();
+                starts.extend_from_slice(&self.relexed.starts);
+                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, None);
+                crate::kdoc::parser::parse_markdown_link(
+                    ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK),
+                    &mut builder,
+                );
+                builder.build_tree(data, Some(p.node), &mut self.pending);
+                self.starts = builder.release(&mut self.bufs);
+            }
+        }
+    }
+}
+
+impl Tree {
+    /// Parses `text` as a `.kt` file or a script. Any bytes parse; invalid UTF-8 lexes as `BAD_CHARACTER`s. At most
+    /// `u32::MAX - 1` bytes are parsed. A fresh `Parser` per call: to parse many files, keep a `Parser` and call
+    /// `Parser::parse`.
+    pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        Parser::new().parse(text, file_kind)
+    }
+
+    /// `Parser::parse_with` on a fresh parser.
+    #[cfg(test)]
+    pub(crate) fn parse_with(
+        text: &[u8],
+        file_kind: FileKind,
+        parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl),
+    ) -> Tree {
+        Parser::new().parse_with(text, file_kind, parse)
     }
 
     /// The parsed text.
@@ -341,52 +450,6 @@ impl Iterator for Preorder<'_> {
     }
 }
 
-/// Expands one chameleon: parses its text with a new builder and appends the result under its node.
-fn expand(text: &Arc<[u8]>, file_tokens: &Lexed, data: &mut TreeData, p: Pending, pending: &mut Vec<Pending>) {
-    use crate::counters::{Counter, add};
-    let len = p.end - p.start;
-    match p.kind {
-        LazyKind::Block | LazyKind::Lambda => {
-            add(if p.kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
-            let (types, starts, file_token) = match reusable_tokens(file_tokens, &p) {
-                Some(tokens) => {
-                    add(Counter::ReusedTokens, tokens.0.len() as u64);
-                    tokens
-                }
-                None => {
-                    let lexed = lexer::tokenize(&text[p.start..p.end]);
-                    add(Counter::RelexedTokens, lexed.len() as u64);
-                    (lexed.types, lexed.starts, None)
-                }
-            };
-            let delegate = PsiBuilderImpl::new(text.clone(), p.start, len, types, starts, file_token);
-            let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate);
-            if p.kind == LazyKind::Block {
-                kotlin_parser::parse_block_expression(&mut builder);
-            } else {
-                kotlin_parser::parse_lambda_expression(&mut builder);
-            }
-            builder.delegate.build_tree(data, Some(p.node), pending);
-        }
-        LazyKind::KDoc => {
-            let (types, starts) = crate::kdoc::lexer::tokenize(&text[p.start..p.end]);
-            add(Counter::KDocChameleons, 1);
-            add(Counter::KDocTokens, types.len() as u64);
-            let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, types, starts, None);
-            crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
-            builder.build_tree(data, Some(p.node), pending);
-        }
-        LazyKind::KDocLink => {
-            let lexed = lexer::tokenize(&text[p.start..p.end]);
-            add(Counter::KDocLinkChameleons, 1);
-            add(Counter::RelexedTokens, lexed.len() as u64);
-            let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, lexed.types, lexed.starts, None);
-            crate::kdoc::parser::parse_markdown_link(ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK), &mut builder);
-            builder.build_tree(data, Some(p.node), pending);
-        }
-    }
-}
-
 /// The file's own tokens for a chameleon when lexing its text alone gives the same tokens: it starts at a token
 /// lexed in the initial state with an empty state stack, ends at a token boundary where the lexer is back in that
 /// state (or at the end of the file), and its last token is not empty. An empty last token is one the lexer emitted
@@ -394,7 +457,8 @@ fn expand(text: &Arc<[u8]>, file_tokens: &Lexed, data: &mut TreeData, p: Pending
 /// ending at the string, does not lex (`{a + "` then a newline: the fresh lexing ends in the string, so the string's
 /// `Expecting '"'` sits at the end and the block's `Expecting '}'` at the same lexeme is dropped). The types are the
 /// lexer's, before any remapping by the outer parse, as a fresh lexing would give them.
-fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(Vec<TokenKind>, Vec<u32>, Option<usize>)> {
+/// Returns their index range `first..last` in the file's tokens.
+fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(usize, usize)> {
     let (first, last) = p.file_tokens?;
     if !file_tokens.is_plain(first)
         || last > file_tokens.len()
@@ -405,7 +469,5 @@ fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(Vec<TokenKind>, 
     {
         return None;
     }
-    let types = file_tokens.types[first..last].to_vec();
-    let starts = file_tokens.starts[first..=last].iter().map(|s| s - p.start as u32).collect();
-    Some((types, starts, Some(first)))
+    Some((first, last))
 }

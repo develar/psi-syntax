@@ -841,10 +841,20 @@ impl Lexed {
 /// Lexes `text` (at most `u32::MAX` bytes are lexed; offsets are `u32`) into token types and starts, as
 /// `TokenSequence.performLexing` does with `KotlinLexer`.
 pub fn tokenize(text: &[u8]) -> Lexed {
+    let mut lexed = Lexed::default();
+    tokenize_into(text, &mut lexed);
+    lexed
+}
+
+/// `tokenize` into `lexed`, which is cleared first (its buffers are reused).
+pub fn tokenize_into(text: &[u8], lexed: &mut Lexed) {
     let text = &text[..text.len().min(u32::MAX as usize)];
     let estimate = text.len() / 4 + 2;
-    let mut lexed =
-        Lexed { types: Vec::with_capacity(estimate), starts: Vec::with_capacity(estimate + 1), plain: Vec::new() };
+    lexed.types.clear();
+    lexed.starts.clear();
+    lexed.plain.clear();
+    lexed.types.reserve(estimate);
+    lexed.starts.reserve(estimate + 1);
     let mut lexer = KotlinLexer::new(text);
     while let Some(token) = lexer.advance() {
         let i = lexed.types.len();
@@ -860,7 +870,6 @@ pub fn tokenize(text: &[u8]) -> Lexed {
         lexed.starts.push(token.start as u32);
     }
     lexed.starts.push(text.len() as u32);
-    lexed
 }
 
 #[cfg(test)]

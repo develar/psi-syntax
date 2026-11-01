@@ -14,4 +14,4 @@ mod unicode;
 
 pub use node_kind::NodeKind;
 pub use tokens::{ElementType, TokenKind, TokenSet};
-pub use tree::{FileKind, NodeId, Tree};
+pub use tree::{FileKind, NodeId, Parser, Tree};

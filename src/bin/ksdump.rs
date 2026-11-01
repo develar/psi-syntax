@@ -5,7 +5,7 @@
 //! - `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--repeat K] [--file-stats OUT.tsv]`: reads
 //!   every file, then parses them all and prints the files, megabytes, seconds and MB/s of the parse alone (the first
 //!   line, one per round), then the tree's heap bytes per source MB. `--threads N` parses on N threads taking files
-//!   from a shared counter, as an indexer does, and prints the wall MB/s and each thread's own parse MB/s; `--walk`
+//!   from a shared counter, one `Parser` per thread, as an indexer does, and prints the wall MB/s and each thread's own parse MB/s; `--walk`
 //!   also walks every tree in preorder reading each node's kind and range, as an extractor does, timed apart;
 //!   `--repeat K` runs K rounds and prints their median; `--file-stats` writes one line per file of the last round.
 //!   Built with `--features alloc-stats`, a counting allocator adds the allocations per file (exact with one thread)
@@ -28,7 +28,7 @@ use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::tokens::TokenKind;
-use kotlin_syntax::{ElementType, FileKind, Tree};
+use kotlin_syntax::{ElementType, FileKind, Parser, Tree};
 
 /// Counts every allocation of the process (`--features alloc-stats` only).
 #[cfg(feature = "alloc-stats")]
@@ -205,6 +205,7 @@ fn main() {
 
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
+    let mut parser = Parser::new();
     for path in &paths {
         let Some(text) = read_source(root, path, args.trim) else {
             eprintln!("cannot read {path}");
@@ -212,7 +213,7 @@ fn main() {
             continue;
         };
         let name = file_name(path);
-        let tree = Tree::parse(&text, FileKind::from_file_name(name));
+        let tree = parser.parse(&text, FileKind::from_file_name(name));
         let dump = psi_to_string(&tree, name);
         let target = out.join(format!("{path}.psi.txt"));
         if let Some(parent) = target.parent() {
@@ -240,9 +241,9 @@ struct FileResult {
     walk_ns: u64,
     nodes: usize,
     tree_bytes: usize,
-    /// Allocations and reallocations during `Tree::parse` (`alloc-stats`; exact with one thread).
+    /// Allocations and reallocations during `Parser::parse` (`alloc-stats`; exact with one thread).
     allocs: u64,
-    /// Bytes allocated during `Tree::parse`, and the bytes still live when it returns (the tree).
+    /// Bytes allocated during `Parser::parse`, and the bytes still live when it returns (the tree).
     alloc_bytes: u64,
     live_bytes: i64,
 }
@@ -299,12 +300,14 @@ fn walk(tree: &Tree) -> u64 {
 
 fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool) -> ThreadResult {
     let mut r = ThreadResult::default();
+    // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
+    let mut parser = Parser::new();
     loop {
         let i = next.fetch_add(1, Ordering::Relaxed);
         let Some(source) = sources.get(i) else { break };
         let (calls0, allocated0, live0) = alloc_snapshot();
         let start = Instant::now();
-        let tree = Tree::parse(&source.text, source.kind);
+        let tree: Tree = parser.parse(&source.text, source.kind);
         let parsed = Instant::now();
         let (calls1, allocated1, live1) = alloc_snapshot();
         let mut f = FileResult {
