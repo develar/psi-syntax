@@ -56,10 +56,10 @@ const KIND_INDEX: u16 = 0x3FFF;
 pub(crate) struct TreeData {
     /// `ElementType::index` of each node, with `LEAF` on a leaf.
     kinds: Vec<u16>,
-    starts: Vec<u32>,
-    ends: Vec<u32>,
-    parents: Vec<u32>,
-    subtree_ends: Vec<u32>,
+    /// `[start, end]` byte offsets.
+    ranges: Vec<[u32; 2]>,
+    /// `[parent, subtree_end]`.
+    links: Vec<[u32; 2]>,
     /// The message of each error node, sorted by node id.
     errors: Vec<(u32, Cow<'static, str>)>,
 }
@@ -69,10 +69,8 @@ impl TreeData {
     fn push(&mut self, parent: u32, kind: u16, start: u32, end: u32) -> u32 {
         let id = self.kinds.len() as u32;
         self.kinds.push(kind);
-        self.starts.push(start);
-        self.ends.push(end);
-        self.parents.push(parent);
-        self.subtree_ends.push(id + 1);
+        self.ranges.push([start, end]);
+        self.links.push([parent, id + 1]);
         id
     }
 
@@ -87,11 +85,18 @@ impl TreeData {
         self.push(parent, kind.index() as u16 | LEAF, start, end)
     }
 
+    /// A token leaf as the next node, a child of `parent`.
+    #[inline(always)]
+    pub(crate) fn add_token_leaf(&mut self, parent: u32, token: TokenKind, start: u32, end: u32) {
+        self.push(parent, token as u16 | LEAF, start, end);
+    }
+
     /// Closes a composite: its byte end, and its subtree ends at the last node appended.
     pub(crate) fn set_end(&mut self, node: u32, end: u32) {
         let n = node as usize;
-        self.ends[n] = end.max(self.starts[n]);
-        self.subtree_ends[n] = self.kinds.len() as u32;
+        let range = &mut self.ranges[n];
+        range[1] = end.max(range[0]);
+        self.links[n][1] = self.kinds.len() as u32;
     }
 
     /// Marks a chameleon block or lambda as left unexpanded.
@@ -102,10 +107,8 @@ impl TreeData {
     /// Room for `additional` more nodes in every column.
     pub(crate) fn reserve(&mut self, additional: usize) {
         self.kinds.reserve(additional);
-        self.starts.reserve(additional);
-        self.ends.reserve(additional);
-        self.parents.reserve(additional);
-        self.subtree_ends.reserve(additional);
+        self.ranges.reserve(additional);
+        self.links.reserve(additional);
     }
 
     pub(crate) fn set_error(&mut self, node: u32, message: Cow<'static, str>) {
@@ -114,10 +117,8 @@ impl TreeData {
 
     fn clear(&mut self) {
         self.kinds.clear();
-        self.starts.clear();
-        self.ends.clear();
-        self.parents.clear();
-        self.subtree_ends.clear();
+        self.ranges.clear();
+        self.links.clear();
         self.errors.clear();
     }
 
@@ -128,10 +129,8 @@ impl TreeData {
         errors.shrink_to_fit();
         TreeData {
             kinds: self.kinds.as_slice().to_vec(),
-            starts: self.starts.as_slice().to_vec(),
-            ends: self.ends.as_slice().to_vec(),
-            parents: self.parents.as_slice().to_vec(),
-            subtree_ends: self.subtree_ends.as_slice().to_vec(),
+            ranges: self.ranges.as_slice().to_vec(),
+            links: self.links.as_slice().to_vec(),
             errors,
         }
     }
@@ -408,8 +407,7 @@ impl Tree {
             .sum();
         self.text.len()
             + d.kinds.capacity() * size_of::<u16>()
-            + (d.starts.capacity() + d.ends.capacity() + d.parents.capacity() + d.subtree_ends.capacity())
-                * size_of::<u32>()
+            + (d.ranges.capacity() + d.links.capacity()) * size_of::<[u32; 2]>()
             + d.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
             + messages
     }
@@ -453,7 +451,8 @@ impl Tree {
     #[inline]
     pub fn range(&self, id: NodeId) -> Range<usize> {
         let i = id.0 as usize;
-        self.data.starts[i] as usize..self.data.ends[i] as usize
+        let [start, end] = self.data.ranges[i];
+        start as usize..end as usize
     }
 
     /// The node's text.
@@ -462,29 +461,29 @@ impl Tree {
     }
 
     pub fn parent(&self, id: NodeId) -> Option<NodeId> {
-        let parent = self.data.parents[id.0 as usize];
+        let parent = self.data.links[id.0 as usize][0];
         (parent != NONE).then_some(NodeId(parent))
     }
 
     /// The end of the subtree at `id`: its nodes are the ids `id..subtree_end(id)`.
     #[inline]
     pub fn subtree_end(&self, id: NodeId) -> NodeId {
-        NodeId(self.data.subtree_ends[id.0 as usize])
+        NodeId(self.data.links[id.0 as usize][1])
     }
 
     pub fn first_child(&self, id: NodeId) -> Option<NodeId> {
-        (self.data.subtree_ends[id.0 as usize] > id.0 + 1).then_some(NodeId(id.0 + 1))
+        (self.data.links[id.0 as usize][1] > id.0 + 1).then_some(NodeId(id.0 + 1))
     }
 
     /// The last child: the ancestor of the subtree's last node that is a child of `id` (a walk up from it).
     pub fn last_child(&self, id: NodeId) -> Option<NodeId> {
-        let end = self.data.subtree_ends[id.0 as usize];
+        let end = self.data.links[id.0 as usize][1];
         if end <= id.0 + 1 {
             return None;
         }
         let mut child = end - 1;
         loop {
-            let parent = self.data.parents[child as usize];
+            let parent = self.data.links[child as usize][0];
             if parent == id.0 {
                 return Some(NodeId(child));
             }
@@ -493,17 +492,17 @@ impl Tree {
     }
 
     pub fn next_sibling(&self, id: NodeId) -> Option<NodeId> {
-        let parent = self.data.parents[id.0 as usize];
+        let parent = self.data.links[id.0 as usize][0];
         if parent == NONE {
             return None;
         }
-        let next = self.data.subtree_ends[id.0 as usize];
-        (next < self.data.subtree_ends[parent as usize]).then_some(NodeId(next))
+        let next = self.data.links[id.0 as usize][1];
+        (next < self.data.links[parent as usize][1]).then_some(NodeId(next))
     }
 
     /// The children in order.
     pub fn children(&self, id: NodeId) -> Children<'_> {
-        Children { subtree_ends: &self.data.subtree_ends, next: id.0 + 1, end: self.data.subtree_ends[id.0 as usize] }
+        Children { links: &self.data.links, next: id.0 + 1, end: self.data.links[id.0 as usize][1] }
     }
 
     /// The first child of the given kind.
@@ -521,13 +520,7 @@ impl Tree {
     /// The nodes of the subtree at `id` in document order (preorder), with their depth below `id`: a scan of the ids
     /// `id..subtree_end(id)`.
     pub fn preorder(&self, id: NodeId) -> Preorder<'_> {
-        Preorder {
-            parents: &self.data.parents,
-            root: id.0,
-            next: id.0,
-            end: self.data.subtree_ends[id.0 as usize],
-            depth: 0,
-        }
+        Preorder { links: &self.data.links, root: id.0, next: id.0, end: self.data.links[id.0 as usize][1], depth: 0 }
     }
 
     /// The leaves (tokens, whitespace, comments) in document order.
@@ -538,7 +531,7 @@ impl Tree {
     /// The subtree at `id`, `id` first, in document order: a scan of the ids `id..subtree_end(id)`, so "every call
     /// under X" is a pass over one column (`descendants(x).filter(|&n| tree.node_kind(n) == Some(CALL_EXPRESSION))`).
     pub fn descendants(&self, id: NodeId) -> impl DoubleEndedIterator<Item = NodeId> + ExactSizeIterator + use<> {
-        (id.0..self.data.subtree_ends[id.0 as usize]).map(NodeId)
+        (id.0..self.data.links[id.0 as usize][1]).map(NodeId)
     }
 
     /// Each token leaf's type and byte range, in document order: a scan of the columns. Their ranges tile the text,
@@ -552,14 +545,14 @@ impl Tree {
                 return None;
             }
             let token = ElementType::from_index((k & KIND_INDEX) as usize)?.token()?;
-            Some((token, d.starts[i] as usize..d.ends[i] as usize))
+            Some((token, d.ranges[i][0] as usize..d.ranges[i][1] as usize))
         })
     }
 }
 
 /// The children of a node.
 pub struct Children<'t> {
-    subtree_ends: &'t [u32],
+    links: &'t [[u32; 2]],
     next: u32,
     /// The parent's subtree end.
     end: u32,
@@ -574,7 +567,7 @@ impl Iterator for Children<'_> {
             return None;
         }
         let id = self.next;
-        self.next = self.subtree_ends[id as usize];
+        self.next = self.links[id as usize][1];
         Some(NodeId(id))
     }
 }
@@ -582,7 +575,7 @@ impl Iterator for Children<'_> {
 /// A preorder walk of a subtree: `(node, depth below the subtree root)`, a scan of its ids; the depth follows from the
 /// parents (a node's parent is the node before it or one of that node's ancestors).
 pub struct Preorder<'t> {
-    parents: &'t [u32],
+    links: &'t [[u32; 2]],
     root: u32,
     next: u32,
     end: u32,
@@ -600,11 +593,11 @@ impl Iterator for Preorder<'_> {
         }
         if id != self.root {
             // climb from the node before to this node's parent
-            let parent = self.parents[id as usize];
+            let parent = self.links[id as usize][0];
             let mut prev = id - 1;
             let mut depth = self.depth;
             while prev != parent && prev != NONE {
-                prev = self.parents[prev as usize];
+                prev = self.links[prev as usize][0];
                 depth = depth.saturating_sub(1);
             }
             self.depth = depth + 1;

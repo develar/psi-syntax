@@ -1140,30 +1140,41 @@ impl PsiBuilderImpl {
     /// Every leaf goes to the current node, so the walk is a loop of two steps: insert the tokens up to `insert_to`
     /// as leaves of the current node, then do `then`. A leaf that is a chameleon stops it there (`resume_bind`).
     fn resume_bind_steps(&mut self, tree: &mut TreeData) -> Option<Pending> {
+        // The state lives in a local while the walk runs (kept in registers), and goes back on a stop.
+        let mut st = self.bind;
+        let chameleon = self.bind_steps(&mut st, tree);
+        self.bind = st;
+        chameleon
+    }
+
+    #[inline(always)]
+    fn bind_steps(&mut self, st: &mut BindState, tree: &mut TreeData) -> Option<Pending> {
         loop {
-            while self.bind.lex_index < self.bind.insert_to {
-                let token = self.bind.lex_index;
-                self.bind.lex_index += 1;
-                if self.lex_starts[token] < self.lex_starts[token + 1] {
-                    // Empty tokens (DANGLING_NEWLINE) are not inserted.
-                    let leaf = ElementType::Token(self.lex_types[token]);
-                    if let Some(chameleon) = self.create_leaf(leaf, token, token + 1, self.bind.cur_node, tree) {
-                        return Some(chameleon);
-                    }
+            while st.lex_index < st.insert_to {
+                let to = st.insert_to;
+                let stop = self.insert_plain_leaves(st.lex_index, to, st.cur_node, tree);
+                if stop == to {
+                    st.lex_index = to;
+                    break;
+                }
+                st.lex_index = stop + 1;
+                let leaf = ElementType::Token(self.lex_types[stop]);
+                if let Some(chameleon) = self.create_leaf(leaf, stop, stop + 1, st.cur_node, tree) {
+                    return Some(chameleon);
                 }
             }
-            match self.bind.then {
+            match st.then {
                 BindStep::Next => {
-                    let Some(&id) = self.production.get(self.bind.i) else {
-                        self.bind.then = BindStep::CloseOpen;
+                    let Some(&id) = self.production.get(st.i) else {
+                        st.then = BindStep::CloseOpen;
                         continue;
                     };
-                    self.bind.i += 1;
+                    st.i += 1;
                     if id < 0 {
                         // done marker; an unbalanced one is only reported in Java
                         if !self.bind_stack.is_empty() {
-                            self.set_insert_to(self.marker(self.bind.cur_marker).done_lexeme);
-                            self.bind.then = BindStep::Close;
+                            st.insert_to = self.leaf_end(self.marker(st.cur_marker).done_lexeme);
+                            st.then = BindStep::Close;
                         }
                         continue;
                     }
@@ -1171,92 +1182,91 @@ impl PsiBuilderImpl {
                     let m = self.marker(id);
                     let (kind, lexeme_index) = (m.kind, m.lexeme_index);
                     if kind == MarkerKind::Start {
-                        self.set_insert_to(lexeme_index);
-                        self.bind.then = BindStep::Open(id);
-                    } else if lexeme_index != self.bind.last_error_index {
+                        st.insert_to = self.leaf_end(lexeme_index);
+                        st.then = BindStep::Open(id);
+                    } else if lexeme_index != st.last_error_index {
                         // adding only the first (deepest) error from the same lexeme offset
-                        self.bind.last_error_index = lexeme_index;
-                        self.set_insert_to(lexeme_index);
-                        self.bind.then = BindStep::Error(id);
+                        st.last_error_index = lexeme_index;
+                        st.insert_to = self.leaf_end(lexeme_index);
+                        st.then = BindStep::Error(id);
                     }
                 }
                 BindStep::Close => {
-                    tree.set_end(self.bind.cur_node, self.offset_of(self.bind.lex_index));
+                    tree.set_end(st.cur_node, self.offset_of(st.lex_index));
                     if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
-                        self.bind.cur_marker = parent_marker;
-                        self.bind.cur_node = parent_node;
+                        st.cur_marker = parent_marker;
+                        st.cur_node = parent_node;
                     }
-                    self.bind.then = BindStep::Next;
+                    st.then = BindStep::Next;
                 }
                 BindStep::Open(id) => {
-                    self.bind.then = BindStep::Next;
+                    st.then = BindStep::Next;
                     if !self.marker(id).collapsed {
-                        self.bind_stack.push((self.bind.cur_marker, self.bind.cur_node));
-                        self.bind.cur_node = self.create_composite(id, self.bind.cur_node, self.bind.lex_index, tree);
-                        self.bind.cur_marker = id;
+                        self.bind_stack.push((st.cur_marker, st.cur_node));
+                        st.cur_node = self.create_composite(id, st.cur_node, st.lex_index, tree);
+                        st.cur_marker = id;
                         continue;
                     }
                     // collapseLeaves; the collapsed marker's own entries are skipped
                     let size = self.production.len();
                     let mut depth = 1;
-                    while self.bind.i < size && depth > 0 {
-                        let inner = self.production[self.bind.i];
-                        self.bind.i += 1;
+                    while st.i < size && depth > 0 {
+                        let inner = self.production[st.i];
+                        st.i += 1;
                         if inner < 0 {
                             depth -= 1;
                         } else if self.marker(inner as u32).kind == MarkerKind::Start {
                             depth += 1;
                         } else {
-                            self.bind.last_error_index = self.marker(inner as u32).lexeme_index;
+                            st.last_error_index = self.marker(inner as u32).lexeme_index;
                         }
                     }
                     let m = self.marker(id);
                     let (start, element_type) = (m.lexeme_index.max(0) as usize, m.element_type);
                     let end = (m.done_lexeme.max(0) as usize).clamp(start, self.lexeme_count);
-                    self.bind.lex_index = end;
-                    self.bind.insert_to = end;
+                    st.lex_index = end;
+                    st.insert_to = end;
                     if let Some(element_type) = element_type
-                        && let Some(chameleon) = self.create_leaf(element_type, start, end, self.bind.cur_node, tree)
+                        && let Some(chameleon) = self.create_leaf(element_type, start, end, st.cur_node, tree)
                     {
                         return Some(chameleon);
                     }
                 }
                 BindStep::Error(id) => {
-                    self.bind.then = BindStep::Next;
-                    let start = self.offset_of(self.bind.lex_index);
-                    let error =
-                        tree.add_composite(self.bind.cur_node, ElementType::Node(NodeKind::ERROR_ELEMENT), start);
+                    st.then = BindStep::Next;
+                    let start = self.offset_of(st.lex_index);
+                    let error = tree.add_composite(st.cur_node, ElementType::Node(NodeKind::ERROR_ELEMENT), start);
                     tree.set_end(error, start);
                     let message = self.take_message(id);
                     tree.set_error(error, message);
                 }
                 BindStep::CloseOpen => {
                     if self.bind_stack.is_empty() {
-                        self.set_insert_to(self.marker(self.bind.root_marker).done_lexeme);
-                        self.bind.then = BindStep::RootTail;
+                        st.insert_to = self.leaf_end(self.marker(st.root_marker).done_lexeme);
+                        st.then = BindStep::RootTail;
                     } else {
-                        self.set_insert_to(self.marker(self.bind.cur_marker).done_lexeme);
-                        self.bind.then = BindStep::CloseOpenOne;
+                        st.insert_to = self.leaf_end(self.marker(st.cur_marker).done_lexeme);
+                        st.then = BindStep::CloseOpenOne;
                     }
                 }
                 BindStep::CloseOpenOne => {
-                    tree.set_end(self.bind.cur_node, self.offset_of(self.bind.lex_index));
+                    tree.set_end(st.cur_node, self.offset_of(st.lex_index));
                     if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
-                        self.bind.cur_marker = parent_marker;
-                        self.bind.cur_node = parent_node;
+                        st.cur_marker = parent_marker;
+                        st.cur_node = parent_node;
                     }
-                    self.bind.then = BindStep::CloseOpen;
+                    st.then = BindStep::CloseOpen;
                 }
                 BindStep::RootTail => {
                     // Tokens after the root's end are not inserted by PsiBuilderImpl (it logs "Tokens ... were not
                     // inserted into the tree"); appending them keeps the tree lossless.
-                    self.bind.cur_node = self.bind.root_node;
-                    self.bind.insert_to = self.lexeme_count;
-                    self.bind.then = BindStep::Finish;
+                    st.cur_node = st.root_node;
+                    st.insert_to = self.lexeme_count;
+                    st.then = BindStep::Finish;
                 }
                 BindStep::Finish => {
-                    tree.set_end(self.bind.root_node, (self.base + self.len) as u32);
-                    self.bind.then = BindStep::Done;
+                    tree.set_end(st.root_node, (self.base + self.len) as u32);
+                    st.then = BindStep::Done;
                     return None;
                 }
                 BindStep::Done => return None,
@@ -1264,10 +1274,29 @@ impl PsiBuilderImpl {
         }
     }
 
-    /// `insertLeaves(curToken, lastIdx, curNode)` as a step of `bind`: the tokens up to `last_idx` go to the current
-    /// node next.
-    fn set_insert_to(&mut self, last_idx: i32) {
-        self.bind.insert_to = (last_idx.max(0) as usize).min(self.lexeme_count);
+    /// `insertLeaves(curToken, lastIdx, curNode)` up to the first token that is a chameleon (a doc comment or a
+    /// markdown link), whose index it returns (`to` if none): the tokens `from..to` as leaves of `cur_node`, but empty
+    /// ones (DANGLING_NEWLINE), which are not inserted.
+    #[inline(always)]
+    fn insert_plain_leaves(&self, from: usize, to: usize, cur_node: u32, tree: &mut TreeData) -> usize {
+        let base = self.base as u32;
+        let types = &self.lex_types[from..to];
+        let starts = &self.lex_starts[from..=to];
+        for (i, (&token, edges)) in types.iter().zip(starts.windows(2)).enumerate() {
+            if edges[0] < edges[1] {
+                if matches!(token, TokenKind::DOC_COMMENT | TokenKind::KDOC_MARKDOWN_LINK) {
+                    return from + i;
+                }
+                tree.add_token_leaf(cur_node, token, base + edges[0], base + edges[1]);
+            }
+        }
+        to
+    }
+
+    /// `insertLeaves(curToken, lastIdx, curNode)` as a step of `bind`: where the tokens to insert next into the
+    /// current node end.
+    fn leaf_end(&self, last_idx: i32) -> usize {
+        (last_idx.max(0) as usize).min(self.lexeme_count)
     }
 
     fn offset_of(&self, lex_index: usize) -> u32 {
