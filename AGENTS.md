@@ -153,7 +153,7 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 
 Java: `testdata/java/` (1036 goldens of IntelliJ's Java parsing tests, `manifest.tsv` with level, entry and trim per
 test) and the Java PSI oracle `tools/java-oracle/JavaPsiOracle.java` (see `tools/java-oracle/README.md`: cached dumps of
-the 68 263 community `.java` files and 19 116 golden mutations). The Java lexer oracle
+the 68 263 community `.java` files, 19 116 golden mutations and 20 000 lexer fuzz inputs). The Java lexer oracle
 `java -cp "$(tools/java-oracle/fetch-jars.sh)/*" tools/java-oracle/JavaLexOracle.java --list LIST --root ROOT` prints
 the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
 `tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
@@ -204,7 +204,6 @@ otherwise.
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
   community files, and again with `--nesting-limit 3` on the community files and the mutations, and the Java lexers
   against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz, and both Java
-  dumps (`.psi.txt`, `.node.txt`) of the community `.java` files and of the golden mutations against the Java PSI
-  oracle's. A faster change that fails it is not a change.
+  dumps (`.psi.txt`, `.node.txt`) of the same three corpora against the Java PSI oracle's. A faster change that fails it is not a change.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
   change does, its measured effect and that the gate passed.

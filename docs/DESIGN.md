@@ -387,6 +387,17 @@ stub, `JavaParserUtil.stoppingBuilder(builder, condition)`, which no parser call
 
 The gate passed, with the community and mutation dumps of both kinds added to it.
 
+### The Java dump labels of the lexer fuzz (child of 4631197), 2026-11-01
+
+The 11 differing `java-lex` inputs were two labels. `PsiInlineDocTagImpl.toString()` concatenates a missing name
+element as `null` (9 inputs, `/**{@ doc */`); `PsiPackageStatementImpl.getPackageName()` is
+`JavaSourceUtil.getReferenceText`, which leaves out whitespace, comments and annotations and puts a space between two
+leaves that would join into one identifier (2 inputs, `package pack1.@code pack2;`). The dump now ports both, and the
+module name `PsiJavaModuleReferenceElementImpl.getReferenceText()` (the reference's children that are not whitespace or
+comments; it walked into a doc comment's tokens before, no input had shown it). The oracle's dumps of the corpus
+(both kinds, 5.8 s; 17 604 of 20 000 with a `PsiErrorElement`) are cached and gated: 0 differing files of either dump,
+as for the 68 260 community files and the 19 116 golden mutations; goldens 1036/1036 `.txt` and `_node.txt`.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -431,10 +442,6 @@ There is no line-level profile of the current code: `atos` returned no line info
   `parse_data_item`, the declaration, reference and annotation recursion) count no levels: 20 000 nested parentheses
   in an initializer overflow the stack. Until a guard like Kotlin's `enter_nesting` exists, `ksdump --bench` and
   `--check-bodies` refuse Java files.
-- **Java dump labels of the lexer fuzz.** 11 of the 20 000 `java-lex` inputs differ from the oracle: an inline doc tag
-  with no name prints `PsiInlineDocTag:` where PSI prints `PsiInlineDocTag:null` (9), and a package statement with an
-  annotation in its name prints `pack1.@codepack2` where PSI's `getPackageName` prints `pack1.pack2` (2). Cache the
-  oracle's dumps of that corpus and gate them once fixed.
 - **`JavaParserUtil.stoppingBuilder(builder, condition)`** is a `todo!` stub: no parser calls it, and porting it needs
   a condition adapter in `SyntaxTreeBuilder`, a check on every `token_type()`.
 

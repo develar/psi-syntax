@@ -12,7 +12,8 @@
 #      fuzz against the cached lines of tools/java-oracle/JavaLexOracle.java;
 #   7. Java's parsers against IntelliJ 271's Java PSI (tools/java-oracle/JavaPsiOracle.java): the 1036 goldens of
 #      testdata/java (step 1, strict), and `diff -rq` of both dumps (.psi.txt, .node.txt) of the 68 260 UTF-8 community
-#      .java files and of the 19 116 one-place mutations of the goldens against the cached oracle dumps, 0 lines.
+#      .java files, of the 19 116 one-place mutations of the goldens and of the 20 000 lexer fuzz inputs against the
+#      cached oracle dumps, 0 lines.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -52,10 +53,11 @@ for corpus in "corpus/java-community-3caa0bf.list $ROOT java-community-3caa0bf" 
   n=$($B --lex --list "$C/$1" --root "$2" | diff - "$C/lex/$3.oracle.txt" | grep -c '^[<>]')
   echo "java lex $3: $n differing lines of $(wc -l < "$C/lex/$3.oracle.txt" | tr -d ' ')"; [ "$n" = 0 ] || fail=1
 done
-# Java: both dumps (`--node`) of the community .java files and of the golden mutations against JavaPsiOracle.java's
-# cached ones (the 3 community files that are not UTF-8 are failures on both sides: no dump).
+# Java: both dumps (`--node`) of the community .java files, the golden mutations and the lexer fuzz against
+# JavaPsiOracle.java's cached ones (the 3 community files that are not UTF-8 are failures on both sides: no dump).
 for corpus in "corpus/java-community-3caa0bf.list $ROOT oracle/java-community-3caa0bf 68260" \
-  "fuzz/java-mut.list $C/fuzz/java-mut fuzz/java-mut.oracle 19116"; do
+  "fuzz/java-mut.list $C/fuzz/java-mut fuzz/java-mut.oracle 19116" \
+  "fuzz/java-lex/list $C/fuzz/java-lex fuzz/java-lex.oracle 20000"; do
   set -- $corpus
   $B --node --list "$C/$1" --root "$2" --out "$O/$(basename "$3")" > /dev/null 2>&1
   n=$(diff -rq -x index.jsonl "$C/$3" "$O/$(basename "$3")" | wc -l | tr -d ' ')

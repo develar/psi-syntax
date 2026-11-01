@@ -75,6 +75,7 @@ separators are converted to `\n`, as the IDE does when it loads a file.
 | `fuzz/java-mut.list` | the oracle list (without the 83 precondition failures) |
 | `fuzz/java-mut.oracle/` | its dumps |
 | `fuzz/java-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `java-lex`) |
+| `fuzz/java-lex.oracle/` | their dumps (17 604 with a `PsiErrorElement`, 5.8 s) |
 | `lex/java-community-3caa0bf.oracle.txt`, `lex/java-mut.oracle.txt`, `lex/java-lex.oracle.txt` | `JavaLexOracle.java`'s lines for the three corpora |
 
 Rebuild them:
@@ -87,6 +88,9 @@ java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/c
 tools/java-oracle/mutate.py $S/fuzz/java-mut
 java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/fuzz/java-mut/list \
   --root $S/fuzz/java-mut --out $S/fuzz/java-mut.oracle --node   # then drop the `failure` lines from the list
+tools/java-oracle/lex_fuzz.py testdata/java $S/fuzz/java-lex 20000 java-lex
+java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/fuzz/java-lex/list \
+  --root $S/fuzz/java-lex --out $S/fuzz/java-lex.oracle --node
 ```
 
 The lexer oracle's cached lines, which `scripts/gate.sh` compares `ksdump --lex` with:

@@ -9,7 +9,8 @@
 use psi_builder::dump::psi_to_string_with;
 
 use crate::node_kind::{Label, NodeKind};
-use crate::syntax_element_types::EXPRESSION_BIT_SET;
+use crate::lexer::is_java_letter_digit;
+use crate::syntax_element_types::{EXPRESSION_BIT_SET, JAVA_COMMENT_OR_WHITESPACE_BIT_SET};
 use crate::tokens::{ElementType, TokenKind};
 use crate::tree::{NodeId, Tree};
 
@@ -79,26 +80,43 @@ fn snippet_attribute_value(text: &[u8]) -> &[u8] {
     &text[start..end]
 }
 
-/// The text of the subtree's leaves that are not whitespace or comments (a reference's canonical text, as far as the
-/// dump needs it).
-fn push_significant_text(tree: &Tree, id: NodeId, out: &mut String) {
-    for (leaf, _) in tree.preorder(id) {
-        if !tree.is_leaf(leaf) {
+/// `JavaSourceUtil.REF_FILTER`: `ElementType.JAVA_COMMENT_OR_WHITESPACE_BIT_SET` and `ANNOTATION`.
+fn is_ref_filtered(kind: ElementType) -> bool {
+    match kind {
+        ElementType::Token(t) => JAVA_COMMENT_OR_WHITESPACE_BIT_SET.contains(t),
+        ElementType::Node(n) => n == NodeKind::ANNOTATION,
+    }
+}
+
+/// `Character.isJavaIdentifierPart(char)` of the UTF-16 unit `c` (a surrogate is not one).
+fn is_java_identifier_part(c: char) -> bool {
+    (c as u32) <= 0xFFFF && is_java_letter_digit(c as u32)
+}
+
+/// `JavaSourceUtil.getReferenceText(ref)`: the texts of the reference's leaves outside `REF_FILTER` (whitespace,
+/// comments, annotations), a space between two that would otherwise join into one identifier (or after a `?`).
+fn push_reference_text(tree: &Tree, reference: NodeId, out: &mut String) {
+    let start = out.len();
+    let end = tree.subtree_end(reference).0;
+    let mut i = reference.0 + 1;
+    while i < end {
+        let id = NodeId(i);
+        if is_ref_filtered(tree.kind(id)) {
+            i = tree.subtree_end(id).0;
             continue;
         }
-        let skip = matches!(
-            tree.kind(leaf),
-            ElementType::Token(
-                TokenKind::WHITE_SPACE
-                    | TokenKind::END_OF_LINE_COMMENT
-                    | TokenKind::C_STYLE_COMMENT
-                    | TokenKind::DOC_COMMENT
-                    | TokenKind::DOC_MARKDOWN_COMMENT
-            )
-        );
-        if !skip {
-            push_text(out, tree.text(leaf));
+        i += 1;
+        if !tree.is_leaf(id) {
+            continue;
         }
+        let leaf_text = String::from_utf8_lossy(tree.text(id));
+        if out.len() > start
+            && leaf_text.chars().next().is_some_and(is_java_identifier_part)
+            && out[start..].chars().next_back().is_some_and(|last| last == '?' || is_java_identifier_part(last))
+        {
+            out.push(' ');
+        }
+        out.push_str(&leaf_text);
     }
 }
 
@@ -181,15 +199,21 @@ fn node_label(tree: &Tree, id: NodeId, n: NodeKind, file_name: &str, out: &mut S
         Label::ModuleName => {
             out.push_str(class);
             out.push(':');
+            // `PsiJavaModuleReferenceElementImpl.getReferenceText()`: the children that are not whitespace or comments
             if let Some(reference) = tree.first_child_of_kind(id, ElementType::Node(NodeKind::MODULE_REFERENCE)) {
-                push_significant_text(tree, reference, out);
+                for child in tree.children(reference) {
+                    if !tree.kind(child).token().is_some_and(|t| JAVA_COMMENT_OR_WHITESPACE_BIT_SET.contains(t)) {
+                        push_text(out, tree.text(child));
+                    }
+                }
             }
         }
         Label::PackageName => {
             out.push_str(class);
             out.push(':');
+            // `getPackageName()`: `JavaSourceUtil.getReferenceText` of the package reference, "" without one
             if let Some(reference) = tree.first_child_of_kind(id, ElementType::Node(NodeKind::JAVA_CODE_REFERENCE)) {
-                push_significant_text(tree, reference, out);
+                push_reference_text(tree, reference, out);
             }
         }
         Label::Diamond => {
@@ -207,8 +231,12 @@ fn node_label(tree: &Tree, id: NodeId, n: NodeKind, file_name: &str, out: &mut S
         Label::DocTagName => {
             out.push_str(class);
             out.push(':');
-            if let Some(name) = tree.first_child_of_kind(id, ElementType::Token(TokenKind::DOC_TAG_NAME)) {
-                push_text(out, tree.text(name));
+            match tree.first_child_of_kind(id, ElementType::Token(TokenKind::DOC_TAG_NAME)) {
+                Some(name) => push_text(out, tree.text(name)),
+                // `PsiInlineDocTagImpl.toString()` concatenates a null name element's text; `PsiDocTagImpl`'s would
+                // throw, and its parser never leaves a tag without a name
+                None if n == NodeKind::DOC_INLINE_TAG => out.push_str("null"),
+                None => {}
             }
         }
         Label::SnippetAttributeName => {
@@ -268,6 +296,31 @@ mod tests {
         assert_eq!(
             node_tree_to_string(&tokens_only("int x;")),
             "java.FILE\n  INT_KEYWORD\n  WHITE_SPACE\n  IDENTIFIER\n  SEMICOLON"
+        );
+    }
+
+    /// The labels of the nodes of `text`'s dump that start with `prefix`.
+    fn labels(text: &str, prefix: &str) -> Vec<String> {
+        let tree = Parser::new().parse(text.as_bytes(), FileKind::default());
+        psi_to_string(&tree, "A.java").lines().map(str::trim).filter(|l| l.starts_with(prefix)).map(String::from).collect()
+    }
+
+    #[test]
+    fn package_name_is_the_reference_text_without_annotations_and_comments() {
+        // `JavaSourceUtil.getReferenceText`, as the Java PSI oracle prints these
+        assert_eq!(labels("package pack1.@code pack2;", "PsiPackageStatement"), ["PsiPackageStatement:pack1.pack2"]);
+        assert_eq!(
+            labels("package a /* c */ . /** d */ b . @A(x=1) c;", "PsiPackageStatement"),
+            ["PsiPackageStatement:a.b.c"]
+        );
+        assert_eq!(labels("module a /** x */ . b {}", "PsiJavaModule:"), ["PsiJavaModule:a.b"]);
+    }
+
+    #[test]
+    fn inline_doc_tag_without_a_name_prints_null() {
+        assert_eq!(
+            labels("/** {@ doc } {@code x} */\nclass A {}", "PsiInlineDocTag"),
+            ["PsiInlineDocTag:null", "PsiInlineDocTag:@code"]
         );
     }
 }
