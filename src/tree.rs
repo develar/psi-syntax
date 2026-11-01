@@ -359,14 +359,20 @@ fn expand(text: &Arc<[u8]>, file_tokens: &Lexed, data: &mut TreeData, p: Pending
 }
 
 /// The file's own tokens for a chameleon when lexing its text alone gives the same tokens: it starts at a token
-/// lexed in the initial state with an empty state stack and ends at a token boundary. The types are the lexer's,
-/// before any remapping by the outer parse, as a fresh lexing would give them.
+/// lexed in the initial state with an empty state stack, ends at a token boundary where the lexer is back in that
+/// state (or at the end of the file), and its last token is not empty. An empty last token is one the lexer emitted
+/// by looking past the chameleon: `DANGLING_NEWLINE` of an unclosed string before a line break, which the text alone,
+/// ending at the string, does not lex (`{a + "` then a newline: the fresh lexing ends in the string, so the string's
+/// `Expecting '"'` sits at the end and the block's `Expecting '}'` at the same lexeme is dropped). The types are the
+/// lexer's, before any remapping by the outer parse, as a fresh lexing would give them.
 fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(Vec<TokenKind>, Vec<u32>, Option<usize>)> {
     let (first, last) = p.file_tokens?;
     if !file_tokens.is_plain(first)
         || last > file_tokens.len()
+        || (last < file_tokens.len() && !file_tokens.is_plain(last))
         || file_tokens.starts.get(first).copied() != Some(p.start as u32)
         || file_tokens.starts.get(last).copied() != Some(p.end as u32)
+        || (last > first && file_tokens.starts.get(last - 1).copied() == Some(p.end as u32))
     {
         return None;
     }

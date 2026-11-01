@@ -1,0 +1,3 @@
+object O {
+ fun f() {
+  "
