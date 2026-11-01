@@ -44,6 +44,8 @@ const NONE: u32 = u32::MAX;
 
 /// `kinds` bit of a leaf (a token; no children).
 const LEAF: u16 = 0x8000;
+/// `kinds` bit of a block or lambda left unexpanded (`ParseOptions::expand_bodies`).
+const UNEXPANDED: u16 = 0x4000;
 /// `kinds` bits of the element type's `ElementType::index`.
 const KIND_INDEX: u16 = 0x3FFF;
 
@@ -92,6 +94,11 @@ impl TreeData {
         self.subtree_ends[n] = self.kinds.len() as u32;
     }
 
+    /// Marks a chameleon block or lambda as left unexpanded.
+    fn set_unexpanded(&mut self, node: u32) {
+        self.kinds[node as usize] |= UNEXPANDED;
+    }
+
     /// Room for `additional` more nodes in every column.
     pub(crate) fn reserve(&mut self, additional: usize) {
         self.kinds.reserve(additional);
@@ -138,6 +145,23 @@ pub struct Tree {
     root: u32,
 }
 
+/// How `Parser::parse_with_options` builds the tree.
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub struct ParseOptions {
+    /// Whether the bodies PSI parses lazily (a block, `BLOCK`, or a lambda, `LAMBDA_EXPRESSION`, that the parser
+    /// skipped as a balanced `{...}`) are parsed and expanded. When false they stay childless nodes with their kind
+    /// and range (`Tree::is_unexpanded`), and `Tree::parse_body` parses one on demand into exactly the subtree the
+    /// full parse has there, because PSI too builds such a body from its text alone. Doc comments are expanded
+    /// either way. True by default.
+    pub expand_bodies: bool,
+}
+
+impl Default for ParseOptions {
+    fn default() -> Self {
+        ParseOptions { expand_bodies: true }
+    }
+}
+
 /// A reusable parser: owns the buffers every builder of a parse works in (the file's tokens, a chameleon's tokens, the
 /// marker pools, the productions, the state stacks), cleared and reused from one file to the next instead of freed.
 /// Keep one per thread; `Tree::parse` makes a fresh one per call.
@@ -153,6 +177,7 @@ pub struct Parser {
     spare: Vec<BuilderBuffers>,
     /// The tree being built; copied into exactly sized buffers when done.
     data: TreeData,
+    options: ParseOptions,
 }
 
 /// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
@@ -168,7 +193,44 @@ impl Parser {
 
     /// Parses `text` as a `.kt` file or a script (see `Tree::parse`).
     pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
-        self.parse_with(text.as_ref(), file_kind, |builder| kotlin_parser::parse(builder, file_kind))
+        self.parse_with_options(text, file_kind, ParseOptions::default())
+    }
+
+    /// `parse` with `options` (e.g. bodies left unexpanded for a pass that reads only declarations).
+    pub fn parse_with_options(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind, options: ParseOptions) -> Tree {
+        self.options = options;
+        let tree = self.parse_with(text.as_ref(), file_kind, |builder| kotlin_parser::parse(builder, file_kind));
+        self.options = ParseOptions::default();
+        tree
+    }
+
+    /// The subtree of the body `id` of `tree` that `ParseOptions { expand_bodies: false }` left unexpanded
+    /// (`Tree::is_unexpanded`), as its own tree over the same source: its root is a node of the body's kind and
+    /// range, its ids start at 0, its ranges are offsets in `tree.source()`. Bodies inside it are expanded as
+    /// `options` says. `None` when `id` is not an unexpanded body.
+    pub fn parse_body(&mut self, tree: &Tree, id: NodeId, options: ParseOptions) -> Option<Tree> {
+        if !tree.is_unexpanded(id) {
+            return None;
+        }
+        let kind = match tree.node_kind(id)? {
+            NodeKind::BLOCK => LazyKind::Block,
+            NodeKind::LAMBDA_EXPRESSION => LazyKind::Lambda,
+            _ => return None,
+        };
+        let range = tree.range(id);
+        self.options = options;
+        let mut data = std::mem::take(&mut self.data);
+        data.clear();
+        let root = data.add_composite(NONE, tree.kind(id), range.start as u32);
+        data.set_end(root, range.end as u32);
+        let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None };
+        let frame = self.begin_chameleon(&tree.text, &mut data, chameleon);
+        self.frames.push(frame);
+        self.bind_frames(&tree.text, &mut data);
+        let body = data.take_exact();
+        self.data = data;
+        self.options = ParseOptions::default();
+        Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root })
     }
 
     /// Lexes `text`, runs `parse` on its builder, builds and expands the tree.
@@ -208,6 +270,11 @@ impl Parser {
     fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData) {
         while let Some(frame) = self.frames.last_mut() {
             match frame.builder.resume_bind(data) {
+                Some(chameleon)
+                    if !self.options.expand_bodies && matches!(chameleon.kind, LazyKind::Block | LazyKind::Lambda) =>
+                {
+                    data.set_unexpanded(chameleon.node);
+                }
                 Some(chameleon) => {
                     let frame = self.begin_chameleon(text, data, chameleon);
                     self.frames.push(frame);
@@ -365,6 +432,17 @@ impl Tree {
         self.kind(id).node()
     }
 
+    /// Whether the node is a block or lambda that `ParseOptions { expand_bodies: false }` left unexpanded: it has no
+    /// children, `parse_body` gives them.
+    pub fn is_unexpanded(&self, id: NodeId) -> bool {
+        self.data.kinds[id.0 as usize] & UNEXPANDED != 0
+    }
+
+    /// `Parser::parse_body` on a fresh parser, every body inside expanded.
+    pub fn parse_body(&self, id: NodeId) -> Option<Tree> {
+        Parser::new().parse_body(self, id, ParseOptions::default())
+    }
+
     /// Whether the node is a leaf (a token; it has no children).
     #[inline]
     pub fn is_leaf(&self, id: NodeId) -> bool {
@@ -455,6 +533,27 @@ impl Tree {
     /// The leaves (tokens, whitespace, comments) in document order.
     pub fn tokens(&self) -> impl Iterator<Item = NodeId> + '_ {
         (0..self.len() as u32).map(NodeId).filter(|&id| self.is_leaf(id))
+    }
+
+    /// The subtree at `id`, `id` first, in document order: a scan of the ids `id..subtree_end(id)`, so "every call
+    /// under X" is a pass over one column (`descendants(x).filter(|&n| tree.node_kind(n) == Some(CALL_EXPRESSION))`).
+    pub fn descendants(&self, id: NodeId) -> impl DoubleEndedIterator<Item = NodeId> + ExactSizeIterator + use<> {
+        (id.0..self.data.subtree_ends[id.0 as usize]).map(NodeId)
+    }
+
+    /// Each token leaf's type and byte range, in document order: a scan of the columns. Their ranges tile the text,
+    /// but for the ranges of unexpanded bodies. This, not the lexer, is what exact highlighting
+    /// reads: the parser remaps soft keywords (`IDENTIFIER` to `by`, `get`, `data`, ...) and joins `?.`, `?:` and `!!`
+    /// from two lexer tokens, and both show only in the tree's leaves.
+    pub fn leaves(&self) -> impl Iterator<Item = (TokenKind, Range<usize>)> + '_ {
+        let d = &self.data;
+        d.kinds.iter().enumerate().filter_map(move |(i, &k)| {
+            if k & LEAF == 0 {
+                return None;
+            }
+            let token = ElementType::from_index((k & KIND_INDEX) as usize)?.token()?;
+            Some((token, d.starts[i] as usize..d.ends[i] as usize))
+        })
     }
 }
 
