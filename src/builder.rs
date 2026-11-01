@@ -280,6 +280,15 @@ pub struct PsiBuilderImpl {
     tokens_to_restore_on_rollback: BTreeMap<usize, TokenKind>,
     current_lexeme: usize,
     token_type_checked: bool,
+    /// The current token, cached for `current_types` (not in the Java): `get_token_type()` and its join with the next
+    /// raw token as `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(raw, 1)` computes it. `tt_valid` is
+    /// cleared wherever `current_lexeme` moves or `lex_types` is written: `advance_lexer`, `raw_advance_lexer` (and
+    /// `advance_to_eof` through it), `rollback_to` (which also restores remapped tokens) and `remap_current_token`.
+    /// `skip_whitespace` only steps over whitespace and comments up to the token both values describe, so it keeps
+    /// them valid. It lives here, not in the semantic layer, because markers mutate this builder directly.
+    tt_raw: Option<TokenKind>,
+    tt_joined: Option<TokenKind>,
+    tt_valid: bool,
     /// `MarkerPool.list`; id 0 is no marker.
     markers: Vec<MarkerData>,
     free_start_markers: Vec<u32>,
@@ -327,6 +336,9 @@ impl PsiBuilderImpl {
             tokens_to_restore_on_rollback: BTreeMap::new(),
             current_lexeme: 0,
             token_type_checked: false,
+            tt_raw: None,
+            tt_joined: None,
+            tt_valid: false,
             markers: vec![MarkerData::new(MarkerKind::Start)],
             free_start_markers: Vec::new(),
             free_error_items: Vec::new(),
@@ -359,8 +371,42 @@ impl PsiBuilderImpl {
         Some(self.lex_types[self.current_lexeme])
     }
 
+    /// `get_token_type()` and, for `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` when it joins complex
+    /// tokens, `getJoinedTokenType(raw, 1)`, computed once per cursor position (see `tt_valid`).
+    #[inline(always)]
+    pub(crate) fn current_types(&mut self) -> (Option<TokenKind>, Option<TokenKind>) {
+        if !self.tt_valid {
+            let raw = self.get_token_type();
+            self.tt_joined = self.joined_token_type(raw, 1);
+            self.tt_raw = raw;
+            self.tt_valid = true;
+        }
+        (self.tt_raw, self.tt_joined)
+    }
+
+    /// `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(rawTokenType, rawLookupSteps)`: `?` before `.` is
+    /// `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
+    fn joined_token_type(&self, raw_token_type: Option<TokenKind>, raw_lookup_steps: i32) -> Option<TokenKind> {
+        if raw_token_type == TokenKind::QUEST {
+            let next_raw_token = self.raw_lookup(raw_lookup_steps);
+            if next_raw_token == TokenKind::DOT {
+                return Some(TokenKind::SAFE_ACCESS);
+            }
+            if next_raw_token == TokenKind::COLON {
+                return Some(TokenKind::ELVIS);
+            }
+        } else if raw_token_type == TokenKind::EXCL {
+            let next_raw_token = self.raw_lookup(raw_lookup_steps);
+            if next_raw_token == TokenKind::EXCL {
+                return Some(TokenKind::EXCLEXCL);
+            }
+        }
+        raw_token_type
+    }
+
     /// `remapCurrentToken(type)`.
     pub fn remap_current_token(&mut self, element_type: TokenKind) {
+        self.tt_valid = false;
         if self.current_lexeme < self.lexeme_count {
             self.lex_types[self.current_lexeme] = element_type;
         }
@@ -426,6 +472,7 @@ impl PsiBuilderImpl {
         }
         self.current_lexeme = (self.current_lexeme + steps as usize).min(self.lexeme_count);
         self.token_type_checked = false;
+        self.tt_valid = false;
     }
 
     /// `advanceToEOF()`.
@@ -441,6 +488,7 @@ impl PsiBuilderImpl {
             return;
         }
         self.token_type_checked = false;
+        self.tt_valid = false;
         self.current_lexeme += 1;
     }
 
@@ -682,6 +730,7 @@ impl PsiBuilderImpl {
         }
         self.current_lexeme = lexeme_index as usize;
         self.token_type_checked = true;
+        self.tt_valid = false;
         self.production_rollback_to(marker.0);
     }
 
@@ -1133,7 +1182,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
 
     /// A handle without adapters: what `KotlinParser` passes to `KotlinParsing.createForTopLevel`.
     pub fn handle(&mut self) -> SemanticWhitespaceAwarePsiBuilder<'_> {
-        SemanticWhitespaceAwarePsiBuilder { imp: self, depth: 0 }
+        SemanticWhitespaceAwarePsiBuilder { imp: self, depth: 0, top_trunc: None, min_eof: i32::MAX }
     }
 
     /// `isWhitespaceOrComment(elementType)`.
@@ -1214,30 +1263,18 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     }
 
     /// `getTokenType()`: `?` before `.` is `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
+    /// The raw type and `getJoinedTokenType(raw, 1)` come from the delegate's per-position cache (`current_types`).
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
-        let raw = self.delegate.get_token_type();
+        let (raw, joined) = self.delegate.current_types();
         if !self.join_complex_tokens() {
             return raw;
         }
-        self.get_joined_token_type(raw, 1)
+        joined
     }
 
+    /// `getJoinedTokenType(rawTokenType, rawLookupSteps)`.
     fn get_joined_token_type(&self, raw_token_type: Option<TokenKind>, raw_lookup_steps: i32) -> Option<TokenKind> {
-        if raw_token_type == TokenKind::QUEST {
-            let next_raw_token = self.delegate.raw_lookup(raw_lookup_steps);
-            if next_raw_token == TokenKind::DOT {
-                return Some(TokenKind::SAFE_ACCESS);
-            }
-            if next_raw_token == TokenKind::COLON {
-                return Some(TokenKind::ELVIS);
-            }
-        } else if raw_token_type == TokenKind::EXCL {
-            let next_raw_token = self.delegate.raw_lookup(raw_lookup_steps);
-            if next_raw_token == TokenKind::EXCL {
-                return Some(TokenKind::EXCLEXCL);
-            }
-        }
-        raw_token_type
+        self.delegate.joined_token_type(raw_token_type, raw_lookup_steps)
     }
 
     /// `advanceLexer()`: a joined token is two lexemes collapsed into one leaf.
@@ -1300,9 +1337,18 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
 /// `wrapped` puts a new adapter on top, as `new TruncatedSemanticWhitespaceAwarePsiBuilder(builder, eof)` and
 /// `new SemanticWhitespaceAwarePsiBuilderForByClause(builder)` do; the Java adapters live as long as the parser that
 /// holds them, which the borrow mirrors.
+///
+/// `top_trunc` and `min_eof` cache what the first `depth` adapters say on every `getTokenType()`: the topmost
+/// truncation's `eof_position` and the smallest non-negative one (`i32::MAX` without). They are computed in `handle`,
+/// `reborrow` and `wrapped` and stay right by the borrow: `wrapped(self)` consumes the handle and `reborrow` freezes
+/// its parent, so while a handle lives every other live handle sits on a prefix at least `depth` long, `wrapped`
+/// truncates no shorter than its own `depth`, and the only write into the prefix (`count_newline_state`) touches
+/// by-clause stack sizes, not truncations.
 pub struct SemanticWhitespaceAwarePsiBuilder<'b> {
     imp: &'b mut SemanticWhitespaceAwarePsiBuilderImpl,
     depth: usize,
+    top_trunc: Option<i32>,
+    min_eof: i32,
 }
 
 impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilder<'_> {
@@ -1314,26 +1360,35 @@ impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilder<'_> {
 impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     /// The same builder for a shorter borrow (to hand to a nested parser).
     pub fn reborrow(&mut self) -> SemanticWhitespaceAwarePsiBuilder<'_> {
-        SemanticWhitespaceAwarePsiBuilder { imp: self.imp, depth: self.depth }
+        SemanticWhitespaceAwarePsiBuilder {
+            imp: self.imp,
+            depth: self.depth,
+            top_trunc: self.top_trunc,
+            min_eof: self.min_eof,
+        }
     }
 
     /// This builder under a new adapter.
     pub fn wrapped(self, adapter: Adapter) -> SemanticWhitespaceAwarePsiBuilder<'b> {
         self.imp.adapters.truncate(self.depth);
         self.imp.adapters.push(adapter);
-        SemanticWhitespaceAwarePsiBuilder { depth: self.depth + 1, imp: self.imp }
+        let (top_trunc, min_eof) = match adapter {
+            Adapter::Truncated { eof_position } => {
+                (Some(eof_position), if eof_position >= 0 { self.min_eof.min(eof_position) } else { self.min_eof })
+            }
+            Adapter::ForByClause { .. } => (self.top_trunc, self.min_eof),
+        };
+        SemanticWhitespaceAwarePsiBuilder { depth: self.depth + 1, imp: self.imp, top_trunc, min_eof }
     }
 
     fn adapters(&self) -> &[Adapter] {
         &self.imp.adapters[..self.depth.min(self.imp.adapters.len())]
     }
 
-    /// The topmost truncation: what `lookAhead` goes through.
+    /// The topmost truncation: what `lookAhead` goes through (cached, see the struct).
+    #[inline]
     fn top_truncated(&self) -> Option<i32> {
-        self.adapters().iter().rev().find_map(|a| match a {
-            Adapter::Truncated { eof_position } => Some(*eof_position),
-            Adapter::ForByClause { .. } => None,
-        })
+        self.top_trunc
     }
 
     /// `SemanticWhitespaceAwarePsiBuilderForByClause.getStackSize()` of the by-clause adapter this builder was created
@@ -1397,7 +1452,8 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
         eof_position >= 0 && offset_from_current >= eof_position
     }
 
-    /// `eof()`: the stream's end, or the current offset at or beyond a truncation's end.
+    /// `eof()`: the stream's end, or the current offset at or beyond a truncation's end. Any truncation in the chain
+    /// ends the stream, so the smallest non-negative `eof_position` (`min_eof`) decides.
     pub fn eof(&mut self) -> bool {
         if self.imp.delegate.eof() {
             return true;
@@ -1405,11 +1461,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
         if self.top_truncated().is_none() {
             return false;
         }
-        let offset = self.imp.delegate.get_current_offset();
-        self.adapters().iter().any(|a| match a {
-            Adapter::Truncated { eof_position } => Self::is_offset_beyond_eof(*eof_position, offset),
-            Adapter::ForByClause { .. } => false,
-        })
+        self.imp.delegate.get_current_offset() >= self.min_eof
     }
 
     /// `getTokenType()`.
