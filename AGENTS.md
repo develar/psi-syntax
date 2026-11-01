@@ -4,7 +4,8 @@ A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's ow
 `dump::psi_to_string` prints what Kotlin 2.4.21's `DebugUtil.psiToString(file, true, false).trim()` prints, byte for
 byte. Consumers: accio (code search; declarations, call sites, imports) and Branch Deck's `code-symbols` (diff
 highlighting, navigation, file summaries). Both read the tree directly: there is no tree-sitter compatibility layer and
-there must never be one.
+there must never be one. `docs/DESIGN.md` describes the architecture as built, its decisions, the measured numbers and
+the open items.
 
 ## Sources to port (read them, port them faithfully)
 

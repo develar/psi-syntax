@@ -2,7 +2,8 @@
 
 A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own (`Kotlin.flex`, `KotlinParsing`,
 `KotlinExpressionParsing`, IntelliJ's `PsiBuilder`). Its tree prints exactly what Kotlin's
-`DebugUtil.psiToString(file, true, false)` prints. See AGENTS.md for the design and the oracles.
+`DebugUtil.psiToString(file, true, false)` prints. See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md
+for the architecture and its measurements.
 
 ```rust
 use kotlin_syntax::{FileKind, ParseOptions, Parser};
