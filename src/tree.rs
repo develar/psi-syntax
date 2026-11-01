@@ -102,11 +102,6 @@ impl TreeData {
         n.end = end.max(n.start);
     }
 
-    pub(crate) fn parent_of(&self, node: u32) -> Option<u32> {
-        let parent = self.nodes[node as usize].parent;
-        (parent != NONE).then_some(parent)
-    }
-
     pub(crate) fn set_error(&mut self, node: u32, message: Cow<'static, str>) {
         self.errors.push((node, message));
     }

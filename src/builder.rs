@@ -181,7 +181,8 @@ enum MarkerKind {
     Error,
 }
 
-/// A `ProductionMarker` (`StartMarker` or `ErrorItem`) with its `MarkerOptionalData` and light-tree links.
+/// A `ProductionMarker` (`StartMarker` or `ErrorItem`) with its `MarkerOptionalData`. The light tree's links are not
+/// stored: `bind` reads the production in order instead (see there).
 #[derive(Clone, Debug)]
 struct MarkerData {
     kind: MarkerKind,
@@ -190,15 +191,12 @@ struct MarkerData {
     /// `myDoneLexeme`; -1 while not done.
     done_lexeme: i32,
     element_type: Option<ElementType>,
-    /// The error message: `MarkerOptionalData.getDoneError` of a start marker, `ErrorItem.myMessage` of an error item.
-    message: Option<Cow<'static, str>>,
+    /// The error message (`MarkerOptionalData.getDoneError` of a start marker, `ErrorItem.myMessage` of an error item)
+    /// as its index + 1 in the builder's `messages`; 0 for none. Kept apart so the pool's records stay small.
+    message: u32,
     left_binder: Binder,
     right_binder: Binder,
     collapsed: bool,
-    parent: u32,
-    first_child: u32,
-    last_child: u32,
-    next: u32,
 }
 
 const NONE: u32 = 0;
@@ -210,14 +208,10 @@ impl MarkerData {
             lexeme_index: -1,
             done_lexeme: -1,
             element_type: None,
-            message: None,
+            message: 0,
             left_binder: DEFAULT_LEFT_BINDER,
             right_binder: DEFAULT_RIGHT_BINDER,
             collapsed: false,
-            parent: NONE,
-            first_child: NONE,
-            last_child: NONE,
-            next: NONE,
         }
     }
 
@@ -274,6 +268,9 @@ pub(crate) struct BuilderBuffers {
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
     production: Vec<i32>,
+    production_lexemes: Vec<i32>,
+    messages: Vec<Cow<'static, str>>,
+    bind_stack: Vec<(u32, u32)>,
     join_complex_tokens: Vec<bool>,
     newlines_enabled: Vec<bool>,
     adapters: Vec<Adapter>,
@@ -311,6 +308,14 @@ pub struct PsiBuilderImpl {
     free_error_items: Vec<u32>,
     /// `MarkerProduction`: a start marker's id, or the negated id of a done marker.
     production: Vec<i32>,
+    /// `getLexemeIndexAt(i)` for every production index (not in the Java, which reads it from the marker): the
+    /// marker's `getLexemeIndex(done)`, written wherever an entry is added and rewritten by `balance_white_spaces`, so
+    /// the searches over the production read one contiguous array.
+    production_lexemes: Vec<i32>,
+    /// The error messages markers refer to (`MarkerData::message`).
+    messages: Vec<Cow<'static, str>>,
+    /// `bind`'s open composites below the root: (marker, node) of each one's parent.
+    bind_stack: Vec<(u32, u32)>,
 }
 
 /// The `PsiBuilder` methods a marker needs: implemented by every builder layer, so `marker.done(builder, kind)` works
@@ -349,6 +354,11 @@ impl PsiBuilderImpl {
         free_error_items.clear();
         let mut production = std::mem::take(&mut bufs.production);
         production.clear();
+        let mut production_lexemes = std::mem::take(&mut bufs.production_lexemes);
+        production_lexemes.clear();
+        let mut messages = std::mem::take(&mut bufs.messages);
+        messages.clear();
+        let bind_stack = std::mem::take(&mut bufs.bind_stack);
         let lexeme_count = lex_types.len();
         lex_starts.resize(lexeme_count + 1, len as u32);
         lex_starts[lexeme_count] = len as u32;
@@ -370,6 +380,9 @@ impl PsiBuilderImpl {
             free_start_markers,
             free_error_items,
             production,
+            production_lexemes,
+            messages,
+            bind_stack,
         }
     }
 
@@ -380,6 +393,9 @@ impl PsiBuilderImpl {
         bufs.free_start_markers = self.free_start_markers;
         bufs.free_error_items = self.free_error_items;
         bufs.production = self.production;
+        bufs.production_lexemes = self.production_lexemes;
+        bufs.messages = self.messages;
+        bufs.bind_stack = self.bind_stack;
         self.lex_starts
     }
 
@@ -601,6 +617,7 @@ impl PsiBuilderImpl {
         }
         let marker = self.create_marker(self.current_lexeme as i32);
         self.production.push(marker.0 as i32);
+        self.production_lexemes.push(self.current_lexeme as i32);
         marker
     }
 
@@ -637,6 +654,20 @@ impl PsiBuilderImpl {
         &self.markers[id as usize]
     }
 
+    /// Stores `message` as the marker's error message.
+    fn set_message(&mut self, id: u32, message: Cow<'static, str>) {
+        self.messages.push(message);
+        self.markers[id as usize].message = self.messages.len() as u32;
+    }
+
+    /// The marker's error message, moved out (the tree is built once).
+    fn take_message(&mut self, id: u32) -> Cow<'static, str> {
+        match self.markers[id as usize].message {
+            0 => Cow::Borrowed(""),
+            i => std::mem::take(&mut self.messages[i as usize - 1]),
+        }
+    }
+
     /// `eof()`: skips whitespace and comments the first time after the cursor moved.
     #[inline(always)]
     pub fn eof(&mut self) -> bool {
@@ -658,10 +689,10 @@ impl PsiBuilderImpl {
             }
         }
         let id = self.allocate(MarkerKind::Error);
-        let marker = &mut self.markers[id as usize];
-        marker.message = Some(message_text.into());
-        marker.lexeme_index = self.current_lexeme as i32;
+        self.set_message(id, message_text.into());
+        self.markers[id as usize].lexeme_index = self.current_lexeme as i32;
         self.production.push(id as i32);
+        self.production_lexemes.push(self.current_lexeme as i32);
     }
 
     /// `hasErrorsAfter(marker)`: whether an error item or error marker was added after `marker` and not dropped.
@@ -671,7 +702,7 @@ impl PsiBuilderImpl {
             id > 0 && {
                 let m = self.marker(id as u32);
                 m.kind == MarkerKind::Error
-                    || (m.element_type == Some(ElementType::Node(NodeKind::ERROR_ELEMENT)) && m.message.is_some())
+                    || (m.element_type == Some(ElementType::Node(NodeKind::ERROR_ELEMENT)) && m.message != 0)
             }
         })
     }
@@ -720,8 +751,12 @@ impl PsiBuilderImpl {
     }
 
     fn get_lexeme_index_at(&self, production_index: usize) -> i32 {
-        let id = self.production[production_index];
-        self.marker(id.unsigned_abs()).get_lexeme_index(id < 0)
+        let lexeme = self.production_lexemes[production_index];
+        if cfg!(debug_assertions) {
+            let id = self.production[production_index];
+            debug_assert_eq!(lexeme, self.marker(id.unsigned_abs()).get_lexeme_index(id < 0));
+        }
+        lexeme
     }
 
     fn production_rollback_to(&mut self, marker_id: u32) {
@@ -733,6 +768,7 @@ impl PsiBuilderImpl {
             }
         }
         self.production.truncate(idx);
+        self.production_lexemes.truncate(idx);
     }
 
     fn drop_marker(&mut self, marker_id: u32) {
@@ -740,9 +776,11 @@ impl PsiBuilderImpl {
             && let Some(i) = self.production.iter().rposition(|&id| id == -(marker_id as i32))
         {
             self.production.remove(i);
+            self.production_lexemes.remove(i);
         }
         if let Some(i) = self.index_of(marker_id) {
             self.production.remove(i);
+            self.production_lexemes.remove(i);
         }
         self.free_marker(marker_id);
     }
@@ -754,12 +792,14 @@ impl PsiBuilderImpl {
         };
         if let Some(index) = index {
             self.production.insert(index, -(marker_id as i32));
+            self.production_lexemes.insert(index, self.marker(marker_id).done_lexeme);
         }
     }
 
     fn add_before(&mut self, marker_id: u32, anchor: u32) {
         if let Some(index) = self.index_of(anchor) {
             self.production.insert(index, marker_id as i32);
+            self.production_lexemes.insert(index, self.marker(marker_id).lexeme_index);
         }
     }
 
@@ -830,7 +870,7 @@ impl PsiBuilderImpl {
         error_message: impl Into<Cow<'static, str>>,
     ) {
         let id = self.allocate(MarkerKind::Error);
-        self.markers[id as usize].message = Some(error_message.into());
+        self.set_message(id, error_message.into());
         self.markers[id as usize].lexeme_index = self.marker(before.0).lexeme_index;
         self.add_before(id, before.0);
         self.done_before(marker, element_type, before);
@@ -863,7 +903,7 @@ impl PsiBuilderImpl {
         crate::counters::add(crate::counters::Counter::Done, 1);
         // doValidityChecks: "Marker already done." is only logged in Java.
         if let Some(message) = error_message {
-            self.markers[marker_id as usize].message = Some(message);
+            self.set_message(marker_id, message);
         }
         let done_lexeme = match before {
             None => self.current_lexeme as i32,
@@ -873,6 +913,14 @@ impl PsiBuilderImpl {
         let left_bound = matches!(m.element_type, Some(ElementType::Node(n)) if n.is_left_bound());
         if left_bound && self.is_empty(m.lexeme_index, done_lexeme) {
             self.set_custom_edge_token_binders(Marker(marker_id), Some(DEFAULT_RIGHT_BINDER), None);
+        }
+        if self.marker(marker_id).is_done() {
+            // Done twice (Java only logs it): the earlier done entry reads the new done lexeme, as Java's does.
+            for i in 0..self.production.len() {
+                if self.production[i] == -(marker_id as i32) {
+                    self.production_lexemes[i] = done_lexeme;
+                }
+            }
         }
         self.markers[marker_id as usize].done_lexeme = done_lexeme;
         self.add_done(marker_id, before);
@@ -893,8 +941,8 @@ impl PsiBuilderImpl {
         self.bind(root_marker, tree, root, pending)
     }
 
-    /// `prepareLightTree()`: balances the edges and links the markers into a tree; returns the root marker (0 if there
-    /// are no markers).
+    /// `prepareLightTree()`: balances the edges; returns the root marker (0 if there are no markers). The Java then
+    /// links the markers into a tree, which `bind` instead reads straight from the production.
     fn prepare_light_tree(&mut self) -> u32 {
         let Some(&first) = self.production.first() else { return NONE };
         if first <= 0 {
@@ -903,60 +951,7 @@ impl PsiBuilderImpl {
         let root_marker = first as u32;
         self.token_type_checked = true;
         self.balance_white_spaces();
-
-        {
-            let root = &mut self.markers[root_marker as usize];
-            root.parent = NONE;
-            root.first_child = NONE;
-            root.last_child = NONE;
-            root.next = NONE;
-        }
-        let mut cur_node = root_marker;
-        let mut nodes: Vec<u32> = vec![root_marker];
-        let mut last_error_index = -1;
-        for i in 1..self.production.len() {
-            let id = self.production[i];
-            if id > 0 {
-                let id = id as u32;
-                if self.marker(id).kind == MarkerKind::Start {
-                    {
-                        let m = &mut self.markers[id as usize];
-                        m.parent = cur_node;
-                        m.first_child = NONE;
-                        m.last_child = NONE;
-                        m.next = NONE;
-                    }
-                    self.add_child(cur_node, id);
-                    nodes.push(cur_node);
-                    cur_node = id;
-                } else {
-                    self.markers[id as usize].parent = cur_node;
-                    let cur_token = self.marker(id).lexeme_index;
-                    // adding only the first (deepest) error from the same lexeme offset
-                    if cur_token != last_error_index {
-                        last_error_index = cur_token;
-                        self.markers[id as usize].next = NONE;
-                        self.add_child(cur_node, id);
-                    }
-                }
-            } else {
-                // done marker; an unbalanced one is only reported in Java
-                if let Some(parent) = nodes.pop() {
-                    cur_node = parent;
-                }
-            }
-        }
         root_marker
-    }
-
-    fn add_child(&mut self, parent: u32, child: u32) {
-        let last = self.marker(parent).last_child;
-        if self.marker(parent).first_child == NONE {
-            self.markers[parent as usize].first_child = child;
-        } else {
-            self.markers[last as usize].next = child;
-        }
-        self.markers[parent as usize].last_child = child;
     }
 
     /// `balanceWhiteSpaces()`: moves each marker edge over the whitespace and comments around it as its binder says.
@@ -978,15 +973,10 @@ impl PsiBuilderImpl {
             } else {
                 item.left_binder
             };
-            let mut lexeme_index = item.get_lexeme_index(done);
+            let mut lexeme_index = self.get_lexeme_index_at(i);
 
             let recursive = binder.is_recursive();
-            let prev_production_lex_index = if recursive {
-                0
-            } else {
-                let prev_id = self.production[i - 1];
-                self.marker(prev_id.unsigned_abs()).get_lexeme_index(prev_id < 0)
-            };
+            let prev_production_lex_index = if recursive { 0 } else { self.get_lexeme_index_at(i - 1) };
             let mut ws_start_index = lexeme_index.max(last_index);
             while ws_start_index > prev_production_lex_index
                 && (ws_start_index as usize) <= self.lexeme_count
@@ -1007,14 +997,17 @@ impl PsiBuilderImpl {
                 let edge = binder.get_edge_position(tokens, at_end, &getter).min(end - start);
                 lexeme_index = ws_start_index + edge as i32;
                 self.markers[item_id as usize].set_lexeme_index(lexeme_index, done);
+                self.production_lexemes[i] = lexeme_index;
             } else if ws_start_index > ws_end_index {
                 // An earlier edge moved past this marker's whitespace: Java configures the token view with a negative
                 // size and the binder still answers.
                 lexeme_index = ws_start_index + self.negative_size_edge(binder, ws_start_index, ws_end_index);
                 self.markers[item_id as usize].set_lexeme_index(lexeme_index, done);
+                self.production_lexemes[i] = lexeme_index;
             } else if lexeme_index < ws_start_index {
                 lexeme_index = ws_start_index;
                 self.markers[item_id as usize].set_lexeme_index(ws_start_index, done);
+                self.production_lexemes[i] = ws_start_index;
             }
 
             last_index = lexeme_index;
@@ -1042,6 +1035,14 @@ impl PsiBuilderImpl {
     }
 
     /// `bind()` with `createRootAST`, `insertLeaves`, `collapseLeaves`: appends the leaves and composites to `tree`.
+    ///
+    /// Java walks the light tree `prepareLightTree` links; this walks the production it is linked from, in the same
+    /// order, with the same rules: after the root, a start is a child of the current marker and becomes current
+    /// (a collapsed one gets its leaf, and its entries up to the done that closes it are skipped), any done closes the
+    /// current marker (at its own done lexeme, not the done entry's) and makes its parent current, so entries after the
+    /// root's done are the root's children, and an error item is a child unless it is at the same lexeme as the last
+    /// error item before it anywhere in the production (`lastErrorIndex`, collapsed markers' items included). Markers
+    /// still open at the end are closed innermost first, then the root.
     fn bind(&mut self, root_marker: u32, tree: &mut TreeData, root: Option<u32>, pending: &mut Vec<Pending>) -> u32 {
         let base = self.base as u32;
         let root_type = if root_marker == NONE {
@@ -1060,60 +1061,73 @@ impl PsiBuilderImpl {
             return root_node;
         }
 
+        let mut stack = std::mem::take(&mut self.bind_stack);
+        stack.clear();
         let mut cur_marker = root_marker;
         let mut cur_node = root_node;
         let mut lex_index = self.marker(root_marker).lexeme_index.max(0) as usize;
-        let mut item = if self.marker(root_marker).first_child != NONE {
-            self.marker(root_marker).first_child
-        } else {
-            root_marker
-        };
-        let mut item_done = self.marker(root_marker).first_child == NONE;
-        loop {
-            let target = self.marker(item).get_lexeme_index(item_done);
-            lex_index = self.insert_leaves(lex_index, target, cur_node, tree, pending);
-
-            if item == root_marker && item_done {
-                break;
-            }
-
-            let m = self.marker(item);
-            let (kind, collapsed, parent, first_child, next) = (m.kind, m.collapsed, m.parent, m.first_child, m.next);
-            if kind == MarkerKind::Start {
-                if item_done {
+        let mut last_error_index = -1;
+        let size = self.production.len();
+        let mut i = 1;
+        while i < size {
+            let id = self.production[i];
+            i += 1;
+            if id < 0 {
+                // done marker; an unbalanced one is only reported in Java
+                if let Some((parent_marker, parent_node)) = stack.pop() {
+                    let done_lexeme = self.marker(cur_marker).done_lexeme;
+                    lex_index = self.insert_leaves(lex_index, done_lexeme, cur_node, tree, pending);
                     tree.set_end(cur_node, self.offset_of(lex_index));
-                    cur_marker = if parent != NONE { parent } else { root_marker };
-                    cur_node = tree.parent_of(cur_node).unwrap_or(root_node);
-                    item = next;
-                    item_done = false;
-                } else if !collapsed {
-                    cur_marker = item;
-                    let child = self.create_composite(item, cur_node, lex_index, tree);
-                    cur_node = child;
-                    if first_child != NONE {
-                        item = first_child;
-                        item_done = false;
-                    } else {
-                        item_done = true;
-                    }
-                    continue;
-                } else {
-                    lex_index = self.collapse_leaves(cur_node, item, tree, pending);
-                    item = next;
+                    cur_marker = parent_marker;
+                    cur_node = parent_node;
                 }
-            } else {
+                continue;
+            }
+            let id = id as u32;
+            let m = self.marker(id);
+            let (kind, collapsed, lexeme_index) = (m.kind, m.collapsed, m.lexeme_index);
+            if kind == MarkerKind::Start {
+                lex_index = self.insert_leaves(lex_index, lexeme_index, cur_node, tree, pending);
+                if !collapsed {
+                    stack.push((cur_marker, cur_node));
+                    cur_node = self.create_composite(id, cur_node, lex_index, tree);
+                    cur_marker = id;
+                } else {
+                    lex_index = self.collapse_leaves(cur_node, id, tree, pending);
+                    let mut depth = 1;
+                    while i < size && depth > 0 {
+                        let inner = self.production[i];
+                        i += 1;
+                        if inner < 0 {
+                            depth -= 1;
+                        } else if self.marker(inner as u32).kind == MarkerKind::Start {
+                            depth += 1;
+                        } else {
+                            last_error_index = self.marker(inner as u32).lexeme_index;
+                        }
+                    }
+                }
+            } else if lexeme_index != last_error_index {
+                // adding only the first (deepest) error from the same lexeme offset
+                last_error_index = lexeme_index;
+                lex_index = self.insert_leaves(lex_index, lexeme_index, cur_node, tree, pending);
                 let start = self.offset_of(lex_index);
                 let error = tree.add_composite(cur_node, ElementType::Node(NodeKind::ERROR_ELEMENT), start);
                 tree.set_end(error, start);
-                tree.set_error(error, self.marker(item).message.clone().unwrap_or(Cow::Borrowed("")));
-                item = next;
-            }
-
-            if item == NONE {
-                item = cur_marker;
-                item_done = true;
+                let message = self.take_message(id);
+                tree.set_error(error, message);
             }
         }
+        while let Some((parent_marker, parent_node)) = stack.pop() {
+            let done_lexeme = self.marker(cur_marker).done_lexeme;
+            lex_index = self.insert_leaves(lex_index, done_lexeme, cur_node, tree, pending);
+            tree.set_end(cur_node, self.offset_of(lex_index));
+            cur_marker = parent_marker;
+            cur_node = parent_node;
+        }
+        self.bind_stack = stack;
+        let done_lexeme = self.marker(root_marker).done_lexeme;
+        lex_index = self.insert_leaves(lex_index, done_lexeme, root_node, tree, pending);
         // Tokens after the root's end are not inserted by PsiBuilderImpl (it logs "Tokens ... were not inserted into
         // the tree"); appending them keeps the tree lossless.
         self.insert_leaves(lex_index, self.lexeme_count as i32, root_node, tree, pending);
@@ -1125,12 +1139,12 @@ impl PsiBuilderImpl {
         (self.base + self.lex_starts[lex_index.min(self.lexeme_count)] as usize) as u32
     }
 
-    fn create_composite(&self, marker: u32, parent: u32, lex_index: usize, tree: &mut TreeData) -> u32 {
-        let m = self.marker(marker);
-        let element_type = m.element_type.unwrap_or(ElementType::Node(NodeKind::ERROR_ELEMENT));
+    fn create_composite(&mut self, marker: u32, parent: u32, lex_index: usize, tree: &mut TreeData) -> u32 {
+        let element_type = self.marker(marker).element_type.unwrap_or(ElementType::Node(NodeKind::ERROR_ELEMENT));
         let node = tree.add_composite(parent, element_type, self.offset_of(lex_index));
         if element_type == ElementType::Node(NodeKind::ERROR_ELEMENT) {
-            tree.set_error(node, m.message.clone().unwrap_or(Cow::Borrowed("")));
+            let message = self.take_message(marker);
+            tree.set_error(node, message);
         }
         node
     }
