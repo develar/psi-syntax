@@ -414,13 +414,35 @@ impl ElementType {
         }
     }
 
-    const fn index(self) -> usize {
+    /// A dense number: a token's discriminant (below 256), 256 + a node type's.
+    pub const fn index(self) -> usize {
         match self {
             ElementType::Token(t) => t as usize,
             ElementType::Node(n) => 256 + n as usize,
         }
     }
+
+    /// The element type of `index()` (`None` for a number that is none).
+    #[inline]
+    pub fn from_index(index: usize) -> Option<ElementType> {
+        if index < 256 {
+            TOKEN_BY_ID[index].map(ElementType::Token)
+        } else {
+            NodeKind::ALL.get(index - 256).map(|&n| ElementType::Node(n))
+        }
+    }
 }
+
+/// Each token type at its discriminant.
+const TOKEN_BY_ID: [Option<TokenKind>; 256] = {
+    let mut table = [None; 256];
+    let mut i = 0;
+    while i < TokenKind::ALL.len() {
+        table[TokenKind::ALL[i] as usize] = Some(TokenKind::ALL[i]);
+        i += 1;
+    }
+    table
+};
 
 impl From<TokenKind> for ElementType {
     fn from(t: TokenKind) -> Self {

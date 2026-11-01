@@ -994,6 +994,8 @@ impl PsiBuilderImpl {
             None => tree.add_composite(u32::MAX, root_type, base),
         };
         self.bind_stack.clear();
+        // At most a leaf per token and a node per production entry (a start or an error).
+        tree.reserve(self.lexeme_count + self.production.len());
         self.bind = if root_marker == NONE {
             // "Parser produced no markers": keep the tree lossless.
             BindState {

@@ -42,69 +42,91 @@ pub struct NodeId(pub u32);
 
 const NONE: u32 = u32::MAX;
 
-#[derive(Copy, Clone, Debug)]
-struct Node {
-    kind: ElementType,
-    leaf: bool,
-    start: u32,
-    end: u32,
-    parent: u32,
-    first_child: u32,
-    last_child: u32,
-    next_sibling: u32,
-}
+/// `kinds` bit of a leaf (a token; no children).
+const LEAF: u16 = 0x8000;
+/// `kinds` bits of the element type's `ElementType::index`.
+const KIND_INDEX: u16 = 0x3FFF;
 
-/// The arena a builder appends to.
+/// The arena a builder appends to, one column per field, nodes in preorder: a node's subtree is the ids
+/// `id..subtree_end[id]`, so its first child is `id + 1` when it has one and the next sibling of a child is its
+/// `subtree_end` while that is inside the parent's.
 #[derive(Default, Debug)]
 pub(crate) struct TreeData {
-    nodes: Vec<Node>,
+    /// `ElementType::index` of each node, with `LEAF` on a leaf.
+    kinds: Vec<u16>,
+    starts: Vec<u32>,
+    ends: Vec<u32>,
+    parents: Vec<u32>,
+    subtree_ends: Vec<u32>,
     /// The message of each error node, sorted by node id.
     errors: Vec<(u32, Cow<'static, str>)>,
 }
 
 impl TreeData {
-    fn push(&mut self, parent: u32, kind: ElementType, leaf: bool, start: u32, end: u32) -> u32 {
-        let id = self.nodes.len() as u32;
-        self.nodes.push(Node {
-            kind,
-            leaf,
-            start,
-            end,
-            parent,
-            first_child: NONE,
-            last_child: NONE,
-            next_sibling: NONE,
-        });
-        if parent != NONE {
-            let last = self.nodes[parent as usize].last_child;
-            if last == NONE {
-                self.nodes[parent as usize].first_child = id;
-            } else {
-                self.nodes[last as usize].next_sibling = id;
-            }
-            self.nodes[parent as usize].last_child = id;
-        }
+    #[inline(always)]
+    fn push(&mut self, parent: u32, kind: u16, start: u32, end: u32) -> u32 {
+        let id = self.kinds.len() as u32;
+        self.kinds.push(kind);
+        self.starts.push(start);
+        self.ends.push(end);
+        self.parents.push(parent);
+        self.subtree_ends.push(id + 1);
         id
     }
 
-    /// A composite node starting at `start` (its end is set when it is done) as the last child of `parent`
-    /// (`u32::MAX`: a root).
+    /// A composite node starting at `start` as the next node, a child of `parent` (`u32::MAX`: a root); its end and
+    /// its subtree's are set when it is done (`set_end`), after its descendants are appended.
     pub(crate) fn add_composite(&mut self, parent: u32, kind: ElementType, start: u32) -> u32 {
-        self.push(parent, kind, false, start, start)
+        self.push(parent, kind.index() as u16, start, start)
     }
 
-    /// A leaf as the last child of `parent`.
+    /// A leaf as the next node, a child of `parent`.
     pub(crate) fn add_leaf(&mut self, parent: u32, kind: ElementType, start: u32, end: u32) -> u32 {
-        self.push(parent, kind, true, start, end)
+        self.push(parent, kind.index() as u16 | LEAF, start, end)
     }
 
+    /// Closes a composite: its byte end, and its subtree ends at the last node appended.
     pub(crate) fn set_end(&mut self, node: u32, end: u32) {
-        let n = &mut self.nodes[node as usize];
-        n.end = end.max(n.start);
+        let n = node as usize;
+        self.ends[n] = end.max(self.starts[n]);
+        self.subtree_ends[n] = self.kinds.len() as u32;
+    }
+
+    /// Room for `additional` more nodes in every column.
+    pub(crate) fn reserve(&mut self, additional: usize) {
+        self.kinds.reserve(additional);
+        self.starts.reserve(additional);
+        self.ends.reserve(additional);
+        self.parents.reserve(additional);
+        self.subtree_ends.reserve(additional);
     }
 
     pub(crate) fn set_error(&mut self, node: u32, message: Cow<'static, str>) {
         self.errors.push((node, message));
+    }
+
+    fn clear(&mut self) {
+        self.kinds.clear();
+        self.starts.clear();
+        self.ends.clear();
+        self.parents.clear();
+        self.subtree_ends.clear();
+        self.errors.clear();
+    }
+
+    /// A copy in exactly sized buffers; the errors are taken (most files have none: their list never allocates; the
+    /// others' is shrunk to fit).
+    fn take_exact(&mut self) -> TreeData {
+        let mut errors = std::mem::take(&mut self.errors);
+        errors.shrink_to_fit();
+        TreeData {
+            kinds: self.kinds.as_slice().to_vec(),
+            starts: self.starts.as_slice().to_vec(),
+            ends: self.ends.as_slice().to_vec(),
+            parents: self.parents.as_slice().to_vec(),
+            subtree_ends: self.subtree_ends.as_slice().to_vec(),
+            errors,
+        }
     }
 }
 
@@ -160,8 +182,7 @@ impl Parser {
         lexer::tokenize_into(&text, &mut self.file);
         crate::counters::add(crate::counters::Counter::FileTokens, self.file.len() as u64);
         let mut data = std::mem::take(&mut self.data);
-        data.nodes.clear();
-        data.errors.clear();
+        data.clear();
 
         let mut bufs = self.spare.pop().unwrap_or_default();
         bufs.lex_types.clear();
@@ -176,10 +197,7 @@ impl Parser {
         self.frames.push(Frame { builder, bufs });
         self.bind_frames(&text, &mut data);
 
-        // Most files have no error: their list never allocates; the others' is shrunk to fit.
-        let mut errors = std::mem::take(&mut data.errors);
-        errors.shrink_to_fit();
-        let tree = TreeData { nodes: data.nodes.as_slice().to_vec(), errors };
+        let tree = data.take_exact();
         self.data = data;
         Tree { text, file_kind, data: tree, root }
     }
@@ -300,20 +318,20 @@ impl Tree {
         NodeId(self.root)
     }
 
-    /// The number of nodes.
+    /// The number of nodes. Ids are `0..len()` in document order (preorder).
     pub fn len(&self) -> usize {
-        self.data.nodes.len()
+        self.data.kinds.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.data.nodes.is_empty()
+        self.data.kinds.is_empty()
     }
 
-    /// The heap bytes this tree holds: its copy of the text, the node arena and the error list with their owned
+    /// The heap bytes this tree holds: its copy of the text, the node columns and the error list with their owned
     /// messages, by capacity. What a consumer pays to keep the tree; `ksdump --bench` reports it per source MB.
     pub fn heap_bytes(&self) -> usize {
-        let messages: usize = self
-            .data
+        let d = &self.data;
+        let messages: usize = d
             .errors
             .iter()
             .map(|(_, m)| match m {
@@ -322,41 +340,42 @@ impl Tree {
             })
             .sum();
         self.text.len()
-            + self.data.nodes.capacity() * size_of::<Node>()
-            + self.data.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
+            + d.kinds.capacity() * size_of::<u16>()
+            + (d.starts.capacity() + d.ends.capacity() + d.parents.capacity() + d.subtree_ends.capacity())
+                * size_of::<u32>()
+            + d.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
             + messages
-    }
-
-    fn node(&self, id: NodeId) -> &Node {
-        &self.data.nodes[id.0 as usize]
     }
 
     /// The element type: a node type for a composite, a token type for a leaf. A doc comment (`DOC_COMMENT`, "KDoc")
     /// and a markdown link (`KDOC_MARKDOWN_LINK`) are composites with a token type, as their PSI is.
+    #[inline]
     pub fn kind(&self, id: NodeId) -> ElementType {
-        self.node(id).kind
+        let index = (self.data.kinds[id.0 as usize] & KIND_INDEX) as usize;
+        ElementType::from_index(index).unwrap_or(ElementType::Node(NodeKind::ERROR_ELEMENT))
     }
 
     /// The token type of a leaf.
     pub fn token_kind(&self, id: NodeId) -> Option<TokenKind> {
-        let n = self.node(id);
-        if n.leaf { n.kind.token() } else { None }
+        if self.is_leaf(id) { self.kind(id).token() } else { None }
     }
 
     /// The node type of a composite.
     pub fn node_kind(&self, id: NodeId) -> Option<NodeKind> {
-        self.node(id).kind.node()
+        self.kind(id).node()
     }
 
     /// Whether the node is a leaf (a token; it has no children).
+    #[inline]
     pub fn is_leaf(&self, id: NodeId) -> bool {
-        self.node(id).leaf
+        self.data.kinds[id.0 as usize] & LEAF != 0
     }
 
     /// The byte range in `source()`.
+    #[inline]
     pub fn range(&self, id: NodeId) -> Range<usize> {
-        let n = self.node(id);
-        n.start as usize..n.end as usize
+        let i = id.0 as usize;
+        self.data.starts[i] as usize..self.data.ends[i] as usize
     }
 
     /// The node's text.
@@ -365,28 +384,48 @@ impl Tree {
     }
 
     pub fn parent(&self, id: NodeId) -> Option<NodeId> {
-        let parent = self.node(id).parent;
+        let parent = self.data.parents[id.0 as usize];
         (parent != NONE).then_some(NodeId(parent))
     }
 
-    pub fn first_child(&self, id: NodeId) -> Option<NodeId> {
-        let child = self.node(id).first_child;
-        (child != NONE).then_some(NodeId(child))
+    /// The end of the subtree at `id`: its nodes are the ids `id..subtree_end(id)`.
+    #[inline]
+    pub fn subtree_end(&self, id: NodeId) -> NodeId {
+        NodeId(self.data.subtree_ends[id.0 as usize])
     }
 
+    pub fn first_child(&self, id: NodeId) -> Option<NodeId> {
+        (self.data.subtree_ends[id.0 as usize] > id.0 + 1).then_some(NodeId(id.0 + 1))
+    }
+
+    /// The last child: the ancestor of the subtree's last node that is a child of `id` (a walk up from it).
     pub fn last_child(&self, id: NodeId) -> Option<NodeId> {
-        let child = self.node(id).last_child;
-        (child != NONE).then_some(NodeId(child))
+        let end = self.data.subtree_ends[id.0 as usize];
+        if end <= id.0 + 1 {
+            return None;
+        }
+        let mut child = end - 1;
+        loop {
+            let parent = self.data.parents[child as usize];
+            if parent == id.0 {
+                return Some(NodeId(child));
+            }
+            child = parent;
+        }
     }
 
     pub fn next_sibling(&self, id: NodeId) -> Option<NodeId> {
-        let next = self.node(id).next_sibling;
-        (next != NONE).then_some(NodeId(next))
+        let parent = self.data.parents[id.0 as usize];
+        if parent == NONE {
+            return None;
+        }
+        let next = self.data.subtree_ends[id.0 as usize];
+        (next < self.data.subtree_ends[parent as usize]).then_some(NodeId(next))
     }
 
     /// The children in order.
     pub fn children(&self, id: NodeId) -> Children<'_> {
-        Children { tree: self, next: self.node(id).first_child }
+        Children { subtree_ends: &self.data.subtree_ends, next: id.0 + 1, end: self.data.subtree_ends[id.0 as usize] }
     }
 
     /// The first child of the given kind.
@@ -401,79 +440,83 @@ impl Tree {
         Some(&self.data.errors[i].1)
     }
 
-    /// The nodes of the subtree at `id` in document order (preorder), with their depth below `id`.
+    /// The nodes of the subtree at `id` in document order (preorder), with their depth below `id`: a scan of the ids
+    /// `id..subtree_end(id)`.
     pub fn preorder(&self, id: NodeId) -> Preorder<'_> {
-        Preorder { tree: self, root: id.0, next: id.0, depth: 0 }
+        Preorder {
+            parents: &self.data.parents,
+            root: id.0,
+            next: id.0,
+            end: self.data.subtree_ends[id.0 as usize],
+            depth: 0,
+        }
     }
 
     /// The leaves (tokens, whitespace, comments) in document order.
     pub fn tokens(&self) -> impl Iterator<Item = NodeId> + '_ {
-        self.preorder(self.root()).map(|(id, _)| id).filter(|&id| self.is_leaf(id))
+        (0..self.len() as u32).map(NodeId).filter(|&id| self.is_leaf(id))
     }
 }
 
 /// The children of a node.
 pub struct Children<'t> {
-    tree: &'t Tree,
+    subtree_ends: &'t [u32],
     next: u32,
+    /// The parent's subtree end.
+    end: u32,
 }
 
 impl Iterator for Children<'_> {
     type Item = NodeId;
 
+    #[inline]
     fn next(&mut self) -> Option<NodeId> {
-        if self.next == NONE {
+        if self.next >= self.end {
             return None;
         }
         let id = self.next;
-        self.next = self.tree.data.nodes[id as usize].next_sibling;
+        self.next = self.subtree_ends[id as usize];
         Some(NodeId(id))
     }
 }
 
-/// A preorder walk of a subtree: `(node, depth below the subtree root)`.
+/// A preorder walk of a subtree: `(node, depth below the subtree root)`, a scan of its ids; the depth follows from the
+/// parents (a node's parent is the node before it or one of that node's ancestors).
 pub struct Preorder<'t> {
-    tree: &'t Tree,
+    parents: &'t [u32],
     root: u32,
     next: u32,
+    end: u32,
     depth: usize,
 }
 
 impl Iterator for Preorder<'_> {
     type Item = (NodeId, usize);
 
+    #[inline]
     fn next(&mut self) -> Option<(NodeId, usize)> {
-        if self.next == NONE {
+        let id = self.next;
+        if id >= self.end {
             return None;
         }
-        let id = self.next;
-        let depth = self.depth;
-        let nodes = &self.tree.data.nodes;
-        let n = &nodes[id as usize];
-        if n.first_child != NONE {
-            self.next = n.first_child;
-            self.depth += 1;
-        } else {
-            let mut cur = id;
-            loop {
-                if cur == self.root {
-                    self.next = NONE;
-                    break;
-                }
-                let c = &nodes[cur as usize];
-                if c.next_sibling != NONE {
-                    self.next = c.next_sibling;
-                    break;
-                }
-                cur = c.parent;
-                self.depth = self.depth.saturating_sub(1);
-                if cur == NONE {
-                    self.next = NONE;
-                    break;
-                }
+        if id != self.root {
+            // climb from the node before to this node's parent
+            let parent = self.parents[id as usize];
+            let mut prev = id - 1;
+            let mut depth = self.depth;
+            while prev != parent && prev != NONE {
+                prev = self.parents[prev as usize];
+                depth = depth.saturating_sub(1);
             }
+            self.depth = depth + 1;
         }
-        Some((NodeId(id), depth))
+        self.next = id + 1;
+        Some((NodeId(id), self.depth))
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let n = (self.end - self.next.min(self.end)) as usize;
+        (n, Some(n))
     }
 }
 
@@ -498,3 +541,11 @@ fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(usize, usize)> {
     }
     Some((first, last))
 }
+
+// A tree is shared across threads as is, a parser moves to the thread that keeps it.
+const _: () = {
+    const fn send_sync<T: Send + Sync + 'static>() {}
+    const fn send<T: Send + 'static>() {}
+    send_sync::<Tree>();
+    send::<Parser>();
+};

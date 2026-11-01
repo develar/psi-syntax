@@ -4,7 +4,7 @@
 mod common;
 
 use kotlin_syntax::dump::psi_to_string;
-use kotlin_syntax::{FileKind, Tree};
+use kotlin_syntax::{FileKind, NodeId, Tree};
 
 struct XorShift(u64);
 
@@ -21,6 +21,7 @@ impl XorShift {
 fn check_lossless(text: &[u8], kind: FileKind) {
     let tree = Tree::parse(text, kind);
     assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()));
+    check_navigation(&tree);
     let mut covered = Vec::with_capacity(text.len());
     for id in tree.tokens() {
         covered.extend_from_slice(tree.text(id));
@@ -28,6 +29,32 @@ fn check_lossless(text: &[u8], kind: FileKind) {
     assert_eq!(covered, text, "{:?}", String::from_utf8_lossy(text));
     assert_eq!(tree.range(tree.root()), 0..text.len());
     let _ = psi_to_string(&tree, "a.kt");
+}
+
+/// The children, first/last child and next sibling of each node agree with its parent links, and each child's range
+/// is inside its parent's.
+fn check_navigation(tree: &Tree) {
+    let mut children: Vec<Vec<NodeId>> = vec![Vec::new(); tree.len()];
+    for i in 0..tree.len() as u32 {
+        if let Some(parent) = tree.parent(NodeId(i)) {
+            assert!(parent.0 < i);
+            let (outer, inner) = (tree.range(parent), tree.range(NodeId(i)));
+            assert!(outer.start <= inner.start && inner.end <= outer.end, "{outer:?} {inner:?}");
+            children[parent.0 as usize].push(NodeId(i));
+        }
+    }
+    for (i, expected) in children.iter().enumerate() {
+        let id = NodeId(i as u32);
+        assert!(tree.children(id).eq(expected.iter().copied()));
+        assert_eq!(tree.first_child(id), expected.first().copied());
+        assert_eq!(tree.last_child(id), expected.last().copied());
+        for pair in expected.windows(2) {
+            assert_eq!(tree.next_sibling(pair[0]), Some(pair[1]));
+        }
+        if let Some(&last) = expected.last() {
+            assert_eq!(tree.next_sibling(last), None);
+        }
+    }
 }
 
 #[test]
