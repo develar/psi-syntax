@@ -31,14 +31,17 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 | module | holds |
 |---|---|
 | `src/tokens.rs` | `TokenKind` (every Kotlin and KDoc token, plus WHITE_SPACE, BAD_CHARACTER), its debug name as the dump prints it, the keyword sets (hard, soft, modifier) |
+| `src/unicode.rs` | `[:letter:]`, `[:digit:]` (Kotlin.flex) and `[:jletter:]` (KDoc.flex) above ASCII, decoded from the character maps of `_JetLexer.java` / `_KDocLexer.java`; generated, do not edit |
 | `src/lexer.rs`, `src/kdoc/lexer.rs` | the ports of Kotlin.flex and KDoc.flex (states, string templates, raw strings, `$$` prefixes, nested block comments, shebang) |
+| `src/kdoc/parser.rs` | `KDocParser` and `KDocLinkParser`: the tree runs them on every doc comment and markdown link |
 | `src/node_kind.rs` | `NodeKind`, the composite element types with their dump names (`FUN`, `CLASS`, `KtFile` root, `PsiErrorElement`) |
 | `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback, the newline mode stack, edge binders; produces the tree |
 | `src/tree.rs` | the lossless tree: one arena (`Vec`) of nodes, `u32` ids, every node a kind and a byte range, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. The public API consumers read: `Tree::parse(text, FileKind::{Kt,Kts})`, `root()`, `kind()`, `range()`, `children()`, `parent()`, `text()`, `first_child_of_kind()`, an iterator over tokens. `Send + Sync`, no lifetimes in the stored tree |
-| `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports |
+| `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
 | `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT`: parse-only throughput in MB/s |
-| `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure |
+| `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
+| `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic |
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
 
@@ -57,9 +60,29 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
    `$HOME/.cache/kotlin-syntax/oracle/community-3caa0bf/` for the list `$HOME/.cache/kotlin-syntax/corpus/community-3caa0bf.list`
    over `/Users/develar/.cache/accio-bench/intellij-community` (55 501 files). Compare with
    `scripts/compare.py ORACLE_DIR OURS_DIR`.
+3. The lexer oracle: `java -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list LIST
+   --root ROOT` prints a hash of each file's tokens (Kotlin, and KDoc inside each doc comment) as `ksdump --lex` does;
+   `diff` the `cut -f1,2` of both. `scripts/lex-fuzz.py` makes mutated inputs for it.
 
 Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java says
 otherwise.
+
+## Porting conventions (the builder and parser API)
+
+- `AbstractKotlinParsing` is a trait implemented by `KotlinParsing<'b>` and `KotlinExpressionParsing<'p, 'b>`; its
+  helpers are provided methods (`self.at(LBRACE)`, `self.expect_with(RPAR, "Expecting ')'")`). `myBuilder` is
+  `self.my_builder()`, a `SemanticWhitespaceAwarePsiBuilder` (the Java builder seen through its adapters).
+- `KotlinExpressionParsing` is a borrow of its `KotlinParsing`: `myExpressionParsing.f()` is
+  `self.my_expression_parsing().f()`, `myKotlinParsing.g()` is `self.my_kotlin_parsing.g()`.
+- A marker is a `Copy` handle whose methods take the builder: `marker.done(self.my_builder(), FUN)`,
+  `marker.precede(self.my_builder())`, `marker.error(self.my_builder(), "...")`, `rollback_to`, `drop`, `collapse`,
+  `done_before`, `error_before`, `set_custom_edge_token_binders(b, Some(left), None)`.
+- A token type is `Option<TokenKind>` (`null` = `None`) and compares with a token directly: `self.tt() == LBRACE`. A
+  `TokenSet` is a `const`, `TokenSet::create(&[..])`, `or_set`, `and_set`, `and_not`; `contains` takes a token, a node
+  type or an `Option`. Composite types are `NodeKind`; an `IElementType` result is `Option<NodeKind>`.
+- Overloads get suffixed names: the fewest-argument form keeps the name, the others `_with` (or a descriptive suffix,
+  e.g. `expect_with_recovery`, `parse_type_ref_with_intersections`), documented on each function.
+- Every stub says `TODO(port): <File>.java:<line>`; port the method there, keep the order.
 
 ## Rules
 
