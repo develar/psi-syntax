@@ -204,6 +204,19 @@ struct MarkerData {
 
 const NONE: u32 = 0;
 
+/// The head node of the production list (`PsiBuilderImpl::links`).
+const HEAD: u32 = 0;
+/// The links of a node not in the production list.
+const UNLINKED: u32 = u32::MAX;
+/// The bit of an extra node (`PsiBuilderImpl::extra_links`).
+const EXTRA: u32 = 1 << 31;
+
+/// The node of a marker's start entry in the production list; its done entry's is the next.
+#[inline(always)]
+fn start_node(marker_id: u32) -> u32 {
+    marker_id << 1
+}
+
 impl MarkerData {
     fn new(kind: MarkerKind) -> Self {
         MarkerData {
@@ -272,8 +285,10 @@ pub(crate) struct Pending {
 /// the deepest measured form). The deepest community file reaches 62 levels, 5 nested type argument lists and 4
 /// nested constructs parsed twice.
 pub const NESTING_LIMIT: u32 = 1000;
-/// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder: an expression `a<a<…` tries one
-/// at every `<` and rolls it back, so this bounds what each `<` costs.
+/// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder. An expression `a<a<…` tries one
+/// at every `<` and rolls it back, each nesting the lists of the `<`s after it: so a list that reaches the limit also
+/// makes every list starting before that token too deep (`type_arguments_too_deep_before`), and each `<` costs
+/// constant time on average, not the limit.
 pub const TYPE_ARGUMENTS_LIMIT: u32 = 32;
 /// How many constructs that are parsed twice may nest in one builder: a rolled-back attempt parses them and the parse
 /// after the rollback parses them again, so the work doubles with each level. An annotation (`parseAnnotation`: an
@@ -352,6 +367,9 @@ pub(crate) struct BuilderBuffers {
     markers: Vec<MarkerData>,
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
+    links: Vec<[u32; 2]>,
+    extra_links: Vec<[u32; 2]>,
+    extra_ids: Vec<i32>,
     production: Vec<i32>,
     production_lexemes: Vec<i32>,
     messages: Vec<Cow<'static, str>>,
@@ -382,6 +400,9 @@ pub struct PsiBuilderImpl {
     nesting_limit: u32,
     type_arguments: u32,
     reparsed: u32,
+    /// A type argument list starting before this token is too deeply nested: one reached `TYPE_ARGUMENTS_LIMIT` here,
+    /// so the lists inside it that start before it would reach it too.
+    type_arguments_too_deep_before: usize,
     /// Where token 0 is in the file's token list, when the tokens are an unmodified slice of it.
     file_token: Option<usize>,
     tokens_to_restore_on_rollback: BTreeMap<usize, TokenKind>,
@@ -401,11 +422,26 @@ pub struct PsiBuilderImpl {
     markers: Vec<MarkerData>,
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
-    /// `MarkerProduction`: a start marker's id, or the negated id of a done marker.
+    /// `MarkerProduction` while parsing, as a doubly linked list (not in the Java's array, whose inserts before a
+    /// marker and removals move everything after it): `links[node]` is `[prev, next]`, where node `2 * id` is the
+    /// start entry of marker `id` and `2 * id + 1` its done entry, and node 0 is the head whose `prev` is the last
+    /// entry; `UNLINKED` for a node not in the list. So `indexOf` is the marker's own node, and `precede`, `doneBefore`,
+    /// `errorBefore`, `drop` and `rollbackTo` touch only the entries they add or remove. A second done entry of the
+    /// same marker id (a marker done twice, which Java only logs, or one done again after its id was reused while an
+    /// old done entry stayed) is an extra node `EXTRA | k`, its links in `extra_links[k]`, its id in `extra_ids[k]`.
+    links: Vec<[u32; 2]>,
+    extra_links: Vec<[u32; 2]>,
+    extra_ids: Vec<i32>,
+    /// How many extra nodes are linked; while none, the last done entry of a marker is its own done node.
+    extras_linked: u32,
+    /// How many entries are linked.
+    production_len: usize,
+    /// The production as an array, made from the list by `prepare_light_tree` for `balance_white_spaces` and `bind`:
+    /// a start marker's id, or the negated id of a done marker.
     production: Vec<i32>,
     /// `getLexemeIndexAt(i)` for every production index (not in the Java, which reads it from the marker): the
-    /// marker's `getLexemeIndex(done)`, written wherever an entry is added and rewritten by `balance_white_spaces`, so
-    /// the searches over the production read one contiguous array.
+    /// marker's `getLexemeIndex(done)` when the list is made into `production`, rewritten by `balance_white_spaces`,
+    /// so its walk reads one contiguous array.
     production_lexemes: Vec<i32>,
     /// The error messages markers refer to (`MarkerData::message`).
     messages: Vec<Cow<'static, str>>,
@@ -429,8 +465,6 @@ impl AsPsiBuilder for PsiBuilderImpl {
     }
 }
 
-const LINEAR_SEARCH_LIMIT: usize = 20;
-
 impl PsiBuilderImpl {
     /// A builder over `text[base..base + len]` with the token types in `bufs.lex_types` and their starts in
     /// `bufs.starts` (relative to `base`, one more entry than the types, the last being `len`). It works in `bufs`, emptied until `release`;
@@ -451,6 +485,15 @@ impl PsiBuilderImpl {
         free_start_markers.clear();
         let mut free_error_items = std::mem::take(&mut bufs.free_error_items);
         free_error_items.clear();
+        let mut links = std::mem::take(&mut bufs.links);
+        links.clear();
+        // Marker 0 (no marker): its start node is the head, the empty list; its done node is never linked.
+        links.push([HEAD, HEAD]);
+        links.push([UNLINKED, UNLINKED]);
+        let mut extra_links = std::mem::take(&mut bufs.extra_links);
+        extra_links.clear();
+        let mut extra_ids = std::mem::take(&mut bufs.extra_ids);
+        extra_ids.clear();
         let mut production = std::mem::take(&mut bufs.production);
         production.clear();
         let mut production_lexemes = std::mem::take(&mut bufs.production_lexemes);
@@ -475,6 +518,7 @@ impl PsiBuilderImpl {
             nesting_limit: NESTING_LIMIT,
             type_arguments: 0,
             reparsed: 0,
+            type_arguments_too_deep_before: 0,
             file_token,
             tokens_to_restore_on_rollback: BTreeMap::new(),
             current_lexeme: 0,
@@ -485,6 +529,11 @@ impl PsiBuilderImpl {
             markers,
             free_start_markers,
             free_error_items,
+            links,
+            extra_links,
+            extra_ids,
+            extras_linked: 0,
+            production_len: 0,
             production,
             production_lexemes,
             messages,
@@ -511,7 +560,11 @@ impl PsiBuilderImpl {
         match kind {
             Nesting::Level => {}
             Nesting::TypeArguments => {
+                if self.current_lexeme < self.type_arguments_too_deep_before {
+                    return false;
+                }
                 if self.type_arguments >= TYPE_ARGUMENTS_LIMIT.min(self.nesting_limit) {
+                    self.type_arguments_too_deep_before = self.current_lexeme + 1;
                     return false;
                 }
                 self.type_arguments += 1;
@@ -580,6 +633,9 @@ impl PsiBuilderImpl {
         bufs.markers = self.markers;
         bufs.free_start_markers = self.free_start_markers;
         bufs.free_error_items = self.free_error_items;
+        bufs.links = self.links;
+        bufs.extra_links = self.extra_links;
+        bufs.extra_ids = self.extra_ids;
         bufs.production = self.production;
         bufs.production_lexemes = self.production_lexemes;
         bufs.messages = self.messages;
@@ -800,12 +856,11 @@ impl PsiBuilderImpl {
     /// `mark()`.
     pub fn mark(&mut self) -> Marker {
         crate::counters::add(crate::counters::Counter::Mark, 1);
-        if !self.production.is_empty() {
+        if self.production_len != 0 {
             self.skip_whitespace();
         }
         let marker = self.create_marker(self.current_lexeme as i32);
-        self.production.push(marker.0 as i32);
-        self.production_lexemes.push(self.current_lexeme as i32);
+        self.link_before(start_node(marker.0), HEAD);
         marker
     }
 
@@ -824,6 +879,8 @@ impl PsiBuilderImpl {
             Some(id) => id,
             None => {
                 self.markers.push(MarkerData::new(kind));
+                self.links.push([UNLINKED, UNLINKED]);
+                self.links.push([UNLINKED, UNLINKED]);
                 (self.markers.len() - 1) as u32
             }
         }
@@ -868,9 +925,8 @@ impl PsiBuilderImpl {
 
     /// `error(messageText)`: an error element at the current token, unless the last production is an error item there.
     pub fn error(&mut self, message_text: impl Into<Cow<'static, str>>) {
-        if let Some(&last) = self.production.last()
-            && last > 0
-        {
+        let last = self.node_id(self.link(HEAD)[0]);
+        if last > 0 {
             let last_marker = self.marker(last as u32);
             if last_marker.kind == MarkerKind::Error && last_marker.lexeme_index == self.current_lexeme as i32 {
                 return;
@@ -879,116 +935,177 @@ impl PsiBuilderImpl {
         let id = self.allocate(MarkerKind::Error);
         self.set_message(id, message_text.into());
         self.markers[id as usize].lexeme_index = self.current_lexeme as i32;
-        self.production.push(id as i32);
-        self.production_lexemes.push(self.current_lexeme as i32);
+        self.link_before(start_node(id), HEAD);
     }
 
     /// `hasErrorsAfter(marker)`: whether an error item or error marker was added after `marker` and not dropped.
     pub fn has_errors_after(&self, marker: Marker) -> bool {
-        let Some(idx) = self.index_of(marker.0) else { return false };
-        self.production[idx + 1..].iter().any(|&id| {
-            id > 0 && {
+        let Some(node) = self.index_of(marker.0) else { return false };
+        let mut node = self.link(node)[1];
+        while node != HEAD {
+            let id = self.node_id(node);
+            if id > 0 {
                 let m = self.marker(id as u32);
-                m.kind == MarkerKind::Error
+                if m.kind == MarkerKind::Error
                     || (m.element_type == Some(ElementType::Node(NodeKind::ERROR_ELEMENT)) && m.message != 0)
+                {
+                    return true;
+                }
             }
-        })
+            node = self.link(node)[1];
+        }
+        false
     }
 
     // MarkerProduction
 
-    /// `MarkerProduction.indexOf`: the production index of a start marker.
-    fn index_of(&self, marker_id: u32) -> Option<usize> {
-        let id = marker_id as i32;
-        let size = self.production.len();
-        let low = size.saturating_sub(LINEAR_SEARCH_LIMIT);
-        for i in (low..size).rev() {
-            if self.production[i] == id {
-                return Some(i);
-            }
-        }
-        crate::counters::add(crate::counters::Counter::IndexOfSearch, 1);
-        let lexeme_index = self.marker(marker_id).get_lexeme_index(false);
-        let from = self.find_marker_at_lexeme(lexeme_index).unwrap_or(0);
-        (from..size).find(|&i| self.production[i] == id)
+    #[inline(always)]
+    fn link(&self, node: u32) -> [u32; 2] {
+        if node & EXTRA == 0 { self.links[node as usize] } else { self.extra_links[(node & !EXTRA) as usize] }
     }
 
-    fn find_marker_at_lexeme(&self, lexeme_index: i32) -> Option<usize> {
-        let end = self.production.len().saturating_sub(LINEAR_SEARCH_LIMIT);
-        let (mut lo, mut hi) = (0usize, end);
-        let mut found = None;
-        while lo < hi {
-            let mid = lo + (hi - lo) / 2;
-            match self.get_lexeme_index_at(mid).cmp(&lexeme_index) {
-                std::cmp::Ordering::Less => lo = mid + 1,
-                std::cmp::Ordering::Greater => hi = mid,
-                std::cmp::Ordering::Equal => {
-                    found = Some(mid);
-                    break;
-                }
-            }
-        }
-        found.map(|i| self.find_same_lexeme_group_start(lexeme_index, i))
+    #[inline(always)]
+    fn link_mut(&mut self, node: u32) -> &mut [u32; 2] {
+        if node & EXTRA == 0 { &mut self.links[node as usize] } else { &mut self.extra_links[(node & !EXTRA) as usize] }
     }
 
-    fn find_same_lexeme_group_start(&self, lexeme_index: i32, mut prod_index: usize) -> usize {
-        while prod_index > 0 && self.get_lexeme_index_at(prod_index - 1) == lexeme_index {
-            prod_index -= 1;
+    /// The production entry a node is: a start marker's id, or the negated id of a done marker.
+    #[inline(always)]
+    fn node_id(&self, node: u32) -> i32 {
+        if node & EXTRA != 0 {
+            return self.extra_ids[(node & !EXTRA) as usize];
         }
-        prod_index
+        let id = (node >> 1) as i32;
+        if node & 1 == 0 { id } else { -id }
     }
 
-    fn get_lexeme_index_at(&self, production_index: usize) -> i32 {
-        let lexeme = self.production_lexemes[production_index];
-        if cfg!(debug_assertions) {
-            let id = self.production[production_index];
-            debug_assert_eq!(lexeme, self.marker(id.unsigned_abs()).get_lexeme_index(id < 0));
-        }
-        lexeme
+    #[inline(always)]
+    fn is_linked(&self, node: u32) -> bool {
+        self.link(node)[0] != UNLINKED
     }
 
+    /// Links `node` into the production right before `anchor` (`HEAD`: at the end).
+    #[inline(always)]
+    fn link_before(&mut self, node: u32, anchor: u32) {
+        let prev = self.link(anchor)[0];
+        *self.link_mut(node) = [prev, anchor];
+        self.link_mut(prev)[1] = node;
+        self.link_mut(anchor)[0] = node;
+        self.production_len += 1;
+        if node & EXTRA != 0 {
+            self.extras_linked += 1;
+        }
+    }
+
+    #[inline(always)]
+    fn unlink(&mut self, node: u32) {
+        let [prev, next] = self.link(node);
+        self.link_mut(prev)[1] = next;
+        self.link_mut(next)[0] = prev;
+        *self.link_mut(node) = [UNLINKED, UNLINKED];
+        self.production_len -= 1;
+        if node & EXTRA != 0 {
+            self.extras_linked -= 1;
+        }
+    }
+
+    /// `MarkerProduction.indexOf`: the production entry of a start marker, its own node when linked.
+    #[inline(always)]
+    fn index_of(&self, marker_id: u32) -> Option<u32> {
+        let node = start_node(marker_id);
+        self.is_linked(node).then_some(node)
+    }
+
+    /// `MarkerProduction.rollbackTo`: removes the entries from the marker's to the end, freeing the markers whose
+    /// start entries they are, from the last entry back (the free lists' order).
     fn production_rollback_to(&mut self, marker_id: u32) {
-        let Some(idx) = self.index_of(marker_id) else { return };
-        for i in (idx..self.production.len()).rev() {
-            let id = self.production[i];
+        let Some(first) = self.index_of(marker_id) else { return };
+        loop {
+            let node = self.link(HEAD)[0];
+            let id = self.node_id(node);
+            self.unlink(node);
             if id > 0 {
                 self.free_marker(id as u32);
             }
+            if node == first {
+                break;
+            }
         }
-        self.production.truncate(idx);
-        self.production_lexemes.truncate(idx);
     }
 
+    /// `MarkerProduction.dropMarker`: removes the last done entry of the marker (when done) and its start entry.
     fn drop_marker(&mut self, marker_id: u32) {
         if self.marker(marker_id).is_done()
-            && let Some(i) = self.production.iter().rposition(|&id| id == -(marker_id as i32))
+            && let Some(node) = self.last_done_entry(marker_id)
         {
-            self.production.remove(i);
-            self.production_lexemes.remove(i);
+            self.unlink(node);
         }
-        if let Some(i) = self.index_of(marker_id) {
-            self.production.remove(i);
-            self.production_lexemes.remove(i);
+        if let Some(node) = self.index_of(marker_id) {
+            self.unlink(node);
         }
         self.free_marker(marker_id);
     }
 
+    /// `lastIndexOf(-id)`: the marker's done node, unless an extra node is linked, which needs a walk back from the
+    /// end.
+    fn last_done_entry(&self, marker_id: u32) -> Option<u32> {
+        if self.extras_linked == 0 {
+            let node = start_node(marker_id) + 1;
+            return self.is_linked(node).then_some(node);
+        }
+        let id = -(marker_id as i32);
+        let mut node = self.link(HEAD)[0];
+        while node != HEAD {
+            if self.node_id(node) == id {
+                return Some(node);
+            }
+            node = self.link(node)[0];
+        }
+        None
+    }
+
+    /// `MarkerProduction.addDone`: a done entry at the end, or before `anchor_before`'s start entry.
     fn add_done(&mut self, marker_id: u32, anchor_before: Option<u32>) {
-        let index = match anchor_before {
-            None => Some(self.production.len()),
+        let anchor = match anchor_before {
+            None => Some(HEAD),
             Some(anchor) => self.index_of(anchor),
         };
-        if let Some(index) = index {
-            self.production.insert(index, -(marker_id as i32));
-            self.production_lexemes.insert(index, self.marker(marker_id).done_lexeme);
+        if let Some(anchor) = anchor {
+            let mut node = start_node(marker_id) + 1;
+            if self.is_linked(node) {
+                node = EXTRA | self.extra_links.len() as u32;
+                self.extra_links.push([UNLINKED, UNLINKED]);
+                self.extra_ids.push(-(marker_id as i32));
+            }
+            self.link_before(node, anchor);
         }
     }
 
+    /// `MarkerProduction.addBefore`: the marker's start entry before `anchor`'s.
     fn add_before(&mut self, marker_id: u32, anchor: u32) {
-        if let Some(index) = self.index_of(anchor) {
-            self.production.insert(index, marker_id as i32);
-            self.production_lexemes.insert(index, self.marker(marker_id).lexeme_index);
+        if let Some(anchor) = self.index_of(anchor) {
+            self.link_before(start_node(marker_id), anchor);
         }
+    }
+
+    /// The production in order as `production` and `production_lexemes`, each entry's lexeme read from its marker
+    /// (`getLexemeIndexAt`).
+    fn flatten_production(&mut self) {
+        self.production.clear();
+        self.production_lexemes.clear();
+        self.production.reserve(self.production_len);
+        self.production_lexemes.reserve(self.production_len);
+        let mut node = self.link(HEAD)[1];
+        while node != HEAD {
+            let id = self.node_id(node);
+            self.production.push(id);
+            self.production_lexemes.push(self.marker(id.unsigned_abs()).get_lexeme_index(id < 0));
+            node = self.link(node)[1];
+        }
+    }
+
+    fn get_lexeme_index_at(&self, production_index: usize) -> i32 {
+        self.production_lexemes[production_index]
     }
 
     // StartMarker
@@ -1104,14 +1221,8 @@ impl PsiBuilderImpl {
         if left_bound && self.is_empty(m.lexeme_index, done_lexeme) {
             self.set_custom_edge_token_binders(Marker(marker_id), Some(DEFAULT_RIGHT_BINDER), None);
         }
-        if self.marker(marker_id).is_done() {
-            // Done twice (Java only logs it): the earlier done entry reads the new done lexeme, as Java's does.
-            for i in 0..self.production.len() {
-                if self.production[i] == -(marker_id as i32) {
-                    self.production_lexemes[i] = done_lexeme;
-                }
-            }
-        }
+        // Done twice (Java only logs it): the earlier done entry reads the new done lexeme too, as Java's does, since
+        // `flatten_production` reads every entry's lexeme from its marker.
         self.markers[marker_id as usize].done_lexeme = done_lexeme;
         self.add_done(marker_id, before);
     }
@@ -1182,6 +1293,7 @@ impl PsiBuilderImpl {
     /// `prepareLightTree()`: balances the edges; returns the root marker (0 if there are no markers). The Java then
     /// links the markers into a tree, which `bind` instead reads straight from the production.
     fn prepare_light_tree(&mut self) -> u32 {
+        self.flatten_production();
         let Some(&first) = self.production.first() else { return NONE };
         if first <= 0 {
             return NONE;
@@ -1961,8 +2073,8 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     /// production item nor `prepareLightTree`'s error dedup changes. In `balanceWhiteSpaces` they would sit at their own
     /// lexemes, a mark on the `?`/`!` and a done right after the joined pair, in lexeme order: each keeps its position,
     /// `last_index` never exceeds the enclosing done, and the walk back of that done's right edge stops at the last
-    /// non-whitespace token before reaching any of them, so every edge the tree uses is the same. Production stays
-    /// sorted by lexeme, so `index_of` and `find_marker_at_lexeme` find the same markers.
+    /// non-whitespace token before reaching any of them, so every edge the tree uses is the same. `index_of` is a
+    /// marker's own node, which they do not change.
     pub fn skip_balanced_block(&mut self) -> bool {
         if self.top_truncated().is_some() {
             return false;

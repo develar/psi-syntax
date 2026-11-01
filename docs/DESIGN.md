@@ -59,7 +59,7 @@ Lexing takes under 10 % of a parse, so it is optimized only where that is cheap 
 `PsiBuilderImpl` is ported with IntelliJ's semantics:
 
 - the `MarkerProduction` order;
-- rollback by production index;
+- rollback to a marker's production entry, freeing markers from the last entry back;
 - the global `lastErrorIndex` error dedup;
 - the edge binders, `remapCurrentToken` and `tokens_to_restore_on_rollback`.
 
@@ -96,11 +96,19 @@ What the port adds to the hot path:
 
 Marker storage:
 
-- **`MarkerData`** is 20 bytes. It holds kind, collapsed, the binders, element type, lexeme and done lexeme. An error
-  message lives in a side table and is addressed by a `u32`. There are no light-tree links.
-- **`production_lexemes`** is a column parallel to `production`. It is written in `mark`, `error`, `add_before` and
-  `add_done`, and rewritten by `balance_white_spaces`. `index_of` and `find_marker_at_lexeme` binary-search it, and a
-  `debug_assert` keeps it equal to the markers.
+- **`MarkerData`** is 20 bytes. It holds kind, collapsed, the binders, element type, lexeme, done lexeme and the
+  nesting where it was collapsed. An error message lives in a side table and is addressed by a `u32`. There are no
+  light-tree links.
+- **The production is a doubly linked list while parsing**, not Java's `IntArrayList`. `links[node]` is
+  `[prev, next]`; node `2·id` is marker `id`'s start entry and `2·id + 1` its done entry, so `indexOf` is the marker's
+  own node and `precede`, `doneBefore`, `errorBefore`, `drop` and `rollbackTo` touch only the entries they add or
+  remove. Java inserts into and removes from the middle of its array (`ArrayList.add(index, …)`), and finds an entry
+  by a linear window, a binary search by lexeme and a walk over the markers at that lexeme; a chain `a+a+…` preceded
+  the same far-back marker at every operator, quadratic: 4.67 s for 100 000 operators on c796e73. The order of entries,
+  and so the tree, is the array's. A marker done twice (Java only logs it) gets an extra done node; while one is
+  linked, `drop` finds a marker's last done entry by walking back, as `lastIndexOf` does.
+- **`production` and `production_lexemes`** are the list made into arrays by `prepare_light_tree`, each entry's
+  lexeme read from its marker; `balance_white_spaces` rewrites the lexemes and `bind` walks the arrays.
 - **`bind` walks the production directly**, with an explicit stack and no `prepareLightTree` links. It reproduces
   `prepareLightTree`'s rules:
   - any done closes the current marker at its own done lexeme;
@@ -144,7 +152,8 @@ overflows too), so the port defines one, and keeps PSI's tree below it.
   (`MarkerData::depth`), so frames are bounded too; body-less trees keep that depth per unexpanded body for
   `parse_body`.
 - **The limits.** 1000 levels; 32 nested type argument lists per builder, because `a<a<…` tries one at every `<` and
-  rolls it back; 10 nested annotations and parenthesized types per builder, because a rolled-back attempt parses
+  rolls it back (a list that reaches 32 also makes every list starting before that token too deep, so each `<` costs
+  constant time on average); 10 nested annotations and parenthesized types per builder, because a rolled-back attempt parses
   them and the parse after it parses them again (`@A(@A(…))`, `((…) -> A) -> A`), which doubles the work per level:
   measured on c796e73, 14 levels of `@A(` took 7.3 ms and 1000 did not finish. Stack per level, measured with a stack
   pointer probe and by bisecting the depth that overflows 1 MB without a limit: 127 B (unary minus) to 559 B
@@ -205,6 +214,7 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | Speed from representation, allocation and layout, never from parser decisions | Equality stays provable by the gate and the counters | all 25 counters identical across batches 2 and 3; in batch 1 only the cursor-call counts (token cache) and the lazy-block counts (brace skip) moved, as intended |
 | Chameleons reparsed exactly as PSI does, not parsed eagerly in the file builder | Not equivalent: a fresh builder resets the newline and join stacks, the edge binders and the error dedup at the chameleon boundary | `reusable_tokens`' DANGLING_NEWLINE case; the brace skip removes the repeated work instead |
 | In-place expansion over a heap frame stack | Preorder ids (1.03M preorder breaks under the old LIFO worklist) without native recursion | walk 3.62 → 2.23 ns/node |
+| The production as a linked list over marker nodes, made into an array for binding | `precede` and the other middle edits in constant time with the array's entry order, so the same tree; a gap buffer or chunks would still need the lexeme search | gate unchanged; 100 000-operator chains 14-45 ms (`+`: 4.67 s → 22 ms); parse 72.7 → 74.2 MB/s |
 | A nesting counter that degrades to an error element, not a bigger stack or `stacker` | Deterministic on every platform and build, bounded memory, no `unsafe`; the dump is PSI's wherever PSI itself parses | gate unchanged; 100 000 levels of 22 forms on 1 MB in at most 110 ms; parse 74.4 → 75.0 MB/s (noise) |
 | The too-deep error over the rest of the construct, in constant time | One token at a time cost `2^10` times the rest of the file inside doubled annotations; a scan to the closer cost O(n) per rolled-back `<` attempt | `@A(` × 100 000: 4.2 ms |
 | A per-thread `Parser`, no thread_local | Allocation churn dominated multi-threaded scaling | allocations per pass 10.7M → 179 779; 16 threads 684 → 917 MB/s (f3aa172 → a99fb45) |
@@ -284,7 +294,8 @@ The gate passed on c796e73 in 62 s.
 | a99fb45 | tree copied out exactly sized | 71.7 → 72.4 | | 11.32 MB per source MB; 179 779 allocations per pass |
 | 279585f … 7fc4e69 | in-place chameleons, preorder columns | 71.5 → 71.9 | | 7.64 MB per source MB; walk 3.62 → 2.23 ns/node |
 | a405a03 | ASCII identifier table | 71.9 → 73.9 | 918.0 → 926.1 | lexer alone 441.3 → 507.7 MB/s |
-| (nesting limit) | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
+| 36b3b17 | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
+| child of 36b3b17 | linked production list | 72.7 → 74.2 (11 rounds, load 4.7-10.3) | | `a+a+…` × 100 000: 4.67 s → 22 ms; 18 chains 14-45 ms |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
 (×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
@@ -308,16 +319,10 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **Quadratic left-associative chains.** A chain `a+a+…+1` takes 0.046 s for 10 000 operators, 0.40 s for 30 000 and
-  4.67 s for 100 000 (a 0.2 MB file).
-  - `scripts/profile.py` attributes 80 % of the time to memmove under `PsiBuilderImpl::precede`, which inserts into
-    the production `Vec` like the Java `ArrayList.add(index, …)`, and 19 % to `find_same_lexeme_group_start` scanning
-    the markers at the same lexeme.
-  - IntelliJ's builder has the same shape. A fix must keep the production order: for example a gap buffer or a
-    chunked production. Not built.
 - **Copies into chameleon frames.** Each chameleon still copies its tokens from the file's (suspended frames then
-  drop what they have bound). Nested chameleons over T tokens copy O(depth · T): 100 000 nested `{ fun g() ` (250 frames at the limit) take
-  99 ms with the nesting limit's commit, 2026-11-01. Sharing the file's tokens would remove it (see "Remaining copies").
+  drop what they have bound). Nested chameleons over T tokens copy O(depth · T): 100 000 nested `{ fun g() ` (250
+  frames at the limit) take 99 ms on 36b3b17, 2026-11-01. Sharing the file's tokens would remove it (see "Remaining
+  copies").
 - **mimalloc for consumers.** Re-measure on the current code, 1 thread included, before recommending it. It was +3-4 %
   at 8 and 16 threads on a99fb45.
 - **Remaining copies.** `lex_types` is copied into each chameleon builder (remap mutates it), and the text is copied
@@ -334,8 +339,8 @@ There is no line-level profile of the current code: `atos` returned no line info
 | A brace-match table from the lexer | The raw `lex_types` scan is already a byte-compare loop; at most about 1 %, plus memory per token |
 | A soft-keyword id per token (rust-analyzer's contextual kind) | `soft_keyword_by_text` is about 1 % of samples after the byte match |
 | A `next_significant` table or a newline-before bit | The token cache shrank their targets; revisit only if a profile shows more than 3 %. A chameleon's token 0 needs a special case |
-| Production tombstones instead of `Vec::remove` in drop | The common drop is near the end; tombstones would have to be invisible to `has_errors_after`, the binary search and the done/start pairing; about 2-3 % estimated |
-| rust-analyzer's `forward_parent` / a marker-system rewrite | Breaks the faithful MarkerProduction port for about 5 % |
+| Production tombstones instead of `Vec::remove` in drop | Superseded by the linked production, whose `drop` unlinks in constant time |
+| rust-analyzer's `forward_parent` / a marker-system rewrite | Breaks the faithful MarkerProduction port for about 5 %; `rollbackTo` a preceding marker has no creation-order equivalent. The linked production keeps the port and removes the quadratic case |
 | Biome-style trivia on tokens | PSI puts whitespace and comments as leaves where binders decide; the dump would differ |
 | Ruff's lazy lexer with checkpoints | PsiBuilder needs the whole token array for lookahead, rollback by index and chameleon token reuse |
 | oxc's 256-entry byte-handler table and pointer `byte_search` | Need `unsafe`; the safe part (the ASCII table) is built |
