@@ -272,12 +272,99 @@ impl TokenKind {
     /// `AbstractKotlinParsing.SOFT_KEYWORD_TEXTS.get(text)`: the soft keyword whose value is `text`.
     pub fn soft_keyword_by_text(text: &[u8]) -> Option<TokenKind> {
         crate::counters::add(crate::counters::Counter::SoftKeywordLookup, 1);
-        SOFT_KEYWORDS.iter().find(|t| t.value().is_some_and(|v| v.as_bytes() == text))
+        // A byte `match` over `SOFT_KEYWORDS`' values (the Java `HashMap`); the test checks it against the set.
+        Some(match text {
+            b"file" => FILE_KEYWORD,
+            b"import" => IMPORT_KEYWORD,
+            b"where" => WHERE_KEYWORD,
+            b"by" => BY_KEYWORD,
+            b"get" => GET_KEYWORD,
+            b"set" => SET_KEYWORD,
+            b"abstract" => ABSTRACT_KEYWORD,
+            b"enum" => ENUM_KEYWORD,
+            b"contract" => CONTRACT_KEYWORD,
+            b"open" => OPEN_KEYWORD,
+            b"inner" => INNER_KEYWORD,
+            b"override" => OVERRIDE_KEYWORD,
+            b"private" => PRIVATE_KEYWORD,
+            b"public" => PUBLIC_KEYWORD,
+            b"internal" => INTERNAL_KEYWORD,
+            b"protected" => PROTECTED_KEYWORD,
+            b"catch" => CATCH_KEYWORD,
+            b"finally" => FINALLY_KEYWORD,
+            b"out" => OUT_KEYWORD,
+            b"final" => FINAL_KEYWORD,
+            b"vararg" => VARARG_KEYWORD,
+            b"reified" => REIFIED_KEYWORD,
+            b"dynamic" => DYNAMIC_KEYWORD,
+            b"companion" => COMPANION_KEYWORD,
+            b"constructor" => CONSTRUCTOR_KEYWORD,
+            b"init" => INIT_KEYWORD,
+            b"sealed" => SEALED_KEYWORD,
+            b"field" => FIELD_KEYWORD,
+            b"property" => PROPERTY_KEYWORD,
+            b"receiver" => RECEIVER_KEYWORD,
+            b"param" => PARAM_KEYWORD,
+            b"setparam" => SETPARAM_KEYWORD,
+            b"delegate" => DELEGATE_KEYWORD,
+            b"all" => ALL_KEYWORD,
+            b"lateinit" => LATEINIT_KEYWORD,
+            b"data" => DATA_KEYWORD,
+            b"inline" => INLINE_KEYWORD,
+            b"noinline" => NOINLINE_KEYWORD,
+            b"tailrec" => TAILREC_KEYWORD,
+            b"external" => EXTERNAL_KEYWORD,
+            b"annotation" => ANNOTATION_KEYWORD,
+            b"crossinline" => CROSSINLINE_KEYWORD,
+            b"const" => CONST_KEYWORD,
+            b"operator" => OPERATOR_KEYWORD,
+            b"infix" => INFIX_KEYWORD,
+            b"suspend" => SUSPEND_KEYWORD,
+            b"expect" => EXPECT_KEYWORD,
+            b"actual" => ACTUAL_KEYWORD,
+            b"value" => VALUE_KEYWORD,
+            b"context" => CONTEXT_KEYWORD,
+            _ => return None,
+        })
     }
 
     /// `KotlinExpressionParsing.KEYWORD_TEXTS.get(text)`: the hard keyword whose `toString()` (debug name) is `text`.
     pub fn keyword_by_debug_name(text: &[u8]) -> Option<TokenKind> {
-        KEYWORDS.iter().find(|t| t.debug_name().as_bytes() == text)
+        // A byte `match` over `KEYWORDS`' debug names; the test checks it against the set.
+        Some(match text {
+            b"package" => PACKAGE_KEYWORD,
+            b"as" => AS_KEYWORD,
+            b"typealias" => TYPE_ALIAS_KEYWORD,
+            b"class" => CLASS_KEYWORD,
+            b"interface" => INTERFACE_KEYWORD,
+            b"this" => THIS_KEYWORD,
+            b"super" => SUPER_KEYWORD,
+            b"val" => VAL_KEYWORD,
+            b"var" => VAR_KEYWORD,
+            b"fun" => FUN_KEYWORD,
+            b"for" => FOR_KEYWORD,
+            b"null" => NULL_KEYWORD,
+            b"true" => TRUE_KEYWORD,
+            b"false" => FALSE_KEYWORD,
+            b"is" => IS_KEYWORD,
+            b"in" => IN_KEYWORD,
+            b"throw" => THROW_KEYWORD,
+            b"return" => RETURN_KEYWORD,
+            b"break" => BREAK_KEYWORD,
+            b"continue" => CONTINUE_KEYWORD,
+            b"object" => OBJECT_KEYWORD,
+            b"if" => IF_KEYWORD,
+            b"else" => ELSE_KEYWORD,
+            b"while" => WHILE_KEYWORD,
+            b"do" => DO_KEYWORD,
+            b"try" => TRY_KEYWORD,
+            b"when" => WHEN_KEYWORD,
+            b"NOT_IN" => NOT_IN,
+            b"NOT_IS" => NOT_IS,
+            b"AS_SAFE" => AS_SAFE,
+            b"typeof" => TYPEOF_KEYWORD,
+            _ => return None,
+        })
     }
 
     /// Whether this token is whitespace or a comment for the Kotlin `PsiBuilder` (`KtTokens.WHITESPACES` +
@@ -763,5 +850,38 @@ mod tests {
         assert!(TokenSet::EMPTY.iter().next().is_none());
         assert!(!KEYWORDS.contains(None::<TokenKind>));
         assert!(QUALIFIED_ACCESS.contains(NodeKind::SAFE_ACCESS_EXPRESSION));
+    }
+
+    /// The byte `match`es of `soft_keyword_by_text` and `keyword_by_debug_name` answer as the scans of
+    /// `SOFT_KEYWORDS` and `KEYWORDS` they replace, for every token's value and debug name and for near misses.
+    #[test]
+    fn keyword_lookups_agree_with_the_keyword_sets() {
+        let soft = |text: &[u8]| SOFT_KEYWORDS.iter().find(|t| t.value().is_some_and(|v| v.as_bytes() == text));
+        let hard = |text: &[u8]| KEYWORDS.iter().find(|t| t.debug_name().as_bytes() == text);
+        let mut inputs: Vec<Vec<u8>> = vec![b"".to_vec(), b"\xff".to_vec(), b"g\xffet".to_vec(), b"`get`".to_vec()];
+        for t in TokenKind::ALL {
+            for text in t.value().into_iter().chain([t.debug_name()]) {
+                let text = text.as_bytes();
+                inputs.push(text.to_vec());
+                inputs.push(text[..text.len() - 1].to_vec());
+                inputs.push([text, b"x"].concat());
+                inputs.push(text.to_ascii_uppercase());
+            }
+        }
+        for text in &inputs {
+            assert_eq!(TokenKind::soft_keyword_by_text(text), soft(text), "{:?}", String::from_utf8_lossy(text));
+            assert_eq!(TokenKind::keyword_by_debug_name(text), hard(text), "{:?}", String::from_utf8_lossy(text));
+        }
+        assert_eq!(
+            SOFT_KEYWORDS
+                .iter()
+                .filter(|t| TokenKind::soft_keyword_by_text(t.value().unwrap().as_bytes()) == Some(*t))
+                .count(),
+            SOFT_KEYWORDS.iter().count()
+        );
+        assert_eq!(
+            KEYWORDS.iter().filter(|t| TokenKind::keyword_by_debug_name(t.debug_name().as_bytes()) == Some(*t)).count(),
+            KEYWORDS.iter().count()
+        );
     }
 }
