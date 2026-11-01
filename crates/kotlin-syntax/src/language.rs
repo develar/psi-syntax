@@ -79,7 +79,7 @@ impl psi_builder::Language for Kotlin {
     }
 
     #[inline]
-    fn tokenize_into(text: &[u8], lexed: &mut Lexed) {
+    fn tokenize_into(text: &[u8], _file_kind: FileKind, lexed: &mut Lexed) {
         lexer::tokenize_into(text, lexed);
     }
 

@@ -1,7 +1,8 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
-//! Java has no parser yet (`crates/java-syntax`): a Java file is refused with exit status 2 before anything runs.
+//! Java has no parser yet (`crates/java-syntax`): `--lex` lexes Java files, any other mode refuses one with exit
+//! status 2 before anything runs.
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -17,7 +18,8 @@
 //!   and the bytes allocated per source MB; it slows the parse, so time without it. With `--features counters`, the
 //!   builder's calls (`tt()`, lookahead, markers, rollbacks) and the tokens lexed, reused and skipped, per file token. Peak RSS: run under
 //!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
-//! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it;
+//! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` (Kotlin) or
+//!   `tools/java-oracle/JavaLexOracle.java` (Java; a list line may carry the level: `PATH<TAB>LEVEL`) prints it;
 //!   with `--bench [--repeat K]`, the MB/s of the Kotlin lexer alone instead.
 //! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that the full
 //!   tree's leaves are the text and `parse_body` of every unexpanded body dumps as the full tree's subtree there;
@@ -222,24 +224,69 @@ fn lex_line(text: &[u8], dump: bool, out: &mut String) -> (u64, usize) {
     (hash.0, count)
 }
 
+/// The hash and token count `tools/java-oracle/JavaLexOracle.java` prints: `JavaLexer` at `level`, the
+/// `JavaDocLexer` tokens of each doc comment (at `LanguageLevel.HIGHEST`, as `JavaDocCommentParser` lexes it) hashed
+/// inside `[` `]` after it.
+fn java_lex_line(text: &[u8], level: java_syntax::LanguageLevel, dump: bool, out: &mut String) -> (u64, usize) {
+    use java_syntax::TokenKind as JavaToken;
+    let mut hash = Fnv(0xcbf29ce484222325);
+    let mut count = 0;
+    let mut lexer = java_syntax::lexer::JavaLexer::new(level, text);
+    while let Some((kind, start, end)) = lexer.next_token() {
+        let token_text = &text[start..end];
+        hash.feed(format!("{}:{};", kind.debug_name(), token_text.len()).as_bytes());
+        if dump {
+            out.push_str(&format!("  {} {}\n", kind.debug_name(), escape(token_text)));
+        }
+        if matches!(kind, JavaToken::DOC_COMMENT | JavaToken::DOC_MARKDOWN_COMMENT) {
+            hash.feed(b"[");
+            let mut doc = java_syntax::doc_lexer::JavaDocLexer::new(true, token_text);
+            while let Some((k, s, e)) = doc.next_token() {
+                let k_text = &token_text[s..e];
+                hash.feed(format!("{}:{};", k.debug_name(), k_text.len()).as_bytes());
+                if dump {
+                    out.push_str(&format!("    {} {}\n", k.debug_name(), escape(k_text)));
+                }
+                count += 1;
+            }
+            hash.feed(b"]");
+        }
+        count += 1;
+    }
+    (hash.0, count)
+}
+
+/// `--lex` of a Java file: a list line is `PATH[<TAB>LEVEL...]` as for the Java oracles; text that is not UTF-8 is
+/// "unreadable", as the oracle, which decodes strictly, prints it.
+fn java_lex(root: &Path, line: &str, dump: bool, stdout: &mut impl Write) {
+    let mut columns = line.split('\t');
+    let path = columns.next().unwrap_or(line);
+    let level =
+        columns.next().and_then(java_syntax::LanguageLevel::from_name).unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+    let text = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok());
+    let Some(text) = text else {
+        let _ = writeln!(stdout, "{path}\tunreadable\t0");
+        return;
+    };
+    let mut out = String::new();
+    let (hash, count) = java_lex_line(&text, level, dump, &mut out);
+    let _ = writeln!(stdout, "{path}\t{hash:x}\t{count}");
+    let _ = stdout.write_all(out.as_bytes());
+}
+
 fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
     let paths = read_list(list);
-    if let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java) {
-        eprintln!("{java}: Java has no parser yet (crates/java-syntax); only Kotlin files are dumped, lexed and timed");
-        std::process::exit(2);
-    }
-    let stdout = std::io::stdout();
-    let mut stdout = std::io::BufWriter::new(stdout.lock());
-
-    if args.lex && args.bench {
-        lex_bench(&args, root, &paths, &mut stdout);
-        return;
-    }
-
-    if args.lex {
-        for path in &paths {
+    if args.lex && !args.bench {
+        let stdout = std::io::stdout();
+        let mut stdout = std::io::BufWriter::new(stdout.lock());
+        for line in &paths {
+            let path = line.split('\t').next().unwrap_or(line);
+            if Lang::of(path, args.lang) == Lang::Java {
+                java_lex(root, line, args.dump, &mut stdout);
+                continue;
+            }
             let Some(text) = read_source(root, path, false) else {
                 let _ = writeln!(stdout, "{path}\tunreadable\t0");
                 continue;
@@ -249,6 +296,17 @@ fn main() {
             let _ = writeln!(stdout, "{path}\t{hash:x}\t{count}");
             let _ = stdout.write_all(dump.as_bytes());
         }
+        return;
+    }
+    if let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java) {
+        eprintln!("{java}: Java has no parser yet (crates/java-syntax); Java files are only lexed (--lex)");
+        std::process::exit(2);
+    }
+    let stdout = std::io::stdout();
+    let mut stdout = std::io::BufWriter::new(stdout.lock());
+
+    if args.lex && args.bench {
+        lex_bench(&args, root, &paths, &mut stdout);
         return;
     }
 

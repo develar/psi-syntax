@@ -138,8 +138,9 @@ pub trait Language: Sized + 'static {
     /// too deeply ends (`PsiBuilderImpl::skip_too_deeply_nested`). Not in the Java.
     fn bracket_depth_change(token: Self::Token) -> i64;
 
-    /// Lexes `text` with the language's lexer into `lexed` (cleared first), as `TokenSequence.performLexing` does.
-    fn tokenize_into(text: &[u8], lexed: &mut Lexed<Self::Token>);
+    /// Lexes `text`, a file of `file_kind` or a chameleon in one, with the language's lexer into `lexed` (cleared
+    /// first), as `TokenSequence.performLexing` does (Java's lexer depends on the file's language level).
+    fn tokenize_into(text: &[u8], file_kind: Self::FileKind, lexed: &mut Lexed<Self::Token>);
 
     /// Parses a file on `builder` (wrapped in the language's layers, whose buffers are `bufs.layer`) and returns the
     /// builder, which then builds the tree.

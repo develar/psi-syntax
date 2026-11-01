@@ -33,15 +33,16 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 |---|---|---|
 | `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters | nothing |
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
-| `java-syntax` | nothing yet | `psi-builder` |
-| `ksdump` | the binary | `kotlin-syntax` |
+| `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers (a skeleton being ported) | `psi-builder` |
+| `ksdump` | the binary | `kotlin-syntax`, `java-syntax` |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense index below 256 and a debug name),
 `Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `LayerBuffers` (the language layers' reusable stacks),
 `FILE`, `ERROR_ELEMENT`, `is_whitespace_or_comment`, `is_left_bound`, `is_chameleon_token`, `chameleon`, `is_body`,
 `joined_token_type` (the cursor cache's derived token), `bracket_depth_change` (the too-deep skip), `tokenize_into`,
-`parse_file` and `parse_chameleon`. The driver hands `parse_chameleon` a `Chameleon`: the chameleon's text and three
+`parse_file` and `parse_chameleon`. `tokenize_into` gets the file's `FileKind` and `Chameleon::file_kind` gives it to
+`parse_chameleon`, because Java's lexer and parsers depend on the file's language level. The driver hands `parse_chameleon` a `Chameleon`: the chameleon's text and three
 ways to a builder (the body's file tokens when they lex alone the same, else relexed; relexed; the caller's own tokens).
 `kotlin_syntax::{Tree, Parser, PsiBuilderImpl, ElementType}` are aliases of the generic types for `Kotlin`, so the
 Kotlin parsers and consumers name them as before.
@@ -139,6 +140,38 @@ Marker storage:
   - the stack starts as `[root]`, so entries after the root's done become root children;
   - error items inside collapsed markers count for the global dedup, although their entries are skipped;
   - open markers close innermost first.
+
+### Java (`java-syntax`)
+
+The sources are java-syntax and platform/syntax of JetBrains/intellij-community at decc943 (AGENTS.md, "Java").
+
+- **Lexers.** `lexer.rs` is `JavaLexer.kt` (its own dispatch on the located character: whitespace, `{`/`}` with the
+  template brace counts on its state stack, comments, character and string literals, text blocks, templates, `#!`,
+  `\u001a`; `locateCharAt` decodes unicode escapes, `mySymbolLength` their length) over `FlexJavaLexer`, the rules of
+  `_JavaLexer.flex` matched as JFlex matches them (longest match, the earlier rule on a tie: the numeric rules are
+  computed alternative by alternative). `doc_lexer.rs` is `JavaDocLexer.kt`: the merging adapter over
+  `AsteriskStripperLexer` over `FlexJavaDocLexer`, each of `_JavaDocLexer.flex`'s 14 states a list of its rules in
+  spec order. Offsets are bytes; the code compares characters only with ASCII ones, so boundaries are those of the
+  UTF-16 original. `[:jletter:]` and `[:jletterdigit:]` above ASCII are decoded from the generated lexers' DFA tables by
+  running them (`tools/java-unicode.py`), JFlex's `.` excludes `\n\r\u000B\u000C\u0085\u2028\u2029` (read off the
+  same tables).
+- **Builder.** The Java parsers run on platform/syntax's `SyntaxTreeBuilder`; the port runs them on `psi_builder`'s
+  `PsiBuilderImpl` seen through `SyntaxTreeBuilder<'b>`, a handle with the `stopAt` offset of
+  `JavaParserUtil.stoppingBuilder` (nested ones stop at the nearest), so no adapter is a type of its own and
+  `DeclarationParser.parse` recursing on a stopping builder does not instantiate generics without end.
+  `enforceCommentTokens({DOC_COMMENT_LEADING_ASTERISKS})` is folded into `Java::is_whitespace_or_comment`: that token
+  occurs in no other builder and the Java comments in no doc comment's. `lastDoneMarker` and the marker accessors
+  (`getNodeType`, `getStart/EndOffset`, `getStart/EndTokenIndex`) are generic `psi_builder` methods.
+- **Lazy elements.** `CODE_BLOCK` is a body (collapsed by `parseBlockLazy`, reparsed by `parseCodeBlockDeep` at the
+  file's level); `DOC_COMMENT` and `DOC_MARKDOWN_COMMENT` (Java lexer tokens) are lexed with `JavaDocLexer` and parsed by
+  `JavaDocParser`; `DOC_REFERENCE_HOLDER` and `DOC_TYPE_HOLDER` (JavaDocParser remaps or collapses into them) are lexed
+  with `JavaLexer(JDK_1_3)` (the type's through `JavaTypeEscapeLexer`). The four token-typed ones are `TokenKind`s, as
+  Kotlin's KDoc is.
+- **Files and entries.** `FileKind { level, entry }`: a file (`java.FILE`) or one of the 13 parser entries of the
+  parser-partial goldens under `test.java.file` with "Unparsed tokens" over what is left, as
+  `JavaParsingTestConfiguratorBase` runs them.
+- **Dumps.** `node_tree_to_string` prints the element types (`DOC_SPACE` as PSI's `WHITE_SPACE`); `psi_to_string` the
+  PSI class of each node and its `toString()` (`NodeKind::label`, from the goldens' 1036 dumps).
 
 ### Parser driver and chameleons (`psi-builder` `src/tree.rs`, `kotlin-syntax` `src/language.rs`)
 
@@ -322,6 +355,22 @@ The crate split, `psi-builder` generic over `Language`, against 26d5703, both `k
 
 The gate passed on the split.
 
+### The Java lexers and the parser skeleton (child of 000c6b3), 2026-11-01
+
+- `ksdump --lex` against `tools/java-oracle/JavaLexOracle.java` (IntelliJ 271's java-syntax `JavaLexer`, and
+  `JavaDocLexer` on every doc comment): 0 differing lines on the 68 263 community `.java` files (3 not UTF-8, both
+  sides "unreadable"), the 19 116 golden mutations and 20 000 lexer fuzz inputs (`lex_fuzz.py`, seed `java-lex`);
+  the 1036 golden inputs, untrimmed, equal too.
+- `tests/lexer.rs`: 1036 of 1036 goldens have the leaf texts of their PSI dump (36 with tokens the parser joins, 55
+  with relexed holders).
+- Lexing the community `.java` files (215.75 MB) with both lexers and hashing every token: 5.2 s wall for
+  `ksdump --lex`, 12.5 s for the Java oracle (one run each, file reads included, the oracle's JVM start too).
+- Kotlin: `psi-builder`'s new parameters and methods change no Kotlin parse. Instructions retired of a whole
+  `ksdump --bench` process, 3 runs each: before 73.59-74.67 G, after 74.64-74.70 G; `scripts/ab.sh`, 7 rounds at load
+  9.5-17: per-round B/A 0.825-1.056, median 1.012 (too loaded to resolve 1 %).
+
+The gate passed (including the Java lexer checks).
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -361,6 +410,13 @@ There is no line-level profile of the current code: `atos` returned no line info
 ## What remains
 
 ### Open items
+
+- **The Java parsers.** 163 methods of `crates/java-syntax/src/parser` are `TODO(port)` stubs. Points to check against
+  the oracle while porting: `SyntaxTreeBuilderImpl` and the PSI tree build (`PsiSyntaxBuilderImpl`, `ToAstMarkers`)
+  against `PsiBuilderImpl` (`mark()` skipping whitespace only after the first marker, error dedup, `processDone`'s
+  left-bound rule, the whitespace balancer's `lexemeIndex < wsStartIndex` case); whether a code block's chameleon reuses
+  the file's tokens even where they do not lex alone the same (platform/syntax reuses collapsed tokens); the PSI labels
+  of the types no golden has.
 
 - **The split's speed on a quiet machine.** Its A/B ran at load 6-18; repeat `scripts/ab.sh` against 26d5703 at load
   under 4 before attributing a later change's small delta.

@@ -6,7 +6,7 @@ Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI,
 |---|---|
 | `crates/psi-builder` | the language-neutral half: IntelliJ's `PsiBuilderImpl` (markers, production, edge binders), the preorder column tree and its consumer API, the parse driver that expands chameleons in place, the dump's layout, token-set storage and lexer helpers, all generic over `psi_builder::Language` |
 | `crates/kotlin-syntax` | Kotlin (package `kotlin-syntax` for consumers): tokens, lexers, node kinds, binders, the `SemanticWhitespaceAwarePsiBuilder` layer, the parsers, KDoc, and `Kotlin: Language` |
-| `crates/java-syntax` | the place of the Java port (empty; see "Java") |
+| `crates/java-syntax` | Java (package `java-syntax`): tokens, node types, the Java and JavaDoc lexers (complete), the binders, `Java: Language`, the dumps, and the parsers as a skeleton being ported (see "Java") |
 | `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java`, else by extension) |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
@@ -35,7 +35,7 @@ Keep the Java structure: one Rust function per Java method, the same name in sna
 against the Java reads line by line. Port behaviour, not just shape: newline sensitivity, rollback, recovery sets,
 error messages (the dump prints `PsiErrorElement:<message>`) and the exact element types.
 
-### Java (not ported yet)
+### Java (lexers ported, parsers being ported)
 
 JetBrains/intellij-community at decc943674edfe7ecc620d2d60b61be38f876994: `java/java-syntax` (`_JavaLexer.flex`, `_JavaDocLexer.flex`,
 `JavaParser` and its `*Parser.kt`, `JavaSyntaxElementType`, `JavaSyntaxTokenType`, `JavaDocSyntax*`), on the builder of
@@ -46,6 +46,14 @@ working tree. The live oracle is the installed IntelliJ 2027.1 (build 271.SNAPSH
 `/Applications/Idea.app/Contents/lib/intellij.platform.syntax*.jar` and the Kotlin stdlib and util jars beside them.
 The same rules hold as for Kotlin: one Rust function per Kotlin/Java method, the same names and order, error messages
 verbatim. `java-syntax` implements `psi_builder::Language` as `kotlin-syntax` does.
+
+| what | source (under `java/java-syntax/src/com/intellij/java/syntax/`) | port (`crates/java-syntax/src/`) |
+|---|---|---|
+| Tokens, element types | `element/JavaSyntaxTokenType.kt`, `JavaDocSyntaxTokenType.kt`, `JavaSyntaxElementType.kt`, `JavaDocSyntaxElementType.kt`, `JShellSyntaxElementType.kt`, `SyntaxElementTypes.kt`, `JavaDocSyntaxTokenTypes.kt` | `tokens.rs`, `node_kind.rs`, `syntax_element_types.rs` |
+| Lexers | `lexer/_JavaLexer.flex`, `JavaLexer.kt`, `JavaTypeEscapeLexer.kt`, `_JavaDocLexer.flex`, `JavaDocLexer.kt` (`gen/.../_JavaLexer.kt`, `_JavaDocLexer.kt` for the Unicode tables) | `lexer.rs`, `doc_lexer.rs`, `unicode.rs` (`tools/java-unicode.py`) |
+| Binders, lazy elements | `element/WhiteSpaceAndCommentSetHolder.kt`, `JavaWhitespaceOrCommentBindingPolicy.kt`, `element/lazyParser/*.kt`, `JavaSyntaxDefinition.kt`, `JavaDocParser.fakeCollapseRightBinder` | `builder.rs` (`Binder`), `language.rs`, `tree.rs` (`FileKind`, `Entry`, `LazyKind`) |
+| Parsers | `parser/*.kt` | `parser/*.rs`, one file per Kotlin file; `JavaParser` wires them; unported methods are `TODO(port): <File>.kt:<line>` stubs |
+| Messages, levels | `resources/messages/JavaSyntaxBundle.properties`, `pom/java/LanguageLevel.kt`, `JavaFeature.kt` | `bundle.rs`, `language_level.rs` |
 
 ## Layout
 
@@ -68,7 +76,13 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format (Kotlin's labels over `psi_builder::dump`) |
 | `src/counters.rs` | the parser's own event counters (semantic layer, chameleons, KDoc tokens, soft keywords) and `ALL`, every counter of a parse in the order `ksdump` prints them |
-| `crates/ksdump/src/main.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java` (else `.java` is Java, anything else Kotlin; a Java file exits 2 until the port exists). Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
+| `java-syntax` `src/lexer.rs`, `src/doc_lexer.rs`, `src/unicode.rs` | `JavaLexer` (by hand: whitespace, comments, literals, text blocks, string templates, unicode escapes) over `FlexJavaLexer` (the rules of `_JavaLexer.flex`), `JavaTypeEscapeLexer`; `JavaDocLexer` (merging adapter, `AsteriskStripperLexer`) over `FlexJavaDocLexer` (every state of `_JavaDocLexer.flex`, longest match, earlier rule on a tie); `[:jletter:]`, `[:jletterdigit:]` above ASCII, generated |
+| `java-syntax` `src/builder.rs` | `SyntaxTreeBuilder` (the builder as a Java parser method receives it, with `JavaParserUtil.stoppingBuilder`'s stop offset), the `SyntaxBuilderUtil` helpers (`advance`, `expect`, `expect_set`, `drop`, `raw_token_text`, `parse_block_lazy`), Java's `Binder`s and `WhiteSpaceAndCommentSetHolder` |
+| `java-syntax` `src/language.rs`, `src/tree.rs` | `Java`, the `Language` impl (whitespace and comments, left-bound types, the five lazy element types and their lexers and parsers, `parse_fragment`); `Tree`, `Parser`, `FileKind { level, entry }` (`Entry::File` or one of the 13 parser-partial entries), `LazyKind` |
+| `java-syntax` `src/parser/*.rs` | `java_parser.rs` (`JavaParser`, `JavaSyntaxDefinition.parse`), `java_parser_util.rs` and `java_keywords.rs` (ported), `file_parser.rs`, `module_parser.rs`, `declaration_parser.rs`, `statement_parser.rs`, `expression_parser.rs` (ported: delegates), `pratt_expression_parser.rs`, `reference_parser.rs`, `pattern_parser.rs`, `java_doc_parser.rs`, `jshell_parser.rs`: every method a function with its final signature, the unported ones `todo!` stubs |
+| `java-syntax` `src/dump.rs` | `psi_to_string` (`DebugUtil.psiToString`: PSI class names and their `toString()`, the labels the goldens show) and `node_tree_to_string` (`DebugUtil.nodeTreeAsElementTypeToString`, the `_node.txt` goldens) |
+| `java-syntax` `tests/lexer.rs` | the leaf texts of all 1036 Java goldens against our tokens (adjacent tokens joined where the parser collapses them, reference and type holders relexed) |
+| `crates/ksdump/src/main.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java` (else `.java` is Java, anything else Kotlin); `--lex` lexes Java files (a list line may be `PATH<TAB>LEVEL`), any other mode refuses one with exit 2 until the parsers exist. Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep and 18 left-associative chains of 100 000 operators on a 1 MB stack, each well under a second; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
@@ -137,6 +151,13 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
    `crates/kotlin-syntax/tests/oracle/`
    (`NAME.kt` and the oracle's dump `NAME.txt`), which `cargo test --release --test oracle` compares.
 
+Java: `testdata/java/` (1036 goldens of IntelliJ's Java parsing tests, `manifest.tsv` with level, entry and trim per
+test) and the Java PSI oracle `tools/java-oracle/JavaPsiOracle.java` (see `tools/java-oracle/README.md`: cached dumps of
+the 68 263 community `.java` files and 19 116 golden mutations). The Java lexer oracle
+`java -cp "$(tools/java-oracle/fetch-jars.sh)/*" tools/java-oracle/JavaLexOracle.java --list LIST --root ROOT` prints
+the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
+`tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
+
 Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java says
 otherwise.
 
@@ -160,7 +181,13 @@ otherwise.
   type or an `Option`. Composite types are `NodeKind`; an `IElementType` result is `Option<NodeKind>`.
 - Overloads get suffixed names: the fewest-argument form keeps the name, the others `_with` (or a descriptive suffix,
   e.g. `expect_with_recovery`, `parse_type_ref_with_intersections`), documented on each function.
-- Every stub says `TODO(port): <File>.java:<line>`; port the method there, keep the order.
+- Every stub says `TODO(port): <File>.java:<line>` (Java: `<File>.kt:<line>`); port the method there, keep the order.
+- Java: a parser method's `builder: SyntaxTreeBuilder` is `builder: &mut SyntaxTreeBuilder<'_>`
+  (`java_syntax::builder`), its sub-parsers views reached through `self.my_parser` (`JavaParser`); a parameter named
+  `type` is `element_type`; a Kotlin method that reaches the builder only through a marker takes the builder first
+  (`java_parser_util::done(builder, marker, NodeKind::CLASS, level)`); a default parameter gives the short name the
+  default and `_with` the full form (`parse_code_block` / `parse_code_block_with`). Token parameters are
+  `Option<TokenKind>`, node types `NodeKind`, either `ElementType`.
 
 ## Rules
 
@@ -175,6 +202,7 @@ otherwise.
   `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over the workspace, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
-  community files, and again with `--nesting-limit 3` on the community files and the mutations. A faster change that fails it is not a change.
+  community files, and again with `--nesting-limit 3` on the community files and the mutations, and the Java lexers
+  against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz. A faster change that fails it is not a change.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
   change does, its measured effect and that the gate passed.

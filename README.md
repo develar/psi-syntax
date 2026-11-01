@@ -7,7 +7,8 @@ Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI,
   column tree and the parse driver that expands lazily parsed elements in place;
 - `kotlin-syntax`: Kotlin, ported from the Kotlin compiler's own (`Kotlin.flex`, `KotlinParsing`,
   `KotlinExpressionParsing`, KDoc);
-- `java-syntax`: the place of the Java port of IntelliJ's `java-syntax` (not started);
+- `java-syntax`: Java, ported from IntelliJ's `java-syntax`: the Java and JavaDoc lexers (equal to IntelliJ's on every
+  file tested), the parsers in progress;
 - `ksdump`: dumps, benchmarks and lexes listed files like the PSI oracles.
 
 See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.

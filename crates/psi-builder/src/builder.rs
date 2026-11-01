@@ -42,8 +42,8 @@ pub trait WhitespacesAndCommentsBinder<T>: Copy + Eq + std::fmt::Debug + Send + 
 
     /// What `getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`: `size()`
     /// is `size`, negative, so `isEmpty()` is false, `indices` is empty, and `get(i)` reads `myLexTypes[start + i]`
-    /// unchecked (`None` outside the tokens).
-    fn negative_size_edge(self, size: i32, get: impl Fn(i32) -> Option<T>) -> i32;
+    /// unchecked (`None` outside the tokens); `text(i)` is what `getter.get(i)` returns then (empty outside them).
+    fn negative_size_edge<'t>(self, size: i32, get: impl Fn(i32) -> Option<T>, text: &dyn Fn(i32) -> &'t [u8]) -> i32;
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -833,6 +833,50 @@ impl<L: Language> PsiBuilderImpl<L> {
         false
     }
 
+    /// `lastDoneMarker` (platform/syntax `SyntaxTreeBuilder`): the marker of the last done entry of the production.
+    pub fn last_done_marker(&self) -> Option<Marker> {
+        let mut node = self.link(HEAD)[0];
+        while node != HEAD && node != UNLINKED {
+            let id = self.node_id(node);
+            if id < 0 {
+                return Some(Marker(id.unsigned_abs()));
+            }
+            node = self.link(node)[0];
+        }
+        None
+    }
+
+    /// `Marker.getNodeType()`: the element type the marker was done (or collapsed) with, `None` while it is open.
+    pub fn marker_node_type(&self, marker: Marker) -> Option<ElementTypeOf<L>> {
+        self.markers.get(marker.0 as usize).and_then(|m| m.element_type)
+    }
+
+    /// `Marker.getStartTokenIndex()`: the index of the marker's first token (-1 for a dropped marker).
+    pub fn marker_start_token_index(&self, marker: Marker) -> i32 {
+        self.markers.get(marker.0 as usize).map_or(-1, |m| m.lexeme_index)
+    }
+
+    /// `Marker.getEndTokenIndex()`: the index of the token after a done marker (-1 while it is open).
+    pub fn marker_end_token_index(&self, marker: Marker) -> i32 {
+        self.markers.get(marker.0 as usize).map_or(-1, |m| m.done_lexeme)
+    }
+
+    /// `Marker.getStartOffset()`: where the marker's first token starts in this builder's text.
+    pub fn marker_start_offset(&self, marker: Marker) -> i32 {
+        self.lexeme_offset(self.marker_start_token_index(marker))
+    }
+
+    /// `Marker.getEndOffset()`: where a done marker's last token ends in this builder's text.
+    pub fn marker_end_offset(&self, marker: Marker) -> i32 {
+        self.lexeme_offset(self.marker_end_token_index(marker))
+    }
+
+    /// The start of token `lexeme` relative to this builder's text (`lexStart`), the text length past the last one.
+    fn lexeme_offset(&self, lexeme: i32) -> i32 {
+        let index = (lexeme.max(0) as usize).min(self.lexeme_count);
+        self.lex_starts.get(index.saturating_sub(self.token_shift)).map_or(self.len as i32, |&s| s as i32)
+    }
+
     // MarkerProduction
 
     #[inline(always)]
@@ -1245,7 +1289,16 @@ impl<L: Language> PsiBuilderImpl<L> {
             let i = ws_start + index;
             if i >= 0 && (i as usize) < self.lexeme_count { Some(self.lex_types[i as usize]) } else { None }
         };
-        binder.negative_size_edge(size, get)
+        let text = |index: i32| -> &[u8] {
+            let i = ws_start + index;
+            if i >= 0 && (i as usize) < self.lexeme_count {
+                let (start, end) = (self.lex_starts[i as usize] as usize, self.lex_starts[i as usize + 1] as usize);
+                &self.text[self.base + start..self.base + end]
+            } else {
+                &[]
+            }
+        };
+        binder.negative_size_edge(size, get, &text)
     }
 
     /// `bind()` with `createRootAST`, `insertLeaves`, `collapseLeaves`: appends the leaves and composites to `tree`,

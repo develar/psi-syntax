@@ -10,6 +10,8 @@ is `DebugUtil.psiToString` of the `PsiJavaFile`.
 | file | does |
 |---|---|
 | `JavaPsiOracle.java` | the oracle: a single-file `java` program on the jars of `jars.sha256` |
+| `JavaLexOracle.java` | the lexer oracle: java-syntax's `JavaLexer` (and `JavaDocLexer` on each doc comment) over a list, one hash line per file as `ksdump --lex` prints it |
+| `lex_fuzz.py` | lexer fuzz inputs: the golden inputs with lexer-state characters and snippets inserted, replaced or deleted |
 | `fetch-jars.sh` | copies those 23 jars from `/Applications/Idea.app/Contents` to `~/.cache/psi-syntax/java-oracle/lib` and checks their sha256, so an IDE update cannot change the oracle silently |
 | `vendor_goldens.py` | writes `testdata/java/` from intellij-community at the revision (`git cat-file`, never the working tree) |
 | `check-goldens.py` | compares an oracle run over `testdata/java/manifest.tsv` with the goldens, byte for byte |
@@ -72,6 +74,8 @@ separators are converted to `\n`, as the IDE does when it loads a file.
 | `fuzz/java-mut/` | the mutants, `original/`, `origins.json` and the full `list` |
 | `fuzz/java-mut.list` | the oracle list (without the 83 precondition failures) |
 | `fuzz/java-mut.oracle/` | its dumps |
+| `fuzz/java-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `java-lex`) |
+| `lex/java-community-3caa0bf.oracle.txt`, `lex/java-mut.oracle.txt`, `lex/java-lex.oracle.txt` | `JavaLexOracle.java`'s lines for the three corpora |
 
 Rebuild them:
 
@@ -83,4 +87,17 @@ java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/c
 tools/java-oracle/mutate.py $S/fuzz/java-mut
 java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/fuzz/java-mut/list \
   --root $S/fuzz/java-mut --out $S/fuzz/java-mut.oracle --node   # then drop the `failure` lines from the list
+```
+
+The lexer oracle's cached lines, which `scripts/gate.sh` compares `ksdump --lex` with:
+
+```sh
+S=$HOME/.cache/psi-syntax C=$HOME/.cache/accio-bench/intellij-community LIB=$(tools/java-oracle/fetch-jars.sh)
+java -cp "$LIB/*" tools/java-oracle/JavaLexOracle.java --list $S/corpus/java-community-3caa0bf.list --root $C \
+  > $S/lex/java-community-3caa0bf.oracle.txt
+java -cp "$LIB/*" tools/java-oracle/JavaLexOracle.java --list $S/fuzz/java-mut.list --root $S/fuzz/java-mut \
+  > $S/lex/java-mut.oracle.txt
+tools/java-oracle/lex_fuzz.py testdata/java $S/fuzz/java-lex 20000 java-lex
+java -cp "$LIB/*" tools/java-oracle/JavaLexOracle.java --list $S/fuzz/java-lex/list --root $S/fuzz/java-lex \
+  > $S/lex/java-lex.oracle.txt
 ```

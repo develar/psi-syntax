@@ -20,6 +20,7 @@ dependencies = [
 name = "ksdump"
 version = "0.1.0"
 dependencies = [
+ "java-syntax",
  "kotlin-syntax",
  "stats_alloc",
 ]

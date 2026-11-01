@@ -207,9 +207,16 @@ pub struct Chameleon<'a, L: Language> {
     /// Its nesting (`NESTING_CHAMELEON` over where it sits) and the parser's limit.
     nesting: u32,
     limit: u32,
+    /// How the file it is in is parsed.
+    file_kind: L::FileKind,
 }
 
 impl<'a, L: Language> Chameleon<'a, L> {
+    /// How the file the chameleon is in is parsed (what `Language::tokenize_into` and `parse_file` got for it).
+    pub fn file_kind(&self) -> L::FileKind {
+        self.file_kind
+    }
+
     /// The chameleon's text.
     pub fn text(&self) -> &'a [u8] {
         let text: &'a Arc<[u8]> = self.text;
@@ -227,7 +234,7 @@ impl<'a, L: Language> Chameleon<'a, L> {
     /// limit.
     pub fn relexed_builder(&mut self) -> PsiBuilderImpl<L> {
         let p = &self.pending;
-        L::tokenize_into(&self.text[p.start..p.end], self.relexed);
+        L::tokenize_into(&self.text[p.start..p.end], self.file_kind, self.relexed);
         add(Counter::RelexedTokens, self.relexed.len() as u64);
         self.bufs.lex_types.clear();
         self.bufs.lex_types.extend_from_slice(&self.relexed.types);
@@ -250,7 +257,7 @@ impl<'a, L: Language> Chameleon<'a, L> {
                 Some(first)
             }
             None => {
-                L::tokenize_into(&self.text[p.start..p.end], self.relexed);
+                L::tokenize_into(&self.text[p.start..p.end], self.file_kind, self.relexed);
                 add(Counter::RelexedTokens, self.relexed.len() as u64);
                 self.bufs.lex_types.clear();
                 self.bufs.lex_types.extend_from_slice(&self.relexed.types);
@@ -319,9 +326,9 @@ impl<L: Language> Parser<L> {
             Err(_) => 0,
         };
         let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None, depth };
-        if let Some(frame) = self.begin_chameleon(&tree.text, &mut data, chameleon) {
+        if let Some(frame) = self.begin_chameleon(&tree.text, &mut data, chameleon, tree.file_kind) {
             self.frames.push(frame);
-            self.bind_frames(&tree.text, &mut data);
+            self.bind_frames(&tree.text, &mut data, tree.file_kind);
         }
         let body = data.take_exact();
         self.data = data;
@@ -339,7 +346,7 @@ impl<L: Language> Parser<L> {
         parse: impl FnOnce(PsiBuilderImpl<L>, &mut BuilderBuffers<L>) -> PsiBuilderImpl<L>,
     ) -> Tree<L> {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
-        L::tokenize_into(&text, &mut self.file);
+        L::tokenize_into(&text, file_kind, &mut self.file);
         add(Counter::FileTokens, self.file.len() as u64);
         let mut data = std::mem::take(&mut self.data);
         data.clear();
@@ -354,7 +361,7 @@ impl<L: Language> Parser<L> {
         let mut builder = parse(file, &mut bufs);
         let root = builder.begin_bind(&mut data, None);
         self.frames.push(Frame { builder, bufs });
-        self.bind_frames(&text, &mut data);
+        self.bind_frames(&text, &mut data, file_kind);
 
         let tree = data.take_exact();
         self.data = data;
@@ -364,7 +371,7 @@ impl<L: Language> Parser<L> {
     /// Runs the builders on `frames` to the end: the top one appends its nodes until it appends a chameleon, whose
     /// builder then goes on top and appends the chameleon's subtree right after it. So node ids are in preorder, and
     /// nesting takes heap, not stack.
-    fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData) {
+    fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData, file_kind: L::FileKind) {
         while let Some(frame) = self.frames.last_mut() {
             match frame.builder.resume_bind(data) {
                 Some(chameleon) if !self.options.expand_bodies && L::is_body(chameleon.kind) => {
@@ -374,7 +381,7 @@ impl<L: Language> Parser<L> {
                     }
                 }
                 Some(chameleon) => {
-                    if let Some(frame) = self.begin_chameleon(text, data, chameleon) {
+                    if let Some(frame) = self.begin_chameleon(text, data, chameleon, file_kind) {
                         self.frames.push(frame);
                     }
                 }
@@ -391,10 +398,16 @@ impl<L: Language> Parser<L> {
     /// under its node. A body (`Language::is_body`) whose nesting (`NESTING_CHAMELEON` over where it sits) passes the
     /// limit is not parsed: its subtree is appended whole, an error element "Code is too deeply nested" over its
     /// tokens, and there is no frame.
-    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending<L::Lazy>) -> Option<Frame<L>> {
+    fn begin_chameleon(
+        &mut self,
+        text: &Arc<[u8]>,
+        data: &mut TreeData,
+        p: Pending<L::Lazy>,
+        file_kind: L::FileKind,
+    ) -> Option<Frame<L>> {
         let nesting = p.depth.saturating_add(NESTING_CHAMELEON);
         if L::is_body(p.kind) && nesting > self.limit() {
-            self.append_too_deep(text, data, &p);
+            self.append_too_deep(text, data, &p, file_kind);
             return None;
         }
         let mut bufs = self.spare.pop().unwrap_or_default();
@@ -407,6 +420,7 @@ impl<L: Language> Parser<L> {
             bufs: &mut bufs,
             nesting,
             limit,
+            file_kind,
         };
         let mut builder = L::parse_chameleon(p.kind, &mut chameleon);
         builder.begin_bind(data, Some(p.node));
@@ -416,11 +430,11 @@ impl<L: Language> Parser<L> {
     /// The subtree of a body nested too deeply to parse: under its node, one error element "Code is too deeply nested"
     /// with its tokens as leaves (as the lexer makes them; an empty token is not a leaf, a doc comment is not
     /// expanded).
-    fn append_too_deep(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: &Pending<L::Lazy>) {
+    fn append_too_deep(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: &Pending<L::Lazy>, file_kind: L::FileKind) {
         let (types, starts, base): (&[L::Token], &[u32], u32) = match reusable_tokens(&self.file, p) {
             Some((first, last)) => (&self.file.types[first..last], &self.file.starts[first..=last], 0),
             None => {
-                L::tokenize_into(&text[p.start..p.end], &mut self.relexed);
+                L::tokenize_into(&text[p.start..p.end], file_kind, &mut self.relexed);
                 (&self.relexed.types, &self.relexed.starts, p.start as u32)
             }
         };

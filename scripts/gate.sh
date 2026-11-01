@@ -7,7 +7,9 @@
 #      psi-tools 4d21cba's tools/psi-gate/mutate.js over crates/kotlin-syntax/testdata/psi) against their cached oracle answers;
 #   4. body-less parsing on the community files: `parse_body` of every unexpanded body dumps as the full parse's subtree;
 #   5. the too-deep paths: the community files and the mutations parsed with nesting limit 3 (`--nesting-limit`), every
-#      tree lossless and every body's `parse_body` its full parse's subtree.
+#      tree lossless and every body's `parse_body` its full parse's subtree;
+#   6. Java's lexers (`ksdump --lex`) on the 68 263 community .java files, the Java golden mutations and the Java lexer
+#      fuzz against the cached lines of tools/java-oracle/JavaLexOracle.java.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -38,6 +40,14 @@ echo "mutations (psi-tools 4d21cba mutate.js over crates/kotlin-syntax/testdata/
 for s in 1 2; do
   n=$($B --lex --list "$C/fuzz/lex-$s/list" --root "$C/fuzz/lex-$s" | cut -f1,2 | diff - "$C/fuzz/lex-$s.oracle" | grep -c '^[<>]')
   echo "lex-fuzz $s: $n differing lines"; [ "$n" = 0 ] || fail=1
+done
+# Java: JavaLexer and JavaDocLexer against tools/java-oracle/JavaLexOracle.java's cached lines (the community .java
+# files, the one-place mutations of the Java goldens, the lexer fuzz of tools/java-oracle/lex_fuzz.py).
+for corpus in "corpus/java-community-3caa0bf.list $ROOT java-community-3caa0bf" "fuzz/java-mut.list $C/fuzz/java-mut java-mut" \
+  "fuzz/java-lex/list $C/fuzz/java-lex java-lex"; do
+  set -- $corpus
+  n=$($B --lex --list "$C/$1" --root "$2" | diff - "$C/lex/$3.oracle.txt" | grep -c '^[<>]')
+  echo "java lex $3: $n differing lines of $(wc -l < "$C/lex/$3.oracle.txt" | tr -d ' ')"; [ "$n" = 0 ] || fail=1
 done
 bodies=$($B --check-bodies --list "$C/corpus/community-3caa0bf.list" --root "$ROOT" | tail -1)
 echo "check-bodies: $bodies"; case "$bodies" in *"differing 0 "*) ;; *) fail=1 ;; esac

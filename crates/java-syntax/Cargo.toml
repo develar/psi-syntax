@@ -1,6 +1,6 @@
 [package]
 name = "java-syntax"
-description = "A lossless Java lexer and parser in Rust, to be ported from IntelliJ's java-syntax (JavaParser, the JavaLexer and JavaDocLexer flex specs); prints PSI's debug dump"
+description = "A lossless Java lexer and parser in Rust, ported from IntelliJ's java-syntax (JavaLexer, JavaDocLexer, JavaParser); prints PSI's debug dumps"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

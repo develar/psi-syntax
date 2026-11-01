@@ -168,7 +168,12 @@ impl psi_builder::WhitespacesAndCommentsBinder<TokenKind> for Binder {
     }
 
     /// `getEdgePosition` on a token view of negative `size` (see the trait).
-    fn negative_size_edge(self, size: i32, get: impl Fn(i32) -> Option<TokenKind>) -> i32 {
+    fn negative_size_edge<'t>(
+        self,
+        size: i32,
+        get: impl Fn(i32) -> Option<TokenKind>,
+        _text: &dyn Fn(i32) -> &'t [u8],
+    ) -> i32 {
         match self {
             Binder::DefaultLeft | Binder::PrecedingComments | Binder::PrecedingDocComments | Binder::TrailingAll => {
                 size
