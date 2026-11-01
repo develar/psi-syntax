@@ -91,9 +91,14 @@ otherwise.
 
 ## Rules
 
-- No dependencies, no `unsafe`, no `unwrap` on input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed
-  as BAD_CHARACTER bytes) and never panics.
+- Dependencies: a well-maintained crate is better than a reinvented one when it is measurably as fast or faster
+  and keeps the output byte-identical; each one is justified in its commit (what it replaces, the measured effect,
+  its maintenance). Nothing that needs a C toolchain or pulls a large tree. No `unsafe` of our own, no `unwrap` on
+  input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes) and never panics.
 - Speed is a goal: no allocation per token beyond the arena, no `String` per leaf (texts are ranges), no recursion
   depth that a 4 MB file of nested expressions can overflow without a guard (PSI's own limits apply).
-- `cargo clippy --release --all-targets -- -D warnings` and `cargo test --release` pass before a commit.
-- Commit messages: imperative subject ≤ 72 characters, a body that says what the change ports and its goldens count.
+- `scripts/gate.sh` prints PASS before every commit: clippy, `KS_STRICT=1 cargo test --release`, byte equality of
+  all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle. A faster change that fails it is
+  not a change.
+- The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
+  change does, its measured effect and that the gate passed.
