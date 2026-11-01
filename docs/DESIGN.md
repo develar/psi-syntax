@@ -13,7 +13,9 @@ before every commit:
 - clippy, on default features and with `counters,alloc-stats`;
 - `KS_STRICT=1 cargo test --release`;
 - byte equality with the PSI oracle on all 55 501 community files and on the cached parse-fuzz and lex-fuzz corpora;
-- `ksdump --check-bodies`: each of the 229 960 community bodies parsed on its own equals the full parse's subtree.
+- `ksdump --check-bodies`: each of the 229 960 community bodies parsed on its own equals the full parse's subtree;
+- the same with nesting limit 3 (`--nesting-limit 3`) on the community files and the mutations, so the too-deep paths
+  run on ordinary code: every tree lossless, every body exact.
 
 Speed work therefore changes only three things, none of which changes a parser decision:
 
@@ -126,8 +128,40 @@ its own text. The port does the same, in place:
 2. The driver pushes the suspended frame on a heap stack, parses the chameleon (reusing the file's tokens when they
    cover it exactly, relexing otherwise), binds it, then resumes.
 
-No native recursion is involved, so 5000 nested lambdas or blocks fit a 256 KB stack (`tests/robustness.rs`), and node
+No native recursion is involved, so chameleon nesting takes heap, not stack, and node
 ids come out strictly in preorder.
+
+### Nesting limit (`builder::NESTING_LIMIT`)
+
+Within one builder the parser is recursive descent, as the Java is: `(((…1)))` recursed once per level and a 12 KB file
+of parentheses overflowed a 2 MB stack, which aborts the whole process. PSI has no defined result there (kotlinc
+overflows too), so the port defines one, and keeps PSI's tree below it.
+
+- **What is counted.** `PsiBuilderImpl::enter_nesting` counts a level at every recursive entry point: an expression
+  (`parsePrefixExpression`, which every expression recursion passes), a type (`parseTypeRefContents`), a member
+  declaration (`parseMemberDeclaration`), a type argument list (`tryParseTypeArgumentList`), an annotation and a
+  parenthesized type. A chameleon's builder starts at 4 levels over where its block or lambda was collapsed
+  (`MarkerData::depth`), so frames are bounded too; body-less trees keep that depth per unexpanded body for
+  `parse_body`.
+- **The limits.** 1000 levels; 32 nested type argument lists per builder, because `a<a<…` tries one at every `<` and
+  rolls it back; 10 nested annotations and parenthesized types per builder, because a rolled-back attempt parses
+  them and the parse after it parses them again (`@A(@A(…))`, `((…) -> A) -> A`), which doubles the work per level:
+  measured on c796e73, 14 levels of `@A(` took 7.3 ms and 1000 did not finish. Stack per level, measured with a stack
+  pointer probe and by bisecting the depth that overflows 1 MB without a limit: 127 B (unary minus) to 559 B
+  (nested `object`), 382 B for parentheses; random mixes of 42 forms stayed below 320 B. 1000 levels of the worst
+  form fit 640 KB, not 512 KB. The community files reach 62 levels, 5 type argument lists and 4 reparsed
+  constructs.
+- **Past a limit** the construct is an error element "Code is too deeply nested" over the rest of it: from the
+  current token to the first token that closes a bracket opened before it (`(`, `[`, `{`, `${`, quotes), at least one
+  token. The table of these closers is made once per builder when first needed, so the error costs constant time,
+  also inside an attempt that is rolled back; the construct around it then closes normally. A chameleon past the limit
+  is not parsed: its node gets one such error with its tokens as leaves.
+- **Frames.** A suspended frame drops the tokens `bind` has passed once they are at least 4096 and half of what it
+  holds (`drop_bound_tokens`, keeping the first token of any collapsed marker still ahead), so nested chameleons hold
+  O(tokens) memory, not O(depth · tokens).
+
+`tests/robustness.rs` parses 22 forms nested 100 000 deep on a 1 MB stack, and every golden with limits 1 to 13;
+the gate runs the community files and the mutations with limit 3 (see Contract).
 
 ### Tree (`src/tree.rs`)
 
@@ -170,7 +204,9 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | A faithful port, one function per Java method, MarkerProduction semantics | Byte equality with PSI on every input, including error recovery; a diff against the Java reads line by line | gate: 0 of 55 501 community files differ, and 0 of 3000 for each parse-fuzz corpus |
 | Speed from representation, allocation and layout, never from parser decisions | Equality stays provable by the gate and the counters | all 25 counters identical across batches 2 and 3; in batch 1 only the cursor-call counts (token cache) and the lazy-block counts (brace skip) moved, as intended |
 | Chameleons reparsed exactly as PSI does, not parsed eagerly in the file builder | Not equivalent: a fresh builder resets the newline and join stacks, the edge binders and the error dedup at the chameleon boundary | `reusable_tokens`' DANGLING_NEWLINE case; the brace skip removes the repeated work instead |
-| In-place expansion over a heap frame stack | Preorder ids (1.03M preorder breaks under the old LIFO worklist) without native recursion | 5000 nested lambdas on 256 KB; walk 3.62 → 2.23 ns/node |
+| In-place expansion over a heap frame stack | Preorder ids (1.03M preorder breaks under the old LIFO worklist) without native recursion | walk 3.62 → 2.23 ns/node |
+| A nesting counter that degrades to an error element, not a bigger stack or `stacker` | Deterministic on every platform and build, bounded memory, no `unsafe`; the dump is PSI's wherever PSI itself parses | gate unchanged; 100 000 levels of 22 forms on 1 MB in at most 110 ms; parse 74.4 → 75.0 MB/s (noise) |
+| The too-deep error over the rest of the construct, in constant time | One token at a time cost `2^10` times the rest of the file inside doubled annotations; a scan to the closer cost O(n) per rolled-back `<` attempt | `@A(` × 100 000: 4.2 ms |
 | A per-thread `Parser`, no thread_local | Allocation churn dominated multi-threaded scaling | allocations per pass 10.7M → 179 779; 16 threads 684 → 917 MB/s (f3aa172 → a99fb45) |
 | Copy the tree out exactly sized, instead of reserving `tokens*15/8+16` | Same CPU time, less memory | user CPU 3.12 vs 3.13 s; 11.32 vs 12.70 MB of tree per source MB |
 | Pair columns `ranges`/`links`, not five `u32` columns | Same 18 B/node, 3 pushes instead of 5 | parse 70.0 → 71.5 MB/s (9 of 9 rounds), linear walk 1.68 → 1.59 ns/node |
@@ -248,6 +284,7 @@ The gate passed on c796e73 in 62 s.
 | a99fb45 | tree copied out exactly sized | 71.7 → 72.4 | | 11.32 MB per source MB; 179 779 allocations per pass |
 | 279585f … 7fc4e69 | in-place chameleons, preorder columns | 71.5 → 71.9 | | 7.64 MB per source MB; walk 3.62 → 2.23 ns/node |
 | a405a03 | ASCII identifier table | 71.9 → 73.9 | 918.0 → 926.1 | lexer alone 441.3 → 507.7 MB/s |
+| (nesting limit) | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
 (×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
@@ -271,17 +308,6 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **No recursion-depth guard.** Measured on c796e73 with `val x = (((…1)))`. On a default 2 MB Rust thread, 4000
-  levels parse and 6000 abort with a stack overflow. With an 8 MB stack, 20 000 parse and 30 000 abort. That is
-  about 350-400 bytes of stack per parenthesis level.
-  - A stack overflow aborts the whole process, so a 12 KB hostile or generated file kills an accio indexing run.
-  - The cause is that the recursive-descent parser recurses once per level within one chameleon. In-place expansion
-    protects chameleon nesting only.
-  - AGENTS.md requires a guard. PSI's own behavior is a `StackOverflowError` that IntelliJ catches. The fix must keep
-    the dump byte-identical on every input that PSI parses. Options are a depth counter that degrades to an error
-    element (the dump then differs only where PSI itself would fail), or running the parse on a thread with a large
-    stack plus `stacker`-style growth. Neither is built or measured.
-  - Unary operators (5000 `-`) and nested calls (4000 `f(`) did not overflow on 2 MB.
 - **Quadratic left-associative chains.** A chain `a+a+…+1` takes 0.046 s for 10 000 operators, 0.40 s for 30 000 and
   4.67 s for 100 000 (a 0.2 MB file).
   - `scripts/profile.py` attributes 80 % of the time to memmove under `PsiBuilderImpl::precede`, which inserts into
@@ -289,9 +315,9 @@ There is no line-level profile of the current code: `atos` returned no line info
     the markers at the same lexeme.
   - IntelliJ's builder has the same shape. A fix must keep the production order: for example a gap buffer or a
     chunked production. Not built.
-- **Memory of suspended frames.** Each suspended chameleon frame holds its own token copy. N nested lambdas over T
-  tokens peak at O(N·T/2), where the old worklist peaked at one level. 5000 levels pass quickly, but nothing bounds
-  it.
+- **Copies into chameleon frames.** Each chameleon still copies its tokens from the file's (suspended frames then
+  drop what they have bound). Nested chameleons over T tokens copy O(depth · T): 100 000 nested `{ fun g() ` (250 frames at the limit) take
+  99 ms with the nesting limit's commit, 2026-11-01. Sharing the file's tokens would remove it (see "Remaining copies").
 - **mimalloc for consumers.** Re-measure on the current code, 1 thread included, before recommending it. It was +3-4 %
   at 8 and 16 threads on a99fb45.
 - **Remaining copies.** `lex_types` is copied into each chameleon builder (remap mutates it), and the text is copied

@@ -9,7 +9,10 @@ use std::borrow::Cow;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{BuilderBuffers, LazyKind, Pending, PsiBuilderImpl, SemanticWhitespaceAwarePsiBuilderImpl};
+use crate::builder::{
+    BuilderBuffers, LazyKind, NESTING_CHAMELEON, NESTING_LIMIT, Pending, PsiBuilderImpl,
+    SemanticWhitespaceAwarePsiBuilderImpl, TOO_DEEPLY_NESTED,
+};
 use crate::lexer::{self, Lexed};
 use crate::node_kind::NodeKind;
 use crate::parsing::kotlin_parser;
@@ -62,6 +65,9 @@ pub(crate) struct TreeData {
     links: Vec<[u32; 2]>,
     /// The message of each error node, sorted by node id.
     errors: Vec<(u32, Cow<'static, str>)>,
+    /// The nesting (`Pending::depth`) of each unexpanded body sitting at a nonzero one, sorted by node id, for
+    /// `parse_body` to start where the full parse would.
+    body_depths: Vec<(u32, u32)>,
 }
 
 impl TreeData {
@@ -120,6 +126,7 @@ impl TreeData {
         self.ranges.clear();
         self.links.clear();
         self.errors.clear();
+        self.body_depths.clear();
     }
 
     /// A copy in exactly sized buffers; the errors are taken (most files have none: their list never allocates; the
@@ -132,6 +139,7 @@ impl TreeData {
             ranges: self.ranges.as_slice().to_vec(),
             links: self.links.as_slice().to_vec(),
             errors,
+            body_depths: self.body_depths.as_slice().to_vec(),
         }
     }
 }
@@ -177,6 +185,8 @@ pub struct Parser {
     /// The tree being built; copied into exactly sized buffers when done.
     data: TreeData,
     options: ParseOptions,
+    /// `NESTING_LIMIT`, or what `set_nesting_limit` set.
+    nesting_limit: Option<u32>,
 }
 
 /// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
@@ -188,6 +198,17 @@ struct Frame {
 impl Parser {
     pub fn new() -> Parser {
         Parser::default()
+    }
+
+    /// Parses with `limit` instead of `NESTING_LIMIT` (tests: a small limit puts the too-deep paths on ordinary
+    /// inputs). Not part of the consumer contract.
+    #[doc(hidden)]
+    pub fn set_nesting_limit(&mut self, limit: u32) {
+        self.nesting_limit = Some(limit);
+    }
+
+    fn limit(&self) -> u32 {
+        self.nesting_limit.unwrap_or(NESTING_LIMIT)
     }
 
     /// Parses `text` as a `.kt` file or a script (see `Tree::parse`).
@@ -222,10 +243,15 @@ impl Parser {
         data.clear();
         let root = data.add_composite(NONE, tree.kind(id), range.start as u32);
         data.set_end(root, range.end as u32);
-        let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None };
-        let frame = self.begin_chameleon(&tree.text, &mut data, chameleon);
-        self.frames.push(frame);
-        self.bind_frames(&tree.text, &mut data);
+        let depth = match tree.data.body_depths.binary_search_by_key(&id.0, |&(node, _)| node) {
+            Ok(i) => tree.data.body_depths[i].1,
+            Err(_) => 0,
+        };
+        let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None, depth };
+        if let Some(frame) = self.begin_chameleon(&tree.text, &mut data, chameleon) {
+            self.frames.push(frame);
+            self.bind_frames(&tree.text, &mut data);
+        }
         let body = data.take_exact();
         self.data = data;
         self.options = ParseOptions::default();
@@ -250,7 +276,8 @@ impl Parser {
         bufs.lex_types.extend_from_slice(&self.file.types);
         bufs.starts.clear();
         bufs.starts.extend_from_slice(&self.file.starts);
-        let file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut bufs, Some(0));
+        let mut file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut bufs, Some(0));
+        file.set_nesting(0, self.limit());
         let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, &mut bufs);
         parse(&mut builder);
         let mut builder = builder.into_delegate(&mut bufs);
@@ -273,10 +300,14 @@ impl Parser {
                     if !self.options.expand_bodies && matches!(chameleon.kind, LazyKind::Block | LazyKind::Lambda) =>
                 {
                     data.set_unexpanded(chameleon.node);
+                    if chameleon.depth > 0 {
+                        data.body_depths.push((chameleon.node, chameleon.depth));
+                    }
                 }
                 Some(chameleon) => {
-                    let frame = self.begin_chameleon(text, data, chameleon);
-                    self.frames.push(frame);
+                    if let Some(frame) = self.begin_chameleon(text, data, chameleon) {
+                        self.frames.push(frame);
+                    }
                 }
                 None => {
                     let Some(Frame { builder, mut bufs }) = self.frames.pop() else { break };
@@ -287,10 +318,17 @@ impl Parser {
         }
     }
 
-    /// Parses one chameleon's text with a new builder and starts appending its subtree under its node.
-    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) -> Frame {
+    /// Parses one chameleon's text with a new builder and starts appending its subtree under its node. A block or
+    /// lambda whose nesting (`NESTING_CHAMELEON` over where it sits) passes the limit is not parsed: its subtree is
+    /// appended whole, an error element "Code is too deeply nested" over its tokens, and there is no frame.
+    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) -> Option<Frame> {
         use crate::counters::{Counter, add};
         let len = p.end - p.start;
+        let nesting = p.depth.saturating_add(NESTING_CHAMELEON);
+        if matches!(p.kind, LazyKind::Block | LazyKind::Lambda) && nesting > self.limit() {
+            self.append_too_deep(text, data, &p);
+            return None;
+        }
         let mut bufs = self.spare.pop().unwrap_or_default();
         let mut builder = match p.kind {
             LazyKind::Block | LazyKind::Lambda => {
@@ -314,7 +352,8 @@ impl Parser {
                         None
                     }
                 };
-                let delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, file_token);
+                let mut delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, file_token);
+                delegate.set_nesting(nesting, self.limit());
                 let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, &mut bufs);
                 if p.kind == LazyKind::Block {
                     kotlin_parser::parse_block_expression(&mut builder);
@@ -348,7 +387,29 @@ impl Parser {
             }
         };
         builder.begin_bind(data, Some(p.node));
-        Frame { builder, bufs }
+        Some(Frame { builder, bufs })
+    }
+
+    /// The subtree of a block or lambda nested too deeply to parse: under its node, one error element "Code is too
+    /// deeply nested" with its tokens as leaves (as the lexer makes them; an empty token is not a leaf, a doc comment
+    /// is not expanded).
+    fn append_too_deep(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: &Pending) {
+        let (types, starts, base): (&[TokenKind], &[u32], u32) = match reusable_tokens(&self.file, p) {
+            Some((first, last)) => (&self.file.types[first..last], &self.file.starts[first..=last], 0),
+            None => {
+                lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
+                (&self.relexed.types, &self.relexed.starts, p.start as u32)
+            }
+        };
+        let error = data.add_composite(p.node, ElementType::Node(NodeKind::ERROR_ELEMENT), p.start as u32);
+        for (&token, edges) in types.iter().zip(starts.windows(2)) {
+            if edges[0] < edges[1] {
+                data.add_token_leaf(error, token, base + edges[0], base + edges[1]);
+            }
+        }
+        data.set_end(error, p.end as u32);
+        data.set_error(error, Cow::Borrowed(TOO_DEEPLY_NESTED));
+        data.set_end(p.node, p.end as u32);
     }
 }
 
@@ -409,6 +470,7 @@ impl Tree {
             + d.kinds.capacity() * size_of::<u16>()
             + (d.ranges.capacity() + d.links.capacity()) * size_of::<[u32; 2]>()
             + d.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
+            + d.body_depths.capacity() * size_of::<(u32, u32)>()
             + messages
     }
 

@@ -197,6 +197,9 @@ struct MarkerData {
     left_binder: Binder,
     right_binder: Binder,
     collapsed: bool,
+    /// The builder's nesting (`PsiBuilderImpl::nesting`) when the marker was collapsed: where a lazy block or lambda
+    /// sits, for the chameleon that expands it (not in the Java).
+    depth: u16,
 }
 
 const NONE: u32 = 0;
@@ -212,6 +215,7 @@ impl MarkerData {
             left_binder: DEFAULT_LEFT_BINDER,
             right_binder: DEFAULT_RIGHT_BINDER,
             collapsed: false,
+            depth: 0,
         }
     }
 
@@ -256,7 +260,46 @@ pub(crate) struct Pending {
     pub start: usize,
     pub end: usize,
     pub file_tokens: Option<(usize, usize)>,
+    /// The nesting of the parse where the chameleon sits (`MarkerData::depth`); 0 for a doc comment or a link.
+    pub depth: u32,
 }
+
+/// How deep a parse may nest (not in the Java, whose recursion has no bound but the thread's stack): the levels of
+/// the recursive entry points it is inside (`Nesting`), counted from the nesting of the chameleon it parses
+/// (`NESTING_CHAMELEON` over where that sits). Past a limit, the construct being entered is an error element "Code is
+/// too deeply nested" over the rest of it (`AbstractKotlinParsing::too_deeply_nested`). A level takes at most about
+/// 560 bytes of stack in a release build (nested `object A { … }`), so a parse fits a 1 MB stack (0.64 MB suffice for
+/// the deepest measured form). The deepest community file reaches 62 levels, 5 nested type argument lists and 4
+/// nested constructs parsed twice.
+pub const NESTING_LIMIT: u32 = 1000;
+/// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder: an expression `a<a<…` tries one
+/// at every `<` and rolls it back, so this bounds what each `<` costs.
+pub const TYPE_ARGUMENTS_LIMIT: u32 = 32;
+/// How many constructs that are parsed twice may nest in one builder: a rolled-back attempt parses them and the parse
+/// after the rollback parses them again, so the work doubles with each level. An annotation (`parseAnnotation`: an
+/// annotated expression is a declaration's modifiers first, `@A(@A(…))`) and a parenthesized type
+/// (`parseTypeRefContents`: then a function type, `((…) -> A) -> A`).
+/// At the limit a construct takes 2^10 times its own (not its contents') work.
+pub const REPARSED_LIMIT: u32 = 10;
+/// The message of the error element a construct nested past a limit becomes.
+pub const TOO_DEEPLY_NESTED: &str = "Code is too deeply nested";
+/// The levels a chameleon (a lazy block or lambda) adds to the nesting where it sits: each suspended frame keeps the
+/// tail of its tokens, and each copies its own tokens in.
+pub const NESTING_CHAMELEON: u32 = 4;
+
+/// What `PsiBuilderImpl::enter_nesting` enters: a level of a recursive entry point (an expression,
+/// `parsePrefixExpression`; a type, `parseTypeRefContents`; a member declaration, `parseMemberDeclaration`), a type
+/// argument list, or a construct that is parsed twice; the last two are levels too.
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum Nesting {
+    Level,
+    TypeArguments,
+    Reparsed,
+}
+
+/// `bind` drops the tokens before its position from a suspended frame (`drop_bound_tokens`) once they are at least
+/// this many and at least half of what it holds.
+const DROP_TOKENS_MIN: usize = 1 << 12;
 
 /// Where `bind` is: its walk of the production, kept in the builder so it can stop at a chameleon and resume.
 #[derive(Copy, Clone, Debug, Default)]
@@ -313,6 +356,7 @@ pub(crate) struct BuilderBuffers {
     production_lexemes: Vec<i32>,
     messages: Vec<Cow<'static, str>>,
     bind_stack: Vec<(u32, u32)>,
+    closers: Vec<u32>,
     join_complex_tokens: Vec<bool>,
     newlines_enabled: Vec<bool>,
     adapters: Vec<Adapter>,
@@ -329,6 +373,15 @@ pub struct PsiBuilderImpl {
     /// `myLexTypes`.
     lex_types: Vec<TokenKind>,
     lexeme_count: usize,
+    /// How many tokens `drop_bound_tokens` removed from the front of `lex_types` and `lex_starts` while binding:
+    /// token `i` is at `i - token_shift` there (0 while parsing).
+    token_shift: usize,
+    /// The nesting of the parse (not in the Java; see `NESTING_LIMIT`): the levels it is inside, from the nesting the
+    /// builder starts at, and of those the type argument lists and the constructs parsed twice, from 0.
+    nesting: u32,
+    nesting_limit: u32,
+    type_arguments: u32,
+    reparsed: u32,
     /// Where token 0 is in the file's token list, when the tokens are an unmodified slice of it.
     file_token: Option<usize>,
     tokens_to_restore_on_rollback: BTreeMap<usize, TokenKind>,
@@ -359,6 +412,9 @@ pub struct PsiBuilderImpl {
     /// `bind`'s open composites below the root: (marker, node) of each one's parent.
     bind_stack: Vec<(u32, u32)>,
     bind: BindState,
+    /// For each token `i`, the first token at or after it that closes a bracket opened before `i`
+    /// (`skip_too_deeply_nested`); computed the first time a construct is too deeply nested, empty until then.
+    closers: Vec<u32>,
 }
 
 /// The `PsiBuilder` methods a marker needs: implemented by every builder layer, so `marker.done(builder, kind)` works
@@ -402,6 +458,8 @@ impl PsiBuilderImpl {
         let mut messages = std::mem::take(&mut bufs.messages);
         messages.clear();
         let bind_stack = std::mem::take(&mut bufs.bind_stack);
+        let mut closers = std::mem::take(&mut bufs.closers);
+        closers.clear();
         let lexeme_count = lex_types.len();
         lex_starts.resize(lexeme_count + 1, len as u32);
         lex_starts[lexeme_count] = len as u32;
@@ -412,6 +470,11 @@ impl PsiBuilderImpl {
             lex_starts,
             lex_types,
             lexeme_count,
+            token_shift: 0,
+            nesting: 0,
+            nesting_limit: NESTING_LIMIT,
+            type_arguments: 0,
+            reparsed: 0,
             file_token,
             tokens_to_restore_on_rollback: BTreeMap::new(),
             current_lexeme: 0,
@@ -427,7 +490,87 @@ impl PsiBuilderImpl {
             messages,
             bind_stack,
             bind: BindState::default(),
+            closers,
         }
+    }
+
+    /// Starts the nesting at `nesting`, with `limit` instead of `NESTING_LIMIT` (and no more than `limit` for the
+    /// other two limits).
+    pub(crate) fn set_nesting(&mut self, nesting: u32, limit: u32) {
+        self.nesting = nesting;
+        self.nesting_limit = limit;
+    }
+
+    /// Enters a nested construct (not in the Java): false, with nothing entered, when that would pass a limit. Each
+    /// `true` is matched by `exit_nesting(kind)` when the construct is parsed.
+    #[inline(always)]
+    pub(crate) fn enter_nesting(&mut self, kind: Nesting) -> bool {
+        if self.nesting >= self.nesting_limit {
+            return false;
+        }
+        match kind {
+            Nesting::Level => {}
+            Nesting::TypeArguments => {
+                if self.type_arguments >= TYPE_ARGUMENTS_LIMIT.min(self.nesting_limit) {
+                    return false;
+                }
+                self.type_arguments += 1;
+            }
+            Nesting::Reparsed => {
+                if self.reparsed >= REPARSED_LIMIT.min(self.nesting_limit) {
+                    return false;
+                }
+                self.reparsed += 1;
+            }
+        }
+        self.nesting += 1;
+        true
+    }
+
+    #[inline(always)]
+    pub(crate) fn exit_nesting(&mut self, kind: Nesting) {
+        self.nesting -= 1;
+        match kind {
+            Nesting::Level => {}
+            Nesting::TypeArguments => self.type_arguments -= 1,
+            Nesting::Reparsed => self.reparsed -= 1,
+        }
+    }
+
+    /// Where the rest of a construct nested too deeply ends when it starts at token `from` (not in the Java): the
+    /// first token at or after `from` that closes a bracket (`(`, `[`, `{`, `${`, a string's quotes) opened before
+    /// `from`, or the end. Constant time: a table of every token's answer is made, in one pass, the first time it is
+    /// asked for, so a rolled-back attempt that reaches the limit costs no more than one that does not.
+    fn unmatched_closer(&mut self, from: usize) -> usize {
+        use TokenKind::*;
+        if self.closers.is_empty() {
+            // The bracket depth before each token, d[0..=n]; the answer for `i` is the token before the first k > i
+            // with d[k] < d[i], found for all i by one backward pass with a stack of increasing depths.
+            let n = self.lexeme_count;
+            let mut depth = Vec::with_capacity(n + 1);
+            let mut d = 0i64;
+            depth.push(d);
+            for &t in &self.lex_types[..n] {
+                match t {
+                    LPAR | LBRACKET | LBRACE | LONG_TEMPLATE_ENTRY_START | OPEN_QUOTE => d += 1,
+                    RPAR | RBRACKET | RBRACE | LONG_TEMPLATE_ENTRY_END | CLOSING_QUOTE => d -= 1,
+                    _ => {}
+                }
+                depth.push(d);
+            }
+            self.closers.resize(n + 1, n as u32);
+            let mut stack: Vec<usize> = Vec::new();
+            for k in (0..=n).rev() {
+                while stack.last().is_some_and(|&top| depth[top] >= depth[k]) {
+                    stack.pop();
+                }
+                if let Some(&top) = stack.last() {
+                    self.closers[k] = (top - 1) as u32;
+                }
+                stack.push(k);
+            }
+        }
+        self.closers.get(from).map_or(self.lexeme_count, |&c| c as usize)
     }
 
     /// Gives the buffers back to `bufs`, the token starts to `bufs.starts`.
@@ -441,6 +584,7 @@ impl PsiBuilderImpl {
         bufs.production_lexemes = self.production_lexemes;
         bufs.messages = self.messages;
         bufs.bind_stack = self.bind_stack;
+        bufs.closers = self.closers;
     }
 
     /// `getOriginalText()`: this builder's text.
@@ -896,7 +1040,9 @@ impl PsiBuilderImpl {
     /// `Marker.collapse(type)`: done, and the tree gets one leaf of `type` over the marker's tokens.
     pub fn collapse(&mut self, marker: Marker, element_type: impl Into<ElementType>) {
         self.done(marker, element_type);
-        self.markers[marker.0 as usize].collapsed = true;
+        let m = &mut self.markers[marker.0 as usize];
+        m.collapsed = true;
+        m.depth = self.nesting.min(u16::MAX as u32) as u16;
     }
 
     /// `Marker.doneBefore(type, before)`.
@@ -1144,7 +1290,44 @@ impl PsiBuilderImpl {
         let mut st = self.bind;
         let chameleon = self.bind_steps(&mut st, tree);
         self.bind = st;
+        if chameleon.is_some() {
+            self.drop_bound_tokens(st.lex_index);
+        }
         chameleon
+    }
+
+    /// Drops the tokens before `lex_index`, which `bind` has passed, while this builder waits for a chameleon (not in
+    /// the Java): suspended frames then hold only the tails of their tokens, so nested chameleons over T tokens take
+    /// O(T) memory, not O(depth·T). Amortized: only when the tokens dropped are at least `DROP_TOKENS_MIN` and at
+    /// least as many as those kept, so each token is moved at most once on average.
+    ///
+    /// `bind` reads no token before `lex_index` again but the first token of a collapsed marker it has not reached
+    /// (`create_leaf` reads its start; its end is clamped to it or after): the drop keeps everything from the smallest
+    /// lexeme of a start entry still ahead.
+    fn drop_bound_tokens(&mut self, lex_index: usize) {
+        let held = self.lex_types.len();
+        let worth = |k: usize| k >= DROP_TOKENS_MIN && k * 2 >= held;
+        if !worth(lex_index.saturating_sub(self.token_shift).min(held)) {
+            return;
+        }
+        let mut keep = lex_index;
+        let ahead = self.bind.i.min(self.production.len());
+        for (&id, &lexeme) in self.production[ahead..].iter().zip(&self.production_lexemes[ahead..]) {
+            if id > 0 {
+                keep = keep.min(lexeme.max(0) as usize);
+            }
+        }
+        let k = keep.saturating_sub(self.token_shift).min(held);
+        if !worth(k) {
+            return;
+        }
+        self.lex_types.drain(..k);
+        self.lex_starts.drain(..k);
+        self.token_shift += k;
+        if self.lex_types.capacity() > 4 * self.lex_types.len() + DROP_TOKENS_MIN {
+            self.lex_types.shrink_to_fit();
+            self.lex_starts.shrink_to_fit();
+        }
     }
 
     #[inline(always)]
@@ -1158,8 +1341,8 @@ impl PsiBuilderImpl {
                     break;
                 }
                 st.lex_index = stop + 1;
-                let leaf = ElementType::Token(self.lex_types[stop]);
-                if let Some(chameleon) = self.create_leaf(leaf, stop, stop + 1, st.cur_node, tree) {
+                let leaf = ElementType::Token(self.lex_types[stop - self.token_shift]);
+                if let Some(chameleon) = self.create_leaf(leaf, stop, stop + 1, st.cur_node, 0, tree) {
                     return Some(chameleon);
                 }
             }
@@ -1222,12 +1405,13 @@ impl PsiBuilderImpl {
                         }
                     }
                     let m = self.marker(id);
-                    let (start, element_type) = (m.lexeme_index.max(0) as usize, m.element_type);
+                    let (start, element_type, depth) = (m.lexeme_index.max(0) as usize, m.element_type, m.depth);
                     let end = (m.done_lexeme.max(0) as usize).clamp(start, self.lexeme_count);
                     st.lex_index = end;
                     st.insert_to = end;
                     if let Some(element_type) = element_type
-                        && let Some(chameleon) = self.create_leaf(element_type, start, end, st.cur_node, tree)
+                        && let Some(chameleon) =
+                            self.create_leaf(element_type, start, end, st.cur_node, depth as u32, tree)
                     {
                         return Some(chameleon);
                     }
@@ -1280,8 +1464,9 @@ impl PsiBuilderImpl {
     #[inline(always)]
     fn insert_plain_leaves(&self, from: usize, to: usize, cur_node: u32, tree: &mut TreeData) -> usize {
         let base = self.base as u32;
-        let types = &self.lex_types[from..to];
-        let starts = &self.lex_starts[from..=to];
+        let shift = self.token_shift;
+        let types = &self.lex_types[from - shift..to - shift];
+        let starts = &self.lex_starts[from - shift..=to - shift];
         for (i, (&token, edges)) in types.iter().zip(starts.windows(2)).enumerate() {
             if edges[0] < edges[1] {
                 if matches!(token, TokenKind::DOC_COMMENT | TokenKind::KDOC_MARKDOWN_LINK) {
@@ -1300,7 +1485,7 @@ impl PsiBuilderImpl {
     }
 
     fn offset_of(&self, lex_index: usize) -> u32 {
-        (self.base + self.lex_starts[lex_index.min(self.lexeme_count)] as usize) as u32
+        (self.base + self.lex_starts[lex_index.min(self.lexeme_count) - self.token_shift] as usize) as u32
     }
 
     fn create_composite(&mut self, marker: u32, parent: u32, lex_index: usize, tree: &mut TreeData) -> u32 {
@@ -1314,17 +1499,19 @@ impl PsiBuilderImpl {
     }
 
     /// `createLeaf(type, start, end)` over the tokens `first..last`: a leaf, or a chameleon composite (a doc comment, a
-    /// markdown link, a collapsed lazy block or lambda), returned for the caller to expand before the walk goes on.
+    /// markdown link, a collapsed lazy block or lambda, at nesting `depth`), returned for the caller to expand before
+    /// the walk goes on.
     fn create_leaf(
         &self,
         element_type: ElementType,
         first: usize,
         last: usize,
         cur_node: u32,
+        depth: u32,
         tree: &mut TreeData,
     ) -> Option<Pending> {
-        let start = self.base + self.lex_starts[first] as usize;
-        let end = self.base + self.lex_starts[last] as usize;
+        let start = self.base + self.lex_starts[first - self.token_shift] as usize;
+        let end = self.base + self.lex_starts[last - self.token_shift] as usize;
         let lazy = match element_type {
             ElementType::Token(TokenKind::DOC_COMMENT) => Some(LazyKind::KDoc),
             ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK) => Some(LazyKind::KDocLink),
@@ -1340,7 +1527,7 @@ impl PsiBuilderImpl {
                     LazyKind::Block | LazyKind::Lambda => self.file_token.map(|f| (f + first, f + last)),
                     LazyKind::KDoc | LazyKind::KDocLink => None,
                 };
-                Some(Pending { node, kind, start, end, file_tokens })
+                Some(Pending { node, kind, start, end, file_tokens, depth })
             }
             _ => {
                 tree.add_leaf(cur_node, element_type, start as u32, end as u32);
@@ -1807,6 +1994,38 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     /// `getOriginalText()`.
     pub fn get_original_text(&self) -> &[u8] {
         self.imp.delegate.get_original_text()
+    }
+
+    /// Not in the Java: moves the cursor over the rest of a construct nested too deeply, from the current token to the
+    /// first that closes a bracket opened before it (`PsiBuilderImpl::unmatched_closer`), or to the stream's end; over
+    /// one token at least unless at the end, so that the callers' loops go on. The tokens stay raw: a `?.` inside is
+    /// `?` and `.`.
+    pub fn skip_too_deeply_nested(&mut self) {
+        if self.eof() {
+            return;
+        }
+        let delegate = &mut self.imp.delegate;
+        let current = delegate.current_lexeme;
+        let mut end = delegate.unmatched_closer(current).max(current + 1);
+        if self.top_trunc.is_some() {
+            // A truncation ends the stream at the first token starting at its end or later (`eof`), after `current`.
+            let eof = self.min_eof.max(0) as u32;
+            let starts = &delegate.lex_starts[..delegate.lexeme_count];
+            end = end.min(current + starts[current..].partition_point(|&s| s < eof));
+        }
+        delegate.raw_advance_lexer((end - current) as i32);
+    }
+
+    /// `PsiBuilderImpl::enter_nesting`.
+    #[inline(always)]
+    pub fn enter_nesting(&mut self, kind: Nesting) -> bool {
+        self.imp.delegate.enter_nesting(kind)
+    }
+
+    /// `PsiBuilderImpl::exit_nesting`.
+    #[inline(always)]
+    pub fn exit_nesting(&mut self, kind: Nesting) {
+        self.imp.delegate.exit_nesting(kind);
     }
 
     /// `hasErrorsAfter(marker)` (on `PsiBuilderImpl`).

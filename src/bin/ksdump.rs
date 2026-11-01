@@ -16,9 +16,11 @@
 //!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
 //! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it;
 //!   with `--bench [--repeat K]`, the MB/s of the Kotlin lexer alone instead.
-//! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that
-//!   `parse_body` of every unexpanded body dumps as the full tree's subtree there; prints the bodies, the differing
-//!   ones (their paths and ranges) and exits nonzero on any.
+//! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that the full
+//!   tree's leaves are the text and `parse_body` of every unexpanded body dumps as the full tree's subtree there;
+//!   prints the bodies, the differing ones (their paths and ranges) and exits nonzero on any.
+//! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
+//!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
 //! The text is read as bytes with CRLF and CR converted to LF, as the oracles do; `--trim` also trims it (what the
 //! compiler's parsing tests parse). A path ending in `.kt` (or without an extension) parses as a file, any other as a
@@ -49,6 +51,7 @@ fn usage() -> ! {
          ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
                 [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
+         (--nesting-limit N: parse with that nesting limit)\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
          ksdump --lex --bench --list LIST --root ROOT [--repeat K]   lexer throughput"
     );
@@ -70,6 +73,7 @@ struct Args {
     check_bodies: bool,
     repeat: usize,
     file_stats: Option<PathBuf>,
+    nesting_limit: Option<u32>,
 }
 
 fn parse_args() -> Args {
@@ -92,6 +96,7 @@ fn parse_args() -> Args {
             "--check-bodies" => args.check_bodies = true,
             "--repeat" => args.repeat = count(it.next()),
             "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
+            "--nesting-limit" => args.nesting_limit = Some(count(it.next()) as u32),
             _ => usage(),
         }
     }
@@ -222,14 +227,14 @@ fn main() {
     }
 
     if args.check_bodies {
-        let differing = check_bodies(root, &paths, &mut stdout);
+        let differing = check_bodies(root, &paths, args.nesting_limit, &mut stdout);
         let _ = stdout.flush();
         std::process::exit(if differing == 0 { 0 } else { 1 });
     }
 
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
-    let mut parser = Parser::new();
+    let mut parser = new_parser(args.nesting_limit);
     for path in &paths {
         let Some(text) = read_source(root, path, args.trim) else {
             eprintln!("cannot read {path}");
@@ -338,14 +343,28 @@ fn linear_walk(tree: &Tree) -> u64 {
 }
 
 /// `--check-bodies`: returns the number of differing bodies.
-fn check_bodies(root: &Path, paths: &[String], stdout: &mut impl Write) -> usize {
+/// A parser, with `--nesting-limit` when given.
+fn new_parser(nesting_limit: Option<u32>) -> Parser {
     let mut parser = Parser::new();
-    let mut body_parser = Parser::new();
+    if let Some(limit) = nesting_limit {
+        parser.set_nesting_limit(limit);
+    }
+    parser
+}
+
+fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdout: &mut impl Write) -> usize {
+    let mut parser = new_parser(nesting_limit);
+    let mut body_parser = new_parser(nesting_limit);
     let (mut bodies, mut differing) = (0usize, 0usize);
     for path in paths {
         let Some(text) = read_source(root, path, false) else { continue };
         let kind = FileKind::from_file_name(file_name(path));
         let full = parser.parse(&text, kind);
+        let covered: Vec<u8> = full.tokens().flat_map(|id| full.text(id).iter().copied()).collect();
+        if covered != text {
+            let _ = writeln!(stdout, "{path}: the leaves are not the text");
+            differing += 1;
+        }
         let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
         let (mut l, mut f) = (0u32, 0u32);
         while (l as usize) < lazy.len() && (f as usize) < full.len() {
@@ -375,10 +394,16 @@ fn check_bodies(root: &Path, paths: &[String], stdout: &mut impl Write) -> usize
     differing
 }
 
-fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool, options: ParseOptions) -> ThreadResult {
+fn bench_thread(
+    sources: &[Source],
+    next: &AtomicUsize,
+    do_walk: bool,
+    options: ParseOptions,
+    nesting_limit: Option<u32>,
+) -> ThreadResult {
     let mut r = ThreadResult::default();
     // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
-    let mut parser = Parser::new();
+    let mut parser = new_parser(nesting_limit);
     loop {
         let i = next.fetch_add(1, Ordering::Relaxed);
         let Some(source) = sources.get(i) else { break };
@@ -478,8 +503,9 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
         let next = AtomicUsize::new(0);
         let start = Instant::now();
         let per_thread: Vec<ThreadResult> = std::thread::scope(|scope| {
-            let handles: Vec<_> =
-                (0..threads).map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk, options))).collect();
+            let handles: Vec<_> = (0..threads)
+                .map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk, options, args.nesting_limit)))
+                .collect();
             handles.into_iter().map(|h| h.join().unwrap_or_default()).collect()
         });
         let wall = start.elapsed().as_secs_f64();

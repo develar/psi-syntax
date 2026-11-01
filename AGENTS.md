@@ -40,11 +40,11 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 | `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf and unexpanded bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser` drives the builders: the file's, then a stack of chameleon builders, each expanding its block, lambda, doc comment or markdown link in place where `bind` meets it (heap, not recursion). The consumer API: see "The consumer contract" |
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
-| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks `parse_body` against the full parse |
+| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files) |
 | `src/counters.rs` | per-thread event counters (cursor calls, markers, rollbacks, lexed/reused/skipped tokens) behind the `counters` feature; without it every `add` compiles to nothing |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
-| `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links, 5000 nested lambdas and blocks on a 256 KB stack |
+| `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep on a 1 MB stack; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
 | `tests/bodies.rs` | body-less parsing on every golden: the full tree minus each body's interior, `parse_body` equal to the full subtree; `leaves()` and `descendants()` |
 
 ## The consumer contract
@@ -69,6 +69,15 @@ What accio and Branch Deck may rely on (`src/tree.rs`):
   (the gate checks all 229 960 bodies of the community files). For declaration-only passes, summaries, navigation;
   a pass over call sites parses in full. Measured on the community files, one thread: 72.0 -> 144.5 MB/s, nodes
   63.7M -> 31.2M, tree 7.64 -> 4.25 bytes per source byte.
+- Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
+  levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
+  parenthesized types; a lazy block or lambda adds 4 to where it sits) up to `builder::NESTING_LIMIT` (1000), at most
+  `TYPE_ARGUMENTS_LIMIT` (32) nested type argument lists and `REPARSED_LIMIT` (10) nested annotations and
+  parenthesized types per block. A construct past a limit is an `ERROR_ELEMENT` with the message
+  `builder::TOO_DEEPLY_NESTED`, "Code is too deeply nested", over the rest of the construct (up to the bracket that
+  closes it); a block or lambda past it is one such error over all its tokens. The tree stays lossless, in preorder
+  and deterministic. PSI has no defined result there (kotlinc overflows its stack); below the limits the tree is PSI's
+  (the deepest community file reaches 62 levels, 5 type argument lists, 4 annotations or parenthesized types).
 - Allocator: kotlin-syntax uses the system allocator and builds no C. Consumers that already build C (tree-sitter)
   should set `#[global_allocator] static A: mimalloc::MiMalloc` (mimalloc 0.1.52): measured before batch 2's buffer
   reuse at 243.2 -> 272.5 MB/s with 8 threads (+12%) and 460.1 -> 528.5 with 16 (+15%), no change on one thread;
@@ -133,6 +142,6 @@ otherwise.
   `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy, `KS_STRICT=1 cargo test --release`, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
-  community files. A faster change that fails it is not a change.
+  community files, and again with `--nesting-limit 3` on the community files and the mutations. A faster change that fails it is not a change.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
   change does, its measured effect and that the gate passed.

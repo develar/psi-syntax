@@ -18,7 +18,7 @@
 #![allow(non_camel_case_types)]
 
 use crate::builder::{
-    Adapter, Binder, Marker, PRECEDING_ALL_COMMENTS_BINDER, SemanticWhitespaceAwarePsiBuilder,
+    Adapter, Binder, Marker, Nesting, PRECEDING_ALL_COMMENTS_BINDER, SemanticWhitespaceAwarePsiBuilder,
     TRAILING_ALL_COMMENTS_BINDER,
 };
 use crate::node_kind::NodeKind;
@@ -417,8 +417,13 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
         expression.done(self.my_builder(), LABELED_EXPRESSION);
     }
 
-    /// `parsePrefixExpression()`: `operation? prefixExpression`.
+    /// `parsePrefixExpression()`: `operation? prefixExpression`. Every recursion of an expression passes here, so it
+    /// counts a level of nesting (`Nesting::Level`; not in the Java).
     pub(crate) fn parse_prefix_expression(&mut self) {
+        if !self.my_builder().enter_nesting(Nesting::Level) {
+            self.too_deeply_nested();
+            return;
+        }
         if self.at(AT) {
             if !self.parse_local_declaration(/* rollbackIfDefinitelyNotExpression = */ false, false) {
                 let expression = self.mark();
@@ -445,6 +450,7 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
                 self.parse_postfix_expression();
             }
         }
+        self.my_builder().exit_nesting(Nesting::Level);
     }
 
     /// `parseDoubleColonSuffix(expression)`: `"::" SimpleName typeArguments?`.

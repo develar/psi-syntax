@@ -16,7 +16,7 @@
 #![allow(non_camel_case_types)]
 
 use crate::builder::{
-    Adapter, Binder, GREEDY_RIGHT_BINDER, Marker, PRECEDING_ALL_BINDER, SemanticWhitespaceAwarePsiBuilder,
+    Adapter, Binder, GREEDY_RIGHT_BINDER, Marker, Nesting, PRECEDING_ALL_BINDER, SemanticWhitespaceAwarePsiBuilder,
     TRAILING_ALL_BINDER,
 };
 use crate::node_kind::NodeKind;
@@ -1317,7 +1317,21 @@ impl<'b> KotlinParsing<'b> {
      *   ;
      */
     /// `parseAnnotation(mode)`.
+    ///
+    /// Not in the Java: an annotation counts as `Nesting::Reparsed`; past a limit its first token is the
+    /// error element, and it counts as parsed.
     pub(crate) fn parse_annotation(&mut self, mode: AnnotationParsingMode) -> bool {
+        if !self.my_builder().enter_nesting(Nesting::Reparsed) {
+            self.too_deeply_nested();
+            return true;
+        }
+        let parsed = self.parse_annotation_nested(mode);
+        self.my_builder().exit_nesting(Nesting::Reparsed);
+        parsed
+    }
+
+    /// The body of `parseAnnotation(mode)`, inside its nesting.
+    fn parse_annotation_nested(&mut self, mode: AnnotationParsingMode) -> bool {
         debug_assert!(
             self._at(IDENTIFIER) ||
                 // We have "@ann" or "@:ann" or "@ :ann", but not "@ ann"
@@ -1680,6 +1694,11 @@ impl<'b> KotlinParsing<'b> {
             self.advance(); // SEMICOLON
             return;
         }
+        // Not in the Java: the nesting of member declarations (classes in class bodies) is counted.
+        if !self.my_builder().enter_nesting(Nesting::Level) {
+            self.too_deeply_nested();
+            return;
+        }
         let decl = self.mark();
 
         let is_companion_block = self.at(COMPANION_KEYWORD) && self.lookahead(1) == LBRACE;
@@ -1706,6 +1725,7 @@ impl<'b> KotlinParsing<'b> {
                 self.close_declaration_with_comment_binders(decl, decl_type, true);
             }
         }
+        self.my_builder().exit_nesting(Nesting::Level);
     }
 
     /// `parseMemberDeclarationRest(modifierDetector)`.
@@ -2718,6 +2738,12 @@ impl<'b> KotlinParsing<'b> {
 
         let type_ref_marker = self.mark();
 
+        // Not in the Java: every recursion of a type passes here and counts one level of nesting.
+        if !self.my_builder().enter_nesting(Nesting::Level) {
+            self.too_deeply_nested();
+            return type_ref_marker;
+        }
+
         self.parse_type_modifier_list();
 
         let lookahead = self.lookahead(1);
@@ -2745,6 +2771,10 @@ impl<'b> KotlinParsing<'b> {
         } else if self.at(IDENTIFIER) || self.at(PACKAGE_KEYWORD) || self.at_parenthesized_mutable_for_platform_types(0)
         {
             self.parse_user_type();
+        } else if self.at(LPAR) && !self.my_builder().enter_nesting(Nesting::Reparsed) {
+            // Not in the Java: a parenthesized type is parsed, then again as a function type after a rollback, so it
+            // counts as `Nesting::Reparsed`; past a limit its `(` is the error element.
+            self.too_deeply_nested();
         } else if self.at(LPAR) {
             let function_or_parenthesized_type = self.mark();
 
@@ -2768,6 +2798,7 @@ impl<'b> KotlinParsing<'b> {
                 self.parse_function_type(function_type);
                 was_function_type_parsed = true;
             }
+            self.my_builder().exit_nesting(Nesting::Reparsed);
         } else {
             self.error_with_recovery(
                 "Type expected",
@@ -2831,6 +2862,7 @@ impl<'b> KotlinParsing<'b> {
 
         type_element_marker.drop(self.my_builder());
         context_receivers_start.drop(self.my_builder());
+        self.my_builder().exit_nesting(Nesting::Level);
         type_ref_marker
     }
 
@@ -2975,7 +3007,14 @@ impl<'b> KotlinParsing<'b> {
     }
 
     /// `tryParseTypeArgumentList(extraRecoverySet)`.
+    ///
+    /// Not in the Java: a list counts as `Nesting::TypeArguments`; past a limit its `<` is the error
+    /// element and the list fails.
     pub fn try_parse_type_argument_list(&mut self, extra_recovery_set: &TokenSet) -> bool {
+        if !self.my_builder().enter_nesting(Nesting::TypeArguments) {
+            self.too_deeply_nested();
+            return false;
+        }
         self.my_builder().disable_newlines();
         self.advance(); // LT
 
@@ -3010,6 +3049,7 @@ impl<'b> KotlinParsing<'b> {
             self.advance(); // GT
         }
         self.my_builder().restore_newlines_state();
+        self.my_builder().exit_nesting(Nesting::TypeArguments);
         at_gt
     }
 

@@ -115,6 +115,16 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         self.error_and_advance_n(message, 1);
     }
 
+    /// Not in the Java: what a construct nested past a limit (`PsiBuilderImpl::enter_nesting`) parses as instead, an
+    /// error element "Code is too deeply nested" over the rest of it: from the current token to the first one that
+    /// closes a bracket opened before it, at least the current token (`skip_too_deeply_nested`). The construct around
+    /// it then closes as it would, and the error costs constant time, also in an attempt that is rolled back.
+    fn too_deeply_nested(&mut self) {
+        let err = self.mark();
+        self.my_builder().skip_too_deeply_nested();
+        err.error(self.my_builder(), crate::builder::TOO_DEEPLY_NESTED);
+    }
+
     /// `errorAndAdvance(message, advanceTokenCount)`.
     fn error_and_advance_n(&mut self, message: impl Into<Cow<'static, str>>, advance_token_count: i32) {
         let err = self.mark();

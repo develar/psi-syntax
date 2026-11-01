@@ -124,25 +124,114 @@ fn random_bytes_and_fragments_parse() {
     }
 }
 
-/// Chameleons nested thousands deep (each a lambda or block expanded inside the one around it) take heap, not stack.
+/// The stack a parse is promised to fit (AGENTS.md, "The consumer contract"): 1 MB in a release build; a debug build's
+/// frames are several times larger.
+const STACK: usize = if cfg!(debug_assertions) { 16 << 20 } else { 1 << 20 };
+
+/// Runs `f` on a thread with `STACK` bytes of stack.
+fn on_small_stack<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> T {
+    std::thread::Builder::new().stack_size(STACK).spawn(f).unwrap().join().unwrap()
+}
+
+/// The checks of `check_lossless` but the dump, whose indentation is quadratic in the depth: ids in preorder, the
+/// navigation consistent with the parent links, the leaves the whole text.
+fn check_tree(tree: &Tree, text: &[u8]) {
+    assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()));
+    check_navigation(tree);
+    let covered: Vec<u8> = tree.tokens().flat_map(|id| tree.text(id).iter().copied()).collect();
+    assert!(covered == text, "the leaves are not the text");
+    assert_eq!(tree.range(tree.root()), 0..text.len());
+}
+
+fn too_deep_errors(tree: &Tree) -> usize {
+    (0..tree.len() as u32).filter(|&i| tree.error_message(NodeId(i)) == Some("Code is too deeply nested")).count()
+}
+
+/// Every recursive form nested 100 000 deep parses on a 1 MB stack, in well under a second, into a well-formed,
+/// lossless tree with the error "Code is too deeply nested" where the nesting passes the limit; the same text parses
+/// to the same tree again (the limit is deterministic). PSI has no defined result here (kotlinc overflows its stack).
 #[test]
-fn deeply_nested_lambdas_and_blocks_parse() {
-    let depth = 5000;
-    let lambdas = format!("val x = {}{}\n", "{ ".repeat(depth), "}".repeat(depth));
-    let blocks = format!("fun f() {}{}\n", "{ run ".repeat(depth), "}".repeat(depth + 1));
-    for text in [lambdas, blocks] {
-        let handle = std::thread::Builder::new()
-            .stack_size(256 * 1024)
-            .spawn(move || {
-                let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
-                let lambdas = tree.preorder(tree.root()).filter(|&(id, _)| !tree.is_leaf(id)).count();
-                let max_depth = tree.preorder(tree.root()).map(|(_, d)| d).max().unwrap_or(0);
-                check_lossless(text.as_bytes(), FileKind::Kt);
-                (lambdas, max_depth)
-            })
-            .unwrap();
-        let (composites, max_depth) = handle.join().unwrap();
-        assert!(composites > depth, "{composites}");
-        assert!(max_depth > depth, "{max_depth}");
+fn deeply_nested_forms_parse_on_a_small_stack() {
+    let n = 100_000;
+    let forms: Vec<(&str, String)> = vec![
+        ("parentheses", format!("val x = {}1{}\n", "(".repeat(n), ")".repeat(n))),
+        ("unary minus", format!("val x = {}1\n", "- ".repeat(n))),
+        ("calls", format!("val x = {}{}\n", "f(".repeat(n), ")".repeat(n))),
+        ("collection literals", format!("val x = {}1{}\n", "[".repeat(n), "]".repeat(n))),
+        ("lambdas", format!("val x = {}{}\n", "{ ".repeat(n), "}".repeat(n))),
+        ("blocks", format!("fun f() {}{}\n", "{ run ".repeat(n), "}".repeat(n + 1))),
+        ("local functions", format!("fun f() {}{}\n", "{ fun g() ".repeat(n), "}".repeat(n + 1))),
+        ("generics", format!("val x: {}B{} = 1\n", "A<".repeat(n), ">".repeat(n))),
+        ("function types", format!("val x: {}A{} = 1\n", "((".repeat(n), ") -> A)".repeat(n))),
+        ("nullable types", format!("val x: {}A{} = 1\n", "(".repeat(n), ")?".repeat(n))),
+        ("string templates", format!("val x = {}1{}\n", "\"${".repeat(n), "}\"".repeat(n))),
+        ("classes", format!("{}{}\n", "class A { ".repeat(n), "}".repeat(n))),
+        ("objects", format!("{}{}\n", "object A { ".repeat(n), "}".repeat(n))),
+        ("object literals", format!("val x = {}1{}\n", "object { val y = ".repeat(n), " }".repeat(n))),
+        ("if", format!("fun f() = {}1\n", "if (a) 1 else ".repeat(n))),
+        ("when", format!("fun f() = {}1{}\n", "when { a -> ".repeat(n), " }".repeat(n))),
+        ("try", format!("fun f() = {}1{}\n", "try { ".repeat(n), " } finally { }".repeat(n))),
+        ("annotated expressions", format!("val x = {}1{}\n", "@A(".repeat(n), ")".repeat(n))),
+        ("annotations", format!("{}{} fun f() {{}}\n", "@A(".repeat(n), ")".repeat(n))),
+        ("labels", format!("val x = {}1\n", "a@ ".repeat(n))),
+        ("destructuring", format!("val x = {{ {}a{} -> }}\n", "(".repeat(n), ")".repeat(n))),
+        ("doc comments", format!("{}{}\nfun f() {{}}\n", "/** ".repeat(n), "*/".repeat(n))),
+    ];
+    for (name, text) in forms {
+        let (elapsed, errors) = on_small_stack(move || {
+            let start = std::time::Instant::now();
+            let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
+            let elapsed = start.elapsed();
+            check_tree(&tree, text.as_bytes());
+            let again = Tree::parse(text.as_bytes(), FileKind::Kt);
+            assert!((0..tree.len() as u32).map(NodeId).all(|i| tree.kind(i) == again.kind(i)
+                && tree.range(i) == again.range(i)
+                && tree.parent(i) == again.parent(i)));
+            (elapsed, too_deep_errors(&tree))
+        });
+        // A doc comment's `/**` nests in the lexer, not the parser.
+        assert!(errors > 0 || name == "doc comments", "{name}: no error at the limit");
+        assert!(elapsed.as_millis() < 2000, "{name}: {elapsed:?}");
+    }
+}
+
+/// With a tiny nesting limit, ordinary code takes the too-deep paths everywhere: every golden still parses without a
+/// panic into a well-formed, lossless tree, and body-less parsing then `parse_body` gives the full parse's subtree.
+#[test]
+fn tiny_nesting_limits_keep_trees_lossless() {
+    use kotlin_syntax::dump::subtree_to_string;
+    use kotlin_syntax::{ParseOptions, Parser};
+    for limit in [1, 2, 3, 5, 8, 13] {
+        let mut parser = Parser::new();
+        parser.set_nesting_limit(limit);
+        let mut body_parser = Parser::new();
+        body_parser.set_nesting_limit(limit);
+        let mut deep = 0;
+        for golden in common::goldens() {
+            let text = common::source_text(&golden).into_bytes();
+            let kind = FileKind::from_file_name(&golden.name);
+            let full = parser.parse(&text, kind);
+            check_tree(&full, &text);
+            deep += too_deep_errors(&full);
+            let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
+            let mut f = 0u32;
+            for l in 0..lazy.len() as u32 {
+                let (ln, fnode) = (NodeId(l), NodeId(f));
+                assert_eq!(lazy.range(ln), full.range(fnode), "{}", golden.name);
+                if lazy.is_unexpanded(ln) {
+                    let body = body_parser.parse_body(&lazy, ln, ParseOptions::default()).unwrap();
+                    assert_eq!(
+                        subtree_to_string(&body, body.root()),
+                        subtree_to_string(&full, fnode),
+                        "{}",
+                        golden.name
+                    );
+                    f = full.subtree_end(fnode).0;
+                } else {
+                    f += 1;
+                }
+            }
+        }
+        assert!(deep > 0, "limit {limit}");
     }
 }

@@ -5,7 +5,9 @@
 #   2. the 55 501 community files: `diff -rq` of our dumps against the cached oracle dumps, 0 lines;
 #   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each, and the 16 724 one-place mutations of
 #      psi-tools 4d21cba's tools/psi-gate/mutate.js over testdata/psi) against their cached oracle answers;
-#   4. body-less parsing on the community files: `parse_body` of every unexpanded body dumps as the full parse's subtree.
+#   4. body-less parsing on the community files: `parse_body` of every unexpanded body dumps as the full parse's subtree;
+#   5. the too-deep paths: the community files and the mutations parsed with nesting limit 3 (`--nesting-limit`), every
+#      tree lossless and every body's `parse_body` its full parse's subtree.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/kotlin-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -39,4 +41,9 @@ for s in 1 2; do
 done
 bodies=$($B --check-bodies --list "$C/corpus/community-3caa0bf.list" --root "$ROOT" | tail -1)
 echo "check-bodies: $bodies"; case "$bodies" in *"differing 0 "*) ;; *) fail=1 ;; esac
+for corpus in "$C/corpus/community-3caa0bf.list $ROOT" "$C/fuzz/mut330.list $C/fuzz/mut330"; do
+  set -- $corpus
+  deep=$($B --check-bodies --nesting-limit 3 --list "$1" --root "$2" | tail -1)
+  echo "nesting limit 3, $(basename "$1"): $deep"; case "$deep" in *"differing 0 "*) ;; *) fail=1 ;; esac
+done
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }
