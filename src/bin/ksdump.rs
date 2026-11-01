@@ -2,17 +2,22 @@
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
-//! - `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--repeat K] [--file-stats OUT.tsv]`: reads
+//! - `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: reads
 //!   every file, then parses them all and prints the files, megabytes, seconds and MB/s of the parse alone (the first
 //!   line, one per round), then the tree's heap bytes per source MB. `--threads N` parses on N threads taking files
 //!   from a shared counter, one `Parser` per thread, as an indexer does, and prints the wall MB/s and each thread's own parse MB/s; `--walk`
-//!   also walks every tree in preorder reading each node's kind and range, as an extractor does, timed apart;
+//!   also walks every tree in preorder reading each node's kind, range and depth, as an extractor does, and then
+//!   scans its nodes in id order (`descendants`) reading kind and range, each timed apart; `--no-bodies` parses
+//!   with `ParseOptions { expand_bodies: false }`, as a declaration-only pass does;
 //!   `--repeat K` runs K rounds and prints their median; `--file-stats` writes one line per file of the last round.
 //!   Built with `--features alloc-stats`, a counting allocator adds the allocations per file (exact with one thread)
 //!   and the bytes allocated per source MB; it slows the parse, so time without it. With `--features counters`, the
 //!   builder's calls (`tt()`, lookahead, markers, rollbacks) and the tokens lexed, reused and skipped, per file token. Peak RSS: run under
 //!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
 //! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it.
+//! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that
+//!   `parse_body` of every unexpanded body dumps as the full tree's subtree there; prints the bodies, the differing
+//!   ones (their paths and ranges) and exits nonzero on any.
 //!
 //! The text is read as bytes with CRLF and CR converted to LF, as the oracles do; `--trim` also trims it (what the
 //! compiler's parsing tests parse). A path ending in `.kt` (or without an extension) parses as a file, any other as a
@@ -25,10 +30,11 @@ use std::time::Instant;
 
 use kotlin_syntax::counters::{self, Counter};
 use kotlin_syntax::dump::psi_to_string;
+use kotlin_syntax::dump::subtree_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::tokens::TokenKind;
-use kotlin_syntax::{ElementType, FileKind, Parser, Tree};
+use kotlin_syntax::{ElementType, FileKind, NodeId, ParseOptions, Parser, Tree};
 
 /// Counts every allocation of the process (`--features alloc-stats` only).
 #[cfg(feature = "alloc-stats")]
@@ -39,8 +45,9 @@ fn usage() -> ! {
     eprintln!(
         "usage:\n  \
          ksdump --list LIST --root ROOT --out OUT [--trim]   write OUT/<path>.psi.txt per listed file\n  \
-         ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--repeat K] [--file-stats OUT]\n  \
-                                                             parse throughput, tree bytes, walk cost\n  \
+         ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
+                [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
+         ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them"
     );
     std::process::exit(2)
@@ -57,6 +64,8 @@ struct Args {
     trim: bool,
     threads: usize,
     walk: bool,
+    no_bodies: bool,
+    check_bodies: bool,
     repeat: usize,
     file_stats: Option<PathBuf>,
 }
@@ -77,6 +86,8 @@ fn parse_args() -> Args {
             "--trim" => args.trim = true,
             "--threads" => args.threads = count(it.next()),
             "--walk" => args.walk = true,
+            "--no-bodies" => args.no_bodies = true,
+            "--check-bodies" => args.check_bodies = true,
             "--repeat" => args.repeat = count(it.next()),
             "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             _ => usage(),
@@ -203,6 +214,12 @@ fn main() {
         return;
     }
 
+    if args.check_bodies {
+        let differing = check_bodies(root, &paths, &mut stdout);
+        let _ = stdout.flush();
+        std::process::exit(if differing == 0 { 0 } else { 1 });
+    }
+
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
     let mut parser = Parser::new();
@@ -239,6 +256,7 @@ struct Source {
 struct FileResult {
     parse_ns: u64,
     walk_ns: u64,
+    linear_walk_ns: u64,
     nodes: usize,
     tree_bytes: usize,
     /// Allocations and reallocations during `Parser::parse` (`alloc-stats`; exact with one thread).
@@ -255,6 +273,7 @@ struct ThreadResult {
     files: usize,
     parse_seconds: f64,
     walk_seconds: f64,
+    linear_walk_seconds: f64,
     checksum: u64,
     results: Vec<(usize, FileResult)>,
     /// This thread's `kotlin_syntax::counters` (`--features counters`).
@@ -283,8 +302,8 @@ fn element_index(kind: ElementType) -> u64 {
     }
 }
 
-/// The walk an extractor does: every node in preorder, its kind and its range; returns a checksum so it is not
-/// optimized away.
+/// The walk an extractor does: every node in preorder, its kind, its range and its depth; returns a checksum so it is
+/// not optimized away.
 fn walk(tree: &Tree) -> u64 {
     let mut acc = 0u64;
     for (id, depth) in tree.preorder(tree.root()) {
@@ -298,7 +317,58 @@ fn walk(tree: &Tree) -> u64 {
     acc
 }
 
-fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool) -> ThreadResult {
+/// What a pass that needs no depth does: every node in id order (document order), its kind and its range.
+fn linear_walk(tree: &Tree) -> u64 {
+    let mut acc = 0u64;
+    for id in tree.descendants(tree.root()) {
+        let range = tree.range(id);
+        acc = acc.wrapping_mul(0x100000001b3)
+            ^ element_index(tree.kind(id))
+            ^ ((range.start as u64) << 9)
+            ^ ((range.end as u64) << 37);
+    }
+    acc
+}
+
+/// `--check-bodies`: returns the number of differing bodies.
+fn check_bodies(root: &Path, paths: &[String], stdout: &mut impl Write) -> usize {
+    let mut parser = Parser::new();
+    let mut body_parser = Parser::new();
+    let (mut bodies, mut differing) = (0usize, 0usize);
+    for path in paths {
+        let Some(text) = read_source(root, path, false) else { continue };
+        let kind = FileKind::from_file_name(file_name(path));
+        let full = parser.parse(&text, kind);
+        let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
+        let (mut l, mut f) = (0u32, 0u32);
+        while (l as usize) < lazy.len() && (f as usize) < full.len() {
+            let (ln, fnode) = (NodeId(l), NodeId(f));
+            if lazy.kind(ln) != full.kind(fnode) || lazy.range(ln) != full.range(fnode) {
+                let _ = writeln!(stdout, "{path}: node {l} {:?} differs from the full tree's {f}", lazy.range(ln));
+                differing += 1;
+                break;
+            }
+            if lazy.is_unexpanded(ln) {
+                bodies += 1;
+                let same = body_parser
+                    .parse_body(&lazy, ln, ParseOptions::default())
+                    .is_some_and(|body| subtree_to_string(&body, body.root()) == subtree_to_string(&full, fnode));
+                if !same {
+                    let _ = writeln!(stdout, "{path}: body {:?} differs", lazy.range(ln));
+                    differing += 1;
+                }
+                f = full.subtree_end(fnode).0;
+            } else {
+                f += 1;
+            }
+            l += 1;
+        }
+    }
+    let _ = writeln!(stdout, "bodies {bodies}  differing {differing}  files {}", paths.len());
+    differing
+}
+
+fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool, options: ParseOptions) -> ThreadResult {
     let mut r = ThreadResult::default();
     // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
     let mut parser = Parser::new();
@@ -307,7 +377,7 @@ fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool) -> Thread
         let Some(source) = sources.get(i) else { break };
         let (calls0, allocated0, live0) = alloc_snapshot();
         let start = Instant::now();
-        let tree: Tree = parser.parse(&source.text, source.kind);
+        let tree: Tree = parser.parse_with_options(&source.text, source.kind, options);
         let parsed = Instant::now();
         let (calls1, allocated1, live1) = alloc_snapshot();
         let mut f = FileResult {
@@ -322,13 +392,17 @@ fn bench_thread(sources: &[Source], next: &AtomicUsize, do_walk: bool) -> Thread
         if do_walk {
             let walk_start = Instant::now();
             r.checksum ^= walk(&tree);
-            f.walk_ns = walk_start.elapsed().as_nanos() as u64;
+            let linear_start = Instant::now();
+            f.walk_ns = (linear_start - walk_start).as_nanos() as u64;
+            r.checksum ^= linear_walk(&tree).rotate_left(1);
+            f.linear_walk_ns = linear_start.elapsed().as_nanos() as u64;
         }
         drop(tree);
         r.bytes += source.text.len();
         r.files += 1;
         r.parse_seconds += f.parse_ns as f64 / 1e9;
         r.walk_seconds += f.walk_ns as f64 / 1e9;
+        r.linear_walk_seconds += f.linear_walk_ns as f64 / 1e9;
         r.results.push((i, f));
     }
     r.counters = kotlin_syntax::counters::snapshot();
@@ -358,6 +432,7 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
     let bytes: usize = sources.iter().map(|s| s.text.len()).sum();
     let mb = bytes as f64 / 1e6;
     let threads = args.threads;
+    let options = ParseOptions { expand_bodies: !args.no_bodies };
     if cfg!(feature = "alloc-stats") {
         let _ = writeln!(stdout, "alloc-stats: timings include the counting allocator");
     }
@@ -369,7 +444,7 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
         let start = Instant::now();
         let per_thread: Vec<ThreadResult> = std::thread::scope(|scope| {
             let handles: Vec<_> =
-                (0..threads).map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk))).collect();
+                (0..threads).map(|_| scope.spawn(|| bench_thread(&sources, &next, args.walk, options))).collect();
             handles.into_iter().map(|h| h.join().unwrap_or_default()).collect()
         });
         let wall = start.elapsed().as_secs_f64();
@@ -418,6 +493,15 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
                 mb / walk_seconds.max(1e-9),
                 walk_seconds * 1e9 / nodes.max(1) as f64,
                 100.0 * walk_seconds / parse_seconds.max(1e-9)
+            );
+            let linear_seconds: f64 = per_thread.iter().map(|t| t.linear_walk_seconds).sum();
+            let _ = writeln!(
+                stdout,
+                "  linear walk seconds {linear_seconds:.3} (summed over threads)  MB/s {:.1}  ns/node {:.2}  of parse \
+                 {:.1}%",
+                mb / linear_seconds.max(1e-9),
+                linear_seconds * 1e9 / nodes.max(1) as f64,
+                100.0 * linear_seconds / parse_seconds.max(1e-9)
             );
         }
         if counters::ENABLED {
@@ -474,14 +558,16 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
         }
     }
     if let Some(out) = &args.file_stats {
-        let mut text = String::from("path\tbytes\tparse_us\twalk_us\tnodes\ttree_bytes\tallocs\talloc_bytes\n");
+        let mut text =
+            String::from("path\tbytes\tparse_us\twalk_us\tlinear_walk_us\tnodes\ttree_bytes\tallocs\talloc_bytes\n");
         for (s, f) in sources.iter().zip(&last) {
             text.push_str(&format!(
-                "{}\t{}\t{:.1}\t{:.1}\t{}\t{}\t{}\t{}\n",
+                "{}\t{}\t{:.1}\t{:.1}\t{:.1}\t{}\t{}\t{}\t{}\n",
                 s.path,
                 s.text.len(),
                 f.parse_ns as f64 / 1e3,
                 f.walk_ns as f64 / 1e3,
+                f.linear_walk_ns as f64 / 1e3,
                 f.nodes,
                 f.tree_bytes,
                 f.allocs,

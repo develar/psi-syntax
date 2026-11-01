@@ -3,7 +3,8 @@
 #   1. clippy (default and with the opt-in `counters,alloc-stats` features) and KS_STRICT=1 cargo test --release
 #      (goldens, lexer, kdoc, robustness);
 #   2. the 55 501 community files: `diff -rq` of our dumps against the cached oracle dumps, 0 lines;
-#   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each) against their cached oracle answers.
+#   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each) against their cached oracle answers;
+#   4. body-less parsing on the community files: `parse_body` of every unexpanded body dumps as the full parse's subtree.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/kotlin-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -32,4 +33,6 @@ for s in 1 2; do
   n=$($B --lex --list "$C/fuzz/lex-$s/list" --root "$C/fuzz/lex-$s" | cut -f1,2 | diff - "$C/fuzz/lex-$s.oracle" | grep -c '^[<>]')
   echo "lex-fuzz $s: $n differing lines"; [ "$n" = 0 ] || fail=1
 done
+bodies=$($B --check-bodies --list "$C/corpus/community-3caa0bf.list" --root "$ROOT" | tail -1)
+echo "check-bodies: $bodies"; case "$bodies" in *"differing 0 "*) ;; *) fail=1 ;; esac
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }
