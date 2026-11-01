@@ -2924,7 +2924,7 @@ impl<'b> KotlinParsing<'b> {
             self.advance_n(offset);
 
             self.advance(); // LPAR
-            if self.my_builder().get_token_text() != Some(word) {
+            if self.my_builder().get_token_bytes() != Some(word.as_bytes()) {
                 // something other than "out" / "Mutable"
                 error.rollback_to(self.my_builder());
                 return false;

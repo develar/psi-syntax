@@ -154,8 +154,8 @@ const IN_KEYWORD_SET: TokenSet = TokenSet::create(&[IN_KEYWORD]);
 const TRY_CATCH_RECOVERY_TOKEN_SET: TokenSet = TokenSet::create(&[LBRACE, RBRACE, FINALLY_KEYWORD, CATCH_KEYWORD]);
 
 /// `KEYWORD_TEXTS = tokenSetToMap(KEYWORDS)`: a hard keyword by its `toString()`.
-fn keyword_texts(text: &str) -> Option<TokenKind> {
-    let keyword = TokenKind::keyword_by_debug_name(text.as_bytes())?;
+fn keyword_texts(text: &[u8]) -> Option<TokenKind> {
+    let keyword = TokenKind::keyword_by_debug_name(text)?;
     KEYWORDS.contains(keyword).then_some(keyword)
 }
 
@@ -816,7 +816,7 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
                 reference.done(self.my_builder(), REFERENCE_EXPRESSION);
                 this_expression.done(self.my_builder(), THIS_EXPRESSION);
             } else {
-                let keyword = self.my_builder().get_token_text().and_then(keyword_texts);
+                let keyword = self.my_builder().get_token_bytes().and_then(keyword_texts);
                 if let Some(keyword) = keyword {
                     self.my_builder().remap_current_token(keyword);
                     self.error_and_advance("Keyword cannot be used as a reference");

@@ -73,7 +73,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
             return true;
         }
 
-        if expectation == IDENTIFIER && self.my_builder().get_token_text() == Some("`") {
+        if expectation == IDENTIFIER && self.my_builder().get_token_bytes() == Some(b"`") {
             self.advance();
         }
 
@@ -191,7 +191,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         if token == IDENTIFIER
             && expectation.is_keyword()
             && expectation.is_soft_keyword()
-            && expectation.value() == self.my_builder().get_token_text()
+            && expectation.value().map(str::as_bytes) == self.my_builder().get_token_bytes()
         {
             self.my_builder().remap_current_token(expectation);
             return true;
@@ -234,8 +234,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         }
         let token = self.tt();
         if token == IDENTIFIER {
-            let keyword_token =
-                self.my_builder().get_token_text().and_then(|text| TokenKind::soft_keyword_by_text(text.as_bytes()));
+            let keyword_token = self.my_builder().get_token_bytes().and_then(TokenKind::soft_keyword_by_text);
             if let Some(keyword_token) = keyword_token
                 && set.contains(keyword_token)
             {

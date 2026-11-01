@@ -1270,6 +1270,19 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
         self.delegate.get_token_text()
     }
 
+    /// `getTokenText()` as bytes, with no UTF-8 check: what the parser compares with keyword and word texts (invalid
+    /// UTF-8, which `get_token_text` shows as U+FFFD, matches none of them either way).
+    pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
+        if self.join_complex_tokens() {
+            match self.get_token_type() {
+                Some(TokenKind::ELVIS) => return Some(b"?:"),
+                Some(TokenKind::SAFE_ACCESS) => return Some(b"?."),
+                _ => {}
+            }
+        }
+        self.delegate.get_token_bytes()
+    }
+
     /// `lookAhead(steps)`.
     pub fn look_ahead(&mut self, steps: i32) -> Option<TokenKind> {
         if !self.join_complex_tokens() {
@@ -1414,6 +1427,14 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
             return None;
         }
         self.imp.get_token_text()
+    }
+
+    /// `getTokenText()` as bytes (see `SemanticWhitespaceAwarePsiBuilderImpl::get_token_bytes`).
+    pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
+        if self.top_truncated().is_some() && self.eof() {
+            return None;
+        }
+        self.imp.get_token_bytes()
     }
 
     /// `lookAhead(steps)`.
