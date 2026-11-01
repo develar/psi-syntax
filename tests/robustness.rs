@@ -17,9 +17,10 @@ impl XorShift {
     }
 }
 
-/// The leaves of the tree, in order, are the whole text.
+/// The leaves of the tree, in order, are the whole text, and node ids are in preorder.
 fn check_lossless(text: &[u8], kind: FileKind) {
     let tree = Tree::parse(text, kind);
+    assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()));
     let mut covered = Vec::with_capacity(text.len());
     for id in tree.tokens() {
         covered.extend_from_slice(tree.text(id));
@@ -93,5 +94,28 @@ fn random_bytes_and_fragments_parse() {
             check_lossless(&text[..cut], FileKind::Kt);
             cut += step;
         }
+    }
+}
+
+/// Chameleons nested thousands deep (each a lambda or block expanded inside the one around it) take heap, not stack.
+#[test]
+fn deeply_nested_lambdas_and_blocks_parse() {
+    let depth = 5000;
+    let lambdas = format!("val x = {}{}\n", "{ ".repeat(depth), "}".repeat(depth));
+    let blocks = format!("fun f() {}{}\n", "{ run ".repeat(depth), "}".repeat(depth + 1));
+    for text in [lambdas, blocks] {
+        let handle = std::thread::Builder::new()
+            .stack_size(256 * 1024)
+            .spawn(move || {
+                let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
+                let lambdas = tree.preorder(tree.root()).filter(|&(id, _)| !tree.is_leaf(id)).count();
+                let max_depth = tree.preorder(tree.root()).map(|(_, d)| d).max().unwrap_or(0);
+                check_lossless(text.as_bytes(), FileKind::Kt);
+                (lambdas, max_depth)
+            })
+            .unwrap();
+        let (composites, max_depth) = handle.join().unwrap();
+        assert!(composites > depth, "{composites}");
+        assert!(max_depth > depth, "{max_depth}");
     }
 }

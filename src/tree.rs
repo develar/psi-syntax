@@ -2,7 +2,8 @@
 //! tokens as leaves; whitespace and comments are leaves where PSI puts them. `Tree::parse` lexes, parses and builds
 //! it, expanding every lazy element as PSI does when the tree is walked: a doc comment with the KDoc lexer and parser,
 //! a markdown link inside it with the Kotlin lexer and `KDocLinkParser`, a collapsed block or lambda by reparsing its
-//! text with `KotlinParser.parseBlockExpression` / `parseLambdaExpression` (a worklist, not recursion).
+//! text with `KotlinParser.parseBlockExpression` / `parseLambdaExpression`, each in place where the tree meets it (a
+//! stack of builders on the heap, not recursion), so node ids are in preorder.
 
 use std::borrow::Cow;
 use std::ops::Range;
@@ -116,20 +117,26 @@ pub struct Tree {
 }
 
 /// A reusable parser: owns the buffers every builder of a parse works in (the file's tokens, a chameleon's tokens, the
-/// marker pool, the production, the state stacks, the chameleon worklist), cleared and reused from one file to the
-/// next instead of freed. Keep one per thread; `Tree::parse` makes a fresh one per call.
+/// marker pools, the productions, the state stacks), cleared and reused from one file to the next instead of freed.
+/// Keep one per thread; `Tree::parse` makes a fresh one per call.
 #[derive(Default)]
 pub struct Parser {
-    bufs: BuilderBuffers,
     /// The file's tokens as the lexer made them (a chameleon reuses a slice of them).
     file: Lexed,
     /// A chameleon's text lexed afresh.
     relexed: Lexed,
-    /// The token starts the current builder reads.
-    starts: Vec<u32>,
-    pending: Vec<Pending>,
+    /// The builders still binding: the file's, then each chameleon's being expanded inside the one before it.
+    frames: Vec<Frame>,
+    /// The buffers of finished builders, for the next ones.
+    spare: Vec<BuilderBuffers>,
     /// The tree being built; copied into exactly sized buffers when done.
     data: TreeData,
+}
+
+/// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
+struct Frame {
+    builder: PsiBuilderImpl,
+    bufs: BuilderBuffers,
 }
 
 impl Parser {
@@ -155,22 +162,20 @@ impl Parser {
         let mut data = std::mem::take(&mut self.data);
         data.nodes.clear();
         data.errors.clear();
-        self.pending.clear();
 
-        self.bufs.lex_types.clear();
-        self.bufs.lex_types.extend_from_slice(&self.file.types);
-        let mut starts = std::mem::take(&mut self.starts);
-        starts.clear();
-        starts.extend_from_slice(&self.file.starts);
-        let file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut self.bufs, starts, Some(0));
-        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, &mut self.bufs);
+        let mut bufs = self.spare.pop().unwrap_or_default();
+        bufs.lex_types.clear();
+        bufs.lex_types.extend_from_slice(&self.file.types);
+        bufs.starts.clear();
+        bufs.starts.extend_from_slice(&self.file.starts);
+        let file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut bufs, Some(0));
+        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, &mut bufs);
         parse(&mut builder);
-        let root = builder.delegate.build_tree(&mut data, None, &mut self.pending);
-        self.starts = builder.release(&mut self.bufs);
+        let mut builder = builder.into_delegate(&mut bufs);
+        let root = builder.begin_bind(&mut data, None);
+        self.frames.push(Frame { builder, bufs });
+        self.bind_frames(&text, &mut data);
 
-        while let Some(p) = self.pending.pop() {
-            self.expand(&text, &mut data, p);
-        }
         // Most files have no error: their list never allocates; the others' is shrunk to fit.
         let mut errors = std::mem::take(&mut data.errors);
         errors.shrink_to_fit();
@@ -179,69 +184,87 @@ impl Parser {
         Tree { text, file_kind, data: tree, root }
     }
 
-    /// Expands one chameleon: parses its text with a new builder and appends the result under its node.
-    fn expand(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) {
+    /// Runs the builders on `frames` to the end: the top one appends its nodes until it appends a chameleon, whose
+    /// builder then goes on top and appends the chameleon's subtree right after it. So node ids are in preorder, and
+    /// nesting takes heap, not stack.
+    fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData) {
+        while let Some(frame) = self.frames.last_mut() {
+            match frame.builder.resume_bind(data) {
+                Some(chameleon) => {
+                    let frame = self.begin_chameleon(text, data, chameleon);
+                    self.frames.push(frame);
+                }
+                None => {
+                    let Some(Frame { builder, mut bufs }) = self.frames.pop() else { break };
+                    builder.release(&mut bufs);
+                    self.spare.push(bufs);
+                }
+            }
+        }
+    }
+
+    /// Parses one chameleon's text with a new builder and starts appending its subtree under its node.
+    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) -> Frame {
         use crate::counters::{Counter, add};
         let len = p.end - p.start;
-        let mut starts = std::mem::take(&mut self.starts);
-        match p.kind {
+        let mut bufs = self.spare.pop().unwrap_or_default();
+        let mut builder = match p.kind {
             LazyKind::Block | LazyKind::Lambda => {
                 add(if p.kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
                 let file_token = match reusable_tokens(&self.file, &p) {
                     Some((first, last)) => {
                         add(Counter::ReusedTokens, (last - first) as u64);
-                        self.bufs.lex_types.clear();
-                        self.bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
-                        starts.clear();
-                        starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
+                        bufs.lex_types.clear();
+                        bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
+                        bufs.starts.clear();
+                        bufs.starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
                         Some(first)
                     }
                     None => {
                         lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
                         add(Counter::RelexedTokens, self.relexed.len() as u64);
-                        self.bufs.lex_types.clear();
-                        self.bufs.lex_types.extend_from_slice(&self.relexed.types);
-                        starts.clear();
-                        starts.extend_from_slice(&self.relexed.starts);
+                        bufs.lex_types.clear();
+                        bufs.lex_types.extend_from_slice(&self.relexed.types);
+                        bufs.starts.clear();
+                        bufs.starts.extend_from_slice(&self.relexed.starts);
                         None
                     }
                 };
-                let delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, file_token);
-                let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, &mut self.bufs);
+                let delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, file_token);
+                let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, &mut bufs);
                 if p.kind == LazyKind::Block {
                     kotlin_parser::parse_block_expression(&mut builder);
                 } else {
                     kotlin_parser::parse_lambda_expression(&mut builder);
                 }
-                builder.delegate.build_tree(data, Some(p.node), &mut self.pending);
-                self.starts = builder.release(&mut self.bufs);
+                builder.into_delegate(&mut bufs)
             }
             LazyKind::KDoc => {
-                crate::kdoc::lexer::tokenize_into(&text[p.start..p.end], &mut self.bufs.lex_types, &mut starts);
+                crate::kdoc::lexer::tokenize_into(&text[p.start..p.end], &mut bufs.lex_types, &mut bufs.starts);
                 add(Counter::KDocChameleons, 1);
-                add(Counter::KDocTokens, self.bufs.lex_types.len() as u64);
-                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, None);
+                add(Counter::KDocTokens, bufs.lex_types.len() as u64);
+                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, None);
                 crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
-                builder.build_tree(data, Some(p.node), &mut self.pending);
-                self.starts = builder.release(&mut self.bufs);
+                builder
             }
             LazyKind::KDocLink => {
                 lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
                 add(Counter::KDocLinkChameleons, 1);
                 add(Counter::RelexedTokens, self.relexed.len() as u64);
-                self.bufs.lex_types.clear();
-                self.bufs.lex_types.extend_from_slice(&self.relexed.types);
-                starts.clear();
-                starts.extend_from_slice(&self.relexed.starts);
-                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut self.bufs, starts, None);
+                bufs.lex_types.clear();
+                bufs.lex_types.extend_from_slice(&self.relexed.types);
+                bufs.starts.clear();
+                bufs.starts.extend_from_slice(&self.relexed.starts);
+                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, None);
                 crate::kdoc::parser::parse_markdown_link(
                     ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK),
                     &mut builder,
                 );
-                builder.build_tree(data, Some(p.node), &mut self.pending);
-                self.starts = builder.release(&mut self.bufs);
+                builder
             }
-        }
+        };
+        builder.begin_bind(data, Some(p.node));
+        Frame { builder, bufs }
     }
 }
 
