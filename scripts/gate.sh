@@ -3,7 +3,8 @@
 #   1. clippy (default and with the opt-in `counters,alloc-stats` features) and KS_STRICT=1 cargo test --release
 #      (goldens, lexer, kdoc, robustness);
 #   2. the 55 501 community files: `diff -rq` of our dumps against the cached oracle dumps, 0 lines;
-#   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each) against their cached oracle answers;
+#   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each, and the 16 724 one-place mutations of
+#      psi-tools 4d21cba's tools/psi-gate/mutate.js over testdata/psi) against their cached oracle answers;
 #   4. body-less parsing on the community files: `parse_body` of every unexpanded body dumps as the full parse's subtree.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/kotlin-syntax/ours/ (concurrent sessions share the machine),
@@ -29,6 +30,9 @@ for s in 11 12; do
   n=$(diff -rq -x index.jsonl "$C/fuzz/parse-$s.oracle" "$O/parse-$s" | wc -l | tr -d ' ')
   echo "parse-fuzz $s: $n differing of 3000"; [ "$n" = 0 ] || fail=1
 done
+$B --list "$C/fuzz/mut330.list" --root "$C/fuzz/mut330" --out "$O/mut330" > /dev/null
+n=$(diff -rq -x index.jsonl "$C/fuzz/mut330.oracle" "$O/mut330" | wc -l | tr -d ' ')
+echo "mutations (psi-tools 4d21cba mutate.js over testdata/psi): $n differing of 16724"; [ "$n" = 0 ] || fail=1
 for s in 1 2; do
   n=$($B --lex --list "$C/fuzz/lex-$s/list" --root "$C/fuzz/lex-$s" | cut -f1,2 | diff - "$C/fuzz/lex-$s.oracle" | grep -c '^[<>]')
   echo "lex-fuzz $s: $n differing lines"; [ "$n" = 0 ] || fail=1
