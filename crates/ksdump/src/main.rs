@@ -1,11 +1,13 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
-//! Java has no parser yet (`crates/java-syntax`): `--lex` lexes Java files, any other mode refuses one with exit
-//! status 2 before anything runs.
+//! Java's parsers are being ported (`crates/java-syntax`): `--lex` and `--out` take Java files (`--out` panics in a
+//! parser method not yet ported), `--bench` and `--check-bodies` refuse one with exit status 2 before anything runs.
 //!
-//! - `ksdump --list LIST --root ROOT --out OUT [--trim]`: writes `OUT/<path>.psi.txt` per listed path, the
+//! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
+//!   A Java list line may carry `<TAB>LEVEL<TAB>ENTRY<TAB>TRIM` as for `JavaPsiOracle.java`; `--node` also writes
+//!   `OUT/<path>.node.txt` (`node_tree_to_string`) for Java files.
 //! - `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: reads
 //!   every file, then parses them all and prints the files, megabytes, seconds and MB/s of the parse alone (the first
 //!   line, one per round), then the tree's heap bytes per source MB. `--threads N` parses on N threads taking files
@@ -53,7 +55,7 @@ static GLOBAL: stats_alloc::StatsAlloc<std::alloc::System> = stats_alloc::StatsA
 fn usage() -> ! {
     eprintln!(
         "usage:\n  \
-         ksdump --list LIST --root ROOT --out OUT [--trim]   write OUT/<path>.psi.txt per listed file\n  \
+         ksdump --list LIST --root ROOT --out OUT [--trim] [--node]   write OUT/<path>.psi.txt (Java: .node.txt too) per listed file\n  \
          ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
                 [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
@@ -96,6 +98,7 @@ struct Args {
     file_stats: Option<PathBuf>,
     nesting_limit: Option<u32>,
     lang: Option<Lang>,
+    node: bool,
 }
 
 fn parse_args() -> Args {
@@ -112,6 +115,7 @@ fn parse_args() -> Args {
             "--lex" => args.lex = true,
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
+            "--node" => args.node = true,
             "--threads" => args.threads = count(it.next()),
             "--walk" => args.walk = true,
             "--no-bodies" => args.no_bodies = true,
@@ -274,6 +278,46 @@ fn java_lex(root: &Path, line: &str, dump: bool, stdout: &mut impl Write) {
     let _ = stdout.write_all(out.as_bytes());
 }
 
+/// `--out` of a Java file, as `tools/java-oracle/JavaPsiOracle.java` writes it: a list line is
+/// `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (`testdata/java/manifest.tsv` is a list), the text is trimmed (chars up to
+/// ' ', `String.trim()`) when TRIM is 1 or, without it, with `--trim`; writes `OUT/<path>.psi.txt` and with `--node`
+/// `OUT/<path>.node.txt`. Text that is not UTF-8 is not dumped (the oracle reports it as a failure).
+fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &str, args: &Args) -> bool {
+    let columns: Vec<&str> = line.split('\t').collect();
+    let path = columns[0];
+    let level = columns
+        .get(1)
+        .and_then(|l| java_syntax::LanguageLevel::from_name(l))
+        .unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+    let entry = columns.get(2).and_then(|e| java_syntax::Entry::from_name(e)).unwrap_or(java_syntax::Entry::File);
+    let trim = columns.get(3).map_or(args.trim, |t| *t == "1");
+    let Some(mut text) = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok()) else {
+        eprintln!("cannot read {path} as UTF-8");
+        return false;
+    };
+    if trim {
+        let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
+        let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
+        text = text[start..end].to_vec();
+    }
+    let tree = parser.parse(&text, java_syntax::FileKind { level, entry });
+    let mut dumps = vec![("psi", java_syntax::dump::psi_to_string(&tree, file_name(path)))];
+    if args.node {
+        dumps.push(("node", java_syntax::dump::node_tree_to_string(&tree)));
+    }
+    for (suffix, dump) in dumps {
+        let target = out.join(format!("{path}.{suffix}.txt"));
+        if let Some(parent) = target.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        if let Err(e) = std::fs::write(&target, dump) {
+            eprintln!("cannot write {}: {e}", target.display());
+            return false;
+        }
+    }
+    true
+}
+
 fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
@@ -298,8 +342,10 @@ fn main() {
         }
         return;
     }
-    if let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java) {
-        eprintln!("{java}: Java has no parser yet (crates/java-syntax); Java files are only lexed (--lex)");
+    if (args.bench || args.check_bodies)
+        && let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java)
+    {
+        eprintln!("{java}: Java is not benchmarked or body-checked yet (its parsers are being ported)");
         std::process::exit(2);
     }
     let stdout = std::io::stdout();
@@ -324,7 +370,13 @@ fn main() {
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
     let mut parser = new_parser(args.nesting_limit);
-    for path in &paths {
+    let mut java_parser = java_syntax::Parser::new();
+    for line in &paths {
+        let path = line.split('\t').next().unwrap_or(line);
+        if Lang::of(path, args.lang) == Lang::Java {
+            failed += !java_dump(&mut java_parser, root, out, line, &args) as usize;
+            continue;
+        }
         let Some(text) = read_source(root, path, args.trim) else {
             eprintln!("cannot read {path}");
             failed += 1;
