@@ -5,8 +5,8 @@ Like lex-fuzz.py, but the mutations aim at the parser's recovery: punctuation, k
 modifiers inserted at a token boundary, and words or punctuation deleted. Writes COUNT (3000) files to OUT_DIR as
 f<N>.kt (or .kts) and OUT_DIR/list. Then compare the trees:
 
-  java -Xss512m -Xmx8g -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" \\
-    $HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/PsiOracle.java --list OUT/list --root OUT --out OUT.oracle
+  java -Xss512m -Xmx8g -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" \\
+    $HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/PsiOracle.java --list OUT/list --root OUT --out OUT.oracle
   target/release/ksdump --list OUT/list --root OUT --out OUT.ours
   scripts/compare.py OUT.oracle OUT.ours
 """

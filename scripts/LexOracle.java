@@ -3,7 +3,7 @@
 // token, KDoc tokens of a doc comment following it between "[" and "]". `ksdump --lex` prints the same lines for our
 // lexers, so `diff` finds every file where they disagree; --dump prints the token lists themselves.
 //
-//   java -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java \
+//   java -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java \
 //     --list LIST --root ROOT [--dump]
 //
 // The text is read as UTF-8 with CRLF and CR converted to LF, as the PSI oracle does.

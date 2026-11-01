@@ -1,25 +1,17 @@
-//! Event counters for profiling the parser: how often the builder's cursor, markers and lexers run per token.
-//! Built with `--features counters` they count per thread (`snapshot`); without it `add` is an empty inline function
-//! and the parser is unchanged. `ksdump --bench` prints them per file token.
+//! Event counters for profiling the builder: how often its cursor, markers and the parse driver's lexing run per
+//! token. Built with `--features counters` they count per thread (`snapshot`); without it `add` is an empty inline
+//! function and the builder is unchanged. A language crate counts its own events beside these (Kotlin's
+//! `kotlin_syntax::counters`); `ksdump --bench` prints both per file token.
 
 /// What is counted.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Counter {
-    /// Tokens the Kotlin lexer made for whole files.
+    /// Tokens the language's lexer made for whole files.
     FileTokens,
-    /// Tokens lexed again for a chameleon (a block or lambda whose file tokens could not be reused, a markdown link).
+    /// Tokens lexed again for a chameleon (a body whose file tokens could not be reused, Kotlin's markdown link).
     RelexedTokens,
     /// File tokens copied into a chameleon's builder instead of lexing its text again.
     ReusedTokens,
-    /// Tokens the KDoc lexer made.
-    KDocTokens,
-    /// Chameleons expanded, by kind.
-    BlockChameleons,
-    LambdaChameleons,
-    KDocChameleons,
-    KDocLinkChameleons,
-    /// `SemanticWhitespaceAwarePsiBuilder.getTokenType()`: the parser's `tt()`, through the adapters.
-    TokenType,
     /// `PsiBuilderImpl.getTokenType()`.
     RawTokenType,
     /// `PsiBuilderImpl.lookAhead(steps)`, and the steps asked for.
@@ -29,8 +21,6 @@ pub enum Counter {
     RawLookup,
     /// `PsiBuilderImpl.getTokenText()` (as text or bytes).
     TokenText,
-    /// `newlineBeforeCurrentToken()`.
-    NewlineBefore,
     /// `PsiBuilderImpl.advanceLexer()`.
     Advance,
     /// Markers: `mark`, `precede`, done (any form), `drop`, `rollbackTo` and the lexemes it rewinds.
@@ -42,30 +32,21 @@ pub enum Counter {
     RollbackLexemes,
     /// `MarkerProduction.indexOf` beyond its linear window (the binary search over the production).
     IndexOfSearch,
-    /// `SOFT_KEYWORD_TEXTS.get(text)`: a soft keyword looked up by an identifier's text.
-    SoftKeywordLookup,
-    /// Tokens `advanceBalancedBlock` stepped over (inside a block or lambda that a later expansion parses again).
+    /// Tokens a balanced block skip stepped over (inside a block or lambda that a later expansion parses again).
     BalancedSkipTokens,
 }
 
 impl Counter {
     /// Every counter, in declaration order.
-    pub const ALL: [Counter; 25] = [
+    pub const ALL: [Counter; 17] = [
         Counter::FileTokens,
         Counter::RelexedTokens,
         Counter::ReusedTokens,
-        Counter::KDocTokens,
-        Counter::BlockChameleons,
-        Counter::LambdaChameleons,
-        Counter::KDocChameleons,
-        Counter::KDocLinkChameleons,
-        Counter::TokenType,
         Counter::RawTokenType,
         Counter::LookAhead,
         Counter::LookAheadSteps,
         Counter::RawLookup,
         Counter::TokenText,
-        Counter::NewlineBefore,
         Counter::Advance,
         Counter::Mark,
         Counter::Precede,
@@ -74,7 +55,6 @@ impl Counter {
         Counter::Rollback,
         Counter::RollbackLexemes,
         Counter::IndexOfSearch,
-        Counter::SoftKeywordLookup,
         Counter::BalancedSkipTokens,
     ];
 }

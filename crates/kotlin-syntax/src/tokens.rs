@@ -5,6 +5,8 @@
 //!
 //! The discriminant of a Kotlin token is its `KtTokens.*_Id`, so `TokenKind::LPAR as i32 == KtTokens.LPAR_Id`.
 
+use psi_builder::ElementTypeSet;
+
 use crate::node_kind::NodeKind;
 
 /// What a token type is in the Java class hierarchy: the flags of `TokenKind::flags`.
@@ -385,51 +387,22 @@ impl TokenKind {
 pub const INVALID_ID: i32 = 0;
 
 /// An element type: what `IElementType` is in the Java code, a token type or a composite node type.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
-pub enum ElementType {
-    Token(TokenKind),
-    Node(NodeKind),
-}
+pub type ElementType = psi_builder::ElementType<TokenKind, NodeKind>;
 
-impl ElementType {
-    /// `IElementType.toString()`.
-    pub const fn debug_name(self) -> &'static str {
-        match self {
-            ElementType::Token(t) => t.debug_name(),
-            ElementType::Node(n) => n.debug_name(),
-        }
+impl psi_builder::TokenType for TokenKind {
+    #[inline(always)]
+    fn index(self) -> u8 {
+        self as u8
     }
 
-    pub const fn token(self) -> Option<TokenKind> {
-        match self {
-            ElementType::Token(t) => Some(t),
-            ElementType::Node(_) => None,
-        }
+    #[inline(always)]
+    fn from_index(index: usize) -> Option<TokenKind> {
+        TOKEN_BY_ID.get(index).copied().flatten()
     }
 
-    pub const fn node(self) -> Option<NodeKind> {
-        match self {
-            ElementType::Node(n) => Some(n),
-            ElementType::Token(_) => None,
-        }
-    }
-
-    /// A dense number: a token's discriminant (below 256), 256 + a node type's.
-    pub const fn index(self) -> usize {
-        match self {
-            ElementType::Token(t) => t as usize,
-            ElementType::Node(n) => 256 + n as usize,
-        }
-    }
-
-    /// The element type of `index()` (`None` for a number that is none).
     #[inline]
-    pub fn from_index(index: usize) -> Option<ElementType> {
-        if index < 256 {
-            TOKEN_BY_ID[index].map(ElementType::Token)
-        } else {
-            NodeKind::ALL.get(index - 256).map(|&n| ElementType::Node(n))
-        }
+    fn debug_name(self) -> &'static str {
+        TokenKind::debug_name(self)
     }
 }
 
@@ -490,7 +463,7 @@ impl PartialEq<NodeKind> for Option<ElementType> {
 /// `com.intellij.psi.tree.TokenSet`: a set of element types (tokens and node types), built at compile time.
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct TokenSet {
-    bits: [u64; 8],
+    bits: ElementTypeSet,
 }
 
 /// Anything `TokenSet::contains` accepts: a token, a node type, an element type, or a possibly-null one (null is in no
@@ -531,15 +504,14 @@ impl TokenSetMember for Option<ElementType> {
 
 impl TokenSet {
     /// `TokenSet.EMPTY`.
-    pub const EMPTY: TokenSet = TokenSet { bits: [0; 8] };
+    pub const EMPTY: TokenSet = TokenSet { bits: ElementTypeSet::EMPTY };
 
     /// `TokenSet.create(tokens...)`.
     pub const fn create(tokens: &[TokenKind]) -> TokenSet {
-        let mut bits = [0u64; 8];
+        let mut bits = ElementTypeSet::EMPTY;
         let mut i = 0;
         while i < tokens.len() {
-            let index = tokens[i] as usize;
-            bits[index / 64] |= 1 << (index % 64);
+            bits = bits.with(tokens[i] as usize);
             i += 1;
         }
         TokenSet { bits }
@@ -547,11 +519,10 @@ impl TokenSet {
 
     /// `TokenSet.create(nodeTypes...)`.
     pub const fn create_nodes(nodes: &[NodeKind]) -> TokenSet {
-        let mut bits = [0u64; 8];
+        let mut bits = ElementTypeSet::EMPTY;
         let mut i = 0;
         while i < nodes.len() {
-            let index = ElementType::Node(nodes[i]).index();
-            bits[index / 64] |= 1 << (index % 64);
+            bits = bits.with(256 + nodes[i] as usize);
             i += 1;
         }
         TokenSet { bits }
@@ -559,14 +530,10 @@ impl TokenSet {
 
     /// `TokenSet.orSet(sets...)`.
     pub const fn or_set(sets: &[TokenSet]) -> TokenSet {
-        let mut bits = [0u64; 8];
+        let mut bits = ElementTypeSet::EMPTY;
         let mut i = 0;
         while i < sets.len() {
-            let mut w = 0;
-            while w < 8 {
-                bits[w] |= sets[i].bits[w];
-                w += 1;
-            }
+            bits = ElementTypeSet::or_set(&[bits, sets[i].bits]);
             i += 1;
         }
         TokenSet { bits }
@@ -574,34 +541,19 @@ impl TokenSet {
 
     /// `TokenSet.andSet(a, b)`.
     pub const fn and_set(a: TokenSet, b: TokenSet) -> TokenSet {
-        let mut bits = [0u64; 8];
-        let mut w = 0;
-        while w < 8 {
-            bits[w] = a.bits[w] & b.bits[w];
-            w += 1;
-        }
-        TokenSet { bits }
+        TokenSet { bits: ElementTypeSet::and_set(a.bits, b.bits) }
     }
 
     /// `TokenSet.andNot(a, b)`.
     pub const fn and_not(a: TokenSet, b: TokenSet) -> TokenSet {
-        let mut bits = [0u64; 8];
-        let mut w = 0;
-        while w < 8 {
-            bits[w] = a.bits[w] & !b.bits[w];
-            w += 1;
-        }
-        TokenSet { bits }
+        TokenSet { bits: ElementTypeSet::and_not(a.bits, b.bits) }
     }
 
     /// `TokenSet.contains(t)`; a null (`None`) element type is in no set.
     #[inline]
     pub fn contains(&self, t: impl TokenSetMember) -> bool {
         match t.element_type() {
-            Some(e) => {
-                let index = e.index();
-                self.bits[index / 64] & (1 << (index % 64)) != 0
-            }
+            Some(e) => self.bits.contains_index(e.index()),
             None => false,
         }
     }

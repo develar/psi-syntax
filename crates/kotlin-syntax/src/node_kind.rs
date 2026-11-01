@@ -159,6 +159,23 @@ nodes! {
     KDOC_NAME = "KDOC_NAME",
 }
 
+impl psi_builder::NodeType for NodeKind {
+    #[inline(always)]
+    fn index(self) -> u8 {
+        self as u8
+    }
+
+    #[inline(always)]
+    fn from_index(index: usize) -> Option<NodeKind> {
+        NodeKind::ALL.get(index).copied()
+    }
+
+    #[inline]
+    fn debug_name(self) -> &'static str {
+        NodeKind::debug_name(self)
+    }
+}
+
 impl NodeKind {
     /// `IElementType.isLeftBound()`: the `KtLeftBoundNodeType`s and `TokenType.ERROR_ELEMENT`. An empty marker of such
     /// a type binds the whitespace before it to its left (PsiBuilderImpl.processDone).

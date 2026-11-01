@@ -5,9 +5,12 @@
 //!
 //! Rules are matched per state in the order of the spec; the comments name the spec rule each branch implements.
 
+pub(crate) use psi_builder::lexer::char_at;
+use psi_builder::lexer::in_ranges;
+
 use crate::tokens::TokenKind;
 use crate::tokens::TokenKind::*;
-use crate::unicode::{KOTLIN_DIGIT, KOTLIN_LETTER, in_ranges};
+use crate::unicode::{KOTLIN_DIGIT, KOTLIN_LETTER};
 
 /// The lexical states of Kotlin.flex (`%xstate` exclusive, `%state` inclusive of the unprefixed rules). The comment
 /// states BLOCK_COMMENT and DOC_COMMENT are pushed and popped within one token (the comment ends at its closing `*/` or
@@ -49,39 +52,6 @@ pub struct KotlinLexer<'a> {
     required_interpolation_prefix: i32,
     /// Whether the last returned token started in the initial state with an empty state stack.
     last_plain: bool,
-}
-
-/// The decoded character at `pos`: its code point and its length in bytes. A byte that does not start a valid UTF-8
-/// sequence is U+FFFD of length 1, as a decoder replaces it.
-#[inline]
-pub(crate) fn char_at(text: &[u8], pos: usize) -> (u32, usize) {
-    let b0 = text[pos];
-    if b0 < 0x80 {
-        return (b0 as u32, 1);
-    }
-    let cont = |i: usize| -> Option<u32> {
-        let b = *text.get(pos + i)?;
-        if b & 0xC0 == 0x80 { Some((b & 0x3F) as u32) } else { None }
-    };
-    let decoded = match b0 {
-        0xC2..=0xDF => cont(1).map(|c1| ((((b0 & 0x1F) as u32) << 6) | c1, 2)),
-        0xE0..=0xEF => match (cont(1), cont(2)) {
-            (Some(c1), Some(c2)) => {
-                let cp = (((b0 & 0x0F) as u32) << 12) | (c1 << 6) | c2;
-                if cp >= 0x800 && !(0xD800..=0xDFFF).contains(&cp) { Some((cp, 3)) } else { None }
-            }
-            _ => None,
-        },
-        0xF0..=0xF4 => match (cont(1), cont(2), cont(3)) {
-            (Some(c1), Some(c2), Some(c3)) => {
-                let cp = (((b0 & 0x07) as u32) << 18) | (c1 << 12) | (c2 << 6) | c3;
-                if (0x10000..=0x10FFFF).contains(&cp) { Some((cp, 4)) } else { None }
-            }
-            _ => None,
-        },
-        _ => None,
-    };
-    decoded.unwrap_or((0xFFFD, 1))
 }
 
 /// `LETTER = [:letter:]|_`.
@@ -823,29 +793,7 @@ impl<'a> KotlinLexer<'a> {
 
 /// The tokens of a text: types, start offsets (one more than tokens: the last is the text length) and, per token,
 /// whether it started in the lexer's initial state with an empty state stack.
-#[derive(Clone, Debug, Default)]
-pub struct Lexed {
-    pub types: Vec<TokenKind>,
-    pub starts: Vec<u32>,
-    plain: Vec<u64>,
-}
-
-impl Lexed {
-    /// The number of tokens.
-    pub fn len(&self) -> usize {
-        self.types.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.types.is_empty()
-    }
-
-    /// Whether token `i` started in the lexer's initial state with an empty stack, so that the text from it lexes
-    /// alone into the same tokens.
-    pub fn is_plain(&self, i: usize) -> bool {
-        self.plain.get(i / 64).is_some_and(|w| w & (1 << (i % 64)) != 0)
-    }
-}
+pub type Lexed = psi_builder::Lexed<TokenKind>;
 
 /// Lexes `text` (at most `u32::MAX` bytes are lexed; offsets are `u32`) into token types and starts, as
 /// `TokenSequence.performLexing` does with `KotlinLexer`.
@@ -858,27 +806,12 @@ pub fn tokenize(text: &[u8]) -> Lexed {
 /// `tokenize` into `lexed`, which is cleared first (its buffers are reused).
 pub fn tokenize_into(text: &[u8], lexed: &mut Lexed) {
     let text = &text[..text.len().min(u32::MAX as usize)];
-    let estimate = text.len() / 4 + 2;
-    lexed.types.clear();
-    lexed.starts.clear();
-    lexed.plain.clear();
-    lexed.types.reserve(estimate);
-    lexed.starts.reserve(estimate + 1);
+    lexed.begin(text.len());
     let mut lexer = KotlinLexer::new(text);
     while let Some(token) = lexer.advance() {
-        let i = lexed.types.len();
-        if i.is_multiple_of(64) {
-            lexed.plain.push(0);
-        }
-        if lexer.last_token_was_plain()
-            && let Some(w) = lexed.plain.last_mut()
-        {
-            *w |= 1 << (i % 64);
-        }
-        lexed.types.push(token.kind);
-        lexed.starts.push(token.start as u32);
+        lexed.push(token.kind, token.start as u32, lexer.last_token_was_plain());
     }
-    lexed.starts.push(text.len() as u32);
+    lexed.end(text.len() as u32);
 }
 
 #[cfg(test)]

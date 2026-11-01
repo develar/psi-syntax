@@ -1,7 +1,6 @@
-//! The port of IntelliJ's `PsiBuilderImpl` (with `MarkerProduction`, `MarkerPool`, `MarkerOptionalData`), the
-//! platform's `WhitespacesBinders` and Kotlin's `KotlinWhitespaceAndCommentsBinders`, and of Kotlin's
-//! `SemanticWhitespaceAwarePsiBuilderImpl` with its adapters `TruncatedSemanticWhitespaceAwarePsiBuilder` and
-//! `SemanticWhitespaceAwarePsiBuilderForByClause`.
+//! The port of IntelliJ's `PsiBuilderImpl` (with `MarkerProduction`, `MarkerPool`, `MarkerOptionalData`) and of the
+//! `WhitespacesAndCommentsBinder` contract, generic over the `Language` whose tokens it parses. A language's own
+//! builder layers (Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl`) and binders live in its crate.
 //!
 //! A builder holds the tokens of one text (a file, or the text of a lazily parsed element), a cursor that skips
 //! whitespace and comments, and the production list of markers. `begin_bind` balances the markers' edges over
@@ -14,8 +13,8 @@ use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use crate::node_kind::NodeKind;
-use crate::tokens::{ElementType, TokenKind, TokenSet};
+use crate::counters::{Counter, add};
+use crate::language::{ElementType, ElementTypeOf, Language};
 use crate::tree::TreeData;
 
 /// A marker (`PsiBuilder.Marker`): a handle into its builder's marker pool. Its methods take the builder, as the Java
@@ -23,156 +22,28 @@ use crate::tree::TreeData;
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Marker(u32);
 
-/// `WhitespacesAndCommentsBinder`: where a marker's edge goes among the whitespace and comments around it.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub enum WhitespacesAndCommentsBinder {
-    /// `WhitespacesBinders.DEFAULT_LEFT_BINDER` (= `GREEDY_RIGHT_BINDER`): the element starts after them.
-    DefaultLeft,
-    /// `WhitespacesBinders.DEFAULT_RIGHT_BINDER` (= `GREEDY_LEFT_BINDER`): the element ends before them.
-    DefaultRight,
-    /// `PrecedingCommentsBinder`.
-    PrecedingComments,
-    /// `PrecedingDocCommentsBinder`.
-    PrecedingDocComments,
-    /// `TrailingCommentsBinder`: binds comments on the same line.
-    TrailingComments,
-    /// `PRECEDING_ALL_COMMENTS_BINDER` (`AllCommentsBinder(false)`).
-    PrecedingAllComments,
-    /// `TRAILING_ALL_COMMENTS_BINDER` (`AllCommentsBinder(true)`).
-    TrailingAllComments,
-    /// `DoNotBindAnything`.
-    DoNotBindAnything,
-    /// `BindFirstShebangWithWhitespaceOnly`.
-    BindFirstShebangWithWhitespaceOnly,
-    /// `PRECEDING_ALL_BINDER` (`BindAll(false)`).
-    PrecedingAll,
-    /// `TRAILING_ALL_BINDER` (`BindAll(true)`).
-    TrailingAll,
-}
+/// `WhitespacesAndCommentsBinder`: where a marker's edge goes among the whitespace and comments around it. A
+/// language's binders are one `Copy` enum, the platform's `WhitespacesBinders` defaults among them.
+pub trait WhitespacesAndCommentsBinder<T>: Copy + Eq + std::fmt::Debug + Send + 'static {
+    /// `WhitespacesBinders.DEFAULT_LEFT_BINDER` (= `GREEDY_RIGHT_BINDER`): the element starts after them
+    /// (`getEdgePosition` is `tokens.size()`).
+    const DEFAULT_LEFT_BINDER: Self;
+    /// `WhitespacesBinders.DEFAULT_RIGHT_BINDER` (= `GREEDY_LEFT_BINDER`): the element ends before them (0).
+    const DEFAULT_RIGHT_BINDER: Self;
 
-pub use WhitespacesAndCommentsBinder as Binder;
-
-/// `WhitespacesBinders.DEFAULT_LEFT_BINDER`.
-pub const DEFAULT_LEFT_BINDER: Binder = Binder::DefaultLeft;
-/// `WhitespacesBinders.DEFAULT_RIGHT_BINDER`.
-pub const DEFAULT_RIGHT_BINDER: Binder = Binder::DefaultRight;
-/// `WhitespacesBinders.GREEDY_LEFT_BINDER`, the same object as `DEFAULT_RIGHT_BINDER`.
-pub const GREEDY_LEFT_BINDER: Binder = Binder::DefaultRight;
-/// `WhitespacesBinders.GREEDY_RIGHT_BINDER`, the same object as `DEFAULT_LEFT_BINDER`.
-pub const GREEDY_RIGHT_BINDER: Binder = Binder::DefaultLeft;
-/// `KotlinWhitespaceAndCommentsBindersKt.PRECEDING_ALL_COMMENTS_BINDER`.
-pub const PRECEDING_ALL_COMMENTS_BINDER: Binder = Binder::PrecedingAllComments;
-/// `KotlinWhitespaceAndCommentsBindersKt.TRAILING_ALL_COMMENTS_BINDER`.
-pub const TRAILING_ALL_COMMENTS_BINDER: Binder = Binder::TrailingAllComments;
-/// `KotlinWhitespaceAndCommentsBindersKt.PRECEDING_ALL_BINDER`.
-pub const PRECEDING_ALL_BINDER: Binder = Binder::PrecedingAll;
-/// `KotlinWhitespaceAndCommentsBindersKt.TRAILING_ALL_BINDER`.
-pub const TRAILING_ALL_BINDER: Binder = Binder::TrailingAll;
-
-fn line_break_count(text: &[u8]) -> usize {
-    text.iter().filter(|&&b| b == b'\n').count()
-}
-
-fn contains_line_break(text: &[u8]) -> bool {
-    text.iter().any(|&b| b == b'\n' || b == b'\r')
-}
-
-impl WhitespacesAndCommentsBinder {
-    /// `isRecursive()`: none of these binders is.
-    pub fn is_recursive(self) -> bool {
+    /// `isRecursive()`.
+    fn is_recursive(self) -> bool {
         false
     }
 
-    /// `getEdgePosition(tokens, atStreamEdge, getter)`: the edge as an index into `tokens`.
-    pub fn get_edge_position<'t>(
-        self,
-        tokens: &[TokenKind],
-        _at_stream_edge: bool,
-        getter: &dyn Fn(usize) -> &'t [u8],
-    ) -> usize {
-        use TokenKind::*;
-        match self {
-            Binder::DefaultLeft => tokens.len(),
-            Binder::DefaultRight => 0,
-            Binder::PrecedingComments => {
-                if tokens.is_empty() {
-                    return 0;
-                }
-                // 1. bind doc comment
-                for idx in (0..tokens.len()).rev() {
-                    if tokens[idx] == DOC_COMMENT {
-                        return idx;
-                    }
-                }
-                // 2. bind plain comments
-                let mut result = tokens.len();
-                for idx in (0..tokens.len()).rev() {
-                    let token_type = tokens[idx];
-                    if token_type == WHITE_SPACE {
-                        if line_break_count(getter(idx)) > 1 {
-                            break;
-                        }
-                    } else if crate::tokens::COMMENTS.contains(token_type) {
-                        if idx == 0 || tokens[idx - 1] == WHITE_SPACE && contains_line_break(getter(idx - 1)) {
-                            result = idx;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                result
-            }
-            Binder::PrecedingDocComments => {
-                if tokens.is_empty() {
-                    return 0;
-                }
-                for idx in (0..tokens.len()).rev() {
-                    if tokens[idx] == DOC_COMMENT {
-                        return idx;
-                    }
-                }
-                tokens.len()
-            }
-            Binder::TrailingComments => {
-                if tokens.is_empty() {
-                    return 0;
-                }
-                let mut result = 0;
-                for (idx, &token_type) in tokens.iter().enumerate() {
-                    match token_type {
-                        WHITE_SPACE => {
-                            if contains_line_break(getter(idx)) {
-                                break;
-                            }
-                        }
-                        EOL_COMMENT | BLOCK_COMMENT => result = idx + 1,
-                        _ => break,
-                    }
-                }
-                result
-            }
-            Binder::PrecedingAllComments | Binder::TrailingAllComments => {
-                if tokens.is_empty() {
-                    return 0;
-                }
-                let is_trailing = self == Binder::TrailingAllComments;
-                let size = tokens.len();
-                // Skip one whitespace if needed. Expect that there can't be several consecutive whitespaces
-                let end_token = tokens[if is_trailing { size - 1 } else { 0 }];
-                let shift = if end_token == WHITE_SPACE { 1 } else { 0 };
-                if is_trailing { size - shift } else { shift }
-            }
-            Binder::DoNotBindAnything => 0,
-            Binder::BindFirstShebangWithWhitespaceOnly => {
-                if tokens.first() == Some(&SHEBANG_COMMENT) {
-                    return if tokens.get(1) == Some(&WHITE_SPACE) { 2 } else { 1 };
-                }
-                0
-            }
-            Binder::PrecedingAll => 0,
-            Binder::TrailingAll => tokens.len(),
-        }
-    }
+    /// `getEdgePosition(tokens, atStreamEdge, getter)`: the edge as an index into `tokens`; `getter(i)` is the text
+    /// of `tokens[i]`.
+    fn get_edge_position<'t>(self, tokens: &[T], at_stream_edge: bool, getter: &dyn Fn(usize) -> &'t [u8]) -> usize;
+
+    /// What `getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`: `size()`
+    /// is `size`, negative, so `isEmpty()` is false, `indices` is empty, and `get(i)` reads `myLexTypes[start + i]`
+    /// unchecked (`None` outside the tokens).
+    fn negative_size_edge(self, size: i32, get: impl Fn(i32) -> Option<T>) -> i32;
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -184,18 +55,18 @@ enum MarkerKind {
 /// A `ProductionMarker` (`StartMarker` or `ErrorItem`) with its `MarkerOptionalData`. The light tree's links are not
 /// stored: `bind` reads the production in order instead (see there).
 #[derive(Clone, Debug)]
-struct MarkerData {
+struct MarkerData<T, N, B> {
     kind: MarkerKind,
     /// `myLexemeIndex`; -1 when the marker is free.
     lexeme_index: i32,
     /// `myDoneLexeme`; -1 while not done.
     done_lexeme: i32,
-    element_type: Option<ElementType>,
+    element_type: Option<ElementType<T, N>>,
     /// The error message (`MarkerOptionalData.getDoneError` of a start marker, `ErrorItem.myMessage` of an error item)
     /// as its index + 1 in the builder's `messages`; 0 for none. Kept apart so the pool's records stay small.
     message: u32,
-    left_binder: Binder,
-    right_binder: Binder,
+    left_binder: B,
+    right_binder: B,
     collapsed: bool,
     /// The builder's nesting (`PsiBuilderImpl::nesting`) when the marker was collapsed: where a lazy block or lambda
     /// sits, for the chameleon that expands it (not in the Java).
@@ -217,7 +88,7 @@ fn start_node(marker_id: u32) -> u32 {
     marker_id << 1
 }
 
-impl MarkerData {
+impl<T, N, B: WhitespacesAndCommentsBinder<T>> MarkerData<T, N, B> {
     fn new(kind: MarkerKind) -> Self {
         MarkerData {
             kind,
@@ -225,8 +96,8 @@ impl MarkerData {
             done_lexeme: -1,
             element_type: None,
             message: 0,
-            left_binder: DEFAULT_LEFT_BINDER,
-            right_binder: DEFAULT_RIGHT_BINDER,
+            left_binder: B::DEFAULT_LEFT_BINDER,
+            right_binder: B::DEFAULT_RIGHT_BINDER,
             collapsed: false,
             depth: 0,
         }
@@ -251,25 +122,12 @@ impl MarkerData {
     }
 }
 
-/// What a collapsed or lazy element is reparsed with when the tree expands it.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub(crate) enum LazyKind {
-    /// `BlockExpressionElementType`: `KotlinParser.parseBlockExpression`.
-    Block,
-    /// `LambdaExpressionElementType`: `KotlinParser.parseLambdaExpression`.
-    Lambda,
-    /// `KDocTokens.KDOC`: `KDocLexer` + `KDocParser`.
-    KDoc,
-    /// `KDocTokens.MARKDOWN_LINK`: `KotlinLexer` + `KDocLinkParser`.
-    KDocLink,
-}
-
-/// A chameleon the tree still has to expand: its node, what parses it, its text range, and the range of its tokens
-/// in the file's own token list when the builder's tokens are a slice of it.
+/// A chameleon the tree still has to expand: its node, what parses it (`Language::Lazy`), its text range, and the
+/// range of its tokens in the file's own token list when the builder's tokens are a slice of it.
 #[derive(Copy, Clone, Debug)]
-pub(crate) struct Pending {
+pub(crate) struct Pending<K> {
     pub node: u32,
-    pub kind: LazyKind,
+    pub kind: K,
     pub start: usize,
     pub end: usize,
     pub file_tokens: Option<(usize, usize)>,
@@ -358,13 +216,12 @@ enum BindStep {
 
 /// The buffers builders work in, kept by a `Parser` from one builder to the next (cleared, not freed): the token
 /// types a builder parses (filled by its caller), the marker pool with its free lists, the production, and the
-/// semantic layer's state stacks and adapters. A builder takes them in `new` and gives them back in `release`.
-#[derive(Default)]
-pub(crate) struct BuilderBuffers {
-    pub lex_types: Vec<TokenKind>,
+/// buffers of the language's builder layers (`layer`). A builder takes them in `new` and gives them back in `release`.
+pub struct BuilderBuffers<L: Language> {
+    pub lex_types: Vec<L::Token>,
     /// The token starts a builder takes in `new` (filled by its caller) and gives back in `release`.
     pub starts: Vec<u32>,
-    markers: Vec<MarkerData>,
+    markers: Vec<MarkerData<L::Token, L::Node, L::Binder>>,
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
     links: Vec<[u32; 2]>,
@@ -375,13 +232,33 @@ pub(crate) struct BuilderBuffers {
     messages: Vec<Cow<'static, str>>,
     bind_stack: Vec<(u32, u32)>,
     closers: Vec<u32>,
-    join_complex_tokens: Vec<bool>,
-    newlines_enabled: Vec<bool>,
-    adapters: Vec<Adapter>,
+    /// The language layers' state stacks (Kotlin's newline and join stacks, its adapters), taken by the layer.
+    pub layer: L::LayerBuffers,
+}
+
+impl<L: Language> Default for BuilderBuffers<L> {
+    fn default() -> Self {
+        BuilderBuffers {
+            lex_types: Vec::new(),
+            starts: Vec::new(),
+            markers: Vec::new(),
+            free_start_markers: Vec::new(),
+            free_error_items: Vec::new(),
+            links: Vec::new(),
+            extra_links: Vec::new(),
+            extra_ids: Vec::new(),
+            production: Vec::new(),
+            production_lexemes: Vec::new(),
+            messages: Vec::new(),
+            bind_stack: Vec::new(),
+            closers: Vec::new(),
+            layer: L::LayerBuffers::default(),
+        }
+    }
 }
 
 /// `PsiBuilderImpl`.
-pub struct PsiBuilderImpl {
+pub struct PsiBuilderImpl<L: Language> {
     text: Arc<[u8]>,
     /// The absolute offset of this builder's text in `text`, and its length.
     base: usize,
@@ -389,7 +266,7 @@ pub struct PsiBuilderImpl {
     /// `myLexStarts`, relative to `base`, `lexeme_count + 1` entries.
     lex_starts: Vec<u32>,
     /// `myLexTypes`.
-    lex_types: Vec<TokenKind>,
+    lex_types: Vec<L::Token>,
     lexeme_count: usize,
     /// How many tokens `drop_bound_tokens` removed from the front of `lex_types` and `lex_starts` while binding:
     /// token `i` is at `i - token_shift` there (0 while parsing).
@@ -405,21 +282,21 @@ pub struct PsiBuilderImpl {
     type_arguments_too_deep_before: usize,
     /// Where token 0 is in the file's token list, when the tokens are an unmodified slice of it.
     file_token: Option<usize>,
-    tokens_to_restore_on_rollback: BTreeMap<usize, TokenKind>,
+    tokens_to_restore_on_rollback: BTreeMap<usize, L::Token>,
     current_lexeme: usize,
     token_type_checked: bool,
-    /// The current token, cached for `current_types` (not in the Java): `get_token_type()` and its join with the next
-    /// raw token as `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(raw, 1)` computes it. `tt_valid` is
+    /// The current token, cached for `current_types` (not in the Java): `get_token_type()` and what the language's
+    /// layer derives from it (`Language::joined_token_type`; Kotlin's `getJoinedTokenType(raw, 1)`). `tt_valid` is
     /// cleared wherever `current_lexeme` moves or `lex_types` is written: `advance_lexer`, `raw_advance_lexer` (and
     /// `advance_to_eof` through it), `rollback_to` (which also restores remapped tokens), `remap_current_token` and
     /// `skip_balanced_block`.
     /// `skip_whitespace` only steps over whitespace and comments up to the token both values describe, so it keeps
-    /// them valid. It lives here, not in the semantic layer, because markers mutate this builder directly.
-    tt_raw: Option<TokenKind>,
-    tt_joined: Option<TokenKind>,
+    /// them valid. It lives here, not in the language's layer, because markers mutate this builder directly.
+    tt_raw: Option<L::Token>,
+    tt_joined: Option<L::Token>,
     tt_valid: bool,
     /// `MarkerPool.list`; id 0 is no marker.
-    markers: Vec<MarkerData>,
+    markers: Vec<MarkerData<L::Token, L::Node, L::Binder>>,
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
     /// `MarkerProduction` while parsing, as a doubly linked list (not in the Java's array, whose inserts before a
@@ -456,16 +333,18 @@ pub struct PsiBuilderImpl {
 /// The `PsiBuilder` methods a marker needs: implemented by every builder layer, so `marker.done(builder, kind)` works
 /// with any of them.
 pub trait AsPsiBuilder {
-    fn psi_builder(&mut self) -> &mut PsiBuilderImpl;
+    type Lang: Language;
+    fn psi_builder(&mut self) -> &mut PsiBuilderImpl<Self::Lang>;
 }
 
-impl AsPsiBuilder for PsiBuilderImpl {
-    fn psi_builder(&mut self) -> &mut PsiBuilderImpl {
+impl<L: Language> AsPsiBuilder for PsiBuilderImpl<L> {
+    type Lang = L;
+    fn psi_builder(&mut self) -> &mut PsiBuilderImpl<L> {
         self
     }
 }
 
-impl PsiBuilderImpl {
+impl<L: Language> PsiBuilderImpl<L> {
     /// A builder over `text[base..base + len]` with the token types in `bufs.lex_types` and their starts in
     /// `bufs.starts` (relative to `base`, one more entry than the types, the last being `len`). It works in `bufs`, emptied until `release`;
     /// the marker pool starts afresh (id 0, no marker), whatever the previous builder left.
@@ -473,7 +352,7 @@ impl PsiBuilderImpl {
         text: Arc<[u8]>,
         base: usize,
         len: usize,
-        bufs: &mut BuilderBuffers,
+        bufs: &mut BuilderBuffers<L>,
         file_token: Option<usize>,
     ) -> Self {
         let lex_types = std::mem::take(&mut bufs.lex_types);
@@ -545,7 +424,7 @@ impl PsiBuilderImpl {
 
     /// Starts the nesting at `nesting`, with `limit` instead of `NESTING_LIMIT` (and no more than `limit` for the
     /// other two limits).
-    pub(crate) fn set_nesting(&mut self, nesting: u32, limit: u32) {
+    pub fn set_nesting(&mut self, nesting: u32, limit: u32) {
         self.nesting = nesting;
         self.nesting_limit = limit;
     }
@@ -553,7 +432,7 @@ impl PsiBuilderImpl {
     /// Enters a nested construct (not in the Java): false, with nothing entered, when that would pass a limit. Each
     /// `true` is matched by `exit_nesting(kind)` when the construct is parsed.
     #[inline(always)]
-    pub(crate) fn enter_nesting(&mut self, kind: Nesting) -> bool {
+    pub fn enter_nesting(&mut self, kind: Nesting) -> bool {
         if self.nesting >= self.nesting_limit {
             return false;
         }
@@ -581,7 +460,7 @@ impl PsiBuilderImpl {
     }
 
     #[inline(always)]
-    pub(crate) fn exit_nesting(&mut self, kind: Nesting) {
+    pub fn exit_nesting(&mut self, kind: Nesting) {
         self.nesting -= 1;
         match kind {
             Nesting::Level => {}
@@ -591,11 +470,11 @@ impl PsiBuilderImpl {
     }
 
     /// Where the rest of a construct nested too deeply ends when it starts at token `from` (not in the Java): the
-    /// first token at or after `from` that closes a bracket (`(`, `[`, `{`, `${`, a string's quotes) opened before
-    /// `from`, or the end. Constant time: a table of every token's answer is made, in one pass, the first time it is
-    /// asked for, so a rolled-back attempt that reaches the limit costs no more than one that does not.
+    /// first token at or after `from` that closes a bracket (`Language::bracket_depth_change`; Kotlin's `(`, `[`, `{`,
+    /// `${`, a string's quotes) opened before `from`, or the end. Constant time: a table of every token's answer is
+    /// made, in one pass, the first time it is asked for, so a rolled-back attempt that reaches the limit costs no
+    /// more than one that does not.
     fn unmatched_closer(&mut self, from: usize) -> usize {
-        use TokenKind::*;
         if self.closers.is_empty() {
             // The bracket depth before each token, d[0..=n]; the answer for `i` is the token before the first k > i
             // with d[k] < d[i], found for all i by one backward pass with a stack of increasing depths.
@@ -604,11 +483,7 @@ impl PsiBuilderImpl {
             let mut d = 0i64;
             depth.push(d);
             for &t in &self.lex_types[..n] {
-                match t {
-                    LPAR | LBRACKET | LBRACE | LONG_TEMPLATE_ENTRY_START | OPEN_QUOTE => d += 1,
-                    RPAR | RBRACKET | RBRACE | LONG_TEMPLATE_ENTRY_END | CLOSING_QUOTE => d -= 1,
-                    _ => {}
-                }
+                d += L::bracket_depth_change(t);
                 depth.push(d);
             }
             self.closers.resize(n + 1, n as u32);
@@ -627,7 +502,7 @@ impl PsiBuilderImpl {
     }
 
     /// Gives the buffers back to `bufs`, the token starts to `bufs.starts`.
-    pub(crate) fn release(self, bufs: &mut BuilderBuffers) {
+    pub(crate) fn release(self, bufs: &mut BuilderBuffers<L>) {
         bufs.starts = self.lex_starts;
         bufs.lex_types = self.lex_types;
         bufs.markers = self.markers;
@@ -648,62 +523,44 @@ impl PsiBuilderImpl {
         &self.text[self.base..self.base + self.len]
     }
 
-    /// `isWhitespaceOrComment(type)`: `KtTokens.WHITESPACES` or `KtTokens.COMMENTS`.
+    /// `isWhitespaceOrComment(type)`: the parser definition's whitespace or comment tokens
+    /// (`Language::is_whitespace_or_comment`).
     #[inline]
-    pub fn is_whitespace_or_comment(&self, element_type: TokenKind) -> bool {
-        element_type.is_whitespace_or_comment()
+    pub fn is_whitespace_or_comment(&self, element_type: L::Token) -> bool {
+        L::is_whitespace_or_comment(element_type)
     }
 
-    /// `whitespaceOrComment(type)` (what `SemanticWhitespaceAwarePsiBuilderImpl.isWhitespaceOrComment` calls).
-    pub fn whitespace_or_comment(&self, token: TokenKind) -> bool {
+    /// `whitespaceOrComment(type)` (what Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl.isWhitespaceOrComment` calls).
+    pub fn whitespace_or_comment(&self, token: L::Token) -> bool {
         self.is_whitespace_or_comment(token)
     }
 
     /// `getTokenType()`: the current token after skipping whitespace and comments; `None` at the end.
     #[inline(always)]
-    pub fn get_token_type(&mut self) -> Option<TokenKind> {
-        crate::counters::add(crate::counters::Counter::RawTokenType, 1);
+    pub fn get_token_type(&mut self) -> Option<L::Token> {
+        add(Counter::RawTokenType, 1);
         if self.eof() {
             return None;
         }
         Some(self.lex_types[self.current_lexeme])
     }
 
-    /// `get_token_type()` and, for `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` when it joins complex
-    /// tokens, `getJoinedTokenType(raw, 1)`, computed once per cursor position (see `tt_valid`).
+    /// `get_token_type()` and `Language::joined_token_type(raw, 1)` (for Kotlin's
+    /// `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` when it joins complex tokens, `getJoinedTokenType(raw,
+    /// 1)`), computed once per cursor position (see `tt_valid`).
     #[inline(always)]
-    pub(crate) fn current_types(&mut self) -> (Option<TokenKind>, Option<TokenKind>) {
+    pub fn current_types(&mut self) -> (Option<L::Token>, Option<L::Token>) {
         if !self.tt_valid {
             let raw = self.get_token_type();
-            self.tt_joined = self.joined_token_type(raw, 1);
+            self.tt_joined = L::joined_token_type(self, raw, 1);
             self.tt_raw = raw;
             self.tt_valid = true;
         }
         (self.tt_raw, self.tt_joined)
     }
 
-    /// `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(rawTokenType, rawLookupSteps)`: `?` before `.` is
-    /// `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
-    fn joined_token_type(&self, raw_token_type: Option<TokenKind>, raw_lookup_steps: i32) -> Option<TokenKind> {
-        if raw_token_type == TokenKind::QUEST {
-            let next_raw_token = self.raw_lookup(raw_lookup_steps);
-            if next_raw_token == TokenKind::DOT {
-                return Some(TokenKind::SAFE_ACCESS);
-            }
-            if next_raw_token == TokenKind::COLON {
-                return Some(TokenKind::ELVIS);
-            }
-        } else if raw_token_type == TokenKind::EXCL {
-            let next_raw_token = self.raw_lookup(raw_lookup_steps);
-            if next_raw_token == TokenKind::EXCL {
-                return Some(TokenKind::EXCLEXCL);
-            }
-        }
-        raw_token_type
-    }
-
     /// `remapCurrentToken(type)`.
-    pub fn remap_current_token(&mut self, element_type: TokenKind) {
+    pub fn remap_current_token(&mut self, element_type: L::Token) {
         self.tt_valid = false;
         if self.current_lexeme < self.lexeme_count {
             self.lex_types[self.current_lexeme] = element_type;
@@ -711,7 +568,7 @@ impl PsiBuilderImpl {
     }
 
     /// `remapCurrentTokenAndRestoreOnRollback(type)`.
-    pub fn remap_current_token_and_restore_on_rollback(&mut self, element_type: TokenKind) {
+    pub fn remap_current_token_and_restore_on_rollback(&mut self, element_type: L::Token) {
         if self.current_lexeme < self.lexeme_count {
             self.tokens_to_restore_on_rollback
                 .entry(self.current_lexeme)
@@ -721,9 +578,9 @@ impl PsiBuilderImpl {
     }
 
     /// `lookAhead(steps)`: the token `steps` non-whitespace tokens ahead of the current one.
-    pub fn look_ahead(&self, mut steps: i32) -> Option<TokenKind> {
-        crate::counters::add(crate::counters::Counter::LookAhead, 1);
-        crate::counters::add(crate::counters::Counter::LookAheadSteps, steps.max(0) as u64);
+    pub fn look_ahead(&self, mut steps: i32) -> Option<L::Token> {
+        add(Counter::LookAhead, 1);
+        add(Counter::LookAheadSteps, steps.max(0) as u64);
         let mut cur = self.shift_over_whitespace_forward(self.current_lexeme);
         while steps > 0 {
             cur = self.shift_over_whitespace_forward(cur + 1);
@@ -740,8 +597,8 @@ impl PsiBuilderImpl {
     }
 
     /// `rawLookup(steps)`: the raw token `steps` away from the current lexeme (whitespace and comments included).
-    pub fn raw_lookup(&self, steps: i32) -> Option<TokenKind> {
-        crate::counters::add(crate::counters::Counter::RawLookup, 1);
+    pub fn raw_lookup(&self, steps: i32) -> Option<L::Token> {
+        add(Counter::RawLookup, 1);
         let cur = self.current_lexeme as i64 + steps as i64;
         if cur >= 0 && (cur as usize) < self.lexeme_count { Some(self.lex_types[cur as usize]) } else { None }
     }
@@ -781,7 +638,7 @@ impl PsiBuilderImpl {
 
     /// `advanceLexer()`.
     pub fn advance_lexer(&mut self) {
-        crate::counters::add(crate::counters::Counter::Advance, 1);
+        add(Counter::Advance, 1);
         if self.eof() {
             return;
         }
@@ -790,21 +647,22 @@ impl PsiBuilderImpl {
         self.current_lexeme += 1;
     }
 
-    /// `KotlinParsing.advanceBalancedBlock()` over the raw tokens, for `SemanticWhitespaceAwarePsiBuilder::
-    /// skip_balanced_block` (not in the Java): counts `{` and `}` from the current lexeme (the block's `{` consumed) and
-    /// puts the cursor after the `}` that closes the block, or at the end. Whitespace and comments are never braces,
-    /// and a joined `?.`/`?:`/`!!` is two lexemes neither of which is one, so the braces counted and the lexeme the
-    /// cursor stops at are the Java loop's.
-    fn skip_balanced_block(&mut self) {
+    /// A balanced block skipped over the raw tokens (not in the Java; Kotlin's `KotlinParsing.advanceBalancedBlock()`
+    /// for `SemanticWhitespaceAwarePsiBuilder::skip_balanced_block`): counts `open` and `close` from the current lexeme
+    /// (the block's `open` consumed) and puts the cursor after the `close` that closes the block, or at the end.
+    /// Whitespace and comments are never braces, so the braces counted and the lexeme the cursor stops at are those of
+    /// a loop of `advanceLexer()` whose token types are never `open` or `close` but where a raw token is one (Kotlin's
+    /// joined `?.`/`?:`/`!!` are two lexemes neither of which is a brace).
+    pub fn skip_balanced_block(&mut self, open: L::Token, close: L::Token) {
         let start = self.current_lexeme;
         let mut brace_count = 1i32;
         let mut i = start;
         while i < self.lexeme_count {
             let t = self.lex_types[i];
             i += 1;
-            if t == TokenKind::LBRACE {
+            if t == open {
                 brace_count += 1;
-            } else if t == TokenKind::RBRACE {
+            } else if t == close {
                 brace_count -= 1;
                 if brace_count == 0 {
                     break;
@@ -812,14 +670,32 @@ impl PsiBuilderImpl {
             }
         }
         if cfg!(feature = "counters") {
-            let stepped = self.lex_types[start..i].iter().filter(|t| !t.is_whitespace_or_comment()).count();
-            crate::counters::add(crate::counters::Counter::BalancedSkipTokens, stepped as u64);
+            let stepped = self.lex_types[start..i].iter().filter(|&&t| !L::is_whitespace_or_comment(t)).count();
+            add(Counter::BalancedSkipTokens, stepped as u64);
         }
         self.current_lexeme = i;
         self.token_type_checked = false;
         self.tt_valid = false;
     }
 
+    /// Moves the cursor over the rest of a construct nested too deeply (not in the Java): from the current token to the
+    /// first that closes a bracket opened before it (`unmatched_closer`), or to the end, and not past the first token
+    /// starting at `eof_offset` or later when a layer ends the stream there (Kotlin's truncation); over one token at
+    /// least, so that the callers' loops go on. The tokens stay raw (no layer joins them). The caller checks `eof()`
+    /// first.
+    pub fn skip_too_deeply_nested(&mut self, eof_offset: Option<u32>) {
+        let current = self.current_lexeme;
+        let mut end = self.unmatched_closer(current).max(current + 1);
+        if let Some(eof) = eof_offset {
+            let starts = &self.lex_starts[..self.lexeme_count];
+            end = end.min(current + starts[current..].partition_point(|&s| s < eof));
+        }
+        self.raw_advance_lexer((end - current) as i32);
+    }
+
+    /// Inlined into `eof()` and `mark()` (as it was inside one crate; instantiated in the language's crate the inliner
+    /// otherwise keeps it a call on every cursor move: measured -0.8 % parse throughput).
+    #[inline(always)]
     fn skip_whitespace(&mut self) {
         while self.current_lexeme < self.lexeme_count
             && self.is_whitespace_or_comment(self.lex_types[self.current_lexeme])
@@ -844,7 +720,7 @@ impl PsiBuilderImpl {
 
     /// `getTokenText()` as bytes.
     pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
-        crate::counters::add(crate::counters::Counter::TokenText, 1);
+        add(Counter::TokenText, 1);
         if self.eof() {
             return None;
         }
@@ -855,7 +731,7 @@ impl PsiBuilderImpl {
 
     /// `mark()`.
     pub fn mark(&mut self) -> Marker {
-        crate::counters::add(crate::counters::Counter::Mark, 1);
+        add(Counter::Mark, 1);
         if self.production_len != 0 {
             self.skip_whitespace();
         }
@@ -895,7 +771,7 @@ impl PsiBuilderImpl {
         }
     }
 
-    fn marker(&self, id: u32) -> &MarkerData {
+    fn marker(&self, id: u32) -> &MarkerData<L::Token, L::Node, L::Binder> {
         &self.markers[id as usize]
     }
 
@@ -947,7 +823,7 @@ impl PsiBuilderImpl {
             if id > 0 {
                 let m = self.marker(id as u32);
                 if m.kind == MarkerKind::Error
-                    || (m.element_type == Some(ElementType::Node(NodeKind::ERROR_ELEMENT)) && m.message != 0)
+                    || (m.element_type == Some(ElementType::Node(L::ERROR_ELEMENT)) && m.message != 0)
                 {
                     return true;
                 }
@@ -1112,7 +988,7 @@ impl PsiBuilderImpl {
 
     /// `Marker.precede()`.
     pub fn precede(&mut self, marker: Marker) -> Marker {
-        crate::counters::add(crate::counters::Counter::Precede, 1);
+        add(Counter::Precede, 1);
         let lexeme_index = self.marker(marker.0).lexeme_index.max(0);
         let pre = self.create_marker(lexeme_index);
         self.add_before(pre.0, marker.0);
@@ -1121,7 +997,7 @@ impl PsiBuilderImpl {
 
     /// `Marker.drop()`.
     pub fn drop(&mut self, marker: Marker) {
-        crate::counters::add(crate::counters::Counter::Drop, 1);
+        add(Counter::Drop, 1);
         self.drop_marker(marker.0);
     }
 
@@ -1131,11 +1007,8 @@ impl PsiBuilderImpl {
         if lexeme_index < 0 {
             return;
         }
-        crate::counters::add(crate::counters::Counter::Rollback, 1);
-        crate::counters::add(
-            crate::counters::Counter::RollbackLexemes,
-            self.current_lexeme.saturating_sub(lexeme_index as usize) as u64,
-        );
+        add(Counter::Rollback, 1);
+        add(Counter::RollbackLexemes, self.current_lexeme.saturating_sub(lexeme_index as usize) as u64);
         if !self.tokens_to_restore_on_rollback.is_empty() {
             let restored = self.tokens_to_restore_on_rollback.split_off(&(lexeme_index as usize));
             for (index, element_type) in restored {
@@ -1149,13 +1022,13 @@ impl PsiBuilderImpl {
     }
 
     /// `Marker.done(type)`.
-    pub fn done(&mut self, marker: Marker, element_type: impl Into<ElementType>) {
+    pub fn done(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>) {
         self.markers[marker.0 as usize].element_type = Some(element_type.into());
         self.process_done(marker.0, None, None);
     }
 
     /// `Marker.collapse(type)`: done, and the tree gets one leaf of `type` over the marker's tokens.
-    pub fn collapse(&mut self, marker: Marker, element_type: impl Into<ElementType>) {
+    pub fn collapse(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>) {
         self.done(marker, element_type);
         let m = &mut self.markers[marker.0 as usize];
         m.collapsed = true;
@@ -1163,7 +1036,7 @@ impl PsiBuilderImpl {
     }
 
     /// `Marker.doneBefore(type, before)`.
-    pub fn done_before(&mut self, marker: Marker, element_type: impl Into<ElementType>, before: Marker) {
+    pub fn done_before(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>, before: Marker) {
         self.markers[marker.0 as usize].element_type = Some(element_type.into());
         self.process_done(marker.0, None, Some(before.0));
     }
@@ -1172,7 +1045,7 @@ impl PsiBuilderImpl {
     pub fn done_before_with_error(
         &mut self,
         marker: Marker,
-        element_type: impl Into<ElementType>,
+        element_type: impl Into<ElementTypeOf<L>>,
         before: Marker,
         error_message: impl Into<Cow<'static, str>>,
     ) {
@@ -1185,18 +1058,18 @@ impl PsiBuilderImpl {
 
     /// `Marker.error(message)`: done as an error element.
     pub fn error_marker(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>) {
-        self.markers[marker.0 as usize].element_type = Some(ElementType::Node(NodeKind::ERROR_ELEMENT));
+        self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
         self.process_done(marker.0, Some(message.into()), None);
     }
 
     /// `Marker.errorBefore(message, before)`.
     pub fn error_before(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>, before: Marker) {
-        self.markers[marker.0 as usize].element_type = Some(ElementType::Node(NodeKind::ERROR_ELEMENT));
+        self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
         self.process_done(marker.0, Some(message.into()), Some(before.0));
     }
 
     /// `Marker.setCustomEdgeTokenBinders(left, right)`; `None` keeps the current binder.
-    pub fn set_custom_edge_token_binders(&mut self, marker: Marker, left: Option<Binder>, right: Option<Binder>) {
+    pub fn set_custom_edge_token_binders(&mut self, marker: Marker, left: Option<L::Binder>, right: Option<L::Binder>) {
         let m = &mut self.markers[marker.0 as usize];
         if let Some(left) = left {
             m.left_binder = left;
@@ -1207,7 +1080,7 @@ impl PsiBuilderImpl {
     }
 
     fn process_done(&mut self, marker_id: u32, error_message: Option<Cow<'static, str>>, before: Option<u32>) {
-        crate::counters::add(crate::counters::Counter::Done, 1);
+        add(Counter::Done, 1);
         // doValidityChecks: "Marker already done." is only logged in Java.
         if let Some(message) = error_message {
             self.set_message(marker_id, message);
@@ -1217,9 +1090,9 @@ impl PsiBuilderImpl {
             Some(before) => self.marker(before).lexeme_index,
         };
         let m = self.marker(marker_id);
-        let left_bound = matches!(m.element_type, Some(ElementType::Node(n)) if n.is_left_bound());
+        let left_bound = matches!(m.element_type, Some(ElementType::Node(n)) if L::is_left_bound(n));
         if left_bound && self.is_empty(m.lexeme_index, done_lexeme) {
-            self.set_custom_edge_token_binders(Marker(marker_id), Some(DEFAULT_RIGHT_BINDER), None);
+            self.set_custom_edge_token_binders(Marker(marker_id), Some(L::Binder::DEFAULT_RIGHT_BINDER), None);
         }
         // Done twice (Java only logs it): the earlier done entry reads the new done lexeme too, as Java's does, since
         // `flatten_production` reads every entry's lexeme from its marker.
@@ -1242,9 +1115,9 @@ impl PsiBuilderImpl {
         let root_marker = self.prepare_light_tree();
         let base = self.base as u32;
         let root_type = if root_marker == NONE {
-            ElementType::Node(NodeKind::KT_FILE)
+            ElementType::Node(L::FILE)
         } else {
-            self.marker(root_marker).element_type.unwrap_or(ElementType::Node(NodeKind::KT_FILE))
+            self.marker(root_marker).element_type.unwrap_or(ElementType::Node(L::FILE))
         };
         let root_node = match root {
             Some(node) => node,
@@ -1286,7 +1159,7 @@ impl PsiBuilderImpl {
     /// `getTreeBuilt()`, the rest: appends nodes in document order until a chameleon (a doc comment, a markdown link,
     /// a collapsed lazy block or lambda) has been appended, and returns it; the caller appends the chameleon's own
     /// subtree right after it (so node ids are in preorder) and calls this again. `None` when the tree is complete.
-    pub(crate) fn resume_bind(&mut self, tree: &mut TreeData) -> Option<Pending> {
+    pub(crate) fn resume_bind(&mut self, tree: &mut TreeData) -> Option<Pending<L::Lazy>> {
         self.resume_bind_steps(tree)
     }
 
@@ -1317,7 +1190,7 @@ impl PsiBuilderImpl {
             let item_id = id.unsigned_abs();
             let item = self.marker(item_id);
             let binder = if item.kind == MarkerKind::Error {
-                DEFAULT_RIGHT_BINDER
+                L::Binder::DEFAULT_RIGHT_BINDER
             } else if done {
                 item.right_binder
             } else {
@@ -1364,24 +1237,15 @@ impl PsiBuilderImpl {
         }
     }
 
-    /// What `binder.getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`:
-    /// `size()` is negative, so `isEmpty()` is false, `indices` is empty, and `get(i)` reads `myLexTypes[start + i]`
-    /// unchecked.
-    fn negative_size_edge(&self, binder: Binder, ws_start: i32, ws_end: i32) -> i32 {
+    /// What `binder.getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`
+    /// (`WhitespacesAndCommentsBinder::negative_size_edge`).
+    fn negative_size_edge(&self, binder: L::Binder, ws_start: i32, ws_end: i32) -> i32 {
         let size = ws_end - ws_start;
-        let get = |index: i32| -> Option<TokenKind> {
+        let get = |index: i32| -> Option<L::Token> {
             let i = ws_start + index;
             if i >= 0 && (i as usize) < self.lexeme_count { Some(self.lex_types[i as usize]) } else { None }
         };
-        match binder {
-            Binder::DefaultLeft | Binder::PrecedingComments | Binder::PrecedingDocComments | Binder::TrailingAll => {
-                size
-            }
-            Binder::DefaultRight | Binder::TrailingComments | Binder::DoNotBindAnything | Binder::PrecedingAll => 0,
-            Binder::PrecedingAllComments => (get(0) == TokenKind::WHITE_SPACE) as i32,
-            Binder::TrailingAllComments => size - (get(size - 1) == TokenKind::WHITE_SPACE) as i32,
-            Binder::BindFirstShebangWithWhitespaceOnly => (get(0) == TokenKind::SHEBANG_COMMENT) as i32,
-        }
+        binder.negative_size_edge(size, get)
     }
 
     /// `bind()` with `createRootAST`, `insertLeaves`, `collapseLeaves`: appends the leaves and composites to `tree`,
@@ -1397,7 +1261,7 @@ impl PsiBuilderImpl {
     ///
     /// Every leaf goes to the current node, so the walk is a loop of two steps: insert the tokens up to `insert_to`
     /// as leaves of the current node, then do `then`. A leaf that is a chameleon stops it there (`resume_bind`).
-    fn resume_bind_steps(&mut self, tree: &mut TreeData) -> Option<Pending> {
+    fn resume_bind_steps(&mut self, tree: &mut TreeData) -> Option<Pending<L::Lazy>> {
         // The state lives in a local while the walk runs (kept in registers), and goes back on a stop.
         let mut st = self.bind;
         let chameleon = self.bind_steps(&mut st, tree);
@@ -1443,7 +1307,7 @@ impl PsiBuilderImpl {
     }
 
     #[inline(always)]
-    fn bind_steps(&mut self, st: &mut BindState, tree: &mut TreeData) -> Option<Pending> {
+    fn bind_steps(&mut self, st: &mut BindState, tree: &mut TreeData) -> Option<Pending<L::Lazy>> {
         loop {
             while st.lex_index < st.insert_to {
                 let to = st.insert_to;
@@ -1531,7 +1395,7 @@ impl PsiBuilderImpl {
                 BindStep::Error(id) => {
                     st.then = BindStep::Next;
                     let start = self.offset_of(st.lex_index);
-                    let error = tree.add_composite(st.cur_node, ElementType::Node(NodeKind::ERROR_ELEMENT), start);
+                    let error = tree.add_composite(st.cur_node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), start);
                     tree.set_end(error, start);
                     let message = self.take_message(id);
                     tree.set_error(error, message);
@@ -1581,7 +1445,7 @@ impl PsiBuilderImpl {
         let starts = &self.lex_starts[from - shift..=to - shift];
         for (i, (&token, edges)) in types.iter().zip(starts.windows(2)).enumerate() {
             if edges[0] < edges[1] {
-                if matches!(token, TokenKind::DOC_COMMENT | TokenKind::KDOC_MARKDOWN_LINK) {
+                if L::is_chameleon_token(token) {
                     return from + i;
                 }
                 tree.add_token_leaf(cur_node, token, base + edges[0], base + edges[1]);
@@ -1601,9 +1465,9 @@ impl PsiBuilderImpl {
     }
 
     fn create_composite(&mut self, marker: u32, parent: u32, lex_index: usize, tree: &mut TreeData) -> u32 {
-        let element_type = self.marker(marker).element_type.unwrap_or(ElementType::Node(NodeKind::ERROR_ELEMENT));
+        let element_type = self.marker(marker).element_type.unwrap_or(ElementType::Node(L::ERROR_ELEMENT));
         let node = tree.add_composite(parent, element_type, self.offset_of(lex_index));
-        if element_type == ElementType::Node(NodeKind::ERROR_ELEMENT) {
+        if element_type == ElementType::Node(L::ERROR_ELEMENT) {
             let message = self.take_message(marker);
             tree.set_error(node, message);
         }
@@ -1615,30 +1479,20 @@ impl PsiBuilderImpl {
     /// the walk goes on.
     fn create_leaf(
         &self,
-        element_type: ElementType,
+        element_type: ElementTypeOf<L>,
         first: usize,
         last: usize,
         cur_node: u32,
         depth: u32,
         tree: &mut TreeData,
-    ) -> Option<Pending> {
+    ) -> Option<Pending<L::Lazy>> {
         let start = self.base + self.lex_starts[first - self.token_shift] as usize;
         let end = self.base + self.lex_starts[last - self.token_shift] as usize;
-        let lazy = match element_type {
-            ElementType::Token(TokenKind::DOC_COMMENT) => Some(LazyKind::KDoc),
-            ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK) => Some(LazyKind::KDocLink),
-            ElementType::Node(NodeKind::BLOCK) => Some(LazyKind::Block),
-            ElementType::Node(NodeKind::LAMBDA_EXPRESSION) => Some(LazyKind::Lambda),
-            _ => None,
-        };
-        match lazy {
+        match L::chameleon(element_type) {
             Some(kind) if start < end => {
                 let node = tree.add_composite(cur_node, element_type, start as u32);
                 tree.set_end(node, end as u32);
-                let file_tokens = match kind {
-                    LazyKind::Block | LazyKind::Lambda => self.file_token.map(|f| (f + first, f + last)),
-                    LazyKind::KDoc | LazyKind::KDocLink => None,
-                };
+                let file_tokens = if L::is_body(kind) { self.file_token.map(|f| (f + first, f + last)) } else { None };
                 Some(Pending { node, kind, start, end, file_tokens, depth })
             }
             _ => {
@@ -1646,503 +1500,6 @@ impl PsiBuilderImpl {
                 None
             }
         }
-    }
-}
-
-/// A builder adapter of the Kotlin parser, applied on top of `SemanticWhitespaceAwarePsiBuilderImpl`.
-#[derive(Copy, Clone, Debug)]
-pub enum Adapter {
-    /// `TruncatedSemanticWhitespaceAwarePsiBuilder`: the stream ends at `eof_position` (an offset; < 0: no limit).
-    Truncated { eof_position: i32 },
-    /// `SemanticWhitespaceAwarePsiBuilderForByClause`: counts its newline-state pushes.
-    ForByClause { stack_size: i32 },
-}
-
-/// `SemanticWhitespaceAwarePsiBuilderImpl`: the newline mode stack and the joining of `?.`, `?:`, `!!` over a
-/// `PsiBuilderImpl`. The adapters live here as a stack; a `SemanticWhitespaceAwarePsiBuilder` handle sees a prefix.
-pub struct SemanticWhitespaceAwarePsiBuilderImpl {
-    pub delegate: PsiBuilderImpl,
-    join_complex_tokens: Vec<bool>,
-    newlines_enabled: Vec<bool>,
-    adapters: Vec<Adapter>,
-}
-
-/// `complexTokens = TokenSet.create(SAFE_ACCESS, ELVIS, EXCLEXCL)`.
-const COMPLEX_TOKENS: TokenSet = TokenSet::create(&[TokenKind::SAFE_ACCESS, TokenKind::ELVIS, TokenKind::EXCLEXCL]);
-
-impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilderImpl {
-    fn psi_builder(&mut self) -> &mut PsiBuilderImpl {
-        &mut self.delegate
-    }
-}
-
-impl SemanticWhitespaceAwarePsiBuilderImpl {
-    /// The semantic layer over `delegate`, its stacks and adapters in `bufs` (emptied until `release`).
-    pub(crate) fn new(delegate: PsiBuilderImpl, bufs: &mut BuilderBuffers) -> Self {
-        let mut join_complex_tokens = std::mem::take(&mut bufs.join_complex_tokens);
-        join_complex_tokens.clear();
-        join_complex_tokens.push(true);
-        let mut newlines_enabled = std::mem::take(&mut bufs.newlines_enabled);
-        newlines_enabled.clear();
-        newlines_enabled.push(true);
-        let mut adapters = std::mem::take(&mut bufs.adapters);
-        adapters.clear();
-        SemanticWhitespaceAwarePsiBuilderImpl { delegate, join_complex_tokens, newlines_enabled, adapters }
-    }
-
-    /// Gives this layer's buffers back to `bufs` and returns the delegate, which builds the tree.
-    pub(crate) fn into_delegate(self, bufs: &mut BuilderBuffers) -> PsiBuilderImpl {
-        bufs.join_complex_tokens = self.join_complex_tokens;
-        bufs.newlines_enabled = self.newlines_enabled;
-        bufs.adapters = self.adapters;
-        self.delegate
-    }
-
-    /// A handle without adapters: what `KotlinParser` passes to `KotlinParsing.createForTopLevel`.
-    pub fn handle(&mut self) -> SemanticWhitespaceAwarePsiBuilder<'_> {
-        SemanticWhitespaceAwarePsiBuilder { imp: self, depth: 0, top_trunc: None, min_eof: i32::MAX }
-    }
-
-    /// `isWhitespaceOrComment(elementType)`.
-    pub fn is_whitespace_or_comment(&self, element_type: TokenKind) -> bool {
-        self.delegate.whitespace_or_comment(element_type)
-    }
-
-    /// `newlineBeforeCurrentToken()`: whether the whitespace before the current token (comments skipped) has a newline.
-    pub fn newline_before_current_token(&mut self) -> bool {
-        crate::counters::add(crate::counters::Counter::NewlineBefore, 1);
-        if !self.newlines_enabled.last().copied().unwrap_or(true) {
-            return false;
-        }
-        if self.delegate.eof() {
-            return true;
-        }
-        let current_offset = self.delegate.get_current_offset();
-        let mut i = 1;
-        while i <= current_offset {
-            let previous_token = self.delegate.raw_lookup(-i);
-            if matches!(
-                previous_token,
-                Some(
-                    TokenKind::BLOCK_COMMENT
-                        | TokenKind::DOC_COMMENT
-                        | TokenKind::EOL_COMMENT
-                        | TokenKind::SHEBANG_COMMENT
-                )
-            ) {
-                i += 1;
-                continue;
-            }
-            if previous_token != TokenKind::WHITE_SPACE {
-                break;
-            }
-            let previous_token_start = self.delegate.raw_token_type_start(-i).max(0) as usize;
-            let previous_token_end = self.delegate.raw_token_type_start(-i + 1).max(0) as usize;
-            let text = self.delegate.get_original_text();
-            if text[previous_token_start..previous_token_end.min(text.len())].contains(&b'\n') {
-                return true;
-            }
-            i += 1;
-        }
-        false
-    }
-
-    pub fn disable_newlines(&mut self) {
-        self.newlines_enabled.push(false);
-    }
-
-    pub fn enable_newlines(&mut self) {
-        self.newlines_enabled.push(true);
-    }
-
-    /// `restoreNewlinesState()`; the initial state is never popped (Java asserts).
-    pub fn restore_newlines_state(&mut self) {
-        if self.newlines_enabled.len() > 1 {
-            self.newlines_enabled.pop();
-        }
-    }
-
-    fn join_complex_tokens(&self) -> bool {
-        self.join_complex_tokens.last().copied().unwrap_or(true)
-    }
-
-    pub fn restore_joining_complex_tokens_state(&mut self) {
-        if self.join_complex_tokens.len() > 1 {
-            self.join_complex_tokens.pop();
-        }
-    }
-
-    pub fn enable_joining_complex_tokens(&mut self) {
-        self.join_complex_tokens.push(true);
-    }
-
-    pub fn disable_joining_complex_tokens(&mut self) {
-        self.join_complex_tokens.push(false);
-    }
-
-    /// `getTokenType()`: `?` before `.` is `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
-    /// The raw type and `getJoinedTokenType(raw, 1)` come from the delegate's per-position cache (`current_types`).
-    #[inline(always)]
-    pub fn get_token_type(&mut self) -> Option<TokenKind> {
-        let (raw, joined) = self.delegate.current_types();
-        if !self.join_complex_tokens() {
-            return raw;
-        }
-        joined
-    }
-
-    /// `getJoinedTokenType(rawTokenType, rawLookupSteps)`.
-    fn get_joined_token_type(&self, raw_token_type: Option<TokenKind>, raw_lookup_steps: i32) -> Option<TokenKind> {
-        self.delegate.joined_token_type(raw_token_type, raw_lookup_steps)
-    }
-
-    /// `advanceLexer()`: a joined token is two lexemes collapsed into one leaf.
-    pub fn advance_lexer(&mut self) {
-        if !self.join_complex_tokens() {
-            self.delegate.advance_lexer();
-            return;
-        }
-        let token_type = self.get_token_type();
-        match token_type {
-            Some(t) if COMPLEX_TOKENS.contains(t) => {
-                let mark = self.delegate.mark();
-                self.delegate.advance_lexer();
-                self.delegate.advance_lexer();
-                self.delegate.collapse(mark, t);
-            }
-            _ => self.delegate.advance_lexer(),
-        }
-    }
-
-    /// `getTokenText()`.
-    pub fn get_token_text(&mut self) -> Option<&str> {
-        if self.join_complex_tokens() {
-            match self.get_token_type() {
-                Some(TokenKind::ELVIS) => return Some("?:"),
-                Some(TokenKind::SAFE_ACCESS) => return Some("?."),
-                _ => {}
-            }
-        }
-        self.delegate.get_token_text()
-    }
-
-    /// `getTokenText()` as bytes, with no UTF-8 check: what the parser compares with keyword and word texts (invalid
-    /// UTF-8, which `get_token_text` shows as U+FFFD, matches none of them either way).
-    pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
-        if self.join_complex_tokens() {
-            match self.get_token_type() {
-                Some(TokenKind::ELVIS) => return Some(b"?:"),
-                Some(TokenKind::SAFE_ACCESS) => return Some(b"?."),
-                _ => {}
-            }
-        }
-        self.delegate.get_token_bytes()
-    }
-
-    /// `lookAhead(steps)`.
-    pub fn look_ahead(&mut self, steps: i32) -> Option<TokenKind> {
-        if !self.join_complex_tokens() {
-            return self.delegate.look_ahead(steps);
-        }
-        if COMPLEX_TOKENS.contains(self.get_token_type()) {
-            return self.delegate.look_ahead(steps + 1);
-        }
-        let raw = self.delegate.look_ahead(steps);
-        self.get_joined_token_type(raw, 2)
-    }
-}
-
-/// `SemanticWhitespaceAwarePsiBuilder` as a parser holds it: the builder seen through the first `depth` adapters.
-/// `wrapped` puts a new adapter on top, as `new TruncatedSemanticWhitespaceAwarePsiBuilder(builder, eof)` and
-/// `new SemanticWhitespaceAwarePsiBuilderForByClause(builder)` do; the Java adapters live as long as the parser that
-/// holds them, which the borrow mirrors.
-///
-/// `top_trunc` and `min_eof` cache what the first `depth` adapters say on every `getTokenType()`: the topmost
-/// truncation's `eof_position` and the smallest non-negative one (`i32::MAX` without). They are computed in `handle`,
-/// `reborrow` and `wrapped` and stay right by the borrow: `wrapped(self)` consumes the handle and `reborrow` freezes
-/// its parent, so while a handle lives every other live handle sits on a prefix at least `depth` long, `wrapped`
-/// truncates no shorter than its own `depth`, and the only write into the prefix (`count_newline_state`) touches
-/// by-clause stack sizes, not truncations.
-pub struct SemanticWhitespaceAwarePsiBuilder<'b> {
-    imp: &'b mut SemanticWhitespaceAwarePsiBuilderImpl,
-    depth: usize,
-    top_trunc: Option<i32>,
-    min_eof: i32,
-}
-
-impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilder<'_> {
-    fn psi_builder(&mut self) -> &mut PsiBuilderImpl {
-        &mut self.imp.delegate
-    }
-}
-
-impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
-    /// The same builder for a shorter borrow (to hand to a nested parser).
-    pub fn reborrow(&mut self) -> SemanticWhitespaceAwarePsiBuilder<'_> {
-        SemanticWhitespaceAwarePsiBuilder {
-            imp: self.imp,
-            depth: self.depth,
-            top_trunc: self.top_trunc,
-            min_eof: self.min_eof,
-        }
-    }
-
-    /// This builder under a new adapter.
-    pub fn wrapped(self, adapter: Adapter) -> SemanticWhitespaceAwarePsiBuilder<'b> {
-        self.imp.adapters.truncate(self.depth);
-        self.imp.adapters.push(adapter);
-        let (top_trunc, min_eof) = match adapter {
-            Adapter::Truncated { eof_position } => {
-                (Some(eof_position), if eof_position >= 0 { self.min_eof.min(eof_position) } else { self.min_eof })
-            }
-            Adapter::ForByClause { .. } => (self.top_trunc, self.min_eof),
-        };
-        SemanticWhitespaceAwarePsiBuilder { depth: self.depth + 1, imp: self.imp, top_trunc, min_eof }
-    }
-
-    fn adapters(&self) -> &[Adapter] {
-        &self.imp.adapters[..self.depth.min(self.imp.adapters.len())]
-    }
-
-    /// The topmost truncation: what `lookAhead` goes through (cached, see the struct).
-    #[inline]
-    fn top_truncated(&self) -> Option<i32> {
-        self.top_trunc
-    }
-
-    /// `SemanticWhitespaceAwarePsiBuilderForByClause.getStackSize()` of the by-clause adapter this builder was created
-    /// with (the top one); 0 without one.
-    pub fn get_stack_size(&self) -> i32 {
-        match self.adapters().last() {
-            Some(Adapter::ForByClause { stack_size }) => *stack_size,
-            _ => 0,
-        }
-    }
-
-    fn count_newline_state(&mut self, delta: i32) {
-        let depth = self.depth.min(self.imp.adapters.len());
-        for adapter in &mut self.imp.adapters[..depth] {
-            if let Adapter::ForByClause { stack_size } = adapter {
-                *stack_size += delta;
-            }
-        }
-    }
-
-    // SemanticWhitespaceAwarePsiBuilder
-
-    pub fn newline_before_current_token(&mut self) -> bool {
-        self.imp.newline_before_current_token()
-    }
-
-    pub fn disable_newlines(&mut self) {
-        self.count_newline_state(1);
-        self.imp.disable_newlines();
-    }
-
-    pub fn enable_newlines(&mut self) {
-        self.count_newline_state(1);
-        self.imp.enable_newlines();
-    }
-
-    pub fn restore_newlines_state(&mut self) {
-        self.count_newline_state(-1);
-        self.imp.restore_newlines_state();
-    }
-
-    pub fn restore_joining_complex_tokens_state(&mut self) {
-        self.imp.restore_joining_complex_tokens_state();
-    }
-
-    pub fn enable_joining_complex_tokens(&mut self) {
-        self.imp.enable_joining_complex_tokens();
-    }
-
-    pub fn disable_joining_complex_tokens(&mut self) {
-        self.imp.disable_joining_complex_tokens();
-    }
-
-    pub fn is_whitespace_or_comment(&self, element_type: TokenKind) -> bool {
-        self.imp.is_whitespace_or_comment(element_type)
-    }
-
-    // PsiBuilder, through the adapters
-
-    fn is_offset_beyond_eof(eof_position: i32, offset_from_current: i32) -> bool {
-        eof_position >= 0 && offset_from_current >= eof_position
-    }
-
-    /// `eof()`: the stream's end, or the current offset at or beyond a truncation's end. Any truncation in the chain
-    /// ends the stream, so the smallest non-negative `eof_position` (`min_eof`) decides.
-    #[inline(always)]
-    pub fn eof(&mut self) -> bool {
-        if self.imp.delegate.eof() {
-            return true;
-        }
-        if self.top_truncated().is_none() {
-            return false;
-        }
-        self.imp.delegate.get_current_offset() >= self.min_eof
-    }
-
-    /// `getTokenType()`.
-    #[inline(always)]
-    pub fn get_token_type(&mut self) -> Option<TokenKind> {
-        crate::counters::add(crate::counters::Counter::TokenType, 1);
-        if self.top_truncated().is_some() && self.eof() {
-            return None;
-        }
-        self.imp.get_token_type()
-    }
-
-    /// `getTokenText()`.
-    pub fn get_token_text(&mut self) -> Option<&str> {
-        if self.top_truncated().is_some() && self.eof() {
-            return None;
-        }
-        self.imp.get_token_text()
-    }
-
-    /// `getTokenText()` as bytes (see `SemanticWhitespaceAwarePsiBuilderImpl::get_token_bytes`).
-    pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
-        if self.top_truncated().is_some() && self.eof() {
-            return None;
-        }
-        self.imp.get_token_bytes()
-    }
-
-    /// `lookAhead(steps)`.
-    pub fn look_ahead(&mut self, steps: i32) -> Option<TokenKind> {
-        let Some(eof_position) = self.top_truncated() else { return self.imp.look_ahead(steps) };
-        if self.eof() {
-            return None;
-        }
-        let raw_look_ahead_steps = self.raw_look_ahead(steps);
-        if Self::is_offset_beyond_eof(eof_position, self.imp.delegate.raw_token_type_start(raw_look_ahead_steps)) {
-            return None;
-        }
-        self.imp.delegate.raw_lookup(raw_look_ahead_steps)
-    }
-
-    /// `TruncatedSemanticWhitespaceAwarePsiBuilder.rawLookAhead(steps)`.
-    fn raw_look_ahead(&self, mut steps: i32) -> i32 {
-        let mut cur = 0;
-        while steps > 0 {
-            cur += 1;
-            let mut raw_token_type = self.imp.delegate.raw_lookup(cur);
-            while let Some(t) = raw_token_type {
-                if !self.is_whitespace_or_comment(t) {
-                    break;
-                }
-                cur += 1;
-                raw_token_type = self.imp.delegate.raw_lookup(cur);
-            }
-            steps -= 1;
-        }
-        cur
-    }
-
-    /// `advanceLexer()`.
-    pub fn advance_lexer(&mut self) {
-        self.imp.advance_lexer();
-    }
-
-    /// `mark()`.
-    pub fn mark(&mut self) -> Marker {
-        self.imp.delegate.mark()
-    }
-
-    /// `error(message)`.
-    pub fn error(&mut self, message: impl Into<Cow<'static, str>>) {
-        self.imp.delegate.error(message);
-    }
-
-    /// `remapCurrentToken(type)`.
-    pub fn remap_current_token(&mut self, element_type: TokenKind) {
-        self.imp.delegate.remap_current_token(element_type);
-    }
-
-    /// `KotlinParsing.advanceBalancedBlock()` as one scan of the raw tokens (`PsiBuilderImpl::skip_balanced_block`)
-    /// when no truncation applies; false, with nothing done, under a `TruncatedSemanticWhitespaceAwarePsiBuilder`,
-    /// whose end the Java loop must check on every token.
-    ///
-    /// The Java loop advances token by token, so with complex tokens joined each `?.`, `?:` and `!!` in the block
-    /// becomes a collapse marker (`advance_lexer`); the scan adds none, and no output can show it. Both callers collapse
-    /// the marker around the block (`parseBlock` into `BLOCK`, `parseFunctionLiteral` into `LAMBDA_EXPRESSION`), and
-    /// `bind` steps over a collapsed marker's children without reading them; the block is parsed again from its text
-    /// when the tree expands it. The omitted markers create no error item, so neither `error`'s check of the last
-    /// production item nor `prepareLightTree`'s error dedup changes. In `balanceWhiteSpaces` they would sit at their own
-    /// lexemes, a mark on the `?`/`!` and a done right after the joined pair, in lexeme order: each keeps its position,
-    /// `last_index` never exceeds the enclosing done, and the walk back of that done's right edge stops at the last
-    /// non-whitespace token before reaching any of them, so every edge the tree uses is the same. `index_of` is a
-    /// marker's own node, which they do not change.
-    pub fn skip_balanced_block(&mut self) -> bool {
-        if self.top_truncated().is_some() {
-            return false;
-        }
-        self.imp.delegate.skip_balanced_block();
-        true
-    }
-
-    /// `rawLookup(steps)`.
-    pub fn raw_lookup(&self, steps: i32) -> Option<TokenKind> {
-        self.imp.delegate.raw_lookup(steps)
-    }
-
-    /// `rawTokenTypeStart(steps)`.
-    pub fn raw_token_type_start(&self, steps: i32) -> i32 {
-        self.imp.delegate.raw_token_type_start(steps)
-    }
-
-    /// `rawTokenIndex()`.
-    pub fn raw_token_index(&self) -> i32 {
-        self.imp.delegate.raw_token_index()
-    }
-
-    /// `getCurrentOffset()`.
-    pub fn get_current_offset(&mut self) -> i32 {
-        self.imp.delegate.get_current_offset()
-    }
-
-    /// `getOriginalText()`.
-    pub fn get_original_text(&self) -> &[u8] {
-        self.imp.delegate.get_original_text()
-    }
-
-    /// Not in the Java: moves the cursor over the rest of a construct nested too deeply, from the current token to the
-    /// first that closes a bracket opened before it (`PsiBuilderImpl::unmatched_closer`), or to the stream's end; over
-    /// one token at least unless at the end, so that the callers' loops go on. The tokens stay raw: a `?.` inside is
-    /// `?` and `.`.
-    pub fn skip_too_deeply_nested(&mut self) {
-        if self.eof() {
-            return;
-        }
-        let delegate = &mut self.imp.delegate;
-        let current = delegate.current_lexeme;
-        let mut end = delegate.unmatched_closer(current).max(current + 1);
-        if self.top_trunc.is_some() {
-            // A truncation ends the stream at the first token starting at its end or later (`eof`), after `current`.
-            let eof = self.min_eof.max(0) as u32;
-            let starts = &delegate.lex_starts[..delegate.lexeme_count];
-            end = end.min(current + starts[current..].partition_point(|&s| s < eof));
-        }
-        delegate.raw_advance_lexer((end - current) as i32);
-    }
-
-    /// `PsiBuilderImpl::enter_nesting`.
-    #[inline(always)]
-    pub fn enter_nesting(&mut self, kind: Nesting) -> bool {
-        self.imp.delegate.enter_nesting(kind)
-    }
-
-    /// `PsiBuilderImpl::exit_nesting`.
-    #[inline(always)]
-    pub fn exit_nesting(&mut self, kind: Nesting) {
-        self.imp.delegate.exit_nesting(kind);
-    }
-
-    /// `hasErrorsAfter(marker)` (on `PsiBuilderImpl`).
-    pub fn has_errors_after(&self, marker: Marker) -> bool {
-        self.imp.delegate.has_errors_after(marker)
     }
 }
 
@@ -2163,30 +1520,30 @@ impl Marker {
     }
 
     /// `done(type)`.
-    pub fn done(self, b: &mut (impl AsPsiBuilder + ?Sized), element_type: impl Into<ElementType>) {
+    pub fn done<B: AsPsiBuilder + ?Sized>(self, b: &mut B, element_type: impl Into<ElementTypeOf<B::Lang>>) {
         b.psi_builder().done(self, element_type);
     }
 
     /// `collapse(type)`.
-    pub fn collapse(self, b: &mut (impl AsPsiBuilder + ?Sized), element_type: impl Into<ElementType>) {
+    pub fn collapse<B: AsPsiBuilder + ?Sized>(self, b: &mut B, element_type: impl Into<ElementTypeOf<B::Lang>>) {
         b.psi_builder().collapse(self, element_type);
     }
 
     /// `doneBefore(type, before)`.
-    pub fn done_before(
+    pub fn done_before<B: AsPsiBuilder + ?Sized>(
         self,
-        b: &mut (impl AsPsiBuilder + ?Sized),
-        element_type: impl Into<ElementType>,
+        b: &mut B,
+        element_type: impl Into<ElementTypeOf<B::Lang>>,
         before: Marker,
     ) {
         b.psi_builder().done_before(self, element_type, before);
     }
 
     /// `doneBefore(type, before, errorMessage)`.
-    pub fn done_before_with_error(
+    pub fn done_before_with_error<B: AsPsiBuilder + ?Sized>(
         self,
-        b: &mut (impl AsPsiBuilder + ?Sized),
-        element_type: impl Into<ElementType>,
+        b: &mut B,
+        element_type: impl Into<ElementTypeOf<B::Lang>>,
         before: Marker,
         error_message: impl Into<Cow<'static, str>>,
     ) {
@@ -2209,191 +1566,12 @@ impl Marker {
     }
 
     /// `setCustomEdgeTokenBinders(left, right)` (`null` = `None`).
-    pub fn set_custom_edge_token_binders(
+    pub fn set_custom_edge_token_binders<B: AsPsiBuilder + ?Sized>(
         self,
-        b: &mut (impl AsPsiBuilder + ?Sized),
-        left: Option<Binder>,
-        right: Option<Binder>,
+        b: &mut B,
+        left: Option<<B::Lang as Language>::Binder>,
+        right: Option<<B::Lang as Language>::Binder>,
     ) {
         b.psi_builder().set_custom_edge_token_binders(self, left, right);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::dump::psi_to_string;
-    use crate::node_kind::NodeKind::*;
-    use crate::tokens::TokenKind::*;
-    use crate::tree::{FileKind, Tree};
-
-    fn dump(text: &str, parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl)) -> String {
-        let tree = Tree::parse_with(text.as_bytes(), FileKind::Kt, parse);
-        psi_to_string(&tree, "a.kt")
-    }
-
-    fn file(
-        b: &mut SemanticWhitespaceAwarePsiBuilderImpl,
-        body: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilder<'_>),
-    ) {
-        let mut h = b.handle();
-        let root = h.mark();
-        body(&mut h);
-        while !h.eof() {
-            h.advance_lexer();
-        }
-        root.done(&mut h, KT_FILE);
-    }
-
-    #[test]
-    fn default_binders_leave_whitespace_and_comments_outside() {
-        let out = dump("// c\n a  b ", |b| {
-            file(b, |h| {
-                let m = h.mark();
-                h.advance_lexer();
-                let empty = h.mark();
-                empty.done(h, VALUE_ARGUMENT_LIST);
-                h.advance_lexer();
-                m.done(h, CALL_EXPRESSION);
-            })
-        });
-        assert_eq!(
-            out,
-            "KtFile: a.kt\n  PsiComment(EOL_COMMENT)('// c')\n  PsiWhiteSpace('\\n ')\n  CALL_EXPRESSION\n    PsiElement(IDENTIFIER)('a')\n    PsiWhiteSpace('  ')\n    VALUE_ARGUMENT_LIST\n      <empty list>\n    PsiElement(IDENTIFIER)('b')\n  PsiWhiteSpace(' ')"
-        );
-    }
-
-    #[test]
-    fn comment_binders_of_declarations() {
-        let out = dump("// doc\nfun f() // trailing\n// next\n\nval x", |b| {
-            file(b, |h| {
-                let decl = h.mark();
-                for _ in 0..4 {
-                    h.advance_lexer();
-                }
-                decl.done(h, FUN);
-                decl.set_custom_edge_token_binders(h, Some(Binder::PrecedingComments), Some(Binder::TrailingComments));
-                let property = h.mark();
-                h.advance_lexer();
-                h.advance_lexer();
-                property.done(h, PROPERTY);
-                property.set_custom_edge_token_binders(
-                    h,
-                    Some(Binder::PrecedingComments),
-                    Some(Binder::TrailingComments),
-                );
-            })
-        });
-        let lines: Vec<&str> = out.lines().map(str::trim).collect();
-        assert_eq!(
-            &lines[1..5],
-            ["FUN", "PsiComment(EOL_COMMENT)('// doc')", "PsiWhiteSpace('\\n')", "PsiElement(fun)('fun')"]
-        );
-        assert!(out.contains("    PsiComment(EOL_COMMENT)('// trailing')\n  PsiWhiteSpace('\\n')\n  PsiComment(EOL_COMMENT)('// next')\n  PsiWhiteSpace('\\n\\n')\n  PROPERTY"), "{out}");
-    }
-
-    #[test]
-    fn joined_tokens_collapse_into_one_leaf() {
-        let out = dump("a?.b?:c!!", |b| {
-            file(b, |h| {
-                assert_eq!(h.get_token_type(), Some(IDENTIFIER));
-                assert_eq!(h.look_ahead(1), Some(SAFE_ACCESS));
-                h.advance_lexer();
-                assert_eq!(h.get_token_type(), Some(SAFE_ACCESS));
-                assert_eq!(h.get_token_text(), Some("?."));
-                h.advance_lexer();
-                h.advance_lexer();
-                assert_eq!(h.get_token_type(), Some(ELVIS));
-                h.disable_joining_complex_tokens();
-                assert_eq!(h.get_token_type(), Some(QUEST));
-                h.restore_joining_complex_tokens_state();
-                h.advance_lexer();
-                h.advance_lexer();
-                assert_eq!(h.get_token_type(), Some(EXCLEXCL));
-                h.advance_lexer();
-                assert!(h.eof());
-            })
-        });
-        assert!(
-            out.contains("PsiElement(SAFE_ACCESS)('?.')")
-                && out.contains("PsiElement(ELVIS)('?:')")
-                && out.contains("PsiElement(EXCLEXCL)('!!')"),
-            "{out}"
-        );
-    }
-
-    #[test]
-    fn newline_before_current_token_skips_comments() {
-        dump("a /* c */\n/* d */ b c", |b| {
-            file(b, |h| {
-                assert!(!h.newline_before_current_token());
-                h.advance_lexer();
-                assert!(h.newline_before_current_token());
-                h.disable_newlines();
-                assert!(!h.newline_before_current_token());
-                h.restore_newlines_state();
-                h.advance_lexer();
-                assert!(!h.newline_before_current_token());
-            })
-        });
-    }
-
-    #[test]
-    fn rollback_precede_done_before_and_errors() {
-        let out = dump("a b c", |b| {
-            file(b, |h| {
-                let start = h.mark();
-                h.advance_lexer();
-                let inner = h.mark();
-                h.error("dropped");
-                h.advance_lexer();
-                start.rollback_to(h);
-                assert_eq!(h.get_token_type(), Some(IDENTIFIER));
-                assert_eq!(h.get_current_offset(), 0);
-                let a = h.mark();
-                h.advance_lexer();
-                a.done(h, REFERENCE_EXPRESSION);
-                let outer = a.precede(h);
-                let b_marker = h.mark();
-                h.advance_lexer();
-                b_marker.done(h, REFERENCE_EXPRESSION);
-                // the cursor is on the whitespace after `b`: an error item binds before it (DEFAULT_RIGHT_BINDER)
-                h.error("first");
-                h.error("same lexeme: ignored");
-                outer.done_before(h, BINARY_EXPRESSION, b_marker);
-                let _ = inner;
-            })
-        });
-        assert_eq!(
-            out,
-            "KtFile: a.kt\n  BINARY_EXPRESSION\n    REFERENCE_EXPRESSION\n      PsiElement(IDENTIFIER)('a')\n  PsiWhiteSpace(' ')\n  REFERENCE_EXPRESSION\n    PsiElement(IDENTIFIER)('b')\n  PsiErrorElement:first\n    <empty list>\n  PsiWhiteSpace(' ')\n  PsiElement(IDENTIFIER)('c')"
-        );
-    }
-
-    #[test]
-    fn truncated_and_by_clause_adapters() {
-        dump("a b c", |b| {
-            let mut h = b.handle();
-            let root = h.mark();
-            {
-                let mut t = h.reborrow().wrapped(Adapter::Truncated { eof_position: 4 });
-                assert_eq!(t.look_ahead(1), Some(IDENTIFIER));
-                assert_eq!(t.look_ahead(2), None);
-                t.advance_lexer();
-                assert!(!t.eof());
-                t.advance_lexer();
-                assert!(t.eof());
-                assert_eq!(t.get_token_type(), None);
-                let mut by = t.wrapped(Adapter::ForByClause { stack_size: 0 });
-                by.enable_newlines();
-                assert_eq!(by.get_stack_size(), 1);
-                by.restore_newlines_state();
-                assert_eq!(by.get_stack_size(), 0);
-            }
-            assert!(!h.eof());
-            assert_eq!(h.get_token_type(), Some(IDENTIFIER));
-            h.advance_lexer();
-            root.done(&mut h, KT_FILE);
-        });
     }
 }

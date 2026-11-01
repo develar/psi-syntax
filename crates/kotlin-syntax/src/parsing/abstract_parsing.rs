@@ -7,7 +7,7 @@
 
 use std::borrow::Cow;
 
-use crate::builder::{Marker, SemanticWhitespaceAwarePsiBuilder, WhitespacesAndCommentsBinder};
+use crate::builder::{Binder, Marker, SemanticWhitespaceAwarePsiBuilder};
 use crate::parsing::kotlin_parsing::KotlinParsing;
 use crate::parsing::patterns::TokenStreamPattern;
 use crate::tokens::TokenKind::*;
@@ -379,12 +379,8 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         marker.done(self.my_builder(), element_type);
         marker.set_custom_edge_token_binders(
             self.my_builder(),
-            Some(if preceding_non_doc_comments {
-                WhitespacesAndCommentsBinder::PrecedingComments
-            } else {
-                WhitespacesAndCommentsBinder::PrecedingDocComments
-            }),
-            Some(WhitespacesAndCommentsBinder::TrailingComments),
+            Some(if preceding_non_doc_comments { Binder::PrecedingComments } else { Binder::PrecedingDocComments }),
+            Some(Binder::TrailingComments),
         );
     }
 

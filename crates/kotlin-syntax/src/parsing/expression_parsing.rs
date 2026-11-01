@@ -1975,14 +1975,14 @@ mod tests {
     use crate::dump::psi_to_string;
     use crate::parsing::abstract_parsing::AbstractKotlinParsing;
     use crate::parsing::kotlin_parsing::KotlinParsing;
-    use crate::tree::{FileKind, Tree};
+    use crate::tree::{FileKind, parse_with};
 
     use super::*;
 
     /// `parseScript()` minus `parsePreamble` and `checkForUnexpectedSymbols`, non-lazy (no collapsed lambdas, which
     /// the declaration half's `advanceBalancedBlock` would skip); the dump from its `SCRIPT` line on.
     fn script(text: &str) -> String {
-        let tree = Tree::parse_with(text.as_bytes(), FileKind::Kts, |b| {
+        let tree = parse_with(text.as_bytes(), FileKind::Kts, |b| {
             let mut kp = KotlinParsing::create_for_top_level_non_lazy(b.handle());
             let file_marker = kp.mark();
             let script_marker = kp.mark();

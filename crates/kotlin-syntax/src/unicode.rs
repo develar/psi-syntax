@@ -1359,12 +1359,3 @@ pub(crate) static KDOC_JLETTER: [(u32, u32); 679] = [
     (0x30000, 0x3134A),
     (0x31350, 0x323AF),
 ];
-
-/// Whether `cp` lies in one of the sorted, disjoint `ranges`.
-pub(crate) fn in_ranges(ranges: &[(u32, u32)], cp: u32) -> bool {
-    match ranges.binary_search_by(|&(start, _)| start.cmp(&cp)) {
-        Ok(_) => true,
-        Err(0) => false,
-        Err(i) => cp <= ranges[i - 1].1,
-    }
-}

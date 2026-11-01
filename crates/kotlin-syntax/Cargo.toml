@@ -1,0 +1,19 @@
+[package]
+name = "kotlin-syntax"
+description = "A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own (Kotlin.flex, KotlinParsing, KotlinExpressionParsing); prints PSI's debug dump"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+psi-builder.workspace = true
+
+[features]
+# `counters::add` counts the parser's and the builder's events per thread (`ksdump --bench` prints them).
+counters = ["psi-builder/counters"]
+
+[lints]
+workspace = true

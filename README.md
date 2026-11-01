@@ -1,9 +1,16 @@
-# kotlin-syntax
+# psi-syntax
 
-A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own (`Kotlin.flex`, `KotlinParsing`,
-`KotlinExpressionParsing`, IntelliJ's `PsiBuilder`). Its tree prints exactly what Kotlin's
-`DebugUtil.psiToString(file, true, false)` prints. See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md
-for the architecture and its measurements.
+Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI, whose trees print exactly what
+`DebugUtil.psiToString(file, true, false)` prints. A Cargo workspace:
+
+- `psi-builder`: the language-neutral half, IntelliJ's `PsiBuilder` (markers, production, edge binders), the preorder
+  column tree and the parse driver that expands lazily parsed elements in place;
+- `kotlin-syntax`: Kotlin, ported from the Kotlin compiler's own (`Kotlin.flex`, `KotlinParsing`,
+  `KotlinExpressionParsing`, KDoc);
+- `java-syntax`: the place of the Java port of IntelliJ's `java-syntax` (not started);
+- `ksdump`: dumps, benchmarks and lexes listed files like the PSI oracles.
+
+See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.
 
 ```rust
 use kotlin_syntax::{FileKind, ParseOptions, Parser};

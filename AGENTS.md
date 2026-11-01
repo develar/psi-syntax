@@ -1,11 +1,19 @@
-# kotlin-syntax: what an agent must know
+# psi-syntax: what an agent must know
 
-A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own. The goal is exact: for every input,
-`dump::psi_to_string` prints what Kotlin 2.4.21's `DebugUtil.psiToString(file, true, false).trim()` prints, byte for
-byte. Consumers: accio (code search; declarations, call sites, imports) and Branch Deck's `code-symbols` (diff
-highlighting, navigation, file summaries). Both read the tree directly: there is no tree-sitter compatibility layer and
-there must never be one. `docs/DESIGN.md` describes the architecture as built, its decisions, the measured numbers and
-the open items.
+Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI, a Cargo workspace:
+
+| crate | holds |
+|---|---|
+| `crates/psi-builder` | the language-neutral half: IntelliJ's `PsiBuilderImpl` (markers, production, edge binders), the preorder column tree and its consumer API, the parse driver that expands chameleons in place, the dump's layout, token-set storage and lexer helpers, all generic over `psi_builder::Language` |
+| `crates/kotlin-syntax` | Kotlin (package `kotlin-syntax` for consumers): tokens, lexers, node kinds, binders, the `SemanticWhitespaceAwarePsiBuilder` layer, the parsers, KDoc, and `Kotlin: Language` |
+| `crates/java-syntax` | the place of the Java port (empty; see "Java") |
+| `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java`, else by extension) |
+
+The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
+`DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte. Consumers: accio (code search; declarations,
+call sites, imports) and Branch Deck's `code-symbols` (diff highlighting, navigation, file summaries). Both read the
+tree directly: there is no tree-sitter compatibility layer and there must never be one. `docs/DESIGN.md` describes the
+architecture as built, its decisions, the measured numbers and the open items.
 
 ## Sources to port (read them, port them faithfully)
 
@@ -18,7 +26,7 @@ disk is read with `git -C $K show HEAD:<path>`.
 | Tokens | `compiler/psi/psi-api/src/org/jetbrains/kotlin/lexer/KtTokens.java`, `KtKeywordToken.java`, `KtSingleValueToken`, `KtModifierKeywordToken` |
 | Lexer | `compiler/psi/parser/src/org/jetbrains/kotlin/lexer/Kotlin.flex` (the JFlex spec; `_JetLexer.java` is its generated form), `KotlinLexer.java` |
 | Element types | `compiler/psi/psi-api/src/org/jetbrains/kotlin/KtNodeTypes.java` (+ `KtStubElementTypes` names where the dump prints them) |
-| Builder | `compiler/psi/parser/src/org/jetbrains/kotlin/parsing/SemanticWhitespaceAwarePsiBuilder*.java`, `TruncatedSemanticWhitespaceAwarePsiBuilder.java`, and IntelliJ's `PsiBuilderImpl` (`/Users/develar/.cache/accio-bench/intellij-community/platform/core-impl/src/com/intellij/lang/impl/PsiBuilderImpl.java`): markers, `precede`, `done`, `drop`, `rollbackTo`, `collapse`, `error`, `doneBefore`, `errorBefore`, edge (whitespace/comment) binders, `remapCurrentToken`, lookahead |
+| Builder | `compiler/psi/parser/src/org/jetbrains/kotlin/parsing/SemanticWhitespaceAwarePsiBuilder*.java`, `TruncatedSemanticWhitespaceAwarePsiBuilder.java` (in `kotlin-syntax`), and IntelliJ's `PsiBuilderImpl` (`/Users/develar/.cache/accio-bench/intellij-community/platform/core-impl/src/com/intellij/lang/impl/PsiBuilderImpl.java`, in `psi-builder`): markers, `precede`, `done`, `drop`, `rollbackTo`, `collapse`, `error`, `doneBefore`, `errorBefore`, edge (whitespace/comment) binders, `remapCurrentToken`, lookahead |
 | Comment binding | `compiler/psi/parser/src/org/jetbrains/kotlin/parsing/KotlinWhitespaceAndCommentsBinders.kt`, plus the platform's default binders (`WhitespacesBinders`) |
 | Parser | `compiler/psi/parser/src/org/jetbrains/kotlin/parsing/AbstractKotlinParsing.java`, `KotlinParsing.java`, `KotlinExpressionParsing.java`, `KotlinParser.java`, the token-stream patterns (`FirstBefore`, `LastBefore`, `AbstractTokenStreamPattern`, …), `ParseUtils.kt` |
 | KDoc | `compiler/psi/parser/src/org/jetbrains/kotlin/kdoc/lexer/KDoc.flex`, `KDocLexer.java`, `kdoc/parser/KDocParser.java`, `KDocLinkParser.kt`, `compiler/psi/psi-api/src/org/jetbrains/kotlin/kdoc/lexer/KDocTokens.java`, `kdoc/parser/KDocElementTypes.java`: the dump expands a doc comment's inner tree |
@@ -27,21 +35,40 @@ Keep the Java structure: one Rust function per Java method, the same name in sna
 against the Java reads line by line. Port behaviour, not just shape: newline sensitivity, rollback, recovery sets,
 error messages (the dump prints `PsiErrorElement:<message>`) and the exact element types.
 
+### Java (not ported yet)
+
+IntelliJ at 3d034e2526507767a19528888066e47ad2898bb1: `community/java/java-syntax` (`_JavaLexer.flex`, `_JavaDocLexer.flex`,
+`JavaParser` and its `*Parser.kt`, `JavaSyntaxElementType`, `JavaSyntaxTokenType`, `JavaDocSyntax*`), on the builder of
+`community/platform/syntax/*` (`SyntaxTreeBuilderImpl`, `MarkerProduction`, `WhitespacesBinders`). Read them with
+`git -C /Users/develar/projects/idea-1 show 3d034e2526507767a19528888066e47ad2898bb1:<path>`, never from the moving
+working tree. The live oracle is the installed IntelliJ 2027.1 (build 271.SNAPSHOT, built from that revision):
+`/Applications/Idea.app/Contents/plugins/java/lib/intellij.java.syntax.jar` with
+`/Applications/Idea.app/Contents/lib/intellij.platform.syntax*.jar` and the Kotlin stdlib and util jars beside them.
+The same rules hold as for Kotlin: one Rust function per Kotlin/Java method, the same names and order, error messages
+verbatim. `java-syntax` implements `psi_builder::Language` as `kotlin-syntax` does.
+
 ## Layout
+
+Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` under `crates/psi-builder/`.
 
 | module | holds |
 |---|---|
+| `psi-builder` `src/language.rs` | `Language` (what the builder, tree and driver ask a language: token and node types, binders, whitespace and comments, left-bound types, chameleons and bodies, the cursor's joined token, brackets, how a file and a chameleon are lexed and parsed), `TokenType`, `NodeType`, the generic `ElementType<T, N>` |
+| `psi-builder` `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback (the production a linked list, so `precede` and the other middle edits take constant time), the `WhitespacesAndCommentsBinder` contract, edge balancing, the nesting limits, the balanced-block and too-deep skips; binds the tree |
+| `psi-builder` `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf and unexpanded bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser<L>` drives the builders: the file's, then a stack of chameleon builders, each expanding its chameleon in place where `bind` meets it (heap, not recursion), through `Language::parse_chameleon` and its `Chameleon` (the body's file tokens when reusable, else relexed). The consumer API: see "The consumer contract" |
+| `psi-builder` `src/dump.rs`, `src/token_set.rs`, `src/lexer.rs`, `src/counters.rs` | the dump's layout (`psi_to_string_with`, a language labels each node; `fix_white_spaces`); `ElementTypeSet`, a `TokenSet`'s bits; `Lexed<T>` (types, starts, plain bits), `char_at`, `in_ranges`; the builder's and driver's event counters |
 | `src/tokens.rs` | `TokenKind` (every Kotlin and KDoc token, plus WHITE_SPACE, BAD_CHARACTER), its debug name as the dump prints it, the keyword sets (hard, soft, modifier) |
 | `src/unicode.rs` | `[:letter:]`, `[:digit:]` (Kotlin.flex) and `[:jletter:]` (KDoc.flex) above ASCII, decoded from the character maps of `_JetLexer.java` / `_KDocLexer.java`; generated, do not edit |
 | `src/lexer.rs`, `src/kdoc/lexer.rs` | the ports of Kotlin.flex and KDoc.flex (states, string templates, raw strings, `$$` prefixes, nested block comments, shebang) |
 | `src/kdoc/parser.rs` | `KDocParser` and `KDocLinkParser`: the tree runs them on every doc comment and markdown link |
 | `src/node_kind.rs` | `NodeKind`, the composite element types with their dump names (`FUN`, `CLASS`, `KtFile` root, `PsiErrorElement`) |
-| `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback (the production a linked list, so `precede` and the other middle edits take constant time), the newline mode stack, edge binders, the nesting limits; produces the tree |
-| `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf and unexpanded bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser` drives the builders: the file's, then a stack of chameleon builders, each expanding its block, lambda, doc comment or markdown link in place where `bind` meets it (heap, not recursion). The consumer API: see "The consumer contract" |
+| `src/language.rs` | `Kotlin`, the `Language` impl: `KotlinParserDefinition`'s whitespace and comments and file type, the lazy element types (BLOCK, LAMBDA_EXPRESSION, KDoc, markdown link) and how each is lexed and parsed |
+| `src/builder.rs` | Kotlin's binders (`Binder`: the platform defaults, `PrecedingCommentsBinder`, `KotlinWhitespaceAndCommentsBinders`, ...), `SemanticWhitespaceAwarePsiBuilderImpl` (newline mode and join stacks, `getJoinedTokenType`) and its adapters seen through the `SemanticWhitespaceAwarePsiBuilder` handle; re-exports the builder for Kotlin's types (`PsiBuilderImpl`, `Marker`, `Nesting`, the limits) |
+| `src/tree.rs` | `Tree`, `Parser` (`psi_builder`'s over `Kotlin`), `FileKind`, `LazyKind` |
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
-| `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
-| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files) |
-| `src/counters.rs` | per-thread event counters (cursor calls, markers, rollbacks, lexed/reused/skipped tokens) behind the `counters` feature; without it every `add` compiles to nothing |
+| `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format (Kotlin's labels over `psi_builder::dump`) |
+| `src/counters.rs` | the parser's own event counters (semantic layer, chameleons, KDoc tokens, soft keywords) and `ALL`, every counter of a parse in the order `ksdump` prints them |
+| `crates/ksdump/src/main.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java` (else `.java` is Java, anything else Kotlin; a Java file exits 2 until the port exists). Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep and 18 left-associative chains of 100 000 operators on a 1 MB stack, each well under a second; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
@@ -49,7 +76,7 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 
 ## The consumer contract
 
-What accio and Branch Deck may rely on (`src/tree.rs`):
+What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for Kotlin by `kotlin_syntax::{Tree, Parser}`):
 
 - One `Parser` per thread (`Parser::new()`, then `parser.parse(text, FileKind)` per file): it keeps every buffer of a
   parse and reuses it; `Tree::parse` makes a fresh one per call. `Parser` is `Send`; `Tree` is `Send + Sync`, owns
@@ -78,7 +105,7 @@ What accio and Branch Deck may rely on (`src/tree.rs`):
   closes it); a block or lambda past it is one such error over all its tokens. The tree stays lossless, in preorder
   and deterministic. PSI has no defined result there (kotlinc overflows its stack); below the limits the tree is PSI's
   (the deepest community file reaches 62 levels, 5 type argument lists, 4 annotations or parenthesized types).
-- Allocator: kotlin-syntax uses the system allocator and builds no C. Consumers that already build C (tree-sitter)
+- Allocator: psi-syntax uses the system allocator and builds no C. Consumers that already build C (tree-sitter)
   should set `#[global_allocator] static A: mimalloc::MiMalloc` (mimalloc 0.1.52): measured before batch 2's buffer
   reuse at 243.2 -> 272.5 MB/s with 8 threads (+12%) and 460.1 -> 528.5 with 16 (+15%), no change on one thread;
   batch 2 (the per-thread `Parser`) itself measured 69.1 MB/s one thread and 917 MB/s with 16. Re-measure mimalloc
@@ -96,23 +123,29 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 1. `cargo test --release --test goldens`: the 789 vendored goldens of the compiler's own parsing tests (Apache-2.0,
    see NOTICE). The first gate; run it after every change.
 2. The live PSI oracle (kotlin-compiler-embeddable 2.4.21) on real code:
-   `java -Xss512m -Xmx8g -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" $HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/PsiOracle.java --list LIST --root ROOT --out OUT`
+   `java -Xss512m -Xmx8g -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" $HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/PsiOracle.java --list LIST --root ROOT --out OUT`
    writes `OUT/<path>.psi.txt` and `OUT/index.jsonl` (`path`, `psiErrors`, `firstError`). Ready dumps:
-   `$HOME/.cache/kotlin-syntax/oracle/community-3caa0bf/` for the list `$HOME/.cache/kotlin-syntax/corpus/community-3caa0bf.list`
+   `$HOME/.cache/psi-syntax/oracle/community-3caa0bf/` for the list `$HOME/.cache/psi-syntax/corpus/community-3caa0bf.list`
    over `/Users/develar/.cache/accio-bench/intellij-community` (55 501 files). Compare with
    `scripts/compare.py ORACLE_DIR OURS_DIR`.
-3. The lexer oracle: `java -cp "$HOME/.cache/kotlin-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list LIST
+3. The lexer oracle: `java -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list LIST
    --root ROOT` prints a hash of each file's tokens (Kotlin, and KDoc inside each doc comment) as `ksdump --lex` does;
    `diff` the `cut -f1,2` of both. `scripts/lex-fuzz.py` makes mutated inputs for it.
 4. Error recovery: `scripts/parse-fuzz.py LIST ROOT OUT [SEED]` mutates files at token boundaries (punctuation,
    keywords, modifiers) for the PSI oracle and `scripts/compare.py`; `scripts/lex-fuzz.py`'s inputs serve it too.
-   `scripts/psi-reduce.py FILE OUT` shrinks a differing file to a small input; a fixed case goes to `tests/oracle/`
+   `scripts/psi-reduce.py FILE OUT` shrinks a differing file to a small input; a fixed case goes to
+   `crates/kotlin-syntax/tests/oracle/`
    (`NAME.kt` and the oracle's dump `NAME.txt`), which `cargo test --release --test oracle` compares.
 
 Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java says
 otherwise.
 
 ## Porting conventions (the builder and parser API)
+
+- What is the platform's goes to `psi-builder`, generic over `L: Language`; what is the language's goes to its crate,
+  and reaches the builder only through `Language` (a new need of a parser is a new `Language` item or a new generic
+  builder method, never a language's token inside `psi-builder`). Monomorphized, the generic code is the code it was:
+  the split was measured at no cost (DESIGN, "Measurements").
 
 - `AbstractKotlinParsing` is a trait implemented by `KotlinParsing<'b>` and `KotlinExpressionParsing<'p, 'b>`; its
   helpers are provided methods (`self.at(LBRACE)`, `self.expect_with(RPAR, "Expecting ')'")`). `myBuilder` is
@@ -140,7 +173,7 @@ otherwise.
 - Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
   the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
-- `scripts/gate.sh` prints PASS before every commit: clippy, `KS_STRICT=1 cargo test --release`, byte equality of
+- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over the workspace, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
   community files, and again with `--nesting-limit 3` on the community files and the mutations. A faster change that fails it is not a change.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the

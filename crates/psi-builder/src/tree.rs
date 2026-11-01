@@ -1,43 +1,18 @@
 //! The lossless syntax tree: one arena of nodes with `u32` ids, each a kind and a byte range, children in order,
-//! tokens as leaves; whitespace and comments are leaves where PSI puts them. `Tree::parse` lexes, parses and builds
-//! it, expanding every lazy element as PSI does when the tree is walked: a doc comment with the KDoc lexer and parser,
-//! a markdown link inside it with the Kotlin lexer and `KDocLinkParser`, a collapsed block or lambda by reparsing its
-//! text with `KotlinParser.parseBlockExpression` / `parseLambdaExpression`, each in place where the tree meets it (a
-//! stack of builders on the heap, not recursion), so node ids are in preorder.
+//! tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser::parse` lexes, parses and builds
+//! it, expanding every lazy element (`Language::chameleon`) as PSI does when the tree is walked: Kotlin's doc
+//! comments, markdown links, collapsed blocks and lambdas, each reparsed in place where the tree meets it (a stack of
+//! builders on the heap, not recursion), so node ids are in preorder.
 
 use std::borrow::Cow;
+use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{
-    BuilderBuffers, LazyKind, NESTING_CHAMELEON, NESTING_LIMIT, Pending, PsiBuilderImpl,
-    SemanticWhitespaceAwarePsiBuilderImpl, TOO_DEEPLY_NESTED,
-};
-use crate::lexer::{self, Lexed};
-use crate::node_kind::NodeKind;
-use crate::parsing::kotlin_parser;
-use crate::tokens::{ElementType, TokenKind};
-
-/// How a file is parsed: `KotlinParser.parse` runs `parseFile` for `.kt` and `parseScript` for anything else.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub enum FileKind {
-    Kt,
-    Kts,
-}
-
-impl FileKind {
-    /// `FileUtilRt.getExtension(name)` empty or `kt` is a file, any other extension a script (case-sensitive).
-    pub fn from_file_name(name: &str) -> FileKind {
-        let base = name.rsplit(['/', '\\']).next().unwrap_or(name);
-        match base.rfind('.') {
-            None => FileKind::Kt,
-            Some(dot) => {
-                let extension = &base[dot + 1..];
-                if extension.is_empty() || extension == "kt" { FileKind::Kt } else { FileKind::Kts }
-            }
-        }
-    }
-}
+use crate::builder::{BuilderBuffers, NESTING_CHAMELEON, NESTING_LIMIT, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED};
+use crate::counters::{Counter, add};
+use crate::language::{ElementType, ElementTypeOf, Language, NodeType, TokenType};
+use crate::lexer::Lexed;
 
 /// A node of a `Tree`.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
@@ -82,19 +57,30 @@ impl TreeData {
 
     /// A composite node starting at `start` as the next node, a child of `parent` (`u32::MAX`: a root); its end and
     /// its subtree's are set when it is done (`set_end`), after its descendants are appended.
-    pub(crate) fn add_composite(&mut self, parent: u32, kind: ElementType, start: u32) -> u32 {
+    pub(crate) fn add_composite<T: TokenType, N: NodeType>(
+        &mut self,
+        parent: u32,
+        kind: ElementType<T, N>,
+        start: u32,
+    ) -> u32 {
         self.push(parent, kind.index() as u16, start, start)
     }
 
     /// A leaf as the next node, a child of `parent`.
-    pub(crate) fn add_leaf(&mut self, parent: u32, kind: ElementType, start: u32, end: u32) -> u32 {
+    pub(crate) fn add_leaf<T: TokenType, N: NodeType>(
+        &mut self,
+        parent: u32,
+        kind: ElementType<T, N>,
+        start: u32,
+        end: u32,
+    ) -> u32 {
         self.push(parent, kind.index() as u16 | LEAF, start, end)
     }
 
     /// A token leaf as the next node, a child of `parent`.
     #[inline(always)]
-    pub(crate) fn add_token_leaf(&mut self, parent: u32, token: TokenKind, start: u32, end: u32) {
-        self.push(parent, token as u16 | LEAF, start, end);
+    pub(crate) fn add_token_leaf<T: TokenType>(&mut self, parent: u32, token: T, start: u32, end: u32) {
+        self.push(parent, token.index() as u16 | LEAF, start, end);
     }
 
     /// Closes a composite: its byte end, and its subtree ends at the last node appended.
@@ -144,22 +130,23 @@ impl TreeData {
     }
 }
 
-/// A parsed Kotlin file.
-pub struct Tree {
+/// A parsed file of language `L`.
+pub struct Tree<L: Language> {
     text: Arc<[u8]>,
-    file_kind: FileKind,
+    file_kind: L::FileKind,
     data: TreeData,
     root: u32,
+    language: PhantomData<fn() -> L>,
 }
 
 /// How `Parser::parse_with_options` builds the tree.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct ParseOptions {
-    /// Whether the bodies PSI parses lazily (a block, `BLOCK`, or a lambda, `LAMBDA_EXPRESSION`, that the parser
-    /// skipped as a balanced `{...}`) are parsed and expanded. When false they stay childless nodes with their kind
-    /// and range (`Tree::is_unexpanded`), and `Tree::parse_body` parses one on demand into exactly the subtree the
-    /// full parse has there, because PSI too builds such a body from its text alone. Doc comments are expanded
-    /// either way. True by default.
+    /// Whether the bodies PSI parses lazily (`Language::is_body`: Kotlin's block, `BLOCK`, or lambda,
+    /// `LAMBDA_EXPRESSION`, that the parser skipped as a balanced `{...}`) are parsed and expanded. When false they
+    /// stay childless nodes with their kind and range (`Tree::is_unexpanded`), and `Tree::parse_body` parses one on
+    /// demand into exactly the subtree the full parse has there, because PSI too builds such a body from its text
+    /// alone. Other chameleons (doc comments) are expanded either way. True by default.
     pub expand_bodies: bool,
 }
 
@@ -172,16 +159,15 @@ impl Default for ParseOptions {
 /// A reusable parser: owns the buffers every builder of a parse works in (the file's tokens, a chameleon's tokens, the
 /// marker pools, the productions, the state stacks), cleared and reused from one file to the next instead of freed.
 /// Keep one per thread; `Tree::parse` makes a fresh one per call.
-#[derive(Default)]
-pub struct Parser {
+pub struct Parser<L: Language> {
     /// The file's tokens as the lexer made them (a chameleon reuses a slice of them).
-    file: Lexed,
+    file: Lexed<L::Token>,
     /// A chameleon's text lexed afresh.
-    relexed: Lexed,
+    relexed: Lexed<L::Token>,
     /// The builders still binding: the file's, then each chameleon's being expanded inside the one before it.
-    frames: Vec<Frame>,
+    frames: Vec<Frame<L>>,
     /// The buffers of finished builders, for the next ones.
-    spare: Vec<BuilderBuffers>,
+    spare: Vec<BuilderBuffers<L>>,
     /// The tree being built; copied into exactly sized buffers when done.
     data: TreeData,
     options: ParseOptions,
@@ -189,15 +175,99 @@ pub struct Parser {
     nesting_limit: Option<u32>,
 }
 
-/// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
-struct Frame {
-    builder: PsiBuilderImpl,
-    bufs: BuilderBuffers,
+impl<L: Language> Default for Parser<L> {
+    fn default() -> Self {
+        Parser {
+            file: Lexed::default(),
+            relexed: Lexed::default(),
+            frames: Vec::new(),
+            spare: Vec::new(),
+            data: TreeData::default(),
+            options: ParseOptions::default(),
+            nesting_limit: None,
+        }
+    }
 }
 
-impl Parser {
-    pub fn new() -> Parser {
-        Parser::default()
+/// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
+struct Frame<L: Language> {
+    builder: PsiBuilderImpl<L>,
+    bufs: BuilderBuffers<L>,
+}
+
+/// A chameleon being expanded, for `Language::parse_chameleon`: its text and the builders it can be parsed with.
+pub struct Chameleon<'a, L: Language> {
+    text: &'a Arc<[u8]>,
+    pending: Pending<L::Lazy>,
+    file: &'a Lexed<L::Token>,
+    relexed: &'a mut Lexed<L::Token>,
+    /// The buffers its builder works in: `lex_types` and `starts` are what `builder` parses; `layer` is for the
+    /// language's layers over it.
+    pub bufs: &'a mut BuilderBuffers<L>,
+    /// Its nesting (`NESTING_CHAMELEON` over where it sits) and the parser's limit.
+    nesting: u32,
+    limit: u32,
+}
+
+impl<'a, L: Language> Chameleon<'a, L> {
+    /// The chameleon's text.
+    pub fn text(&self) -> &'a [u8] {
+        let text: &'a Arc<[u8]> = self.text;
+        &text[self.pending.start..self.pending.end]
+    }
+
+    /// A builder over the tokens in `bufs.lex_types` and `bufs.starts` (relative to the chameleon's start, one more
+    /// start than types), at nesting 0 with the default limit.
+    pub fn builder(&mut self) -> PsiBuilderImpl<L> {
+        let p = &self.pending;
+        PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, None)
+    }
+
+    /// A builder over the chameleon's text lexed afresh with `Language::tokenize_into`, at nesting 0 with the default
+    /// limit.
+    pub fn relexed_builder(&mut self) -> PsiBuilderImpl<L> {
+        let p = &self.pending;
+        L::tokenize_into(&self.text[p.start..p.end], self.relexed);
+        add(Counter::RelexedTokens, self.relexed.len() as u64);
+        self.bufs.lex_types.clear();
+        self.bufs.lex_types.extend_from_slice(&self.relexed.types);
+        self.bufs.starts.clear();
+        self.bufs.starts.extend_from_slice(&self.relexed.starts);
+        self.builder()
+    }
+
+    /// A builder over a body's tokens (`Language::is_body`) at its nesting: the file's own tokens when they lex alone
+    /// the same (`reusable_tokens`), its text lexed afresh otherwise.
+    pub fn body_builder(&mut self) -> PsiBuilderImpl<L> {
+        let p = &self.pending;
+        let file_token = match reusable_tokens(self.file, p) {
+            Some((first, last)) => {
+                add(Counter::ReusedTokens, (last - first) as u64);
+                self.bufs.lex_types.clear();
+                self.bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
+                self.bufs.starts.clear();
+                self.bufs.starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
+                Some(first)
+            }
+            None => {
+                L::tokenize_into(&self.text[p.start..p.end], self.relexed);
+                add(Counter::RelexedTokens, self.relexed.len() as u64);
+                self.bufs.lex_types.clear();
+                self.bufs.lex_types.extend_from_slice(&self.relexed.types);
+                self.bufs.starts.clear();
+                self.bufs.starts.extend_from_slice(&self.relexed.starts);
+                None
+            }
+        };
+        let mut delegate = PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, file_token);
+        delegate.set_nesting(self.nesting, self.limit);
+        delegate
+    }
+}
+
+impl<L: Language> Parser<L> {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Parses with `limit` instead of `NESTING_LIMIT` (tests: a small limit puts the too-deep paths on ordinary
@@ -211,15 +281,20 @@ impl Parser {
         self.nesting_limit.unwrap_or(NESTING_LIMIT)
     }
 
-    /// Parses `text` as a `.kt` file or a script (see `Tree::parse`).
-    pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+    /// Parses `text` as a file of `file_kind` (see `Tree::parse`).
+    pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: L::FileKind) -> Tree<L> {
         self.parse_with_options(text, file_kind, ParseOptions::default())
     }
 
     /// `parse` with `options` (e.g. bodies left unexpanded for a pass that reads only declarations).
-    pub fn parse_with_options(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind, options: ParseOptions) -> Tree {
+    pub fn parse_with_options(
+        &mut self,
+        text: impl AsRef<[u8]>,
+        file_kind: L::FileKind,
+        options: ParseOptions,
+    ) -> Tree<L> {
         self.options = options;
-        let tree = self.parse_with(text.as_ref(), file_kind, |builder| kotlin_parser::parse(builder, file_kind));
+        let tree = self.parse_with(text.as_ref(), file_kind, |builder, bufs| L::parse_file(builder, bufs, file_kind));
         self.options = ParseOptions::default();
         tree
     }
@@ -228,15 +303,11 @@ impl Parser {
     /// (`Tree::is_unexpanded`), as its own tree over the same source: its root is a node of the body's kind and
     /// range, its ids start at 0, its ranges are offsets in `tree.source()`. Bodies inside it are expanded as
     /// `options` says. `None` when `id` is not an unexpanded body.
-    pub fn parse_body(&mut self, tree: &Tree, id: NodeId, options: ParseOptions) -> Option<Tree> {
+    pub fn parse_body(&mut self, tree: &Tree<L>, id: NodeId, options: ParseOptions) -> Option<Tree<L>> {
         if !tree.is_unexpanded(id) {
             return None;
         }
-        let kind = match tree.node_kind(id)? {
-            NodeKind::BLOCK => LazyKind::Block,
-            NodeKind::LAMBDA_EXPRESSION => LazyKind::Lambda,
-            _ => return None,
-        };
+        let kind = tree.node_kind(id).and_then(|n| L::chameleon(ElementType::Node(n))).filter(|&k| L::is_body(k))?;
         let range = tree.range(id);
         self.options = options;
         let mut data = std::mem::take(&mut self.data);
@@ -255,19 +326,21 @@ impl Parser {
         let body = data.take_exact();
         self.data = data;
         self.options = ParseOptions::default();
-        Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root })
+        Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root, language: PhantomData })
     }
 
-    /// Lexes `text`, runs `parse` on its builder, builds and expands the tree.
-    pub(crate) fn parse_with(
+    /// Lexes `text`, runs `parse` on its builder (with `bufs` for the language's layers over it) and takes the builder
+    /// back, builds and expands the tree. `parse_with_options` runs `Language::parse_file`; tests run their own.
+    #[doc(hidden)]
+    pub fn parse_with(
         &mut self,
         text: &[u8],
-        file_kind: FileKind,
-        parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl),
-    ) -> Tree {
+        file_kind: L::FileKind,
+        parse: impl FnOnce(PsiBuilderImpl<L>, &mut BuilderBuffers<L>) -> PsiBuilderImpl<L>,
+    ) -> Tree<L> {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
-        lexer::tokenize_into(&text, &mut self.file);
-        crate::counters::add(crate::counters::Counter::FileTokens, self.file.len() as u64);
+        L::tokenize_into(&text, &mut self.file);
+        add(Counter::FileTokens, self.file.len() as u64);
         let mut data = std::mem::take(&mut self.data);
         data.clear();
 
@@ -278,16 +351,14 @@ impl Parser {
         bufs.starts.extend_from_slice(&self.file.starts);
         let mut file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut bufs, Some(0));
         file.set_nesting(0, self.limit());
-        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, &mut bufs);
-        parse(&mut builder);
-        let mut builder = builder.into_delegate(&mut bufs);
+        let mut builder = parse(file, &mut bufs);
         let root = builder.begin_bind(&mut data, None);
         self.frames.push(Frame { builder, bufs });
         self.bind_frames(&text, &mut data);
 
         let tree = data.take_exact();
         self.data = data;
-        Tree { text, file_kind, data: tree, root }
+        Tree { text, file_kind, data: tree, root, language: PhantomData }
     }
 
     /// Runs the builders on `frames` to the end: the top one appends its nodes until it appends a chameleon, whose
@@ -296,9 +367,7 @@ impl Parser {
     fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData) {
         while let Some(frame) = self.frames.last_mut() {
             match frame.builder.resume_bind(data) {
-                Some(chameleon)
-                    if !self.options.expand_bodies && matches!(chameleon.kind, LazyKind::Block | LazyKind::Lambda) =>
-                {
+                Some(chameleon) if !self.options.expand_bodies && L::is_body(chameleon.kind) => {
                     data.set_unexpanded(chameleon.node);
                     if chameleon.depth > 0 {
                         data.body_depths.push((chameleon.node, chameleon.depth));
@@ -318,90 +387,44 @@ impl Parser {
         }
     }
 
-    /// Parses one chameleon's text with a new builder and starts appending its subtree under its node. A block or
-    /// lambda whose nesting (`NESTING_CHAMELEON` over where it sits) passes the limit is not parsed: its subtree is
-    /// appended whole, an error element "Code is too deeply nested" over its tokens, and there is no frame.
-    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending) -> Option<Frame> {
-        use crate::counters::{Counter, add};
-        let len = p.end - p.start;
+    /// Parses one chameleon's text with a new builder (`Language::parse_chameleon`) and starts appending its subtree
+    /// under its node. A body (`Language::is_body`) whose nesting (`NESTING_CHAMELEON` over where it sits) passes the
+    /// limit is not parsed: its subtree is appended whole, an error element "Code is too deeply nested" over its
+    /// tokens, and there is no frame.
+    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending<L::Lazy>) -> Option<Frame<L>> {
         let nesting = p.depth.saturating_add(NESTING_CHAMELEON);
-        if matches!(p.kind, LazyKind::Block | LazyKind::Lambda) && nesting > self.limit() {
+        if L::is_body(p.kind) && nesting > self.limit() {
             self.append_too_deep(text, data, &p);
             return None;
         }
         let mut bufs = self.spare.pop().unwrap_or_default();
-        let mut builder = match p.kind {
-            LazyKind::Block | LazyKind::Lambda => {
-                add(if p.kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
-                let file_token = match reusable_tokens(&self.file, &p) {
-                    Some((first, last)) => {
-                        add(Counter::ReusedTokens, (last - first) as u64);
-                        bufs.lex_types.clear();
-                        bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
-                        bufs.starts.clear();
-                        bufs.starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
-                        Some(first)
-                    }
-                    None => {
-                        lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
-                        add(Counter::RelexedTokens, self.relexed.len() as u64);
-                        bufs.lex_types.clear();
-                        bufs.lex_types.extend_from_slice(&self.relexed.types);
-                        bufs.starts.clear();
-                        bufs.starts.extend_from_slice(&self.relexed.starts);
-                        None
-                    }
-                };
-                let mut delegate = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, file_token);
-                delegate.set_nesting(nesting, self.limit());
-                let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, &mut bufs);
-                if p.kind == LazyKind::Block {
-                    kotlin_parser::parse_block_expression(&mut builder);
-                } else {
-                    kotlin_parser::parse_lambda_expression(&mut builder);
-                }
-                builder.into_delegate(&mut bufs)
-            }
-            LazyKind::KDoc => {
-                crate::kdoc::lexer::tokenize_into(&text[p.start..p.end], &mut bufs.lex_types, &mut bufs.starts);
-                add(Counter::KDocChameleons, 1);
-                add(Counter::KDocTokens, bufs.lex_types.len() as u64);
-                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, None);
-                crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
-                builder
-            }
-            LazyKind::KDocLink => {
-                lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
-                add(Counter::KDocLinkChameleons, 1);
-                add(Counter::RelexedTokens, self.relexed.len() as u64);
-                bufs.lex_types.clear();
-                bufs.lex_types.extend_from_slice(&self.relexed.types);
-                bufs.starts.clear();
-                bufs.starts.extend_from_slice(&self.relexed.starts);
-                let mut builder = PsiBuilderImpl::new(text.clone(), p.start, len, &mut bufs, None);
-                crate::kdoc::parser::parse_markdown_link(
-                    ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK),
-                    &mut builder,
-                );
-                builder
-            }
+        let limit = self.limit();
+        let mut chameleon = Chameleon {
+            text,
+            pending: p,
+            file: &self.file,
+            relexed: &mut self.relexed,
+            bufs: &mut bufs,
+            nesting,
+            limit,
         };
+        let mut builder = L::parse_chameleon(p.kind, &mut chameleon);
         builder.begin_bind(data, Some(p.node));
         Some(Frame { builder, bufs })
     }
 
-    /// The subtree of a block or lambda nested too deeply to parse: under its node, one error element "Code is too
-    /// deeply nested" with its tokens as leaves (as the lexer makes them; an empty token is not a leaf, a doc comment
-    /// is not expanded).
-    fn append_too_deep(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: &Pending) {
-        let (types, starts, base): (&[TokenKind], &[u32], u32) = match reusable_tokens(&self.file, p) {
+    /// The subtree of a body nested too deeply to parse: under its node, one error element "Code is too deeply nested"
+    /// with its tokens as leaves (as the lexer makes them; an empty token is not a leaf, a doc comment is not
+    /// expanded).
+    fn append_too_deep(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: &Pending<L::Lazy>) {
+        let (types, starts, base): (&[L::Token], &[u32], u32) = match reusable_tokens(&self.file, p) {
             Some((first, last)) => (&self.file.types[first..last], &self.file.starts[first..=last], 0),
             None => {
-                lexer::tokenize_into(&text[p.start..p.end], &mut self.relexed);
+                L::tokenize_into(&text[p.start..p.end], &mut self.relexed);
                 (&self.relexed.types, &self.relexed.starts, p.start as u32)
             }
         };
-        let error = data.add_composite(p.node, ElementType::Node(NodeKind::ERROR_ELEMENT), p.start as u32);
+        let error = data.add_composite(p.node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), p.start as u32);
         for (&token, edges) in types.iter().zip(starts.windows(2)) {
             if edges[0] < edges[1] {
                 data.add_token_leaf(error, token, base + edges[0], base + edges[1]);
@@ -413,22 +436,12 @@ impl Parser {
     }
 }
 
-impl Tree {
-    /// Parses `text` as a `.kt` file or a script. Any bytes parse; invalid UTF-8 lexes as `BAD_CHARACTER`s. At most
-    /// `u32::MAX - 1` bytes are parsed. A fresh `Parser` per call: to parse many files, keep a `Parser` and call
-    /// `Parser::parse`.
-    pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+impl<L: Language> Tree<L> {
+    /// Parses `text` as a file of `file_kind` (Kotlin: a `.kt` file or a script). Any bytes parse; invalid UTF-8 lexes
+    /// as `BAD_CHARACTER`s. At most `u32::MAX - 1` bytes are parsed. A fresh `Parser` per call: to parse many files,
+    /// keep a `Parser` and call `Parser::parse`.
+    pub fn parse(text: impl AsRef<[u8]>, file_kind: L::FileKind) -> Tree<L> {
         Parser::new().parse(text, file_kind)
-    }
-
-    /// `Parser::parse_with` on a fresh parser.
-    #[cfg(test)]
-    pub(crate) fn parse_with(
-        text: &[u8],
-        file_kind: FileKind,
-        parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl),
-    ) -> Tree {
-        Parser::new().parse_with(text, file_kind, parse)
     }
 
     /// The parsed text.
@@ -436,11 +449,11 @@ impl Tree {
         &self.text
     }
 
-    pub fn file_kind(&self) -> FileKind {
+    pub fn file_kind(&self) -> L::FileKind {
         self.file_kind
     }
 
-    /// The `KtFile` node.
+    /// The file node (Kotlin's `KtFile`).
     pub fn root(&self) -> NodeId {
         NodeId(self.root)
     }
@@ -474,32 +487,33 @@ impl Tree {
             + messages
     }
 
-    /// The element type: a node type for a composite, a token type for a leaf. A doc comment (`DOC_COMMENT`, "KDoc")
-    /// and a markdown link (`KDOC_MARKDOWN_LINK`) are composites with a token type, as their PSI is.
+    /// The element type: a node type for a composite, a token type for a leaf. An expanded chameleon token (Kotlin's
+    /// doc comment, `DOC_COMMENT`, "KDoc", and markdown link, `KDOC_MARKDOWN_LINK`) is a composite with a token type,
+    /// as its PSI is.
     #[inline]
-    pub fn kind(&self, id: NodeId) -> ElementType {
+    pub fn kind(&self, id: NodeId) -> ElementTypeOf<L> {
         let index = (self.data.kinds[id.0 as usize] & KIND_INDEX) as usize;
-        ElementType::from_index(index).unwrap_or(ElementType::Node(NodeKind::ERROR_ELEMENT))
+        ElementType::from_index(index).unwrap_or(ElementType::Node(L::ERROR_ELEMENT))
     }
 
     /// The token type of a leaf.
-    pub fn token_kind(&self, id: NodeId) -> Option<TokenKind> {
+    pub fn token_kind(&self, id: NodeId) -> Option<L::Token> {
         if self.is_leaf(id) { self.kind(id).token() } else { None }
     }
 
     /// The node type of a composite.
-    pub fn node_kind(&self, id: NodeId) -> Option<NodeKind> {
+    pub fn node_kind(&self, id: NodeId) -> Option<L::Node> {
         self.kind(id).node()
     }
 
-    /// Whether the node is a block or lambda that `ParseOptions { expand_bodies: false }` left unexpanded: it has no
-    /// children, `parse_body` gives them.
+    /// Whether the node is a body (Kotlin's block or lambda) that `ParseOptions { expand_bodies: false }` left
+    /// unexpanded: it has no children, `parse_body` gives them.
     pub fn is_unexpanded(&self, id: NodeId) -> bool {
         self.data.kinds[id.0 as usize] & UNEXPANDED != 0
     }
 
     /// `Parser::parse_body` on a fresh parser, every body inside expanded.
-    pub fn parse_body(&self, id: NodeId) -> Option<Tree> {
+    pub fn parse_body(&self, id: NodeId) -> Option<Tree<L>> {
         Parser::new().parse_body(self, id, ParseOptions::default())
     }
 
@@ -568,7 +582,7 @@ impl Tree {
     }
 
     /// The first child of the given kind.
-    pub fn first_child_of_kind(&self, id: NodeId, kind: impl Into<ElementType>) -> Option<NodeId> {
+    pub fn first_child_of_kind(&self, id: NodeId, kind: impl Into<ElementTypeOf<L>>) -> Option<NodeId> {
         let kind = kind.into();
         self.children(id).find(|&c| self.kind(c) == kind)
     }
@@ -592,7 +606,7 @@ impl Tree {
 
     /// The subtree at `id`, `id` first, in document order: a scan of the ids `id..subtree_end(id)`, so "every call
     /// under X" is a pass over one column (`descendants(x).filter(|&n| tree.node_kind(n) == Some(CALL_EXPRESSION))`).
-    pub fn descendants(&self, id: NodeId) -> impl DoubleEndedIterator<Item = NodeId> + ExactSizeIterator + use<> {
+    pub fn descendants(&self, id: NodeId) -> impl DoubleEndedIterator<Item = NodeId> + ExactSizeIterator + use<L> {
         (id.0..self.data.links[id.0 as usize][1]).map(NodeId)
     }
 
@@ -600,13 +614,13 @@ impl Tree {
     /// but for the ranges of unexpanded bodies. This, not the lexer, is what exact highlighting
     /// reads: the parser remaps soft keywords (`IDENTIFIER` to `by`, `get`, `data`, ...) and joins `?.`, `?:` and `!!`
     /// from two lexer tokens, and both show only in the tree's leaves.
-    pub fn leaves(&self) -> impl Iterator<Item = (TokenKind, Range<usize>)> + '_ {
+    pub fn leaves(&self) -> impl Iterator<Item = (L::Token, Range<usize>)> + '_ {
         let d = &self.data;
         d.kinds.iter().enumerate().filter_map(move |(i, &k)| {
             if k & LEAF == 0 {
                 return None;
             }
-            let token = ElementType::from_index((k & KIND_INDEX) as usize)?.token()?;
+            let token = ElementTypeOf::<L>::from_index((k & KIND_INDEX) as usize)?.token()?;
             Some((token, d.ranges[i][0] as usize..d.ranges[i][1] as usize))
         })
     }
@@ -682,7 +696,7 @@ impl Iterator for Preorder<'_> {
 /// `Expecting '"'` sits at the end and the block's `Expecting '}'` at the same lexeme is dropped). The types are the
 /// lexer's, before any remapping by the outer parse, as a fresh lexing would give them.
 /// Returns their index range `first..last` in the file's tokens.
-fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(usize, usize)> {
+fn reusable_tokens<T, K>(file_tokens: &Lexed<T>, p: &Pending<K>) -> Option<(usize, usize)> {
     let (first, last) = p.file_tokens?;
     if !file_tokens.is_plain(first)
         || last > file_tokens.len()
@@ -695,11 +709,3 @@ fn reusable_tokens(file_tokens: &Lexed, p: &Pending) -> Option<(usize, usize)> {
     }
     Some((first, last))
 }
-
-// A tree is shared across threads as is, a parser moves to the thread that keeps it.
-const _: () = {
-    const fn send_sync<T: Send + Sync + 'static>() {}
-    const fn send<T: Send + 'static>() {}
-    send_sync::<Tree>();
-    send::<Parser>();
-};

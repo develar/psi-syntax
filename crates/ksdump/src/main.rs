@@ -1,4 +1,7 @@
-//! `ksdump`: dumps, benchmarks and lexes listed Kotlin files.
+//! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
+//!
+//! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
+//! Java has no parser yet (`crates/java-syntax`): a Java file is refused with exit status 2 before anything runs.
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -31,11 +34,12 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
 
-use kotlin_syntax::counters::{self, Counter};
+use kotlin_syntax::counters::{self, AnyCounter};
 use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::dump::subtree_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
+use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
 use kotlin_syntax::tokens::TokenKind;
 use kotlin_syntax::{ElementType, FileKind, NodeId, ParseOptions, Parser, Tree};
 
@@ -53,9 +57,24 @@ fn usage() -> ! {
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
          (--nesting-limit N: parse with that nesting limit)\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
-         ksdump --lex --bench --list LIST --root ROOT [--repeat K]   lexer throughput"
+         ksdump --lex --bench --list LIST --root ROOT [--repeat K]   lexer throughput\n  \
+         (--lang kotlin|java: the files' language; by default `.java` is Java, anything else Kotlin)"
     );
     std::process::exit(2)
+}
+
+/// The language a file is parsed as.
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+enum Lang {
+    Kotlin,
+    Java,
+}
+
+impl Lang {
+    /// `--lang`, else by extension: `.java` is Java, anything else Kotlin (`.kt`, `.kts`, none).
+    fn of(path: &str, forced: Option<Lang>) -> Lang {
+        forced.unwrap_or(if path.ends_with(".java") { Lang::Java } else { Lang::Kotlin })
+    }
 }
 
 #[derive(Default)]
@@ -74,6 +93,7 @@ struct Args {
     repeat: usize,
     file_stats: Option<PathBuf>,
     nesting_limit: Option<u32>,
+    lang: Option<Lang>,
 }
 
 fn parse_args() -> Args {
@@ -97,6 +117,13 @@ fn parse_args() -> Args {
             "--repeat" => args.repeat = count(it.next()),
             "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--nesting-limit" => args.nesting_limit = Some(count(it.next()) as u32),
+            "--lang" => {
+                args.lang = Some(match it.next().as_deref() {
+                    Some("kotlin") => Lang::Kotlin,
+                    Some("java") => Lang::Java,
+                    _ => usage(),
+                })
+            }
             _ => usage(),
         }
     }
@@ -199,6 +226,10 @@ fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
     let paths = read_list(list);
+    if let Some(java) = paths.iter().find(|p| Lang::of(p, args.lang) == Lang::Java) {
+        eprintln!("{java}: Java has no parser yet (crates/java-syntax); only Kotlin files are dumped, lexed and timed");
+        std::process::exit(2);
+    }
     let stdout = std::io::stdout();
     let mut stdout = std::io::BufWriter::new(stdout.lock());
 
@@ -308,10 +339,7 @@ fn alloc_snapshot() -> (u64, u64, i64) {
 }
 
 fn element_index(kind: ElementType) -> u64 {
-    match kind {
-        ElementType::Token(t) => t as u64,
-        ElementType::Node(n) => 256 + n as u64,
-    }
+    kind.index() as u64
 }
 
 /// The walk an extractor does: every node in preorder, its kind, its range and its depth; returns a checksum so it is
@@ -566,7 +594,7 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
             );
         }
         if counters::ENABLED {
-            let mut total = vec![0u64; Counter::ALL.len()];
+            let mut total = vec![0u64; counters::ALL.len()];
             for t in &per_thread {
                 for (sum, c) in total.iter_mut().zip(&t.counters) {
                     *sum += c;
@@ -612,9 +640,10 @@ fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
         );
     }
     if counters::ENABLED {
-        let file_tokens = last_counters[Counter::FileTokens as usize].max(1) as f64;
+        let file_tokens_at = counters::ALL.iter().position(|&c| c == AnyCounter::Builder(BuilderCounter::FileTokens));
+        let file_tokens = file_tokens_at.map_or(0, |i| last_counters[i]).max(1) as f64;
         let _ = writeln!(stdout, "counters (last round; per file token):");
-        for (k, v) in Counter::ALL.iter().zip(&last_counters) {
+        for (k, v) in counters::ALL.iter().zip(&last_counters) {
             let _ = writeln!(stdout, "  {:<20} {:>12}  {:>8.3}", format!("{k:?}"), v, *v as f64 / file_tokens);
         }
     }

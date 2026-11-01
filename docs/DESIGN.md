@@ -1,4 +1,4 @@
-# kotlin-syntax: design
+# psi-syntax: design
 
 AGENTS.md says what to port and how to check it; this document says how the port is built, why, what it costs and what
 is still open. The design sections are in the present tense. Every number comes with the commit it was measured on
@@ -27,17 +27,41 @@ Before and after each such change, the 25 `--features counters` counters (cursor
 reused and skipped tokens) are compared. The token cache was meant to move only the raw cursor-call counts, and the
 brace skip only the calls, markers and tokens skipped inside lazy blocks. Every other change left all 25 identical.
 
+## Workspace
+
+| crate | holds | depends on |
+|---|---|---|
+| `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters | nothing |
+| `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
+| `java-syntax` | nothing yet | `psi-builder` |
+| `ksdump` | the binary | `kotlin-syntax` |
+
+`psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
+`ParserDefinition` and from element types: `Token`, `Node` (each with a dense index below 256 and a debug name),
+`Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `LayerBuffers` (the language layers' reusable stacks),
+`FILE`, `ERROR_ELEMENT`, `is_whitespace_or_comment`, `is_left_bound`, `is_chameleon_token`, `chameleon`, `is_body`,
+`joined_token_type` (the cursor cache's derived token), `bracket_depth_change` (the too-deep skip), `tokenize_into`,
+`parse_file` and `parse_chameleon`. The driver hands `parse_chameleon` a `Chameleon`: the chameleon's text and three
+ways to a builder (the body's file tokens when they lex alone the same, else relexed; relexed; the caller's own tokens).
+`kotlin_syntax::{Tree, Parser, PsiBuilderImpl, ElementType}` are aliases of the generic types for `Kotlin`, so the
+Kotlin parsers and consumers name them as before.
+
+Everything is monomorphized per language; nothing is `dyn`. A function the Kotlin crate's own code used to inline may
+be instantiated differently from another crate: `skip_whitespace`, inlined before, became a call on every cursor move
+after the split and cost 0.8 %, so it is `#[inline(always)]`; Kotlin's `getJoinedTokenType`, a call before, is again
+not forced inline. The split's measurements are under "Measurements".
+
 ## Pipeline
 
 ```
-text ─ lexer::tokenize_into ─> Lexed {types, starts}      (file tokens, Parser-owned buffers)
+text ─ Language::tokenize_into ─> Lexed {types, starts}   (file tokens, Parser-owned buffers)
      ─ PsiBuilderImpl + KotlinParsing ─> production        (markers, one Rust fn per Java method)
      ─ begin_bind: balance_white_spaces, bind ─> TreeData   (Parser-owned columns, preorder)
          └─ at each chameleon (BLOCK, LAMBDA, KDoc, markdown link): suspend the frame, parse it, bind, resume
      ─ copy out ─> Tree {Arc<[u8]>, kinds, ranges, links, errors}   (exactly sized, Send + Sync)
 ```
 
-### Lexer (`src/lexer.rs`, `src/kdoc/lexer.rs`)
+### Lexer (`kotlin-syntax`: `src/lexer.rs`, `src/kdoc/lexer.rs`)
 
 The lexers are hand ports of `Kotlin.flex` and `KDoc.flex`, not generated code:
 
@@ -54,7 +78,7 @@ own. ASCII is handled by byte tables and byte `match`es:
 
 Lexing takes under 10 % of a parse, so it is optimized only where that is cheap and safe.
 
-### Builder (`src/builder.rs`)
+### Builder (`psi-builder` `src/builder.rs`, Kotlin's layer in `kotlin-syntax` `src/builder.rs`)
 
 `PsiBuilderImpl` is ported with IntelliJ's semantics:
 
@@ -69,8 +93,8 @@ Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl` adds the newline-mode and token
 
 What the port adds to the hot path:
 
-- **A current-token cache** in `PsiBuilderImpl`: `tt_raw`, `tt_joined` and `tt_valid`. `current_types` holds the
-  `getJoinedTokenType` body.
+- **A current-token cache** in `PsiBuilderImpl`: `tt_raw`, `tt_joined` and `tt_valid`. `current_types` computes the
+  joined type with `Language::joined_token_type`, Kotlin's `getJoinedTokenType` body.
   - The cache lives in `PsiBuilderImpl`, not in the semantic-whitespace layer, because `Marker` methods mutate
     `PsiBuilderImpl` directly.
   - It is invalidated wherever `current_lexeme` moves or `lex_types` changes: `advance_lexer`, `raw_advance_lexer`
@@ -84,8 +108,8 @@ What the port adds to the hot path:
   hot path.
 - **`#[inline(always)]` on the cursor chain** (`tt`, `_at`, `token_matches`, `_at_set`, `at`, the handle's and the
   impl's `get_token_type`/`eof`).
-- **`skip_balanced_block`.** When no `Truncated` adapter is active, `advance_balanced_block` counts `LBRACE`/`RBRACE`
-  over the raw `lex_types`, instead of the Java loop that joins `?.`/`?:`/`!!` and creates their collapse markers.
+- **`skip_balanced_block(open, close)`.** When no `Truncated` adapter is active, `advance_balanced_block` counts
+  `LBRACE`/`RBRACE` over the raw `lex_types`, instead of the Java loop that joins `?.`/`?:`/`!!` and creates their collapse markers.
   The result is the same:
   - Both callers collapse the enclosing marker: `parse_block_with` collapses `BLOCK` and the lazy lambda collapses
     `LAMBDA_EXPRESSION`.
@@ -116,7 +140,7 @@ Marker storage:
   - error items inside collapsed markers count for the global dedup, although their entries are skipped;
   - open markers close innermost first.
 
-### Parser driver and chameleons (`src/tree.rs`)
+### Parser driver and chameleons (`psi-builder` `src/tree.rs`, `kotlin-syntax` `src/language.rs`)
 
 `Parser` owns every buffer a parse needs:
 
@@ -172,7 +196,7 @@ overflows too), so the port defines one, and keeps PSI's tree below it.
 `tests/robustness.rs` parses 22 forms nested 100 000 deep on a 1 MB stack, and every golden with limits 1 to 13;
 the gate runs the community files and the mutations with limit 3 (see Contract).
 
-### Tree (`src/tree.rs`)
+### Tree (`psi-builder` `src/tree.rs`)
 
 A tree is three columns over the node ids, in preorder:
 
@@ -220,6 +244,7 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | A per-thread `Parser`, no thread_local | Allocation churn dominated multi-threaded scaling | allocations per pass 10.7M → 179 779; 16 threads 684 → 917 MB/s (f3aa172 → a99fb45) |
 | Copy the tree out exactly sized, instead of reserving `tokens*15/8+16` | Same CPU time, less memory | user CPU 3.12 vs 3.13 s; 11.32 vs 12.70 MB of tree per source MB |
 | Pair columns `ranges`/`links`, not five `u32` columns | Same 18 B/node, 3 pushes instead of 5 | parse 70.0 → 71.5 MB/s (9 of 9 rounds), linear walk 1.68 → 1.59 ns/node |
+| `psi-builder` generic over a `Language` trait, monomorphized; not `dyn`, not language-neutral numeric ids | The Java port reuses the builder, tree and driver; Kotlin keeps its enums and every parser call site (`kotlin_syntax` aliases the generic types), and the compiled Kotlin parse is the one it was | gate unchanged, all 25 counters identical; 1 thread B/A 0.985 before forcing `skip_whitespace` inline and leaving `getJoinedTokenType` outlined, after it paired-round medians 0.991 and 0.997 at load 6-14 (see the split's measurement) |
 | No `unsafe`, no C toolchain, no large dependency tree | Consumers build it on every platform; any byte sequence must parse | `unsafe_code = "forbid"`; the only dependency is the optional `stats_alloc` |
 
 ### Libraries
@@ -237,7 +262,7 @@ byte-identical. None qualified. The measurements are from the survey prototypes 
 | bumpalo, typed-arena | rejected | lifetime-bound references conflict with an owned `Send + Sync` tree |
 | id-arena, la-arena | rejected | the same as `Vec` plus `u32` ids |
 | smallvec | rejected | reusing buffers in the `Parser` removes the same allocations |
-| lasso, rustc-hash, foldhash | rejected | `src/` has no hash map, no per-leaf `String`; interning is the consumer's choice |
+| lasso, rustc-hash, foldhash | rejected | no crate has a hash map, no per-leaf `String`; interning is the consumer's choice |
 | bitflags, fixedbitset | rejected | `TokenSet { [u64; 8] }` with const constructors covers tokens and node types; the `at_set` cost was the keyword loop and `from_utf8` |
 | mimalloc 0.1.52 | consumer-side only | needs C. Before buffer reuse: +12 % at 8 threads, +15 % at 16. After it (a99fb45): +3.8 % at 8, +3.1 % at 16 (load 8-15); 1 thread not measured |
 | stats_alloc 0.1.10 | kept, optional | the `alloc-stats` feature, profiling only |
@@ -279,6 +304,24 @@ tree-sitter. Ours was 3.6-4.1× faster in every round.
 
 The gate passed on c796e73 in 62 s.
 
+### The workspace split (child of 26d5703), 2026-11-01
+
+The crate split, `psi-builder` generic over `Language`, against 26d5703, both `ksdump --bench` on the community files:
+
+- the 25 `--features counters` counters, the 63 742 904 nodes, the 7.64 MB of tree per source MB, the `--walk`
+  checksum and the body-less 31 240 422 nodes are identical;
+- the first split binary measured 1 thread 75.1 → 74.0 MB/s (B/A 0.985, 11 alternating rounds, A faster in 10, load
+  3.3-5.1). Its code had changed in two places: `skip_whitespace`, inlined before, was a call on every cursor move,
+  and `getJoinedTokenType`, a call before, was forced inline into every `tt()`. With `#[inline(always)]` on the first
+  and no attribute on the second the code is within 1 KB of 26d5703's (697 064 vs 698 088 bytes of functions);
+- that binary, alternating with 26d5703: 15 rounds at load 7.7-18 (median of per-round B/A 0.997), 21 rounds at load
+  5.7-13.8 (69.4 vs 69.2 MB/s, median of per-round B/A 0.991). The machine was shared throughout; a quieter repeat is
+  the open check;
+- instructions retired of a whole `ksdump --bench` process (`/usr/bin/time -l`, file reading included), 5 runs each:
+  26d5703 73.26-74.57 G, the split 73.48-74.69 G, equal within their run-to-run spread.
+
+The gate passed on the split.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -318,6 +361,9 @@ There is no line-level profile of the current code: `atos` returned no line info
 ## What remains
 
 ### Open items
+
+- **The split's speed on a quiet machine.** Its A/B ran at load 6-18; repeat `scripts/ab.sh` against 26d5703 at load
+  under 4 before attributing a later change's small delta.
 
 - **Copies into chameleon frames.** Each chameleon still copies its tokens from the file's (suspended frames then
   drop what they have bound). Nested chameleons over T tokens copy O(depth · T): 100 000 nested `{ fun g() ` (250

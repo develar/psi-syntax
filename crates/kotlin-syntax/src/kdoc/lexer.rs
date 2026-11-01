@@ -8,7 +8,8 @@
 use crate::lexer::{Token, char_at};
 use crate::tokens::TokenKind;
 use crate::tokens::TokenKind::*;
-use crate::unicode::{KDOC_JLETTER, in_ranges};
+use crate::unicode::KDOC_JLETTER;
+use psi_builder::lexer::in_ranges;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 enum State {

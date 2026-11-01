@@ -10,7 +10,7 @@ set -u
 [ $# -ge 2 ] || { sed -n 2,8p "$0"; exit 2; }
 A=$1 B=$2; shift 2
 ROUNDS=${1:-5}; [ $# -ge 1 ] && shift
-LIST=${KS_LIST:-$HOME/.cache/kotlin-syntax/corpus/community-3caa0bf.list}
+LIST=${KS_LIST:-$HOME/.cache/psi-syntax/corpus/community-3caa0bf.list}
 ROOT=${KS_ROOT:-/Users/develar/.cache/accio-bench/intellij-community}
 load() { sysctl -n vm.loadavg | awk '{print $2}'; }
 run() { bin=$1; shift; "$bin" --bench --list "$LIST" --root "$ROOT" "$@" 2>/dev/null | awk '/MB\/s/ && /^(round [0-9]+  )?files/ {for (i=1;i<=NF;i++) if ($i=="MB/s") print $(i+1); exit}'; }

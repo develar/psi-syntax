@@ -14,7 +14,7 @@ import tempfile
 
 here = os.path.dirname(os.path.abspath(__file__))
 ksdump = os.path.join(here, "..", "target", "release", "ksdump")
-tools = os.path.expanduser("~/.cache/kotlin-syntax/psi-tools/tools/psi-oracle")
+tools = os.path.expanduser("~/.cache/psi-syntax/psi-tools/tools/psi-oracle")
 source, out = sys.argv[1], sys.argv[2]
 ext = os.path.splitext(source)[1]
 work = tempfile.mkdtemp(prefix="psi-reduce-")

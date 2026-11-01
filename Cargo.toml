@@ -1,32 +1,27 @@
-[package]
-name = "kotlin-syntax"
+[workspace]
+resolver = "3"
+members = ["crates/psi-builder", "crates/kotlin-syntax", "crates/java-syntax", "crates/ksdump"]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.90"
-description = "A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own (Kotlin.flex, KotlinParsing, KotlinExpressionParsing); prints PSI's debug dump"
 license = "Apache-2.0"
-repository = "https://github.com/develar/kotlin-syntax"
+repository = "https://github.com/develar/psi-syntax"
 publish = false
 
-[dependencies]
-# Only `ksdump --bench` with `--features alloc-stats`: a counting global allocator (allocations per file); it is
-# opt-in because its atomic counters slow the parse and contend across threads.
-stats_alloc = { version = "0.1.10", optional = true }
-
-[features]
-alloc-stats = ["dep:stats_alloc"]
-# `counters::add` counts the builder's cursor calls, markers and lexed tokens per thread (`ksdump --bench` prints them).
-counters = []
-
-[dev-dependencies]
+[workspace.dependencies]
+psi-builder = { path = "crates/psi-builder" }
+kotlin-syntax = { path = "crates/kotlin-syntax" }
+java-syntax = { path = "crates/java-syntax" }
 
 [profile.release]
 debug = true
 codegen-units = 1
 lto = "fat"
 
-[lints.rust]
+[workspace.lints.rust]
 unsafe_code = "forbid"
 
-[lints.clippy]
+[workspace.lints.clippy]
 all = { level = "warn", priority = -1 }

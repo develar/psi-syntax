@@ -2461,7 +2461,7 @@ impl<'b> KotlinParsing<'b> {
             }
 
             self.advance();
-            crate::counters::add(crate::counters::Counter::BalancedSkipTokens, 1);
+            psi_builder::counters::add(psi_builder::counters::Counter::BalancedSkipTokens, 1);
 
             if brace_count == 0 {
                 break;

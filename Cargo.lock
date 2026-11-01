@@ -3,11 +3,30 @@
 version = 4
 
 [[package]]
+name = "java-syntax"
+version = "0.1.0"
+dependencies = [
+ "psi-builder",
+]
+
+[[package]]
 name = "kotlin-syntax"
 version = "0.1.0"
 dependencies = [
+ "psi-builder",
+]
+
+[[package]]
+name = "ksdump"
+version = "0.1.0"
+dependencies = [
+ "kotlin-syntax",
  "stats_alloc",
 ]
+
+[[package]]
+name = "psi-builder"
+version = "0.1.0"
 
 [[package]]
 name = "stats_alloc"

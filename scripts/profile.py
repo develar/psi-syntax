@@ -24,7 +24,7 @@ import subprocess
 import sys
 import time
 
-LIST = os.environ.get("KS_LIST", os.path.expanduser("~/.cache/kotlin-syntax/corpus/community-3caa0bf.list"))
+LIST = os.environ.get("KS_LIST", os.path.expanduser("~/.cache/psi-syntax/corpus/community-3caa0bf.list"))
 ROOT = os.environ.get("KS_ROOT", "/Users/develar/.cache/accio-bench/intellij-community")
 
 NODE = re.compile(r"^(?P<indent>[\s+!:|]*)(?P<count>\d+) (?P<sym>.+?)  \(in (?P<image>[^)]+)\)(?: \+ [\d,]+)?"
