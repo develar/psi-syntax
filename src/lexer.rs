@@ -100,6 +100,18 @@ fn is_identifier_part(cp: u32) -> bool {
     }
 }
 
+/// `is_identifier_part` of each ASCII byte (`is_ascii_alphanumeric() || '_'`); false at 0x80 and above, where
+/// `plain_identifier_end` decodes the character and asks `is_identifier_part`.
+const ASCII_IDENTIFIER_PART: [bool; 256] = {
+    let mut table = [false; 256];
+    let mut b = 0;
+    while b < 0x80 {
+        table[b] = (b as u8).is_ascii_alphanumeric() || b == b'_' as usize;
+        b += 1;
+    }
+    table
+};
+
 /// The hard keywords Kotlin.flex lists as literal rules (before `{IDENTIFIER}`).
 fn hard_keyword(text: &[u8]) -> Option<TokenKind> {
     Some(match text {
@@ -228,13 +240,10 @@ impl<'a> KotlinLexer<'a> {
             return None;
         }
         let mut j = i + len;
-        while j < self.text.len() {
-            let b = self.text[j];
-            if b < 0x80 {
-                if b.is_ascii_alphanumeric() || b == b'_' {
-                    j += 1;
-                    continue;
-                }
+        loop {
+            let rest = &self.text[j..];
+            j += rest.iter().position(|&b| !ASCII_IDENTIFIER_PART[b as usize]).unwrap_or(rest.len());
+            if j >= self.text.len() || self.text[j] < 0x80 {
                 break;
             }
             let (cp, len) = char_at(self.text, j);

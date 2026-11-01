@@ -14,7 +14,8 @@
 //!   and the bytes allocated per source MB; it slows the parse, so time without it. With `--features counters`, the
 //!   builder's calls (`tt()`, lookahead, markers, rollbacks) and the tokens lexed, reused and skipped, per file token. Peak RSS: run under
 //!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
-//! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it.
+//! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` prints it;
+//!   with `--bench [--repeat K]`, the MB/s of the Kotlin lexer alone instead.
 //! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that
 //!   `parse_body` of every unexpanded body dumps as the full tree's subtree there; prints the bodies, the differing
 //!   ones (their paths and ranges) and exits nonzero on any.
@@ -48,7 +49,8 @@ fn usage() -> ! {
          ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
                 [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
-         ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them"
+         ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
+         ksdump --lex --bench --list LIST --root ROOT [--repeat K]   lexer throughput"
     );
     std::process::exit(2)
 }
@@ -194,6 +196,11 @@ fn main() {
     let paths = read_list(list);
     let stdout = std::io::stdout();
     let mut stdout = std::io::BufWriter::new(stdout.lock());
+
+    if args.lex && args.bench {
+        lex_bench(&args, root, &paths, &mut stdout);
+        return;
+    }
 
     if args.lex {
         for path in &paths {
@@ -416,6 +423,34 @@ fn median(values: &mut [f64]) -> f64 {
 
 fn percentile(sorted: &[u64], p: f64) -> u64 {
     if sorted.is_empty() { 0 } else { sorted[((sorted.len() - 1) as f64 * p).round() as usize] }
+}
+
+/// `--bench --lex`: the Kotlin lexer alone (`lexer::tokenize_into`, one buffer reused), one thread, per round.
+fn lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
+    let sources: Vec<Vec<u8>> = paths.iter().filter_map(|p| read_source(root, p, args.trim)).collect();
+    let mb = sources.iter().map(Vec::len).sum::<usize>() as f64 / 1e6;
+    let mut lexed = kotlin_syntax::lexer::Lexed::default();
+    let mut round_mbs = Vec::new();
+    for round in 1..=args.repeat {
+        let (mut tokens, mut seconds) = (0usize, 0.0);
+        for text in &sources {
+            let start = Instant::now();
+            kotlin_syntax::lexer::tokenize_into(text, &mut lexed);
+            seconds += start.elapsed().as_secs_f64();
+            tokens += lexed.len();
+        }
+        let mbs = mb / seconds.max(1e-9);
+        round_mbs.push(mbs);
+        let prefix = if args.repeat > 1 { format!("round {round}  ") } else { String::new() };
+        let _ = writeln!(
+            stdout,
+            "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
+            sources.len()
+        );
+    }
+    if args.repeat > 1 {
+        let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
+    }
 }
 
 fn bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
