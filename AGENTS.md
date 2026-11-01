@@ -36,14 +36,43 @@ error messages (the dump prints `PsiErrorElement:<message>`) and the exact eleme
 | `src/kdoc/parser.rs` | `KDocParser` and `KDocLinkParser`: the tree runs them on every doc comment and markdown link |
 | `src/node_kind.rs` | `NodeKind`, the composite element types with their dump names (`FUN`, `CLASS`, `KtFile` root, `PsiErrorElement`) |
 | `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback, the newline mode stack, edge binders; produces the tree |
-| `src/tree.rs` | the lossless tree: one arena (`Vec`) of nodes, `u32` ids, every node a kind and a byte range, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. The public API consumers read: `Tree::parse(text, FileKind::{Kt,Kts})` (or, one per thread, `Parser::new()` and `parser.parse(text, kind)`, which reuses its buffers from file to file), `root()`, `kind()`, `range()`, `children()`, `parent()`, `text()`, `first_child_of_kind()`, an iterator over tokens. `Send + Sync`, no lifetimes in the stored tree |
+| `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf and unexpanded bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser` drives the builders: the file's, then a stack of chameleon builders, each expanding its block, lambda, doc comment or markdown link in place where `bind` meets it (heap, not recursion). The consumer API: see "The consumer contract" |
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format |
-| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk, tree bytes per source MB; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token |
+| `src/bin/ksdump.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench` times the lexer alone; `ksdump --check-bodies` checks `parse_body` against the full parse |
 | `src/counters.rs` | per-thread event counters (cursor calls, markers, rollbacks, lexed/reused/skipped tokens) behind the `counters` feature; without it every `add` compiles to nothing |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
-| `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic |
+| `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links, 5000 nested lambdas and blocks on a 256 KB stack |
+| `tests/bodies.rs` | body-less parsing on every golden: the full tree minus each body's interior, `parse_body` equal to the full subtree; `leaves()` and `descendants()` |
+
+## The consumer contract
+
+What accio and Branch Deck may rely on (`src/tree.rs`):
+
+- One `Parser` per thread (`Parser::new()`, then `parser.parse(text, FileKind)` per file): it keeps every buffer of a
+  parse and reuses it; `Tree::parse` makes a fresh one per call. `Parser` is `Send`; `Tree` is `Send + Sync`, owns
+  its copy of the text (`Arc<[u8]>`) and has no lifetime, so a tree can be handed to other threads (a const
+  assertion in `tree.rs` keeps this true).
+- Ids are preorder: `0..len()` is document order, the subtree of `id` is `id..subtree_end(id)`. `root`, `kind`,
+  `token_kind`, `node_kind`, `is_leaf`, `range`, `text`, `parent`, `first_child`, `last_child`, `next_sibling`,
+  `children`, `first_child_of_kind`, `preorder` (with depth), `tokens`, `error_message`; `descendants(id)` is the
+  id range, so "every `CALL_EXPRESSION` under X" is a scan of one column.
+- Highlighting reads `leaves()`: each token leaf's `(TokenKind, range)` in document order. Not the lexer: soft keywords
+  are remapped by the parser (`IDENTIFIER` becomes `by`, `get`, `data`, ...) and `?.`, `?:`, `!!` are joined by the
+  parser from two lexer tokens, so only the tree's leaves are exact.
+- Body-less parsing: `parser.parse_with_options(text, kind, ParseOptions { expand_bodies: false })` leaves every lazily
+  parsed block and lambda (what PSI builds as a chameleon) a childless node with its kind and range,
+  `is_unexpanded(id)`; doc comments are still expanded. `tree.parse_body(id)` (or `parser.parse_body(&tree, id,
+  options)`) parses one on demand into its own `Tree` over the same source, exactly the full parse's subtree there
+  (the gate checks all 229 960 bodies of the community files). For declaration-only passes, summaries, navigation;
+  a pass over call sites parses in full. Measured on the community files, one thread: 72.0 -> 144.5 MB/s, nodes
+  63.7M -> 31.2M, tree 7.64 -> 4.25 bytes per source byte.
+- Allocator: kotlin-syntax uses the system allocator and builds no C. Consumers that already build C (tree-sitter)
+  should set `#[global_allocator] static A: mimalloc::MiMalloc` (mimalloc 0.1.52): measured before batch 2's buffer
+  reuse at 243.2 -> 272.5 MB/s with 8 threads (+12%) and 460.1 -> 528.5 with 16 (+15%), no change on one thread;
+  batch 2 (the per-thread `Parser`) itself measured 69.1 MB/s one thread and 917 MB/s with 16. Re-measure mimalloc
+  on the current code before relying on the number.
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
 
@@ -102,7 +131,7 @@ otherwise.
   the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy, `KS_STRICT=1 cargo test --release`, byte equality of
-  all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle. A faster change that fails it is
-  not a change.
+  all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
+  community files. A faster change that fails it is not a change.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
   change does, its measured effect and that the gate passed.

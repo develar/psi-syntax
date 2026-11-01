@@ -49,7 +49,7 @@ const UNEXPANDED: u16 = 0x4000;
 /// `kinds` bits of the element type's `ElementType::index`.
 const KIND_INDEX: u16 = 0x3FFF;
 
-/// The arena a builder appends to, one column per field, nodes in preorder: a node's subtree is the ids
+/// The arena a builder appends to, three columns (kinds, ranges, links), nodes in preorder: a node's subtree is the ids
 /// `id..subtree_end[id]`, so its first child is `id + 1` when it has one and the next sibling of a child is its
 /// `subtree_end` while that is inside the parent's.
 #[derive(Default, Debug)]
