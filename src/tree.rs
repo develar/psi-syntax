@@ -128,6 +128,8 @@ pub struct Parser {
     /// The token starts the current builder reads.
     starts: Vec<u32>,
     pending: Vec<Pending>,
+    /// The tree being built; copied into exactly sized buffers when done.
+    data: TreeData,
 }
 
 impl Parser {
@@ -150,7 +152,9 @@ impl Parser {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
         lexer::tokenize_into(&text, &mut self.file);
         crate::counters::add(crate::counters::Counter::FileTokens, self.file.len() as u64);
-        let mut data = TreeData::default();
+        let mut data = std::mem::take(&mut self.data);
+        data.nodes.clear();
+        data.errors.clear();
         self.pending.clear();
 
         self.bufs.lex_types.clear();
@@ -167,7 +171,12 @@ impl Parser {
         while let Some(p) = self.pending.pop() {
             self.expand(&text, &mut data, p);
         }
-        Tree { text, file_kind, data, root }
+        // Most files have no error: their list never allocates; the others' is shrunk to fit.
+        let mut errors = std::mem::take(&mut data.errors);
+        errors.shrink_to_fit();
+        let tree = TreeData { nodes: data.nodes.as_slice().to_vec(), errors };
+        self.data = data;
+        Tree { text, file_kind, data: tree, root }
     }
 
     /// Expands one chameleon: parses its text with a new builder and appends the result under its node.
