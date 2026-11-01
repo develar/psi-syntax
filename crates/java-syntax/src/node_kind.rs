@@ -80,7 +80,8 @@ nodes! {
     CLASS = "CLASS", "PsiClass", Label::Name;
     IMPLICIT_CLASS = "IMPLICIT_CLASS", "PsiImplicitClass", Label::Plain;
     ANONYMOUS_CLASS = "ANONYMOUS_CLASS", "PsiAnonymousClass", Label::Plain;
-    ENUM_CONSTANT_INITIALIZER = "ENUM_CONSTANT_INITIALIZER", "PsiAnonymousClass", Label::Plain;
+    // `PsiEnumConstantInitializerImpl.toString()`, its parenthesis unbalanced.
+    ENUM_CONSTANT_INITIALIZER = "ENUM_CONSTANT_INITIALIZER", "PsiAnonymousClass (PsiEnumConstantInitializerImpl)):", Label::Plain;
     TYPE_PARAMETER_LIST = "TYPE_PARAMETER_LIST", "PsiTypeParameterList", Label::Plain;
     TYPE_PARAMETER = "TYPE_PARAMETER", "PsiTypeParameter", Label::Name;
     IMPORT_LIST = "IMPORT_LIST", "PsiImportList", Label::Plain;
