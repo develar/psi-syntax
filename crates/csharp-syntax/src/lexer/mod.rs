@@ -38,6 +38,7 @@ use crate::error_code::{ErrorCode, MessageID, XmlParseErrorCode};
 use crate::green::{DiagArg, DiagnosticId, Green, GreenArena, TokenText, Trivia, TriviaList};
 use crate::language_version::LanguageVersion;
 use crate::parser::doc_comment_parser::{DocumentationCommentParser, DocumentationCommentParserBuffers};
+use crate::parser::interpolated_string::InterpolatedStringBuffers;
 use crate::syntax_kind::SyntaxKind;
 use crate::syntax_parser::SyntaxParserBuffers;
 use crate::tree::DocumentationMode;
@@ -139,6 +140,9 @@ pub struct LexerBuffers {
     /// The token window of `_directiveParser`, the buffers of `_xmlParser`.
     directive_parser: SyntaxParserBuffers,
     xml_parser: DocumentationCommentParserBuffers,
+    /// What the parser of an interpolated or raw string token over this lexer reuses: the interpolations, the
+    /// buffers of the lexers and parsers it makes for the holes and texts.
+    interpolated_string: InterpolatedStringBuffers,
 }
 
 /// `Lexer.TokenInfo`: what the scanners found. The text is always the lexeme (`lexeme_start..position`); the
@@ -317,6 +321,11 @@ impl<'t> Lexer<'t> {
     #[inline]
     pub fn position(&self) -> u32 {
         self.text_window.position()
+    }
+
+    /// The buffers the parser of an interpolated or raw string token reuses (`parser::interpolated_string`).
+    pub(crate) fn interpolated_string_buffers(&mut self) -> &mut InterpolatedStringBuffers {
+        &mut self.buffers.interpolated_string
     }
 
     /// The cells of the directive stacks (`DirectiveStack`'s queries take them).

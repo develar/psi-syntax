@@ -2,6 +2,39 @@
 //! by a nested lexer and parser over its text (lane D). Every method in C# order; see `parser/mod.rs` for the conventions.
 
 use super::*;
+use crate::lexer::{Lexer, LexerBuffers};
+use crate::syntax_parser::SyntaxParserBuffers;
+
+/// The buffers the parser of an interpolated or raw string token reuses, kept by its lexer (`LexerBuffers`).
+#[derive(Default)]
+pub(crate) struct InterpolatedStringBuffers {
+    /// `interpolations` of `ParseInterpolatedOrRawStringToken`.
+    interpolations: Vec<Interpolation>,
+    /// The buffers of the temporary lexers and parsers of this level (each holds the next level's).
+    nested: Vec<NestedBuffers>,
+    /// `fakeString` of `MakeInterpolatedStringTextToken`.
+    fake_string: Vec<u8>,
+    /// `content` of `getContent`.
+    content: Vec<u8>,
+}
+
+/// A temporary lexer's and parser's buffers.
+#[derive(Default)]
+struct NestedBuffers {
+    lexer: LexerBuffers,
+    parser: SyntaxParserBuffers,
+    pool: SyntaxListPool,
+}
+
+/// The buffers of a temporary lexer or parser over `lexer`'s level.
+fn take_nested(lexer: &mut Lexer<'_>) -> NestedBuffers {
+    lexer.interpolated_string_buffers().nested.pop().unwrap_or_default()
+}
+
+/// `take_nested`'s buffers back.
+fn give_nested(lexer: &mut Lexer<'_>, buffers: NestedBuffers) {
+    lexer.interpolated_string_buffers().nested.push(buffers);
+}
 
 impl<'l, 't> LanguageParser<'l, 't> {
     /// `private LiteralExpressionSyntax ParseRawStringToken()` (LanguageParser_InterpolatedString.cs:16).
