@@ -20,7 +20,9 @@
 #   9. C#'s lexer (`ksdump --lex --lang csharp --doc none`, Roslyn 5.9.0's `SyntaxFactory.ParseTokens` with
 #      directives and diagnostics) on the four corpora of tools/csharp-oracle (dotnet/roslyn, dotnet/runtime,
 #      dotnet/aspnetcore, Avalonia), its golden mutations and its lexer fuzz against the cached lines of
-#      `tools/csharp-oracle/oracle.sh lex --doc none`, 0 differing lines.
+#      `tools/csharp-oracle/oracle.sh lex --doc none`, and the same with `--doc parse` (documentation comments
+#      parsed into structured trivia by the documentation comment parser) against `lex --doc parse`'s, 0 differing
+#      lines.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -96,5 +98,8 @@ for corpus in "corpus/csharp-roslyn-35d9211.list $C/csharp-src/roslyn csharp-ros
   case "$1" in /*) list=$1 ;; *) list=$C/$1 ;; esac
   n=$($B --lex --lang csharp --doc none --list "$list" --root "$2" | diff - "$C/lex/$3.oracle.txt" | grep -c '^[<>]')
   echo "csharp lex $3: $n differing lines of $(wc -l < "$C/lex/$3.oracle.txt" | tr -d ' ')"; [ "$n" = 0 ] || fail=1
+  n=$($B --lex --lang csharp --doc parse --list "$list" --root "$2" | diff - "$C/lex/$3.doc.oracle.txt" | grep -c '^[<>]')
+  echo "csharp lex --doc parse $3: $n differing lines of $(wc -l < "$C/lex/$3.doc.oracle.txt" | tr -d ' ')"
+  [ "$n" = 0 ] || fail=1
 done
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }

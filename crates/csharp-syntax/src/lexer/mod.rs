@@ -35,9 +35,9 @@ use directive_parser::DirectiveParser;
 use sliding_text_window::{INVALID_CHARACTER, SlidingTextWindow};
 
 use crate::error_code::{ErrorCode, MessageID, XmlParseErrorCode};
-use crate::green::{DiagArg, DiagnosticId, Green, GreenArena, SyntaxListPool, TokenText, Trivia, TriviaList};
+use crate::green::{DiagArg, DiagnosticId, Green, GreenArena, TokenText, Trivia, TriviaList};
 use crate::language_version::LanguageVersion;
-use crate::parser::doc_comment_parser::DocumentationCommentParser;
+use crate::parser::doc_comment_parser::{DocumentationCommentParser, DocumentationCommentParserBuffers};
 use crate::syntax_kind::SyntaxKind;
 use crate::syntax_parser::SyntaxParserBuffers;
 use crate::tree::DocumentationMode;
@@ -136,10 +136,9 @@ pub struct LexerBuffers {
     value_text: String,
     /// The cells of the directive stacks.
     directives: DirectiveStore,
-    /// The token window of `_directiveParser` and of `_xmlParser`, and the latter's list pool.
+    /// The token window of `_directiveParser`, the buffers of `_xmlParser`.
     directive_parser: SyntaxParserBuffers,
-    xml_parser: SyntaxParserBuffers,
-    xml_pool: SyntaxListPool,
+    xml_parser: DocumentationCommentParserBuffers,
 }
 
 /// `Lexer.TokenInfo`: what the scanners found. The text is always the lexeme (`lexeme_start..position`); the
@@ -2472,23 +2471,12 @@ impl<'t> Lexer<'t> {
         }
     }
 
-    /// The documentation comment at the position as Roslyn's `LexXmlDocComment` makes it, while
-    /// `DocumentationCommentParser.ParseDocumentationComment` (lane D) is not ported: until then its stub returns no
-    /// node, and the comment is lexed as `DocumentationMode.None` lexes it (a comment trivia).
+    /// `this.AddTrivia(this.LexXmlDocComment(style), ref triviaList)` (in `LexSyntaxTrivia`): the documentation comment
+    /// at the position as a structured trivia.
     fn lex_xml_doc_comment_or_comment(&mut self, style: XmlDocCommentStyle, trivia_list: &mut Vec<Trivia>) {
-        let start = self.text_window.position();
         let doc_comment = self.lex_xml_doc_comment(style);
-        if !doc_comment.is_null() {
-            let trivia = self.arena.structured_trivia(doc_comment);
-            self.add_trivia(trivia, trivia_list);
-            return;
-        }
-        self.text_window.reset(start);
-        self.start();
-        match style {
-            XmlDocCommentStyle::SingleLine => self.lex_single_line_comment(trivia_list),
-            XmlDocCommentStyle::Delimited => self.lex_multi_line_comment(trivia_list, b'/'),
-        }
+        let trivia = self.arena.structured_trivia(doc_comment);
+        self.add_trivia(trivia, trivia_list);
     }
 
     /// `LexXmlDocComment(style)`.
@@ -2496,25 +2484,28 @@ impl<'t> Lexer<'t> {
         let save_mode = self.mode;
 
         let buffers = std::mem::take(&mut self.buffers.xml_parser);
-        let pool = std::mem::take(&mut self.buffers.xml_pool);
         let mut is_terminated = true;
-        let (doc_comment, buffers, pool) = {
-            let mut parser = DocumentationCommentParser::new(self, buffers, pool);
+        let (doc_comment, buffers) = {
+            let mut parser = DocumentationCommentParser::new(self, buffers);
             parser.re_initialize(if style == XmlDocCommentStyle::SingleLine {
                 LexerMode::XML_DOC_COMMENT_STYLE_SINGLE_LINE
             } else {
                 LexerMode::XML_DOC_COMMENT_STYLE_DELIMITED
             });
             let doc_comment = parser.parse_documentation_comment(&mut is_terminated);
-            let (buffers, pool) = parser.into_buffers();
-            (doc_comment, buffers, pool)
+            (doc_comment, parser.into_buffers())
         };
         self.buffers.xml_parser = buffers;
-        self.buffers.xml_pool = pool;
+
+        // We better have finished with the whole comment. There should be error
+        // code in the implementation of ParseXmlDocComment that ensures this.
+        debug_assert!(
+            self.location_is(XmlDocCommentLocation::End) || self.text_window.peek_char() == INVALID_CHARACTER
+        );
 
         self.mode = save_mode;
 
-        if !doc_comment.is_null() && !is_terminated {
+        if !is_terminated {
             // The comment didn't end.  Report an error at the start point.
             // NOTE: report this error even if the DocumentationMode is less than diagnose - the comment would be
             // malformed as a non-doc comment as well.

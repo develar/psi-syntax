@@ -64,8 +64,6 @@ pub struct SyntaxParser<'l, 't> {
     /// `lexer`.
     pub lexer: &'l mut Lexer<'t>,
     pub kind: ParserKind,
-    /// `DocumentationCommentParser.InCref`, read by its overrides of the expected-token errors.
-    pub in_cref: bool,
     allow_mode_reset: bool,
     mode: LexerMode,
     /// `_firstBlender`: the lexer state before `tokens[0]`.
@@ -107,7 +105,6 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         let mut parser = SyntaxParser {
             lexer,
             kind,
-            in_cref: false,
             allow_mode_reset,
             mode,
             first_state,

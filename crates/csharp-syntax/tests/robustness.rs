@@ -189,10 +189,20 @@ fn deep_lexer_forms_lex_losslessly() {
             format!("#region\n{}", "#region\n#endregion\n".repeat(n)),
             format!("{}\"", "@".repeat(n)),
             format!("$\"{{{}}}\"", "@".repeat(n)),
+            // documentation comments: nested elements, cref type arguments and extension members, many attributes
+            format!("/// {}x{}\nclass C {{}}", "<a>".repeat(n), "</a>".repeat(n)),
+            format!("/** {}x{} */\nclass C {{}}", "<a>".repeat(n), "</a>".repeat(n)),
+            format!("/// <see cref=\"{}B{}\"/>\nclass C {{}}", "A{".repeat(n), "}".repeat(n)),
+            format!("/// <see cref=\"M({}B{})\"/>\nclass C {{}}", "A{".repeat(n), "}".repeat(n)),
+            format!("/// <see cref=\"{}M\"/>\nclass C {{}}", "extension(int).".repeat(n)),
+            format!("/// <a {}/>\nclass C {{}}", (0..n).map(|i| format!("b{i}=\"\" ")).collect::<String>()),
+            format!("/// <a {}/>\nclass C {{}}", "b=\"\" ".repeat(n)),
         ];
         for text in &texts {
             let lexed = parser.lex(text, FileKind::default());
             check(&lexed, text.as_bytes());
+            let diagnosed = parser.lex(text, FileKind { doc_mode: DocumentationMode::Diagnose, ..FileKind::default() });
+            check(&diagnosed, text.as_bytes());
             let tree = parser.parse(text, FileKind::default());
             check(&tree, text.as_bytes());
         }
