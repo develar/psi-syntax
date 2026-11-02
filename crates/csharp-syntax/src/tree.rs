@@ -289,6 +289,27 @@ impl Parser {
         Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false }
     }
 
+    /// The number of tokens `lex` makes of `text`, without a tree: the lexer alone, what `ksdump --lex --bench` times.
+    pub fn lex_count(&mut self, text: &[u8], file_kind: FileKind) -> usize {
+        let mut arena = std::mem::take(&mut self.arena);
+        arena.clear();
+        let mut lexer = Lexer::new(text, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let mut count = 0;
+        loop {
+            let position = lexer.position();
+            let token = lexer.lex(LexerMode::SYNTAX);
+            count += 1;
+            let eof = lexer.arena_ref().kind(token) == SyntaxKind::EndOfFileToken;
+            if eof || (lexer.position() == position && lexer.arena_ref().full_width(token) == 0) {
+                break;
+            }
+        }
+        let (arena, lexer_buffers) = lexer.into_parts();
+        self.lexer = lexer_buffers;
+        self.arena = arena;
+        count
+    }
+
     fn finish(&mut self, arena: GreenArena, root: Green, source: &Arc<[u8]>, file_kind: FileKind) -> Tree {
         let no_result = root.is_null();
         let (tree, diagnostics) = if no_result {

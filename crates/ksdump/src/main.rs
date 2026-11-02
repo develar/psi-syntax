@@ -72,7 +72,8 @@ fn usage() -> ! {
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
          ksdump --lex --bench --list LIST --root ROOT [--repeat K] [--docs]   lexer throughput (--docs: doc comments too)\n  \
          ksdump --lex --list LIST --root ROOT [--full OUT]   C# files: lexer hash lines as tools/csharp-oracle lex prints them\n  \
-         (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin)"
+         (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
+         C#: --version V and --doc parse|none|diagnose for the list lines without those columns, as tools/csharp-oracle)"
     );
     std::process::exit(2)
 }
@@ -145,6 +146,18 @@ fn parse_args() -> Args {
             "--repeat" => args.repeat = count(it.next()),
             "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--nesting-limit" => args.nesting_limit = Some(count(it.next()) as u32),
+            "--version" => {
+                let version = it.next().and_then(|v| csharp_syntax::LanguageVersion::from_name(&v));
+                let mut defaults = csharp_defaults();
+                defaults.version = version.unwrap_or_else(|| usage());
+                set_csharp_defaults(defaults);
+            }
+            "--doc" => {
+                let doc = it.next().and_then(|d| csharp_syntax::DocumentationMode::from_name(&d));
+                let mut defaults = csharp_defaults();
+                defaults.doc_mode = doc.unwrap_or_else(|| usage());
+                set_csharp_defaults(defaults);
+            }
             "--lang" => {
                 args.lang = Some(match it.next().as_deref() {
                     Some("kotlin") => Lang::Kotlin,
@@ -355,11 +368,25 @@ fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &s
     true
 }
 
+/// The C# file kind of a list line's empty or absent columns: `--version` and `--doc` (once each), else `latest`,
+/// `compilation-unit`, `parse`.
+static CSHARP_DEFAULTS: std::sync::Mutex<Option<csharp_syntax::FileKind>> = std::sync::Mutex::new(None);
+
+fn csharp_defaults() -> csharp_syntax::FileKind {
+    CSHARP_DEFAULTS.lock().ok().and_then(|d| *d).unwrap_or_default()
+}
+
+fn set_csharp_defaults(kind: csharp_syntax::FileKind) {
+    if let Ok(mut d) = CSHARP_DEFAULTS.lock() {
+        *d = Some(kind);
+    }
+}
+
 /// A C# list line, `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle` reads it (an empty or absent
-/// column takes the default: `latest`, `compilation-unit`, `parse`); `None` for a column that names nothing.
+/// column takes `csharp_defaults`); `None` for a column that names nothing.
 fn csharp_line(line: &str) -> Option<(&str, csharp_syntax::FileKind)> {
     let columns: Vec<&str> = line.split('\t').collect();
-    let mut kind = csharp_syntax::FileKind::default();
+    let mut kind = csharp_defaults();
     if let Some(v) = columns.get(1).filter(|v| !v.is_empty()) {
         kind.version = csharp_syntax::LanguageVersion::from_name(v)?;
     }
@@ -485,8 +512,8 @@ fn main() {
 
     if args.lex && args.bench {
         if csharp_files != 0 {
-            eprintln!("--lex --bench: not for C# yet (the lexer is being ported)");
-            std::process::exit(2);
+            csharp_lex_bench(&args, root, &paths, &mut stdout);
+            return;
         }
         lex_bench(&args, root, &paths, java_files != 0, &mut stdout);
         return;
@@ -651,7 +678,7 @@ impl BenchLanguage for csharp_syntax::CSharp {
     }
     /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing.
     fn file_kind(line: &str) -> (&str, csharp_syntax::FileKind) {
-        csharp_line(line).unwrap_or((line.split('\t').next().unwrap_or(line), csharp_syntax::FileKind::default()))
+        csharp_line(line).unwrap_or((line.split('\t').next().unwrap_or(line), csharp_defaults()))
     }
     fn counters() -> Vec<u64> {
         Vec::new()
@@ -979,6 +1006,40 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], java: bool, stdout: &mu
                 doc_mb / doc_seconds.max(1e-9)
             );
         }
+    }
+    if args.repeat > 1 {
+        let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
+    }
+}
+
+/// `--lex --bench` of C# files: the lexer alone (`Parser::lex_count`, every token of `SyntaxFactory.ParseTokens` with
+/// its trivia, directives and diagnostics, no tree), over the valid UTF-8 files of the list.
+fn csharp_lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
+    let sources: Vec<(Vec<u8>, csharp_syntax::FileKind)> = paths
+        .iter()
+        .filter_map(|line| {
+            let (path, kind) = csharp_line(line)?;
+            csharp_source(root, path).ok().map(|text| (text, kind))
+        })
+        .collect();
+    let mb = sources.iter().map(|s| s.0.len()).sum::<usize>() as f64 / 1e6;
+    let mut parser = csharp_syntax::Parser::new();
+    let mut round_mbs = Vec::new();
+    for round in 1..=args.repeat {
+        let (mut tokens, mut seconds) = (0usize, 0.0);
+        for (text, kind) in &sources {
+            let start = Instant::now();
+            tokens += parser.lex_count(text, *kind);
+            seconds += start.elapsed().as_secs_f64();
+        }
+        let mbs = mb / seconds.max(1e-9);
+        round_mbs.push(mbs);
+        let prefix = if args.repeat > 1 { format!("round {round}  ") } else { String::new() };
+        let _ = writeln!(
+            stdout,
+            "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
+            sources.len()
+        );
     }
     if args.repeat > 1 {
         let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);

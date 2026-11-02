@@ -16,7 +16,11 @@
 #      cached oracle dumps, 0 lines;
 #   8. Java's bodies and too-deep paths: `parse_body` of every unexpanded code block of the community .java files
 #      against the full parse, and the same with nesting limit 3 on the community .java files and the golden mutations,
-#      every tree lossless.
+#      every tree lossless;
+#   9. C#'s lexer (`ksdump --lex --lang csharp --doc none`, Roslyn 5.9.0's `SyntaxFactory.ParseTokens` with
+#      directives and diagnostics) on the four corpora of tools/csharp-oracle (dotnet/roslyn, dotnet/runtime,
+#      dotnet/aspnetcore, Avalonia), its golden mutations and its lexer fuzz against the cached lines of
+#      `tools/csharp-oracle/oracle.sh lex --doc none`, 0 differing lines.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -79,5 +83,18 @@ for corpus in "$C/corpus/java-community-3caa0bf.list $ROOT" "$C/fuzz/java-mut.li
   set -- $corpus
   deep=$($B --check-bodies --nesting-limit 3 --list "$1" --root "$2" | tail -1)
   echo "java nesting limit 3, $(basename "$1"): $deep"; case "$deep" in *"differing 0 "*) ;; *) fail=1 ;; esac
+done
+# C#: the lexer against tools/csharp-oracle's cached `lex --doc none` lines (the four corpora, the golden mutations,
+# the lexer fuzz; the mutations' lines were made from the list's paths alone, the defaults for every file).
+cut -f1 "$C/fuzz/csharp-mut.list" > "$O/csharp-mut.paths"
+for corpus in "corpus/csharp-roslyn-35d9211.list $C/csharp-src/roslyn csharp-roslyn-35d9211" \
+  "corpus/csharp-runtime-6aa72da.list $C/csharp-src/runtime csharp-runtime-6aa72da" \
+  "corpus/csharp-aspnetcore-0ef4bbf.list $C/csharp-src/aspnetcore csharp-aspnetcore-0ef4bbf" \
+  "corpus/csharp-avalonia-2d79ba5.list $C/csharp-src/avalonia csharp-avalonia-2d79ba5" \
+  "$O/csharp-mut.paths $C/fuzz/csharp-mut csharp-mut" "fuzz/csharp-lex/list $C/fuzz/csharp-lex csharp-lex"; do
+  set -- $corpus
+  case "$1" in /*) list=$1 ;; *) list=$C/$1 ;; esac
+  n=$($B --lex --lang csharp --doc none --list "$list" --root "$2" | diff - "$C/lex/$3.oracle.txt" | grep -c '^[<>]')
+  echo "csharp lex $3: $n differing lines of $(wc -l < "$C/lex/$3.oracle.txt" | tr -d ' ')"; [ "$n" = 0 ] || fail=1
 done
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }

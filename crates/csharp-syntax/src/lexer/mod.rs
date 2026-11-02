@@ -220,6 +220,8 @@ pub struct Lexer<'t> {
     buffers: LexerBuffers,
     /// The nesting of the recursive scanners (`MAX_NESTED_SCAN_DEPTH`).
     pub(crate) scan_depth: u32,
+    /// The run of `@`s `TryScanAtStringToken` measured last.
+    at_run: std::ops::Range<u32>,
 }
 
 impl<'t> Lexer<'t> {
@@ -268,6 +270,7 @@ impl<'t> Lexer<'t> {
             arena,
             buffers,
             scan_depth: 0,
+            at_run: 0..0,
         }
     }
 
@@ -898,16 +901,28 @@ impl<'t> Lexer<'t> {
     pub(crate) fn try_scan_at_string_token(&mut self, info: &mut TokenInfo) -> bool {
         debug_assert!(self.text_window.peek_char() == c(b'@'));
 
-        let mut index = 0;
-        while self.text_window.peek_char_at(index) == c(b'@') {
-            index += 1;
-        }
+        // `while (TextWindow.PeekChar(index) == '@') index++;`: the `@`s are a byte each, so the character after them
+        // is the one at their end (a scan forward, not `PeekChar(index)` from the start for every `@`)
+        // (and a hole of `@`s asks at each of them: the run of the last one asked is kept)
+        let position = self.text_window.position();
+        let end = if self.at_run.start <= position && position < self.at_run.end {
+            self.at_run.end
+        } else {
+            let text = self.text_window.text();
+            let mut end = position;
+            while end < self.text_window.text_end() && text[end as usize] == b'@' {
+                end += 1;
+            }
+            self.at_run = position..end;
+            end
+        };
+        let after = self.text_window.char_at(end);
 
-        if self.text_window.peek_char_at(index) == c(b'"') {
+        if after == c(b'"') {
             // @"
             self.scan_verbatim_string_literal(info);
             return true;
-        } else if self.text_window.peek_char_at(index) == c(b'$') {
+        } else if after == c(b'$') {
             // @$"
             self.scan_interpolated_string_literal(info);
             return true;

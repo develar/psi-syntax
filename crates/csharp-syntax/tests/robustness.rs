@@ -187,6 +187,8 @@ fn deep_lexer_forms_lex_losslessly() {
             format!("#if {}\n#endif\n", vec!["A"; n].join(" == ")),
             format!("#if B\n{}{}#endif\n", "#if A\n".repeat(n), "#endif\n".repeat(n)),
             format!("#region\n{}", "#region\n#endregion\n".repeat(n)),
+            format!("{}\"", "@".repeat(n)),
+            format!("$\"{{{}}}\"", "@".repeat(n)),
         ];
         for text in &texts {
             let lexed = parser.lex(text, FileKind::default());
