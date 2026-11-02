@@ -108,8 +108,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `is_unexpanded(id)`; doc comments are still expanded. `tree.parse_body(id)` (or `parser.parse_body(&tree, id,
   options)`) parses one on demand into its own `Tree` over the same source, exactly the full parse's subtree there
   (the gate checks all 229 960 bodies of the community files). For declaration-only passes, summaries, navigation;
-  a pass over call sites parses in full. Measured on the community files, one thread: 72.0 -> 144.5 MB/s, nodes
-  63.7M -> 31.2M, tree 7.64 -> 4.25 bytes per source byte.
+  a pass over call sites parses in full. Measured on the community files, one thread, 72c8c11: Kotlin
+  111.3 -> 231.8 MB/s, nodes 63.7M -> 31.2M, tree 7.64 -> 4.26 bytes per source byte; Java 120.0 -> 265.2 MB/s,
+  nodes 85.3M -> 38.6M, tree 8.12 -> 4.24.
 - Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
   levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
   parenthesized types; a lazy block or lambda adds 4 to where it sits) up to `builder::NESTING_LIMIT` (1000), at most
@@ -128,9 +129,12 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
   noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.
 - Build: the consumer's release profile compiles psi-syntax. Fat LTO and one codegen unit, as here; a profile-guided
-  build (`scripts/pgo.sh` is the recipe: instrument, run over a few MB of Kotlin and Java, merge, rebuild) cuts 13-14 %
-  of Kotlin's and 13-17 % of Java's instructions (×1.11 and ×1.26 wall on one thread) with byte-identical trees;
-  `panic = "abort"` another 1-2 %. Measured in DESIGN, "Build and toolchain".
+  build (`scripts/pgo.sh` is the recipe: instrument, run over a few MB of Kotlin and Java, merge, rebuild with the
+  same rustc; in a consumer's own build `RUSTFLAGS=-Cprofile-generate=DIR`, a run, `llvm-profdata merge`,
+  `RUSTFLAGS=-Cprofile-use=merged.profdata`) cuts 12 % of Kotlin's and 13 % of Java's instructions on 72c8c11
+  (goldens as training; ×1.10 and ×1.13 wall on one thread; other real code as training did 1-4 points better on the
+  hints commit's first base) with byte-identical trees; `panic = "abort"` another 1-2 %. Measured in DESIGN, "Build
+  and toolchain" and "Current".
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
 

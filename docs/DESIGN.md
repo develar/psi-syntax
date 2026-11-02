@@ -188,11 +188,14 @@ Marker storage:
   binders take a shortcut exact by their contract: `DEFAULT_LEFT_BINDER`'s edge is the whitespace's end and
   `DEFAULT_RIGHT_BINDER`'s its start, whichever of the Java's three cases (a token view of positive, negative or
   zero size) applies, so neither builds a view.
-- **`bind` walks the production directly**, with an explicit stack and no `prepareLightTree` links, in one loop over
-  the entries (leaves, then open or close a composite or append an error), leaving its state machine only at a
-  chameleon leaf, a collapsed marker and the end. It reproduces `prepareLightTree`'s rules:
+- **`bind` walks the production directly**, with no stack and no `prepareLightTree` links, in one loop over the
+  entries (leaves, then open or close a composite or append an error), leaving its state machine only at a
+  chameleon leaf, a collapsed marker and the end. The open composites are the current node's ancestors in the tree
+  being built: closing one reads its parent from the tree, and each open composite's marker is stashed in its
+  subtree end (`TreeData::stash`) until closing overwrites it; the root's marker is `BindState`'s. It reproduces
+  `prepareLightTree`'s rules:
   - any done closes the current marker at its own done lexeme;
-  - the stack starts as `[root]`, so entries after the root's done become root children;
+  - a done at the root closes nothing, so entries after the root's done become root children;
   - error items inside collapsed markers count for the global dedup, although their entries are skipped;
   - open markers close innermost first.
 
@@ -497,7 +500,54 @@ The machine is an Apple M5 Max shared with other sessions. Every comparison alte
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
 
-### Current, c796e73, 2026-11-01
+### Current, 72c8c11 (the code of 7ce233e), 2026-11-02
+
+Against 9b8c26f, the master before the builder core batch, rebuilt in a temporary worktree; both binaries are plain
+`cargo build --release --locked` builds with the workspace profile. Load was 1.2-4.8 (a quiet machine).
+Instructions and cycles are the primary metric: per parse round, the difference of `ksdump --bench --repeat 4` and
+`--repeat 1` under `/usr/bin/time -l`, divided by 3, binaries alternating, 2 or 3 passes each (at 16 threads, all
+threads of the process). Wall is secondary: `scripts/ab.sh`, alternating, medians; at 16 threads, wall time per round.
+
+| measure | Kotlin (55 501 files, 172.91 MB) | Java (68 263 files, 215.75 MB) |
+|---|---|---|
+| instructions, 1 thread | 54.19 → 35.39-35.40 G (−34.7 %) | 75.38-75.40 → 43.47 G (−42.3 %) |
+| cycles, 1 thread | 9.96-9.98 → 6.81-6.84 G (−31.6 %) | 13.79 → 7.88-7.91 G (−42.7 %) |
+| instructions, 16 threads | 53.87-54.21 → 35.41 G | 75.24-75.44 → 43.28-43.54 G |
+| cycles, 16 threads | 12.18-12.19 → 8.26-8.28 G (−32.1 %) | 15.93-16.00 → 9.67-9.76 G (−39.1 %) |
+| wall, 1 thread (5 rounds, load 1.5-1.7) | 75.4 → 111.3 MB/s (×1.48) | 69.1 → 120.0 MB/s (×1.74) |
+| wall, 16 threads (3 rounds, load 1.5-4.8) | 956.5 → 1414.9 MB/s (×1.48) | 913.2 → 1488.4 MB/s (×1.63) |
+| body-less, 1 thread (3 rounds, load 1.9-2.2) | 149.6 → 231.8 MB/s (×1.55) | 127.2 → 265.2 MB/s (×2.08) |
+| lexer alone (`--lex --bench --repeat 7`, 2 passes) | 5.80 → 3.11 G, cycles 1.46-1.48 → 1.01-1.04 G; 539 → 770 MB/s | 3.73-3.86 G, cycles 1.16 G, 852 MB/s (9b8c26f cannot bench the Java lexer) |
+| doc-comment lexer alone (`--docs`, one run) | 453.5 MB/s over 9.54 MB of KDoc | 494.3 MB/s over 9.37 MB of JavaDoc |
+
+B was faster in every round. The first pass of 9b8c26f's Kotlin (53.79 G) and Java (73.41 G, 12.40 G cycles) is
+below the others, an outlier of its `--repeat 1` run; the other passes gave 54.19 G and 75.38-75.40 G. At 16 threads a
+round costs 21-23 % more cycles than on one thread (8.27 against 6.82 G Kotlin) for the same instructions: the cores
+share caches and memory bandwidth.
+
+The trees are the same on both commits (deterministic, single values):
+
+| | Kotlin | Java |
+|---|---|---|
+| nodes | 63 742 904 | 85 270 521 |
+| tree per source MB (text included) | 7.64 MB | 8.12 MB |
+| bytes a node | 20.7 | 20.6 |
+| nodes per source KB | 368.6 | 395.2 |
+| largest tree | 3.4 MB | 9.3 MB |
+| body-less: nodes, tree per source MB | 31 240 422, 4.26 MB | 38 558 344, 4.24 MB |
+
+The preorder walk measures 2.16 → 2.18 ns/node and the linear scan 1.57 → 1.53 ns/node (Kotlin, one run each, the
+same checksum `96e0e5f40acc13a0`); as a share of the faster parse the walk is now 9.0 % (6.1 % before).
+
+`scripts/pgo.sh` (training on the goldens) on 72c8c11 against the plain build, alternating, 2 passes: Kotlin
+35.01-35.38 → 31.06-31.07 G (−12.2 %), cycles 6.85-6.86 → 6.15-6.17 G; Java 43.16-43.47 → 37.79-37.80 G (−13.0 %),
+cycles 7.92-7.94 → 6.92-6.94 G. `scripts/ab.sh`, 3 rounds at load 1.4-2.0: Kotlin 112.7 → 124.3 MB/s (×1.10), Java
+121.0 → 137.2 MB/s (×1.13). Its `--walk` checksums (kind, range and depth of every node) and tree bytes equal the
+plain build's on both corpora (`96e0e5f40acc13a0`, `c7e0ef63cac45006`); the gate itself did not run on it.
+
+The gate passed on 72c8c11 and on the commit carrying this section.
+
+### c796e73, 2026-11-01
 
 There were 3 alternating rounds. In each round `ksdump --bench --repeat 3` (or `ts-bench … 3`) ran with 1 thread,
 then tree-sitter-kotlin with 1 thread, then 16 threads, then `--walk`. The figures are medians over rounds of each
@@ -757,13 +807,15 @@ Not landed, from the same round of branches:
 | be86ab9 … 194a628 | byte-class lexing loops, keyword hashes, doc-comment runs (on the builder core batch) | 99.5 → 108.7; Java 89.9 → 119.9 (bench, alternating, load 1.4-2.6) | | instructions per round 40.74 → 36.00 G, Java 59.12 → 44.23 G |
 | 7ce233e (measured first as a child of 9b8c26f) | inline and cold hints where a profile inlines | Kotlin 62.5 → 62.2 (9 rounds, load 9.5-13, noise); Java 56.9 → 63.2 (7 rounds, load 8-12) | | instructions per round Kotlin −3.9 %, Java −8.7 %; core cycles −6 %, −10 %; binary 1384 → 1666 KB; on the lexer batch −1.7 % both |
 | 9b8c26f → 7ce233e | the radical batch integrated | 77.4 → 114.4 (5 rounds, load 1.2-1.7); Java 70.5 → 122.7 | 972 → 1419; Java 922 → 1492 | instructions per round 54.19 → 35.40 G, Java 75.40 → 43.48 G |
+| 9b8c26f → 72c8c11 | the final measurement, the baseline rebuilt in a temporary worktree | 75.4 → 111.3 (5 rounds, load 1.5-1.7); Java 69.1 → 120.0 | 956.5 → 1414.9; Java 913.2 → 1488.4 | instructions per round 54.19 → 35.40 G, Java 75.40 → 43.47 G; lexer alone 539 → 770 MB/s; trees unchanged (see "Current") |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
-(×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
-1c8bcfa numbers. They are not an A/B against 1c8bcfa.
+(×1.14, with 16 threads 684.2 → 917.0). 72c8c11's 111.3 MB/s on one thread and 1415 MB/s on 16 are about 2.9× and
+3.1× the 1c8bcfa numbers. They are not an A/B against 1c8bcfa.
 
-The lexer-alone figure today (477 MB/s at load 4) is below the 507.7 MB/s recorded for a405a03. The source is the
-same, so this is machine state, not a regression that was measured.
+The Kotlin lexer alone measures 539 MB/s on 9b8c26f at load 2.4, against 477 MB/s for c796e73 at load 4 and
+507.7 MB/s for a405a03, all over the same lexer source: the spread is machine state, not a measured change. On
+72c8c11 it is 770 MB/s in the same alternating runs.
 
 ### Profile after batch 1 (f3aa172, `scripts/profile.py`, 1 thread)
 
@@ -780,8 +832,9 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **Java speed.** One thread at 122.7 MB/s against Kotlin's 114.4 on 7ce233e (load 1.2-1.7, see "The radical batch
-  integrated"); the Java builder path still has no `--features counters` output.
+- **Java speed.** One thread at 120.0 MB/s against Kotlin's 111.3 on 72c8c11 (load 1.5-1.7, "Current"): 0.201 G
+  instructions per source MB against Kotlin's 0.205 G. The Java builder path still has no `--features counters`
+  output.
 - **Java's rolled-back lambda parameters.** `(a<b>c(…` looks like a typed lambda: its parameter list is parsed, with
   PSI's error recovery to the `)` that ends it, then rolled back, at every level. So each level inside the nesting
   limit scans the rest of the text: 10 000 levels of `(a<b>c(` with `)) + 1` or `)) - 1` after take 0.8 s, 100 000
