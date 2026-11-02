@@ -1065,6 +1065,25 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
+    /// The index of the first token starting at `offset` or later, the token count when none does; `usize::MAX` past
+    /// the text's end (not in the Java): a layer that ends the stream at an offset (Java's stopping builder) compares
+    /// the cursor with it (`skipped_lexeme`) instead of the current offset with the offset.
+    pub fn first_token_at(&self, offset: i32) -> usize {
+        if offset as i64 > self.len as i64 {
+            return usize::MAX;
+        }
+        self.lex_starts[..self.lexeme_count].partition_point(|&s| (s as i64) < offset as i64)
+    }
+
+    /// The cursor after `eof()`'s skip of whitespace and comments, with `eof()`'s effects (not in the Java):
+    /// `getCurrentOffset() >= offset` is `skipped_lexeme() >= first_token_at(offset)` for an offset within the text.
+    #[inline(always)]
+    pub fn skipped_lexeme(&mut self) -> usize {
+        self.current_lexeme = self.sig;
+        self.checked = true;
+        self.sig
+    }
+
     /// `getCurrentOffset()`: the start of the current token, the text length at the end.
     pub fn get_current_offset(&mut self) -> i32 {
         if self.eof() {

@@ -182,6 +182,9 @@ pub struct SyntaxTreeBuilder<'b> {
     b: &'b mut PsiBuilderImpl,
     /// The `stopAt` of the innermost stopping builder; `i32::MAX` when there is none.
     stop_at: i32,
+    /// The first token starting at `stop_at` or later (`PsiBuilderImpl::first_token_at`), `usize::MAX` when none
+    /// stops the stream: `currentOffset >= stopAt` is the cursor (after `eof()`'s skip) at it or past it.
+    stop_token: usize,
 }
 
 impl AsPsiBuilder for SyntaxTreeBuilder<'_> {
@@ -195,18 +198,20 @@ impl AsPsiBuilder for SyntaxTreeBuilder<'_> {
 impl<'b> SyntaxTreeBuilder<'b> {
     /// The builder itself, without an adapter.
     pub fn new(b: &'b mut PsiBuilderImpl) -> Self {
-        SyntaxTreeBuilder { b, stop_at: i32::MAX }
+        SyntaxTreeBuilder { b, stop_at: i32::MAX, stop_token: usize::MAX }
     }
 
     /// `JavaParserUtil.stoppingBuilder(builder, stopAt)`: this builder ending at the offset `stop_at`.
     pub fn stopping_builder(&mut self, stop_at: i32) -> SyntaxTreeBuilder<'_> {
-        SyntaxTreeBuilder { b: self.b, stop_at: self.stop_at.min(stop_at) }
+        let stop_at = self.stop_at.min(stop_at);
+        let stop_token = if stop_at == i32::MAX { usize::MAX } else { self.b.first_token_at(stop_at) };
+        SyntaxTreeBuilder { b: self.b, stop_at, stop_token }
     }
 
     /// `tokenType`: the current token, `None` at the end (or from the stopping offset on).
     #[inline]
     pub fn token_type(&mut self) -> Option<TokenKind> {
-        if self.stop_at != i32::MAX && self.b.get_current_offset() >= self.stop_at {
+        if self.b.skipped_lexeme() >= self.stop_token {
             return None;
         }
         self.b.get_token_type()
@@ -215,7 +220,7 @@ impl<'b> SyntaxTreeBuilder<'b> {
     /// `eof()`.
     #[inline]
     pub fn eof(&mut self) -> bool {
-        (self.stop_at != i32::MAX && self.b.get_current_offset() >= self.stop_at) || self.b.eof()
+        self.b.skipped_lexeme() >= self.stop_token || self.b.eof()
     }
 
     /// `advanceLexer()`.
