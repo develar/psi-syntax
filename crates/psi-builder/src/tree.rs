@@ -114,6 +114,25 @@ impl TreeData {
         n.subtree_end = len;
     }
 
+    /// The parent of a node being built.
+    #[inline(always)]
+    pub(crate) fn parent_of(&self, node: u32) -> u32 {
+        self.nodes[node as usize].parent
+    }
+
+    /// Keeps `value` in an open composite's subtree end until `set_end` writes it (`bind` keeps the marker of each
+    /// open composite there, instead of a stack of them).
+    #[inline(always)]
+    pub(crate) fn stash(&mut self, node: u32, value: u32) {
+        self.nodes[node as usize].subtree_end = value;
+    }
+
+    /// What `stash` kept in an open composite.
+    #[inline(always)]
+    pub(crate) fn stashed(&self, node: u32) -> u32 {
+        self.nodes[node as usize].subtree_end
+    }
+
     /// Marks a chameleon block or lambda as left unexpanded.
     fn set_unexpanded(&mut self, node: u32) {
         self.nodes[node as usize].kind |= UNEXPANDED;

@@ -206,7 +206,8 @@ const DROP_TOKENS_MIN: usize = 1 << 12;
 struct BindState {
     root_marker: u32,
     root_node: u32,
-    /// The marker and node leaves and children go to; `bind_stack` holds their ancestors below the root.
+    /// The marker and node leaves and children go to. Their ancestors below the root are the node's parents in the
+    /// tree, each open composite's marker stashed in its subtree end (`TreeData::stash`) until it is closed.
     cur_marker: u32,
     cur_node: u32,
     /// The next token to insert, and the end of the tokens to insert before `then`.
@@ -217,6 +218,18 @@ struct BindState {
     /// The next production entry.
     i: usize,
     then: BindStep,
+}
+
+impl BindState {
+    /// The current composite closed: its parent becomes current, with the marker stashed in it (the root's own).
+    #[inline(always)]
+    fn close_to_parent(&mut self, tree: &TreeData) {
+        if self.cur_node != self.root_node {
+            self.cur_node = tree.parent_of(self.cur_node);
+            self.cur_marker =
+                if self.cur_node == self.root_node { self.root_marker } else { tree.stashed(self.cur_node) };
+        }
+    }
 }
 
 /// What `bind` does once the tokens before it are inserted.
@@ -435,8 +448,6 @@ pub struct PsiBuilderImpl<L: Language> {
     entries: Vec<Entry>,
     /// The error messages markers refer to (`MarkerData::message`).
     messages: Vec<Cow<'static, str>>,
-    /// `bind`'s open composites below the root: (marker, node) of each one's parent.
-    bind_stack: Vec<(u32, u32)>,
     bind: BindState,
     /// For each token `i`, the first token at or after it that closes a bracket opened before `i`
     /// (`skip_too_deeply_nested`); computed the first time a construct is too deeply nested, empty until then.
@@ -516,7 +527,6 @@ impl<L: Language> Default for PsiBuilderImpl<L> {
             production_len: 0,
             entries: Vec::new(),
             messages: Vec::new(),
-            bind_stack: Vec::new(),
             bind: BindState::default(),
             closers: Vec::new(),
             block_closers: Vec::new(),
@@ -584,7 +594,6 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.production_len = 0;
         self.entries.clear();
         self.messages.clear();
-        self.bind_stack.clear();
         self.bind = BindState::default();
         self.closers.clear();
         self.block_closers.clear();
@@ -1603,7 +1612,6 @@ impl<L: Language> PsiBuilderImpl<L> {
             Some(node) => node,
             None => tree.add_composite(u32::MAX, root_type, base),
         };
-        self.bind_stack.clear();
         // At most a leaf per token and a node per production entry (a start or an error).
         tree.reserve(self.lexeme_count + self.entries.len());
         self.bind = if root_marker == NONE {
@@ -1731,17 +1739,14 @@ impl<L: Language> PsiBuilderImpl<L> {
                 BindStep::Next => self.bind_entries(st, tree),
                 BindStep::Close => {
                     tree.set_end(st.cur_node, self.offset_of(st.lex_index));
-                    if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
-                        st.cur_marker = parent_marker;
-                        st.cur_node = parent_node;
-                    }
+                    st.close_to_parent(tree);
                     st.then = BindStep::Next;
                 }
                 BindStep::Open(id) => {
                     st.then = BindStep::Next;
                     if !self.marker(id).collapsed {
-                        self.bind_stack.push((st.cur_marker, st.cur_node));
                         st.cur_node = self.create_composite(id, st.cur_node, st.lex_index, tree);
+                        tree.stash(st.cur_node, id);
                         st.cur_marker = id;
                         continue;
                     }
@@ -1776,7 +1781,7 @@ impl<L: Language> PsiBuilderImpl<L> {
                     self.append_error_item(id, st.cur_node, st.lex_index, tree);
                 }
                 BindStep::CloseOpen => {
-                    if self.bind_stack.is_empty() {
+                    if st.cur_node == st.root_node {
                         st.insert_to = self.leaf_end(self.marker(st.root_marker).done_lexeme);
                         st.then = BindStep::RootTail;
                     } else {
@@ -1786,10 +1791,7 @@ impl<L: Language> PsiBuilderImpl<L> {
                 }
                 BindStep::CloseOpenOne => {
                     tree.set_end(st.cur_node, self.offset_of(st.lex_index));
-                    if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
-                        st.cur_marker = parent_marker;
-                        st.cur_node = parent_node;
-                    }
+                    st.close_to_parent(tree);
                     st.then = BindStep::CloseOpen;
                 }
                 BindStep::RootTail => {
@@ -1819,18 +1821,19 @@ impl<L: Language> PsiBuilderImpl<L> {
         let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
         let done_own = self.extras_linked == 0;
         let (count, shift, base) = (self.lexeme_count, self.token_shift, self.base as u32);
-        let PsiBuilderImpl { entries, lex_types, lex_starts, markers, messages, bind_stack, .. } = self;
+        let PsiBuilderImpl { entries, lex_types, lex_starts, markers, messages, .. } = self;
         let (entries, types, starts) = (&entries[..], &lex_types[..], &lex_starts[..]);
         let leaf_end = |lexeme: i32| (lexeme.max(0) as usize).min(count);
         let offset = |k: usize| base + starts[k.min(count) - shift];
         let (mut i, mut lex, mut cur_node, mut cur_marker) = (st.i, st.lex_index, st.cur_node, st.cur_marker);
+        let (root_node, root_marker) = (st.root_node, st.root_marker);
         let mut last_error = st.last_error_index;
         st.then = loop {
             let Some(&e) = entries.get(i) else { break BindStep::CloseOpen };
             i += 1;
             let (to, then) = if e.id < 0 {
                 // done marker; an unbalanced one is only reported in Java
-                if bind_stack.is_empty() {
+                if cur_node == root_node {
                     continue;
                 }
                 // It closes the current marker at that marker's done lexeme: the entry's own, when it is that
@@ -1874,14 +1877,12 @@ impl<L: Language> PsiBuilderImpl<L> {
             match then {
                 BindStep::Close => {
                     tree.set_end(cur_node, offset(lex));
-                    if let Some((parent_marker, parent_node)) = bind_stack.pop() {
-                        cur_marker = parent_marker;
-                        cur_node = parent_node;
-                    }
+                    cur_node = tree.parent_of(cur_node);
+                    cur_marker = if cur_node == root_node { root_marker } else { tree.stashed(cur_node) };
                 }
                 BindStep::Open(id) => {
-                    bind_stack.push((cur_marker, cur_node));
                     let node = tree.push_composite(cur_node, e.ty, offset(lex));
+                    tree.stash(node, id);
                     if e.ty == error_index {
                         tree.set_error(node, take_message(markers, messages, id));
                     }
