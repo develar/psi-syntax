@@ -283,6 +283,45 @@ pub(crate) struct FlexJavaDocLexer {
     generic_nesting_level: i32,
 }
 
+/// The bytes that end a `comment_data_run`: the line terminators of JFlex's `.` in ASCII (`\n`, `\r`, `\u000B`; `\f`
+/// is `[\ \t\f]+`), and `{`, `}` and `*`, which start the rules whose tokens are not DOC_COMMENT_DATA (an inline tag's
+/// start and end, `"*"+"/"`).
+const DATA_STOP: [bool; 256] = {
+    let mut table = [false; 256];
+    let stops = b"\n\r\x0B{}*";
+    let mut i = 0;
+    while i < stops.len() {
+        table[stops[i] as usize] = true;
+        i += 1;
+    }
+    table
+};
+
+/// Outside markdown mode, in COMMENT_DATA (or in COMMENT_DATA_START at a byte that is not `[\ \t\f]` or `@`), every
+/// rule that can match at a character which is not a `DATA_STOP` byte or a line terminator above ASCII returns
+/// DOC_COMMENT_DATA and moves to (or stays in) COMMENT_DATA: `.`, `[\ \t\f]+` (`commentDataWithSpaces` is set only in
+/// markdown mode), the escapes, the code fence and the punctuation rules; none of their matches extends over a
+/// `DATA_STOP` byte. So the run of such characters merges (`MergingLexerAdapter`) into what its one-rule tokens would:
+/// its end, the end of the text when nothing stops it.
+fn comment_data_run(text: &[u8], pos: usize) -> usize {
+    let mut p = pos;
+    while let Some(&b) = text.get(p) {
+        if b < 0x80 {
+            if DATA_STOP[b as usize] {
+                break;
+            }
+            p += 1;
+        } else {
+            let (c, len) = char_at(text, p);
+            if !is_dot(c) {
+                break;
+            }
+            p += len;
+        }
+    }
+    p
+}
+
 /// `{WHITE_DOC_SPACE_CHAR}` = `[\ \t\f\n\r]`.
 fn is_ws(b: u8) -> bool {
     matches!(b, b' ' | b'\t' | 0x0C | b'\n' | b'\r')
@@ -337,6 +376,16 @@ impl FlexJavaDocLexer {
         let state = self.zz_lexical_state;
         let byte = |i: usize| text.get(pos + i).copied();
         let b0 = text[pos];
+        if !self.my_markdown_mode
+            && !DATA_STOP[b0 as usize]
+            && (state == COMMENT_DATA || (state == COMMENT_DATA_START && !matches!(b0, b' ' | b'\t' | 0x0C | b'@')))
+        {
+            let end = comment_data_run(text, pos);
+            if end > pos {
+                self.yybegin(COMMENT_DATA);
+                return (DOC_COMMENT_DATA, end);
+            }
+        }
         let (c0, l0) = char_at(text, pos);
         let mut best = Best::default();
 

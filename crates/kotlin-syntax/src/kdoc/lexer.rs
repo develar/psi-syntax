@@ -113,7 +113,7 @@ enum Rule {
 use Rule::*;
 
 /// The rules active in a state, in spec order.
-fn rules(state: State) -> &'static [Rule] {
+const fn rules(state: State) -> &'static [Rule] {
     match state {
         State::Initial => &[Start, End, BadCharacter],
         State::LineBeginning => &[
@@ -188,25 +188,158 @@ fn rules(state: State) -> &'static [Rule] {
     }
 }
 
+/// Every rule, by its position in spec order.
+const ALL_RULES: [Rule; BadCharacter as usize + 1] = [
+    Start,
+    End,
+    LineBeginningWhiteSpace,
+    LineBeginningAsterisks,
+    TagName,
+    TagBeginningLineBreak,
+    TagBeginningWhiteSpace,
+    TagBeginningCodeLink,
+    TagBeginningQualifiedName,
+    TagBeginningAny,
+    TagTextLineBreak,
+    TagTextWhiteSpace,
+    TagTextCodeLink,
+    TagTextBackticks,
+    TagTextAny,
+    CodeFenceStart,
+    ContentsBackticks,
+    CodeSpanLineBreak,
+    CodeSpanBackticks,
+    CodeSpanAny,
+    CodeSpanLineWhiteSpace,
+    CodeSpanLineAsterisks,
+    ContentsLineBreak,
+    ContentsWhiteSpace,
+    EscapedChar,
+    LPar,
+    RPar,
+    ContentsCodeLink,
+    ContentsAny,
+    CodeBlockLineWhiteSpace,
+    CodeBlockLineAsterisks,
+    CodeFenceEnd,
+    CodeBlockLineBreak,
+    CodeBlockWhiteSpace,
+    CodeBlockAny,
+    BadCharacter,
+];
+
+/// The bytes a match of `rule` can start with (a superset: `try_rule` decides), `true` for any byte.
+const fn rule_can_start(rule: Rule, b: u8) -> bool {
+    match rule {
+        Start => b == b'/',
+        End | LineBeginningAsterisks | CodeSpanLineAsterisks | CodeBlockLineAsterisks => b == b'*',
+        LineBeginningWhiteSpace
+        | TagBeginningWhiteSpace
+        | TagTextWhiteSpace
+        | CodeSpanLineWhiteSpace
+        | ContentsWhiteSpace
+        | CodeBlockLineWhiteSpace
+        | CodeBlockWhiteSpace => matches!(b, b' ' | b'\t' | 0x0C),
+        TagName => b == b'@',
+        TagBeginningLineBreak | TagTextLineBreak | CodeSpanLineBreak | ContentsLineBreak | CodeBlockLineBreak => {
+            matches!(b, b'\r' | b'\n')
+        }
+        TagBeginningCodeLink | TagTextCodeLink | ContentsCodeLink => b == b'[',
+        // {IDENTIFIER}: a backtick or [:jletter:] (ASCII letters, `$`, `_`, and characters above ASCII)
+        TagBeginningQualifiedName => b == b'`' || b.is_ascii_alphabetic() || b == b'$' || b == b'_' || b >= 0x80,
+        TagTextBackticks | ContentsBackticks | CodeSpanBackticks => b == b'`',
+        CodeFenceStart | CodeFenceEnd => b == b'`' || b == b'~',
+        EscapedChar => b == b'\\',
+        LPar => b == b'(',
+        RPar => b == b')',
+        TagBeginningAny | TagTextAny | CodeSpanAny | ContentsAny | CodeBlockAny | BadCharacter => true,
+    }
+}
+
+/// Per first byte, the rules that can match there (bit `rule as usize`).
+const FIRST_BYTE_RULES: [u64; 256] = {
+    let mut table = [0u64; 256];
+    let mut b = 0;
+    while b < 256 {
+        let mut r = 0;
+        while r < ALL_RULES.len() {
+            if rule_can_start(ALL_RULES[r], b as u8) {
+                table[b] |= 1 << r;
+            }
+            r += 1;
+        }
+        b += 1;
+    }
+    table
+};
+
+/// Per state (`State as usize`), the rules `rules` lists for it (bit `rule as usize`); their spec order is the bits'.
+const STATE_RULES: [u64; 12] = {
+    let states = [
+        State::Initial,
+        State::LineBeginning,
+        State::ContentsBeginning,
+        State::TagBeginning,
+        State::TagTextBeginning,
+        State::Contents,
+        State::CodeBlock,
+        State::CodeBlockLineBeginning,
+        State::CodeBlockContentsBeginning,
+        State::IndentedCodeBlock,
+        State::CodeSpanContents,
+        State::CodeSpanLineBeginning,
+    ];
+    let mut table = [0u64; 12];
+    let mut i = 0;
+    while i < states.len() {
+        let list = rules(states[i]);
+        let mut j = 0;
+        let mut last = 0;
+        while j < list.len() {
+            let r = list[j] as usize;
+            assert!(j == 0 || r > last, "a state's rules are not in spec order");
+            assert!(ALL_RULES[r] as usize == r);
+            table[states[i] as usize] |= 1 << r;
+            last = r;
+            j += 1;
+        }
+        i += 1;
+    }
+    table
+};
+
+/// The bytes that start a rule of CONTENTS other than `ContentsWhiteSpace`, `ContentsAny` and `BadCharacter`: `*` (`End`),
+/// a backtick, CR and LF, a backslash (`EscapedChar`), `(`, `)` and `[` (`ContentsCodeLink`).
+const CONTENTS_STOP: [bool; 256] = {
+    let mut table = [false; 256];
+    let stops = b"*`\r\n\\()[";
+    let mut i = 0;
+    while i < stops.len() {
+        table[stops[i] as usize] = true;
+        i += 1;
+    }
+    table
+};
+
 /// `KDocKnownTag.findByTagName`: `(isReferenceRequired, isSectionStart)` of a known tag name (with or without `@`).
 pub(crate) fn find_known_tag(tag_name: &[u8]) -> Option<(bool, bool)> {
     let name = tag_name.strip_prefix(b"@").unwrap_or(tag_name);
-    let upper: Vec<u8> = name.iter().map(u8::to_ascii_uppercase).collect();
-    Some(match upper.as_slice() {
-        b"AUTHOR" => (false, false),
-        b"THROWS" => (true, false),
-        b"EXCEPTION" => (true, false),
-        b"PARAM" => (true, false),
-        b"RECEIVER" => (false, false),
-        b"RETURN" => (false, false),
-        b"SEE" => (true, false),
-        b"SINCE" => (false, false),
-        b"CONSTRUCTOR" => (false, true),
-        b"PROPERTY" => (true, true),
-        b"SAMPLE" => (true, false),
-        b"SUPPRESS" => (false, false),
-        _ => return None,
-    })
+    // `name.uppercase()` compared with each tag's name (ASCII case only, as the port uppercases)
+    const TAGS: [(&[u8], (bool, bool)); 12] = [
+        (b"AUTHOR", (false, false)),
+        (b"THROWS", (true, false)),
+        (b"EXCEPTION", (true, false)),
+        (b"PARAM", (true, false)),
+        (b"RECEIVER", (false, false)),
+        (b"RETURN", (false, false)),
+        (b"SEE", (true, false)),
+        (b"SINCE", (false, false)),
+        (b"CONSTRUCTOR", (false, true)),
+        (b"PROPERTY", (true, true)),
+        (b"SAMPLE", (true, false)),
+        (b"SUPPRESS", (false, false)),
+    ];
+    TAGS.iter().find(|(tag, _)| tag.eq_ignore_ascii_case(name)).map(|&(_, known)| known)
 }
 
 /// `Character.isWhitespace` of a code point (on a BMP char, as the Java code calls it on `char`s).
@@ -498,8 +631,22 @@ impl<'a> FlexKDocLexer<'a> {
         if start >= self.text.len() || self.failed {
             return None;
         }
+        let b = self.text[start];
+        if !CONTENTS_STOP[b as usize]
+            && (self.state == State::Contents
+                || (self.state == State::ContentsBeginning && !matches!(b, b' ' | b'\t' | 0x0C | b'@' | b'~')))
+        {
+            return Some(self.contents_run(start));
+        }
+        if let Some(token) = self.line_start(start, b) {
+            return Some(token);
+        }
         let mut best: Option<(Rule, usize, usize)> = None;
-        for &rule in rules(self.state) {
+        // The state's rules that can match at this byte, in spec order (`Rule` is in spec order).
+        let mut candidates = STATE_RULES[self.state as usize] & FIRST_BYTE_RULES[self.text[start] as usize];
+        while candidates != 0 {
+            let rule = ALL_RULES[candidates.trailing_zeros() as usize];
+            candidates &= candidates - 1;
             if let Some((match_len, token_len)) = self.try_rule(rule, start)
                 && best.is_none_or(|(_, best_len, _)| match_len > best_len)
             {
@@ -520,6 +667,62 @@ impl<'a> FlexKDocLexer<'a> {
             self.pos = self.text.len();
             return Some(Token { kind: BAD_CHARACTER, start, end: self.text.len() });
         }
+        let kind = self.action(rule, start, end);
+        Some(Token { kind, start, end })
+    }
+
+    /// In CONTENTS at a character that starts no rule but `ContentsWhiteSpace`, `ContentsAny` and `BadCharacter`, or
+    /// in CONTENTS_BEGINNING at one that starts no rule but `ContentsAny` and `BadCharacter` (not whitespace, `@` or
+    /// `~` either; `ContentsAny` then moves to CONTENTS): the run of such characters as one KDOC_TEXT token, which `KDocLexer` would merge from their one-character tokens
+    /// (`ContentsAny`) and whitespace runs (`ContentsWhiteSpace`, also KDOC_TEXT in CONTENTS). Their actions leave the
+    /// state CONTENTS; `ContentsAny`'s also make the block a paragraph and reset the line break count, so the run does
+    /// that when it holds a character other than whitespace. It ends at a byte of `CONTENTS_STOP` (ASCII, so at a
+    /// character boundary) or the end of the text.
+    fn contents_run(&mut self, start: usize) -> Token {
+        let text = self.text;
+        let mut end = start;
+        let mut any = false;
+        while let Some(&b) = text.get(end) {
+            if CONTENTS_STOP[b as usize] {
+                break;
+            }
+            any |= !matches!(b, b' ' | b'\t' | 0x0C);
+            end += 1;
+        }
+        if any {
+            self.last_block_type = Some(BlockType::Paragraph);
+            self.yybegin_and_update(State::Contents);
+        }
+        self.pos = end;
+        Token { kind: KDOC_TEXT, start, end }
+    }
+
+    /// The tokens of a line's start, where the longest match is plain without trying every rule: a line break in
+    /// LINE_BEGINNING, CONTENTS_BEGINNING and CONTENTS (`ContentsLineBreak` ties `ContentsAny` and comes first), the
+    /// whitespace of LINE_BEGINNING (`LineBeginningWhiteSpace` ties `ContentsWhiteSpace` and comes first), its
+    /// asterisks when no `/` follows them (`End` does not match, `LineBeginningAsterisks` is longest) and the whitespace
+    /// of CONTENTS_BEGINNING (`ContentsWhiteSpace`). `None` elsewhere.
+    #[inline(always)]
+    fn line_start(&mut self, start: usize, b: u8) -> Option<Token> {
+        let (rule, len) = match (self.state, b) {
+            (State::LineBeginning | State::ContentsBeginning | State::Contents, b'\n' | b'\r') => (ContentsLineBreak, 1),
+            (State::LineBeginning, b' ' | b'\t' | 0x0C) => {
+                (LineBeginningWhiteSpace, self.run_of(start, |b| matches!(b, b' ' | b'\t' | 0x0C)))
+            }
+            (State::LineBeginning, b'*') => {
+                let stars = self.run_of(start, |b| b == b'*');
+                if self.at(start + stars) == Some(b'/') {
+                    return None;
+                }
+                (LineBeginningAsterisks, stars)
+            }
+            (State::ContentsBeginning, b' ' | b'\t' | 0x0C) => {
+                (ContentsWhiteSpace, self.run_of(start, |b| matches!(b, b' ' | b'\t' | 0x0C)))
+            }
+            _ => return None,
+        };
+        let end = start + len;
+        self.pos = end;
         let kind = self.action(rule, start, end);
         Some(Token { kind, start, end })
     }

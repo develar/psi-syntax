@@ -92,6 +92,12 @@ own. ASCII is handled by byte tables:
 - Identifier parts scan `ASCII_IDENTIFIER_PART`; a byte at 0x80 or above is decoded and asked `is_identifier_part`.
 - Tokens go to `Lexed` through `LexedWriter`, a batch of 64 on the stack (two stores and a bit a token), appended
   when full.
+- KDoc (`src/kdoc/lexer.rs`) tries, of a state's rules, only those that can start with the byte at hand
+  (`STATE_RULES & FIRST_BYTE_RULES`, bit sets in spec order). In CONTENTS (and in CONTENTS_BEGINNING at a byte that
+  starts no other rule) a run of text and whitespace is one KDOC_TEXT token, which `KDocLexer` would merge from
+  `ContentsAny`'s one-character tokens and `ContentsWhiteSpace`'s runs; the run applies their actions once. A line's
+  break, leading whitespace and asterisks, and CONTENTS_BEGINNING's whitespace take their rule directly
+  (`line_start`).
 
 Java's `tokenize_into` does the same over `JavaLexer` (see "Java"). The lexers' tokens and plain bits were compared
 with the previous code's on every gate corpus before the change; the gate's lexer oracles hash `tokenize_into`'s
@@ -201,6 +207,9 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
   only read by `{` and `}`, which take the fast path while its top counts no template braces); a backslash, a byte
   above ASCII, `/`, the quotes, `#`, `\u001a` and the controls go through `locate_token`. Keywords are a perfect hash
   of the first, second and last byte and the length into 128 slots (`keyword_hash`), compared as one or two words.
+  Outside markdown mode, `FlexJavaDocLexer` lexes a run of COMMENT_DATA as one DOC_COMMENT_DATA token
+  (`comment_data_run`): every rule that matches inside it returns DOC_COMMENT_DATA and stays in COMMENT_DATA, so the
+  merging adapter would join its tokens into the same one.
 - **Builder.** The Java parsers run on platform/syntax's `SyntaxTreeBuilder`; the port runs them on `psi_builder`'s
   `PsiBuilderImpl` seen through `SyntaxTreeBuilder<'b>`, a handle with the `stopAt` offset of
   `JavaParserUtil.stoppingBuilder` (nested ones stop at the nearest), so no adapter is a type of its own and

@@ -647,16 +647,17 @@ impl FlexJavaLexer {
         if b >= 0x80 {
             let (cp, len) = char_at(text, pos);
             if is_java_letter(cp) {
-                let end = identifier_end(text, pos + len);
-                return (self.keyword_or_identifier(&text[pos..end]), end);
+                // the keywords are ASCII
+                return (TokenKind::IDENTIFIER, identifier_end(text, pos + len));
             }
             return (TokenKind::BAD_CHARACTER, pos + len);
         }
         operator(text, pos).unwrap_or((TokenKind::BAD_CHARACTER, pos + 1))
     }
 
-    /// `keyword_or_identifier(&text[start..end])` through `KEYWORDS`, a perfect hash of the keywords: one candidate,
-    /// compared as one or two words read from `text`.
+    /// The keyword rules before `{IDENTIFIER}` at `text[start..end]`: the keyword of exactly this text, else
+    /// IDENTIFIER (`assert` and `enum` below their levels too). Through `KEYWORDS`, a perfect hash of `KEYWORD_LIST`:
+    /// one candidate, compared as one or two words read from `text`.
     #[inline(always)]
     fn keyword_or_identifier_at(&self, text: &[u8], start: usize, end: usize) -> TokenKind {
         let len = end - start;
@@ -671,79 +672,6 @@ impl FlexJavaLexer {
             TokenKind::ASSERT_KEYWORD if !self.my_assert_keyword => TokenKind::IDENTIFIER,
             TokenKind::ENUM_KEYWORD if !self.my_enum_keyword => TokenKind::IDENTIFIER,
             kind => kind,
-        }
-    }
-
-    /// The keyword rules before `{IDENTIFIER}`: a keyword of exactly this text, else IDENTIFIER.
-    fn keyword_or_identifier(&self, word: &[u8]) -> TokenKind {
-        use TokenKind::*;
-        match word {
-            b"true" => TRUE_KEYWORD,
-            b"false" => FALSE_KEYWORD,
-            b"null" => NULL_KEYWORD,
-            b"abstract" => ABSTRACT_KEYWORD,
-            b"assert" => {
-                if self.my_assert_keyword {
-                    ASSERT_KEYWORD
-                } else {
-                    IDENTIFIER
-                }
-            }
-            b"boolean" => BOOLEAN_KEYWORD,
-            b"break" => BREAK_KEYWORD,
-            b"byte" => BYTE_KEYWORD,
-            b"case" => CASE_KEYWORD,
-            b"catch" => CATCH_KEYWORD,
-            b"char" => CHAR_KEYWORD,
-            b"class" => CLASS_KEYWORD,
-            b"const" => CONST_KEYWORD,
-            b"continue" => CONTINUE_KEYWORD,
-            b"default" => DEFAULT_KEYWORD,
-            b"do" => DO_KEYWORD,
-            b"double" => DOUBLE_KEYWORD,
-            b"else" => ELSE_KEYWORD,
-            b"enum" => {
-                if self.my_enum_keyword {
-                    ENUM_KEYWORD
-                } else {
-                    IDENTIFIER
-                }
-            }
-            b"extends" => EXTENDS_KEYWORD,
-            b"final" => FINAL_KEYWORD,
-            b"finally" => FINALLY_KEYWORD,
-            b"float" => FLOAT_KEYWORD,
-            b"for" => FOR_KEYWORD,
-            b"goto" => GOTO_KEYWORD,
-            b"if" => IF_KEYWORD,
-            b"implements" => IMPLEMENTS_KEYWORD,
-            b"import" => IMPORT_KEYWORD,
-            b"instanceof" => INSTANCEOF_KEYWORD,
-            b"int" => INT_KEYWORD,
-            b"interface" => INTERFACE_KEYWORD,
-            b"long" => LONG_KEYWORD,
-            b"native" => NATIVE_KEYWORD,
-            b"new" => NEW_KEYWORD,
-            b"package" => PACKAGE_KEYWORD,
-            b"private" => PRIVATE_KEYWORD,
-            b"public" => PUBLIC_KEYWORD,
-            b"short" => SHORT_KEYWORD,
-            b"super" => SUPER_KEYWORD,
-            b"switch" => SWITCH_KEYWORD,
-            b"synchronized" => SYNCHRONIZED_KEYWORD,
-            b"this" => THIS_KEYWORD,
-            b"throw" => THROW_KEYWORD,
-            b"protected" => PROTECTED_KEYWORD,
-            b"transient" => TRANSIENT_KEYWORD,
-            b"return" => RETURN_KEYWORD,
-            b"void" => VOID_KEYWORD,
-            b"static" => STATIC_KEYWORD,
-            b"strictfp" => STRICTFP_KEYWORD,
-            b"while" => WHILE_KEYWORD,
-            b"try" => TRY_KEYWORD,
-            b"volatile" => VOLATILE_KEYWORD,
-            b"throws" => THROWS_KEYWORD,
-            _ => IDENTIFIER,
         }
     }
 }
