@@ -557,6 +557,38 @@ The gate passed.
 
 The gate passed.
 
+### The builder core batch (children of 9b8c26f), 2026-11-02
+
+Ten commits on the builder, the cursor and the driver, none changing a parser decision: one array of balanced entries
+for `bind` with the default binders' edges taken directly, one record per node while building; the semantic
+layer's stack tops in fields and the token before the cursor walked as a slice; the cursor's token computed at every
+move (`sig`, `checked` kept only for remaps); `bind`'s entry walk out of line over borrowed fields; no error message
+through `processDone`; frames reset in place instead of builders moved; Java's block ends read from the file's brace
+pairs; `bind` without a stack (parents from the tree, open markers stashed in it); a rolled-back tail cut off at
+once; Kotlin's current token one read; Java's stopping builder compared by token. The gate passed on each commit;
+the 25 counters are identical but the cursor-call counts RawTokenType and RawLookup.
+
+Measured against 9b8c26f at load 1.6-2.2 (a quiet machine). Instructions and cycles of the parse itself, per round,
+from `thread_selfcounts` around each parse (2 alternating pairs of 2 rounds each), and of a whole process as the
+difference of `--repeat 3` and `--repeat 1` (`/usr/bin/time -l`, one run each); wall from `scripts/ab.sh`:
+
+| measure | Kotlin | Java |
+|---|---|---|
+| instructions, in-process | 54.21 → 40.76 G (-24.8 %) | 75.40 → 59.13 G (-21.6 %) |
+| cycles, in-process | 10.03-10.09 → 7.67-7.69 G (-23.6 %) | 13.72-13.77 → 10.60-10.67 G (-22.8 %) |
+| instructions / cycles, process difference | 54.17 / 10.20 → 40.74 / 7.69 G | 75.39 / 13.82 → 58.63 / 10.62 G |
+| 1 thread, 5 rounds | 76.6 → 100.1 MB/s (×1.31) | 69.4 → 89.9 MB/s (×1.30) |
+| 16 threads, 3 rounds | 972 → 1278 MB/s (×1.31) | 916 → 1163 MB/s (×1.27) |
+
+B was faster in every round. Per phase after the batch (calibrated `thread_selfcounts` around each phase, Kotlin /
+Java, instructions in G): lex 5.8 / 17.7, file parse 8.8 / 8.1, chameleon parse 17.0 / 19.7, balance 3.8 / 5.7,
+bind 5.5 / 7.9, copy out 0.5 / 0.7. Balancing and binding still take about 30 % of the cycles of both (instructions
+per cycle about 3 there, 5 to 6 in the parsers): their branches on start or done entries and on the leaves between
+them are data-dependent. Measured and dropped on the way: nodes written in place without a growth check (+0.55 G
+Kotlin, +0.8 G Java), a per-builder table of whitespace runs for the default edges (+1.3 G Kotlin: it covers the
+collapsed bodies' tokens too), more `inline(always)` on marker operations (+0.2 G, 165 KB of code), a specialized
+end-of-production link (no change).
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -574,6 +606,7 @@ The gate passed.
 | a405a03 | ASCII identifier table | 71.9 → 73.9 | 918.0 → 926.1 | lexer alone 441.3 → 507.7 MB/s |
 | 36b3b17 | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
 | child of 36b3b17 | linked production list | 72.7 → 74.2 (11 rounds, load 4.7-10.3) | | `a+a+…` × 100 000: 4.67 s → 22 ms; 18 chains 14-45 ms |
+| 9b8c26f → the builder core batch | balanced entries, eager cursor, frames in place, brace pairs, stackless bind (10 commits) | 76.6 → 100.1 (5 rounds, load 1.6-2.2); Java 69.4 → 89.9 | 972 → 1278; Java 916 → 1163 | instructions per round 54.21 → 40.76 G, Java 75.40 → 59.13 G |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
 (×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
