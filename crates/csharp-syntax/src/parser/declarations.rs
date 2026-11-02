@@ -724,6 +724,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
     }
 
     /// `public bool IsGobalAttributesTerminator()` (LanguageParser.cs:906).
+    #[allow(dead_code)] // Roslyn calls it nowhere either
     pub(crate) fn is_gobal_attributes_terminator(&mut self) -> bool {
         self.is_end_of_namespace() || self.is_possible_namespace_member_declaration()
     }
@@ -2377,6 +2378,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private bool CanReuseMemberDeclaration(SyntaxKind kind, bool isGlobal)` (LanguageParser.cs:2529): incremental
     /// parsing only; the global field and method case reads the old tree's parent, which a full parse has not.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn can_reuse_member_declaration(&mut self, kind: SyntaxKind, is_global: bool) -> bool {
         match kind {
             SyntaxKind::ClassDeclaration
@@ -4905,6 +4907,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static bool CanReuseParameterList(Syntax.ParameterListSyntax list, bool identifierIsOptional)` (LanguageParser.cs:4814):
     /// incremental parsing only (`CurrentNode`, a node of the old tree).
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn can_reuse_parameter_list(&self, list: Green, identifier_is_optional: bool) -> bool {
         if list.is_null() {
             return false;
@@ -4925,6 +4928,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static bool CanReuseBracketedParameterList(Syntax.BracketedParameterListSyntax list)` (LanguageParser.cs:4842):
     /// incremental parsing only.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn can_reuse_bracketed_parameter_list(&self, list: Green) -> bool {
         if list.is_null() {
             return false;
@@ -5026,6 +5030,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static bool CanReuseParameter(CSharp.Syntax.ParameterSyntax parameter, bool identifierIsOptional)` (LanguageParser.cs:4936):
     /// incremental parsing only; the checks of the red tree's parents (lambda parameters) have no green form.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn can_reuse_parameter(&self, parameter: Green, identifier_is_optional: bool) -> bool {
         if parameter.is_null() {
             return false;
@@ -5567,12 +5572,6 @@ impl VariableFlags {
     pub(crate) fn contains(self, flag: VariableFlags) -> bool {
         self.0 & flag.0 != 0
     }
-
-    /// `value & ~flag`.
-    #[inline]
-    pub(crate) fn without(self, flag: VariableFlags) -> VariableFlags {
-        VariableFlags(self.0 & !flag.0)
-    }
 }
 
 impl std::ops::BitOr for VariableFlags {
@@ -5596,6 +5595,7 @@ impl std::ops::BitAnd for VariableFlags {
 impl<'l, 't> LanguageParser<'l, 't> {
     /// `private static SyntaxTokenList GetOriginalModifiers(CSharp.CSharpSyntaxNode decl)` (LanguageParser.cs:5439):
     /// incremental parsing only (a declaration of the old tree).
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn get_original_modifiers(&self, decl: Green) -> Green {
         if !decl.is_null() {
             let a = self.base.arena_ref();
@@ -5630,6 +5630,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static bool WasFirstVariable(CSharp.Syntax.VariableDeclaratorSyntax variable)` (LanguageParser.cs:5478):
     /// incremental parsing only; it reads the old tree's parent, which a green node has not, so never.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn was_first_variable(&self, variable: Green) -> bool {
         let _ = variable;
         false
@@ -5637,6 +5638,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static VariableFlags GetOriginalVariableFlags(CSharp.Syntax.VariableDeclaratorSyntax old)` (LanguageParser.cs:5488):
     /// incremental parsing only; without the old tree's parent no flag is known.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn get_original_variable_flags(&self, old: Green) -> VariableFlags {
         let _ = old;
         VariableFlags::NONE
@@ -5644,6 +5646,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private static bool CanReuseVariableDeclarator(CSharp.Syntax.VariableDeclaratorSyntax old, VariableFlags flags, bool isFirst)` (LanguageParser.cs:5511):
     /// incremental parsing only: a full parse reuses nothing.
+    #[allow(dead_code)] // incremental parsing only: there is no old tree
     pub(crate) fn can_reuse_variable_declarator(&self, old: Green, flags: VariableFlags, is_first: bool) -> bool {
         let _ = (old, flags, is_first);
         false
@@ -6216,12 +6219,6 @@ impl NameOptions {
     pub(crate) fn contains(self, flag: NameOptions) -> bool {
         self.0 & flag.0 != 0
     }
-
-    /// `value & ~flag`.
-    #[inline]
-    pub(crate) fn without(self, flag: NameOptions) -> NameOptions {
-        NameOptions(self.0 & !flag.0)
-    }
 }
 
 impl std::ops::BitOr for NameOptions {
@@ -6457,6 +6454,7 @@ pub(crate) fn separated_count(a: &crate::green::GreenArena, list: Green) -> usiz
 }
 
 /// The elements of a separated list's green node (every other slot of a list, or the node itself).
+#[allow(dead_code)] // for the incremental parsing checks only
 pub(crate) fn separated_nodes(a: &crate::green::GreenArena, list: Green) -> impl Iterator<Item = Green> + '_ {
     let (slots, single): (&[Green], Option<Green>) = if list.is_list() {
         (a.slots(list), None)

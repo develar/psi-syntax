@@ -21,10 +21,8 @@
 //! the recursion unwinds) and `ParseWithStackGuard` returns `CreateForGlobalFailure`, the tree Roslyn makes when it
 //! runs out of stack.
 
-// The stubs take their parameters unused and are not called yet; every name the lanes need is in scope.
-#![allow(dead_code, unused_variables, unused_imports, clippy::too_many_arguments)]
-// Roslyn's names and parameter types.
-#![allow(clippy::enum_variant_names, clippy::ptr_arg)]
+// Roslyn's names, parameter types and parameter lists.
+#![allow(clippy::enum_variant_names, clippy::ptr_arg, clippy::too_many_arguments)]
 
 pub(crate) mod declarations;
 pub(crate) mod doc_comment_parser;
@@ -43,9 +41,7 @@ pub(crate) use crate::lexer::{InterpolatedStringKind, Interpolation, LexerMode};
 pub(crate) use crate::syntax_kind::SyntaxKind;
 pub(crate) use crate::syntax_parser::SyntaxParser;
 pub(crate) use declarations::*;
-pub(crate) use doc_comment_parser::DocumentationCommentParser;
 pub(crate) use expressions::*;
-pub(crate) use statements::*;
 pub(crate) use types::*;
 
 use crate::lexer::Lexer;
@@ -214,12 +210,6 @@ impl TerminatorState {
     #[inline]
     pub(crate) fn contains(self, flag: TerminatorState) -> bool {
         self.0 & flag.0 != 0
-    }
-
-    /// `value & ~flag`.
-    #[inline]
-    pub(crate) fn without(self, flag: TerminatorState) -> TerminatorState {
-        TerminatorState(self.0 & !flag.0)
     }
 }
 
@@ -662,6 +652,8 @@ pub(crate) struct ResetPoint {
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub(crate) struct DeclarationModifiers(pub(crate) u32);
 
+// Every value of Roslyn's enum, whether the parser reads it or not.
+#[allow(dead_code)]
 impl DeclarationModifiers {
     pub(crate) const NONE: DeclarationModifiers = DeclarationModifiers(0);
     pub(crate) const ABSTRACT: DeclarationModifiers = DeclarationModifiers(1 << 0);

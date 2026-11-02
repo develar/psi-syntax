@@ -1038,20 +1038,6 @@ impl ScanTypeFlags {
     pub(crate) const TUPLE_TYPE: ScanTypeFlags = ScanTypeFlags(8);
 }
 
-impl ScanTypeFlags {
-    /// `(value & flag) != 0`.
-    #[inline]
-    pub(crate) fn contains(self, flag: ScanTypeFlags) -> bool {
-        self.0 & flag.0 != 0
-    }
-
-    /// `value & ~flag`.
-    #[inline]
-    pub(crate) fn without(self, flag: ScanTypeFlags) -> ScanTypeFlags {
-        ScanTypeFlags(self.0 & !flag.0)
-    }
-}
-
 impl std::ops::BitOr for ScanTypeFlags {
     type Output = ScanTypeFlags;
 
@@ -1466,6 +1452,7 @@ pub(crate) enum ParseTypeMode {
     Parameter,
     AfterIs,
     DefinitePattern,
+    #[allow(dead_code)] // Roslyn's callers never pass it either (`ParseType` only tests for it)
     AfterOut,
     AfterRef,
     AfterTupleComma,

@@ -1767,6 +1767,7 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
     }
 
     /// `private bool InCref` (DocumentationCommentParser.cs:1613).
+    #[allow(dead_code)] // its two callers read `in_cref_mode` of the mode they already hold
     pub(crate) fn in_cref(&mut self) -> bool {
         in_cref_mode(self.mode())
     }

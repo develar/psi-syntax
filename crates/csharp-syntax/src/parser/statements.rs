@@ -5,9 +5,7 @@
 //! its `using` covers.
 //!
 //! Not in Roslyn: `ParseDesignation` recursing into nested parentheses counts `_recursionDepth`, as
-//! `ParseStatementCore` does, so that a deep `var ((((...` stays within the stack. The `[...][...]` loop before a
-//! statement stops when `ParseBracketedArgumentList` consumed no token, which Roslyn's never does: while that callee of
-//! another lane is a stub, the parse still ends.
+//! `ParseStatementCore` does, so that a deep `var ((((...` stays within the stack.
 
 use super::*;
 use crate::green::{GreenArena, TokenText};
@@ -52,13 +50,8 @@ impl<'l, 't> LanguageParser<'l, 't> {
         // collection expression being indexed into, or if it's a sequence of attributes.
         let mut had_bracket_argument_list = false;
         while self.current_kind() == SyntaxKind::OpenBracketToken {
-            let before = self.current_token_position();
             self.parse_bracketed_argument_list();
             had_bracket_argument_list = true;
-            // Not in Roslyn (see the module's documentation): ParseBracketedArgumentList eats the `[`.
-            if self.current_token_position() == before {
-                break;
-            }
         }
 
         // Check the next token to see if it indicates the `[...]` sequence we have is a term or not. This is the
@@ -199,7 +192,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `private StatementSyntax TryReuseStatement(SyntaxList<AttributeListSyntax> attributes, bool isGlobal)` (LanguageParser.cs:8428):
     /// never anything, as `IsIncrementalAndFactoryContextMatches` is false without incremental parsing.
-    pub(crate) fn try_reuse_statement(&mut self, attributes: Green, is_global: bool) -> Green {
+    pub(crate) fn try_reuse_statement(&mut self, _attributes: Green, _is_global: bool) -> Green {
         Green::NULL
     }
 
