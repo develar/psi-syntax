@@ -418,6 +418,25 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.token_offset += 1;
     }
 
+    /// Whether the parse was abandoned (`abandon`): every token reads as the end of file.
+    #[inline]
+    pub fn is_abandoned(&self) -> bool {
+        !self.forced_eof.is_null()
+    }
+
+    /// Moves forward to the token at `position` (not in Roslyn): what eating every token up to it does, for a scan
+    /// replayed from its memo (`LanguageParser::scan_tuple_type`).
+    pub fn advance_to_position(&mut self, position: i32) {
+        let delta = position - self.current_token_position();
+        if delta <= 0 {
+            return;
+        }
+        let last = self.peek_token(delta - 1);
+        self.prev_token_trailing_trivia = self.arena_ref().trailing_trivia(last);
+        self.current_token = Green::NULL;
+        self.token_offset += delta;
+    }
+
     /// `ForceEndOfFile()`.
     pub fn force_end_of_file(&mut self) {
         self.current_token = self.arena().token(SyntaxKind::EndOfFileToken);

@@ -1022,6 +1022,53 @@ impl<'l, 't> LanguageParser<'l, 't> {
     }
 }
 
+/// Where a `scan_tuple_type` started: the token position and the parser's context, everything the scan reads besides
+/// tokens, in one word (the position in the low 32 bits, the 29 bits of the terminator state, the 3 flags).
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+pub(crate) struct ScannedTupleKey(u64);
+
+impl ScannedTupleKey {
+    fn new(position: i32, term_state: u32, is_in_query: bool, is_in_async: bool, field_keyword: bool) -> Self {
+        let context = (u64::from(term_state) << 3)
+            | (u64::from(is_in_query) << 2)
+            | (u64::from(is_in_async) << 1)
+            | u64::from(field_keyword);
+        ScannedTupleKey((context << 32) | u64::from(position as u32))
+    }
+}
+
+/// The hasher of `scanned_tuples`: one multiply of the key's word (FxHash's), not SipHash.
+#[derive(Default)]
+pub(crate) struct WordHasher(u64);
+
+impl std::hash::Hasher for WordHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.write_u64(u64::from(b));
+        }
+    }
+
+    fn write_u64(&mut self, word: u64) {
+        self.0 = (self.0.rotate_left(5) ^ word).wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
+    }
+}
+
+/// `scanned_tuples`' map.
+pub(crate) type ScannedTuples =
+    std::collections::HashMap<ScannedTupleKey, ScannedTuple, std::hash::BuildHasherDefault<WordHasher>>;
+
+/// What a finished `scan_tuple_type` gave: its flags, the token position it left the parser at and its last token.
+#[derive(Copy, Clone, Debug)]
+pub(crate) struct ScannedTuple {
+    flags: ScanTypeFlags,
+    end: i32,
+    last_token_of_type: Green,
+}
+
 /// `ScanTypeFlags` (LanguageParser.cs:7166): an enum in C#, its values in declaration order.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub(crate) struct ScanTypeFlags(pub(crate) u32);
@@ -1283,7 +1330,41 @@ impl<'l, 't> LanguageParser<'l, 't> {
     }
 
     /// `private ScanTypeFlags ScanTupleType(out SyntaxToken lastTokenOfType)` (LanguageParser.cs:7432).
+    ///
+    /// Not in Roslyn: a finished scan of a tuple type whose first element starts with `(` is kept by its start
+    /// (`ScannedTuple`), and a scan from the same token in the same context replays it. `((((a + b) + c) + d) …`
+    /// scans the tuple types nested in each `(` again at every level (as a lambda's return type, a cast's type, a
+    /// declaration's), so its time grew as the square of the depth (21 s for the 24 MB `hugeexpr1.cs` of
+    /// dotnet/runtime, lines 600 parentheses deep); a scan reads nothing but the tokens and the context of the key, so
+    /// the replay ends where the scan ended with the same last token. A tuple that starts otherwise is not nested at
+    /// its start and is scanned as Roslyn scans it.
     pub(crate) fn scan_tuple_type(&mut self, last_token_of_type: &mut Green) -> ScanTypeFlags {
+        if self.current_kind() != SyntaxKind::OpenParenToken || self.base.is_abandoned() {
+            return self.scan_tuple_type_core(last_token_of_type);
+        }
+        let key = ScannedTupleKey::new(
+            self.current_token_position(),
+            self.term_state.0,
+            self.is_in_query,
+            self.is_in_async,
+            self.is_in_field_keyword_context,
+        );
+        if let Some(scanned) = self.scanned_tuples.get(&key).copied() {
+            self.advance_to_position(scanned.end);
+            *last_token_of_type = scanned.last_token_of_type;
+            return scanned.flags;
+        }
+        let flags = self.scan_tuple_type_core(last_token_of_type);
+        if !self.base.is_abandoned() {
+            let scanned =
+                ScannedTuple { flags, end: self.current_token_position(), last_token_of_type: *last_token_of_type };
+            self.scanned_tuples.insert(key, scanned);
+        }
+        flags
+    }
+
+    /// `ScanTupleType` itself (see `scan_tuple_type`).
+    fn scan_tuple_type_core(&mut self, last_token_of_type: &mut Green) -> ScanTypeFlags {
         let mut tuple_element_type = self.scan_type_with_for_pattern(last_token_of_type, false);
         if tuple_element_type != ScanTypeFlags::NOT_TYPE {
             if self.is_true_identifier() {

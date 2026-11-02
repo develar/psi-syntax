@@ -73,6 +73,8 @@ pub struct LanguageParser<'l, 't> {
     pub(crate) term_state: TerminatorState,
     /// The lexer's position when the recursion limit was hit (the `InsufficientExecutionStackException`), if it was.
     pub(crate) stack_exhausted_at: Option<u32>,
+    /// The finished tuple type scans of this parse (`scan_tuple_type`), not in Roslyn.
+    pub(crate) scanned_tuples: ScannedTuples,
 }
 
 impl<'l, 't> Deref for LanguageParser<'l, 't> {
@@ -109,6 +111,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             recursion_depth: 0,
             term_state: TerminatorState::END_OF_FILE,
             stack_exhausted_at: None,
+            scanned_tuples: ScannedTuples::default(),
         }
     }
 
