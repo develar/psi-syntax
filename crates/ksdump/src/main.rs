@@ -37,12 +37,29 @@
 //!   `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the lexer dump) per file and with `--full`
 //!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files; `--check-bodies` (C# has no lazily parsed
 //!   bodies) only checks that each tree's leaves are its file's text. `--nesting-limit` does not apply.
-//! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
-//!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
+//! - `ksdump --check ORACLE --list LIST --root ROOT [--out OUT] [--node]`: makes the dumps `--out` would write, each in
+//!   memory, and compares them byte for byte with the oracle's `ORACLE/<path>.<suffix>` without writing ours (what
+//!   `diff -rq -x index.jsonl ORACLE OURS` checks of an `--out` directory: a dump that differs, a dump one side lacks, a
+//!   directory of the oracle without dumps, all but `index.jsonl`); prints the differences sorted by path, then
+//!   `N differing of M` (M the list's files), writes the differing dumps and the list `differing.txt` to OUT, and exits
+//!   nonzero on any difference. A file the oracle has no dump for (its `index.jsonl` failures) must have none of ours.
+//! - `ksdump --lex --check LINES --list LIST --root ROOT`: the `--lex` lines against the oracle's cached ones in LINES,
+//!   line by line in list order (a Kotlin line's first two columns, as `scripts/LexOracle.java` prints them); prints
+//!   each differing pair (`<` ours, `>` the oracle's), then `N differing lines of M` (M the oracle's lines), and exits
+//!   nonzero on any.
+//! - `--threads N`: `--out`, `--check`, `--lex` and `--check-bodies` parse on N threads (default: every core), one
+//!   `Parser` per thread, files taken from a shared counter largest first; their output is in list order whatever N
+//!   is. Peak RSS is a few files' trees and dumps (C#'s runtime corpus: 3.1 GB, its 9.9 MB `TestData.g.cs` alone
+//!   most of it).
+//! - `--nesting-limit N` (with `--check-bodies`, `--bench`, `--out` or `--check`): parses with the nesting limit N
+//!   instead of `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
 //! The text is read as bytes with CRLF and CR converted to LF, as the oracles do; `--trim` also trims it (what the
 //! compiler's parsing tests parse). A path ending in `.kt` (or without an extension) parses as a file, any other as a
 //! script.
+
+mod check;
+mod pool;
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -68,7 +85,10 @@ fn usage() -> ! {
          ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
                 [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
-         (--nesting-limit N: parse with that nesting limit)\n  \
+         ksdump --check ORACLE --list LIST --root ROOT [--out OUT] [--node]   our dumps against ORACLE's, in memory\n  \
+         ksdump --lex --check LINES --list LIST --root ROOT  our lexer lines against the oracle's LINES\n  \
+         (--nesting-limit N: parse with that nesting limit; --threads N: threads of --out, --check, --lex and\n  \
+         --check-bodies, default every core)\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
          ksdump --lex --bench --list LIST --root ROOT [--repeat K] [--docs]   lexer throughput (--docs: doc comments too)\n  \
          ksdump --lex --list LIST --root ROOT [--full OUT]   C# files: lexer hash lines as tools/csharp-oracle lex prints them\n  \
@@ -108,7 +128,10 @@ struct Args {
     lex: bool,
     dump: bool,
     trim: bool,
-    threads: usize,
+    /// `--threads N`; `--bench` defaults to one thread, the other modes to every core.
+    threads: Option<usize>,
+    /// `--check ORACLE`: the oracle's dump directory, or with `--lex` its file of lexer lines.
+    check: Option<PathBuf>,
     walk: bool,
     no_bodies: bool,
     check_bodies: bool,
@@ -123,7 +146,7 @@ struct Args {
 }
 
 fn parse_args() -> Args {
-    let mut args = Args { threads: 1, repeat: 1, ..Args::default() };
+    let mut args = Args { repeat: 1, ..Args::default() };
     let count =
         |v: Option<String>| v.and_then(|v| v.parse::<usize>().ok()).filter(|&n| n > 0).unwrap_or_else(|| usage());
     let mut it = std::env::args().skip(1);
@@ -139,7 +162,8 @@ fn parse_args() -> Args {
             "--node" => args.node = true,
             "--docs" => args.docs = true,
             "--full" => args.full = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
-            "--threads" => args.threads = count(it.next()),
+            "--threads" => args.threads = Some(count(it.next())),
+            "--check" => args.check = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--walk" => args.walk = true,
             "--no-bodies" => args.no_bodies = true,
             "--check-bodies" => args.check_bodies = true,
@@ -170,6 +194,13 @@ fn parse_args() -> Args {
         }
     }
     args
+}
+
+impl Args {
+    /// The threads of `--out`, `--check`, `--lex` and `--check-bodies`.
+    fn workers(&self) -> usize {
+        self.threads.unwrap_or_else(pool::default_threads)
+    }
 }
 
 fn read_list(list: &Path) -> Vec<String> {
@@ -301,26 +332,149 @@ fn java_lex_line(text: &[u8], level: java_syntax::LanguageLevel, dump: bool, out
 
 /// `--lex` of a Java file: a list line is `PATH[<TAB>LEVEL...]` as for the Java oracles; text that is not UTF-8 is
 /// "unreadable", as the oracle, which decodes strictly, prints it.
-fn java_lex(root: &Path, line: &str, dump: bool, stdout: &mut impl Write) {
+fn java_lex(root: &Path, line: &str, dump: bool) -> String {
     let mut columns = line.split('\t');
     let path = columns.next().unwrap_or(line);
     let level =
         columns.next().and_then(java_syntax::LanguageLevel::from_name).unwrap_or(java_syntax::LanguageLevel::HIGHEST);
     let text = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok());
     let Some(text) = text else {
-        let _ = writeln!(stdout, "{path}\tunreadable\t0");
-        return;
+        return format!("{path}\tunreadable\t0\n");
     };
     let mut out = String::new();
     let (hash, count) = java_lex_line(&text, level, dump, &mut out);
-    let _ = writeln!(stdout, "{path}\t{hash:x}\t{count}");
-    let _ = stdout.write_all(out.as_bytes());
+    format!("{path}\t{hash:x}\t{count}\n{out}")
 }
 
-/// `--out` of a Java file, as `tools/java-oracle/JavaPsiOracle.java` writes it: a list line is
-/// `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (`testdata/java/manifest.tsv` is a list), the text is trimmed (chars up to
-/// ' ', `String.trim()`) when TRIM is 1 or, without it, with `--trim`; writes `OUT/<path>.psi.txt` and with `--node`
-/// `OUT/<path>.node.txt`. Text that is not UTF-8 is not dumped (the oracle reports it as a failure).
+/// `--lex` of a Kotlin file: its line as `scripts/LexOracle.java` prints it (with the count, which `LexOracle.java`
+/// leaves out) and with `--dump` the tokens after it.
+fn kotlin_lex(root: &Path, path: &str, dump: bool) -> String {
+    let Some(text) = read_source(root, path, false) else {
+        return format!("{path}\tunreadable\t0\n");
+    };
+    let mut out = String::new();
+    let (hash, count) = lex_line(&text, dump, &mut out);
+    format!("{path}\t{hash:x}\t{count}\n{out}")
+}
+
+/// What `--lex` prints for a list line, newline-terminated: one line, with `--dump` the tokens after it.
+fn lex_file(parsers: &mut Parsers, root: &Path, line: &str, args: &Args) -> String {
+    let path = line.split('\t').next().unwrap_or(line);
+    match Lang::of(path, args.lang) {
+        Lang::Kotlin => kotlin_lex(root, path, args.dump),
+        Lang::Java => java_lex(root, line, args.dump),
+        Lang::CSharp => csharp_lex(parsers.csharp(), root, line, args.full.as_deref()) + "\n",
+    }
+}
+
+/// A list's files as `--out`, `--check`, `--lex` and `--check-bodies` take them: largest first, so that the slowest
+/// (C#'s 24 MB `hugeexpr1.cs`, some 20 s alone) start at once instead of finishing a run on one thread.
+struct Schedule {
+    order: Vec<usize>,
+}
+
+impl Schedule {
+    /// The size of each list line's file (its first column; 0 when it cannot be read), stat'ed on `threads` threads.
+    fn new(root: &Path, lines: &[String], threads: usize) -> Schedule {
+        let mut sizes = Vec::with_capacity(lines.len());
+        let size = |_: &mut (), i: usize| {
+            let path = lines[i].split('\t').next().unwrap_or(&lines[i]);
+            std::fs::metadata(root.join(path)).map_or(0, |m| m.len())
+        };
+        pool::ordered(&pool::list_order(lines.len()), threads, || (), size, |_, bytes| sizes.push(bytes));
+        Schedule { order: pool::largest_first(&sizes) }
+    }
+
+    /// `work(state, i)` for the list's lines on `threads` threads (`pool::ordered`), largest first, each thread with its
+    /// `init()` state; `each(i, result)` in list order.
+    fn run<S, R: Send>(
+        &self,
+        threads: usize,
+        init: impl Fn() -> S + Sync,
+        work: impl Fn(&mut S, usize) -> R + Sync,
+        each: impl FnMut(usize, R),
+    ) {
+        pool::ordered(&self.order, threads, init, work, each);
+    }
+}
+
+/// A thread's parsers, one per language, each made when its first file comes.
+struct Parsers {
+    nesting_limit: Option<u32>,
+    kotlin: Option<Parser>,
+    java: Option<java_syntax::Parser>,
+    csharp: Option<csharp_syntax::Parser>,
+}
+
+impl Parsers {
+    fn new(nesting_limit: Option<u32>) -> Parsers {
+        Parsers { nesting_limit, kotlin: None, java: None, csharp: None }
+    }
+
+    fn kotlin(&mut self) -> &mut Parser {
+        let limit = self.nesting_limit;
+        self.kotlin.get_or_insert_with(|| new_parser(limit))
+    }
+
+    fn java(&mut self) -> &mut java_syntax::Parser {
+        let limit = self.nesting_limit;
+        self.java.get_or_insert_with(|| new_parser(limit))
+    }
+
+    fn csharp(&mut self) -> &mut csharp_syntax::Parser {
+        self.csharp.get_or_insert_with(csharp_syntax::Parser::new)
+    }
+}
+
+/// The dumps of one list line as its oracle names them, `<path>.<suffix>` under its directory: Kotlin `psi.txt`, Java
+/// `psi.txt` and with `--node` `node.txt`, C# `tree.txt`. A file the oracle reports as a failure has none.
+struct Dumps<'a> {
+    path: &'a str,
+    files: Vec<(&'static str, String)>,
+    /// A C# file's `index.jsonl` line.
+    index: Option<String>,
+}
+
+/// What `--out` writes for a list line, made in memory.
+fn dump_line<'a>(parsers: &mut Parsers, root: &Path, line: &'a str, args: &Args) -> Dumps<'a> {
+    let path = line.split('\t').next().unwrap_or(line);
+    let (files, index) = match Lang::of(path, args.lang) {
+        Lang::Java => (java_dump(parsers.java(), root, line, args), None),
+        Lang::CSharp => {
+            let (dump, index) = csharp_dump(parsers.csharp(), root, line);
+            (dump.map(|d| vec![("tree.txt", d)]).unwrap_or_default(), Some(index))
+        }
+        Lang::Kotlin => match read_source(root, path, args.trim) {
+            Some(text) => {
+                let name = file_name(path);
+                let tree = parsers.kotlin().parse(&text, FileKind::from_file_name(name));
+                (vec![("psi.txt", psi_to_string(&tree, name))], None)
+            }
+            None => {
+                eprintln!("cannot read {path}");
+                (Vec::new(), None)
+            }
+        },
+    };
+    Dumps { path, files, index }
+}
+
+/// `--out` of a list line's dumps: writes `OUT/<path>.<suffix>`; false when there is none or one cannot be written.
+fn write_dumps(out: &Path, dumps: &Dumps) -> bool {
+    let mut written = !dumps.files.is_empty();
+    for (suffix, text) in &dumps.files {
+        let target = out.join(format!("{}.{suffix}", dumps.path));
+        if let Some(parent) = target.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        if let Err(e) = std::fs::write(&target, text) {
+            eprintln!("cannot write {}: {e}", target.display());
+            written = false;
+        }
+    }
+    written
+}
+
 /// A Java list line, `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` as `JavaPsiOracle.java` reads it: the path, how the
 /// file parses (`LanguageLevel.HIGHEST` and a file by default) and whether its text is trimmed (`trim` by default).
 fn java_line(line: &str, trim: bool) -> (&str, java_syntax::FileKind, bool) {
@@ -341,31 +495,25 @@ fn trim_bytes(text: Vec<u8>) -> Vec<u8> {
     text[start..end].to_vec()
 }
 
-fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &str, args: &Args) -> bool {
+/// `--out` of a Java file, as `tools/java-oracle/JavaPsiOracle.java` writes it: a list line is
+/// `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (`testdata/java/manifest.tsv` is a list), the text is trimmed (chars up to
+/// ' ', `String.trim()`) when TRIM is 1 or, without it, with `--trim`; the dumps of `<path>.psi.txt` and with `--node`
+/// `<path>.node.txt`. Text that is not UTF-8 is not dumped (the oracle reports it as a failure).
+fn java_dump(parser: &mut java_syntax::Parser, root: &Path, line: &str, args: &Args) -> Vec<(&'static str, String)> {
     let (path, kind, trim) = java_line(line, args.trim);
     let Some(mut text) = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok()) else {
         eprintln!("cannot read {path} as UTF-8");
-        return false;
+        return Vec::new();
     };
     if trim {
         text = trim_bytes(text);
     }
     let tree = parser.parse(&text, kind);
-    let mut dumps = vec![("psi", java_syntax::dump::psi_to_string(&tree, file_name(path)))];
+    let mut dumps = vec![("psi.txt", java_syntax::dump::psi_to_string(&tree, file_name(path)))];
     if args.node {
-        dumps.push(("node", java_syntax::dump::node_tree_to_string(&tree)));
+        dumps.push(("node.txt", java_syntax::dump::node_tree_to_string(&tree)));
     }
-    for (suffix, dump) in dumps {
-        let target = out.join(format!("{path}.{suffix}.txt"));
-        if let Some(parent) = target.parent() {
-            let _ = std::fs::create_dir_all(parent);
-        }
-        if let Err(e) = std::fs::write(&target, dump) {
-            eprintln!("cannot write {}: {e}", target.display());
-            return false;
-        }
-    }
-    true
+    dumps
 }
 
 /// The C# file kind of a list line's empty or absent columns: `--version` and `--doc` (once each), else `latest`,
@@ -408,52 +556,48 @@ fn csharp_source(root: &Path, path: &str) -> Result<Vec<u8>, &'static str> {
     Ok(text)
 }
 
-/// `--out` of a C# file: `OUT/<path>.tree.txt`; returns its `index.jsonl` line.
-fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, out: &Path, line: &str) -> String {
+/// `--out` of a C# file: the dump of `<path>.tree.txt` (none on a failure) and its `index.jsonl` line.
+fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) -> (Option<String>, String) {
     use csharp_syntax::dump;
     let Some((path, kind)) = csharp_line(line) else {
-        return dump::failure_line(line.split('\t').next().unwrap_or(line), "bad list line");
+        return (None, dump::failure_line(line.split('\t').next().unwrap_or(line), "bad list line"));
     };
     let text = match csharp_source(root, path) {
         Ok(text) => text,
-        Err(failure) => return dump::failure_line(path, failure),
+        Err(failure) => return (None, dump::failure_line(path, failure)),
     };
     let tree = parser.parse(&text, kind);
     if tree.has_no_result() {
-        return dump::failure_line(path, &format!("no {}", kind.entry.name()));
+        return (None, dump::failure_line(path, &format!("no {}", kind.entry.name())));
     }
     let Some(text) = dump::tree_to_string_within(&tree, dump::MAX_CHARS) else {
-        return dump::failure_line(path, "dump over 512 MB");
+        return (None, dump::failure_line(path, "dump over 512 MB"));
     };
-    let target = out.join(format!("{path}.tree.txt"));
-    if let Some(parent) = target.parent() {
-        let _ = std::fs::create_dir_all(parent);
-    }
-    if let Err(e) = std::fs::write(&target, text) {
-        eprintln!("cannot write {}: {e}", target.display());
-    }
-    dump::index_line(path, &tree)
+    (Some(text), dump::index_line(path, &tree))
 }
 
 /// `--check-bodies` of C# files (C# has no lazily parsed bodies): each file parses, without a panic, into a tree whose
 /// leaves are its text; prints the differing ones and a last line `differing N  files M`, returns N. A file that is
 /// not UTF-8 or that its entry cannot parse is not checked.
-fn csharp_check_lossless(root: &Path, lines: &[String], stdout: &mut impl Write) -> usize {
-    let mut parser = csharp_syntax::Parser::new();
+fn csharp_check_lossless(root: &Path, lines: &[String], threads: usize, stdout: &mut impl Write) -> usize {
+    let schedule = Schedule::new(root, lines, threads);
     let mut differing = 0usize;
-    for line in lines {
-        let Some((path, kind)) = csharp_line(line) else { continue };
-        let Ok(text) = csharp_source(root, path) else { continue };
+    let check = |parser: &mut csharp_syntax::Parser, i: usize| {
+        let (path, kind) = csharp_line(&lines[i])?;
+        let text = csharp_source(root, path).ok()?;
         let tree = parser.parse(&text, kind);
         if tree.has_no_result() {
-            continue;
+            return None;
         }
         let covered: Vec<u8> = tree.tokens().flat_map(|id| tree.text(id).iter().copied()).collect();
-        if covered != text {
+        (covered != text).then(|| path.to_owned())
+    };
+    schedule.run(threads, csharp_syntax::Parser::new, check, |_, failed| {
+        if let Some(path) = failed {
             let _ = writeln!(stdout, "{path}: the leaves are not the text");
             differing += 1;
         }
-    }
+    });
     let _ = writeln!(stdout, "differing {differing}  files {}", lines.len());
     differing
 }
@@ -490,30 +634,24 @@ fn main() {
     if args.lex && !args.bench {
         let stdout = std::io::stdout();
         let mut stdout = std::io::BufWriter::new(stdout.lock());
-        let mut csharp_parser = csharp_syntax::Parser::new();
-        for line in &paths {
-            let path = line.split('\t').next().unwrap_or(line);
-            match Lang::of(path, args.lang) {
-                Lang::Java => {
-                    java_lex(root, line, args.dump, &mut stdout);
-                    continue;
-                }
-                Lang::CSharp => {
-                    let lexed = csharp_lex(&mut csharp_parser, root, line, args.full.as_deref());
-                    let _ = writeln!(stdout, "{lexed}");
-                    continue;
-                }
-                Lang::Kotlin => {}
+        let schedule = Schedule::new(root, &paths, args.workers());
+        let lex = |parsers: &mut Parsers, i: usize| lex_file(parsers, root, &paths[i], &args);
+        if let Some(lines) = args.check.as_deref() {
+            if args.dump {
+                usage();
             }
-            let Some(text) = read_source(root, path, false) else {
-                let _ = writeln!(stdout, "{path}\tunreadable\t0");
-                continue;
-            };
-            let mut dump = String::new();
-            let (hash, count) = lex_line(&text, args.dump, &mut dump);
-            let _ = writeln!(stdout, "{path}\t{hash:x}\t{count}");
-            let _ = stdout.write_all(dump.as_bytes());
+            let differing = check::lex(lines, &paths, &schedule, args.lang, args.workers(), lex, &mut stdout);
+            let _ = stdout.flush();
+            std::process::exit(if differing == 0 { 0 } else { 1 });
         }
+        schedule.run(
+            args.workers(),
+            || Parsers::new(None),
+            lex,
+            |_, text| {
+                let _ = stdout.write_all(text.as_bytes());
+            },
+        );
         return;
     }
     // A Java or C# list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
@@ -529,7 +667,7 @@ fn main() {
     let stdout = std::io::stdout();
     let mut stdout = std::io::BufWriter::new(stdout.lock());
     if args.check_bodies && csharp_files != 0 {
-        let differing = csharp_check_lossless(root, &paths, &mut stdout);
+        let differing = csharp_check_lossless(root, &paths, args.workers(), &mut stdout);
         let _ = stdout.flush();
         std::process::exit(if differing == 0 { 0 } else { 1 });
     }
@@ -556,53 +694,37 @@ fn main() {
 
     if args.check_bodies {
         let differing = if java_files == 0 {
-            check_bodies::<Kotlin>(root, &paths, args.nesting_limit, &mut stdout)
+            check_bodies::<Kotlin>(root, &paths, args.nesting_limit, args.workers(), &mut stdout)
         } else {
-            check_bodies::<java_syntax::Java>(root, &paths, args.nesting_limit, &mut stdout)
+            check_bodies::<java_syntax::Java>(root, &paths, args.nesting_limit, args.workers(), &mut stdout)
         };
+        let _ = stdout.flush();
+        std::process::exit(if differing == 0 { 0 } else { 1 });
+    }
+
+    let schedule = Schedule::new(root, &paths, args.workers());
+    let init = || Parsers::new(args.nesting_limit);
+    if let Some(oracle) = args.check.as_deref() {
+        let dumps = |parsers: &mut Parsers, i: usize| dump_line(parsers, root, &paths[i], &args);
+        let differing = check::dumps(oracle, args.out.as_deref(), &schedule, args.workers(), init, dumps, &mut stdout);
         let _ = stdout.flush();
         std::process::exit(if differing == 0 { 0 } else { 1 });
     }
 
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
-    let mut parser: Parser = new_parser(args.nesting_limit);
-    let mut java_parser: java_syntax::Parser = new_parser(args.nesting_limit);
-    let mut csharp_parser = csharp_syntax::Parser::new();
     let mut csharp_index = String::new();
-    for line in &paths {
-        let path = line.split('\t').next().unwrap_or(line);
-        match Lang::of(path, args.lang) {
-            Lang::Java => {
-                failed += !java_dump(&mut java_parser, root, out, line, &args) as usize;
-                continue;
-            }
-            Lang::CSharp => {
-                let index_line = csharp_dump(&mut csharp_parser, root, out, line);
-                failed += index_line.contains("\"failure\":") as usize;
-                csharp_index.push_str(&index_line);
-                csharp_index.push('\n');
-                continue;
-            }
-            Lang::Kotlin => {}
+    let write = |parsers: &mut Parsers, i: usize| {
+        let dumps = dump_line(parsers, root, &paths[i], &args);
+        (write_dumps(out, &dumps), dumps.index)
+    };
+    schedule.run(args.workers(), init, write, |_, (written, index)| {
+        failed += !written as usize;
+        if let Some(index) = index {
+            csharp_index.push_str(&index);
+            csharp_index.push('\n');
         }
-        let Some(text) = read_source(root, path, args.trim) else {
-            eprintln!("cannot read {path}");
-            failed += 1;
-            continue;
-        };
-        let name = file_name(path);
-        let tree = parser.parse(&text, FileKind::from_file_name(name));
-        let dump = psi_to_string(&tree, name);
-        let target = out.join(format!("{path}.psi.txt"));
-        if let Some(parent) = target.parent() {
-            let _ = std::fs::create_dir_all(parent);
-        }
-        if let Err(e) = std::fs::write(&target, dump) {
-            eprintln!("cannot write {}: {e}", target.display());
-            failed += 1;
-        }
-    }
+    });
     if csharp_files != 0 {
         let _ = std::fs::create_dir_all(out);
         if let Err(e) = std::fs::write(out.join("index.jsonl"), csharp_index) {
@@ -842,51 +964,79 @@ fn same_subtree<L: Language>(
     })
 }
 
+/// What `--check-bodies` found in one file: its bodies, the differing ones and their report lines.
+#[derive(Default)]
+struct BodiesChecked {
+    bodies: usize,
+    differing: usize,
+    report: String,
+}
+
 /// `--check-bodies`: returns the number of differing bodies.
 fn check_bodies<L: BodiesLanguage>(
     root: &Path,
     lines: &[String],
     nesting_limit: Option<u32>,
+    threads: usize,
     stdout: &mut impl Write,
 ) -> usize {
-    let mut parser = new_parser::<L>(nesting_limit);
-    let mut body_parser = new_parser::<L>(nesting_limit);
+    let schedule = Schedule::new(root, lines, threads);
     let (mut bodies, mut differing) = (0usize, 0usize);
-    for line in lines {
-        let Some((path, text, kind)) = L::check_source(root, line) else { continue };
-        let full = parser.parse(&text, kind);
-        let covered: Vec<u8> = full.tokens().flat_map(|id| full.text(id).iter().copied()).collect();
-        if covered != text {
-            let _ = writeln!(stdout, "{path}: the leaves are not the text");
-            differing += 1;
-        }
-        let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
-        let (mut l, mut f) = (0u32, 0u32);
-        while (l as usize) < lazy.len() && (f as usize) < full.len() {
-            let (ln, fnode) = (NodeId(l), NodeId(f));
-            if lazy.kind(ln) != full.kind(fnode) || lazy.range(ln) != full.range(fnode) {
-                let _ = writeln!(stdout, "{path}: node {l} {:?} differs from the full tree's {f}", lazy.range(ln));
-                differing += 1;
-                break;
-            }
-            if lazy.is_unexpanded(ln) {
-                bodies += 1;
-                let same = body_parser
-                    .parse_body(&lazy, ln, ParseOptions::default())
-                    .is_some_and(|body| same_subtree(&body, body.root(), &full, fnode));
-                if !same {
-                    let _ = writeln!(stdout, "{path}: body {:?} differs", lazy.range(ln));
-                    differing += 1;
-                }
-                f = full.subtree_end(fnode).0;
-            } else {
-                f += 1;
-            }
-            l += 1;
-        }
-    }
+    let parsers = || (new_parser::<L>(nesting_limit), new_parser::<L>(nesting_limit));
+    let check = |parsers: &mut (psi_builder::Parser<L>, psi_builder::Parser<L>), i: usize| {
+        check_file_bodies::<L>(&mut parsers.0, &mut parsers.1, root, &lines[i])
+    };
+    schedule.run(threads, parsers, check, |_, checked| {
+        bodies += checked.bodies;
+        differing += checked.differing;
+        let _ = stdout.write_all(checked.report.as_bytes());
+    });
     let _ = writeln!(stdout, "bodies {bodies}  differing {differing}  files {}", lines.len());
     differing
+}
+
+/// `--check-bodies` of one list line: the full tree's leaves are the text, and `parse_body` of every body of the
+/// body-less parse is the full tree's subtree there.
+fn check_file_bodies<L: BodiesLanguage>(
+    parser: &mut psi_builder::Parser<L>,
+    body_parser: &mut psi_builder::Parser<L>,
+    root: &Path,
+    line: &str,
+) -> BodiesChecked {
+    use std::fmt::Write as _;
+    let mut checked = BodiesChecked::default();
+    let Some((path, text, kind)) = L::check_source(root, line) else { return checked };
+    let full = parser.parse(&text, kind);
+    let covered: Vec<u8> = full.tokens().flat_map(|id| full.text(id).iter().copied()).collect();
+    if covered != text {
+        let _ = writeln!(checked.report, "{path}: the leaves are not the text");
+        checked.differing += 1;
+    }
+    let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
+    let (mut l, mut f) = (0u32, 0u32);
+    while (l as usize) < lazy.len() && (f as usize) < full.len() {
+        let (ln, fnode) = (NodeId(l), NodeId(f));
+        if lazy.kind(ln) != full.kind(fnode) || lazy.range(ln) != full.range(fnode) {
+            let _ = writeln!(checked.report, "{path}: node {l} {:?} differs from the full tree's {f}", lazy.range(ln));
+            checked.differing += 1;
+            break;
+        }
+        if lazy.is_unexpanded(ln) {
+            checked.bodies += 1;
+            let same = body_parser
+                .parse_body(&lazy, ln, ParseOptions::default())
+                .is_some_and(|body| same_subtree(&body, body.root(), &full, fnode));
+            if !same {
+                let _ = writeln!(checked.report, "{path}: body {:?} differs", lazy.range(ln));
+                checked.differing += 1;
+            }
+            f = full.subtree_end(fnode).0;
+        } else {
+            f += 1;
+        }
+        l += 1;
+    }
+    checked
 }
 
 fn bench_thread<L: BenchLanguage>(
@@ -1080,7 +1230,7 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
         .collect();
     let bytes: usize = sources.iter().map(|s| s.text.len()).sum();
     let mb = bytes as f64 / 1e6;
-    let threads = args.threads;
+    let threads = args.threads.unwrap_or(1);
     let options = ParseOptions { expand_bodies: !args.no_bodies };
     if cfg!(feature = "alloc-stats") {
         let _ = writeln!(stdout, "alloc-stats: timings include the counting allocator");
