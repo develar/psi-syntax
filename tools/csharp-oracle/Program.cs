@@ -18,6 +18,7 @@ static class Program
                [--entry NAME] [--threads N] [--stack-mb M]
           dump --serve [--version ...] [--doc ...] [--entry ...] [--threads N]   (stdin: LIST<TAB>ROOT<TAB>OUT, prints done)
           lex --list LIST --root ROOT [--version ...] [--doc ...] [--full OUT] [--threads N]
+          values --list LIST --root ROOT [--version ...] [--doc ...] [--entry ...] [--kept] [--threads N]
           goldens --src ROSLYN_TREE --out DIR [--threads N]
           unicode
         """;
@@ -40,6 +41,7 @@ static class Program
             {
                 "dump" => DumpMode.Run(a),
                 "lex" => LexMode.Run(a),
+                "values" => ValuesMode.Run(a),
                 "goldens" => Goldens.Run(a),
                 "unicode" => UnicodeMode.Run(),
                 _ => throw new UsageException($"unknown mode {args[0]}"),
@@ -72,7 +74,7 @@ sealed class Args
                 throw new UsageException($"unexpected argument {key}");
             }
             var name = key[2..];
-            if (name is "serve" or "check-interpolation")
+            if (name is "serve" or "check-interpolation" or "kept")
             {
                 a._values[name] = null;
             }

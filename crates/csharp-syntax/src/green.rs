@@ -775,6 +775,15 @@ impl GreenArena {
         (d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) == IS_NOT_MISSING).then_some((d.start, d.width))
     }
 
+    /// The `ValueText` the lexer set on the token where it is not the text (`set_token_value`), else `None`.
+    pub fn token_value(&self, token: Green) -> Option<&str> {
+        if !token.is_token() {
+            return None;
+        }
+        let &(start, len) = self.values.get(self.token_data(token).value as usize)?;
+        self.strings.get(start as usize..(start + len) as usize)
+    }
+
     /// `SyntaxToken.ValueText` as bytes: the value the lexer set, else the text.
     pub fn token_value_text<'s>(&'s self, token: Green, source: &'s [u8]) -> &'s [u8] {
         if token.is_token() {

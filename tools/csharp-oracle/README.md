@@ -11,7 +11,7 @@ its nuspec names, which no tag contains). The dump is not imitated: it is a walk
 | `CSharpOracle.csproj`, `global.json`, `nuget.config`, `Directory.Build.props` | a `net10.0` console program on `Microsoft.CodeAnalysis.CSharp` `[5.9.0]`, SDK 10.0.403 exactly (`rollForward: disable`), nuget.org only; build products and packages in `~/.cache/psi-syntax/csharp-oracle/` |
 | `packages.lock.json` | the content hash of every package (`RestoreLockedMode`): restore fails when a package does not match, as `jars.sha256` pins the Java oracle's jars. `CSHARP_ORACLE_UNLOCK=1` rewrites it (a pin bump) |
 | `oracle.sh` | builds the program once per source tree (`build/<hash of the sources>`) and runs it: `oracle.sh MODE ARGS` |
-| `Program.cs`, `Dump.cs` | the modes `dump`, `lex` and `unicode`, the dump format below |
+| `Program.cs`, `Dump.cs`, `Values.cs` | the modes `dump`, `lex`, `values` and `unicode`, the dump format below |
 | `Goldens.cs` | the `goldens` mode: the inputs of Roslyn's parser and lexer tests |
 | `vendor-goldens.sh` | writes `testdata/csharp/` from the tests at the pin (`git archive`, never a working tree) |
 | `corpus.py` | a corpus list: the tracked `.cs` files of a checkout that are valid UTF-8 |
@@ -32,6 +32,7 @@ tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version 
   [--doc parse|none|diagnose] [--entry NAME] [--threads N] [--stack-mb M]
 tools/csharp-oracle/oracle.sh dump --serve [the same defaults]   # stdin: LIST<TAB>ROOT<TAB>OUT, prints done after each
 tools/csharp-oracle/oracle.sh lex --list LIST --root ROOT [--version ...] [--doc ...] [--full OUT]
+tools/csharp-oracle/oracle.sh values --list LIST --root ROOT [--version ...] [--doc ...] [--entry ...] [--kept]
 tools/csharp-oracle/oracle.sh goldens --src ROSLYN_TREE --out DIR [--skipped LOG]   # vendor-goldens.sh runs it
 tools/csharp-oracle/oracle.sh unicode   # CharUnicodeInfo.GetUnicodeCategory of 0..10FFFF as runs
 ```
@@ -167,6 +168,39 @@ Each list line prints one line, in list order: `PATH<TAB>TOKENS<TAB>HASH`, TOKEN
 FNV-1a 64-bit hash (offset basis `0xcbf29ce484222325`, prime `0x100000001b3`) of the dump's UTF-8 bytes, 16 lowercase
 hex digits; or `PATH<TAB>failure<TAB>REASON`. `--full OUT` also writes the dump to `OUT/PATH.lex.txt`. List lines
 are read as for `dump` (VERSION and DOC columns apply, ENTRY is ignored).
+
+### Value texts (`values`, `ksdump --values --lang csharp`)
+
+One line per token whose `ValueText` is not its `Text`, in document order, the tokens of structured trivia
+(directives, documentation comments, skipped tokens) included (`DescendantTokens(descendIntoTrivia: true)`; for the
+`tokens` entry each lexed token after the tokens of its leading trivia's structures and before its trailing
+trivia's): `PATH<TAB>START<TAB>Kind<TAB>'value'`, START the token's `SpanStart` in UTF-8 bytes, the value with the
+text escapes; or `PATH<TAB>failure<TAB>REASON`. List lines as for `dump`. `--kept` leaves out the tokens whose value
+the port does not keep (`Values.cs`, `Kept`: numeric, character, raw string and interpolated text literals, and
+strings outside directives; `value_not_kept` of crates/csharp-syntax/src/tree.rs): what `Tree::value_text` answers,
+the lines `ksdump --values` prints of ours. The offsets map Roslyn's positions through the source, so after a token
+whose tree text is not the source's (`&#103;lobal::` in a cref becomes the keyword `global` of fixed text) a position
+past a character outside ASCII maps to another byte than ours, which count the tree's own text.
+
+The gate (`ksdump --values --check LINES`) compares ours with cached `--kept` lines, made once with the lists' own
+columns (`C=~/.cache/psi-syntax`):
+
+```sh
+mkdir -p $C/values
+for c in roslyn-35d9211:roslyn runtime-6aa72da:runtime aspnetcore-0ef4bbf:aspnetcore avalonia-2d79ba5:avalonia; do
+  tools/csharp-oracle/oracle.sh values --kept --list $C/corpus/csharp-${c%%:*}.list --root $C/csharp-src/${c##*:} \
+    > $C/values/csharp-${c%%:*}.kept.txt
+done
+tools/csharp-oracle/oracle.sh values --kept --list $C/fuzz/csharp-mut.list --root $C/fuzz/csharp-mut \
+  > $C/values/csharp-mut.kept.txt
+tools/csharp-oracle/oracle.sh values --kept --list $C/fuzz/csharp-lex/list --root $C/fuzz/csharp-lex \
+  > $C/values/csharp-lex.kept.txt
+```
+
+`crates/csharp-syntax/tests/values/goldens.values.txt` is the same of the goldens (`manifest.tsv`'s lines with `.cs`
+added to the path, `--root testdata/csharp`), and `values.values.txt` of `values.cs` beside it. Equal on 2026-11-02:
+the four corpora, the 7051 goldens at their entries, the 122 741 mutations and the 20 000 lexer fuzz inputs (DESIGN,
+"Value texts").
 
 ## Goldens (`testdata/csharp/`)
 

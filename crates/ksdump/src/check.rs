@@ -1,7 +1,7 @@
-//! `--check`: our dumps and lexer lines against an oracle's cached ones, made and compared in memory on every core, so
+//! `--check`: our dumps, lexer lines and value text lines against an oracle's cached ones, made and compared in memory on every core, so
 //! that a run writes only what differs (the oracle's dumps are read once, ours never touch the disk).
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::{ErrorKind, Read, Write};
 use std::path::Path;
 
@@ -133,6 +133,68 @@ pub fn lex(
         report(None, Some(oracle));
     }
     let _ = writeln!(stdout, "{differing} differing lines of {}", expected.len());
+    differing
+}
+
+/// `--values --check LINES` (C#): the value text lines `values(state, i)` makes of list line `i` (`dump::value_lines`,
+/// none or more a file) against the cached `tools/csharp-oracle/oracle.sh values --kept` lines of the same file
+/// (their first column, the list line's path), every line in order. Prints each differing file's lines (`< ours`,
+/// `> oracle`), the oracle's lines of a file not listed, and `N differing lines of M`. Returns N.
+pub fn values(
+    lines: &Path,
+    paths: &[String],
+    schedule: &Schedule,
+    threads: usize,
+    values: impl Fn(&mut Parsers, usize) -> String + Sync,
+    stdout: &mut impl Write,
+) -> usize {
+    let text = match std::fs::read_to_string(lines) {
+        Ok(text) => text,
+        Err(e) => {
+            eprintln!("cannot read {}: {e}", lines.display());
+            std::process::exit(1)
+        }
+    };
+    let total = text.split_terminator('\n').count();
+    let mut expected: HashMap<&str, Vec<&str>> = HashMap::new();
+    let mut order = Vec::new();
+    for line in text.split_terminator('\n') {
+        let path = line.split('\t').next().unwrap_or(line);
+        expected
+            .entry(path)
+            .or_insert_with(|| {
+                order.push(path);
+                Vec::new()
+            })
+            .push(line);
+    }
+    let mut differing = 0usize;
+    schedule.run(
+        threads,
+        || Parsers::new(None),
+        values,
+        |i, ours| {
+            let path = paths[i].split('\t').next().unwrap_or(&paths[i]);
+            let oracle = expected.remove(path).unwrap_or_default();
+            let ours: Vec<&str> = ours.split_terminator('\n').collect();
+            if ours != oracle {
+                differing += ours.len().max(oracle.len());
+                for line in ours {
+                    let _ = writeln!(stdout, "< {line}");
+                }
+                for line in oracle {
+                    let _ = writeln!(stdout, "> {line}");
+                }
+            }
+        },
+    );
+    for path in order {
+        for line in expected.remove(path).unwrap_or_default() {
+            differing += 1;
+            let _ = writeln!(stdout, "> {line}");
+        }
+    }
+    let _ = writeln!(stdout, "{differing} differing lines of {total}");
     differing
 }
 

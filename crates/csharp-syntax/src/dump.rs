@@ -233,6 +233,25 @@ fn four_byte_char(source: &[u8], at: usize) -> Option<u32> {
     (c.len_utf8() == 4).then_some(c as u32)
 }
 
+/// What `tools/csharp-oracle/oracle.sh values --kept` prints of a tree (its README, "Value texts"): a line
+/// `PATH<TAB>START<TAB>Kind<TAB>'value'` for each token whose `Tree::value_text` is not its text, in document order,
+/// `START` the token's start, the value with the text escapes. Without `--kept` the oracle also prints the tokens
+/// whose value the port does not keep (`value_text` is `None`: the literals but a directive's strings).
+pub fn value_lines(path: &str, tree: &Tree) -> String {
+    let mut out = String::new();
+    for id in tree.descendants(tree.root()) {
+        let Some(value) = tree.value_text(id) else { continue };
+        if value.as_bytes() == tree.text(id) {
+            continue;
+        }
+        let kind = tree.token_kind(id).map_or("", |k| k.debug_name());
+        out.push_str(&format!("{path}\t{}\t{kind}\t'", tree.range(id).start));
+        escape(value, &mut out);
+        out.push_str("'\n");
+    }
+    out
+}
+
 /// The `index.jsonl` line of a dumped file: `{"path":…,"errors":N,"firstError":"CSnnnn [s..e) message"|null}`.
 pub fn index_line(path: &str, tree: &Tree) -> String {
     let mut out = String::from("{\"path\":");

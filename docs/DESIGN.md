@@ -419,7 +419,8 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   node of its structure (a directive, a documentation comment, skipped tokens). A token's text is a range of the
   source, `SyntaxFacts.GetText(kind)` for a token made by kind (`SyntaxFactory.Token`, a merged `>>`), or a string the
   arena keeps; `ValueText` is kept only where it is not the text (an escaped identifier, `@`, a directive's string,
-  an XML entity). Flags are Roslyn's (`IsNotMissing`, contains diagnostics, directives, skipped text, structured
+  an XML entity, a cref's brace), and the flattened tree keeps those values beside it (`Tree::value_text`). Flags
+  are Roslyn's (`IsNotMissing`, contains diagnostics, directives, skipped text, structured
   trivia), inherited from the children as `GreenNode`'s are.
 - **Copies, never changes.** What Roslyn does by making a new green node (a diagnostic added, a token with other
   trivia, a first or last token replaced) appends a new record; the old one stays, garbage, until the file ends. So a
@@ -471,7 +472,10 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   tokens land where Roslyn puts them. The tree's text is the source; where Roslyn's tree drops a token (once in the
   corpora, mutations and fuzz: `ParseConversionOperatorDeclaration` replacing a modifier by a skipped one) its
   positions no longer spell the source, and from the first leaf whose text differs the tree's text is the green
-  tree's own (`ToFullString()`), so every element shows its text at its red position as Roslyn's does.
+  tree's own (`ToFullString()`), so every element shows its text at its red position as Roslyn's does. The same walk
+  copies the value of each token the arena kept one for into a side table of the tree, `(leaf id, end)` pairs over
+  one string in id order, which `Tree::value_text` searches; every other token's value is its text, or one the port
+  does not keep (a literal's).
 - **Trivia ownership bits.** `kinds` has two bits for C#, `TRAILING` (0x2000) and `MISSING` (0x1000), and 12 bits of
   kind index (574 C# kinds: 252 token and trivia kinds below `NODE_BASE`, 322 node kinds). Which token a trivia leaf
   belongs to cannot be read off positions: the end of a line does not end trailing trivia in a directive, skipped
@@ -572,8 +576,9 @@ changes a tree of the gate's inputs; the first three apply only past limits no c
   `#if` sections.
 - **Linear algorithms with Roslyn's decisions**: the replayed tuple type scans, trailing trivia grown in place,
   `IsDefined` stepping over cells, a run of `@` scanned once (`TryScanAtStringToken`).
-- **Values not kept**: the `ValueText` of string literals and of interpolated and raw string texts (no tree shows
-  them); `MakeInterpolatedStringTextToken` lexes a text as a string literal only when that could report a diagnostic
+- **Values not kept**: the `ValueText` of numeric literals (in directives too), of character literals, of string
+  literals outside directives and of interpolated and raw string texts (no tree shows them; `Tree::value_text` is
+  `None` there, a missing token's empty text aside); `MakeInterpolatedStringTextToken` lexes a text as a string literal only when that could report a diagnostic
   (an escape or a line break in a regular text, a quote in a verbatim one).
 - **Where Roslyn throws `ExceptionUtilities.UnexpectedValue`** on a value no input reaches (a designation kind in
   `ParseForEachStatement`, the precedence of a kind `GetPrecedence` does not list, a lexer mode no parser asks), the
@@ -621,7 +626,8 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
   `buffers::RETAINED_BYTES` = 64 MiB by default): a parse that leaves more shrinks them to half of that. `heap_bytes()`
   is what they hold, `shrink_to(bytes)` shrinks them on demand (the same for the three languages, "Retained buffers").
 - C#: `csharp_syntax::Tree` derefs to the same `psi_builder::Tree` and adds `diagnostics()` (codes, byte spans,
-  messages, in Roslyn's order). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`
+  messages, in Roslyn's order) and `value_text(id)` (`SyntaxToken.ValueText`: `@class` is `class`, `\u0061` is `a`;
+  "Value texts"). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`
   telling which token they belong to; an inserted token is an empty leaf with `is_missing`. There is no body-less
   parsing: Roslyn parses no block on its own.
 
@@ -723,6 +729,39 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### Value texts (child of "(csharp) Shrink a parser's buffers past its retained bytes"), 2026-11-02
+
+`Tree::value_text` against Roslyn's `SyntaxToken.ValueText`: `tools/csharp-oracle/oracle.sh values --kept` prints
+every token whose value is not its text and is one the port keeps (it leaves out the literals: numeric, character,
+string outside directives, raw string, interpolated text), `ksdump --values` ours, compared line for line
+(`ksdump --values --check`). The port's lines (identifiers, entities, cref braces and entities, directive strings
+and names), all equal to Roslyn's; the gate compares the corpora, the mutations and the fuzz on every run, and
+`tests/value_text.rs` the goldens (`tests/values/goldens.values.txt`):
+
+| input | lines | of which directive strings |
+|---|---|---|
+| dotnet/roslyn (17 075 files) | 13 385 | 3 228 |
+| dotnet/runtime (31 267) | 29 738 | 16 |
+| dotnet/aspnetcore (10 188) | 5 046 | 368 |
+| Avalonia (4 085) | 592 | 0 |
+| the 7051 goldens at their entries, versions and modes | 587 | 121 |
+| the 122 741 golden mutations | 14 591 | 766 |
+| the 20 000 lexer fuzz inputs | 2 580 | 565 |
+
+The fuzz found 7 wrong values first: Roslyn keeps a token's `StringValue` in its `TokenInfo`, the port in the lexer's
+`value`, which a directive in the token's trailing trivia (`@c #r "a"`, a directive not first on its line) overwrote
+with its own tokens' values before the token was made; `lex_syntax_token` now keeps it across the trailing trivia. No
+tree changed (the gate). The table costs a branch per token in `flatten` and nothing in most files (no token has a
+value: the table and its string allocate nothing): `scripts/ab.sh` against the commit before this entry, 7 rounds at
+load 2, roslyn B/A 0.988 and aspnetcore 0.985 in wall time, while the instructions of a roslyn run (`/usr/bin/time -l`,
+files read included) went 63.05 → 62.17 G (-1.4 %): code placement, within what a layout change moves.
+`tests/value_text.rs` ports Roslyn's expectations (`LexicalTests.cs`' identifiers, verbatim keywords, keywords and
+punctuation, multiple `@`; `NameParsingTests.cs`' formatting characters; `CrefLexerTests.cs`' and
+`NameAttributeValueLexerTests.cs`' entities, escapes and braces; `PreprocessorTests.cs`' directive names and files) and
+compares `tests/values/values.cs` and the goldens with the oracle's lines of them. Missing tokens (`#pragma checksum`
+without its strings, `#line` without its number) have the empty text, a missing literal's included, as Roslyn's
+`MissingTokenWithTrivia`; the oracle's lines cannot show it (a value equal to the text is no line), a test does.
 
 ### Retained buffers (child of 6e8c19af), 2026-11-02
 

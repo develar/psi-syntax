@@ -26,7 +26,8 @@
 //! derefs to `psi_builder::Tree<CSharp>` (ids in preorder, `kind`, `range`, `children`, `leaves`, `descendants`, ...);
 //! a node's range is its full span, a token a leaf between its leading and trailing trivia, structured trivia
 //! (directives, documentation comments, skipped tokens) a subtree; `Tree::diagnostics` is `GetDiagnostics()` in
-//! Roslyn's order. Any bytes parse without a panic on a 1 MB stack; past Roslyn's nesting, which a fixed depth counter
+//! Roslyn's order, `Tree::value_text` a token's `ValueText` (`@class` is `class`). A `Parser` keeps at most its
+//! retained bytes of buffers between files (`set_retained_bytes`, `shrink_to`, `heap_bytes`). Any bytes parse without a panic on a 1 MB stack; past Roslyn's nesting, which a fixed depth counter
 //! replaces, and past the work and memory budgets, the tree is the one Roslyn returns on an exhausted stack
 //! (`ERR_InsufficientStack`). docs/DESIGN.md, "C#", "C# nesting and work" and "C# deviations", says how and where it
 //! differs from Roslyn.

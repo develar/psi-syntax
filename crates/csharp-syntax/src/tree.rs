@@ -9,13 +9,13 @@ use psi_builder::TreeBuilder;
 pub use psi_builder::tree::{Children, NodeId, Preorder};
 
 use crate::error_code::{ErrorCode, Severity};
-use crate::flatten::Flattener;
+use crate::flatten::{Flat, Flattener, Values};
 use crate::green::{Green, GreenArena, SyntaxListPool};
 use crate::language::CSharp;
 use crate::language_version::LanguageVersion;
 use crate::lexer::{Lexer, LexerBuffers, LexerMode, LexerOptions};
 use crate::parser::LanguageParser;
-use crate::syntax_kind::SyntaxKind;
+use crate::syntax_kind::{SyntaxKind, TokenKind};
 use crate::syntax_parser::SyntaxParserBuffers;
 
 /// `DocumentationMode`: whether documentation comments are parsed into structured trivia (`Parse`, the default of
@@ -171,10 +171,15 @@ impl Diagnostic {
 }
 
 /// A parsed C# text: `psi_builder`'s tree (`Deref`: ids in preorder, `kind`, `range`, `children`, `leaves`, ...,
-/// `error_message(id)`, the first message on a node) and its diagnostics in Roslyn's order.
+/// `error_message(id)`, the first message on a node), its diagnostics in Roslyn's order and its tokens' value texts
+/// (`value_text`).
 pub struct Tree {
     tree: psi_builder::Tree<CSharp>,
     diagnostics: Box<[Diagnostic]>,
+    /// The token leaves whose `ValueText` is not their text, in id order, and the end of each one's value in
+    /// `value_strings` (`flatten::Values`).
+    values: Box<[(u32, u32)]>,
+    value_strings: Box<str>,
     /// The entry returned null (`ParseMemberDeclaration` of text that is no member): the tree is an empty root.
     no_result: bool,
     /// The tokens of `Parser::lex` (`Entry::Tokens`) as the root's children, not a parse.
@@ -189,7 +194,38 @@ impl Deref for Tree {
     }
 }
 
+/// The token kinds whose `ValueText` is a value the port does not keep (a number's, a character's, a string's
+/// content): `Tree::value_text` has none for them, unless the lexer kept it (a directive's string) or the token is
+/// missing. `tools/csharp-oracle`'s `values --kept` leaves out the same kinds (`Values.cs`, `NotKept`).
+fn value_not_kept(kind: TokenKind) -> bool {
+    matches!(
+        kind,
+        TokenKind::NumericLiteralToken
+            | TokenKind::CharacterLiteralToken
+            | TokenKind::StringLiteralToken
+            | TokenKind::Utf8StringLiteralToken
+            | TokenKind::SingleLineRawStringLiteralToken
+            | TokenKind::MultiLineRawStringLiteralToken
+            | TokenKind::Utf8SingleLineRawStringLiteralToken
+            | TokenKind::Utf8MultiLineRawStringLiteralToken
+            | TokenKind::InterpolatedStringToken
+            | TokenKind::InterpolatedStringTextToken
+    )
+}
+
 impl Tree {
+    /// The tree of what a walk made, with the entry's flags.
+    fn of(flat: Flat, no_result: bool, lexed: bool) -> Tree {
+        Tree {
+            tree: flat.tree,
+            diagnostics: flat.diagnostics.into_boxed_slice(),
+            values: flat.values.ends.into_boxed_slice(),
+            value_strings: flat.values.text.into_boxed_str(),
+            no_result,
+            lexed,
+        }
+    }
+
     /// Parses `text` with a fresh `Parser` (keep a `Parser` per thread to reuse its buffers).
     pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
         Parser::once().parse(text, file_kind)
@@ -200,8 +236,7 @@ impl Tree {
     pub fn from_green(arena: &GreenArena, root: Green, source: &[u8], file_kind: FileKind) -> Tree {
         let source: Arc<[u8]> = Arc::from(source);
         let mut builder = TreeBuilder::new();
-        let (tree, diagnostics) = Flattener::default().flatten(arena, root, &source, &mut builder, file_kind);
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: false }
+        Tree::of(Flattener::default().flatten(arena, root, &source, &mut builder, file_kind), false, false)
     }
 
     /// The tree of lexed `tokens` of `arena` as the children of a root, as `Parser::lex` builds it (tests).
@@ -209,13 +244,41 @@ impl Tree {
     pub fn from_tokens(arena: &GreenArena, tokens: &[Green], source: &[u8], file_kind: FileKind) -> Tree {
         let source: Arc<[u8]> = Arc::from(source);
         let mut builder = TreeBuilder::new();
-        let (tree, diagnostics) = Flattener::default().flatten_tokens(arena, tokens, &source, &mut builder, file_kind);
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: true }
+        Tree::of(Flattener::default().flatten_tokens(arena, tokens, &source, &mut builder, file_kind), false, true)
     }
 
     /// `GetDiagnostics()`, in Roslyn's order.
     pub fn diagnostics(&self) -> &[Diagnostic] {
         &self.diagnostics
+    }
+
+    /// `SyntaxToken.ValueText` of the token leaf `id`: the identifier's name without a verbatim `@` and with its
+    /// unicode escapes (`\uXXXX`, `\UXXXXXXXX`) decoded (`@class` is `class`; in a documentation comment's name
+    /// attribute the `@` is part of the value, as in Roslyn: `<param name="@a"/>` is `@a`), an XML entity's character
+    /// (`&lt;` is `<`), a cref's `{` and `}` as `<` and `>`, a directive string's content (`#line 1 "a.cs"`); else the
+    /// token's text (keywords, punctuation, XML text, an identifier without escapes, a missing token's empty text,
+    /// a missing literal's included). `None` for a node, a trivia leaf, a token whose text is not UTF-8, and a literal
+    /// whose value the port does not keep: every numeric literal (also in a directive: `#line 010` and `#pragma
+    /// warning disable 0168` have none), and character, string (but a directive's), raw string and interpolated
+    /// text tokens; their `ValueText` is the value, which no tree shows. Only values that differ from the text are
+    /// stored, in a table searched by id.
+    pub fn value_text(&self, id: NodeId) -> Option<&str> {
+        let kind = self.tree.token_kind(id)?;
+        if crate::dump::is_trivia(kind) {
+            return None;
+        }
+        if let Ok(i) = self.values.binary_search_by_key(&id.0, |&(leaf, _)| leaf) {
+            let start = if i == 0 { 0 } else { self.values[i - 1].1 as usize };
+            return self.value_strings.get(start..self.values[i].1 as usize);
+        }
+        // a missing token's `ValueText` is its `Text`, empty (`MissingTokenWithTrivia`), whatever its kind
+        if self.tree.is_missing(id) {
+            return Some("");
+        }
+        if value_not_kept(kind) {
+            return None;
+        }
+        self.tree.utf8_text(id)
     }
 
     /// The tree without its diagnostics.
@@ -235,11 +298,13 @@ impl Tree {
         self.lexed
     }
 
-    /// The heap bytes of the tree and its diagnostics.
+    /// The heap bytes of the tree, its diagnostics and its value texts.
     pub fn heap_bytes(&self) -> usize {
         self.tree.heap_bytes()
             + self.diagnostics.len() * size_of::<Diagnostic>()
             + self.diagnostics.iter().map(|d| d.message.capacity()).sum::<usize>()
+            + self.values.len() * size_of::<(u32, u32)>()
+            + self.value_strings.len()
     }
 }
 
@@ -400,10 +465,10 @@ impl Parser {
         }
         let (arena, lexer_buffers) = lexer.into_parts();
         self.lexer = lexer_buffers;
-        let (tree, diagnostics) = self.flattener.flatten_tokens(&arena, &tokens, &source, &mut self.builder, file_kind);
+        let flat = self.flattener.flatten_tokens(&arena, &tokens, &source, &mut self.builder, file_kind);
         self.arena = arena;
         self.retain();
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: true }
+        Tree::of(flat, false, true)
     }
 
     /// The number of tokens `lex` makes of `text`, without a tree: the lexer alone, what `ksdump --lex --bench` times.
@@ -430,16 +495,17 @@ impl Parser {
 
     fn finish(&mut self, arena: GreenArena, root: Green, source: &Arc<[u8]>, file_kind: FileKind) -> Tree {
         let no_result = root.is_null();
-        let (tree, diagnostics) = if no_result {
+        let flat = if no_result {
             let id = self.builder.open(None, psi_builder::ElementType::Node(crate::NodeKind::CompilationUnit), 0);
             self.builder.close(id, 0);
-            (self.builder.finish(source.clone(), file_kind), Vec::new())
+            let tree = self.builder.finish(source.clone(), file_kind);
+            Flat { tree, diagnostics: Vec::new(), values: Values::default() }
         } else {
             self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind)
         };
         self.arena = arena;
         self.retain();
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result, lexed: false }
+        Tree::of(flat, no_result, false)
     }
 }
 

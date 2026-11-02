@@ -22,7 +22,10 @@
 #      dotnet/aspnetcore, Avalonia), its golden mutations and its lexer fuzz against the cached lines of
 #      `tools/csharp-oracle/oracle.sh lex --doc none`, and the same with `--doc parse` (documentation comments
 #      parsed into structured trivia by the documentation comment parser) and `--doc diagnose` (with its XML errors)
-#      against `lex --doc parse`'s and `lex --doc diagnose`'s, 0 differing lines;
+#      against `lex --doc parse`'s and `lex --doc diagnose`'s, 0 differing lines; and `Tree::value_text` (`ksdump
+#      --values --check`) on the four corpora, the golden mutations at their list's columns and the lexer fuzz against
+#      the cached lines of `tools/csharp-oracle/oracle.sh values --kept` (Roslyn's `ValueText` where the port keeps
+#      it), 0 differing lines;
 #  10. C#'s parser against Roslyn 5.9.0's trees (`tools/csharp-oracle/oracle.sh dump`): the 7051 goldens of
 #      testdata/csharp and the reduced cases of crates/csharp-syntax/tests/oracle (step 1, strict), and our dumps
 #      against the cached oracle dumps of the four corpora at Latest and at Preview, of the golden mutations at their
@@ -33,10 +36,11 @@
 # file, what `diff -rq -x index.jsonl ORACLE OURS` checked of written dumps (a dump that differs, one that either side
 # lacks, an oracle directory without dumps; index.jsonl is not compared, so a file the oracle failed on must have no
 # dump of ours either). A lexer comparison is `ksdump --lex --check LINES`, line by line against the cached lines (a
-# Kotlin line's first two columns, as LexOracle.java prints them). Each runs on every core, one parser per thread;
-# a new corpus is one line calling `dumps`, `lex` or `bodies` in its language's section. The sections run in three
+# Kotlin line's first two columns, as LexOracle.java prints them). Each runs on every core, one parser per thread; a new
+# corpus is one line calling `dumps`, `lex`, `values` or `bodies` in its language's section. The sections run in three
 # lanes at once (see `lane` below).
-# Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
+# Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings;
+# the value text lines: tools/csharp-oracle/README.md, "Value texts").
 # Each run's logs and differing dumps go to a fresh directory under ~/.cache/psi-syntax/ours/ (concurrent sessions
 # share the machine), removed on PASS and kept, with its path printed, on FAIL.
 set -u
@@ -69,6 +73,12 @@ dumps() {
 lex() {
   name=$1 lines=$2; shift 2
   $B --lex --check "$lines" "$@" > "$O/$name.log" 2>&1
+  report "$name" $?
+}
+# values NAME LINES ARGS...: `ksdump --values --check LINES ARGS...`.
+values() {
+  name=$1 lines=$2; shift 2
+  $B --values --check "$lines" "$@" > "$O/$name.log" 2>&1
   report "$name" $?
 }
 # bodies NAME ARGS...: `ksdump --check-bodies ARGS...`, nonzero on a differing body or a tree whose leaves are not the
@@ -130,6 +140,15 @@ csharp_lex() {
     lex csharp-lex-$3 "$C/lex/$3.oracle.txt" --lang csharp --doc none --list "$1" --root "$2" || f=1
     lex csharp-lex-doc-parse-$3 "$C/lex/$3.doc.oracle.txt" --lang csharp --doc parse --list "$1" --root "$2" || f=1
     lex csharp-lex-doc-diagnose-$3 "$C/lex/$3.diag.oracle.txt" --lang csharp --doc diagnose --list "$1" --root "$2" || f=1
+  done
+  # The value texts against the cached `values --kept` lines (made with the list's columns, the mutations' included).
+  for corpus in "$C/corpus/csharp-roslyn-35d9211.list $C/csharp-src/roslyn csharp-roslyn-35d9211" \
+    "$C/corpus/csharp-runtime-6aa72da.list $C/csharp-src/runtime csharp-runtime-6aa72da" \
+    "$C/corpus/csharp-aspnetcore-0ef4bbf.list $C/csharp-src/aspnetcore csharp-aspnetcore-0ef4bbf" \
+    "$C/corpus/csharp-avalonia-2d79ba5.list $C/csharp-src/avalonia csharp-avalonia-2d79ba5" \
+    "$C/fuzz/csharp-mut.list $C/fuzz/csharp-mut csharp-mut" "$C/fuzz/csharp-lex/list $C/fuzz/csharp-lex csharp-lex"; do
+    set -- $corpus
+    values csharp-values-$3 "$C/values/$3.kept.txt" --list "$1" --root "$2" || f=1
   done
   return $f
 }

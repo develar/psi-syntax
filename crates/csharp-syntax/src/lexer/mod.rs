@@ -521,9 +521,15 @@ impl<'t> Lexer<'t> {
         let mut errors = std::mem::take(&mut self.buffers.token_errors);
         self.get_errors(&mut errors);
 
+        // Roslyn keeps the token's `StringValue` in its `TokenInfo`; here it is `self.value`, which a directive in the
+        // trailing trivia (one that is not first on its line: `@a #line 1 "b"`) overwrites with its own tokens' values.
+        let value = token_info.has_value.then(|| std::mem::take(&mut self.value));
         let mut trailing = std::mem::take(&mut self.buffers.trailing_trivia);
         trailing.clear();
         self.lex_syntax_trivia(true, true, &mut trailing);
+        if let Some(value) = value {
+            self.value = value;
+        }
 
         let leading_list = self.arena.trivia_list(&leading);
         let trailing_list = self.arena.trivia_list(&trailing);

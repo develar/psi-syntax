@@ -44,6 +44,22 @@ pub(crate) struct Flattener {
     stack: Vec<Frame>,
 }
 
+/// What a walk returns: the tree, its diagnostics in Roslyn's order, and the value texts of its tokens whose
+/// `ValueText` is not their text (`Tree::value_text`).
+pub(crate) struct Flat {
+    pub(crate) tree: psi_builder::Tree<CSharp>,
+    pub(crate) diagnostics: Vec<Diagnostic>,
+    pub(crate) values: Values,
+}
+
+/// The `ValueText` of each token leaf whose value the arena keeps (`GreenArena::token_value`): the leaf's id and the
+/// end of its value in `text`, in id order, each value starting where the one before ends.
+#[derive(Default)]
+pub(crate) struct Values {
+    pub(crate) ends: Vec<(u32, u32)>,
+    pub(crate) text: String,
+}
+
 /// What a walk builds: the tree's nodes in `builder`, and the diagnostics.
 struct Walk<'a> {
     arena: &'a GreenArena,
@@ -63,6 +79,7 @@ struct Walk<'a> {
     source_next: u32,
     /// The tree's text from the first leaf whose text is not the source's at its position on (`ToFullString()`).
     text: Option<Vec<u8>>,
+    values: Values,
 }
 
 /// A byte offset of a text and its UTF-16 position, moved to the next one asked (diagnostics come in walk order, so
@@ -154,7 +171,7 @@ impl Flattener {
         source: &Arc<[u8]>,
         builder: &mut TreeBuilder<CSharp>,
         file_kind: FileKind,
-    ) -> (psi_builder::Tree<CSharp>, Vec<Diagnostic>) {
+    ) -> Flat {
         let length = arena.full_width(root);
         let mut walk = Walk {
             arena,
@@ -167,6 +184,7 @@ impl Flattener {
             utf16: Utf16Cursor::default(),
             source_next: 0,
             text: None,
+            values: Values::default(),
         };
         self.stack.clear();
         if root.is_token() {
@@ -182,7 +200,7 @@ impl Flattener {
         }
         let text = walk.text.take().map_or_else(|| source.clone(), Arc::from);
         let tree = walk.builder.finish(text, file_kind);
-        (tree, walk.diagnostics)
+        Flat { tree, diagnostics: walk.diagnostics, values: walk.values }
     }
 
     /// The tree of `tokens` (a lexer's, `SyntaxFactory.ParseTokens`) as children of a `CompilationUnit` root, the
@@ -194,7 +212,7 @@ impl Flattener {
         source: &Arc<[u8]>,
         builder: &mut TreeBuilder<CSharp>,
         file_kind: FileKind,
-    ) -> (psi_builder::Tree<CSharp>, Vec<Diagnostic>) {
+    ) -> Flat {
         let length = tokens.iter().map(|&t| arena.full_width(t)).fold(0u32, u32::wrapping_add);
         let mut walk = Walk {
             arena,
@@ -207,6 +225,7 @@ impl Flattener {
             utf16: Utf16Cursor::default(),
             source_next: 0,
             text: None,
+            values: Values::default(),
         };
         let root = walk.builder.open(None, ElementType::Node(NodeKind::CompilationUnit), 0);
         for &token in tokens {
@@ -216,7 +235,7 @@ impl Flattener {
         }
         walk.builder.close(root, walk.position);
         let tree = walk.builder.finish(source.clone(), file_kind);
-        (tree, walk.diagnostics)
+        Flat { tree, diagnostics: walk.diagnostics, values: walk.values }
     }
 
     fn run(&mut self, walk: &mut Walk<'_>) {
@@ -326,6 +345,10 @@ impl Walk<'_> {
         let leaf = self.builder.leaf(parent, kind, start, end);
         if self.arena.is_missing(green) {
             self.builder.set_missing(leaf);
+        }
+        if let Some(value) = self.arena.token_value(green) {
+            self.values.text.push_str(value);
+            self.values.ends.push((leaf.0, self.values.text.len() as u32));
         }
         match self.arena.token_source_range(green) {
             Some((at, width)) => self.leaf_text(start, at, width, None),

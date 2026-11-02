@@ -92,6 +92,8 @@ fn usage() -> ! {
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
          ksdump --lex --bench --list LIST --root ROOT [--repeat K] [--docs]   lexer throughput (--docs: doc comments too)\n  \
          ksdump --lex --list LIST --root ROOT [--full OUT]   C# files: lexer hash lines as tools/csharp-oracle lex prints them\n  \
+         ksdump --values --list LIST --root ROOT             C# files: value text lines as tools/csharp-oracle values prints them\n  \
+         ksdump --values --check LINES --list LIST --root ROOT   C#: our value text lines against the oracle's `values --kept`\n  \
          (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
          C#: --version V and --doc parse|none|diagnose for the list lines without those columns, as tools/csharp-oracle)"
     );
@@ -126,6 +128,9 @@ struct Args {
     out: Option<PathBuf>,
     bench: bool,
     lex: bool,
+    /// `--values` (C#): the value text lines as `tools/csharp-oracle values --kept` prints them (`--check LINES`:
+    /// against those lines).
+    values: bool,
     dump: bool,
     trim: bool,
     /// `--threads N`; `--bench` defaults to one thread, the other modes to every core.
@@ -160,6 +165,7 @@ fn parse_args() -> Args {
             "--out" => args.out = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--bench" => args.bench = true,
             "--lex" => args.lex = true,
+            "--values" => args.values = true,
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
             "--node" => args.node = true,
@@ -637,10 +643,45 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
     format!("{path}\t{}\t{:016x}", csharp_syntax::dump::lexed_tokens(&tree), hash.0)
 }
 
+/// `--values` of a C# file: `dump::value_lines` of its tree, or `PATH<TAB>failure<TAB>REASON`.
+fn csharp_values(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) -> String {
+    let path = line.split('\t').next().unwrap_or(line);
+    let Some((_, kind)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
+    let text = match csharp_source(root, path) {
+        Ok(text) => text,
+        Err(failure) => return format!("{path}\tfailure\t{failure}\n"),
+    };
+    let tree = parser.parse(&text, kind);
+    if tree.has_no_result() {
+        return String::new();
+    }
+    csharp_syntax::dump::value_lines(path, &tree)
+}
+
 fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
     let paths = read_list(list);
+    if args.values {
+        let stdout = std::io::stdout();
+        let mut stdout = std::io::BufWriter::new(stdout.lock());
+        let schedule = Schedule::new(root, &paths, args.workers());
+        let values = |parsers: &mut Parsers, i: usize| csharp_values(parsers.csharp(), root, &paths[i]);
+        if let Some(lines) = args.check.as_deref() {
+            let differing = check::values(lines, &paths, &schedule, args.workers(), values, &mut stdout);
+            let _ = stdout.flush();
+            std::process::exit(if differing == 0 { 0 } else { 1 });
+        }
+        schedule.run(
+            args.workers(),
+            || Parsers::new(None),
+            values,
+            |_, text| {
+                let _ = stdout.write_all(text.as_bytes());
+            },
+        );
+        return;
+    }
     if args.lex && !args.bench {
         let stdout = std::io::stdout();
         let mut stdout = std::io::BufWriter::new(stdout.lock());
