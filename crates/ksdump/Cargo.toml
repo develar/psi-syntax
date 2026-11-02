@@ -1,6 +1,6 @@
 [package]
 name = "ksdump"
-description = "Dumps, benchmarks and lexes listed files with the psi-syntax parsers, like the PSI oracles"
+description = "Dumps, benchmarks and lexes listed files with the psi-syntax parsers, like the PSI and Roslyn oracles"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -11,6 +11,7 @@ publish.workspace = true
 [dependencies]
 kotlin-syntax.workspace = true
 java-syntax.workspace = true
+csharp-syntax.workspace = true
 # Only `ksdump --bench` with `--features alloc-stats`: a counting global allocator (allocations per file); it is
 # opt-in because its atomic counters slow the parse and contend across threads.
 stats_alloc = { version = "0.1.10", optional = true }

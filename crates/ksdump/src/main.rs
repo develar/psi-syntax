@@ -1,6 +1,7 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
-//! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
+//! Each file's language is `--lang kotlin|java|csharp` when given, else its extension: `.java` is Java, `.cs` C#,
+//! anything else Kotlin.
 //! `--lex`, `--out`, `--bench` and `--check-bodies` take Java files (`crates/java-syntax`); a `--bench` or
 //! `--check-bodies` list (`--lex --bench` too) is of one language, else ksdump exits with status 2 before anything runs.
 //!
@@ -29,6 +30,12 @@
 //!   tree's leaves are the text and `parse_body` of every unexpanded body is the full tree's subtree there (the same
 //!   kinds, ranges, error messages and shape); prints the bodies, the differing ones (their paths and ranges) and
 //!   exits nonzero on any. A Java list line is read as for `--out`.
+//! - C# (`crates/csharp-syntax`): a list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle`
+//!   reads it (`latest`/`preview`/`7.3`, `compilation-unit`/`expression`/..., `parse`/`none`); the text is the file's
+//!   bytes as they are (no line-separator conversion) and must be UTF-8. `--out` writes `OUT/<path>.tree.txt` and
+//!   `OUT/index.jsonl` as the oracle does; `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the
+//!   lexer dump) per file and with `--full` writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files.
+//!   `--check-bodies` and `--nesting-limit` do not apply (C# has no lazily parsed bodies).
 //! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
 //!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
@@ -44,7 +51,7 @@ use std::time::Instant;
 use kotlin_syntax::counters::{self, AnyCounter};
 use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
-use kotlin_syntax::psi_builder::{self, Language};
+use kotlin_syntax::psi_builder::{self, Language, TreeLanguage};
 use kotlin_syntax::tokens::TokenKind;
 use kotlin_syntax::{FileKind, Kotlin, NodeId, ParseOptions, Parser};
 
@@ -63,7 +70,8 @@ fn usage() -> ! {
          (--nesting-limit N: parse with that nesting limit)\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
          ksdump --lex --bench --list LIST --root ROOT [--repeat K] [--docs]   lexer throughput (--docs: doc comments too)\n  \
-         (--lang kotlin|java: the files' language; by default `.java` is Java, anything else Kotlin)"
+         ksdump --lex --list LIST --root ROOT [--full OUT]   C# files: lexer hash lines as tools/csharp-oracle lex prints them\n  \
+         (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin)"
     );
     std::process::exit(2)
 }
@@ -73,12 +81,19 @@ fn usage() -> ! {
 enum Lang {
     Kotlin,
     Java,
+    CSharp,
 }
 
 impl Lang {
-    /// `--lang`, else by extension: `.java` is Java, anything else Kotlin (`.kt`, `.kts`, none).
+    /// `--lang`, else by extension: `.java` is Java, `.cs` C#, anything else Kotlin (`.kt`, `.kts`, none).
     fn of(path: &str, forced: Option<Lang>) -> Lang {
-        forced.unwrap_or(if path.ends_with(".java") { Lang::Java } else { Lang::Kotlin })
+        forced.unwrap_or(if path.ends_with(".java") {
+            Lang::Java
+        } else if path.ends_with(".cs") {
+            Lang::CSharp
+        } else {
+            Lang::Kotlin
+        })
     }
 }
 
@@ -101,6 +116,8 @@ struct Args {
     lang: Option<Lang>,
     node: bool,
     docs: bool,
+    /// `--full OUT` (C# `--lex`): the lexer dumps' directory.
+    full: Option<PathBuf>,
 }
 
 fn parse_args() -> Args {
@@ -119,6 +136,7 @@ fn parse_args() -> Args {
             "--trim" => args.trim = true,
             "--node" => args.node = true,
             "--docs" => args.docs = true,
+            "--full" => args.full = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--threads" => args.threads = count(it.next()),
             "--walk" => args.walk = true,
             "--no-bodies" => args.no_bodies = true,
@@ -130,6 +148,7 @@ fn parse_args() -> Args {
                 args.lang = Some(match it.next().as_deref() {
                     Some("kotlin") => Lang::Kotlin,
                     Some("java") => Lang::Java,
+                    Some("csharp") => Lang::CSharp,
                     _ => usage(),
                 })
             }
@@ -335,6 +354,79 @@ fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &s
     true
 }
 
+/// A C# list line, `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle` reads it (an empty or absent
+/// column takes the default: `latest`, `compilation-unit`, `parse`); `None` for a column that names nothing.
+fn csharp_line(line: &str) -> Option<(&str, csharp_syntax::FileKind)> {
+    let columns: Vec<&str> = line.split('\t').collect();
+    let mut kind = csharp_syntax::FileKind::default();
+    if let Some(v) = columns.get(1).filter(|v| !v.is_empty()) {
+        kind.version = csharp_syntax::LanguageVersion::from_name(v)?;
+    }
+    if let Some(e) = columns.get(2).filter(|e| !e.is_empty()) {
+        kind.entry = csharp_syntax::Entry::from_name(e)?;
+    }
+    if let Some(d) = columns.get(3).filter(|d| !d.is_empty()) {
+        kind.doc_mode = csharp_syntax::DocumentationMode::from_name(d)?;
+    }
+    Some((columns[0], kind))
+}
+
+/// A C# file's bytes as they are, when they are UTF-8 (`Encoding.UTF8.GetString` with a throwing decoder).
+fn csharp_source(root: &Path, path: &str) -> Result<Vec<u8>, &'static str> {
+    let text = std::fs::read(root.join(path)).map_err(|_| "cannot read")?;
+    if std::str::from_utf8(&text).is_err() {
+        return Err("invalid UTF-8");
+    }
+    Ok(text)
+}
+
+/// `--out` of a C# file: `OUT/<path>.tree.txt`; returns its `index.jsonl` line.
+fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, out: &Path, line: &str) -> String {
+    use csharp_syntax::dump;
+    let Some((path, kind)) = csharp_line(line) else {
+        return dump::failure_line(line.split('\t').next().unwrap_or(line), "bad list line");
+    };
+    let text = match csharp_source(root, path) {
+        Ok(text) => text,
+        Err(failure) => return dump::failure_line(path, failure),
+    };
+    let tree = parser.parse(&text, kind);
+    if tree.has_no_result() {
+        return dump::failure_line(path, &format!("no {}", kind.entry.name()));
+    }
+    let target = out.join(format!("{path}.tree.txt"));
+    if let Some(parent) = target.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Err(e) = std::fs::write(&target, dump::tree_to_string(&tree)) {
+        eprintln!("cannot write {}: {e}", target.display());
+    }
+    dump::index_line(path, &tree)
+}
+
+/// `--lex` of a C# file: `PATH<TAB>TOKENS<TAB>HASH` as `tools/csharp-oracle lex` prints it; with `--full OUT` the
+/// dump goes to `OUT/<path>.lex.txt`.
+fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full: Option<&Path>) -> String {
+    let path = line.split('\t').next().unwrap_or(line);
+    let Some((_, kind)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line") };
+    let text = match csharp_source(root, path) {
+        Ok(text) => text,
+        Err(failure) => return format!("{path}\tfailure\t{failure}"),
+    };
+    let tree = parser.lex(&text, kind);
+    let dump = csharp_syntax::dump::lex_to_string(&tree);
+    let mut hash = Fnv(0xcbf29ce484222325);
+    hash.feed(dump.as_bytes());
+    if let Some(full) = full {
+        let target = full.join(format!("{path}.lex.txt"));
+        if let Some(parent) = target.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&target, &dump);
+    }
+    format!("{path}\t{}\t{:016x}", csharp_syntax::dump::lexed_tokens(&tree), hash.0)
+}
+
 fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
@@ -342,11 +434,20 @@ fn main() {
     if args.lex && !args.bench {
         let stdout = std::io::stdout();
         let mut stdout = std::io::BufWriter::new(stdout.lock());
+        let mut csharp_parser = csharp_syntax::Parser::new();
         for line in &paths {
             let path = line.split('\t').next().unwrap_or(line);
-            if Lang::of(path, args.lang) == Lang::Java {
-                java_lex(root, line, args.dump, &mut stdout);
-                continue;
+            match Lang::of(path, args.lang) {
+                Lang::Java => {
+                    java_lex(root, line, args.dump, &mut stdout);
+                    continue;
+                }
+                Lang::CSharp => {
+                    let lexed = csharp_lex(&mut csharp_parser, root, line, args.full.as_deref());
+                    let _ = writeln!(stdout, "{lexed}");
+                    continue;
+                }
+                Lang::Kotlin => {}
             }
             let Some(text) = read_source(root, path, false) else {
                 let _ = writeln!(stdout, "{path}\tunreadable\t0");
@@ -359,23 +460,36 @@ fn main() {
         }
         return;
     }
-    // A Java list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
-    let is_java = |line: &&String| Lang::of(line.split('\t').next().unwrap_or(line), args.lang) == Lang::Java;
-    let java_files = paths.iter().filter(is_java).count();
-    if (args.bench || args.check_bodies) && java_files != 0 && java_files != paths.len() {
-        eprintln!("the list mixes Java and Kotlin files ({java_files} of {} are Java)", paths.len());
+    // A Java or C# list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
+    let lang_of = |line: &String| Lang::of(line.split('\t').next().unwrap_or(line), args.lang);
+    let java_files = paths.iter().filter(|l| lang_of(l) == Lang::Java).count();
+    let csharp_files = paths.iter().filter(|l| lang_of(l) == Lang::CSharp).count();
+    let languages =
+        (java_files != 0) as usize + (csharp_files != 0) as usize + (java_files + csharp_files != paths.len()) as usize;
+    if (args.bench || args.check_bodies) && languages > 1 {
+        eprintln!("the list mixes languages ({java_files} Java and {csharp_files} C# files of {})", paths.len());
+        std::process::exit(2);
+    }
+    if args.check_bodies && csharp_files != 0 {
+        eprintln!("--check-bodies: C# has no lazily parsed bodies");
         std::process::exit(2);
     }
     let stdout = std::io::stdout();
     let mut stdout = std::io::BufWriter::new(stdout.lock());
 
     if args.lex && args.bench {
+        if csharp_files != 0 {
+            eprintln!("--lex --bench: not for C# yet (the lexer is being ported)");
+            std::process::exit(2);
+        }
         lex_bench(&args, root, &paths, java_files != 0, &mut stdout);
         return;
     }
 
     if args.bench {
-        if java_files == 0 {
+        if csharp_files != 0 {
+            bench::<csharp_syntax::CSharp>(&args, root, &paths, &mut stdout);
+        } else if java_files == 0 {
             bench::<Kotlin>(&args, root, &paths, &mut stdout);
         } else {
             bench::<java_syntax::Java>(&args, root, &paths, &mut stdout);
@@ -397,11 +511,23 @@ fn main() {
     let mut failed = 0;
     let mut parser: Parser = new_parser(args.nesting_limit);
     let mut java_parser: java_syntax::Parser = new_parser(args.nesting_limit);
+    let mut csharp_parser = csharp_syntax::Parser::new();
+    let mut csharp_index = String::new();
     for line in &paths {
         let path = line.split('\t').next().unwrap_or(line);
-        if Lang::of(path, args.lang) == Lang::Java {
-            failed += !java_dump(&mut java_parser, root, out, line, &args) as usize;
-            continue;
+        match Lang::of(path, args.lang) {
+            Lang::Java => {
+                failed += !java_dump(&mut java_parser, root, out, line, &args) as usize;
+                continue;
+            }
+            Lang::CSharp => {
+                let index_line = csharp_dump(&mut csharp_parser, root, out, line);
+                failed += index_line.contains("\"failure\":") as usize;
+                csharp_index.push_str(&index_line);
+                csharp_index.push('\n');
+                continue;
+            }
+            Lang::Kotlin => {}
         }
         let Some(text) = read_source(root, path, args.trim) else {
             eprintln!("cannot read {path}");
@@ -420,6 +546,12 @@ fn main() {
             failed += 1;
         }
     }
+    if csharp_files != 0 {
+        let _ = std::fs::create_dir_all(out);
+        if let Err(e) = std::fs::write(out.join("index.jsonl"), csharp_index) {
+            eprintln!("cannot write {}: {e}", out.join("index.jsonl").display());
+        }
+    }
     let _ = writeln!(stdout, "dumped {} of {} files to {}", paths.len() - failed, paths.len(), out.display());
 }
 
@@ -430,30 +562,102 @@ struct Source<K> {
     text: Vec<u8>,
 }
 
-/// What `--bench` and `--check-bodies` ask of a language beyond `psi_builder::Language`.
-trait BenchLanguage: Language {
+/// What `--bench` asks of a language: its parser and how a list line parses.
+trait BenchLanguage: TreeLanguage {
+    /// The reusable parser (one per thread) and the tree it makes.
+    type Parser;
+    type Tree;
+    /// A parser, with `--nesting-limit` when given and the language has one.
+    fn new_parser(nesting_limit: Option<u32>) -> Self::Parser;
+    fn parse(parser: &mut Self::Parser, text: &[u8], kind: Self::FileKind, options: ParseOptions) -> Self::Tree;
+    /// The tree's nodes.
+    fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self>;
+    /// What a consumer pays to keep the tree.
+    fn heap_bytes(tree: &Self::Tree) -> usize;
     /// The path of a list line and how its file is parsed.
     fn file_kind(line: &str) -> (&str, Self::FileKind);
-    /// `--check-bodies`: the path of a list line, the text it parses and how.
-    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, Self::FileKind)>;
     /// This thread's counters in `kotlin_syntax::counters::ALL` order, empty when the language has none.
     fn counters() -> Vec<u64>;
+    /// A file's text as the oracles read it (Kotlin and Java: line separators converted to LF).
+    fn read_text(root: &Path, path: &str, trim: bool) -> Option<Vec<u8>> {
+        read_source(root, path, trim)
+    }
+}
+
+/// What `--check-bodies` asks of a language beyond `psi_builder::Language`.
+trait BodiesLanguage: Language {
+    /// `--check-bodies`: the path of a list line, the text it parses and how.
+    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, Self::FileKind)>;
+}
+
+/// The `BenchLanguage` items of a language parsed by `psi_builder::Parser`.
+macro_rules! psi_bench_language {
+    () => {
+        type Parser = psi_builder::Parser<Self>;
+        type Tree = psi_builder::Tree<Self>;
+        fn new_parser(nesting_limit: Option<u32>) -> Self::Parser {
+            new_parser::<Self>(nesting_limit)
+        }
+        fn parse(parser: &mut Self::Parser, text: &[u8], kind: Self::FileKind, options: ParseOptions) -> Self::Tree {
+            parser.parse_with_options(text, kind, options)
+        }
+        fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self> {
+            tree
+        }
+        fn heap_bytes(tree: &Self::Tree) -> usize {
+            tree.heap_bytes()
+        }
+    };
 }
 
 impl BenchLanguage for Kotlin {
+    psi_bench_language!();
     fn file_kind(line: &str) -> (&str, FileKind) {
         (line, FileKind::from_file_name(file_name(line)))
-    }
-    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, FileKind)> {
-        let text = read_source(root, line, false)?;
-        Some((line.to_string(), text, FileKind::from_file_name(file_name(line))))
     }
     fn counters() -> Vec<u64> {
         kotlin_syntax::counters::snapshot()
     }
 }
 
+impl BodiesLanguage for Kotlin {
+    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, FileKind)> {
+        let text = read_source(root, line, false)?;
+        Some((line.to_string(), text, FileKind::from_file_name(file_name(line))))
+    }
+}
+
+impl BenchLanguage for csharp_syntax::CSharp {
+    type Parser = csharp_syntax::Parser;
+    type Tree = csharp_syntax::Tree;
+    fn new_parser(_: Option<u32>) -> Self::Parser {
+        csharp_syntax::Parser::new()
+    }
+    /// Every C# file parses in full: `options` (body-less parsing) does not apply.
+    fn parse(parser: &mut Self::Parser, text: &[u8], kind: Self::FileKind, _: ParseOptions) -> Self::Tree {
+        parser.parse(text, kind)
+    }
+    fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self> {
+        tree.as_psi()
+    }
+    fn heap_bytes(tree: &Self::Tree) -> usize {
+        tree.heap_bytes()
+    }
+    /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing.
+    fn file_kind(line: &str) -> (&str, csharp_syntax::FileKind) {
+        csharp_line(line).unwrap_or((line.split('\t').next().unwrap_or(line), csharp_syntax::FileKind::default()))
+    }
+    fn counters() -> Vec<u64> {
+        Vec::new()
+    }
+    /// The bytes as they are, as `tools/csharp-oracle` reads them.
+    fn read_text(root: &Path, path: &str, _: bool) -> Option<Vec<u8>> {
+        std::fs::read(root.join(path)).ok()
+    }
+}
+
 impl BenchLanguage for java_syntax::Java {
+    psi_bench_language!();
     /// `PATH[<TAB>LEVEL]`: a file at LEVEL, else at `LanguageLevel.HIGHEST`.
     fn file_kind(line: &str) -> (&str, java_syntax::FileKind) {
         let mut columns = line.split('\t');
@@ -467,6 +671,9 @@ impl BenchLanguage for java_syntax::Java {
     fn counters() -> Vec<u64> {
         Vec::new()
     }
+}
+
+impl BodiesLanguage for java_syntax::Java {
     /// As `--out` reads it (`java_source`), the text as bytes even when it is not UTF-8.
     fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, java_syntax::FileKind)> {
         let (path, kind, trim) = java_line(line, false);
@@ -521,7 +728,7 @@ fn alloc_snapshot() -> (u64, u64, i64) {
 
 /// The walk an extractor does: every node in preorder, its kind, its range and its depth; returns a checksum so it is
 /// not optimized away.
-fn walk<L: Language>(tree: &psi_builder::Tree<L>) -> u64 {
+fn walk<L: TreeLanguage>(tree: &psi_builder::Tree<L>) -> u64 {
     let mut acc = 0u64;
     for (id, depth) in tree.preorder(tree.root()) {
         let range = tree.range(id);
@@ -535,7 +742,7 @@ fn walk<L: Language>(tree: &psi_builder::Tree<L>) -> u64 {
 }
 
 /// What a pass that needs no depth does: every node in id order (document order), its kind and its range.
-fn linear_walk<L: Language>(tree: &psi_builder::Tree<L>) -> u64 {
+fn linear_walk<L: TreeLanguage>(tree: &psi_builder::Tree<L>) -> u64 {
     let mut acc = 0u64;
     for id in tree.descendants(tree.root()) {
         let range = tree.range(id);
@@ -579,7 +786,7 @@ fn same_subtree<L: Language>(
 }
 
 /// `--check-bodies`: returns the number of differing bodies.
-fn check_bodies<L: BenchLanguage>(
+fn check_bodies<L: BodiesLanguage>(
     root: &Path,
     lines: &[String],
     nesting_limit: Option<u32>,
@@ -634,19 +841,20 @@ fn bench_thread<L: BenchLanguage>(
 ) -> ThreadResult {
     let mut r = ThreadResult::default();
     // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
-    let mut parser = new_parser::<L>(nesting_limit);
+    let mut parser = L::new_parser(nesting_limit);
     loop {
         let i = next.fetch_add(1, Ordering::Relaxed);
         let Some(source) = sources.get(i) else { break };
         let (calls0, allocated0, live0) = alloc_snapshot();
         let start = Instant::now();
-        let tree = parser.parse_with_options(&source.text, source.kind, options);
+        let parsed_tree = L::parse(&mut parser, &source.text, source.kind, options);
         let parsed = Instant::now();
         let (calls1, allocated1, live1) = alloc_snapshot();
+        let tree = L::psi(&parsed_tree);
         let mut f = FileResult {
             parse_ns: (parsed - start).as_nanos() as u64,
             nodes: tree.len(),
-            tree_bytes: tree.heap_bytes(),
+            tree_bytes: L::heap_bytes(&parsed_tree),
             allocs: calls1 - calls0,
             alloc_bytes: allocated1 - allocated0,
             live_bytes: live1 - live0,
@@ -654,13 +862,13 @@ fn bench_thread<L: BenchLanguage>(
         };
         if do_walk {
             let walk_start = Instant::now();
-            r.checksum ^= walk(&tree);
+            r.checksum ^= walk(tree);
             let linear_start = Instant::now();
             f.walk_ns = (linear_start - walk_start).as_nanos() as u64;
-            r.checksum ^= linear_walk(&tree).rotate_left(1);
+            r.checksum ^= linear_walk(tree).rotate_left(1);
             f.linear_walk_ns = linear_start.elapsed().as_nanos() as u64;
         }
-        drop(tree);
+        drop(parsed_tree);
         r.bytes += source.text.len();
         r.files += 1;
         r.parse_seconds += f.parse_ns as f64 / 1e9;
@@ -776,7 +984,7 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
         .iter()
         .filter_map(|line| {
             let (path, kind) = L::file_kind(line);
-            read_source(root, path, args.trim).map(|text| Source { path: path.to_owned(), kind, text })
+            L::read_text(root, path, args.trim).map(|text| Source { path: path.to_owned(), kind, text })
         })
         .collect();
     let bytes: usize = sources.iter().map(|s| s.text.len()).sum();
