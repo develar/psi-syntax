@@ -20,7 +20,9 @@ before every commit:
 For Java the contract is the same against IntelliJ 271's Java PSI: `java_syntax::dump::psi_to_string` prints
 `DebugUtil.psiToString(file, true, false).trim()` and `node_tree_to_string` the `_node.txt` dump. The gate checks both
 dumps on the 1036 goldens (`KS_STRICT=1`), the 68 260 UTF-8 community `.java` files, the 19 116 golden mutations and
-the 20 000 lexer fuzz inputs, and the Java lexers' token lines on the same corpora (see "Java", "Oracle").
+the 20 000 lexer fuzz inputs, and the Java lexers' token lines on the same corpora (see "Java", "Oracle"); then
+`ksdump --check-bodies` on the community `.java` files (443 161 code blocks), and with `--nesting-limit 3` on them and
+on the golden mutations.
 
 Speed work therefore changes only three things, none of which changes a parser decision:
 
@@ -187,9 +189,8 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
   1036 vendored goldens of IntelliJ's Java parsing tests byte for byte, both dumps, which is what makes its dumps of
   other corpora the reference. `JavaLexOracle.java` prints `JavaLexer`'s and `JavaDocLexer`'s tokens as
   `ksdump --lex` does. Its cached dumps are listed in `tools/java-oracle/README.md`.
-- **Bench.** `ksdump --bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, every one a file). Java's parse counts
-  no nesting levels yet (see "Open items"), so the Java bench threads run on a 64 MB stack; `--check-bodies` still
-  refuses Java.
+- **Bench.** `ksdump --bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, every one a file), on default thread
+  stacks; `--check-bodies` takes one as `--out` does (`PATH[<TAB>LEVEL<TAB>ENTRY<TAB>TRIM]`).
 - **`JavaParserUtil.stoppingBuilder(builder, condition)`** (JavaParserUtil.kt:133) is the one method not ported.
   Nothing in intellij-community at decc943 calls it (the parsers call only `stoppingBuilder(builder, stopAt)`, from
   `braceMatchingBuilder` and `DeclarationParser.parse`), and its adapter would call the condition on every
@@ -252,6 +253,61 @@ overflows too), so the port defines one, and keeps PSI's tree below it.
 `tests/robustness.rs` parses 22 forms nested 100 000 deep on a 1 MB stack, and every golden with limits 1 to 13;
 the gate runs the community files and the mutations with limit 3 (see Contract).
 
+The limits are `Language` constants (`NESTING_LIMIT`, `TYPE_ARGUMENTS_LIMIT`, `REPARSED_LIMIT`), whose defaults are
+Kotlin's. A construct parsed twice that reaches its limit also makes every such construct starting before that token
+too deep (`reparsed_too_deep_before`, as for type argument lists): otherwise the constructs re-parsed after the
+rollback of the one around them, each reaching the limit again from a shallower start, cost a polynomial of the
+input (Java's `@A(f(@A(f(…` grew as n³ with a limit of 3); below the limits nothing changes.
+
+### Java nesting (`java-syntax`; `Java::NESTING_LIMIT`)
+
+The Java parsers recurse once per level as Kotlin's do: 20 000 nested parentheses in an initializer overflowed the
+stack. They count on the same `psi_builder` machinery (`SyntaxTreeBuilder::enter_nesting`), and past a limit a
+construct is the same error element over the rest of it (`java_parser_util::too_deeply_nested`, which returns the
+error's marker as the construct the caller parsed).
+
+- **What is counted.** Every recursion cycle passes one counted function: an expression
+  (`tryParseWithPrecedenceAtMost`) and a unary operand (`parseUnary`'s operand of a prefix operator or a cast, the
+  recursion that does not pass it); a statement (`parseStatement`); a declaration (`DeclarationParser.parse`, once
+  the token may start one: members, local and anonymous classes, enum constant bodies); an array initializer (an
+  annotation's recurses through `parseAnnotationValue` without an expression); a type (`parseTypeInfo`); a type
+  argument list (`parseReferenceParameterList` at `<`, `Nesting::TypeArguments`); an annotation
+  (`Nesting::Reparsed`); a pattern (`parseTypeOrRecordPattern`, record patterns); an inline doc tag (`parseDataItem` at
+  `{@`). `ModuleParser` and `JShellParser` have no cycle of their own. A code block is a body and starts its frame at
+  `NESTING_CHAMELEON` over where it was collapsed; a doc comment and its reference holders start at 0 with the parser's
+  limit (`Chameleon::builder`), as a KDoc does: they hold no body, so a frame is bounded by its own tokens.
+- **The limits.** 1200 levels: IntelliJ's own test `Parenth2.java` (in the community corpus and the goldens) nests
+  1001 parenthesized expressions, 1010 levels; the next deepest community file reaches 174 (`NestedLambda.java`), the
+  deepest production file 102. A level takes at most 652 bytes of stack in a release build (typed and parenthesized
+  lambdas, enum constant bodies; measured by bisecting the depth that overflows 1 MB without a limit, over 45 forms:
+  127 B for unary operators and casts, 461 B for parentheses, 588 B for calls), and the deepest forms at the limit
+  need 772 KB (bisected stack size), so a parse fits 1 MB. 32 type argument lists (the community files reach 4). 5
+  annotations (the community files reach 4): an annotation in an expression is parsed up to 4 times per parse of the
+  one around it (as a type's annotations, as the expression's, in a cast and in a lambda's parameters, each rolled
+  back), so `@A(f(@A(f(…))))` took 3 times the work per level and 16 levels 12.6 s; at 5, an annotation takes at most
+  4^5 = 1024 times its own work, as Kotlin's 2^10.
+- **Block ends in constant time.** `braceMatchingBuilder` (every class body) and `parseBlockLazy` (every code block)
+  find the `}` that closes a block with a loop over the tokens, which nested class bodies in one builder and nested
+  bodies across frames ran once per level: 16 000 nested classes took 2.3 s, anonymous classes 5.8 s.
+  `PsiBuilderImpl::balanced_block_end` answers what that loop finds: it counts the raw tokens while the builder has
+  counted fewer than it has tokens, then makes a table of every token's answer in one pass (the stack pass of the
+  too-deep closers); a body deeper than `SHARED_BLOCK_DEPTH` (64) takes the file's table, made once per file
+  (`Language::BLOCK_BRACES`), instead of counting its own tokens again in every frame. A remapped bracket makes the
+  table stale up to it (Java's parsers remap no brace). The marker and rollback around the loop stay, so the builder's
+  state after it is the Kotlin's; `parseBlockLazy` ends at the `}` or at the first token from the stopping offset on,
+  as the loop does.
+- **Markdown labels.** `parseMarkdownReferenceOrLink` scans from each `[` to the `]` that balances it, remapping the
+  DOC_SPACEs on the way: `/// [[[…]]]` ran it at every `[` over the rest, 16 000 brackets 1.2 s. The `]` comes from
+  `balanced_block_end_at` over the doc brackets, each DOC_SPACE is remapped once (`remap_label_spaces`: nested labels
+  lie inside the one around them), and the bracket counts, only compared with each other and with 1, from whether a
+  `[` is inside.
+
+`tests/robustness.rs` (Java) parses 80 recursive forms nested 100 000 deep on a 1 MB stack (each under 110 ms; two
+more at 10 000: see "Open items"), 44 chains and lists of 100 000 operators or elements (each under 70 ms), 40 random
+mixes of 26 expression forms 3000 deep, random bytes and fragments, and every golden with limits 1 to 13 (lossless,
+`parse_body` equal to the full parse's subtree); the gate runs `--check-bodies` on the Java corpora at the default
+limit and at 3.
+
 ### Tree (`psi-builder` `src/tree.rs`)
 
 A tree is three columns over the node ids, in preorder:
@@ -295,6 +351,8 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | Chameleons reparsed exactly as PSI does, not parsed eagerly in the file builder | Not equivalent: a fresh builder resets the newline and join stacks, the edge binders and the error dedup at the chameleon boundary | `reusable_tokens`' DANGLING_NEWLINE case; the brace skip removes the repeated work instead |
 | In-place expansion over a heap frame stack | Preorder ids (1.03M preorder breaks under the old LIFO worklist) without native recursion | walk 3.62 → 2.23 ns/node |
 | The production as a linked list over marker nodes, made into an array for binding | `precede` and the other middle edits in constant time with the array's entry order, so the same tree; a gap buffer or chunks would still need the lexeme search | gate unchanged; 100 000-operator chains 14-45 ms (`+`: 4.67 s → 22 ms); parse 72.7 → 74.2 MB/s |
+| Java's nesting on the same counter, with its own limits (`Language` constants) | One mechanism and one error for both languages; Java's stack per level (652 B) and `Parenth2.java` (1010 levels) want 1200, its annotations (parsed up to 4 times per level) 5 | gate unchanged, now with Java's `--check-bodies` at limits 1200 and 3; 80 forms nested 100 000 deep on 1 MB |
+| Block ends counted, then tabulated, the table shared by deep frames | `braceMatchingBuilder` and `parseBlockLazy` scanned to the `}` once per level; a table made by every builder cost that again in every frame of a deep chain | 16 000 nested classes 2.3 s → 1.9 ms; 100 000 nested `try` with a table per builder 515 ms (92 % making tables), counted then shared 38 ms |
 | A nesting counter that degrades to an error element, not a bigger stack or `stacker` | Deterministic on every platform and build, bounded memory, no `unsafe`; the dump is PSI's wherever PSI itself parses | gate unchanged; 100 000 levels of 22 forms on 1 MB in at most 110 ms; parse 74.4 → 75.0 MB/s (noise) |
 | The too-deep error over the rest of the construct, in constant time | One token at a time cost `2^10` times the rest of the file inside doubled annotations; a scan to the closer cost O(n) per rolled-back `<` attempt | `@A(` × 100 000: 4.2 ms |
 | A per-thread `Parser`, no thread_local | Allocation churn dominated multi-threaded scaling | allocations per pass 10.7M → 179 779; 16 threads 684 → 917 MB/s (f3aa172 → a99fb45) |
@@ -457,6 +515,24 @@ gave B/A 0.909 with per-round values from 9.0 to 58.6 MB/s, which resolves nothi
 
 The gate passed.
 
+### The Java nesting guard (child of 61b4d1d), 2026-11-02
+
+- Corpus, `scripts/ab.sh` against 61b4d1d, one thread, 11 alternating rounds at load 12-20 over the community `.java`
+  files: 56.0 → 60.4 MB/s (median B/A of the rounds 1.08, B faster in all 11). The gain is `parseBlockLazy`'s
+  count of the raw tokens in place of its loop of `tokenType` and `advanceLexer` over every code block. Kotlin, 9
+  rounds at load 10-19: 69.1 → 69.1 MB/s (median of the per-round B/A 0.993; round 8's B ran at 39.6 during a spike).
+- Trees: every dump of the gate's Java and Kotlin corpora unchanged; the deepest community `.java` file
+  (`Parenth2.java`) reaches 1010 levels, 4 type argument lists and 4 annotations.
+- Adversarial inputs on a 1 MB thread, `tests/robustness.rs`, at load 12-20: 80 forms nested 100 000 deep in 1.5 ms
+  (`!a`) to 102 ms (`new A() { void f() { g(`, a chain of bodies); before the guard the parser's own recursions overflowed
+  a 1 MB stack below 10 000 levels, and on a 1 GB stack 16 000 levels took up to 8.0 s (enum constant bodies) and
+  `@A(f(` 16 levels 22 s.
+  44 chains and lists of 100 000 in 2.0 ms (modifiers) to 65 ms (`a<b>c` × 100 000); `a < a < …` took 15 s for 16 000
+  operators before (each `a` tried a type with every `<` after it). `/// [[[…]]]`: 100 000 brackets 8.9 ms, 55 s
+  before.
+
+The gate passed.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -497,16 +573,17 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **Java nesting guard.** Java's recursive entry points (Pratt `parse`/`parse_unary`, `parse_statement`, JavaDoc
-  `parse_data_item`, the declaration, reference and annotation recursion) count no levels: 20 000 nested parentheses
-  in an initializer overflow the stack. Until a guard like Kotlin's `enter_nesting` exists, `ksdump --bench` runs Java
-  on 64 MB thread stacks, `--check-bodies` refuses Java files, and a consumer cannot parse arbitrary Java on a 1 MB
-  stack.
-- **Java bodies.** `CODE_BLOCK` is a body and `--no-bodies` parses without it (measured above), but no check compares
-  `parse_body` of a Java body with the full parse, as `--check-bodies` does for Kotlin.
-- **Java speed.** One thread at 54.5 MB/s (load 14-37) against Kotlin's 75.3 (load 4-24): Java has 395 nodes per
-  source KB against Kotlin's 369 and no profile yet. Take one (`scripts/profile.py`) and a quiet round before speed
-  work; the Java builder path has no `--features counters` output.
+- **Java speed.** One thread at 54.5 MB/s (load 14-37; 60.4 at load 12-20 after the nesting guard) against Kotlin's
+  75.3 (load 4-24): Java has 395 nodes per source KB against Kotlin's 369 and no profile yet. Take one
+  (`scripts/profile.py`) and a quiet round before speed work; the Java builder path has no `--features counters`
+  output.
+- **Java's rolled-back lambda parameters.** `(a<b>c(…` looks like a typed lambda: its parameter list is parsed, with
+  PSI's error recovery to the `)` that ends it, then rolled back, at every level. So each level inside the nesting
+  limit scans the rest of the text: 10 000 levels of `(a<b>c(` with `)) + 1` or `)) - 1` after take 0.8 s, 100 000
+  levels 15-25 s (linear in the text, times about 300 levels). Bounding it needs the attempt to know where its list
+  ends without parsing it; the recovery parses references there (and remaps tokens that stay remapped after the
+  rollback), so it is left as PSI's.
+
 - **The split's speed on a quiet machine.** Its A/B ran at load 6-18; repeat `scripts/ab.sh` against 26d5703 at load
   under 4 before attributing a later change's small delta.
 

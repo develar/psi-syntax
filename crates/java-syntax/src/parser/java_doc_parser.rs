@@ -1,12 +1,12 @@
 //! `JavaDocParser.kt`: the inside of a doc comment (HTML and markdown), and the reference and type holders in it.
 
-use psi_builder::Marker;
+use psi_builder::{AsPsiBuilder, Marker};
 
-use crate::builder::{Binder, SyntaxTreeBuilder};
+use crate::builder::{Binder, Nesting, SyntaxTreeBuilder};
 use crate::language_level::LanguageLevel;
 use crate::node_kind::NodeKind;
 use crate::parser::java_parser::JavaParser;
-use crate::parser::java_parser_util::empty_element;
+use crate::parser::java_parser_util::{empty_element, too_deeply_nested};
 use crate::parser::reference_parser::ReferenceParser;
 use crate::tokens::{TokenKind, TokenSet};
 
@@ -17,12 +17,21 @@ pub struct JavaDocParser<'a, 'b> {
     brace_scope: i32,
     /// true for all '{' opening an inline tag
     closing_status_list: Vec<bool>,
+    /// Not in the Kotlin: the tokens `[start, end)` whose `DOC_SPACE`s a markdown label's scan already remapped to
+    /// `WHITE_SPACE` (`remap_label_spaces`).
+    label_spaces_remapped: (usize, usize),
 }
 
 impl<'a, 'b> JavaDocParser<'a, 'b> {
     /// `JavaDocParser(builder, languageLevel)`.
     pub fn new(builder: &'a mut SyntaxTreeBuilder<'b>, language_level: LanguageLevel) -> Self {
-        JavaDocParser { builder, language_level, brace_scope: 0, closing_status_list: Vec::new() }
+        JavaDocParser {
+            builder,
+            language_level,
+            brace_scope: 0,
+            closing_status_list: Vec::new(),
+            label_spaces_remapped: (0, 0),
+        }
     }
 
     /// `parseJavadocReference(parser)` (JavaDocParser.kt:43).
@@ -81,8 +90,28 @@ impl<'a, 'b> JavaDocParser<'a, 'b> {
 
     /// `parseDataItem(tagName, isInline)` (JavaDocParser.kt:83). A tag name is compared only with the tags this parser
     /// knows, so it is passed as that tag's constant, or as "" for any other tag (`tag_name_of`).
+    ///
+    /// Not in the Kotlin: an inline tag (`{@code …}`, which recurses here for its items) counts a level of nesting
+    /// (`Nesting::Level`); past the limit the tag and the rest of the one around it are the error element "Code is too
+    /// deeply nested".
     fn parse_data_item(&mut self, tag_name: Option<&[u8]>, is_inline: bool) {
-        let mut token_type = self.get_token_type();
+        let token_type = self.get_token_type();
+        if token_type == Some(TokenKind::DOC_INLINE_TAG_START) {
+            if !self.builder.enter_nesting(Nesting::Level) {
+                too_deeply_nested(self.builder);
+                return;
+            }
+            self.parse_data_item_nested(tag_name, is_inline, token_type);
+            self.builder.exit_nesting(Nesting::Level);
+        } else {
+            self.parse_data_item_nested(tag_name, is_inline, token_type);
+        }
+    }
+
+    /// The body of `parseDataItem(tagName, isInline)` once its first token type is read; an inline tag is inside its
+    /// nesting.
+    fn parse_data_item_nested(&mut self, tag_name: Option<&[u8]>, is_inline: bool, token_type: Option<TokenKind>) {
+        let mut token_type = token_type;
         if token_type == Some(TokenKind::DOC_INLINE_TAG_START) {
             let tag = self.builder.mark();
             self.builder.advance_lexer();
@@ -267,19 +296,25 @@ impl<'a, 'b> JavaDocParser<'a, 'b> {
         let start_label_offset = self.builder.current_offset();
 
         // Labels are allowed balanced brackets, count each side
-        while !self.builder.eof() {
-            let token = self.find_inline_token_with(Some(TokenKind::DOC_RBRACKET), Some(TokenKind::DOC_LBRACKET), true);
-            if token == Some(TokenKind::DOC_LBRACKET) {
-                left_bracket_count += 1;
-                continue;
-            }
-            if token == Some(TokenKind::DOC_RBRACKET) {
-                right_bracket_count += 1;
-                if left_bracket_count == right_bracket_count {
-                    break;
-                }
-            }
+        //
+        // Not in the Kotlin: its loop, `findInlineToken(DOC_RBRACKET, DOC_LBRACKET, true)` until the counts are equal
+        // or the end, stops at the `]` that balances this `[` (or at the end) and remaps every DOC_SPACE before it to
+        // WHITE_SPACE; nested `[[[…]]]` ran it at every `[` over the rest of the comment, quadratic. Here the `]` comes
+        // from the builder's table of bracket blocks, the spaces are remapped once (`remap_label_spaces`), and the
+        // counts are only compared with each other and with 1: equal when the `]` is found, above 1 when a `[` is
+        // inside.
+        let b = self.builder.psi_builder();
+        let (start, count) = (b.raw_token_index() as usize + 1, b.lexeme_count());
+        let end = b.balanced_block_end_at(start, TokenKind::DOC_LBRACKET, TokenKind::DOC_RBRACKET);
+        self.remap_label_spaces(start, end);
+        let b = self.builder.psi_builder();
+        if end < count {
+            let inner = b.find_raw_token(start..end, TokenKind::DOC_LBRACKET).is_some();
+            left_bracket_count += inner as i32;
+            right_bracket_count = left_bracket_count;
         }
+        b.raw_advance_lexer((end - b.raw_token_index() as usize) as i32);
+        self.builder.token_type();
 
         let end_label_offset = self.builder.current_offset();
         let is_short_ref_empty = end_label_offset - start_label_offset <= 1;
@@ -358,6 +393,22 @@ impl<'a, 'b> JavaDocParser<'a, 'b> {
             tag.done(self.builder, NodeKind::DOC_MARKDOWN_REFERENCE_LINK);
         } else {
             tag.drop(self.builder);
+        }
+    }
+
+    /// Not in the Kotlin: remaps the DOC_SPACEs of the tokens `[start, end)` to WHITE_SPACE, as the scan of a markdown
+    /// label over them does (`getTokenType(false)` at each), skipping what an earlier label's scan remapped: nested
+    /// labels lie inside the one around them, so each token is remapped once.
+    fn remap_label_spaces(&mut self, start: usize, end: usize) {
+        let (done_start, done_end) = self.label_spaces_remapped;
+        let b = self.builder.psi_builder();
+        if start <= done_end && end >= done_start {
+            b.remap_tokens(start..done_start.max(start), TokenKind::DOC_SPACE, TokenKind::WHITE_SPACE);
+            b.remap_tokens(done_end.min(end)..end, TokenKind::DOC_SPACE, TokenKind::WHITE_SPACE);
+            self.label_spaces_remapped = (start.min(done_start), end.max(done_end));
+        } else {
+            b.remap_tokens(start..end, TokenKind::DOC_SPACE, TokenKind::WHITE_SPACE);
+            self.label_spaces_remapped = (start, end);
         }
     }
 

@@ -2,13 +2,13 @@
 
 use psi_builder::Marker;
 
-use crate::builder::SyntaxTreeBuilder;
+use crate::builder::{Nesting, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::language_level::JavaFeature;
 use crate::node_kind::NodeKind;
 use crate::parser::java_keywords;
 use crate::parser::java_parser::JavaParser;
-use crate::parser::java_parser_util::{empty_element, error, expect_or_error};
+use crate::parser::java_parser_util::{empty_element, error, expect_or_error, too_deeply_nested};
 use crate::syntax_element_types::PRIMITIVE_TYPE_BIT_SET;
 use crate::tokens::{TokenKind, TokenSet};
 
@@ -107,6 +107,9 @@ impl<'p> ReferenceParser<'p> {
     }
 
     /// `parseTypeInfo(builder, flags, badWildcard)` (ReferenceParser.kt:62).
+    ///
+    /// Not in the Kotlin: every recursion of a type passes here, so it counts a level of nesting (`Nesting::Level`);
+    /// past the limit the type is the error element "Code is too deeply nested", a type with errors.
     fn parse_type_info_with(
         &self,
         builder: &mut SyntaxTreeBuilder<'_>,
@@ -114,7 +117,22 @@ impl<'p> ReferenceParser<'p> {
         bad_wildcard: bool,
     ) -> Option<TypeInfo> {
         builder.token_type()?;
+        if !builder.enter_nesting(Nesting::Level) {
+            let marker = Some(too_deeply_nested(builder));
+            return Some(TypeInfo { marker, has_errors: true, ..TypeInfo::default() });
+        }
+        let type_info = self.parse_type_info_nested(builder, flags, bad_wildcard);
+        builder.exit_nesting(Nesting::Level);
+        type_info
+    }
 
+    /// The body of `parseTypeInfo(builder, flags, badWildcard)` once a token is there, inside its nesting.
+    fn parse_type_info_nested(
+        &self,
+        builder: &mut SyntaxTreeBuilder<'_>,
+        flags: i32,
+        bad_wildcard: bool,
+    ) -> Option<TypeInfo> {
         let mut type_info = TypeInfo::default();
 
         let mut element_type = builder.mark();
@@ -333,6 +351,10 @@ impl<'p> ReferenceParser<'p> {
     }
 
     /// `parseReferenceParameterList(builder, wildcard, diamonds)` (ReferenceParser.kt:294).
+    ///
+    /// Not in the Kotlin: a list counts as `Nesting::TypeArguments` (an expression `a < b < …` tries a type with
+    /// type arguments at every `a` and rolls it back); past a limit its `<` and the rest is the error element "Code is
+    /// too deeply nested" in the list, which is not ok.
     pub fn parse_reference_parameter_list(
         &self,
         builder: &mut SyntaxTreeBuilder<'_>,
@@ -340,10 +362,29 @@ impl<'p> ReferenceParser<'p> {
         diamonds: bool,
     ) -> bool {
         let list = builder.mark();
-        if !builder.expect(Some(TokenKind::LT)) {
+        if builder.token_type() != Some(TokenKind::LT) {
             list.done(builder, NodeKind::REFERENCE_PARAMETER_LIST);
             return false;
         }
+        if !builder.enter_nesting(Nesting::TypeArguments) {
+            too_deeply_nested(builder);
+            list.done(builder, NodeKind::REFERENCE_PARAMETER_LIST);
+            return false;
+        }
+        let is_ok = self.parse_reference_parameter_list_nested(builder, list, wildcard, diamonds);
+        builder.exit_nesting(Nesting::TypeArguments);
+        is_ok
+    }
+
+    /// The rest of `parseReferenceParameterList(builder, wildcard, diamonds)` at its `<`, inside its nesting.
+    fn parse_reference_parameter_list_nested(
+        &self,
+        builder: &mut SyntaxTreeBuilder<'_>,
+        list: Marker,
+        wildcard: bool,
+        diamonds: bool,
+    ) -> bool {
+        builder.advance_lexer();
 
         let mut flags = set(set(Self::EAT_LAST_DOT, Self::WILDCARD, wildcard), Self::DIAMONDS, diamonds);
         let mut is_ok = true;

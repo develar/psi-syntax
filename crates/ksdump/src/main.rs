@@ -1,10 +1,9 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
-//! `--lex`, `--out` and `--bench` take Java files (`crates/java-syntax`); a `--bench` list is of one language, and
-//! `--check-bodies` and `--lex --bench` refuse a Java file with exit status 2 before anything runs (Java's bodies are
-//! not checked yet; the lexer bench is Kotlin's). Java's parse has no nesting guard yet, so its bench threads get a
-//! 64 MB stack (`JAVA_BENCH_STACK`).
+//! `--lex`, `--out`, `--bench` and `--check-bodies` take Java files (`crates/java-syntax`); a `--bench` or
+//! `--check-bodies` list is of one language, and `--lex --bench` refuses a Java file with exit status 2 before anything
+//! runs (the lexer bench is Kotlin's).
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -27,8 +26,9 @@
 //!   `tools/java-oracle/JavaLexOracle.java` (Java; a list line may carry the level: `PATH<TAB>LEVEL`) prints it;
 //!   with `--bench [--repeat K]`, the MB/s of the Kotlin lexer alone instead.
 //! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that the full
-//!   tree's leaves are the text and `parse_body` of every unexpanded body dumps as the full tree's subtree there;
-//!   prints the bodies, the differing ones (their paths and ranges) and exits nonzero on any.
+//!   tree's leaves are the text and `parse_body` of every unexpanded body is the full tree's subtree there (the same
+//!   kinds, ranges, error messages and shape); prints the bodies, the differing ones (their paths and ranges) and
+//!   exits nonzero on any. A Java list line is read as for `--out`.
 //! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
 //!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
@@ -43,7 +43,6 @@ use std::time::Instant;
 
 use kotlin_syntax::counters::{self, AnyCounter};
 use kotlin_syntax::dump::psi_to_string;
-use kotlin_syntax::dump::subtree_to_string;
 use kotlin_syntax::kdoc::lexer::KDocLexer;
 use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
@@ -286,25 +285,36 @@ fn java_lex(root: &Path, line: &str, dump: bool, stdout: &mut impl Write) {
 /// `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (`testdata/java/manifest.tsv` is a list), the text is trimmed (chars up to
 /// ' ', `String.trim()`) when TRIM is 1 or, without it, with `--trim`; writes `OUT/<path>.psi.txt` and with `--node`
 /// `OUT/<path>.node.txt`. Text that is not UTF-8 is not dumped (the oracle reports it as a failure).
-fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &str, args: &Args) -> bool {
+/// A Java list line, `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` as `JavaPsiOracle.java` reads it: the path, how the
+/// file parses (`LanguageLevel.HIGHEST` and a file by default) and whether its text is trimmed (`trim` by default).
+fn java_line(line: &str, trim: bool) -> (&str, java_syntax::FileKind, bool) {
     let columns: Vec<&str> = line.split('\t').collect();
-    let path = columns[0];
     let level = columns
         .get(1)
         .and_then(|l| java_syntax::LanguageLevel::from_name(l))
         .unwrap_or(java_syntax::LanguageLevel::HIGHEST);
     let entry = columns.get(2).and_then(|e| java_syntax::Entry::from_name(e)).unwrap_or(java_syntax::Entry::File);
-    let trim = columns.get(3).map_or(args.trim, |t| *t == "1");
+    let trim = columns.get(3).map_or(trim, |t| *t == "1");
+    (columns[0], java_syntax::FileKind { level, entry }, trim)
+}
+
+/// `String.trim()` of a Java test's text, by bytes.
+fn trim_bytes(text: Vec<u8>) -> Vec<u8> {
+    let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
+    let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
+    text[start..end].to_vec()
+}
+
+fn java_dump(parser: &mut java_syntax::Parser, root: &Path, out: &Path, line: &str, args: &Args) -> bool {
+    let (path, kind, trim) = java_line(line, args.trim);
     let Some(mut text) = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok()) else {
         eprintln!("cannot read {path} as UTF-8");
         return false;
     };
     if trim {
-        let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
-        let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
-        text = text[start..end].to_vec();
+        text = trim_bytes(text);
     }
-    let tree = parser.parse(&text, java_syntax::FileKind { level, entry });
+    let tree = parser.parse(&text, kind);
     let mut dumps = vec![("psi", java_syntax::dump::psi_to_string(&tree, file_name(path)))];
     if args.node {
         dumps.push(("node", java_syntax::dump::node_tree_to_string(&tree)));
@@ -349,14 +359,14 @@ fn main() {
     // A Java list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
     let is_java = |line: &&String| Lang::of(line.split('\t').next().unwrap_or(line), args.lang) == Lang::Java;
     let java_files = paths.iter().filter(is_java).count();
-    if (args.check_bodies || args.lex)
+    if args.lex
         && let Some(java) = paths.iter().find(is_java)
     {
-        eprintln!("{java}: Java bodies are not checked and the Java lexer is not benchmarked yet");
+        eprintln!("{java}: the Java lexer is not benchmarked yet");
         std::process::exit(2);
     }
-    if args.bench && java_files != 0 && java_files != paths.len() {
-        eprintln!("--bench: the list mixes Java and Kotlin files ({java_files} of {} are Java)", paths.len());
+    if (args.bench || args.check_bodies) && java_files != 0 && java_files != paths.len() {
+        eprintln!("the list mixes Java and Kotlin files ({java_files} of {} are Java)", paths.len());
         std::process::exit(2);
     }
     let stdout = std::io::stdout();
@@ -377,7 +387,11 @@ fn main() {
     }
 
     if args.check_bodies {
-        let differing = check_bodies(root, &paths, args.nesting_limit, &mut stdout);
+        let differing = if java_files == 0 {
+            check_bodies::<Kotlin>(root, &paths, args.nesting_limit, &mut stdout)
+        } else {
+            check_bodies::<java_syntax::Java>(root, &paths, args.nesting_limit, &mut stdout)
+        };
         let _ = stdout.flush();
         std::process::exit(if differing == 0 { 0 } else { 1 });
     }
@@ -385,7 +399,7 @@ fn main() {
     let Some(out) = args.out.as_deref() else { usage() };
     let mut failed = 0;
     let mut parser: Parser = new_parser(args.nesting_limit);
-    let mut java_parser = java_syntax::Parser::new();
+    let mut java_parser: java_syntax::Parser = new_parser(args.nesting_limit);
     for line in &paths {
         let path = line.split('\t').next().unwrap_or(line);
         if Lang::of(path, args.lang) == Lang::Java {
@@ -419,24 +433,23 @@ struct Source<K> {
     text: Vec<u8>,
 }
 
-/// The stack of a Java bench thread: Java's parse counts no nesting levels yet (DESIGN, "Open items"), so it runs on
-/// a stack as large as the deepest corpus file could want; the pages are committed only as they are used.
-const JAVA_BENCH_STACK: usize = 64 << 20;
-
-/// What `--bench` asks of a language beyond `psi_builder::Language`.
+/// What `--bench` and `--check-bodies` ask of a language beyond `psi_builder::Language`.
 trait BenchLanguage: Language {
-    /// A bench thread's stack size, `None` for the default.
-    const STACK: Option<usize>;
     /// The path of a list line and how its file is parsed.
     fn file_kind(line: &str) -> (&str, Self::FileKind);
+    /// `--check-bodies`: the path of a list line, the text it parses and how.
+    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, Self::FileKind)>;
     /// This thread's counters in `kotlin_syntax::counters::ALL` order, empty when the language has none.
     fn counters() -> Vec<u64>;
 }
 
 impl BenchLanguage for Kotlin {
-    const STACK: Option<usize> = None;
     fn file_kind(line: &str) -> (&str, FileKind) {
         (line, FileKind::from_file_name(file_name(line)))
+    }
+    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, FileKind)> {
+        let text = read_source(root, line, false)?;
+        Some((line.to_string(), text, FileKind::from_file_name(file_name(line))))
     }
     fn counters() -> Vec<u64> {
         kotlin_syntax::counters::snapshot()
@@ -444,7 +457,6 @@ impl BenchLanguage for Kotlin {
 }
 
 impl BenchLanguage for java_syntax::Java {
-    const STACK: Option<usize> = Some(JAVA_BENCH_STACK);
     /// `PATH[<TAB>LEVEL]`: a file at LEVEL, else at `LanguageLevel.HIGHEST`.
     fn file_kind(line: &str) -> (&str, java_syntax::FileKind) {
         let mut columns = line.split('\t');
@@ -457,6 +469,12 @@ impl BenchLanguage for java_syntax::Java {
     }
     fn counters() -> Vec<u64> {
         Vec::new()
+    }
+    /// As `--out` reads it (`java_source`), the text as bytes even when it is not UTF-8.
+    fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, java_syntax::FileKind)> {
+        let (path, kind, trim) = java_line(line, false);
+        let text = read_source(root, path, false)?;
+        Some((path.to_string(), if trim { trim_bytes(text) } else { text }, kind))
     }
 }
 
@@ -541,14 +559,40 @@ fn new_parser<L: Language>(nesting_limit: Option<u32>) -> psi_builder::Parser<L>
     parser
 }
 
+/// The subtree of `a` at `a_root` and that of `b` at `b_root` have the same nodes: kinds, ranges, error messages and
+/// shape (what their dumps show, and the ranges).
+fn same_subtree<L: Language>(
+    a: &psi_builder::Tree<L>,
+    a_root: NodeId,
+    b: &psi_builder::Tree<L>,
+    b_root: NodeId,
+) -> bool {
+    let size = a.subtree_end(a_root).0 - a_root.0;
+    if b.subtree_end(b_root).0 - b_root.0 != size {
+        return false;
+    }
+    (0..size).all(|k| {
+        let (x, y) = (NodeId(a_root.0 + k), NodeId(b_root.0 + k));
+        a.kind(x) == b.kind(y)
+            && a.range(x) == b.range(y)
+            && a.error_message(x) == b.error_message(y)
+            && a.subtree_end(x).0 - x.0 == b.subtree_end(y).0 - y.0
+            && (k == 0 || a.parent(x).map(|p| x.0 - p.0) == b.parent(y).map(|p| y.0 - p.0))
+    })
+}
+
 /// `--check-bodies`: returns the number of differing bodies.
-fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdout: &mut impl Write) -> usize {
-    let mut parser: Parser = new_parser(nesting_limit);
-    let mut body_parser: Parser = new_parser(nesting_limit);
+fn check_bodies<L: BenchLanguage>(
+    root: &Path,
+    lines: &[String],
+    nesting_limit: Option<u32>,
+    stdout: &mut impl Write,
+) -> usize {
+    let mut parser = new_parser::<L>(nesting_limit);
+    let mut body_parser = new_parser::<L>(nesting_limit);
     let (mut bodies, mut differing) = (0usize, 0usize);
-    for path in paths {
-        let Some(text) = read_source(root, path, false) else { continue };
-        let kind = FileKind::from_file_name(file_name(path));
+    for line in lines {
+        let Some((path, text, kind)) = L::check_source(root, line) else { continue };
         let full = parser.parse(&text, kind);
         let covered: Vec<u8> = full.tokens().flat_map(|id| full.text(id).iter().copied()).collect();
         if covered != text {
@@ -568,7 +612,7 @@ fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdou
                 bodies += 1;
                 let same = body_parser
                     .parse_body(&lazy, ln, ParseOptions::default())
-                    .is_some_and(|body| subtree_to_string(&body, body.root()) == subtree_to_string(&full, fnode));
+                    .is_some_and(|body| same_subtree(&body, body.root(), &full, fnode));
                 if !same {
                     let _ = writeln!(stdout, "{path}: body {:?} differs", lazy.range(ln));
                     differing += 1;
@@ -580,7 +624,7 @@ fn check_bodies(root: &Path, paths: &[String], nesting_limit: Option<u32>, stdou
             l += 1;
         }
     }
-    let _ = writeln!(stdout, "bodies {bodies}  differing {differing}  files {}", paths.len());
+    let _ = writeln!(stdout, "bodies {bodies}  differing {differing}  files {}", lines.len());
     differing
 }
 
@@ -692,19 +736,12 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
         let per_thread: Vec<ThreadResult> = std::thread::scope(|scope| {
             let handles: Vec<_> = (0..threads)
                 .map(|_| {
-                    let mut thread = std::thread::Builder::new();
-                    if let Some(size) = L::STACK {
-                        thread = thread.stack_size(size);
-                    }
-                    thread.spawn_scoped(scope, || {
+                    std::thread::Builder::new().spawn_scoped(scope, || {
                         bench_thread::<L>(&sources, &next, args.walk, options, args.nesting_limit)
                     })
                 })
                 .collect();
-            handles
-                .into_iter()
-                .map(|h| h.ok().and_then(|h| h.join().ok()).unwrap_or_default())
-                .collect()
+            handles.into_iter().map(|h| h.ok().and_then(|h| h.join().ok()).unwrap_or_default()).collect()
         });
         let wall = start.elapsed().as_secs_f64();
         let mut results = vec![FileResult::default(); sources.len()];

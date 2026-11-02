@@ -138,21 +138,24 @@ pub(crate) struct Pending<K> {
 /// How deep a parse may nest (not in the Java, whose recursion has no bound but the thread's stack): the levels of
 /// the recursive entry points it is inside (`Nesting`), counted from the nesting of the chameleon it parses
 /// (`NESTING_CHAMELEON` over where that sits). Past a limit, the construct being entered is an error element "Code is
-/// too deeply nested" over the rest of it (`AbstractKotlinParsing::too_deeply_nested`). A level takes at most about
-/// 560 bytes of stack in a release build (nested `object A { … }`), so a parse fits a 1 MB stack (0.64 MB suffice for
-/// the deepest measured form). The deepest community file reaches 62 levels, 5 nested type argument lists and 4
-/// nested constructs parsed twice.
+/// too deeply nested" over the rest of it (`AbstractKotlinParsing::too_deeply_nested`). The default of
+/// `Language::NESTING_LIMIT`, Kotlin's: a level takes at most about 560 bytes of stack in a release build (nested
+/// `object A { … }`), so a parse fits a 1 MB stack (0.64 MB suffice for the deepest measured form). The deepest
+/// community file reaches 62 levels, 5 nested type argument lists and 4 nested constructs parsed twice.
 pub const NESTING_LIMIT: u32 = 1000;
-/// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder. An expression `a<a<…` tries one
+/// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder (the default of
+/// `Language::TYPE_ARGUMENTS_LIMIT`, Kotlin's and Java's). An expression `a<a<…` tries one
 /// at every `<` and rolls it back, each nesting the lists of the `<`s after it: so a list that reaches the limit also
 /// makes every list starting before that token too deep (`type_arguments_too_deep_before`), and each `<` costs
 /// constant time on average, not the limit.
 pub const TYPE_ARGUMENTS_LIMIT: u32 = 32;
-/// How many constructs that are parsed twice may nest in one builder: a rolled-back attempt parses them and the parse
-/// after the rollback parses them again, so the work doubles with each level. An annotation (`parseAnnotation`: an
-/// annotated expression is a declaration's modifiers first, `@A(@A(…))`) and a parenthesized type
-/// (`parseTypeRefContents`: then a function type, `((…) -> A) -> A`).
-/// At the limit a construct takes 2^10 times its own (not its contents') work.
+/// How many constructs that are parsed twice may nest in one builder (the default of `Language::REPARSED_LIMIT`,
+/// Kotlin's): a rolled-back attempt parses them and the parse after the rollback parses them again, so the work
+/// doubles with each level. Kotlin's are an annotation (`parseAnnotation`: an annotated expression is a declaration's
+/// modifiers first, `@A(@A(…))`) and a parenthesized type (`parseTypeRefContents`: then a function type,
+/// `((…) -> A) -> A`). At the limit a construct takes 2^10 times its own (not its contents') work. One that reaches the
+/// limit also makes every such construct starting before that token too deep (`reparsed_too_deep_before`): a
+/// construct parsed again after a rollback of the one around it then costs constant time, not another 2^10 times.
 pub const REPARSED_LIMIT: u32 = 10;
 /// The message of the error element a construct nested past a limit becomes.
 pub const TOO_DEEPLY_NESTED: &str = "Code is too deeply nested";
@@ -168,6 +171,30 @@ pub enum Nesting {
     Level,
     TypeArguments,
     Reparsed,
+}
+
+/// For each token `i` of `types`, the first token at or after `i` that closes a bracket opened before `i` (by
+/// `depth_change`: +1 opens, -1 closes), or `types.len()` when none does; `out` gets `types.len() + 1` entries. With
+/// d[k] the depth before token k, the answer for `i` is the token before the first k > i with d[k] < d[i], found for
+/// all i by one backward pass with a stack of increasing depths (as deep as the brackets nest).
+pub(crate) fn closers_table<T: Copy>(types: &[T], depth_change: impl Fn(T) -> i64, out: &mut Vec<u32>) {
+    let n = types.len();
+    out.clear();
+    out.resize(n + 1, n as u32);
+    let mut d: i64 = types.iter().map(|&t| depth_change(t)).sum();
+    let mut stack: Vec<(usize, i64)> = Vec::new();
+    for k in (0..=n).rev() {
+        if k < n {
+            d -= depth_change(types[k]);
+        }
+        while stack.last().is_some_and(|&(_, top)| top >= d) {
+            stack.pop();
+        }
+        if let Some(&(top, _)) = stack.last() {
+            out[k] = (top - 1) as u32;
+        }
+        stack.push((k, d));
+    }
 }
 
 /// `bind` drops the tokens before its position from a suspended frame (`drop_bound_tokens`) once they are at least
@@ -232,6 +259,7 @@ pub struct BuilderBuffers<L: Language> {
     messages: Vec<Cow<'static, str>>,
     bind_stack: Vec<(u32, u32)>,
     closers: Vec<u32>,
+    block_closers: Vec<u32>,
     /// The language layers' state stacks (Kotlin's newline and join stacks, its adapters), taken by the layer.
     pub layer: L::LayerBuffers,
 }
@@ -252,6 +280,7 @@ impl<L: Language> Default for BuilderBuffers<L> {
             messages: Vec::new(),
             bind_stack: Vec::new(),
             closers: Vec::new(),
+            block_closers: Vec::new(),
             layer: L::LayerBuffers::default(),
         }
     }
@@ -280,6 +309,8 @@ pub struct PsiBuilderImpl<L: Language> {
     /// A type argument list starting before this token is too deeply nested: one reached `TYPE_ARGUMENTS_LIMIT` here,
     /// so the lists inside it that start before it would reach it too.
     type_arguments_too_deep_before: usize,
+    /// A construct parsed twice starting before this token is too deeply nested: one reached `REPARSED_LIMIT` here.
+    reparsed_too_deep_before: usize,
     /// Where token 0 is in the file's token list, when the tokens are an unmodified slice of it.
     file_token: Option<usize>,
     tokens_to_restore_on_rollback: BTreeMap<usize, L::Token>,
@@ -328,6 +359,17 @@ pub struct PsiBuilderImpl<L: Language> {
     /// For each token `i`, the first token at or after it that closes a bracket opened before `i`
     /// (`skip_too_deeply_nested`); computed the first time a construct is too deeply nested, empty until then.
     closers: Vec<u32>,
+    /// For each token `i`, the first token at or after it that closes a block of `block_pair` opened before `i`
+    /// (`balanced_block_end`); computed the first time it is asked for, empty until then.
+    block_closers: Vec<u32>,
+    block_pair: Option<(L::Token, L::Token)>,
+    /// How many tokens `balanced_block_end` has counted before making `block_closers`.
+    block_scanned: usize,
+    /// `block_closers` answers for the tokens from here on: a bracket remapped before it made it stale there.
+    block_valid_from: usize,
+    /// The file's `block_closers` for `Language::BLOCK_BRACES` and where token 0 is in the file's tokens, when the
+    /// builder's tokens are a slice of the file's and it was given the table (`share_block_closers`).
+    shared_block_closers: Option<(Arc<[u32]>, usize)>,
 }
 
 /// The `PsiBuilder` methods a marker needs: implemented by every builder layer, so `marker.done(builder, kind)` works
@@ -382,6 +424,8 @@ impl<L: Language> PsiBuilderImpl<L> {
         let bind_stack = std::mem::take(&mut bufs.bind_stack);
         let mut closers = std::mem::take(&mut bufs.closers);
         closers.clear();
+        let mut block_closers = std::mem::take(&mut bufs.block_closers);
+        block_closers.clear();
         let lexeme_count = lex_types.len();
         lex_starts.resize(lexeme_count + 1, len as u32);
         lex_starts[lexeme_count] = len as u32;
@@ -394,10 +438,11 @@ impl<L: Language> PsiBuilderImpl<L> {
             lexeme_count,
             token_shift: 0,
             nesting: 0,
-            nesting_limit: NESTING_LIMIT,
+            nesting_limit: L::NESTING_LIMIT,
             type_arguments: 0,
             reparsed: 0,
             type_arguments_too_deep_before: 0,
+            reparsed_too_deep_before: 0,
             file_token,
             tokens_to_restore_on_rollback: BTreeMap::new(),
             current_lexeme: 0,
@@ -419,6 +464,11 @@ impl<L: Language> PsiBuilderImpl<L> {
             bind_stack,
             bind: BindState::default(),
             closers,
+            block_closers,
+            block_pair: None,
+            block_scanned: 0,
+            block_valid_from: 0,
+            shared_block_closers: None,
         }
     }
 
@@ -442,14 +492,18 @@ impl<L: Language> PsiBuilderImpl<L> {
                 if self.current_lexeme < self.type_arguments_too_deep_before {
                     return false;
                 }
-                if self.type_arguments >= TYPE_ARGUMENTS_LIMIT.min(self.nesting_limit) {
+                if self.type_arguments >= L::TYPE_ARGUMENTS_LIMIT.min(self.nesting_limit) {
                     self.type_arguments_too_deep_before = self.current_lexeme + 1;
                     return false;
                 }
                 self.type_arguments += 1;
             }
             Nesting::Reparsed => {
-                if self.reparsed >= REPARSED_LIMIT.min(self.nesting_limit) {
+                if self.current_lexeme < self.reparsed_too_deep_before {
+                    return false;
+                }
+                if self.reparsed >= L::REPARSED_LIMIT.min(self.nesting_limit) {
+                    self.reparsed_too_deep_before = self.current_lexeme + 1;
                     return false;
                 }
                 self.reparsed += 1;
@@ -476,29 +530,127 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// more than one that does not.
     fn unmatched_closer(&mut self, from: usize) -> usize {
         if self.closers.is_empty() {
-            // The bracket depth before each token, d[0..=n]; the answer for `i` is the token before the first k > i
-            // with d[k] < d[i], found for all i by one backward pass with a stack of increasing depths.
-            let n = self.lexeme_count;
-            let mut depth = Vec::with_capacity(n + 1);
-            let mut d = 0i64;
-            depth.push(d);
-            for &t in &self.lex_types[..n] {
-                d += L::bracket_depth_change(t);
-                depth.push(d);
-            }
-            self.closers.resize(n + 1, n as u32);
-            let mut stack: Vec<usize> = Vec::new();
-            for k in (0..=n).rev() {
-                while stack.last().is_some_and(|&top| depth[top] >= depth[k]) {
-                    stack.pop();
-                }
-                if let Some(&top) = stack.last() {
-                    self.closers[k] = (top - 1) as u32;
-                }
-                stack.push(k);
-            }
+            closers_table(&self.lex_types[..self.lexeme_count], L::bracket_depth_change, &mut self.closers);
         }
         self.closers.get(from).map_or(self.lexeme_count, |&c| c as usize)
+    }
+
+    /// Where a block of `open` and `close` that the current token is inside ends (not in the Java): the index of the
+    /// first token at or after the current one that closes a block opened before it, or the token count when none
+    /// does (`balanced_block_end_at` the current token).
+    pub fn balanced_block_end(&mut self, open: L::Token, close: L::Token) -> usize {
+        self.balanced_block_end_at(self.current_lexeme, open, close)
+    }
+
+    /// The index of the first token at or after `from` that closes a block of `open` and `close` opened before it, or
+    /// the token count when none does (not in the Java). It is what a loop finds that counts `open` and `close` from 1
+    /// over the tokens from `from` and stops where the count is 0 (whitespace and comments are never `open` or
+    /// `close`), in amortized constant time: the raw tokens are counted while the builder has counted fewer than it has
+    /// tokens, and then a table of every token's answer is made in one pass, as for `unmatched_closer`. So a builder
+    /// asked once (a chameleon with one nested block) scans only that block, and one asked for every level of nested
+    /// blocks costs O(tokens). A token remapped from or to `open` or `close` makes the table stale up to it
+    /// (`block_valid_from`): before it the tokens are counted. A builder asks for one pair only.
+    pub fn balanced_block_end_at(&mut self, from: usize, open: L::Token, close: L::Token) -> usize {
+        debug_assert!(self.block_pair.is_none_or(|pair| pair == (open, close)), "one pair per builder");
+        self.block_pair = Some((open, close));
+        let (from, n) = (from.min(self.lexeme_count), self.lexeme_count);
+        if let Some((table, first)) = &self.shared_block_closers
+            && L::BLOCK_BRACES == Some((open, close))
+        {
+            // The file's answer, unless it is past this builder's tokens: brackets nest, so the first token closing
+            // the block is the same in the slice.
+            return (table[first + from] as usize).saturating_sub(*first).min(n);
+        }
+        if self.block_closers.is_empty() && self.block_scanned >= n {
+            let change = |t: L::Token| (t == open) as i64 - (t == close) as i64;
+            closers_table(&self.lex_types[..n], change, &mut self.block_closers);
+            self.block_valid_from = 0;
+        }
+        if !self.block_closers.is_empty() && from >= self.block_valid_from {
+            return self.block_closers[from] as usize;
+        }
+        let mut count = 1i32;
+        for (k, &t) in self.lex_types[from..n].iter().enumerate() {
+            if t == open {
+                count += 1;
+            } else if t == close {
+                count -= 1;
+                if count == 0 {
+                    self.block_scanned += k + 1;
+                    return from + k;
+                }
+            }
+        }
+        self.block_scanned += n - from;
+        n
+    }
+
+    /// The number of tokens (`myLexemeCount`).
+    pub fn lexeme_count(&self) -> usize {
+        self.lexeme_count
+    }
+
+    /// The first token of type `token` in `range` (not in the Java), searched over the raw tokens.
+    pub fn find_raw_token(&self, range: std::ops::Range<usize>, token: L::Token) -> Option<usize> {
+        let end = range.end.min(self.lexeme_count);
+        let start = range.start.min(end);
+        self.lex_types[start..end].iter().position(|&t| t == token).map(|i| start + i)
+    }
+
+    /// Remaps every token of type `from` in `range` to `to` (not in the Java): what `remapCurrentToken(to)` at each of
+    /// them does, without moving the cursor.
+    pub fn remap_tokens(&mut self, range: std::ops::Range<usize>, from: L::Token, to: L::Token) {
+        let end = range.end.min(self.lexeme_count);
+        let start = range.start.min(end);
+        for i in start..end {
+            if self.lex_types[i] == from {
+                self.note_remap(i, from, to);
+                self.lex_types[i] = to;
+            }
+        }
+        self.tt_valid = false;
+    }
+
+    /// A remap of token `index` from `old` to `new`: if either is a bracket of `block_pair`, the block table is stale
+    /// up to it.
+    #[inline(always)]
+    fn note_remap(&mut self, index: usize, old: L::Token, new: L::Token) {
+        if let Some((open, close)) = self.block_pair
+            && (old == open || old == close || new == open || new == close)
+        {
+            self.block_valid_from = self.block_valid_from.max(index + 1);
+        }
+    }
+
+    /// `SyntaxBuilderUtil.parseBlockLazy`'s loop in constant time (not in the Java; `balanced_block_end`): with the
+    /// block's `open` consumed, puts the cursor after the `close` that closes the block and returns true, or, when no
+    /// `close` does before the first token starting at `stop_offset` or later (a layer's end of the stream) or before
+    /// the end, puts it at the first token there that is not whitespace and returns false: where a loop of `eof()`,
+    /// `getTokenType()` and `advanceLexer()` counting `open` and `close` from 1 stops, in the same state.
+    pub fn skip_balanced_block_to(&mut self, open: L::Token, close: L::Token, stop_offset: Option<u32>) -> bool {
+        let current = self.current_lexeme;
+        let end = self.balanced_block_end(open, close);
+        let stop = stop_offset.unwrap_or(u32::MAX);
+        if end < self.lexeme_count && self.lex_starts[end] < stop {
+            self.raw_advance_lexer((end + 1 - current) as i32);
+            return true;
+        }
+        let at_stop = current + self.lex_starts[current..self.lexeme_count].partition_point(|&s| s < stop);
+        self.raw_advance_lexer((at_stop - current) as i32);
+        self.eof();
+        false
+    }
+
+    /// Gives the builder the file's table of `balanced_block_end` answers for `Language::BLOCK_BRACES`
+    /// (`file_block_closers`); its token 0 is the file's token `first`, and its tokens are a slice of the file's.
+    pub(crate) fn share_block_closers(&mut self, table: Arc<[u32]>, first: usize) {
+        debug_assert!(first + self.lexeme_count < table.len());
+        self.shared_block_closers = Some((table, first));
+    }
+
+    /// The start of token `index` relative to the builder's text, the text's length past the last token.
+    pub fn token_start(&self, index: usize) -> u32 {
+        self.lex_starts[index.min(self.lexeme_count)]
     }
 
     /// Gives the buffers back to `bufs`, the token starts to `bufs.starts`.
@@ -516,6 +668,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         bufs.messages = self.messages;
         bufs.bind_stack = self.bind_stack;
         bufs.closers = self.closers;
+        bufs.block_closers = self.block_closers;
     }
 
     /// `getOriginalText()`: this builder's text.
@@ -563,6 +716,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     pub fn remap_current_token(&mut self, element_type: L::Token) {
         self.tt_valid = false;
         if self.current_lexeme < self.lexeme_count {
+            self.note_remap(self.current_lexeme, self.lex_types[self.current_lexeme], element_type);
             self.lex_types[self.current_lexeme] = element_type;
         }
     }
@@ -1056,6 +1210,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         if !self.tokens_to_restore_on_rollback.is_empty() {
             let restored = self.tokens_to_restore_on_rollback.split_off(&(lexeme_index as usize));
             for (index, element_type) in restored {
+                self.note_remap(index, self.lex_types[index], element_type);
                 self.lex_types[index] = element_type;
             }
         }

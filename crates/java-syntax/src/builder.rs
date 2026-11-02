@@ -15,6 +15,10 @@ use std::borrow::Cow;
 
 use psi_builder::{AsPsiBuilder, Marker, WhitespacesAndCommentsBinder};
 
+pub use psi_builder::builder::{
+    NESTING_CHAMELEON, NESTING_LIMIT, Nesting, REPARSED_LIMIT, TOO_DEEPLY_NESTED, TYPE_ARGUMENTS_LIMIT,
+};
+
 use crate::Java;
 use crate::language_level::{JavaFeature, LanguageLevel};
 use crate::node_kind::NodeKind;
@@ -238,6 +242,38 @@ impl<'b> SyntaxTreeBuilder<'b> {
         self.b.get_token_bytes()
     }
 
+    /// `PsiBuilderImpl::enter_nesting` (not in the Kotlin; see `psi_builder::NESTING_LIMIT`).
+    #[inline(always)]
+    pub fn enter_nesting(&mut self, kind: Nesting) -> bool {
+        self.b.enter_nesting(kind)
+    }
+
+    /// `PsiBuilderImpl::exit_nesting`.
+    #[inline(always)]
+    pub fn exit_nesting(&mut self, kind: Nesting) {
+        self.b.exit_nesting(kind);
+    }
+
+    /// Not in the Kotlin: moves the cursor over the rest of a construct nested too deeply, from the current token to
+    /// the first that closes a bracket opened before it (`PsiBuilderImpl::skip_too_deeply_nested`; Java's `(`, `[`,
+    /// `{`, a template's begin, an inline doc tag's `{@`), not past the stopping offset; over one token at least unless
+    /// at the end, so that the callers' loops go on.
+    pub fn skip_too_deeply_nested(&mut self) {
+        if self.eof() {
+            return;
+        }
+        let stop = (self.stop_at != i32::MAX).then(|| self.stop_at.max(0) as u32);
+        self.b.skip_too_deeply_nested(stop);
+    }
+
+    /// Not in the Kotlin: the offset where the block of `{` and `}` the cursor is in ends (`braceMatchingBuilder`'s
+    /// loop, in constant time: `PsiBuilderImpl::balanced_block_end`): the start of the `}` that closes it, the text's
+    /// length when none does, and at most this builder's stopping offset (where that loop stops at the latest).
+    pub fn brace_block_end_offset(&mut self) -> i32 {
+        let end = self.b.balanced_block_end(TokenKind::LBRACE, TokenKind::RBRACE);
+        (self.b.token_start(end) as i32).min(self.stop_at)
+    }
+
     /// `text`: the builder's whole text.
     pub fn text(&self) -> &[u8] {
         self.b.get_original_text()
@@ -376,21 +412,14 @@ impl<'b> SyntaxTreeBuilder<'b> {
 
         self.advance_lexer();
 
-        let mut brace_count = 1;
-
-        while brace_count > 0 && !self.eof() {
-            let token_type = self.token_type();
-            if token_type == Some(left_brace) {
-                brace_count += 1;
-            } else if token_type == Some(right_brace) {
-                brace_count -= 1;
-            }
-            self.advance_lexer();
-        }
+        // Not in the Kotlin: its loop (`braceCount` from 1, `leftBrace` +1, `rightBrace` -1, `advanceLexer()` while it
+        // is above 0 and not `eof()`) in constant time, which nested lambdas and switch blocks ran once per level.
+        let stop = (self.stop_at != i32::MAX).then(|| self.stop_at.max(0) as u32);
+        let closed = self.b.skip_balanced_block_to(left_brace, right_brace, stop);
 
         marker.collapse(self, code_block);
 
-        if brace_count > 0 {
+        if !closed {
             marker.set_custom_edge_token_binders(self, None, Some(Binder::DefaultLeft));
         }
 

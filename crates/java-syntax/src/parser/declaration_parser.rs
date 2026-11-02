@@ -2,14 +2,14 @@
 
 use psi_builder::Marker;
 
-use crate::builder::SyntaxTreeBuilder;
+use crate::builder::{Nesting, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::language_level::{JavaFeature, LanguageLevel};
 use crate::node_kind::NodeKind;
 use crate::parser::java_keywords;
 use crate::parser::java_parser::JavaParser;
 use crate::parser::java_parser_util::{
-    self, done, empty_element, empty_element_before, error, error_with, expect_or_error,
+    self, done, empty_element, empty_element_before, error, error_with, expect_or_error, too_deeply_nested,
 };
 use crate::parser::reference_parser::ReferenceParser;
 use crate::syntax_element_types::{CLASS_KEYWORD_BIT_SET, KEYWORD_BIT_SET, MODIFIER_BIT_SET, PRIMITIVE_TYPE_BIT_SET};
@@ -287,6 +287,18 @@ impl<'p> DeclarationParser<'p> {
             return None;
         }
 
+        // Not in the Kotlin: a declaration (class members in class bodies, local and anonymous classes) counts a level
+        // of nesting; past the limit it is the error element "Code is too deeply nested".
+        if !builder.enter_nesting(Nesting::Level) {
+            return Some(too_deeply_nested(builder));
+        }
+        let declaration = self.parse_nested(builder, context);
+        builder.exit_nesting(Nesting::Level);
+        declaration
+    }
+
+    /// The rest of `parse(builder, context)` once the current token may start a declaration, inside its nesting.
+    fn parse_nested(&self, builder: &mut SyntaxTreeBuilder<'_>, context: Option<Context>) -> Option<Marker> {
         let declaration = builder.mark();
         let declaration_start = builder.current_offset();
         let mod_list = self.parse_modifier_list(builder);
@@ -970,9 +982,24 @@ impl<'p> DeclarationParser<'p> {
     }
 
     /// `parseAnnotation(builder)` (DeclarationParser.kt:885).
+    ///
+    /// Not in the Kotlin: an annotation counts as `Nesting::Reparsed`. Expressions are tried as types and
+    /// declarations, casts and lambdas first, each rolled back, so an annotation in an expression is parsed several
+    /// times over and an expression in its arguments again each time: `@A(f(@A(f(…))))` took 3 times the work per
+    /// level. Past the limit the annotation is the error element "Code is too deeply nested".
     pub fn parse_annotation(&self, builder: &mut SyntaxTreeBuilder<'_>) -> Marker {
         // `require(builder.tokenType === AT)`: every caller is at `@`.
         debug_assert_eq!(builder.token_type(), Some(TokenKind::AT));
+        if !builder.enter_nesting(Nesting::Reparsed) {
+            return too_deeply_nested(builder);
+        }
+        let anno = self.parse_annotation_nested(builder);
+        builder.exit_nesting(Nesting::Reparsed);
+        anno
+    }
+
+    /// The body of `parseAnnotation(builder)`, inside its nesting.
+    fn parse_annotation_nested(&self, builder: &mut SyntaxTreeBuilder<'_>) -> Marker {
         let anno = builder.mark();
         builder.advance_lexer();
 

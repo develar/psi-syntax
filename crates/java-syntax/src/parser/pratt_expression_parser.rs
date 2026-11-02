@@ -2,12 +2,12 @@
 
 use psi_builder::Marker;
 
-use crate::builder::{Binder, SyntaxTreeBuilder};
+use crate::builder::{Binder, Nesting, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::node_kind::NodeKind;
 use crate::parser::expression_parser::ExpressionParser;
 use crate::parser::java_parser::JavaParser;
-use crate::parser::java_parser_util::{done, empty_element, error, expect_or_error, expr_type};
+use crate::parser::java_parser_util::{done, empty_element, error, expect_or_error, expr_type, too_deeply_nested};
 use crate::parser::reference_parser::ReferenceParser;
 use crate::syntax_element_types::{ALL_LITERALS, MODIFIER_BIT_SET, PRIMITIVE_TYPE_BIT_SET};
 use crate::tokens::{TokenKind, TokenSet};
@@ -31,7 +31,25 @@ impl<'p> PrattExpressionParser<'p> {
 
     /// `tryParseWithPrecedenceAtMost(builder, maxPrecedence, mode)` (PrattExpressionParser.kt:45): the traditional
     /// Pratt parser for infix expressions. If the marker is `None`, nothing is parsed.
+    ///
+    /// Not in the Kotlin: every recursion of an expression but a unary one passes here, so it counts a level of
+    /// nesting (`Nesting::Level`); past the limit the expression is the error element "Code is too deeply nested".
     pub fn try_parse_with_precedence_at_most(
+        &self,
+        builder: &mut SyntaxTreeBuilder<'_>,
+        max_precedence: i32,
+        mode: i32,
+    ) -> Option<Marker> {
+        if !builder.enter_nesting(Nesting::Level) {
+            return Some(too_deeply_nested(builder));
+        }
+        let lhs = self.try_parse_with_precedence_at_most_nested(builder, max_precedence, mode);
+        builder.exit_nesting(Nesting::Level);
+        lhs
+    }
+
+    /// The body of `tryParseWithPrecedenceAtMost(builder, maxPrecedence, mode)`, inside its nesting.
+    fn try_parse_with_precedence_at_most_nested(
         &self,
         builder: &mut SyntaxTreeBuilder<'_>,
         max_precedence: i32,
@@ -60,7 +78,7 @@ impl<'p> PrattExpressionParser<'p> {
             let unary = builder.mark();
             builder.advance_lexer();
 
-            let operand = self.parse_unary(builder, mode);
+            let operand = self.parse_unary_operand(builder, mode);
             if operand.is_none() {
                 error(builder, message("expected.expression"));
             }
@@ -88,7 +106,7 @@ impl<'p> PrattExpressionParser<'p> {
                 return self.parse_postfix(builder, mode);
             }
 
-            let expr = self.parse_unary(builder, mode);
+            let expr = self.parse_unary_operand(builder, mode);
             if expr.is_none() {
                 if !type_info.is_parameterized {
                     // cannot parse correct parenthesized expression after correct parameterized type
@@ -110,6 +128,17 @@ impl<'p> PrattExpressionParser<'p> {
         } else {
             self.parse_postfix(builder, mode)
         }
+    }
+
+    /// Not in the Kotlin: `parseUnary(builder, mode)` for the operand of a prefix operator or a cast, the unary
+    /// recursion that does not pass `tryParseWithPrecedenceAtMost`, so it counts a level of nesting there.
+    fn parse_unary_operand(&self, builder: &mut SyntaxTreeBuilder<'_>, mode: i32) -> Option<Marker> {
+        if !builder.enter_nesting(Nesting::Level) {
+            return Some(too_deeply_nested(builder));
+        }
+        let operand = self.parse_unary(builder, mode);
+        builder.exit_nesting(Nesting::Level);
+        operand
     }
 
     /// `parsePostfix(builder, mode)` (PrattExpressionParser.kt:118).
@@ -683,7 +712,27 @@ impl<'p> PrattExpressionParser<'p> {
     }
 
     /// `parseArrayInitializer(builder, type, elementParser, missingElementKey)` (PrattExpressionParser.kt:621).
+    ///
+    /// Not in the Kotlin: an annotation's array initializer recurses through `parseAnnotationValue` without an
+    /// expression, so an initializer counts a level of nesting.
     pub fn parse_array_initializer_with(
+        &self,
+        builder: &mut SyntaxTreeBuilder<'_>,
+        element_type: NodeKind,
+        element_parser: &dyn Fn(&mut SyntaxTreeBuilder<'_>) -> Option<Marker>,
+        missing_element_key: &'static str,
+    ) -> Marker {
+        if !builder.enter_nesting(Nesting::Level) {
+            return too_deeply_nested(builder);
+        }
+        let array_init =
+            self.parse_array_initializer_nested(builder, element_type, element_parser, missing_element_key);
+        builder.exit_nesting(Nesting::Level);
+        array_init
+    }
+
+    /// The body of `parseArrayInitializer(builder, type, elementParser, missingElementKey)`, inside its nesting.
+    fn parse_array_initializer_nested(
         &self,
         builder: &mut SyntaxTreeBuilder<'_>,
         element_type: NodeKind,

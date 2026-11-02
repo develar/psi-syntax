@@ -87,23 +87,15 @@ pub fn semicolon(builder: &mut SyntaxTreeBuilder<'_>) {
 }
 
 /// `braceMatchingBuilder(builder)`: the builder stopping at the `}` that closes the block it is in (or at the end).
+///
+/// Not in the Kotlin: the Kotlin finds the `}` with a loop over the tokens (`braceCount` from 1, `{` +1, `}` -1, stop at
+/// 0 or at `eof()`), which nested class bodies run once per level, quadratic; `brace_block_end_offset` gives the
+/// offset that loop stops at in constant time. The marker is kept, so the cursor and the builder's state after the
+/// rollback are the Kotlin's.
 pub fn brace_matching_builder<'s>(builder: &'s mut SyntaxTreeBuilder<'_>) -> SyntaxTreeBuilder<'s> {
     let pos = builder.mark();
 
-    let mut brace_count = 1;
-    while !builder.eof() {
-        let token_type = builder.token_type();
-        if token_type == Some(TokenKind::LBRACE) {
-            brace_count += 1;
-        } else if token_type == Some(TokenKind::RBRACE) {
-            brace_count -= 1;
-        }
-        if brace_count == 0 {
-            break;
-        }
-        builder.advance_lexer();
-    }
-    let stop_at = builder.current_offset();
+    let stop_at = builder.brace_block_end_offset();
 
     pos.rollback_to(builder);
 
@@ -119,3 +111,15 @@ pub fn stopping_builder<'s>(builder: &'s mut SyntaxTreeBuilder<'_>, stop_at: i32
 // decc943 calls it (the parsers call only `stoppingBuilder(builder, stopAt)`, from `braceMatchingBuilder` and
 // `DeclarationParser.parse`), and its adapter would put a call of the condition on every `tokenType` and `eof()` of
 // every builder (`SyntaxTreeBuilder` holds only the offset). Port it into `SyntaxTreeBuilder` with its first caller.
+
+/// Not in the Kotlin: what a construct nested past a limit (`SyntaxTreeBuilder::enter_nesting`) parses as instead, an
+/// error element "Code is too deeply nested" over the rest of it: from the current token to the first one that closes
+/// a bracket opened before it, at least the current token (`skip_too_deeply_nested`). The construct around it then
+/// closes as it would, and the error costs constant time, also in an attempt that is rolled back. Returns the error
+/// element's marker, which the caller returns as the construct it parsed.
+pub fn too_deeply_nested(builder: &mut SyntaxTreeBuilder<'_>) -> Marker {
+    let err = builder.mark();
+    builder.skip_too_deeply_nested();
+    err.error(builder, crate::builder::TOO_DEEPLY_NESTED);
+    err
+}

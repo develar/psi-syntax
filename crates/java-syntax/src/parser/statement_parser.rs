@@ -2,14 +2,14 @@
 
 use psi_builder::Marker;
 
-use crate::builder::{Binder, SyntaxTreeBuilder};
+use crate::builder::{Binder, Nesting, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::language_level::{JavaFeature, LanguageLevel};
 use crate::node_kind::NodeKind;
 use crate::parser::declaration_parser::{Context, is_non_sealed_token};
 use crate::parser::java_keywords;
 use crate::parser::java_parser::JavaParser;
-use crate::parser::java_parser_util::{done, error, expect_or_error, expr_type, semicolon};
+use crate::parser::java_parser_util::{done, error, expect_or_error, expr_type, semicolon, too_deeply_nested};
 use crate::syntax_element_types::JAVA_COMMENT_OR_WHITESPACE_BIT_SET;
 use crate::tokens::{TokenKind, TokenSet};
 
@@ -109,7 +109,20 @@ impl<'p> StatementParser<'p> {
     }
 
     /// `parseStatement(builder)` (StatementParser.kt:93).
+    ///
+    /// Not in the Kotlin: every recursion of a statement (`if`, loops, labels) passes here, so it counts a level of
+    /// nesting (`Nesting::Level`); past the limit the statement is the error element "Code is too deeply nested".
     pub fn parse_statement(&self, builder: &mut SyntaxTreeBuilder<'_>) -> Option<Marker> {
+        if !builder.enter_nesting(Nesting::Level) {
+            return Some(too_deeply_nested(builder));
+        }
+        let statement = self.parse_statement_nested(builder);
+        builder.exit_nesting(Nesting::Level);
+        statement
+    }
+
+    /// The body of `parseStatement(builder)`, inside its nesting.
+    fn parse_statement_nested(&self, builder: &mut SyntaxTreeBuilder<'_>) -> Option<Marker> {
         let token_type = builder.token_type();
         if token_type == Some(TokenKind::IF_KEYWORD) {
             return Some(self.parse_if_statement(builder));

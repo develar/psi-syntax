@@ -34,6 +34,18 @@ impl psi_builder::Language for Java {
     const FILE: NodeKind = NodeKind::JAVA_FILE;
     const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
 
+    /// Not in the Kotlin: IntelliJ's own test `Parenth2.java` nests 1001 parenthesized expressions (1010 levels), and a
+    /// level takes at most 652 bytes of stack in a release build (a typed lambda's body, an enum constant's body), so
+    /// 1200 levels fit 782 KB and a parse fits a 1 MB stack.
+    const NESTING_LIMIT: u32 = 1200;
+    /// Not in the Kotlin: an annotation in an expression is parsed up to 4 times per parse of the one around it (as a
+    /// type's, as the expression's annotations, in a cast and in a lambda's parameters that are rolled back), so at
+    /// the limit an annotation takes 4^5 = 1024 times its own work, Kotlin's 2^10. The deepest community file nests
+    /// 4 annotations.
+    const REPARSED_LIMIT: u32 = 5;
+    /// `braceMatchingBuilder` and `parseBlockLazy` ask where a `{` block ends.
+    const BLOCK_BRACES: Option<(TokenKind, TokenKind)> = Some((TokenKind::LBRACE, TokenKind::RBRACE));
+
     /// `JavaSyntaxDefinition.whitespaces` + `.comments`, and DOC_COMMENT_LEADING_ASTERISKS, the comment token
     /// JavaDocParser enforces on a doc comment's builder (`enforceCommentTokens`) before it reads a token: it occurs
     /// in no other builder, and the Java comments occur in no doc comment's, so one set serves both.
@@ -70,13 +82,15 @@ impl psi_builder::Language for Java {
         kind == LazyKind::CodeBlock
     }
 
-    /// `(`, `[`, `{` and a template's begin open; their closers close.
+    /// `(`, `[`, `{`, a template's begin and an inline doc tag's `{@` open; their closers close.
     #[inline]
     fn bracket_depth_change(token: TokenKind) -> i64 {
         use TokenKind::*;
         match token {
-            LPARENTH | LBRACKET | LBRACE | STRING_TEMPLATE_BEGIN | TEXT_BLOCK_TEMPLATE_BEGIN => 1,
-            RPARENTH | RBRACKET | RBRACE | STRING_TEMPLATE_END | TEXT_BLOCK_TEMPLATE_END => -1,
+            LPARENTH | LBRACKET | LBRACE | STRING_TEMPLATE_BEGIN | TEXT_BLOCK_TEMPLATE_BEGIN | DOC_INLINE_TAG_START => {
+                1
+            }
+            RPARENTH | RBRACKET | RBRACE | STRING_TEMPLATE_END | TEXT_BLOCK_TEMPLATE_END | DOC_INLINE_TAG_END => -1,
             _ => 0,
         }
     }

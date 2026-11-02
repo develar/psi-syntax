@@ -9,7 +9,12 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{BuilderBuffers, NESTING_CHAMELEON, NESTING_LIMIT, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED};
+use crate::builder::{BuilderBuffers, NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED, closers_table};
+
+/// The nesting from which a body reparsed from the file's tokens shares the file's table of block ends
+/// (`Language::BLOCK_BRACES`): below it, each frame counts its own blocks (most files never reach it, and pay for no
+/// table); above it, every frame of a deep chain of bodies would count again the tokens the frame around it counted.
+pub const SHARED_BLOCK_DEPTH: u32 = 64;
 use crate::counters::{Counter, add};
 use crate::language::{ElementType, ElementTypeOf, Language, NodeType, TokenType};
 use crate::lexer::Lexed;
@@ -173,6 +178,9 @@ pub struct Parser<L: Language> {
     options: ParseOptions,
     /// `NESTING_LIMIT`, or what `set_nesting_limit` set.
     nesting_limit: Option<u32>,
+    /// The table of block ends of the file's tokens (`PsiBuilderImpl::balanced_block_end` over `self.file`), made for
+    /// the first body deeper than `SHARED_BLOCK_DEPTH` and shared by every such body of the file.
+    file_block_closers: Option<Arc<[u32]>>,
 }
 
 impl<L: Language> Default for Parser<L> {
@@ -185,6 +193,7 @@ impl<L: Language> Default for Parser<L> {
             data: TreeData::default(),
             options: ParseOptions::default(),
             nesting_limit: None,
+            file_block_closers: None,
         }
     }
 }
@@ -201,6 +210,8 @@ pub struct Chameleon<'a, L: Language> {
     pending: Pending<L::Lazy>,
     file: &'a Lexed<L::Token>,
     relexed: &'a mut Lexed<L::Token>,
+    /// `Parser::file_block_closers`.
+    file_block_closers: &'a mut Option<Arc<[u32]>>,
     /// The buffers its builder works in: `lex_types` and `starts` are what `builder` parses; `layer` is for the
     /// language's layers over it.
     pub bufs: &'a mut BuilderBuffers<L>,
@@ -224,14 +235,17 @@ impl<'a, L: Language> Chameleon<'a, L> {
     }
 
     /// A builder over the tokens in `bufs.lex_types` and `bufs.starts` (relative to the chameleon's start, one more
-    /// start than types), at nesting 0 with the default limit.
+    /// start than types), at nesting 0 with the parser's limit: a doc comment or a link holds no body, so its frame
+    /// is bounded by its own tokens wherever it sits.
     pub fn builder(&mut self) -> PsiBuilderImpl<L> {
         let p = &self.pending;
-        PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, None)
+        let mut builder = PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, None);
+        builder.set_nesting(0, self.limit);
+        builder
     }
 
-    /// A builder over the chameleon's text lexed afresh with `Language::tokenize_into`, at nesting 0 with the default
-    /// limit.
+    /// A builder over the chameleon's text lexed afresh with `Language::tokenize_into`, at nesting 0 with the
+    /// parser's limit.
     pub fn relexed_builder(&mut self) -> PsiBuilderImpl<L> {
         let p = &self.pending;
         L::tokenize_into(&self.text[p.start..p.end], self.file_kind, self.relexed);
@@ -268,6 +282,16 @@ impl<'a, L: Language> Chameleon<'a, L> {
         };
         let mut delegate = PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, file_token);
         delegate.set_nesting(self.nesting, self.limit);
+        if let (Some(first), Some((open, close))) = (file_token, L::BLOCK_BRACES)
+            && p.depth >= SHARED_BLOCK_DEPTH
+        {
+            let table = self.file_block_closers.get_or_insert_with(|| {
+                let mut table = Vec::new();
+                closers_table(&self.file.types, |t| (t == open) as i64 - (t == close) as i64, &mut table);
+                table.into()
+            });
+            delegate.share_block_closers(table.clone(), first);
+        }
         delegate
     }
 }
@@ -277,7 +301,7 @@ impl<L: Language> Parser<L> {
         Self::default()
     }
 
-    /// Parses with `limit` instead of `NESTING_LIMIT` (tests: a small limit puts the too-deep paths on ordinary
+    /// Parses with `limit` instead of `Language::NESTING_LIMIT` (tests: a small limit puts the too-deep paths on ordinary
     /// inputs). Not part of the consumer contract.
     #[doc(hidden)]
     pub fn set_nesting_limit(&mut self, limit: u32) {
@@ -285,7 +309,7 @@ impl<L: Language> Parser<L> {
     }
 
     fn limit(&self) -> u32 {
-        self.nesting_limit.unwrap_or(NESTING_LIMIT)
+        self.nesting_limit.unwrap_or(L::NESTING_LIMIT)
     }
 
     /// Parses `text` as a file of `file_kind` (see `Tree::parse`).
@@ -347,6 +371,7 @@ impl<L: Language> Parser<L> {
     ) -> Tree<L> {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
         L::tokenize_into(&text, file_kind, &mut self.file);
+        self.file_block_closers = None;
         add(Counter::FileTokens, self.file.len() as u64);
         let mut data = std::mem::take(&mut self.data);
         data.clear();
@@ -417,6 +442,7 @@ impl<L: Language> Parser<L> {
             pending: p,
             file: &self.file,
             relexed: &mut self.relexed,
+            file_block_closers: &mut self.file_block_closers,
             bufs: &mut bufs,
             nesting,
             limit,

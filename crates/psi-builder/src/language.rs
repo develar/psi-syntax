@@ -134,6 +134,19 @@ pub trait Language: Sized + 'static {
         raw
     }
 
+    /// How deep the parse may nest (`builder::NESTING_LIMIT`, the default): chosen from the deepest file of the
+    /// language's corpus and the stack a level of its parsers takes, so a parse fits a 1 MB stack. Not in the Java.
+    const NESTING_LIMIT: u32 = crate::builder::NESTING_LIMIT;
+    /// How many type argument lists may nest in one builder (`builder::TYPE_ARGUMENTS_LIMIT`, the default).
+    const TYPE_ARGUMENTS_LIMIT: u32 = crate::builder::TYPE_ARGUMENTS_LIMIT;
+    /// How many constructs parsed twice may nest in one builder (`builder::REPARSED_LIMIT`, the default).
+    const REPARSED_LIMIT: u32 = crate::builder::REPARSED_LIMIT;
+
+    /// The block brackets the parsers ask `PsiBuilderImpl::balanced_block_end` for (Java's `{` and `}`), `None` when
+    /// they never do: a chameleon nested deeper than `SHARED_BLOCK_DEPTH` takes their table of the file's tokens,
+    /// made once per file, instead of scanning or tabulating its own tokens again in every frame.
+    const BLOCK_BRACES: Option<(Self::Token, Self::Token)> = None;
+
     /// How a token changes the bracket depth (+1 opens, -1 closes, 0 neither): where the rest of a construct nested
     /// too deeply ends (`PsiBuilderImpl::skip_too_deeply_nested`). Not in the Java.
     fn bracket_depth_change(token: Self::Token) -> i64;

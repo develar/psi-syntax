@@ -2,12 +2,12 @@
 
 use psi_builder::Marker;
 
-use crate::builder::SyntaxTreeBuilder;
+use crate::builder::{Nesting, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::node_kind::NodeKind;
 use crate::parser::java_keywords;
 use crate::parser::java_parser::JavaParser;
-use crate::parser::java_parser_util::{done, empty_element, error, expect_or_error};
+use crate::parser::java_parser_util::{done, empty_element, error, expect_or_error, too_deeply_nested};
 use crate::parser::reference_parser::ReferenceParser;
 use crate::tokens::{TokenKind, TokenSet};
 
@@ -113,7 +113,21 @@ impl<'p> PatternParser<'p> {
     }
 
     /// `parseTypeOrRecordPattern(builder, expectVar)` (PatternParser.kt:110).
+    ///
+    /// Not in the Kotlin: every recursion of a pattern (a record pattern's components) passes here, so it counts a
+    /// level of nesting (`Nesting::Level`); past the limit the pattern is the error element "Code is too deeply
+    /// nested".
     fn parse_type_or_record_pattern(&self, builder: &mut SyntaxTreeBuilder<'_>, expect_var: bool) -> Marker {
+        if !builder.enter_nesting(Nesting::Level) {
+            return too_deeply_nested(builder);
+        }
+        let pattern = self.parse_type_or_record_pattern_nested(builder, expect_var);
+        builder.exit_nesting(Nesting::Level);
+        pattern
+    }
+
+    /// The body of `parseTypeOrRecordPattern(builder, expectVar)`, inside its nesting.
+    fn parse_type_or_record_pattern_nested(&self, builder: &mut SyntaxTreeBuilder<'_>, expect_var: bool) -> Marker {
         let pattern = builder.mark();
         let pattern_variable = builder.mark();
         let mod_list = self.my_parser.declaration_parser().parse_modifier_list_with(builder, PATTERN_MODIFIERS);

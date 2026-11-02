@@ -13,7 +13,10 @@
 #   7. Java's parsers against IntelliJ 271's Java PSI (tools/java-oracle/JavaPsiOracle.java): the 1036 goldens of
 #      testdata/java (step 1, strict), and `diff -rq` of both dumps (.psi.txt, .node.txt) of the 68 260 UTF-8 community
 #      .java files, of the 19 116 one-place mutations of the goldens and of the 20 000 lexer fuzz inputs against the
-#      cached oracle dumps, 0 lines.
+#      cached oracle dumps, 0 lines;
+#   8. Java's bodies and too-deep paths: `parse_body` of every unexpanded code block of the community .java files
+#      against the full parse, and the same with nesting limit 3 on the community .java files and the golden mutations,
+#      every tree lossless.
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -69,5 +72,12 @@ for corpus in "$C/corpus/community-3caa0bf.list $ROOT" "$C/fuzz/mut330.list $C/f
   set -- $corpus
   deep=$($B --check-bodies --nesting-limit 3 --list "$1" --root "$2" | tail -1)
   echo "nesting limit 3, $(basename "$1"): $deep"; case "$deep" in *"differing 0 "*) ;; *) fail=1 ;; esac
+done
+bodies=$($B --check-bodies --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" | tail -1)
+echo "java check-bodies: $bodies"; case "$bodies" in *"differing 0 "*) ;; *) fail=1 ;; esac
+for corpus in "$C/corpus/java-community-3caa0bf.list $ROOT" "$C/fuzz/java-mut.list $C/fuzz/java-mut"; do
+  set -- $corpus
+  deep=$($B --check-bodies --nesting-limit 3 --list "$1" --root "$2" | tail -1)
+  echo "java nesting limit 3, $(basename "$1"): $deep"; case "$deep" in *"differing 0 "*) ;; *) fail=1 ;; esac
 done
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }
