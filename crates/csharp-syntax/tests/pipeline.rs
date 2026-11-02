@@ -1,5 +1,5 @@
-//! The pipeline end to end while the parser is stubs: a file parses into a compilation unit whose end of file carries
-//! every token (Roslyn's lexer's) as skipped trivia, losslessly; the entries and the lexer dump run.
+//! The pipeline end to end: a file parses losslessly into the compilation unit Roslyn makes of it (its dump is the
+//! oracle's, `tools/csharp-oracle/oracle.sh dump`); the entries and the lexer dump run.
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
 use csharp_syntax::{Entry, FileKind, NodeKind, Parser, Tree};
@@ -12,12 +12,34 @@ fn a_file_parses_losslessly() {
     assert_eq!(tree.range(tree.root()), 0..text.len());
     let leaves: Vec<u8> = tree.tokens().flat_map(|id| tree.text(id).to_vec()).collect();
     assert_eq!(leaves, text.as_bytes());
-    let dump = tree_to_string(&tree);
-    assert!(
-        dump.starts_with("CompilationUnit [0..27)\n  L:SkippedTokensTrivia [0..5)\n    ClassKeyword [0..5) 'class'\n"),
-        "{dump}"
+    assert_eq!(
+        tree_to_string(&tree),
+        concat!(
+            "CompilationUnit [0..27)\n",
+            "  ClassDeclaration [0..27)\n",
+            "    ClassKeyword [0..5) 'class'\n",
+            "    T:WhitespaceTrivia [5..6) ' '\n",
+            "    IdentifierToken [6..7) 'C'\n",
+            "    T:EndOfLineTrivia [7..9) '\\r\\n'\n",
+            "    OpenBraceToken [9..10) '{'\n",
+            "    T:EndOfLineTrivia [10..11) '\\n'\n",
+            "    FieldDeclaration [11..25)\n",
+            "      VariableDeclaration [11..18)\n",
+            "        PredefinedType [11..17)\n",
+            "          L:WhitespaceTrivia [11..13) '  '\n",
+            "          IntKeyword [13..16) 'int'\n",
+            "          T:WhitespaceTrivia [16..17) ' '\n",
+            "        VariableDeclarator [17..18)\n",
+            "          IdentifierToken [17..18) 'x'\n",
+            "      SemicolonToken [18..19) ';'\n",
+            "      T:WhitespaceTrivia [19..20) ' '\n",
+            "      T:SingleLineCommentTrivia [20..24) '// c'\n",
+            "      T:EndOfLineTrivia [24..25) '\\n'\n",
+            "    CloseBraceToken [25..26) '}'\n",
+            "    T:EndOfLineTrivia [26..27) '\\n'\n",
+            "  EndOfFileToken [27..27) ''\n",
+        )
     );
-    assert!(dump.ends_with("  EndOfFileToken [27..27) ''\n"), "{dump}");
 }
 
 #[test]

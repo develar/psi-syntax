@@ -13,10 +13,8 @@
 //! | `interpolated_string.rs` | `LanguageParser_InterpolatedString.cs` | D |
 //! | `doc_comment_parser.rs` | `DocumentationCommentParser.cs` | D |
 //!
-//! A method not ported yet is a stub marked `TODO(port): <File>.cs:<line>` that returns the default of its type (null
-//! for a green node) and consumes nothing, so the parse goes on. `ParseNamespaceBody` skips every token until it is
-//! ported, keeping the tree lossless. A C# overload takes a suffix after the first (`_with_<last parameter>`); `ref`
-//! and `out` parameters are `&mut`, a nullable list builder `Option<SyntaxListBuilder>`.
+//! A C# overload takes a suffix after the first (`_with_<last parameter>`); `ref` and `out` parameters are `&mut`, a
+//! nullable list builder `Option<SyntaxListBuilder>`.
 //!
 //! `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` is `ensure_sufficient_execution_stack`: past
 //! `MAX_RECURSION_DEPTH` the parse is abandoned (every further token reads as the end of file, so every loop ends and

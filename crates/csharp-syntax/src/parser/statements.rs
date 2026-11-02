@@ -788,7 +788,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             return false;
         }
 
-        let modifier = Self::get_modifier_excluding_scoped(next_token);
+        let modifier = self.get_modifier_excluding_scoped(next_token);
         if modifier == DeclarationModifiers::PARTIAL {
             if facts::is_predefined_type(self.peek_kind(2)) {
                 return false;
@@ -2466,7 +2466,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
         // cases are `scoped ref`, `scoped out`, and `scoped in`.  But we detect and allow `scoped this`, `scoped
         // params` and `scoped readonly` as well.  These will be reported as errors later in binding.
         let current = self.current_token();
-        let result = if Self::is_parameter_modifier_excluding_scoped(current) {
+        let result = if self.is_parameter_modifier_excluding_scoped(current) {
             true
         } else {
             // More complex cases.  We have to check for `scoped Type ...` now.

@@ -1,8 +1,8 @@
 //! Any bytes parse without a panic into a lossless tree: random bytes, random fragments of C#, deep nesting and long
 //! chains, on a 1 MB stack; the leaves tile the text, ids are in preorder and the links agree, the lexer dump and the
-//! tree dump run. The lexer is Roslyn's (its recursive scanners nest to `MAX_NESTED_SCAN_DEPTH`), the parser is still
-//! stubs (phase 2): these hold for them, and must keep holding as the parser is ported (phase 4 adds the deep forms
-//! against the oracle).
+//! tree dump run. The lexer is Roslyn's (its recursive scanners nest to `MAX_NESTED_SCAN_DEPTH`), and so is the parser
+//! (past `MAX_RECURSION_DEPTH` it fails as Roslyn's does on an exhausted stack, `CreateForGlobalFailure`); phase 4
+//! adds the deep forms against the oracle.
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
 use csharp_syntax::{DocumentationMode, Entry, FileKind, NodeId, Parser, Tree};
