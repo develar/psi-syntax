@@ -382,7 +382,8 @@ impl<'l, 't> LanguageParser<'l, 't> {
         // happening.  It's not a bug but it's inefficient and should be changed.
         debug_assert_eq!(self.recursion_depth, 0);
         let result = parse_func(self);
-        match self.stack_exhausted_at {
+        // An arena past its budget (`green::budget_for`) fails as an exhausted stack does.
+        match self.stack_exhausted_at.or(self.base.budget_exhausted_at) {
             None => result,
             Some(position) => {
                 let empty = create_empty_node_func(self);

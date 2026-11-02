@@ -253,11 +253,20 @@ pub struct Parser {
     pool: SyntaxListPool,
     builder: TreeBuilder<CSharp>,
     flattener: Flattener,
+    /// What `set_arena_budget` set in place of `green::budget_for`.
+    arena_budget: Option<usize>,
 }
 
 impl Parser {
     pub fn new() -> Parser {
         Parser::default()
+    }
+
+    /// Parses with an arena budget of `bytes` instead of `green::budget_for` of the text (tests: a small budget puts
+    /// the abandoned parse on ordinary inputs). Not part of the consumer contract.
+    #[doc(hidden)]
+    pub fn set_arena_budget(&mut self, bytes: usize) {
+        self.arena_budget = Some(bytes);
     }
 
     /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`).
@@ -268,6 +277,7 @@ impl Parser {
         let source: Arc<[u8]> = Arc::from(text.as_ref());
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
+        arena.set_budget(self.arena_budget.unwrap_or_else(|| crate::green::budget_for(source.len())));
         let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
         let buffers = std::mem::take(&mut self.syntax_parser);
         let pool = std::mem::take(&mut self.pool);

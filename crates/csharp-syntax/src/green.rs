@@ -234,6 +234,19 @@ pub struct GreenArena {
     values: Vec<(u32, u32)>,
     /// Scratch of the walks (`enumerate_nodes`, the token replacers), kept to reuse its buffer.
     stack: Vec<Green>,
+    /// The most bytes the buffers may hold for one parse (`set_budget`; 0: no bound).
+    budget: usize,
+    /// Whether the buffers grew past `budget`: the parser then abandons the parse (`SyntaxParser::current_token`).
+    over_budget: bool,
+}
+
+/// The budget of a parse of `text_len` bytes (`GreenArena::set_budget`): 256 bytes of arena per source byte, at least
+/// 256 MiB. Not in Roslyn, whose green nodes the garbage collector frees: here a parse keeps every record, including
+/// the garbage of rolled-back speculation, until the file is done, so a parser loop that allocates without consuming
+/// tokens would grow without end (a stub of an unfinished port did, to 67 GB). Past the budget the parse is abandoned
+/// as Roslyn abandons it when its stack runs out, so memory stays linear in the input.
+pub fn budget_for(text_len: usize) -> usize {
+    text_len.saturating_mul(256).max(256 << 20)
 }
 
 impl GreenArena {
@@ -241,8 +254,29 @@ impl GreenArena {
         GreenArena::default()
     }
 
+    /// At most `bytes` in the buffers from now on (`budget_for`); past it `is_over_budget` turns true.
+    pub fn set_budget(&mut self, bytes: usize) {
+        self.budget = bytes;
+    }
+
+    /// Whether the buffers grew past the budget.
+    #[inline(always)]
+    pub fn is_over_budget(&self) -> bool {
+        self.over_budget
+    }
+
+    /// Checks the budget when a buffer is about to grow (the only time the bytes held change).
+    #[cold]
+    #[inline(never)]
+    fn check_budget(&mut self) {
+        if self.budget != 0 && self.heap_bytes() > self.budget {
+            self.over_budget = true;
+        }
+    }
+
     /// Forgets every record, keeping the buffers.
     pub fn clear(&mut self) {
+        self.over_budget = false;
         self.tokens.clear();
         self.nodes.clear();
         self.trivia.clear();
@@ -460,6 +494,9 @@ impl GreenArena {
         if own_flags & IS_NOT_MISSING == 0 {
             flags &= !IS_NOT_MISSING;
         }
+        if self.tokens.len() == self.tokens.capacity() {
+            self.check_budget();
+        }
         let id = Green::new(TAG_TOKEN, self.tokens.len());
         self.tokens.push(TokenData {
             kind,
@@ -631,6 +668,9 @@ impl GreenArena {
         }
         if diags.len != 0 {
             flags |= CONTAINS_DIAGNOSTICS;
+        }
+        if self.nodes.len() == self.nodes.capacity() || self.slots.capacity() - self.slots.len() < slots.len() {
+            self.check_budget();
         }
         let slot_start = self.slots.len() as u32;
         self.slots.extend_from_slice(slots);

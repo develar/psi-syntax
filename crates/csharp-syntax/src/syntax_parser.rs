@@ -86,6 +86,8 @@ pub struct SyntaxParser<'l, 't> {
     node_scratch: Vec<Green>,
     /// The end of file every token reads as once the parse is abandoned (`abandon`), else null.
     forced_eof: Green,
+    /// Where the parse was abandoned because the arena outgrew its budget (`abandon_over_budget`).
+    pub budget_exhausted_at: Option<u32>,
 }
 
 impl<'l, 't> SyntaxParser<'l, 't> {
@@ -120,6 +122,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             trivia_scratch: buffers.trivia,
             node_scratch: buffers.nodes,
             forced_eof: Green::NULL,
+            budget_exhausted_at: None,
         };
         // PreLex is not cancellable: Roslyn prelexes unless a cancellation token can cancel, so always here.
         if pre_lex_if_not_incremental && !parser.allow_mode_reset {
@@ -270,7 +273,21 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         if self.current_token.is_null() {
             self.current_token = self.fetch_current_token();
         }
+        if self.lexer.arena_ref().is_over_budget() {
+            self.abandon_over_budget();
+        }
         self.current_token
+    }
+
+    /// The arena outgrew its budget (`green::budget_for`, not in Roslyn): the parse is abandoned (`abandon`), and
+    /// `LanguageParser::parse_with_stack_guard` gives what Roslyn gives when its stack runs out.
+    #[cold]
+    #[inline(never)]
+    fn abandon_over_budget(&mut self) {
+        if self.budget_exhausted_at.is_none() {
+            self.budget_exhausted_at = Some(self.lexer.position());
+        }
+        self.abandon();
     }
 
     /// `CurrentToken.Kind`.
@@ -359,6 +376,9 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     /// `PeekToken(n)`.
     pub fn peek_token(&mut self, n: i32) -> Green {
         debug_assert!(n >= 0);
+        if self.lexer.arena_ref().is_over_budget() {
+            self.abandon_over_budget();
+        }
         if !self.forced_eof.is_null() {
             return self.forced_eof;
         }
