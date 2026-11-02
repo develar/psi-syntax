@@ -1,5 +1,5 @@
 //! The C# tree: `psi_builder`'s preorder column tree over `CSharp` with Roslyn's diagnostics (`Tree`), how a text is
-//! parsed (`FileKind`: language version, parser entry, documentation mode).
+//! parsed (`FileKind`: language version, parser entry, documentation mode) and the reusable `Parser`.
 
 use std::ops::Deref;
 use std::sync::Arc;
@@ -10,9 +10,13 @@ pub use psi_builder::tree::{Children, NodeId, Preorder};
 
 use crate::error_code::{ErrorCode, Severity};
 use crate::flatten::Flattener;
-use crate::green::{Green, GreenArena};
+use crate::green::{Green, GreenArena, SyntaxListPool};
 use crate::language::CSharp;
 use crate::language_version::LanguageVersion;
+use crate::lexer::{Lexer, LexerBuffers, LexerMode, LexerOptions};
+use crate::parser::LanguageParser;
+use crate::syntax_kind::SyntaxKind;
+use crate::syntax_parser::SyntaxParserBuffers;
 
 /// `DocumentationMode`: whether documentation comments are parsed into structured trivia (`Parse`, the default of
 /// `CSharpParseOptions`) or lexed as comments (`None`); `Diagnose` also reports their XML errors.
@@ -122,6 +126,16 @@ impl FileKind {
     }
 }
 
+impl FileKind {
+    /// The lexer's options of this kind (`ParseName` ignores the kind's: it parses at the defaults).
+    pub(crate) fn lexer_options(self) -> LexerOptions {
+        if self.entry == Entry::Name {
+            return LexerOptions::default();
+        }
+        LexerOptions { version: self.version, doc_mode: self.doc_mode }
+    }
+}
+
 /// A diagnostic of a tree: the node it is attached to, its code, its span in bytes and its English message, as
 /// `SyntaxTree.GetDiagnostics()` reports it.
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -165,6 +179,11 @@ impl Deref for Tree {
 }
 
 impl Tree {
+    /// Parses `text` with a fresh `Parser` (keep a `Parser` per thread to reuse its buffers).
+    pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        Parser::new().parse(text, file_kind)
+    }
+
     /// The tree of the green `root` of `arena` over `source` (tests build green trees by hand).
     #[doc(hidden)]
     pub fn from_green(arena: &GreenArena, root: Green, source: &[u8], file_kind: FileKind) -> Tree {
@@ -207,8 +226,87 @@ impl Tree {
     }
 }
 
-// A tree is shared across threads as is.
+/// A reusable C# parser: owns the green arena, the lexer's and the parsers' buffers and the tree builder, cleared and
+/// reused from one file to the next. Keep one per thread; `Tree::parse` makes a fresh one per call.
+#[derive(Default)]
+pub struct Parser {
+    arena: GreenArena,
+    lexer: LexerBuffers,
+    syntax_parser: SyntaxParserBuffers,
+    pool: SyntaxListPool,
+    builder: TreeBuilder<CSharp>,
+    flattener: Flattener,
+}
+
+impl Parser {
+    pub fn new() -> Parser {
+        Parser::default()
+    }
+
+    /// Parses `text` as `file_kind` says.
+    pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        let source: Arc<[u8]> = Arc::from(text.as_ref());
+        let mut arena = std::mem::take(&mut self.arena);
+        arena.clear();
+        let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let buffers = std::mem::take(&mut self.syntax_parser);
+        let pool = std::mem::take(&mut self.pool);
+        let (root, buffers, pool) = {
+            let mut parser = LanguageParser::new(&mut lexer, LexerMode::SYNTAX, buffers, pool);
+            let root = parser.parse_entry(file_kind.entry);
+            let (buffers, pool) = parser.into_buffers();
+            (root, buffers, pool)
+        };
+        self.syntax_parser = buffers;
+        self.pool = pool;
+        let (arena, lexer_buffers) = lexer.into_parts();
+        self.lexer = lexer_buffers;
+        self.finish(arena, root, &source, file_kind)
+    }
+
+    /// The lexer's tokens of `text` in `LexerMode.Syntax` up to and with the end of file (`SyntaxFactory.ParseTokens`),
+    /// as the children of a root, with their diagnostics in token order: what `ksdump --lex` prints.
+    pub fn lex(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        let source: Arc<[u8]> = Arc::from(text.as_ref());
+        let mut arena = std::mem::take(&mut self.arena);
+        arena.clear();
+        let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let mut tokens: Vec<Green> = Vec::new();
+        loop {
+            let position = lexer.position();
+            let token = lexer.lex(LexerMode::SYNTAX);
+            tokens.push(token);
+            let eof = lexer.arena_ref().kind(token) == SyntaxKind::EndOfFileToken;
+            // a lexer that does not move would loop forever: end there
+            if eof || (lexer.position() == position && lexer.arena_ref().full_width(token) == 0) {
+                break;
+            }
+        }
+        let (arena, lexer_buffers) = lexer.into_parts();
+        self.lexer = lexer_buffers;
+        let (tree, diagnostics) = self.flattener.flatten_tokens(&arena, &tokens, &source, &mut self.builder, file_kind);
+        self.arena = arena;
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false }
+    }
+
+    fn finish(&mut self, arena: GreenArena, root: Green, source: &Arc<[u8]>, file_kind: FileKind) -> Tree {
+        let no_result = root.is_null();
+        let (tree, diagnostics) = if no_result {
+            let id = self.builder.open(None, psi_builder::ElementType::Node(crate::NodeKind::CompilationUnit), 0);
+            self.builder.close(id, 0);
+            (self.builder.finish(source.clone(), file_kind), Vec::new())
+        } else {
+            self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind)
+        };
+        self.arena = arena;
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result }
+    }
+}
+
+// A tree is shared across threads as is, a parser moves to the thread that keeps it.
 const _: () = {
     const fn send_sync<T: Send + Sync + 'static>() {}
+    const fn send<T: Send + 'static>() {}
     send_sync::<Tree>();
+    send::<Parser>();
 };
