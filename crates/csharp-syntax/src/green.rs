@@ -303,12 +303,17 @@ impl GreenArena {
         self.push_trivia(TriviaData { kind, flags, start: 0, width, structure: node, diags: DiagList::default() })
     }
 
-    /// `trivia` with `diagnostics` (`WithDiagnosticsGreen` of a trivia): a new record.
+    /// `trivia` with `diagnostics` (`WithDiagnosticsGreen` of a trivia): a new record. A structured trivia is its
+    /// structure in Roslyn's green tree, so the structure gets them (a new node, then a new trivia over it).
     pub fn trivia_with_diagnostics(&mut self, trivia: Trivia, diagnostics: &[DiagnosticId]) -> Trivia {
         let mut data = self.trivia[trivia.0 as usize];
+        if !data.structure.is_null() {
+            let structure = self.with_diagnostics(data.structure, diagnostics);
+            return self.structured_trivia(structure);
+        }
         data.diags = self.push_diag_list(diagnostics.iter().map(|d| d.0));
         data.flags &= !CONTAINS_DIAGNOSTICS;
-        if data.diags.len != 0 || (!data.structure.is_null() && self.contains_diagnostics(data.structure)) {
+        if data.diags.len != 0 {
             data.flags |= CONTAINS_DIAGNOSTICS;
         }
         self.push_trivia(data)
@@ -348,9 +353,9 @@ impl GreenArena {
         self.trivia[trivia.0 as usize].flags & CONTAINS_DIAGNOSTICS != 0
     }
 
-    /// The diagnostics attached to the trivia itself (a structured trivia's are its node's).
-    pub fn trivia_diagnostics(&self, trivia: Trivia) -> &[u32] {
-        self.diag_slice(self.trivia[trivia.0 as usize].diags)
+    /// The diagnostics attached to an unstructured trivia (a structured trivia's are its structure's).
+    pub fn trivia_diagnostics(&self, trivia: Trivia) -> impl ExactSizeIterator<Item = DiagnosticId> + '_ {
+        self.diag_slice(self.trivia[trivia.0 as usize].diags).iter().map(|&d| DiagnosticId(d))
     }
 
     /// A trivia list of `items` in order (`SyntaxListBuilder.ToListNode()` of trivia).
@@ -594,7 +599,15 @@ impl GreenArena {
         }
     }
 
-    fn push_node(&mut self, tag: u32, kind: SyntaxKind, own: u16, slots: &[Green], extra: u32, diags: DiagList) -> Green {
+    fn push_node(
+        &mut self,
+        tag: u32,
+        kind: SyntaxKind,
+        own: u16,
+        slots: &[Green],
+        extra: u32,
+        diags: DiagList,
+    ) -> Green {
         let mut flags = own;
         let mut full_width = 0u32;
         for &s in slots {

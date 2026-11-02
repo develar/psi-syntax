@@ -83,7 +83,9 @@ fn keywords_spell_their_kinds() {
     assert_eq!(facts::get_text(SyntaxKind::GreaterThanGreaterThanGreaterThanEqualsToken), ">>>=");
     assert_eq!(facts::get_text(SyntaxKind::IdentifierToken), "");
     assert_eq!(facts::get_binary_expression(SyntaxKind::PlusToken), SyntaxKind::AddExpression);
-    assert!(facts::is_reserved_keyword(SyntaxKind::ClassKeyword) && !facts::is_reserved_keyword(SyntaxKind::VarKeyword));
+    assert!(
+        facts::is_reserved_keyword(SyntaxKind::ClassKeyword) && !facts::is_reserved_keyword(SyntaxKind::VarKeyword)
+    );
 }
 
 #[test]

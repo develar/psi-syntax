@@ -33,6 +33,7 @@ static class Program
             if (!m && start >= 0) { ranges.Add((start, ch - 1)); start = -1; }
         }
         o.Append($"/// {doc}\n");
+        o.Append("#[rustfmt::skip]\n");
         o.Append($"pub(crate) static {name}: [(u16, u16); {ranges.Count}] = [\n");
         foreach (var (s, e) in ranges) o.Append($"    (0x{s:X4}, 0x{e:X4}),\n");
         o.Append("];\n\n");
@@ -41,6 +42,7 @@ static class Program
     static void Ascii(StringBuilder o, string name, string doc, Func<char, bool> member)
     {
         o.Append($"/// {doc}\n");
+        o.Append("#[rustfmt::skip]\n");
         o.Append($"pub(crate) static {name}: [bool; 128] = [\n");
         for (int row = 0; row < 128; row += 16)
         {
