@@ -241,6 +241,18 @@ enum BindStep {
     Done,
 }
 
+/// The error message of marker `id` (`MarkerData::message`), moved out of `messages` (the tree is built once).
+fn take_message<T, N, B>(
+    markers: &[MarkerData<T, N, B>],
+    messages: &mut [Cow<'static, str>],
+    id: u32,
+) -> Cow<'static, str> {
+    match markers[id as usize].message {
+        0 => Cow::Borrowed(""),
+        i => std::mem::take(&mut messages[i as usize - 1]),
+    }
+}
+
 /// A production entry as `bind` reads it (`PsiBuilderImpl::entries`): the entry, its balanced lexeme
 /// (`getLexemeIndexAt` after `balanceWhiteSpaces`) and, for a start entry, what `bind` needs of its marker.
 #[derive(Copy, Clone, Debug)]
@@ -1091,10 +1103,7 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     /// The marker's error message, moved out (the tree is built once).
     fn take_message(&mut self, id: u32) -> Cow<'static, str> {
-        match self.markers[id as usize].message {
-            0 => Cow::Borrowed(""),
-            i => std::mem::take(&mut self.messages[i as usize - 1]),
-        }
+        take_message(&self.markers, &mut self.messages, id)
     }
 
     /// `eof()`: skips whitespace and comments the first time after the cursor moved (to `sig`).
@@ -1680,7 +1689,6 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     #[inline(always)]
     fn bind_steps(&mut self, st: &mut BindState, tree: &mut TreeData) -> Option<Pending<L::Lazy>> {
-        let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
         loop {
             while st.lex_index < st.insert_to {
                 let to = st.insert_to;
@@ -1696,69 +1704,7 @@ impl<L: Language> PsiBuilderImpl<L> {
                 }
             }
             match st.then {
-                BindStep::Next => {
-                    // The entries in one loop: each inserts the leaves before it and opens or closes a composite, or
-                    // appends an error element. A chameleon leaf on the way, a collapsed marker and the end go
-                    // through `then`.
-                    let done_own = self.extras_linked == 0;
-                    loop {
-                        let Some(&e) = self.entries.get(st.i) else {
-                            st.then = BindStep::CloseOpen;
-                            break;
-                        };
-                        st.i += 1;
-                        if e.id < 0 {
-                            // done marker; an unbalanced one is only reported in Java
-                            if self.bind_stack.is_empty() {
-                                continue;
-                            }
-                            // It closes the current marker at that marker's done lexeme: the entry's own, when it is
-                            // that marker's only done entry.
-                            let done_lexeme = if done_own && e.id.unsigned_abs() == st.cur_marker {
-                                e.lex
-                            } else {
-                                self.marker(st.cur_marker).done_lexeme
-                            };
-                            let to = self.leaf_end(done_lexeme);
-                            if !self.insert_leaves_to(st, to, BindStep::Close, tree) {
-                                break;
-                            }
-                            tree.set_end(st.cur_node, self.offset_of(st.lex_index));
-                            if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
-                                st.cur_marker = parent_marker;
-                                st.cur_node = parent_node;
-                            }
-                            continue;
-                        }
-                        let id = e.id as u32;
-                        if e.flags == 0 {
-                            let to = self.leaf_end(e.lex);
-                            if !self.insert_leaves_to(st, to, BindStep::Open(id), tree) {
-                                break;
-                            }
-                            self.bind_stack.push((st.cur_marker, st.cur_node));
-                            let node = tree.push_composite(st.cur_node, e.ty, self.offset_of(st.lex_index));
-                            if e.ty == error_index {
-                                let message = self.take_message(id);
-                                tree.set_error(node, message);
-                            }
-                            st.cur_node = node;
-                            st.cur_marker = id;
-                        } else if e.flags & ENTRY_COLLAPSED != 0 {
-                            st.insert_to = self.leaf_end(e.lex);
-                            st.then = BindStep::Open(id);
-                            break;
-                        } else if e.lex != st.last_error_index {
-                            // adding only the first (deepest) error from the same lexeme offset
-                            st.last_error_index = e.lex;
-                            let to = self.leaf_end(e.lex);
-                            if !self.insert_leaves_to(st, to, BindStep::Error(id), tree) {
-                                break;
-                            }
-                            self.append_error_item(id, st.cur_node, st.lex_index, tree);
-                        }
-                    }
-                }
+                BindStep::Next => self.bind_entries(st, tree),
                 BindStep::Close => {
                     tree.set_end(st.cur_node, self.offset_of(st.lex_index));
                     if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
@@ -1839,21 +1785,95 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
-    /// Inserts the tokens from `st.lex_index` to `to` as leaves of the current node; true when all are. At a
-    /// chameleon leaf it stops there and leaves the rest and `then` to `bind_steps`' leaf loop, which appends the
-    /// chameleon and stops the walk.
-    #[inline(always)]
-    fn insert_leaves_to(&self, st: &mut BindState, to: usize, then: BindStep, tree: &mut TreeData) -> bool {
-        if st.lex_index < to {
-            let stop = self.insert_plain_leaves(st.lex_index, to, st.cur_node, tree);
-            st.lex_index = stop;
-            if stop != to {
-                st.insert_to = to;
-                st.then = then;
-                return false;
+    /// `bind_steps`' walk of the entries from `st.i`: each inserts the leaves before it and opens or closes a
+    /// composite, or appends an error element. It returns with `st.then` set to what the state machine does next: the
+    /// end (`CloseOpen`), a collapsed marker (`Open`, its leaves to insert first), or the step an entry was at when a
+    /// chameleon leaf stopped its leaves (`st.insert_to` their end). The fields it reads are borrowed apart, so the
+    /// walk keeps its state in registers.
+    #[inline(never)]
+    fn bind_entries(&mut self, st: &mut BindState, tree: &mut TreeData) {
+        let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
+        let done_own = self.extras_linked == 0;
+        let (count, shift, base) = (self.lexeme_count, self.token_shift, self.base as u32);
+        let PsiBuilderImpl { entries, lex_types, lex_starts, markers, messages, bind_stack, .. } = self;
+        let (entries, types, starts) = (&entries[..], &lex_types[..], &lex_starts[..]);
+        let leaf_end = |lexeme: i32| (lexeme.max(0) as usize).min(count);
+        let offset = |k: usize| base + starts[k.min(count) - shift];
+        let (mut i, mut lex, mut cur_node, mut cur_marker) = (st.i, st.lex_index, st.cur_node, st.cur_marker);
+        let mut last_error = st.last_error_index;
+        st.then = loop {
+            let Some(&e) = entries.get(i) else { break BindStep::CloseOpen };
+            i += 1;
+            let (to, then) = if e.id < 0 {
+                // done marker; an unbalanced one is only reported in Java
+                if bind_stack.is_empty() {
+                    continue;
+                }
+                // It closes the current marker at that marker's done lexeme: the entry's own, when it is that
+                // marker's only done entry.
+                let done_lexeme = if done_own && e.id.unsigned_abs() == cur_marker {
+                    e.lex
+                } else {
+                    markers[cur_marker as usize].done_lexeme
+                };
+                (leaf_end(done_lexeme), BindStep::Close)
+            } else if e.flags == 0 {
+                (leaf_end(e.lex), BindStep::Open(e.id as u32))
+            } else if e.flags & ENTRY_COLLAPSED != 0 {
+                st.insert_to = leaf_end(e.lex);
+                break BindStep::Open(e.id as u32);
+            } else if e.lex != last_error {
+                // adding only the first (deepest) error from the same lexeme offset
+                last_error = e.lex;
+                (leaf_end(e.lex), BindStep::Error(e.id as u32))
+            } else {
+                continue;
+            };
+            // insertLeaves, but empty tokens (DANGLING_NEWLINE); a chameleon leaf stops the walk there
+            let mut stopped = false;
+            while lex < to {
+                let (s0, s1) = (starts[lex - shift], starts[lex + 1 - shift]);
+                if s0 < s1 {
+                    let token = types[lex - shift];
+                    if L::is_chameleon_token(token) {
+                        stopped = true;
+                        break;
+                    }
+                    tree.add_token_leaf(cur_node, token, base + s0, base + s1);
+                }
+                lex += 1;
             }
-        }
-        true
+            if stopped {
+                st.insert_to = to;
+                break then;
+            }
+            match then {
+                BindStep::Close => {
+                    tree.set_end(cur_node, offset(lex));
+                    if let Some((parent_marker, parent_node)) = bind_stack.pop() {
+                        cur_marker = parent_marker;
+                        cur_node = parent_node;
+                    }
+                }
+                BindStep::Open(id) => {
+                    bind_stack.push((cur_marker, cur_node));
+                    let node = tree.push_composite(cur_node, e.ty, offset(lex));
+                    if e.ty == error_index {
+                        tree.set_error(node, take_message(markers, messages, id));
+                    }
+                    cur_node = node;
+                    cur_marker = id;
+                }
+                _ => {
+                    let start = offset(lex);
+                    let error = tree.add_composite(cur_node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), start);
+                    tree.set_end(error, start);
+                    tree.set_error(error, take_message(markers, messages, e.id as u32));
+                }
+            }
+        };
+        (st.i, st.lex_index, st.cur_node, st.cur_marker, st.last_error_index) =
+            (i, lex, cur_node, cur_marker, last_error);
     }
 
     /// An error item's element: empty, at `lex_index`, a child of `cur_node`.
