@@ -1,0 +1,57 @@
+ConditionalExpression [0..45)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  QuestionToken [2..3) '?'
+  T:WhitespaceTrivia [3..4) ' '
+  ConditionalAccessExpression [4..42)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'b'
+    QuestionToken [5..6) '?'
+    ElementBindingExpression [6..42)
+      BracketedArgumentList [6..42)
+        OpenBracketToken [6..7) '['
+        Argument [7..40)
+          AnonymousMethodExpression [7..40)
+            DelegateKeyword [7..15) 'delegate'
+            T:WhitespaceTrivia [15..16) ' '
+            Block [16..40)
+              OpenBraceToken [16..17) '{'
+              T:WhitespaceTrivia [17..18) ' '
+              LocalDeclarationStatement [18..39)
+                VariableDeclaration [18..37)
+                  IdentifierName [18..22)
+                    IdentifierToken [18..21) 'var'
+                    T:WhitespaceTrivia [21..22) ' '
+                  VariableDeclarator [22..37)
+                    IdentifierToken [22..23) 'v'
+                    T:WhitespaceTrivia [23..24) ' '
+                    EqualsValueClause [24..37)
+                      EqualsToken [24..25) '='
+                      T:WhitespaceTrivia [25..26) ' '
+                      ConditionalExpression [26..37)
+                        IdentifierName [26..28)
+                          IdentifierToken [26..27) 'x'
+                          T:WhitespaceTrivia [27..28) ' '
+                        QuestionToken [28..29) '?'
+                        T:WhitespaceTrivia [29..30) ' '
+                        CollectionExpression [30..34)
+                          OpenBracketToken [30..31) '['
+                          ExpressionElement [31..32)
+                            IdentifierName [31..32)
+                              IdentifierToken [31..32) 'y'
+                          CloseBracketToken [32..33) ']'
+                          T:WhitespaceTrivia [33..34) ' '
+                        ColonToken [34..35) ':'
+                        T:WhitespaceTrivia [35..36) ' '
+                        IdentifierName [36..37)
+                          IdentifierToken [36..37) 'z'
+                SemicolonToken [37..38) ';'
+                T:WhitespaceTrivia [38..39) ' '
+              CloseBraceToken [39..40) '}'
+        CloseBracketToken [40..41) ']'
+        T:WhitespaceTrivia [41..42) ' '
+  ColonToken [42..43) ':'
+  T:WhitespaceTrivia [43..44) ' '
+  IdentifierName [44..45)
+    IdentifierToken [44..45) 'd'

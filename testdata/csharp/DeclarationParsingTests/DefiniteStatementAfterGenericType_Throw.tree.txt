@@ -1,0 +1,33 @@
+MethodDeclaration [0..37)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..37)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ExpressionStatement [11..36)
+      GreaterThanExpression [11..34)
+        LessThanExpression [11..24)
+          IdentifierName [11..19)
+            L:WhitespaceTrivia [11..15) '    '
+            IdentifierToken [15..19) 'List'
+          LessThanToken [19..20) '<'
+          IdentifierName [20..24)
+            IdentifierToken [20..24) 'Type'
+        GreaterThanToken [24..25) '>'
+        T:WhitespaceTrivia [25..26) ' '
+        ThrowExpression [26..34)
+          ThrowKeyword [26..31) 'throw'
+          T:WhitespaceTrivia [31..32) ' '
+          IdentifierName [32..34)
+            IdentifierToken [32..34) 'ex'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+    CloseBraceToken [36..37) '}'
+Diagnostics:
+  CS1525 [26..34) Invalid expression term \'throw\'

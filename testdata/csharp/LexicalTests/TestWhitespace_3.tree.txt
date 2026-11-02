@@ -1,0 +1,4 @@
+L:WhitespaceTrivia [0..3) '\u{FEFF}'
+IdentifierToken [3..14) 'to\u{FEFF}ken\u{FEFF}'
+T:WhitespaceTrivia [14..18) ' \u{FEFF}'
+EndOfFileToken [18..18) ''

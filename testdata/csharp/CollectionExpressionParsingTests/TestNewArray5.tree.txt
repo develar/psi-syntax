@@ -1,0 +1,23 @@
+SimpleMemberAccessExpression [0..18)
+  ArrayCreationExpression [0..11)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayType [4..11)
+      NullableType [4..8)
+        ArrayType [4..7)
+          IdentifierName [4..5)
+            IdentifierToken [4..5) 'T'
+          ArrayRankSpecifier [5..7)
+            OpenBracketToken [5..6) '['
+            OmittedArraySizeExpression [6..6)
+              OmittedArraySizeExpressionToken [6..6) ''
+            CloseBracketToken [6..7) ']'
+        QuestionToken [7..8) '?'
+      ArrayRankSpecifier [8..11)
+        OpenBracketToken [8..9) '['
+        NumericLiteralExpression [9..10)
+          NumericLiteralToken [9..10) '1'
+        CloseBracketToken [10..11) ']'
+  DotToken [11..12) '.'
+  IdentifierName [12..18)
+    IdentifierToken [12..18) 'Length'

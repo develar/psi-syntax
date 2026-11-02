@@ -1,0 +1,1 @@
+using ref readonly int x = ref y;

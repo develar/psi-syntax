@@ -1,0 +1,25 @@
+CompilationUnit [0..27)
+  ClassDeclaration [0..27)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    FieldDeclaration [10..26)
+      VariableDeclaration [10..24)
+        PredefinedType [10..17)
+          StringKeyword [10..16) 'string'
+          T:WhitespaceTrivia [16..17) ' '
+        VariableDeclarator [17..24)
+          IdentifierToken [17..18) 's'
+          T:WhitespaceTrivia [18..19) ' '
+          EqualsValueClause [19..24)
+            EqualsToken [19..20) '='
+            T:WhitespaceTrivia [20..21) ' '
+            StringLiteralExpression [21..24)
+              StringLiteralToken [21..24) '"\u{0000}"'
+      SemicolonToken [24..25) ';'
+      T:WhitespaceTrivia [25..26) ' '
+    CloseBraceToken [26..27) '}'
+  EndOfFileToken [27..27) ''

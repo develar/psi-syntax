@@ -1,0 +1,1 @@
+closed partial record C { }

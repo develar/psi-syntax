@@ -1,0 +1,30 @@
+CompilationUnit [0..19)
+  AttributeList [0..19)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..11)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+    Attribute [11..19)
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'a'
+      AttributeArgumentList [12..19)
+        OpenParenToken [12..13) '('
+        AttributeArgument [13..17)
+          IdentifierName [13..17)
+            IdentifierToken [13..14) 'b'
+            T:WhitespaceTrivia [14..15) ' '
+            T:SkippedTokensTrivia [15..16)
+              BadToken [15..16) '$'
+            T:WhitespaceTrivia [16..17) ' '
+        CommaToken [17..17) missing
+        AttributeArgument [17..18)
+          IdentifierName [17..18)
+            IdentifierToken [17..18) 'c'
+        CloseParenToken [18..19) ')'
+    CloseBracketToken [19..19) missing
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1056 [15..15) Unexpected character \'$\'
+  CS1003 [17..18) Syntax error, \',\' expected
+  CS1003 [19..19) Syntax error, \']\' expected

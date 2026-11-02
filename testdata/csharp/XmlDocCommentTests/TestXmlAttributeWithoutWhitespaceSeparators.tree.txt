@@ -1,0 +1,37 @@
+CompilationUnit [0..29)
+  L:SingleLineDocumentationCommentTrivia [0..29)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..29)
+      XmlElementStartTag [4..22)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'goo'
+        XmlTextAttribute [8..15)
+          XmlName [8..10)
+            L:WhitespaceTrivia [8..9) ' '
+            IdentifierToken [9..10) 'a'
+          EqualsToken [10..11) '='
+          DoubleQuoteToken [11..12) '"'
+          XmlTextLiteralToken [12..14) 'as'
+          DoubleQuoteToken [14..15) '"'
+        XmlTextAttribute [15..21)
+          XmlName [15..16)
+            IdentifierToken [15..16) 'b'
+          EqualsToken [16..17) '='
+          DoubleQuoteToken [17..18) '"'
+          XmlTextLiteralToken [18..20) 'as'
+          DoubleQuoteToken [20..21) '"'
+        GreaterThanToken [21..22) '>'
+      XmlText [22..23)
+        XmlTextLiteralToken [22..23) ' '
+      XmlElementEndTag [23..29)
+        LessThanSlashToken [23..25) '</'
+        XmlName [25..28)
+          IdentifierToken [25..28) 'goo'
+        GreaterThanToken [28..29) '>'
+    EndOfDocumentationCommentToken [29..29) ''
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1570 [15..16) XML comment has badly formed XML -- \'Required white space was missing.\'

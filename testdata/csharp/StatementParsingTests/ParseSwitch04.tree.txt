@@ -1,0 +1,24 @@
+SwitchStatement [0..19)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..7) missing
+  AddExpression [7..17)
+    ParenthesizedExpression [7..11)
+      OpenParenToken [7..8) '('
+      NumericLiteralExpression [8..9)
+        NumericLiteralToken [8..9) '1'
+      CloseParenToken [9..10) ')'
+      T:WhitespaceTrivia [10..11) ' '
+    PlusToken [11..12) '+'
+    T:WhitespaceTrivia [12..13) ' '
+    ParenthesizedExpression [13..17)
+      OpenParenToken [13..14) '('
+      NumericLiteralExpression [14..15)
+        NumericLiteralToken [14..15) '2'
+      CloseParenToken [15..16) ')'
+      T:WhitespaceTrivia [16..17) ' '
+  CloseParenToken [17..17) missing
+  OpenBraceToken [17..18) '{'
+  CloseBraceToken [18..19) '}'
+Diagnostics:
+  CS8515 [7..16) Parentheses are required around the switch governing expression.

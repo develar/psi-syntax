@@ -1,0 +1,73 @@
+CompilationUnit [0..107)
+  L:DefineDirectiveTrivia [0..13)
+    HashToken [0..1) '#'
+    DefineKeyword [1..7) 'define'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..8) missing
+    L:SkippedTokensTrivia [8..12)
+      TrueKeyword [8..12) 'true'
+    EndOfDirectiveToken [12..12) ''
+    T:EndOfLineTrivia [12..13) '\n'
+  L:DefineDirectiveTrivia [13..27)
+    HashToken [13..14) '#'
+    DefineKeyword [14..20) 'define'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..21) missing
+    L:SkippedTokensTrivia [21..26)
+      FalseKeyword [21..26) 'false'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  L:DefineDirectiveTrivia [27..43)
+    HashToken [27..28) '#'
+    DefineKeyword [28..34) 'define'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierToken [35..35) missing
+    L:SkippedTokensTrivia [35..42)
+      DefaultKeyword [35..42) 'default'
+    EndOfDirectiveToken [42..42) ''
+    T:EndOfLineTrivia [42..43) '\n'
+  L:DefineDirectiveTrivia [43..58)
+    HashToken [43..44) '#'
+    DefineKeyword [44..50) 'define'
+    T:WhitespaceTrivia [50..51) ' '
+    IdentifierToken [51..51) missing
+    L:SkippedTokensTrivia [51..57)
+      HiddenKeyword [51..57) 'hidden'
+    EndOfDirectiveToken [57..57) ''
+    T:EndOfLineTrivia [57..58) '\n'
+  L:DefineDirectiveTrivia [58..75)
+    HashToken [58..59) '#'
+    DefineKeyword [59..65) 'define'
+    T:WhitespaceTrivia [65..66) ' '
+    IdentifierToken [66..66) missing
+    L:SkippedTokensTrivia [66..74)
+      ChecksumKeyword [66..74) 'checksum'
+    EndOfDirectiveToken [74..74) ''
+    T:EndOfLineTrivia [74..75) '\n'
+  L:DefineDirectiveTrivia [75..91)
+    HashToken [75..76) '#'
+    DefineKeyword [76..82) 'define'
+    T:WhitespaceTrivia [82..83) ' '
+    IdentifierToken [83..83) missing
+    L:SkippedTokensTrivia [83..90)
+      DisableKeyword [83..90) 'disable'
+    EndOfDirectiveToken [90..90) ''
+    T:EndOfLineTrivia [90..91) '\n'
+  L:DefineDirectiveTrivia [91..107)
+    HashToken [91..92) '#'
+    DefineKeyword [92..98) 'define'
+    T:WhitespaceTrivia [98..99) ' '
+    IdentifierToken [99..99) missing
+    L:SkippedTokensTrivia [99..106)
+      RestoreKeyword [99..106) 'restore'
+    EndOfDirectiveToken [106..106) ''
+    T:EndOfLineTrivia [106..107) '\n'
+  EndOfFileToken [107..107) ''
+Diagnostics:
+  CS1001 [8..12) Identifier expected
+  CS1001 [21..26) Identifier expected
+  CS1001 [35..42) Identifier expected
+  CS1001 [51..57) Identifier expected
+  CS1001 [66..74) Identifier expected
+  CS1001 [83..90) Identifier expected
+  CS1001 [99..106) Identifier expected

@@ -1,0 +1,40 @@
+CompilationUnit [0..34)
+  ClassDeclaration [0..34)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    TypeParameterList [7..11)
+      LessThanToken [7..8) '<'
+      TypeParameter [8..9)
+        IdentifierToken [8..9) 'b'
+      GreaterThanToken [9..10) '>'
+      T:WhitespaceTrivia [10..11) ' '
+    TypeParameterConstraintClause [11..23)
+      WhereKeyword [11..16) 'where'
+      T:WhitespaceTrivia [16..17) ' '
+      IdentifierName [17..19)
+        IdentifierToken [17..18) 'b'
+        T:WhitespaceTrivia [18..19) ' '
+      ColonToken [19..20) ':'
+      T:WhitespaceTrivia [20..21) ' '
+      TypeConstraint [21..23)
+        IdentifierName [21..23)
+          IdentifierToken [21..22) 'c'
+          T:WhitespaceTrivia [22..23) ' '
+    TypeParameterConstraintClause [23..31)
+      WhereKeyword [23..28) 'where'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierName [29..31)
+        IdentifierToken [29..30) 'b'
+        T:WhitespaceTrivia [30..31) ' '
+      ColonToken [31..31) missing
+      TypeConstraint [31..31)
+        IdentifierName [31..31)
+          IdentifierToken [31..31) missing
+    OpenBraceToken [31..32) '{'
+    T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''
+Diagnostics:
+  CS1003 [31..32) Syntax error, \':\' expected
+  CS1031 [31..32) Type expected

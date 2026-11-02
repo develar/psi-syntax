@@ -1,0 +1,19 @@
+ReturnStatement [0..23)
+  ReturnKeyword [0..6) 'return'
+  T:WhitespaceTrivia [6..7) ' '
+  ParenthesizedLambdaExpression [7..22)
+    RefType [7..15)
+      RefKeyword [7..10) 'ref'
+      T:WhitespaceTrivia [10..11) ' '
+      PredefinedType [11..15)
+        IntKeyword [11..14) 'int'
+        T:WhitespaceTrivia [14..15) ' '
+    ParameterList [15..18)
+      OpenParenToken [15..16) '('
+      CloseParenToken [16..17) ')'
+      T:WhitespaceTrivia [17..18) ' '
+    EqualsGreaterThanToken [18..20) '=>'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierName [21..22)
+      IdentifierToken [21..22) 'x'
+  SemicolonToken [22..23) ';'

@@ -1,0 +1,13 @@
+CompilationUnit [0..29)
+  L:SingleLineDocumentationCommentTrivia [0..29)
+    XmlComment [0..29)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlCommentStartToken [3..7) '<!--'
+      XmlTextLiteralToken [7..23) ' A Comment with '
+      MinusMinusToken [23..25) '--'
+      XmlTextLiteralToken [25..26) ' '
+      XmlCommentEndToken [26..29) '-->'
+    EndOfDocumentationCommentToken [29..29) ''
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1570 [23..25) XML comment has badly formed XML -- \'Incorrect syntax was used in a comment.\'

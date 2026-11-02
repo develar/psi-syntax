@@ -1,0 +1,89 @@
+CompilationUnit [0..136)
+  ClassDeclaration [0..136)
+    L:SingleLineDocumentationCommentTrivia [0..125)
+      XmlText [0..8)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..4) ' '
+        XmlEntityLiteralToken [4..8) '&#1;'
+      XmlElement [8..25)
+        XmlElementStartTag [8..14)
+          LessThanToken [8..9) '<'
+          XmlName [9..13)
+            IdentifierToken [9..13) 'doc1'
+          GreaterThanToken [13..14) '>'
+        XmlText [14..18)
+          XmlEntityLiteralToken [14..18) '&#2;'
+        XmlElementEndTag [18..25)
+          LessThanSlashToken [18..20) '</'
+          XmlName [20..24)
+            IdentifierToken [20..24) 'doc1'
+          GreaterThanToken [24..25) '>'
+      XmlText [25..30)
+        XmlTextLiteralNewLineToken [25..26) '\n'
+        L:DocumentationCommentExteriorTrivia [26..29) '///'
+        XmlTextLiteralToken [29..30) ' '
+      XmlElement [30..64)
+        XmlElementStartTag [30..36)
+          LessThanToken [30..31) '<'
+          XmlName [31..35)
+            IdentifierToken [31..35) 'doc2'
+          GreaterThanToken [35..36) '>'
+        XmlCDataSection [36..57)
+          XmlCDataStartToken [36..45) '<![CDATA['
+          XmlTextLiteralToken [45..54) '&#5;&#31;'
+          XmlCDataEndToken [54..57) ']]>'
+        XmlElementEndTag [57..64)
+          LessThanSlashToken [57..59) '</'
+          XmlName [59..63)
+            IdentifierToken [59..63) 'doc2'
+          GreaterThanToken [63..64) '>'
+      XmlText [64..69)
+        XmlTextLiteralNewLineToken [64..65) '\n'
+        L:DocumentationCommentExteriorTrivia [65..68) '///'
+        XmlTextLiteralToken [68..69) ' '
+      XmlElement [69..94)
+        XmlElementStartTag [69..87)
+          LessThanToken [69..70) '<'
+          XmlName [70..74)
+            IdentifierToken [70..74) 'doc3'
+          XmlTextAttribute [74..86)
+            XmlName [74..76)
+              L:WhitespaceTrivia [74..75) ' '
+              IdentifierToken [75..76) 'x'
+            L:WhitespaceTrivia [76..77) ' '
+            EqualsToken [77..78) '='
+            L:WhitespaceTrivia [78..79) ' '
+            DoubleQuoteToken [79..80) '"'
+            XmlEntityLiteralToken [80..85) '&#14;'
+            DoubleQuoteToken [85..86) '"'
+          GreaterThanToken [86..87) '>'
+        XmlElementEndTag [87..94)
+          LessThanSlashToken [87..89) '</'
+          XmlName [89..93)
+            IdentifierToken [89..93) 'doc3'
+          GreaterThanToken [93..94) '>'
+      XmlText [94..107)
+        XmlEntityLiteralToken [94..102) '&#xffff;'
+        XmlTextLiteralNewLineToken [102..103) '\n'
+        L:DocumentationCommentExteriorTrivia [103..106) '///'
+        XmlTextLiteralToken [106..107) ' '
+      XmlComment [107..124)
+        XmlCommentStartToken [107..111) '<!--'
+        XmlTextLiteralToken [111..121) ' &#xfffe; '
+        XmlCommentEndToken [121..124) '-->'
+      XmlText [124..125)
+        XmlTextLiteralNewLineToken [124..125) '\n'
+      EndOfDocumentationCommentToken [125..125) ''
+    ClassKeyword [125..130) 'class'
+    T:WhitespaceTrivia [130..131) ' '
+    IdentifierToken [131..132) 'A'
+    T:WhitespaceTrivia [132..133) ' '
+    OpenBraceToken [133..134) '{'
+    CloseBraceToken [134..135) '}'
+    T:EndOfLineTrivia [135..136) '\n'
+  EndOfFileToken [136..136) ''
+Diagnostics:
+  CS1570 [4..4) XML comment has badly formed XML -- \'Invalid unicode character.\'
+  CS1570 [14..14) XML comment has badly formed XML -- \'Invalid unicode character.\'
+  CS1570 [80..80) XML comment has badly formed XML -- \'Invalid unicode character.\'
+  CS1570 [94..94) XML comment has badly formed XML -- \'Invalid unicode character.\'

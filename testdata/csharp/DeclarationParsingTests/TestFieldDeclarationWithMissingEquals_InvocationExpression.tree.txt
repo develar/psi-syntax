@@ -1,0 +1,31 @@
+CompilationUnit [0..22)
+  ClassDeclaration [0..22)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..21)
+      VariableDeclaration [10..19)
+        IdentifierName [10..14)
+          L:WhitespaceTrivia [10..12) '  '
+          IdentifierToken [12..13) 'C'
+          T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..19)
+          IdentifierToken [14..15) 'x'
+          T:WhitespaceTrivia [15..16) ' '
+          EqualsValueClause [16..19)
+            EqualsToken [16..16) missing
+            SimpleMemberAccessExpression [16..19)
+              IdentifierName [16..17)
+                IdentifierToken [16..17) 'X'
+              DotToken [17..18) '.'
+              IdentifierName [18..19)
+                IdentifierToken [18..19) 'Y'
+      SemicolonToken [19..20) ';'
+      T:EndOfLineTrivia [20..21) '\n'
+    CloseBraceToken [21..22) '}'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1003 [16..17) Syntax error, \'=\' expected

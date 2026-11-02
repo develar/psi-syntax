@@ -1,0 +1,69 @@
+MethodDeclaration [0..96)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..54)
+    IdentifierToken [7..18) 'IDictionary'
+    TypeArgumentList [18..54)
+      LessThanToken [18..19) '<'
+      TupleType [19..54)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      GreaterThanToken [54..54) missing
+  IdentifierToken [54..65) 'IEnumerable'
+  TypeParameterList [65..73)
+    LessThanToken [65..66) '<'
+    TypeParameter [66..72)
+      IdentifierToken [66..66) missing
+      T:SkippedTokensTrivia [66..72)
+        StringKeyword [66..72) 'string'
+    GreaterThanToken [72..73) '>'
+  ParameterList [73..95)
+    OpenParenToken [73..73) missing
+    T:SkippedTokensTrivia [73..74)
+      GreaterThanToken [73..74) '>'
+    T:WhitespaceTrivia [74..75) ' '
+    Parameter [75..87)
+      IdentifierName [75..87)
+        IdentifierToken [75..87) 'GetAllValues'
+      IdentifierToken [87..87) missing
+    CommaToken [87..87) missing
+    Parameter [87..95)
+      TupleType [87..95)
+        OpenParenToken [87..88) '('
+        TupleElement [88..94)
+          IdentifierName [88..93)
+            IdentifierToken [88..92) 'Type'
+            T:WhitespaceTrivia [92..93) ' '
+          IdentifierToken [93..94) 't'
+        CommaToken [94..94) missing
+        TupleElement [94..94)
+          IdentifierName [94..94)
+            IdentifierToken [94..94) missing
+        CloseParenToken [94..95) ')'
+      IdentifierToken [95..95) missing
+    CloseParenToken [95..95) missing
+  SemicolonToken [95..96) ';'
+Diagnostics:
+  CS1003 [54..65) Syntax error, \'>\' expected
+  CS1001 [66..72) Identifier expected
+  CS1003 [66..72) Syntax error, \',\' expected
+  CS1003 [73..74) Syntax error, \'(\' expected
+  CS1001 [73..74) Identifier expected
+  CS1001 [87..88) Identifier expected
+  CS1003 [87..88) Syntax error, \',\' expected
+  CS8124 [94..95) Tuple must contain at least two elements.
+  CS1001 [95..96) Identifier expected
+  CS1026 [95..96) ) expected

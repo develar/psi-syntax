@@ -1,0 +1,24 @@
+ExpressionStatement [0..22)
+  SimpleAssignmentExpression [0..21)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..21)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..21)
+        PredefinedType [8..11)
+          IntKeyword [8..11) 'int'
+        ArrayRankSpecifier [11..21)
+          OpenBracketToken [11..12) '['
+          T:SkippedTokensTrivia [12..18)
+            StaticKeyword [12..18) 'static'
+          T:WhitespaceTrivia [18..19) ' '
+          IdentifierName [19..20)
+            IdentifierToken [19..20) 'x'
+          CloseBracketToken [20..21) ']'
+  SemicolonToken [21..22) ';'
+Diagnostics:
+  CS1003 [12..18) Syntax error, \',\' expected

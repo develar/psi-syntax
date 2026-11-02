@@ -1,0 +1,14 @@
+CompilationUnit [0..14)
+  AttributeList [0..14)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..10)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+    Attribute [10..13)
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'a'
+      AttributeArgumentList [11..13)
+        OpenParenToken [11..12) '('
+        CloseParenToken [12..13) ')'
+    CloseBracketToken [13..14) ']'
+  EndOfFileToken [14..14) ''

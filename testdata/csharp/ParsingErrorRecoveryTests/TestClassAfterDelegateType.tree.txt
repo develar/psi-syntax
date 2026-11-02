@@ -1,0 +1,26 @@
+CompilationUnit [0..22)
+  DelegateDeclaration [0..11)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..11)
+      IdentifierToken [9..10) 'd'
+      T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..11) missing
+    ParameterList [11..11)
+      OpenParenToken [11..11) missing
+      CloseParenToken [11..11) missing
+    SemicolonToken [11..11) missing
+  ClassDeclaration [11..22)
+    ClassKeyword [11..16) 'class'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierToken [17..18) 'c'
+    T:WhitespaceTrivia [18..19) ' '
+    OpenBraceToken [19..20) '{'
+    T:WhitespaceTrivia [20..21) ' '
+    CloseBraceToken [21..22) '}'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1001 [11..16) Identifier expected
+  CS1003 [11..16) Syntax error, \'(\' expected
+  CS1026 [11..16) ) expected
+  CS1002 [11..16) ; expected

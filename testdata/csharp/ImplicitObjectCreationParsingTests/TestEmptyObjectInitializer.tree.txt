@@ -1,0 +1,8 @@
+ImplicitObjectCreationExpression [0..7)
+  NewKeyword [0..3) 'new'
+  ArgumentList [3..5)
+    OpenParenToken [3..4) '('
+    CloseParenToken [4..5) ')'
+  ObjectInitializerExpression [5..7)
+    OpenBraceToken [5..6) '{'
+    CloseBraceToken [6..7) '}'

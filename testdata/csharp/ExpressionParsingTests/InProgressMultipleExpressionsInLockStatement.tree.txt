@@ -1,0 +1,24 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    LockStatement [0..21)
+      LockKeyword [0..4) 'lock'
+      T:WhitespaceTrivia [4..5) ' '
+      OpenParenToken [5..6) '('
+      IdentifierName [6..16)
+        IdentifierToken [6..9) 'Boo'
+        T:WhitespaceTrivia [9..10) ' '
+        T:SkippedTokensTrivia [10..14)
+          IdentifierToken [10..14) 'Quux'
+        T:SkippedTokensTrivia [14..15)
+          OpenParenToken [14..15) '('
+        T:SkippedTokensTrivia [15..16)
+          CloseParenToken [15..16) ')'
+      CloseParenToken [16..17) ')'
+      T:EndOfLineTrivia [17..18) '\n'
+      Block [18..21)
+        OpenBraceToken [18..19) '{'
+        T:EndOfLineTrivia [19..20) '\n'
+        CloseBraceToken [20..21) '}'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1073 [10..14) Unexpected token \'Quux\'

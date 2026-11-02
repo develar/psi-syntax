@@ -1,0 +1,29 @@
+IsPatternExpression [0..27)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..27)
+    PredefinedType [5..12)
+      StringKeyword [5..11) 'string'
+      T:WhitespaceTrivia [11..12) ' '
+    PropertyPatternClause [12..27)
+      L:SkippedTokensTrivia [12..13)
+        IdentifierToken [12..13) '_'
+      L:WhitespaceTrivia [13..14) ' '
+      OpenBraceToken [14..15) '{'
+      T:WhitespaceTrivia [15..16) ' '
+      Subpattern [16..26)
+        NameColon [16..24)
+          IdentifierName [16..22)
+            IdentifierToken [16..22) 'Length'
+          ColonToken [22..23) ':'
+          T:WhitespaceTrivia [23..24) ' '
+        ConstantPattern [24..26)
+          NumericLiteralExpression [24..26)
+            NumericLiteralToken [24..25) '5'
+            T:WhitespaceTrivia [25..26) ' '
+      CloseBraceToken [26..27) '}'
+Diagnostics:
+  CS8525 [12..13) A variable designator must come after a property pattern.

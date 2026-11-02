@@ -1,0 +1,1 @@
+class c<t> where t : where t : a { }

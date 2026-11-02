@@ -1,0 +1,36 @@
+SwitchStatement [0..42)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..41)
+    CasePatternSwitchLabel [13..39)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      ConstantPattern [18..28)
+        InvocationExpression [18..28)
+          IdentifierName [18..24)
+            IdentifierToken [18..24) 'nameof'
+          ArgumentList [24..28)
+            OpenParenToken [24..25) '('
+            Argument [25..26)
+              IdentifierName [25..26)
+                IdentifierToken [25..26) 'n'
+            CloseParenToken [26..27) ')'
+            T:WhitespaceTrivia [27..28) ' '
+      WhenClause [28..37)
+        WhenKeyword [28..32) 'when'
+        T:WhitespaceTrivia [32..33) ' '
+        TrueLiteralExpression [33..37)
+          TrueKeyword [33..37) 'true'
+      ColonToken [37..38) ':'
+      T:WhitespaceTrivia [38..39) ' '
+    EmptyStatement [39..41)
+      SemicolonToken [39..40) ';'
+      T:WhitespaceTrivia [40..41) ' '
+  CloseBraceToken [41..42) '}'

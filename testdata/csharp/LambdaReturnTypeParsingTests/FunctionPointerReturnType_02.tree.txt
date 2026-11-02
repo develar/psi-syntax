@@ -1,0 +1,41 @@
+ParenthesizedLambdaExpression [0..67)
+  FunctionPointerType [0..54)
+    DelegateKeyword [0..8) 'delegate'
+    AsteriskToken [8..9) '*'
+    T:WhitespaceTrivia [9..10) ' '
+    FunctionPointerCallingConvention [10..26)
+      UnmanagedKeyword [10..19) 'unmanaged'
+      FunctionPointerUnmanagedCallingConventionList [19..26)
+        OpenBracketToken [19..20) '['
+        FunctionPointerUnmanagedCallingConvention [20..25)
+          IdentifierToken [20..25) 'Cdecl'
+        CloseBracketToken [25..26) ']'
+    FunctionPointerParameterList [26..54)
+      LessThanToken [26..27) '<'
+      FunctionPointerParameter [27..46)
+        RefKeyword [27..30) 'ref'
+        T:WhitespaceTrivia [30..31) ' '
+        FunctionPointerType [31..46)
+          DelegateKeyword [31..39) 'delegate'
+          AsteriskToken [39..40) '*'
+          FunctionPointerParameterList [40..46)
+            LessThanToken [40..41) '<'
+            FunctionPointerParameter [41..45)
+              PredefinedType [41..45)
+                VoidKeyword [41..45) 'void'
+            GreaterThanToken [45..46) '>'
+      CommaToken [46..47) ','
+      T:WhitespaceTrivia [47..48) ' '
+      FunctionPointerParameter [48..52)
+        PredefinedType [48..52)
+          VoidKeyword [48..52) 'void'
+      GreaterThanToken [52..53) '>'
+      T:WhitespaceTrivia [53..54) ' '
+  ParameterList [54..57)
+    OpenParenToken [54..55) '('
+    CloseParenToken [55..56) ')'
+    T:WhitespaceTrivia [56..57) ' '
+  EqualsGreaterThanToken [57..59) '=>'
+  T:WhitespaceTrivia [59..60) ' '
+  DefaultLiteralExpression [60..67)
+    DefaultKeyword [60..67) 'default'

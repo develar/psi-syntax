@@ -1,0 +1,14 @@
+CompilationUnit [0..29)
+  InterfaceDeclaration [0..29)
+    ClosedKeyword [0..6) 'closed'
+    T:WhitespaceTrivia [6..7) ' '
+    PublicKeyword [7..13) 'public'
+    T:WhitespaceTrivia [13..14) ' '
+    InterfaceKeyword [14..23) 'interface'
+    T:WhitespaceTrivia [23..24) ' '
+    IdentifierToken [24..25) 'C'
+    T:WhitespaceTrivia [25..26) ' '
+    OpenBraceToken [26..27) '{'
+    T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'
+  EndOfFileToken [29..29) ''

@@ -1,0 +1,1 @@
+static IDictionary<(string Value, string Description) Alias::X> GetAllValues(Type t);

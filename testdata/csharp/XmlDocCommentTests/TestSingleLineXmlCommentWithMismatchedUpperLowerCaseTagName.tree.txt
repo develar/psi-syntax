@@ -1,0 +1,20 @@
+CompilationUnit [0..15)
+  L:SingleLineDocumentationCommentTrivia [0..15)
+    XmlElement [0..15)
+      XmlElementStartTag [0..8)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        LessThanToken [3..4) '<'
+        XmlName [4..7)
+          IdentifierToken [4..7) 'goo'
+        GreaterThanToken [7..8) '>'
+      XmlText [8..9)
+        XmlTextLiteralToken [8..9) ' '
+      XmlElementEndTag [9..15)
+        LessThanSlashToken [9..11) '</'
+        XmlName [11..14)
+          IdentifierToken [11..14) 'Goo'
+        GreaterThanToken [14..15) '>'
+    EndOfDocumentationCommentToken [15..15) ''
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1570 [11..14) XML comment has badly formed XML -- \'End tag \'Goo\' does not match the start tag \'goo\'.\'

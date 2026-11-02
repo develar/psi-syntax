@@ -1,0 +1,8 @@
+CompilationUnit [0..6)
+  L:BadDirectiveTrivia [0..6)
+    HashToken [0..1) '#'
+    EndIfKeyword [1..6) 'endif'
+    EndOfDirectiveToken [6..6) ''
+  EndOfFileToken [6..6) ''
+Diagnostics:
+  CS1028 [0..6) Unexpected preprocessor directive

@@ -1,0 +1,2 @@
+Utf8StringLiteralExpression [0..9)
+  Utf8StringLiteralToken [0..9) '"hello"u8'

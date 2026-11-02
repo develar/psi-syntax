@@ -1,0 +1,26 @@
+CompilationUnit [0..30)
+  L:LineDirectiveTrivia [0..30)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..7) '1'
+    L:SkippedTokensTrivia [7..30)
+      CommaToken [7..8) ','
+      T:WhitespaceTrivia [8..9) ' '
+      NumericLiteralToken [9..10) '2'
+      CloseParenToken [10..11) ')'
+      T:WhitespaceTrivia [11..12) ' '
+      MinusToken [12..13) '-'
+      T:WhitespaceTrivia [13..14) ' '
+      OpenParenToken [14..15) '('
+      NumericLiteralToken [15..16) '3'
+      CommaToken [16..17) ','
+      T:WhitespaceTrivia [17..18) ' '
+      NumericLiteralToken [18..19) '4'
+      CloseParenToken [19..20) ')'
+      T:WhitespaceTrivia [20..21) ' '
+      StringLiteralToken [21..30) '"file.cs"'
+    EndOfDirectiveToken [30..30) ''
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1578 [7..8) Quoted file name, single-line comment or end-of-line expected

@@ -1,0 +1,16 @@
+LocalDeclarationStatement [0..10)
+  VariableDeclaration [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'T'
+      T:WhitespaceTrivia [1..2) ' '
+    VariableDeclarator [2..3)
+      IdentifierToken [2..3) 'a'
+    CommaToken [3..4) ','
+    T:WhitespaceTrivia [4..5) ' '
+    VariableDeclarator [5..6)
+      IdentifierToken [5..6) 'b'
+    CommaToken [6..7) ','
+    T:WhitespaceTrivia [7..8) ' '
+    VariableDeclarator [8..9)
+      IdentifierToken [8..9) 'c'
+  SemicolonToken [9..10) ';'

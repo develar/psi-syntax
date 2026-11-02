@@ -1,0 +1,1 @@
+_ = e is A and B and C;

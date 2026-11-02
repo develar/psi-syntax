@@ -1,0 +1,1 @@
+switch (o) { case (S.Int a, S.Int b)[] q: break; }

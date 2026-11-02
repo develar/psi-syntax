@@ -1,0 +1,2 @@
+
+scoped record A;

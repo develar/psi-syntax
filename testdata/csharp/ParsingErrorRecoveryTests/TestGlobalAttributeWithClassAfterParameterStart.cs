@@ -1,0 +1,1 @@
+[assembly: a( class c { }

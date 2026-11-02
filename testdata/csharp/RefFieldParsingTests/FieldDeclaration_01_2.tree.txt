@@ -1,0 +1,20 @@
+StructDeclaration [0..21)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  FieldDeclaration [11..20)
+    VariableDeclaration [11..18)
+      RefType [11..17)
+        RefKeyword [11..14) 'ref'
+        T:WhitespaceTrivia [14..15) ' '
+        IdentifierName [15..17)
+          IdentifierToken [15..16) 'T'
+          T:WhitespaceTrivia [16..17) ' '
+      VariableDeclarator [17..18)
+        IdentifierToken [17..18) 'F'
+    SemicolonToken [18..19) ';'
+    T:WhitespaceTrivia [19..20) ' '
+  CloseBraceToken [20..21) '}'

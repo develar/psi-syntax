@@ -1,0 +1,17 @@
+CompilationUnit [0..18)
+  UsingDirective [0..18)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'x'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    RefType [10..17)
+      RefKeyword [10..13) 'ref'
+      T:WhitespaceTrivia [13..14) ' '
+      PredefinedType [14..17)
+        IntKeyword [14..17) 'int'
+    SemicolonToken [17..18) ';'
+  EndOfFileToken [18..18) ''

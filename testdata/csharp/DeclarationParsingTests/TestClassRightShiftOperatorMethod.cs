@@ -1,0 +1,1 @@
+class a { b operator >> (c d, e f) { } }

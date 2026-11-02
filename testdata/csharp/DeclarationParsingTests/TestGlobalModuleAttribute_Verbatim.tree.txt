@@ -1,0 +1,11 @@
+CompilationUnit [0..11)
+  AttributeList [0..11)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..9)
+      IdentifierToken [1..8) '@module'
+      ColonToken [8..9) ':'
+    Attribute [9..10)
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'a'
+    CloseBracketToken [10..11) ']'
+  EndOfFileToken [11..11) ''

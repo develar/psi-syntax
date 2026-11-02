@@ -1,0 +1,1 @@
+Func<string, string> func0 = (string y, string x!! = null) => x;

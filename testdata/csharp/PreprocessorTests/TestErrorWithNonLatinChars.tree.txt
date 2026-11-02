@@ -1,0 +1,10 @@
+CompilationUnit [0..15)
+  L:ErrorDirectiveTrivia [0..15)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..15) 'файл'
+    EndOfDirectiveToken [15..15) ''
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1029 [7..15) #error: \'файл\'

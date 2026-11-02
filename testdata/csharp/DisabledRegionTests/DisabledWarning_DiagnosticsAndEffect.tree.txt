@@ -1,0 +1,41 @@
+CompilationUnit [0..70)
+  ClassDeclaration [0..70)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:IfDirectiveTrivia [1..11)
+      HashToken [1..2) '#'
+      IfKeyword [2..4) 'if'
+      T:WhitespaceTrivia [4..5) ' '
+      FalseLiteralExpression [5..10)
+        FalseKeyword [5..10) 'false'
+      EndOfDirectiveToken [10..10) ''
+      T:EndOfLineTrivia [10..11) '\n'
+    L:WarningDirectiveTrivia [11..31)
+      HashToken [11..12) '#'
+      WarningKeyword [12..19) 'warning'
+      T:WhitespaceTrivia [19..20) ' '
+      L:PreprocessingMessageTrivia [20..30) '"warning1"'
+      EndOfDirectiveToken [30..30) ''
+      T:EndOfLineTrivia [30..31) '\n'
+    L:EndIfDirectiveTrivia [31..38)
+      HashToken [31..32) '#'
+      EndIfKeyword [32..37) 'endif'
+      EndOfDirectiveToken [37..37) ''
+      T:EndOfLineTrivia [37..38) '\n'
+    L:WarningDirectiveTrivia [38..58)
+      HashToken [38..39) '#'
+      WarningKeyword [39..46) 'warning'
+      T:WhitespaceTrivia [46..47) ' '
+      L:PreprocessingMessageTrivia [47..57) '"warning2"'
+      EndOfDirectiveToken [57..57) ''
+      T:EndOfLineTrivia [57..58) '\n'
+    ClassKeyword [58..63) 'class'
+    T:WhitespaceTrivia [63..64) ' '
+    IdentifierToken [64..65) 'C'
+    T:WhitespaceTrivia [65..66) ' '
+    OpenBraceToken [66..67) '{'
+    T:WhitespaceTrivia [67..68) ' '
+    CloseBraceToken [68..69) '}'
+    T:EndOfLineTrivia [69..70) '\n'
+  EndOfFileToken [70..70) ''
+Diagnostics:
+  CS1030 [47..57) #warning: \'"warning2"\'

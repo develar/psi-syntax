@@ -1,0 +1,16 @@
+ParenthesizedLambdaExpression [0..15)
+  ParameterList [0..9)
+    OpenParenToken [0..1) '('
+    Parameter [1..7)
+      ScopedKeyword [1..7) 'scoped'
+      IdentifierToken [7..7) missing
+    CloseParenToken [7..8) ')'
+    T:WhitespaceTrivia [8..9) ' '
+  EqualsGreaterThanToken [9..11) '=>'
+  T:WhitespaceTrivia [11..12) ' '
+  Block [12..15)
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+Diagnostics:
+  CS1001 [7..8) Identifier expected

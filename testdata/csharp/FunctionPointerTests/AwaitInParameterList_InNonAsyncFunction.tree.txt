@@ -1,0 +1,39 @@
+CompilationUnit [0..46)
+  GlobalStatement [0..46)
+    LocalFunctionStatement [0..46)
+      PredefinedType [0..6)
+        L:EndOfLineTrivia [0..1) '\n'
+        VoidKeyword [1..5) 'void'
+        T:WhitespaceTrivia [5..6) ' '
+      IdentifierToken [6..7) 'M'
+      ParameterList [7..10)
+        OpenParenToken [7..8) '('
+        CloseParenToken [8..9) ')'
+        T:EndOfLineTrivia [9..10) '\n'
+      Block [10..46)
+        OpenBraceToken [10..11) '{'
+        T:EndOfLineTrivia [11..12) '\n'
+        LocalDeclarationStatement [12..45)
+          VariableDeclaration [12..43)
+            FunctionPointerType [12..40)
+              L:WhitespaceTrivia [12..16) '    '
+              DelegateKeyword [16..24) 'delegate'
+              AsteriskToken [24..25) '*'
+              FunctionPointerParameterList [25..40)
+                LessThanToken [25..26) '<'
+                FunctionPointerParameter [26..31)
+                  IdentifierName [26..31)
+                    IdentifierToken [26..31) 'await'
+                CommaToken [31..32) ','
+                T:WhitespaceTrivia [32..33) ' '
+                FunctionPointerParameter [33..38)
+                  IdentifierName [33..38)
+                    IdentifierToken [33..38) 'await'
+                GreaterThanToken [38..39) '>'
+                T:WhitespaceTrivia [39..40) ' '
+            VariableDeclarator [40..43)
+              IdentifierToken [40..43) 'ptr'
+          SemicolonToken [43..44) ';'
+          T:EndOfLineTrivia [44..45) '\n'
+        CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''

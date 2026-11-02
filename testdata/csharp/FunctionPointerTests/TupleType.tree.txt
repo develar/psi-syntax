@@ -1,0 +1,47 @@
+CastExpression [0..58)
+  OpenParenToken [0..1) '('
+  TupleType [1..54)
+    OpenParenToken [1..2) '('
+    TupleElement [2..25)
+      FunctionPointerType [2..23)
+        DelegateKeyword [2..10) 'delegate'
+        AsteriskToken [10..11) '*'
+        FunctionPointerParameterList [11..23)
+          LessThanToken [11..12) '<'
+          FunctionPointerParameter [12..15)
+            PredefinedType [12..15)
+              IntKeyword [12..15) 'int'
+          CommaToken [15..16) ','
+          T:WhitespaceTrivia [16..17) ' '
+          FunctionPointerParameter [17..21)
+            PredefinedType [17..21)
+              VoidKeyword [17..21) 'void'
+          GreaterThanToken [21..22) '>'
+          T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..25) 'i1'
+    CommaToken [25..26) ','
+    T:WhitespaceTrivia [26..27) ' '
+    TupleElement [27..53)
+      FunctionPointerType [27..51)
+        DelegateKeyword [27..35) 'delegate'
+        AsteriskToken [35..36) '*'
+        T:WhitespaceTrivia [36..37) ' '
+        FunctionPointerCallingConvention [37..44)
+          ManagedKeyword [37..44) 'managed'
+        FunctionPointerParameterList [44..51)
+          LessThanToken [44..45) '<'
+          FunctionPointerParameter [45..46)
+            IdentifierName [45..46)
+              IdentifierToken [45..46) 'C'
+          CommaToken [46..47) ','
+          T:WhitespaceTrivia [47..48) ' '
+          FunctionPointerParameter [48..49)
+            IdentifierName [48..49)
+              IdentifierToken [48..49) 'D'
+          GreaterThanToken [49..50) '>'
+          T:WhitespaceTrivia [50..51) ' '
+      IdentifierToken [51..53) 'i2'
+    CloseParenToken [53..54) ')'
+  CloseParenToken [54..55) ')'
+  IdentifierName [55..58)
+    IdentifierToken [55..58) 'ptr'

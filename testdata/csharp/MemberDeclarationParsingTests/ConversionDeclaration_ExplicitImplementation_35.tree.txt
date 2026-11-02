@@ -1,0 +1,50 @@
+CompilationUnit [0..46)
+  ConversionOperatorDeclaration [0..10)
+    L:EndOfLineTrivia [0..1) '\n'
+    ExplicitKeyword [1..9) 'explicit'
+    T:EndOfLineTrivia [9..10) '\n'
+    OperatorKeyword [10..10) missing
+    IdentifierName [10..10)
+      IdentifierToken [10..10) missing
+    ParameterList [10..10)
+      OpenParenToken [10..10) missing
+      CloseParenToken [10..10) missing
+    SemicolonToken [10..10) missing
+  GlobalStatement [10..46)
+    LocalDeclarationStatement [10..46)
+      VariableDeclaration [10..44)
+        GenericName [10..25)
+          IdentifierToken [10..14) 'Func'
+          TypeArgumentList [14..25)
+            LessThanToken [14..15) '<'
+            PredefinedType [15..18)
+              IntKeyword [15..18) 'int'
+            CommaToken [18..19) ','
+            T:WhitespaceTrivia [19..20) ' '
+            PredefinedType [20..23)
+              IntKeyword [20..23) 'int'
+            GreaterThanToken [23..24) '>'
+            T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..44)
+          IdentifierToken [25..27) 'f1'
+          T:WhitespaceTrivia [27..28) ' '
+          EqualsValueClause [28..44)
+            EqualsToken [28..29) '='
+            T:WhitespaceTrivia [29..30) ' '
+            ParenthesizedLambdaExpression [30..44)
+              ParameterList [30..39)
+                OpenParenToken [30..31) '('
+                Parameter [31..37)
+                  IdentifierToken [31..37) 'param1'
+                CloseParenToken [37..38) ')'
+                T:WhitespaceTrivia [38..39) ' '
+              EqualsGreaterThanToken [39..41) '=>'
+              T:WhitespaceTrivia [41..42) ' '
+              NumericLiteralExpression [42..44)
+                NumericLiteralToken [42..44) '10'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1003 [9..9) Syntax error, \'operator\' expected
+  CS1001 [9..9) Identifier expected

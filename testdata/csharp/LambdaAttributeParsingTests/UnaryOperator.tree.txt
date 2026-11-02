@@ -1,0 +1,25 @@
+LogicalNotExpression [0..15)
+  ExclamationToken [0..1) '!'
+  T:WhitespaceTrivia [1..2) ' '
+  InvocationExpression [2..15)
+    CollectionExpression [2..6)
+      OpenBracketToken [2..3) '['
+      ExpressionElement [3..4)
+        IdentifierName [3..4)
+          IdentifierToken [3..4) 'A'
+      CloseBracketToken [4..5) ']'
+      T:WhitespaceTrivia [5..6) ' '
+    ArgumentList [6..15)
+      OpenParenToken [6..7) '('
+      CloseParenToken [7..8) ')'
+      T:WhitespaceTrivia [8..9) ' '
+      T:SkippedTokensTrivia [9..11)
+        EqualsGreaterThanToken [9..11) '=>'
+      T:WhitespaceTrivia [11..12) ' '
+      T:SkippedTokensTrivia [12..13)
+        OpenBraceToken [12..13) '{'
+      T:WhitespaceTrivia [13..14) ' '
+      T:SkippedTokensTrivia [14..15)
+        CloseBraceToken [14..15) '}'
+Diagnostics:
+  CS1073 [0..8) Unexpected token \'=>\'

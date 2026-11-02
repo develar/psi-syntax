@@ -1,0 +1,1 @@
+#pragma warning restore "CS0114", 162, "CS0168" // Mixed string & numeric codes

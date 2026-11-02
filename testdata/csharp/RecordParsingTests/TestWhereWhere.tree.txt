@@ -1,0 +1,41 @@
+CompilationUnit [0..51)
+  ClassDeclaration [0..51)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..16) 'Goo'
+    TypeParameterList [16..20)
+      LessThanToken [16..17) '<'
+      TypeParameter [17..18)
+        IdentifierToken [17..18) 'T'
+      GreaterThanToken [18..19) '>'
+      T:WhitespaceTrivia [19..20) ' '
+    BaseList [20..48)
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+      SimpleBaseType [22..36)
+        QualifiedName [22..36)
+          IdentifierName [22..28)
+            IdentifierToken [22..28) 'System'
+          DotToken [28..29) '.'
+          IdentifierName [29..36)
+            IdentifierToken [29..35) 'Object'
+            T:WhitespaceTrivia [35..36) ' '
+      CommaToken [36..36) missing
+      SimpleBaseType [36..42)
+        IdentifierName [36..42)
+          IdentifierToken [36..41) 'where'
+          T:WhitespaceTrivia [41..42) ' '
+      CommaToken [42..42) missing
+      SimpleBaseType [42..48)
+        IdentifierName [42..48)
+          IdentifierToken [42..47) 'where'
+          T:WhitespaceTrivia [47..48) ' '
+    OpenBraceToken [48..49) '{'
+    T:WhitespaceTrivia [49..50) ' '
+    CloseBraceToken [50..51) '}'
+  EndOfFileToken [51..51) ''
+Diagnostics:
+  CS1003 [36..41) Syntax error, \',\' expected
+  CS1003 [42..47) Syntax error, \',\' expected

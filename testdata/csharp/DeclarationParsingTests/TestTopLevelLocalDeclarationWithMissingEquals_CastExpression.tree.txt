@@ -1,0 +1,25 @@
+CompilationUnit [0..11)
+  GlobalStatement [0..9)
+    LocalFunctionStatement [0..9)
+      IdentifierName [0..2)
+        IdentifierToken [0..1) 'C'
+        T:WhitespaceTrivia [1..2) ' '
+      IdentifierToken [2..3) 'x'
+      T:WhitespaceTrivia [3..4) ' '
+      ParameterList [4..9)
+        OpenParenToken [4..5) '('
+        Parameter [5..8)
+          PredefinedType [5..8)
+            IntKeyword [5..8) 'int'
+          IdentifierToken [8..8) missing
+        CloseParenToken [8..9) ')'
+      SemicolonToken [9..9) missing
+  GlobalStatement [9..11)
+    ExpressionStatement [9..11)
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '0'
+      SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1001 [8..9) Identifier expected
+  CS1002 [9..10) ; expected

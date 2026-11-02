@@ -1,0 +1,87 @@
+CompilationUnit [0..154)
+  ClassDeclaration [0..68)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Base'
+    T:WhitespaceTrivia [18..19) ' '
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..66)
+      L:WhitespaceTrivia [21..25) '    '
+      PublicKeyword [25..31) 'public'
+      T:WhitespaceTrivia [31..32) ' '
+      VirtualKeyword [32..39) 'virtual'
+      T:WhitespaceTrivia [39..40) ' '
+      PredefinedType [40..45)
+        VoidKeyword [40..44) 'void'
+        T:WhitespaceTrivia [44..45) ' '
+      IdentifierToken [45..46) 'M'
+      ParameterList [46..58)
+        OpenParenToken [46..47) '('
+        Parameter [47..56)
+          RefKeyword [47..50) 'ref'
+          T:WhitespaceTrivia [50..51) ' '
+          PredefinedType [51..55)
+            IntKeyword [51..54) 'int'
+            T:WhitespaceTrivia [54..55) ' '
+          IdentifierToken [55..56) 'X'
+        CloseParenToken [56..57) ')'
+        T:WhitespaceTrivia [57..58) ' '
+      Block [58..66)
+        OpenBraceToken [58..59) '{'
+        T:EndOfLineTrivia [59..60) '\n'
+        L:WhitespaceTrivia [60..64) '    '
+        CloseBraceToken [64..65) '}'
+        T:EndOfLineTrivia [65..66) '\n'
+    CloseBraceToken [66..67) '}'
+    T:EndOfLineTrivia [67..68) '\n'
+  ClassDeclaration [68..154)
+    PublicKeyword [68..74) 'public'
+    T:WhitespaceTrivia [74..75) ' '
+    ClassKeyword [75..80) 'class'
+    T:WhitespaceTrivia [80..81) ' '
+    IdentifierToken [81..88) 'Derived'
+    T:WhitespaceTrivia [88..89) ' '
+    BaseList [89..96)
+      ColonToken [89..90) ':'
+      T:WhitespaceTrivia [90..91) ' '
+      SimpleBaseType [91..96)
+        IdentifierName [91..96)
+          IdentifierToken [91..95) 'Base'
+          T:WhitespaceTrivia [95..96) ' '
+    OpenBraceToken [96..97) '{'
+    T:EndOfLineTrivia [97..98) '\n'
+    MethodDeclaration [98..153)
+      L:WhitespaceTrivia [98..102) '    '
+      PublicKeyword [102..108) 'public'
+      T:WhitespaceTrivia [108..109) ' '
+      OverrideKeyword [109..117) 'override'
+      T:WhitespaceTrivia [117..118) ' '
+      PredefinedType [118..123)
+        VoidKeyword [118..122) 'void'
+        T:WhitespaceTrivia [122..123) ' '
+      IdentifierToken [123..124) 'M'
+      ParameterList [124..145)
+        OpenParenToken [124..125) '('
+        Parameter [125..143)
+          RefKeyword [125..128) 'ref'
+          T:WhitespaceTrivia [128..129) ' '
+          ReadOnlyKeyword [129..137) 'readonly'
+          T:WhitespaceTrivia [137..138) ' '
+          PredefinedType [138..142)
+            IntKeyword [138..141) 'int'
+            T:WhitespaceTrivia [141..142) ' '
+          IdentifierToken [142..143) 'X'
+        CloseParenToken [143..144) ')'
+        T:WhitespaceTrivia [144..145) ' '
+      Block [145..153)
+        OpenBraceToken [145..146) '{'
+        T:EndOfLineTrivia [146..147) '\n'
+        L:WhitespaceTrivia [147..151) '    '
+        CloseBraceToken [151..152) '}'
+        T:EndOfLineTrivia [152..153) '\n'
+    CloseBraceToken [153..154) '}'
+  EndOfFileToken [154..154) ''

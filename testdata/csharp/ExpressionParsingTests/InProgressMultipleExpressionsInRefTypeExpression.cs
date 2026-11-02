@@ -1,0 +1,1 @@
+var v = __reftype(Boo Quux());

@@ -1,0 +1,32 @@
+CompilationUnit [0..41)
+  ClassDeclaration [0..41)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..40)
+      L:WhitespaceTrivia [11..15) '    '
+      StaticKeyword [15..21) 'static'
+      T:WhitespaceTrivia [21..22) ' '
+      AsyncKeyword [22..27) 'async'
+      T:WhitespaceTrivia [27..28) ' '
+      QualifiedName [28..40)
+        IdentifierName [28..33)
+          IdentifierToken [28..33) 'Tasks'
+        DotToken [33..34) '.'
+        GenericName [34..40)
+          IdentifierToken [34..38) 'Task'
+          TypeArgumentList [38..40)
+            LessThanToken [38..39) '<'
+            T:EndOfLineTrivia [39..40) '\n'
+            IdentifierName [40..40)
+              IdentifierToken [40..40) missing
+            GreaterThanToken [40..40) missing
+    CloseBraceToken [40..41) '}'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1031 [39..39) Type expected
+  CS1003 [39..39) Syntax error, \'>\' expected

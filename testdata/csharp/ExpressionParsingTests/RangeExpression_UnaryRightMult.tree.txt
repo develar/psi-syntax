@@ -1,0 +1,10 @@
+LogicalAndExpression [0..8)
+  RangeExpression [0..4)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'a'
+    DotDotToken [1..3) '..'
+    T:WhitespaceTrivia [3..4) ' '
+  AmpersandAmpersandToken [4..6) '&&'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierName [7..8)
+    IdentifierToken [7..8) 'b'

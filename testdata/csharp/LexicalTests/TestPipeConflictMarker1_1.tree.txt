@@ -1,0 +1,6 @@
+L:WhitespaceTrivia [0..1) ' '
+BarBarToken [1..3) '||'
+BarBarToken [3..5) '||'
+BarBarToken [5..7) '||'
+BarToken [7..8) '|'
+EndOfFileToken [8..8) ''

@@ -1,0 +1,5 @@
+CompilationUnit [0..21)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:SingleLineCommentTrivia [1..20) '// yada #define XYZ'
+  L:EndOfLineTrivia [20..21) '\n'
+  EndOfFileToken [21..21) ''

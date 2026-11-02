@@ -1,0 +1,18 @@
+ParenthesizedLambdaExpression [0..26)
+  ParameterList [0..19)
+    OpenParenToken [0..1) '('
+    Parameter [1..17)
+      OutKeyword [1..4) 'out'
+      T:WhitespaceTrivia [4..5) ' '
+      ScopedKeyword [5..11) 'scoped'
+      T:WhitespaceTrivia [11..12) ' '
+      PredefinedType [12..16)
+        IntKeyword [12..15) 'int'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'a'
+    CloseParenToken [17..18) ')'
+    T:WhitespaceTrivia [18..19) ' '
+  EqualsGreaterThanToken [19..21) '=>'
+  T:WhitespaceTrivia [21..22) ' '
+  NullLiteralExpression [22..26)
+    NullKeyword [22..26) 'null'

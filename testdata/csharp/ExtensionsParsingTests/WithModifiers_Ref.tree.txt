@@ -1,0 +1,40 @@
+CompilationUnit [0..39)
+  ClassDeclaration [0..39)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    IncompleteMember [10..27)
+      RefType [10..27)
+        L:WhitespaceTrivia [10..14) '    '
+        RefKeyword [14..17) 'ref'
+        T:WhitespaceTrivia [17..18) ' '
+        IdentifierName [18..27)
+          IdentifierToken [18..27) 'extension'
+    IncompleteMember [27..36)
+      TupleType [27..36)
+        OpenParenToken [27..28) '('
+        TupleElement [28..32)
+          IdentifierName [28..32)
+            IdentifierToken [28..32) 'Type'
+        CommaToken [32..32) missing
+        TupleElement [32..32)
+          IdentifierName [32..32)
+            IdentifierToken [32..32) missing
+        CloseParenToken [32..33) ')'
+        T:WhitespaceTrivia [33..34) ' '
+        T:SkippedTokensTrivia [34..35)
+          OpenBraceToken [34..35) '{'
+        T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'
+    T:EndOfLineTrivia [37..38) '\n'
+    T:SkippedTokensTrivia [38..39)
+      CloseBraceToken [38..39) '}'
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1519 [27..28) Invalid token \'(\' in a member declaration
+  CS8124 [32..33) Tuple must contain at least two elements.
+  CS1519 [34..35) Invalid token \'{\' in a member declaration
+  CS1022 [38..39) Type or namespace definition, or end-of-file expected

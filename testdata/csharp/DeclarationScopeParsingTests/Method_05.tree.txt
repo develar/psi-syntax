@@ -1,0 +1,27 @@
+FieldDeclaration [0..28)
+  VariableDeclaration [0..27)
+    RefType [0..11)
+      RefKeyword [0..3) 'ref'
+      T:WhitespaceTrivia [3..4) ' '
+      IdentifierName [4..11)
+        IdentifierToken [4..10) 'scoped'
+        T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..27)
+      IdentifierToken [11..12) 'R'
+      T:WhitespaceTrivia [12..13) ' '
+      EqualsValueClause [13..27)
+        EqualsToken [13..13) missing
+        ParenthesizedLambdaExpression [13..27)
+          IdentifierName [13..14)
+            IdentifierToken [13..14) 'F'
+          ParameterList [14..17)
+            OpenParenToken [14..15) '('
+            CloseParenToken [15..16) ')'
+            T:WhitespaceTrivia [16..17) ' '
+          EqualsGreaterThanToken [17..19) '=>'
+          T:WhitespaceTrivia [19..20) ' '
+          DefaultLiteralExpression [20..27)
+            DefaultKeyword [20..27) 'default'
+  SemicolonToken [27..28) ';'
+Diagnostics:
+  CS1003 [13..14) Syntax error, \'=\' expected

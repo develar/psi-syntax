@@ -1,0 +1,40 @@
+CompilationUnit [0..34)
+  ClassDeclaration [0..34)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    PropertyDeclaration [10..22)
+      PredefinedType [10..14)
+        IntKeyword [10..13) 'int'
+        T:WhitespaceTrivia [13..14) ' '
+      IdentifierToken [14..15) 'p'
+      T:WhitespaceTrivia [15..16) ' '
+      AccessorList [16..22)
+        OpenBraceToken [16..17) '{'
+        T:WhitespaceTrivia [17..18) ' '
+        GetAccessorDeclaration [18..22)
+          GetKeyword [18..21) 'get'
+          T:WhitespaceTrivia [21..22) ' '
+          SemicolonToken [22..22) missing
+        CloseBraceToken [22..22) missing
+    MethodDeclaration [22..33)
+      PredefinedType [22..26)
+        IntKeyword [22..25) 'int'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..27) 'M'
+      ParameterList [27..30)
+        OpenParenToken [27..28) '('
+        CloseParenToken [28..29) ')'
+        T:WhitespaceTrivia [29..30) ' '
+      Block [30..33)
+        OpenBraceToken [30..31) '{'
+        CloseBraceToken [31..32) '}'
+        T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''
+Diagnostics:
+  CS8180 [22..25) { or ; or => expected
+  CS1513 [22..25) } expected

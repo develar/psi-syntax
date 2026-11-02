@@ -1,0 +1,1 @@
+class a { public class b { } }

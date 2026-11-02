@@ -1,0 +1,28 @@
+ForStatement [0..42)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  InvocationExpression [5..30)
+    SimpleMemberAccessExpression [5..22)
+      IdentifierName [5..12)
+        IdentifierToken [5..12) 'Console'
+      DotToken [12..13) '.'
+      IdentifierName [13..22)
+        IdentifierToken [13..22) 'WriteLine'
+    ArgumentList [22..30)
+      OpenParenToken [22..23) '('
+      Argument [23..29)
+        StringLiteralExpression [23..29)
+          StringLiteralToken [23..29) '"Blah"'
+      CloseParenToken [29..30) ')'
+  SemicolonToken [30..31) ';'
+  T:WhitespaceTrivia [31..32) ' '
+  TrueLiteralExpression [32..36)
+    TrueKeyword [32..36) 'true'
+  SemicolonToken [36..37) ';'
+  CloseParenToken [37..38) ')'
+  T:EndOfLineTrivia [38..39) '\n'
+  Block [39..42)
+    OpenBraceToken [39..40) '{'
+    T:EndOfLineTrivia [40..41) '\n'
+    CloseBraceToken [41..42) '}'

@@ -1,0 +1,51 @@
+CompilationUnit [0..72)
+  GlobalStatement [0..22)
+    LocalDeclarationStatement [0..22)
+      AwaitKeyword [0..5) 'await'
+      T:WhitespaceTrivia [5..6) ' '
+      UsingKeyword [6..11) 'using'
+      T:WhitespaceTrivia [11..12) ' '
+      VariableDeclaration [12..20)
+        IdentifierName [12..19)
+          IdentifierToken [12..18) 'scoped'
+          T:WhitespaceTrivia [18..19) ' '
+        VariableDeclarator [19..20)
+          IdentifierToken [19..20) 's'
+      SemicolonToken [20..21) ';'
+      T:EndOfLineTrivia [21..22) '\n'
+  GlobalStatement [22..46)
+    LocalDeclarationStatement [22..46)
+      AwaitKeyword [22..27) 'await'
+      T:WhitespaceTrivia [27..28) ' '
+      UsingKeyword [28..33) 'using'
+      T:WhitespaceTrivia [33..34) ' '
+      VariableDeclaration [34..44)
+        RefType [34..44)
+          RefKeyword [34..37) 'ref'
+          T:WhitespaceTrivia [37..38) ' '
+          IdentifierName [38..44)
+            IdentifierToken [38..44) 'scoped'
+        VariableDeclarator [44..44)
+          IdentifierToken [44..44) missing
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+  GlobalStatement [46..72)
+    LocalDeclarationStatement [46..72)
+      AwaitKeyword [46..51) 'await'
+      T:WhitespaceTrivia [51..52) ' '
+      UsingKeyword [52..57) 'using'
+      T:WhitespaceTrivia [57..58) ' '
+      VariableDeclaration [58..70)
+        RefType [58..69)
+          RefKeyword [58..61) 'ref'
+          T:WhitespaceTrivia [61..62) ' '
+          IdentifierName [62..69)
+            IdentifierToken [62..68) 'scoped'
+            T:WhitespaceTrivia [68..69) ' '
+        VariableDeclarator [69..70)
+          IdentifierToken [69..70) 'r'
+      SemicolonToken [70..71) ';'
+      T:EndOfLineTrivia [71..72) '\n'
+  EndOfFileToken [72..72) ''
+Diagnostics:
+  CS1001 [44..45) Identifier expected

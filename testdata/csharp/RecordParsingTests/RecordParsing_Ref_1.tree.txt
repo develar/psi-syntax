@@ -1,0 +1,9 @@
+CompilationUnit [0..13)
+  RecordDeclaration [0..13)
+    RefKeyword [0..3) 'ref'
+    T:WhitespaceTrivia [3..4) ' '
+    RecordKeyword [4..10) 'record'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'R'
+    SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''

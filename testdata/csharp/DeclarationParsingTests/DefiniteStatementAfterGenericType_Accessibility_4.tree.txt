@@ -1,0 +1,17 @@
+CompilationUnit [0..21)
+  IncompleteMember [0..11)
+    GenericName [0..11)
+      IdentifierToken [0..4) 'List'
+      TypeArgumentList [4..11)
+        LessThanToken [4..5) '<'
+        IdentifierName [5..9)
+          IdentifierToken [5..9) 'Type'
+        GreaterThanToken [9..10) '>'
+        T:EndOfLineTrivia [10..11) '\n'
+  IncompleteMember [11..21)
+    L:EndOfLineTrivia [11..12) '\n'
+    ProtectedKeyword [12..21) 'protected'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1585 [12..21) Member modifier \'protected\' must precede the member type and name
+  CS0116 [12..21) A namespace cannot directly contain members such as fields, methods or statements

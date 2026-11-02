@@ -1,0 +1,30 @@
+ForStatement [0..30)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ImplicitArrayCreationExpression [5..12)
+    NewKeyword [5..8) 'new'
+    OpenBracketToken [8..9) '['
+    CloseBracketToken [9..10) ']'
+    ArrayInitializerExpression [10..12)
+      OpenBraceToken [10..11) '{'
+      CloseBraceToken [11..12) '}'
+  SemicolonToken [12..13) ';'
+  ImplicitArrayCreationExpression [13..20)
+    NewKeyword [13..16) 'new'
+    OpenBracketToken [16..17) '['
+    CloseBracketToken [17..18) ']'
+    ArrayInitializerExpression [18..20)
+      OpenBraceToken [18..19) '{'
+      CloseBraceToken [19..20) '}'
+  SemicolonToken [20..21) ';'
+  ImplicitArrayCreationExpression [21..28)
+    NewKeyword [21..24) 'new'
+    OpenBracketToken [24..25) '['
+    CloseBracketToken [25..26) ']'
+    ArrayInitializerExpression [26..28)
+      OpenBraceToken [26..27) '{'
+      CloseBraceToken [27..28) '}'
+  CloseParenToken [28..29) ')'
+  EmptyStatement [29..30)
+    SemicolonToken [29..30) ';'

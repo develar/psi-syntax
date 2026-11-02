@@ -1,0 +1,30 @@
+ConditionalExpression [0..18)
+  IsExpression [0..11)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'o'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    ArrayType [5..11)
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'A'
+      ArrayRankSpecifier [6..8)
+        OpenBracketToken [6..7) '['
+        OmittedArraySizeExpression [7..7)
+          OmittedArraySizeExpressionToken [7..7) ''
+        CloseBracketToken [7..8) ']'
+      ArrayRankSpecifier [8..11)
+        OpenBracketToken [8..9) '['
+        OmittedArraySizeExpression [9..9)
+          OmittedArraySizeExpressionToken [9..9) ''
+        CloseBracketToken [9..10) ']'
+        T:WhitespaceTrivia [10..11) ' '
+  QuestionToken [11..12) '?'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..15)
+    IdentifierToken [13..14) 'b'
+    T:WhitespaceTrivia [14..15) ' '
+  ColonToken [15..16) ':'
+  T:WhitespaceTrivia [16..17) ' '
+  IdentifierName [17..18)
+    IdentifierToken [17..18) 'c'

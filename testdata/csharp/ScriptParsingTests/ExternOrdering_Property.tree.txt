@@ -1,0 +1,33 @@
+CompilationUnit [0..45)
+  PropertyDeclaration [0..45)
+    L:EndOfLineTrivia [0..1) '\n'
+    ExternKeyword [1..7) 'extern'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierName [8..14)
+      IdentifierToken [8..13) 'alias'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..17) 'Goo'
+    T:WhitespaceTrivia [17..18) ' '
+    AccessorList [18..45)
+      OpenBraceToken [18..19) '{'
+      T:WhitespaceTrivia [19..20) ' '
+      GetAccessorDeclaration [20..25)
+        GetKeyword [20..23) 'get'
+        SemicolonToken [23..24) ';'
+        T:WhitespaceTrivia [24..25) ' '
+      CloseBraceToken [25..26) '}'
+      T:EndOfLineTrivia [26..27) '\n'
+      T:SkippedTokensTrivia [27..33)
+        ExternKeyword [27..33) 'extern'
+      T:WhitespaceTrivia [33..34) ' '
+      T:SkippedTokensTrivia [34..39)
+        AliasKeyword [34..39) 'alias'
+      T:WhitespaceTrivia [39..40) ' '
+      T:SkippedTokensTrivia [40..43)
+        IdentifierToken [40..43) 'Goo'
+      T:SkippedTokensTrivia [43..44)
+        SemicolonToken [43..44) ';'
+      T:EndOfLineTrivia [44..45) '\n'
+  EndOfFileToken [45..45) ''
+Diagnostics:
+  CS0439 [27..33) An extern alias declaration must precede all other elements defined in the namespace

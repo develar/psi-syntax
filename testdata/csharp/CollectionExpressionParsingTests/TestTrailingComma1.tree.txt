@@ -1,0 +1,7 @@
+CollectionExpression [0..4)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'A'
+  CommaToken [2..3) ','
+  CloseBracketToken [3..4) ']'

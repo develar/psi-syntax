@@ -1,0 +1,38 @@
+OperatorDeclaration [0..38)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  GreaterThanGreaterThanEqualsToken [11..14) '>>='
+  ParameterList [14..33)
+    OpenParenToken [14..15) '('
+    Parameter [15..19)
+      IdentifierName [15..17)
+        IdentifierToken [15..16) 'C'
+        T:WhitespaceTrivia [16..17) ' '
+      IdentifierToken [17..19) 'x1'
+    CommaToken [19..20) ','
+    T:WhitespaceTrivia [20..21) ' '
+    Parameter [21..25)
+      IdentifierName [21..23)
+        IdentifierToken [21..22) 'C'
+        T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..25) 'x2'
+    CommaToken [25..26) ','
+    T:WhitespaceTrivia [26..27) ' '
+    Parameter [27..31)
+      IdentifierName [27..29)
+        IdentifierToken [27..28) 'C'
+        T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..31) 'x3'
+    CloseParenToken [31..32) ')'
+    T:WhitespaceTrivia [32..33) ' '
+  ArrowExpressionClause [33..37)
+    EqualsGreaterThanToken [33..35) '=>'
+    T:WhitespaceTrivia [35..36) ' '
+    IdentifierName [36..37)
+      IdentifierToken [36..37) 'x'
+  SemicolonToken [37..38) ';'
+Diagnostics:
+  CS9313 [11..14) Overloaded compound assignment operator \'>>=\' takes one parameter

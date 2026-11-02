@@ -1,0 +1,17 @@
+PropertyDeclaration [0..22)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..14)
+    IdentifierToken [9..13) 'Prop'
+    T:WhitespaceTrivia [13..14) ' '
+  IdentifierToken [14..14) missing
+  AccessorList [14..22)
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    GetAccessorDeclaration [16..21)
+      GetKeyword [16..19) 'get'
+      SemicolonToken [19..20) ';'
+      T:WhitespaceTrivia [20..21) ' '
+    CloseBraceToken [21..22) '}'
+Diagnostics:
+  CS1001 [14..15) Identifier expected

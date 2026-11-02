@@ -1,0 +1,19 @@
+CompilationUnit [0..23)
+  L:IfDirectiveTrivia [0..17)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    TrueLiteralExpression [4..9)
+      TrueKeyword [4..8) 'true'
+      T:WhitespaceTrivia [8..9) ' '
+    L:SkippedTokensTrivia [9..16)
+      IdentifierToken [9..16) 'GARBAGE'
+    EndOfDirectiveToken [16..16) ''
+    T:EndOfLineTrivia [16..17) '\n'
+  L:EndIfDirectiveTrivia [17..23)
+    HashToken [17..18) '#'
+    EndIfKeyword [18..23) 'endif'
+    EndOfDirectiveToken [23..23) ''
+  EndOfFileToken [23..23) ''
+Diagnostics:
+  CS1025 [9..16) Single-line comment or end-of-line expected

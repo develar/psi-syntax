@@ -1,0 +1,5 @@
+ParenthesizedExpression [0..5)
+  OpenParenToken [0..1) '('
+  IdentifierName [1..4)
+    IdentifierToken [1..4) 'goo'
+  CloseParenToken [4..5) ')'

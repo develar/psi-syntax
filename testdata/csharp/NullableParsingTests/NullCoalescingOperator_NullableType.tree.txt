@@ -1,0 +1,16 @@
+CoalesceExpression [0..12)
+  AsExpression [0..8)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    AsKeyword [2..4) 'as'
+    T:WhitespaceTrivia [4..5) ' '
+    NullableType [5..8)
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'T'
+      QuestionToken [6..7) '?'
+      T:WhitespaceTrivia [7..8) ' '
+  QuestionQuestionToken [8..10) '??'
+  T:WhitespaceTrivia [10..11) ' '
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'y'

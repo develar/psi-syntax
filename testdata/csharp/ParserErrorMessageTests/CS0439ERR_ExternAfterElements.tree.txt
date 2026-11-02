@@ -1,0 +1,61 @@
+CompilationUnit [0..189)
+  UsingDirective [0..48)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+    T:SkippedTokensTrivia [15..21)
+      ExternKeyword [15..21) 'extern'
+    T:WhitespaceTrivia [21..22) ' '
+    T:SkippedTokensTrivia [22..27)
+      AliasKeyword [22..27) 'alias'
+    T:WhitespaceTrivia [27..28) ' '
+    T:SkippedTokensTrivia [28..34)
+      IdentifierToken [28..34) 'MyType'
+    T:SkippedTokensTrivia [34..35)
+      SemicolonToken [34..35) ';'
+    T:WhitespaceTrivia [35..38) '   '
+    T:SingleLineCommentTrivia [38..47) '// CS0439'
+    T:EndOfLineTrivia [47..48) '\n'
+  ClassDeclaration [48..189)
+    L:SingleLineCommentTrivia [48..122) '// To resolve the error, make the extern alias the first line in the file.'
+    L:EndOfLineTrivia [122..123) '\n'
+    PublicKeyword [123..129) 'public'
+    T:WhitespaceTrivia [129..130) ' '
+    ClassKeyword [130..135) 'class'
+    T:WhitespaceTrivia [135..136) ' '
+    IdentifierToken [136..140) 'Test'
+    T:WhitespaceTrivia [140..141) ' '
+    T:EndOfLineTrivia [141..142) '\n'
+    OpenBraceToken [142..143) '{'
+    T:EndOfLineTrivia [143..144) '\n'
+    MethodDeclaration [144..187)
+      L:WhitespaceTrivia [144..148) '    '
+      PublicKeyword [148..154) 'public'
+      T:WhitespaceTrivia [154..155) ' '
+      StaticKeyword [155..161) 'static'
+      T:WhitespaceTrivia [161..162) ' '
+      PredefinedType [162..167)
+        VoidKeyword [162..166) 'void'
+        T:WhitespaceTrivia [166..167) ' '
+      IdentifierToken [167..171) 'Main'
+      ParameterList [171..175)
+        OpenParenToken [171..172) '('
+        CloseParenToken [172..173) ')'
+        T:WhitespaceTrivia [173..174) ' '
+        T:EndOfLineTrivia [174..175) '\n'
+      Block [175..187)
+        L:WhitespaceTrivia [175..179) '    '
+        OpenBraceToken [179..180) '{'
+        T:EndOfLineTrivia [180..181) '\n'
+        L:WhitespaceTrivia [181..185) '    '
+        CloseBraceToken [185..186) '}'
+        T:EndOfLineTrivia [186..187) '\n'
+    CloseBraceToken [187..188) '}'
+    T:EndOfLineTrivia [188..189) '\n'
+  EndOfFileToken [189..189) ''
+Diagnostics:
+  CS0439 [15..21) An extern alias declaration must precede all other elements defined in the namespace

@@ -1,0 +1,101 @@
+CompilationUnit [0..208)
+  NamespaceDeclaration [0..208)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..206)
+      L:WhitespaceTrivia [15..19) '    '
+      PublicKeyword [19..25) 'public'
+      T:WhitespaceTrivia [25..26) ' '
+      ClassKeyword [26..31) 'class'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'a'
+      T:EndOfLineTrivia [33..34) '\n'
+      L:WhitespaceTrivia [34..38) '    '
+      OpenBraceToken [38..39) '{'
+      T:EndOfLineTrivia [39..40) '\n'
+      MethodDeclaration [40..146)
+        L:WhitespaceTrivia [40..48) '        '
+        PublicKeyword [48..54) 'public'
+        T:WhitespaceTrivia [54..55) ' '
+        StaticKeyword [55..61) 'static'
+        T:WhitespaceTrivia [61..62) ' '
+        PredefinedType [62..67)
+          VoidKeyword [62..66) 'void'
+          T:WhitespaceTrivia [66..67) ' '
+        IdentifierToken [67..68) 'f'
+        ParameterList [68..84)
+          OpenParenToken [68..69) '('
+          Parameter [69..74)
+            PredefinedType [69..73)
+              IntKeyword [69..72) 'int'
+              T:WhitespaceTrivia [72..73) ' '
+            IdentifierToken [73..74) 'i'
+          CommaToken [74..75) ','
+          T:WhitespaceTrivia [75..76) ' '
+          Parameter [76..82)
+            PredefinedType [76..81)
+              CharKeyword [76..80) 'char'
+              T:WhitespaceTrivia [80..81) ' '
+            IdentifierToken [81..82) 'j'
+          CloseParenToken [82..83) ')'
+          T:EndOfLineTrivia [83..84) '\n'
+        Block [84..146)
+          L:WhitespaceTrivia [84..92) '        '
+          OpenBraceToken [92..93) '{'
+          T:EndOfLineTrivia [93..94) '\n'
+          LocalDeclarationStatement [94..136)
+            VariableDeclaration [94..121)
+              PredefinedType [94..113)
+                L:WhitespaceTrivia [94..106) '            '
+                StringKeyword [106..112) 'string'
+                T:WhitespaceTrivia [112..113) ' '
+              VariableDeclarator [113..121)
+                IdentifierToken [113..114) 'a'
+                T:WhitespaceTrivia [114..115) ' '
+                EqualsValueClause [115..121)
+                  EqualsToken [115..116) '='
+                  T:WhitespaceTrivia [116..117) ' '
+                  StringLiteralExpression [117..121)
+                    StringLiteralToken [117..121) '"\\m"'
+            SemicolonToken [121..122) ';'
+            T:WhitespaceTrivia [122..126) '    '
+            T:SingleLineCommentTrivia [126..135) '// CS1009'
+            T:EndOfLineTrivia [135..136) '\n'
+          L:WhitespaceTrivia [136..144) '        '
+          CloseBraceToken [144..145) '}'
+          T:EndOfLineTrivia [145..146) '\n'
+      MethodDeclaration [146..200)
+        L:WhitespaceTrivia [146..154) '        '
+        PublicKeyword [154..160) 'public'
+        T:WhitespaceTrivia [160..161) ' '
+        StaticKeyword [161..167) 'static'
+        T:WhitespaceTrivia [167..168) ' '
+        PredefinedType [168..173)
+          VoidKeyword [168..172) 'void'
+          T:WhitespaceTrivia [172..173) ' '
+        IdentifierToken [173..177) 'Main'
+        ParameterList [177..180)
+          OpenParenToken [177..178) '('
+          CloseParenToken [178..179) ')'
+          T:EndOfLineTrivia [179..180) '\n'
+        Block [180..200)
+          L:WhitespaceTrivia [180..188) '        '
+          OpenBraceToken [188..189) '{'
+          T:EndOfLineTrivia [189..190) '\n'
+          L:WhitespaceTrivia [190..198) '        '
+          CloseBraceToken [198..199) '}'
+          T:EndOfLineTrivia [199..200) '\n'
+      L:WhitespaceTrivia [200..204) '    '
+      CloseBraceToken [204..205) '}'
+      T:EndOfLineTrivia [205..206) '\n'
+    CloseBraceToken [206..207) '}'
+    T:EndOfLineTrivia [207..208) '\n'
+  EndOfFileToken [208..208) ''
+Diagnostics:
+  CS1009 [118..120) Unrecognized escape sequence

@@ -1,0 +1,60 @@
+CompilationUnit [0..71)
+  ClassDeclaration [0..71)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..69)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'M'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:EndOfLineTrivia [18..19) '\n'
+      Block [19..69)
+        OpenBraceToken [19..20) '{'
+        T:EndOfLineTrivia [20..21) '\n'
+        LocalDeclarationStatement [21..44)
+          VariableDeclaration [21..42)
+            IdentifierName [21..26)
+              L:WhitespaceTrivia [21..22) ' '
+              IdentifierToken [22..25) 'var'
+              T:WhitespaceTrivia [25..26) ' '
+            VariableDeclarator [26..42)
+              IdentifierToken [26..27) 'x'
+              T:WhitespaceTrivia [27..28) ' '
+              EqualsValueClause [28..42)
+                EqualsToken [28..29) '='
+                T:WhitespaceTrivia [29..30) ' '
+                SizeOfExpression [30..42)
+                  SizeOfKeyword [30..36) 'sizeof'
+                  OpenParenToken [36..37) '('
+                  PredefinedType [37..41)
+                    VoidKeyword [37..41) 'void'
+                  CloseParenToken [41..42) ')'
+          SemicolonToken [42..43) ';'
+          T:EndOfLineTrivia [43..44) '\n'
+        ReturnStatement [44..67)
+          L:WhitespaceTrivia [44..45) ' '
+          ReturnKeyword [45..51) 'return'
+          T:WhitespaceTrivia [51..52) ' '
+          DefaultExpression [52..65)
+            DefaultKeyword [52..59) 'default'
+            OpenParenToken [59..60) '('
+            PredefinedType [60..64)
+              VoidKeyword [60..64) 'void'
+            CloseParenToken [64..65) ')'
+          SemicolonToken [65..66) ';'
+          T:EndOfLineTrivia [66..67) '\n'
+        CloseBraceToken [67..68) '}'
+        T:WhitespaceTrivia [68..69) ' '
+    CloseBraceToken [69..70) '}'
+    T:EndOfLineTrivia [70..71) '\n'
+  EndOfFileToken [71..71) ''
+Diagnostics:
+  CS1547 [37..41) Keyword \'void\' cannot be used in this context
+  CS1547 [60..64) Keyword \'void\' cannot be used in this context

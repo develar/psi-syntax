@@ -1,0 +1,1 @@
+static IDictionary<(string Value, string Description) (X, X.X, X.X.X)> GetAllValues<T(Type t);

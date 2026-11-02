@@ -1,0 +1,32 @@
+ExpressionStatement [0..17)
+  SimpleAssignmentExpression [0..16)
+    InvocationExpression [0..13)
+      ElementAccessExpression [0..6)
+        IdentifierName [0..3)
+          IdentifierToken [0..3) 'var'
+        BracketedArgumentList [3..6)
+          OpenBracketToken [3..4) '['
+          Argument [4..4)
+            IdentifierName [4..4)
+              IdentifierToken [4..4) missing
+          CloseBracketToken [4..5) ']'
+          T:WhitespaceTrivia [5..6) ' '
+      ArgumentList [6..13)
+        OpenParenToken [6..7) '('
+        Argument [7..8)
+          IdentifierName [7..8)
+            IdentifierToken [7..8) 'x'
+        CommaToken [8..9) ','
+        T:WhitespaceTrivia [9..10) ' '
+        Argument [10..11)
+          IdentifierName [10..11)
+            IdentifierToken [10..11) 'y'
+        CloseParenToken [11..12) ')'
+        T:WhitespaceTrivia [12..13) ' '
+    EqualsToken [13..14) '='
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'e'
+  SemicolonToken [16..17) ';'
+Diagnostics:
+  CS0443 [4..5) Syntax error; value expected

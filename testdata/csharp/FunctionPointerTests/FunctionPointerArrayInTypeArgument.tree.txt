@@ -1,0 +1,26 @@
+LocalDeclarationStatement [0..23)
+  VariableDeclaration [0..22)
+    GenericName [0..21)
+      IdentifierToken [0..1) 'I'
+      TypeArgumentList [1..21)
+        LessThanToken [1..2) '<'
+        ArrayType [2..19)
+          FunctionPointerType [2..17)
+            DelegateKeyword [2..10) 'delegate'
+            AsteriskToken [10..11) '*'
+            FunctionPointerParameterList [11..17)
+              LessThanToken [11..12) '<'
+              FunctionPointerParameter [12..16)
+                PredefinedType [12..16)
+                  VoidKeyword [12..16) 'void'
+              GreaterThanToken [16..17) '>'
+          ArrayRankSpecifier [17..19)
+            OpenBracketToken [17..18) '['
+            OmittedArraySizeExpression [18..18)
+              OmittedArraySizeExpressionToken [18..18) ''
+            CloseBracketToken [18..19) ']'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..22)
+      IdentifierToken [21..22) 'i'
+  SemicolonToken [22..23) ';'

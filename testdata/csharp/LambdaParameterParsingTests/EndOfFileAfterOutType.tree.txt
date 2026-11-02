@@ -1,0 +1,72 @@
+CompilationUnit [0..72)
+  ClassDeclaration [0..72)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..72)
+      PredefinedType [11..21)
+        L:WhitespaceTrivia [11..16) '     '
+        VoidKeyword [16..20) 'void'
+        T:WhitespaceTrivia [20..21) ' '
+      IdentifierToken [21..24) 'Goo'
+      ParameterList [24..27)
+        OpenParenToken [24..25) '('
+        CloseParenToken [25..26) ')'
+        T:WhitespaceTrivia [26..27) ' '
+      Block [27..72)
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        LocalDeclarationStatement [29..70)
+          VariableDeclaration [29..70)
+            QualifiedName [29..61)
+              IdentifierName [29..45)
+                L:WhitespaceTrivia [29..39) '          '
+                IdentifierToken [39..45) 'System'
+              DotToken [45..46) '.'
+              GenericName [46..61)
+                IdentifierToken [46..50) 'Func'
+                TypeArgumentList [50..61)
+                  LessThanToken [50..51) '<'
+                  PredefinedType [51..54)
+                    IntKeyword [51..54) 'int'
+                  CommaToken [54..55) ','
+                  T:WhitespaceTrivia [55..56) ' '
+                  PredefinedType [56..59)
+                    IntKeyword [56..59) 'int'
+                  GreaterThanToken [59..60) '>'
+                  T:WhitespaceTrivia [60..61) ' '
+            VariableDeclarator [61..70)
+              IdentifierToken [61..62) 'f'
+              T:WhitespaceTrivia [62..63) ' '
+              EqualsValueClause [63..70)
+                EqualsToken [63..64) '='
+                T:WhitespaceTrivia [64..65) ' '
+                ParenthesizedExpression [65..70)
+                  OpenParenToken [65..66) '('
+                  IdentifierName [66..66)
+                    IdentifierToken [66..66) missing
+                  CloseParenToken [66..66) missing
+                  T:SkippedTokensTrivia [66..69)
+                    OutKeyword [66..69) 'out'
+                  T:WhitespaceTrivia [69..70) ' '
+          SemicolonToken [70..70) missing
+        ExpressionStatement [70..72)
+          IdentifierName [70..72)
+            IdentifierToken [70..71) 'C'
+            T:EndOfLineTrivia [71..72) '\n'
+          SemicolonToken [72..72) missing
+        CloseBraceToken [72..72) missing
+    CloseBraceToken [72..72) missing
+  EndOfFileToken [72..72) ''
+Diagnostics:
+  CS1525 [66..69) Invalid expression term \'out\'
+  CS1026 [66..69) ) expected
+  CS1003 [66..69) Syntax error, \',\' expected
+  CS1002 [70..71) ; expected
+  CS1002 [71..71) ; expected
+  CS1513 [71..71) } expected
+  CS1513 [71..71) } expected

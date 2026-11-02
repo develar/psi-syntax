@@ -1,0 +1,64 @@
+CompilationUnit [0..111)
+  ClassDeclaration [0..111)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..111)
+      L:WhitespaceTrivia [21..24) '   '
+      PublicKeyword [24..30) 'public'
+      T:WhitespaceTrivia [30..31) ' '
+      StaticKeyword [31..37) 'static'
+      T:WhitespaceTrivia [37..38) ' '
+      PredefinedType [38..43)
+        VoidKeyword [38..42) 'void'
+        T:WhitespaceTrivia [42..43) ' '
+      IdentifierToken [43..47) 'Main'
+      ParameterList [47..50)
+        OpenParenToken [47..48) '('
+        CloseParenToken [48..49) ')'
+        T:EndOfLineTrivia [49..50) '\n'
+      Block [50..111)
+        L:WhitespaceTrivia [50..53) '   '
+        OpenBraceToken [53..54) '{'
+        T:EndOfLineTrivia [54..55) '\n'
+        LocalDeclarationStatement [55..111)
+          VariableDeclaration [55..111)
+            PredefinedType [55..68)
+              L:WhitespaceTrivia [55..61) '      '
+              StringKeyword [61..67) 'string'
+              T:WhitespaceTrivia [67..68) ' '
+            VariableDeclarator [68..111)
+              IdentifierToken [68..69) 's'
+              T:WhitespaceTrivia [69..70) ' '
+              EqualsValueClause [70..111)
+                EqualsToken [70..71) '='
+                T:WhitespaceTrivia [71..72) ' '
+                InterpolatedStringExpression [72..111)
+                  InterpolatedStringStartToken [72..74) '$"'
+                  InterpolatedStringText [74..76)
+                    InterpolatedStringTextToken [74..76) 'x '
+                  Interpolation [76..111)
+                    OpenBraceToken [76..77) '{'
+                    T:WhitespaceTrivia [77..78) ' '
+                    T:MultiLineCommentTrivia [78..111) '/* comment\n         } y";\n   }\n}\n'
+                    IdentifierName [111..111)
+                      IdentifierToken [111..111) missing
+                    CloseBraceToken [111..111) missing
+                  InterpolatedStringEndToken [111..111) missing
+          SemicolonToken [111..111) missing
+        CloseBraceToken [111..111) missing
+    CloseBraceToken [111..111) missing
+  EndOfFileToken [111..111) ''
+Diagnostics:
+  CS8076 [75..77) Missing close delimiter \'}\' for interpolated expression started with \'{\'.
+  CS1035 [78..78) End-of-file found, \'*/\' expected
+  CS1733 [111..111) Expected expression
+  CS1002 [111..111) ; expected
+  CS1513 [111..111) } expected
+  CS1513 [111..111) } expected

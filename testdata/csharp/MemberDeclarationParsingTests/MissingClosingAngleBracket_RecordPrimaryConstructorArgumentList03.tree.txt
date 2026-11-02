@@ -1,0 +1,60 @@
+RecordDeclaration [0..81)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  RecordKeyword [7..13) 'record'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierToken [14..15) 'M'
+  TypeParameterList [15..17)
+    LessThanToken [15..16) '<'
+    TypeParameter [16..17)
+      IdentifierToken [16..17) 'T'
+    GreaterThanToken [17..17) missing
+  ParameterList [17..42)
+    OpenParenToken [17..18) '('
+    Parameter [18..40)
+      GenericName [18..35)
+        IdentifierToken [18..32) 'ImmutableArray'
+        TypeArgumentList [32..35)
+          LessThanToken [32..33) '<'
+          IdentifierName [33..35)
+            IdentifierToken [33..34) 'T'
+            T:WhitespaceTrivia [34..35) ' '
+          GreaterThanToken [35..35) missing
+      IdentifierToken [35..40) 'Array'
+    CloseParenToken [40..41) ')'
+    T:EndOfLineTrivia [41..42) '\n'
+  BaseList [42..80)
+    L:WhitespaceTrivia [42..46) '    '
+    ColonToken [46..47) ':'
+    T:WhitespaceTrivia [47..48) ' '
+    PrimaryConstructorBaseType [48..80)
+      GenericName [48..55)
+        IdentifierToken [48..53) 'Other'
+        TypeArgumentList [53..55)
+          LessThanToken [53..54) '<'
+          IdentifierName [54..55)
+            IdentifierToken [54..55) 'T'
+          GreaterThanToken [55..55) missing
+      ArgumentList [55..80)
+        OpenParenToken [55..56) '('
+        Argument [56..74)
+          ParenthesizedExpression [56..74)
+            OpenParenToken [56..57) '('
+            LessThanExpression [57..73)
+              IdentifierName [57..71)
+                IdentifierToken [57..71) 'ImmutableArray'
+              LessThanToken [71..72) '<'
+              IdentifierName [72..73)
+                IdentifierToken [72..73) 'T'
+            CloseParenToken [73..74) ')'
+        CommaToken [74..74) missing
+        Argument [74..79)
+          IdentifierName [74..79)
+            IdentifierToken [74..79) 'Array'
+        CloseParenToken [79..80) ')'
+  SemicolonToken [80..81) ';'
+Diagnostics:
+  CS1003 [17..18) Syntax error, \'>\' expected
+  CS1003 [35..40) Syntax error, \'>\' expected
+  CS1003 [55..56) Syntax error, \'>\' expected
+  CS1003 [74..79) Syntax error, \',\' expected

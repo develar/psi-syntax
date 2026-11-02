@@ -1,0 +1,1 @@
+c is [.. int[]? slice 5]

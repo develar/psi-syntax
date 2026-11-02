@@ -1,0 +1,19 @@
+OperatorDeclaration [0..22)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  LessThanLessThanEqualsToken [11..14) '<<='
+  ParameterList [14..17)
+    OpenParenToken [14..15) '('
+    CloseParenToken [15..16) ')'
+    T:WhitespaceTrivia [16..17) ' '
+  ArrowExpressionClause [17..21)
+    EqualsGreaterThanToken [17..19) '=>'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierName [20..21)
+      IdentifierToken [20..21) 'x'
+  SemicolonToken [21..22) ';'
+Diagnostics:
+  CS9313 [11..14) Overloaded compound assignment operator \'<<=\' takes one parameter

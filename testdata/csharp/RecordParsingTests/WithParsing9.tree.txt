@@ -1,0 +1,22 @@
+WithExpression [0..21)
+  WithExpression [0..13)
+    InvocationExpression [0..4)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'M'
+      ArgumentList [1..4)
+        OpenParenToken [1..2) '('
+        CloseParenToken [2..3) ')'
+        T:WhitespaceTrivia [3..4) ' '
+    WithKeyword [4..8) 'with'
+    T:WhitespaceTrivia [8..9) ' '
+    WithInitializerExpression [9..13)
+      OpenBraceToken [9..10) '{'
+      T:WhitespaceTrivia [10..11) ' '
+      CloseBraceToken [11..12) '}'
+      T:WhitespaceTrivia [12..13) ' '
+  WithKeyword [13..17) 'with'
+  T:WhitespaceTrivia [17..18) ' '
+  WithInitializerExpression [18..21)
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    CloseBraceToken [20..21) '}'

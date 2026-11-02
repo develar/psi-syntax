@@ -1,0 +1,44 @@
+MethodDeclaration [0..88)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..67)
+    IdentifierToken [7..18) 'IDictionary'
+    TypeArgumentList [18..67)
+      LessThanToken [18..19) '<'
+      TupleType [19..54)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      CommaToken [54..54) missing
+      QualifiedName [54..65)
+        IdentifierName [54..59)
+          IdentifierToken [54..59) 'Outer'
+        DotToken [59..60) '.'
+        IdentifierName [60..65)
+          IdentifierToken [60..65) 'Inner'
+      GreaterThanToken [65..66) '>'
+      T:WhitespaceTrivia [66..67) ' '
+  IdentifierToken [67..79) 'GetAllValues'
+  ParameterList [79..87)
+    OpenParenToken [79..80) '('
+    Parameter [80..86)
+      IdentifierName [80..85)
+        IdentifierToken [80..84) 'Type'
+        T:WhitespaceTrivia [84..85) ' '
+      IdentifierToken [85..86) 't'
+    CloseParenToken [86..87) ')'
+  SemicolonToken [87..88) ';'
+Diagnostics:
+  CS1003 [54..59) Syntax error, \',\' expected

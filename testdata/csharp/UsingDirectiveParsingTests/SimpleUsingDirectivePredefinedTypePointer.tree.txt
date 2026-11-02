@@ -1,0 +1,16 @@
+CompilationUnit [0..11)
+  GlobalStatement [0..11)
+    LocalDeclarationStatement [0..11)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      VariableDeclaration [6..10)
+        PointerType [6..10)
+          PredefinedType [6..9)
+            IntKeyword [6..9) 'int'
+          AsteriskToken [9..10) '*'
+        VariableDeclarator [10..10)
+          IdentifierToken [10..10) missing
+      SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1001 [10..11) Identifier expected

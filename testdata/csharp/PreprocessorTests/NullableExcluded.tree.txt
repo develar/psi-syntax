@@ -1,0 +1,39 @@
+CompilationUnit [0..69)
+  L:NullableDirectiveTrivia [0..17)
+    HashToken [0..1) '#'
+    NullableKeyword [1..9) 'nullable'
+    T:WhitespaceTrivia [9..10) ' '
+    EnableKeyword [10..16) 'enable'
+    EndOfDirectiveToken [16..16) ''
+    T:EndOfLineTrivia [16..17) '\n'
+  L:IfDirectiveTrivia [17..27)
+    HashToken [17..18) '#'
+    IfKeyword [18..20) 'if'
+    T:WhitespaceTrivia [20..21) ' '
+    FalseLiteralExpression [21..26)
+      FalseKeyword [21..26) 'false'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  L:NullableDirectiveTrivia [27..44)
+    HashToken [27..28) '#'
+    NullableKeyword [28..36) 'nullable'
+    T:WhitespaceTrivia [36..37) ' '
+    EnableKeyword [37..43) 'enable'
+    EndOfDirectiveToken [43..43) ''
+    T:EndOfLineTrivia [43..44) '\n'
+  L:EndIfDirectiveTrivia [44..51)
+    HashToken [44..45) '#'
+    EndIfKeyword [45..50) 'endif'
+    EndOfDirectiveToken [50..50) ''
+    T:EndOfLineTrivia [50..51) '\n'
+  L:NullableDirectiveTrivia [51..69)
+    HashToken [51..52) '#'
+    NullableKeyword [52..60) 'nullable'
+    T:WhitespaceTrivia [60..61) ' '
+    DisableKeyword [61..68) 'disable'
+    EndOfDirectiveToken [68..68) ''
+    T:EndOfLineTrivia [68..69) '\n'
+  EndOfFileToken [69..69) ''
+Diagnostics:
+  CS8025 [1..9) Feature \'nullable reference types\' is not available in C# 4. Please use language version 8.0 or greater.
+  CS8025 [52..60) Feature \'nullable reference types\' is not available in C# 4. Please use language version 8.0 or greater.

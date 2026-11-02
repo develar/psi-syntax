@@ -1,0 +1,11 @@
+SwitchStatement [0..14)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'a'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  CloseBraceToken [13..14) '}'

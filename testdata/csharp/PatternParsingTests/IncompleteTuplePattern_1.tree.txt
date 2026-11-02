@@ -1,0 +1,35 @@
+ExpressionStatement [0..16)
+  SimpleAssignmentExpression [0..15)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    IsPatternExpression [4..15)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'i'
+        T:WhitespaceTrivia [5..6) ' '
+      IsKeyword [6..8) 'is'
+      T:WhitespaceTrivia [8..9) ' '
+      RecursivePattern [9..15)
+        PositionalPatternClause [9..15)
+          OpenParenToken [9..10) '('
+          Subpattern [10..11)
+            ConstantPattern [10..11)
+              NumericLiteralExpression [10..11)
+                NumericLiteralToken [10..11) '1'
+          CommaToken [11..12) ','
+          T:WhitespaceTrivia [12..15) '   '
+          Subpattern [15..15)
+            ConstantPattern [15..15)
+              IdentifierName [15..15)
+                IdentifierToken [15..15) missing
+          CloseParenToken [15..15) missing
+  SemicolonToken [15..15) missing
+  T:SkippedTokensTrivia [15..16)
+    CloseBraceToken [15..16) '}'
+Diagnostics:
+  CS1073 [0..15) Unexpected token \'}\'
+  CS8504 [15..16) Pattern missing
+  CS1026 [15..16) ) expected
+  CS1002 [15..16) ; expected

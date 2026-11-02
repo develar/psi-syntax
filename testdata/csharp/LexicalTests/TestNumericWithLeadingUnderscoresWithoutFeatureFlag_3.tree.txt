@@ -1,0 +1,4 @@
+NumericLiteralToken [0..4) '0x_1'
+EndOfFileToken [4..4) ''
+Diagnostics:
+  CS8059 [0..0) Feature \'leading digit separator\' is not available in C# 6. Please use language version 7.2 or greater.

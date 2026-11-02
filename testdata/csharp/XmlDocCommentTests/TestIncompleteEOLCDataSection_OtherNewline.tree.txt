@@ -1,0 +1,22 @@
+CompilationUnit [0..37)
+  ClassDeclaration [0..37)
+    L:SingleLineDocumentationCommentTrivia [0..26)
+      XmlText [0..4)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..4) ' '
+      XmlCDataSection [4..26)
+        XmlCDataStartToken [4..13) '<![CDATA['
+        XmlTextLiteralToken [13..24) ' incomplete'
+        XmlTextLiteralNewLineToken [24..26) '\u{0085}'
+        XmlCDataEndToken [26..26) missing
+      EndOfDocumentationCommentToken [26..26) ''
+    ClassKeyword [26..31) 'class'
+    T:WhitespaceTrivia [31..32) ' '
+    IdentifierToken [32..33) 'C'
+    T:WhitespaceTrivia [33..34) ' '
+    OpenBraceToken [34..35) '{'
+    T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'
+  EndOfFileToken [37..37) ''
+Diagnostics:
+  CS1570 [26..26) XML comment has badly formed XML -- \'The character(s) \'\' cannot be used at this location.\'

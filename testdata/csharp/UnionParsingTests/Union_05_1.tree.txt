@@ -1,0 +1,21 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..17)
+    LocalFunctionStatement [0..17)
+      RefType [0..10)
+        RefKeyword [0..3) 'ref'
+        T:WhitespaceTrivia [3..4) ' '
+        IdentifierName [4..10)
+          IdentifierToken [4..9) 'union'
+          T:WhitespaceTrivia [9..10) ' '
+      IdentifierToken [10..12) 'U1'
+      ParameterList [12..16)
+        OpenParenToken [12..13) '('
+        Parameter [13..15)
+          IdentifierName [13..15)
+            IdentifierToken [13..15) 'E1'
+          IdentifierToken [15..15) missing
+        CloseParenToken [15..16) ')'
+      SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1001 [15..16) Identifier expected

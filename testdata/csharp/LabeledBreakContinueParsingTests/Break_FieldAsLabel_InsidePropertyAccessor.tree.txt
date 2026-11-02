@@ -1,0 +1,45 @@
+PropertyDeclaration [0..95)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  IdentifierToken [4..5) 'P'
+  T:EndOfLineTrivia [5..6) '\n'
+  AccessorList [6..95)
+    OpenBraceToken [6..7) '{'
+    T:EndOfLineTrivia [7..8) '\n'
+    GetAccessorDeclaration [8..94)
+      L:WhitespaceTrivia [8..12) '    '
+      GetKeyword [12..15) 'get'
+      T:EndOfLineTrivia [15..16) '\n'
+      Block [16..94)
+        L:WhitespaceTrivia [16..20) '    '
+        OpenBraceToken [20..21) '{'
+        T:EndOfLineTrivia [21..22) '\n'
+        WhileStatement [22..88)
+          L:WhitespaceTrivia [22..30) '        '
+          WhileKeyword [30..35) 'while'
+          T:WhitespaceTrivia [35..36) ' '
+          OpenParenToken [36..37) '('
+          TrueLiteralExpression [37..41)
+            TrueKeyword [37..41) 'true'
+          CloseParenToken [41..42) ')'
+          T:EndOfLineTrivia [42..43) '\n'
+          Block [43..88)
+            L:WhitespaceTrivia [43..51) '        '
+            OpenBraceToken [51..52) '{'
+            T:EndOfLineTrivia [52..53) '\n'
+            BreakStatement [53..78)
+              L:WhitespaceTrivia [53..65) '            '
+              BreakKeyword [65..70) 'break'
+              T:WhitespaceTrivia [70..71) ' '
+              IdentifierName [71..76)
+                IdentifierToken [71..76) 'field'
+              SemicolonToken [76..77) ';'
+              T:EndOfLineTrivia [77..78) '\n'
+            L:WhitespaceTrivia [78..86) '        '
+            CloseBraceToken [86..87) '}'
+            T:EndOfLineTrivia [87..88) '\n'
+        L:WhitespaceTrivia [88..92) '    '
+        CloseBraceToken [92..93) '}'
+        T:EndOfLineTrivia [93..94) '\n'
+    CloseBraceToken [94..95) '}'

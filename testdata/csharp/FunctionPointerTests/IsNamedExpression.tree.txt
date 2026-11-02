@@ -1,0 +1,19 @@
+IsPatternExpression [0..24)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  DeclarationPattern [5..24)
+    FunctionPointerType [5..21)
+      DelegateKeyword [5..13) 'delegate'
+      AsteriskToken [13..14) '*'
+      FunctionPointerParameterList [14..21)
+        LessThanToken [14..15) '<'
+        FunctionPointerParameter [15..19)
+          PredefinedType [15..19)
+            VoidKeyword [15..19) 'void'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    SingleVariableDesignation [21..24)
+      IdentifierToken [21..24) 'ptr'

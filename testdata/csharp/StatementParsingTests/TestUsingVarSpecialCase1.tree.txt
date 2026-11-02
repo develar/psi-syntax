@@ -1,0 +1,27 @@
+LocalDeclarationStatement [0..24)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  VariableDeclaration [6..23)
+    IdentifierName [6..10)
+      IdentifierToken [6..9) 'var'
+      T:WhitespaceTrivia [9..10) ' '
+    VariableDeclarator [10..23)
+      IdentifierToken [10..11) 'x'
+      T:WhitespaceTrivia [11..12) ' '
+      EqualsValueClause [12..23)
+        EqualsToken [12..13) '='
+        T:WhitespaceTrivia [13..14) ' '
+        ConditionalExpression [14..23)
+          IdentifierName [14..16)
+            IdentifierToken [14..15) 'f'
+            T:WhitespaceTrivia [15..16) ' '
+          QuestionToken [16..17) '?'
+          T:WhitespaceTrivia [17..18) ' '
+          IdentifierName [18..20)
+            IdentifierToken [18..19) 'a'
+            T:WhitespaceTrivia [19..20) ' '
+          ColonToken [20..21) ':'
+          T:WhitespaceTrivia [21..22) ' '
+          IdentifierName [22..23)
+            IdentifierToken [22..23) 'b'
+  SemicolonToken [23..24) ';'

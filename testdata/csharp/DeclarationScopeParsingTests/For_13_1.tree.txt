@@ -1,0 +1,38 @@
+ForStatement [0..37)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForKeyword [1..4) 'for'
+  T:WhitespaceTrivia [4..5) ' '
+  OpenParenToken [5..6) '('
+  IdentifierName [6..14)
+    IdentifierToken [6..13) '@scoped'
+    T:WhitespaceTrivia [13..14) ' '
+  CommaToken [14..14) missing
+  RefExpression [14..27)
+    RefKeyword [14..17) 'ref'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierName [18..27)
+      IdentifierToken [18..18) missing
+      T:SkippedTokensTrivia [18..26)
+        ReadOnlyKeyword [18..26) 'readonly'
+      T:WhitespaceTrivia [26..27) ' '
+  CommaToken [27..27) missing
+  PredefinedType [27..31)
+    IntKeyword [27..30) 'int'
+    T:WhitespaceTrivia [30..31) ' '
+  CommaToken [31..31) missing
+  IdentifierName [31..32)
+    IdentifierToken [31..32) 'a'
+  SemicolonToken [32..33) ';'
+  SemicolonToken [33..34) ';'
+  CloseParenToken [34..35) ')'
+  EmptyStatement [35..37)
+    SemicolonToken [35..36) ';'
+    T:EndOfLineTrivia [36..37) '\n'
+Diagnostics:
+  CS1003 [14..17) Syntax error, \',\' expected
+  CS1525 [14..18) Invalid expression term \'ref\'
+  CS1525 [18..26) Invalid expression term \'readonly\'
+  CS1003 [18..26) Syntax error, \',\' expected
+  CS1003 [27..30) Syntax error, \',\' expected
+  CS1525 [27..30) Invalid expression term \'int\'
+  CS1003 [31..32) Syntax error, \',\' expected

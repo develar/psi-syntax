@@ -1,0 +1,30 @@
+CompilationUnit [0..44)
+  ClassDeclaration [0..44)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..13) 'Class1'
+    TypeParameterList [13..16)
+      LessThanToken [13..14) '<'
+      TypeParameter [14..15)
+        IdentifierToken [14..15) 'T'
+      GreaterThanToken [15..16) '>'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    ConstructorDeclaration [18..42)
+      L:WhitespaceTrivia [18..22) '    '
+      PublicKeyword [22..28) 'public'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..35) 'Class1'
+      ParameterList [35..38)
+        OpenParenToken [35..36) '('
+        CloseParenToken [36..37) ')'
+        T:WhitespaceTrivia [37..38) ' '
+      Block [38..42)
+        OpenBraceToken [38..39) '{'
+        T:WhitespaceTrivia [39..40) ' '
+        CloseBraceToken [40..41) '}'
+        T:EndOfLineTrivia [41..42) '\n'
+    CloseBraceToken [42..43) '}'
+    T:EndOfLineTrivia [43..44) '\n'
+  EndOfFileToken [44..44) ''

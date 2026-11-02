@@ -1,0 +1,15 @@
+CompilationUnit [0..11)
+  ClassDeclaration [0..11)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:EndOfLineTrivia [6..7) '\n'
+    IdentifierToken [7..8) 'C'
+    TypeParameterList [8..10)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..9)
+        IdentifierToken [9..9) missing
+      GreaterThanToken [9..10) '>'
+    SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1001 [9..10) Identifier expected

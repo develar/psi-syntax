@@ -1,0 +1,56 @@
+CompilationUnit [0..105)
+  NamespaceDeclaration [0..105)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    L:WhitespaceTrivia [13..17) '    '
+    OpenBraceToken [17..18) '{'
+    T:EndOfLineTrivia [18..19) '\n'
+    MethodDeclaration [19..42)
+      L:WhitespaceTrivia [19..23) '    '
+      PublicKeyword [23..29) 'public'
+      T:WhitespaceTrivia [29..30) ' '
+      PredefinedType [30..35)
+        VoidKeyword [30..34) 'void'
+        T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..36) 'f'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:WhitespaceTrivia [38..39) ' '
+      Block [39..42)
+        OpenBraceToken [39..40) '{'
+        CloseBraceToken [40..41) '}'
+        T:EndOfLineTrivia [41..42) '\n'
+    ClassDeclaration [42..99)
+      L:WhitespaceTrivia [42..46) '    '
+      PublicKeyword [46..52) 'public'
+      T:WhitespaceTrivia [52..53) ' '
+      ClassKeyword [53..58) 'class'
+      T:WhitespaceTrivia [58..59) ' '
+      IdentifierToken [59..60) 'C'
+      T:EndOfLineTrivia [60..61) '\n'
+      L:WhitespaceTrivia [61..69) '        '
+      OpenBraceToken [69..70) '{'
+      T:EndOfLineTrivia [70..71) '\n'
+      T:WhitespaceTrivia [71..79) '        '
+      T:SkippedTokensTrivia [79..85)
+        ReturnKeyword [79..85) 'return'
+      T:WhitespaceTrivia [85..86) ' '
+      T:SkippedTokensTrivia [86..87)
+        NumericLiteralToken [86..87) '1'
+      T:SkippedTokensTrivia [87..88)
+        SemicolonToken [87..88) ';'
+      T:EndOfLineTrivia [88..89) '\n'
+      L:WhitespaceTrivia [89..97) '        '
+      CloseBraceToken [97..98) '}'
+      T:EndOfLineTrivia [98..99) '\n'
+    L:WhitespaceTrivia [99..103) '    '
+    CloseBraceToken [103..104) '}'
+    T:EndOfLineTrivia [104..105) '\n'
+  EndOfFileToken [105..105) ''
+Diagnostics:
+  CS1519 [79..85) Invalid token \'return\' in a member declaration

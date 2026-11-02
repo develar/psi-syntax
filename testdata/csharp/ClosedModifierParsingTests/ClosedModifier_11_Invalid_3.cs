@@ -1,0 +1,1 @@
+public closed enum C { }

@@ -1,0 +1,1 @@
+var f = int x = 3 => x;

@@ -1,0 +1,48 @@
+MethodDeclaration [0..40)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..40)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..26)
+      VariableDeclaration [11..26)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:EndOfLineTrivia [25..26) '\n'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    LocalDeclarationStatement [26..40)
+      L:WhitespaceTrivia [26..30) '    '
+      VolatileKeyword [30..38) 'volatile'
+      T:EndOfLineTrivia [38..39) '\n'
+      VariableDeclaration [39..40)
+        IdentifierName [39..39)
+          IdentifierToken [39..39) missing
+        VariableDeclarator [39..40)
+          IdentifierToken [39..39) missing
+          T:SkippedTokensTrivia [39..40)
+            CloseBraceToken [39..40) '}'
+      SemicolonToken [40..40) missing
+    CloseBraceToken [40..40) missing
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected
+  CS0106 [30..38) The modifier \'volatile\' is not valid for this item
+  CS1031 [38..38) Type expected
+  CS1001 [38..38) Identifier expected
+  CS1003 [38..38) Syntax error, \',\' expected
+  CS1002 [40..40) ; expected
+  CS1513 [40..40) } expected

@@ -1,0 +1,20 @@
+CompilationUnit [0..21)
+  StructDeclaration [0..21)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:WhitespaceTrivia [9..10) ' '
+    BaseList [10..19)
+      ColonToken [10..11) ':'
+      T:WhitespaceTrivia [11..12) ' '
+      PrimaryConstructorBaseType [12..19)
+        IdentifierName [12..16)
+          IdentifierToken [12..16) 'Base'
+        ArgumentList [16..19)
+          OpenParenToken [16..17) '('
+          CloseParenToken [17..18) ')'
+          T:WhitespaceTrivia [18..19) ' '
+    OpenBraceToken [19..20) '{'
+    CloseBraceToken [20..21) '}'
+  EndOfFileToken [21..21) ''

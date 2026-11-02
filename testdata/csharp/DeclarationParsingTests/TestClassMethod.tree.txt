@@ -1,0 +1,24 @@
+CompilationUnit [0..21)
+  ClassDeclaration [0..21)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..20)
+      IdentifierName [10..12)
+        IdentifierToken [10..11) 'b'
+        T:WhitespaceTrivia [11..12) ' '
+      IdentifierToken [12..13) 'X'
+      ParameterList [13..16)
+        OpenParenToken [13..14) '('
+        CloseParenToken [14..15) ')'
+        T:WhitespaceTrivia [15..16) ' '
+      Block [16..20)
+        OpenBraceToken [16..17) '{'
+        T:WhitespaceTrivia [17..18) ' '
+        CloseBraceToken [18..19) '}'
+        T:WhitespaceTrivia [19..20) ' '
+    CloseBraceToken [20..21) '}'
+  EndOfFileToken [21..21) ''

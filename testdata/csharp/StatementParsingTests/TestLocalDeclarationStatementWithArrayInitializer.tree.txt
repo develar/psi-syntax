@@ -1,0 +1,21 @@
+LocalDeclarationStatement [0..13)
+  VariableDeclaration [0..12)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'T'
+      T:WhitespaceTrivia [1..2) ' '
+    VariableDeclarator [2..12)
+      IdentifierToken [2..3) 'a'
+      T:WhitespaceTrivia [3..4) ' '
+      EqualsValueClause [4..12)
+        EqualsToken [4..5) '='
+        T:WhitespaceTrivia [5..6) ' '
+        ArrayInitializerExpression [6..12)
+          OpenBraceToken [6..7) '{'
+          IdentifierName [7..8)
+            IdentifierToken [7..8) 'b'
+          CommaToken [8..9) ','
+          T:WhitespaceTrivia [9..10) ' '
+          IdentifierName [10..11)
+            IdentifierToken [10..11) 'c'
+          CloseBraceToken [11..12) '}'
+  SemicolonToken [12..13) ';'

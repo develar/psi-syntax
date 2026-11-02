@@ -1,0 +1,22 @@
+ForStatement [0..20)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..16)
+    IdentifierName [5..7)
+      IdentifierToken [5..6) 'C'
+      T:WhitespaceTrivia [6..7) ' '
+    VariableDeclarator [7..16)
+      IdentifierToken [7..8) 'x'
+      T:WhitespaceTrivia [8..9) ' '
+      EqualsValueClause [9..16)
+        EqualsToken [9..9) missing
+        DefaultLiteralExpression [9..16)
+          DefaultKeyword [9..16) 'default'
+  SemicolonToken [16..17) ';'
+  SemicolonToken [17..18) ';'
+  CloseParenToken [18..19) ')'
+  EmptyStatement [19..20)
+    SemicolonToken [19..20) ';'
+Diagnostics:
+  CS1003 [9..16) Syntax error, \'=\' expected

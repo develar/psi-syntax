@@ -1,0 +1,27 @@
+InvocationExpression [0..11)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..11)
+    OpenParenToken [1..2) '('
+    Argument [2..4)
+      IdentifierName [2..4)
+        IdentifierToken [2..3) 'A'
+        T:WhitespaceTrivia [3..4) ' '
+    CommaToken [4..4) missing
+    Argument [4..5)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'a'
+    CommaToken [5..6) ','
+    T:WhitespaceTrivia [6..7) ' '
+    Argument [7..9)
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'B'
+        T:WhitespaceTrivia [8..9) ' '
+    CommaToken [9..9) missing
+    Argument [9..10)
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'b'
+    CloseParenToken [10..11) ')'
+Diagnostics:
+  CS1003 [4..5) Syntax error, \',\' expected
+  CS1003 [9..10) Syntax error, \',\' expected

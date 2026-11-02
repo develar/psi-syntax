@@ -1,0 +1,37 @@
+SwitchExpression [0..48)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..47)
+    DeclarationPattern [13..31)
+      NullableType [13..23)
+        IdentifierName [13..21)
+          L:WhitespaceTrivia [13..17) '    '
+          IdentifierToken [17..21) 'Type'
+        QuestionToken [21..22) '?'
+        T:WhitespaceTrivia [22..23) ' '
+      SingleVariableDesignation [23..31)
+        IdentifierToken [23..30) 'varName'
+        T:WhitespaceTrivia [30..31) ' '
+    WhenClause [31..42)
+      WhenKeyword [31..35) 'when'
+      T:WhitespaceTrivia [35..36) ' '
+      GreaterThanExpression [36..42)
+        IdentifierName [36..38)
+          IdentifierToken [36..37) 'x'
+          T:WhitespaceTrivia [37..38) ' '
+        GreaterThanToken [38..39) '>'
+        T:WhitespaceTrivia [39..40) ' '
+        NumericLiteralExpression [40..42)
+          NumericLiteralToken [40..41) '0'
+          T:WhitespaceTrivia [41..42) ' '
+    EqualsGreaterThanToken [42..44) '=>'
+    T:WhitespaceTrivia [44..45) ' '
+    NumericLiteralExpression [45..47)
+      NumericLiteralToken [45..46) '1'
+      T:EndOfLineTrivia [46..47) '\n'
+  CloseBraceToken [47..48) '}'

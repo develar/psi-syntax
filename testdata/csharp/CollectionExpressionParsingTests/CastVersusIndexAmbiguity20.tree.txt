@@ -1,0 +1,30 @@
+ElementAccessExpression [0..29)
+  ParenthesizedExpression [0..20)
+    OpenParenToken [0..1) '('
+    SimpleMemberAccessExpression [1..19)
+      AliasQualifiedName [1..12)
+        IdentifierName [1..6)
+          IdentifierToken [1..6) 'alias'
+        ColonColonToken [6..8) '::'
+        IdentifierName [8..12)
+          IdentifierToken [8..12) 'type'
+      DotToken [12..13) '.'
+      IdentifierName [13..19)
+        IdentifierToken [13..19) 'member'
+    CloseParenToken [19..20) ')'
+  BracketedArgumentList [20..29)
+    OpenBracketToken [20..21) '['
+    Argument [21..22)
+      NumericLiteralExpression [21..22)
+        NumericLiteralToken [21..22) '1'
+    CommaToken [22..23) ','
+    T:WhitespaceTrivia [23..24) ' '
+    Argument [24..25)
+      NumericLiteralExpression [24..25)
+        NumericLiteralToken [24..25) '2'
+    CommaToken [25..26) ','
+    T:WhitespaceTrivia [26..27) ' '
+    Argument [27..28)
+      NumericLiteralExpression [27..28)
+        NumericLiteralToken [27..28) '3'
+    CloseBracketToken [28..29) ']'

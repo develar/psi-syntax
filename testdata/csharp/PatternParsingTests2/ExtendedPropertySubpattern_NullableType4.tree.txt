@@ -1,0 +1,44 @@
+IsPatternExpression [0..45)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..45)
+    PropertyPatternClause [5..45)
+      OpenBraceToken [5..6) '{'
+      T:WhitespaceTrivia [6..7) ' '
+      Subpattern [7..27)
+        NameColon [7..13)
+          IdentifierName [7..11)
+            IdentifierToken [7..11) 'Prop'
+          ColonToken [11..12) ':'
+          T:WhitespaceTrivia [12..13) ' '
+        DeclarationPattern [13..27)
+          NullableType [13..19)
+            IdentifierName [13..17)
+              IdentifierToken [13..17) 'Type'
+            QuestionToken [17..18) '?'
+            T:WhitespaceTrivia [18..19) ' '
+          SingleVariableDesignation [19..27)
+            IdentifierToken [19..26) 'propVal'
+            T:WhitespaceTrivia [26..27) ' '
+      CommaToken [27..27) missing
+      Subpattern [27..44)
+        NameColon [27..34)
+          IdentifierName [27..32)
+            IdentifierToken [27..32) 'Prop2'
+          ColonToken [32..33) ':'
+          T:WhitespaceTrivia [33..34) ' '
+        DeclarationPattern [34..44)
+          NullableType [34..39)
+            PredefinedType [34..37)
+              IntKeyword [34..37) 'int'
+            QuestionToken [37..38) '?'
+            T:WhitespaceTrivia [38..39) ' '
+          SingleVariableDesignation [39..44)
+            IdentifierToken [39..43) 'val2'
+            T:WhitespaceTrivia [43..44) ' '
+      CloseBraceToken [44..45) '}'
+Diagnostics:
+  CS1003 [27..32) Syntax error, \',\' expected

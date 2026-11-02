@@ -1,0 +1,30 @@
+ArrayCreationExpression [0..22)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..22)
+    NullableType [4..20)
+      ArrayType [4..19)
+        NullableType [4..14)
+          ArrayType [4..13)
+            PredefinedType [4..10)
+              ObjectKeyword [4..10) 'object'
+            ArrayRankSpecifier [10..13)
+              OpenBracketToken [10..11) '['
+              NumericLiteralExpression [11..12)
+                NumericLiteralToken [11..12) '1'
+              CloseBracketToken [12..13) ']'
+          QuestionToken [13..14) '?'
+        ArrayRankSpecifier [14..19)
+          OpenBracketToken [14..15) '['
+          NumericLiteralExpression [15..16)
+            NumericLiteralToken [15..16) '2'
+          CommaToken [16..17) ','
+          NumericLiteralExpression [17..18)
+            NumericLiteralToken [17..18) '3'
+          CloseBracketToken [18..19) ']'
+      QuestionToken [19..20) '?'
+    ArrayRankSpecifier [20..22)
+      OpenBracketToken [20..21) '['
+      OmittedArraySizeExpression [21..21)
+        OmittedArraySizeExpressionToken [21..21) ''
+      CloseBracketToken [21..22) ']'

@@ -1,0 +1,23 @@
+SwitchStatement [0..16)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  TupleExpression [7..14)
+    OpenParenToken [7..8) '('
+    Argument [8..12)
+      NameColon [8..11)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'a'
+        ColonToken [9..10) ':'
+        T:WhitespaceTrivia [10..11) ' '
+      NumericLiteralExpression [11..12)
+        NumericLiteralToken [11..12) '0'
+    CommaToken [12..12) missing
+    Argument [12..12)
+      IdentifierName [12..12)
+        IdentifierToken [12..12) missing
+    CloseParenToken [12..13) ')'
+    T:WhitespaceTrivia [13..14) ' '
+  OpenBraceToken [14..15) '{'
+  CloseBraceToken [15..16) '}'
+Diagnostics:
+  CS8124 [12..13) Tuple must contain at least two elements.

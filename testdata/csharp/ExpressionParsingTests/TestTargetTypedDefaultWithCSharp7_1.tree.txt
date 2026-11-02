@@ -1,0 +1,2 @@
+DefaultLiteralExpression [0..7)
+  DefaultKeyword [0..7) 'default'

@@ -1,0 +1,1 @@
+public Task<SomeNamespace. Method();

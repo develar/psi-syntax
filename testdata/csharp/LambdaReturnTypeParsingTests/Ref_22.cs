@@ -1,0 +1,1 @@
+d1 switch { null => (ref int () => x) }

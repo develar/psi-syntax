@@ -1,0 +1,36 @@
+ParenthesizedLambdaExpression [0..34)
+  ParameterList [0..4)
+    L:EndOfLineTrivia [0..1) '\n'
+    OpenParenToken [1..2) '('
+    CloseParenToken [2..3) ')'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  Block [7..34)
+    OpenBraceToken [7..8) '{'
+    T:EndOfLineTrivia [8..9) '\n'
+    LocalDeclarationStatement [9..32)
+      L:WhitespaceTrivia [9..13) '    '
+      ConstKeyword [13..18) 'const'
+      T:WhitespaceTrivia [18..19) ' '
+      VariableDeclaration [19..30)
+        IdentifierName [19..25)
+          IdentifierToken [19..24) 'await'
+          T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..30)
+          IdentifierToken [25..28) 'goo'
+          BracketedArgumentList [28..30)
+            OpenBracketToken [28..28) missing
+            T:SkippedTokensTrivia [28..29)
+              OpenParenToken [28..29) '('
+            CloseBracketToken [29..29) missing
+            T:SkippedTokensTrivia [29..30)
+              CloseParenToken [29..30) ')'
+      SemicolonToken [30..31) ';'
+      T:EndOfLineTrivia [31..32) '\n'
+    CloseBraceToken [32..33) '}'
+    T:EndOfLineTrivia [33..34) '\n'
+Diagnostics:
+  CS1528 [28..29) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [28..29) Syntax error, \'[\' expected
+  CS1003 [29..30) Syntax error, \']\' expected

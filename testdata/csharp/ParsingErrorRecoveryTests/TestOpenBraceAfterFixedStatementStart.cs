@@ -1,0 +1,1 @@
+class c { void m() { fixed(t v { } } }

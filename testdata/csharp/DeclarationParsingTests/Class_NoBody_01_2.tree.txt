@@ -1,0 +1,12 @@
+CompilationUnit [0..9)
+  StructDeclaration [0..9)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:EndOfLineTrivia [7..8) '\n'
+    IdentifierToken [8..9) 'C'
+    OpenBraceToken [9..9) missing
+    CloseBraceToken [9..9) missing
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1514 [9..9) { expected
+  CS1513 [9..9) } expected

@@ -1,0 +1,12 @@
+CompilationUnit [0..16)
+  RecordDeclaration [0..16)
+    FileKeyword [0..4) 'file'
+    T:WhitespaceTrivia [4..5) ' '
+    RecordKeyword [5..11) 'record'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..13) 'X'
+    ParameterList [13..15)
+      OpenParenToken [13..14) '('
+      CloseParenToken [14..15) ')'
+    SemicolonToken [15..16) ';'
+  EndOfFileToken [16..16) ''

@@ -1,0 +1,1 @@
+for(T a in b) { }

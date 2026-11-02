@@ -1,0 +1,10 @@
+CompilationUnit [0..27)
+  L:ErrorDirectiveTrivia [0..27)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..27) 'Your monkey is alive'
+    EndOfDirectiveToken [27..27) ''
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1029 [7..27) #error: \'Your monkey is alive\'

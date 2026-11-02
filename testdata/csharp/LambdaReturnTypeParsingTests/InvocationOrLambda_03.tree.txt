@@ -1,0 +1,25 @@
+InvocationExpression [0..21)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..21)
+    OpenParenToken [1..2) '('
+    Argument [2..7)
+      RefKeyword [2..5) 'ref'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..7)
+        IdentifierToken [6..7) 'a'
+    CommaToken [7..8) ','
+    T:WhitespaceTrivia [8..9) ' '
+    Argument [9..14)
+      OutKeyword [9..12) 'out'
+      T:WhitespaceTrivia [12..13) ' '
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'b'
+    CommaToken [14..15) ','
+    T:WhitespaceTrivia [15..16) ' '
+    Argument [16..20)
+      InKeyword [16..18) 'in'
+      T:WhitespaceTrivia [18..19) ' '
+      IdentifierName [19..20)
+        IdentifierToken [19..20) 'c'
+    CloseParenToken [20..21) ')'

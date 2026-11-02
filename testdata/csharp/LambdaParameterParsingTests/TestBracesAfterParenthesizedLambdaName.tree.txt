@@ -1,0 +1,48 @@
+FieldDeclaration [0..42)
+  VariableDeclaration [0..41)
+    GenericName [0..23)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..23)
+        LessThanToken [4..5) '<'
+        ArrayType [5..13)
+          PredefinedType [5..11)
+            StringKeyword [5..11) 'string'
+          ArrayRankSpecifier [11..13)
+            OpenBracketToken [11..12) '['
+            OmittedArraySizeExpression [12..12)
+              OmittedArraySizeExpressionToken [12..12) ''
+            CloseBracketToken [12..13) ']'
+        CommaToken [13..14) ','
+        T:WhitespaceTrivia [14..15) ' '
+        PredefinedType [15..21)
+          StringKeyword [15..21) 'string'
+        GreaterThanToken [21..22) '>'
+        T:WhitespaceTrivia [22..23) ' '
+    VariableDeclarator [23..41)
+      IdentifierToken [23..28) 'func0'
+      T:WhitespaceTrivia [28..29) ' '
+      EqualsValueClause [29..41)
+        EqualsToken [29..30) '='
+        T:WhitespaceTrivia [30..31) ' '
+        ParenthesizedLambdaExpression [31..41)
+          ParameterList [31..37)
+            OpenParenToken [31..32) '('
+            Parameter [32..35)
+              ArrayType [32..35)
+                IdentifierName [32..33)
+                  IdentifierToken [32..33) 'x'
+                ArrayRankSpecifier [33..35)
+                  OpenBracketToken [33..34) '['
+                  OmittedArraySizeExpression [34..34)
+                    OmittedArraySizeExpressionToken [34..34) ''
+                  CloseBracketToken [34..35) ']'
+              IdentifierToken [35..35) missing
+            CloseParenToken [35..36) ')'
+            T:WhitespaceTrivia [36..37) ' '
+          EqualsGreaterThanToken [37..39) '=>'
+          T:WhitespaceTrivia [39..40) ' '
+          IdentifierName [40..41)
+            IdentifierToken [40..41) 'x'
+  SemicolonToken [41..42) ';'
+Diagnostics:
+  CS1001 [35..36) Identifier expected

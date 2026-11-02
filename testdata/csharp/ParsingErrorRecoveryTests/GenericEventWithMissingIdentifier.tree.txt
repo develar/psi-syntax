@@ -1,0 +1,45 @@
+CompilationUnit [0..44)
+  ClassDeclaration [0..44)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    BaseList [9..13)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      SimpleBaseType [11..13)
+        IdentifierName [11..13)
+          IdentifierToken [11..12) 'I'
+          T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    EventDeclaration [15..44)
+      L:WhitespaceTrivia [15..19) '    '
+      EventKeyword [19..24) 'event'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierName [25..27)
+        IdentifierToken [25..26) 'D'
+        T:WhitespaceTrivia [26..27) ' '
+      ExplicitInterfaceSpecifier [27..40)
+        IdentifierName [27..28)
+          IdentifierToken [27..28) 'I'
+        DotToken [28..29) '.'
+        T:MultiLineCommentTrivia [29..40) '/*missing*/'
+      IdentifierToken [40..40) missing
+      T:SkippedTokensTrivia [40..41)
+        LessThanToken [40..41) '<'
+      T:WhitespaceTrivia [41..42) ' '
+      AccessorList [42..44)
+        OpenBraceToken [42..43) '{'
+        T:EndOfLineTrivia [43..44) '\n'
+        CloseBraceToken [44..44) missing
+    CloseBraceToken [44..44) missing
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1001 [40..41) Identifier expected
+  CS1001 [40..41) Identifier expected
+  CS1003 [42..43) Syntax error, \'>\' expected
+  CS7002 [40..41) Unexpected use of a generic name
+  CS1513 [43..43) } expected
+  CS1513 [43..43) } expected

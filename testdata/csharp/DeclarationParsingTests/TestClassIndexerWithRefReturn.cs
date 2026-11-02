@@ -1,0 +1,1 @@
+class a { ref b this[c d] { get; set; } }

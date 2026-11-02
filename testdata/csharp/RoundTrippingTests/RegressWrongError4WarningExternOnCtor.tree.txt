@@ -1,0 +1,58 @@
+CompilationUnit [0..107)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..107)
+    PublicKeyword [14..20) 'public'
+    T:WhitespaceTrivia [20..21) ' '
+    ClassKeyword [21..26) 'class'
+    T:WhitespaceTrivia [26..27) ' '
+    IdentifierToken [27..28) 'C'
+    T:EndOfLineTrivia [28..29) '\n'
+    OpenBraceToken [29..30) '{'
+    T:EndOfLineTrivia [30..31) '\n'
+    ConstructorDeclaration [31..47)
+      L:WhitespaceTrivia [31..35) '    '
+      ExternKeyword [35..41) 'extern'
+      T:WhitespaceTrivia [41..42) ' '
+      IdentifierToken [42..43) 'C'
+      ParameterList [43..45)
+        OpenParenToken [43..44) '('
+        CloseParenToken [44..45) ')'
+      SemicolonToken [45..46) ';'
+      T:EndOfLineTrivia [46..47) '\n'
+    MethodDeclaration [47..106)
+      L:WhitespaceTrivia [47..51) '    '
+      PublicKeyword [51..57) 'public'
+      T:WhitespaceTrivia [57..58) ' '
+      StaticKeyword [58..64) 'static'
+      T:WhitespaceTrivia [64..65) ' '
+      PredefinedType [65..69)
+        IntKeyword [65..68) 'int'
+        T:WhitespaceTrivia [68..69) ' '
+      IdentifierToken [69..73) 'Main'
+      ParameterList [73..76)
+        OpenParenToken [73..74) '('
+        CloseParenToken [74..75) ')'
+        T:EndOfLineTrivia [75..76) '\n'
+      Block [76..106)
+        L:WhitespaceTrivia [76..80) '    '
+        OpenBraceToken [80..81) '{'
+        T:EndOfLineTrivia [81..82) '\n'
+        ReturnStatement [82..100)
+          L:WhitespaceTrivia [82..90) '        '
+          ReturnKeyword [90..96) 'return'
+          T:WhitespaceTrivia [96..97) ' '
+          NumericLiteralExpression [97..98)
+            NumericLiteralToken [97..98) '1'
+          SemicolonToken [98..99) ';'
+          T:EndOfLineTrivia [99..100) '\n'
+        L:WhitespaceTrivia [100..104) '    '
+        CloseBraceToken [104..105) '}'
+        T:EndOfLineTrivia [105..106) '\n'
+    CloseBraceToken [106..107) '}'
+  EndOfFileToken [107..107) ''

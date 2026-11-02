@@ -1,0 +1,107 @@
+CompilationUnit [0..121)
+  ClassDeclaration [0..121)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SingleLineDocumentationCommentTrivia [1..97)
+      XmlText [1..5)
+        L:DocumentationCommentExteriorTrivia [1..4) '///'
+        XmlTextLiteralToken [4..5) ' '
+      XmlElement [5..32)
+        XmlElementStartTag [5..10)
+          LessThanToken [5..6) '<'
+          XmlName [6..9)
+            XmlPrefix [6..8)
+              IdentifierToken [6..7) 'A'
+              ColonToken [7..8) ':'
+            IdentifierToken [8..9) 'B'
+          GreaterThanToken [9..10) '>'
+        XmlText [10..26)
+          XmlTextLiteralNewLineToken [10..11) '\n'
+          L:DocumentationCommentExteriorTrivia [11..14) '///'
+          XmlTextLiteralToken [14..21) '   good'
+          XmlTextLiteralNewLineToken [21..22) '\n'
+          L:DocumentationCommentExteriorTrivia [22..25) '///'
+          XmlTextLiteralToken [25..26) ' '
+        XmlElementEndTag [26..32)
+          LessThanSlashToken [26..28) '</'
+          XmlName [28..31)
+            XmlPrefix [28..30)
+              IdentifierToken [28..29) 'A'
+              ColonToken [29..30) ':'
+            IdentifierToken [30..31) 'B'
+          GreaterThanToken [31..32) '>'
+      XmlText [32..37)
+        XmlTextLiteralNewLineToken [32..33) '\n'
+        L:DocumentationCommentExteriorTrivia [33..36) '///'
+        XmlTextLiteralToken [36..37) ' '
+      XmlElement [37..64)
+        XmlElementStartTag [37..42)
+          LessThanToken [37..38) '<'
+          XmlName [38..41)
+            XmlPrefix [38..40)
+              IdentifierToken [38..39) 'A'
+              ColonToken [39..40) ':'
+            IdentifierToken [40..41) 'B'
+          GreaterThanToken [41..42) '>'
+        XmlText [42..57)
+          XmlTextLiteralNewLineToken [42..43) '\n'
+          L:DocumentationCommentExteriorTrivia [43..46) '///'
+          XmlTextLiteralToken [46..52) '   bad'
+          XmlTextLiteralNewLineToken [52..53) '\n'
+          L:DocumentationCommentExteriorTrivia [53..56) '///'
+          XmlTextLiteralToken [56..57) ' '
+        XmlElementEndTag [57..64)
+          LessThanSlashToken [57..59) '</'
+          XmlName [59..63)
+            XmlPrefix [59..62)
+              IdentifierToken [59..60) 'A'
+              L:WhitespaceTrivia [60..61) ' '
+              ColonToken [61..62) ':'
+            IdentifierToken [62..63) 'B'
+          GreaterThanToken [63..64) '>'
+      XmlText [64..69)
+        XmlTextLiteralNewLineToken [64..65) '\n'
+        L:DocumentationCommentExteriorTrivia [65..68) '///'
+        XmlTextLiteralToken [68..69) ' '
+      XmlElement [69..96)
+        XmlElementStartTag [69..74)
+          LessThanToken [69..70) '<'
+          XmlName [70..73)
+            XmlPrefix [70..72)
+              IdentifierToken [70..71) 'A'
+              ColonToken [71..72) ':'
+            IdentifierToken [72..73) 'B'
+          GreaterThanToken [73..74) '>'
+        XmlText [74..89)
+          XmlTextLiteralNewLineToken [74..75) '\n'
+          L:DocumentationCommentExteriorTrivia [75..78) '///'
+          XmlTextLiteralToken [78..84) '   bad'
+          XmlTextLiteralNewLineToken [84..85) '\n'
+          L:DocumentationCommentExteriorTrivia [85..88) '///'
+          XmlTextLiteralToken [88..89) ' '
+        XmlElementEndTag [89..96)
+          LessThanSlashToken [89..91) '</'
+          XmlName [91..95)
+            XmlPrefix [91..93)
+              IdentifierToken [91..92) 'A'
+              ColonToken [92..93) ':'
+            L:WhitespaceTrivia [93..94) ' '
+            IdentifierToken [94..95) 'B'
+          GreaterThanToken [95..96) '>'
+      XmlText [96..97)
+        XmlTextLiteralNewLineToken [96..97) '\n'
+      EndOfDocumentationCommentToken [97..97) ''
+    PublicKeyword [97..103) 'public'
+    T:WhitespaceTrivia [103..104) ' '
+    ClassKeyword [104..109) 'class'
+    T:WhitespaceTrivia [109..110) ' '
+    IdentifierToken [110..117) 'Program'
+    T:EndOfLineTrivia [117..118) '\n'
+    OpenBraceToken [118..119) '{'
+    T:EndOfLineTrivia [119..120) '\n'
+    CloseBraceToken [120..121) '}'
+  EndOfFileToken [121..121) ''
+Diagnostics:
+  CS1570 [59..63) XML comment has badly formed XML -- \'End tag \'A :B\' does not match the start tag \'A:B\'.\'
+  CS1570 [60..61) XML comment has badly formed XML -- \'Whitespace is not allowed at this location.\'
+  CS1570 [91..95) XML comment has badly formed XML -- \'End tag \'A: B\' does not match the start tag \'A:B\'.\'
+  CS1570 [93..94) XML comment has badly formed XML -- \'Whitespace is not allowed at this location.\'

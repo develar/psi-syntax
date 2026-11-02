@@ -1,0 +1,20 @@
+CompilationUnit [0..17)
+  ClassDeclaration [0..17)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    BaseList [9..16)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      PrimaryConstructorBaseType [11..16)
+        IdentifierName [11..15)
+          IdentifierToken [11..15) 'Base'
+        ArgumentList [15..16)
+          OpenParenToken [15..16) '('
+          CloseParenToken [16..16) missing
+    SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1026 [16..17) ) expected

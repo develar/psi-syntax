@@ -1,0 +1,14 @@
+CompilationUnit [0..26)
+  RecordDeclaration [0..26)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClosedKeyword [7..13) 'closed'
+    T:WhitespaceTrivia [13..14) ' '
+    RecordKeyword [14..20) 'record'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..22) 'C'
+    T:WhitespaceTrivia [22..23) ' '
+    OpenBraceToken [23..24) '{'
+    T:WhitespaceTrivia [24..25) ' '
+    CloseBraceToken [25..26) '}'
+  EndOfFileToken [26..26) ''

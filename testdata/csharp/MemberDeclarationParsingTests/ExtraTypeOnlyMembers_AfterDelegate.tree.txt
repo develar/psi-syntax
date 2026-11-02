@@ -1,0 +1,45 @@
+CompilationUnit [0..119)
+  NamespaceDeclaration [0..119)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    DelegateDeclaration [14..36)
+      L:WhitespaceTrivia [14..18) '    '
+      DelegateKeyword [18..26) 'delegate'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..31)
+        IntKeyword [27..30) 'int'
+        T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..32) 'D'
+      ParameterList [32..34)
+        OpenParenToken [32..33) '('
+        CloseParenToken [33..34) ')'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+    MethodDeclaration [36..118)
+      L:EndOfLineTrivia [36..37) '\n'
+      L:WhitespaceTrivia [37..41) '    '
+      L:SingleLineCommentTrivia [41..87) '// This should not be sucked into the delegate'
+      L:EndOfLineTrivia [87..88) '\n'
+      L:WhitespaceTrivia [88..92) '    '
+      PrivateKeyword [92..99) 'private'
+      T:WhitespaceTrivia [99..100) ' '
+      PredefinedType [100..105)
+        VoidKeyword [100..104) 'void'
+        T:WhitespaceTrivia [104..105) ' '
+      IdentifierToken [105..111) 'Method'
+      ParameterList [111..114)
+        OpenParenToken [111..112) '('
+        CloseParenToken [112..113) ')'
+        T:WhitespaceTrivia [113..114) ' '
+      Block [114..118)
+        OpenBraceToken [114..115) '{'
+        T:WhitespaceTrivia [115..116) ' '
+        CloseBraceToken [116..117) '}'
+        T:EndOfLineTrivia [117..118) '\n'
+    CloseBraceToken [118..119) '}'
+  EndOfFileToken [119..119) ''

@@ -1,0 +1,4 @@
+L:ConflictMarkerTrivia [0..7) '======='
+EndOfFileToken [7..7) ''
+Diagnostics:
+  CS8300 [0..7) Merge conflict marker encountered

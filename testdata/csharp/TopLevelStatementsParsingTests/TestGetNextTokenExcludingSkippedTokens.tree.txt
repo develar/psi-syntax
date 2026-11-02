@@ -1,0 +1,18 @@
+CompilationUnit [0..23)
+  UsingDirective [0..23)
+    L:SkippedTokensTrivia [0..7)
+      IdentifierToken [0..7) 'garbage'
+    L:EndOfLineTrivia [7..8) '\n'
+    UsingKeyword [8..13) 'using'
+    T:WhitespaceTrivia [13..14) ' '
+    QualifiedName [14..21)
+      IdentifierName [14..17)
+        IdentifierToken [14..17) 'goo'
+      DotToken [17..18) '.'
+      IdentifierName [18..21)
+        IdentifierToken [18..21) 'bar'
+    SemicolonToken [21..22) ';'
+    T:EndOfLineTrivia [22..23) '\n'
+  EndOfFileToken [23..23) ''
+Diagnostics:
+  CS0116 [0..7) A namespace cannot directly contain members such as fields, methods or statements

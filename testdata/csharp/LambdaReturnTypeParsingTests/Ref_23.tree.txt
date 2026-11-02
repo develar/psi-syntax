@@ -1,0 +1,32 @@
+SwitchExpression [0..37)
+  IdentifierName [0..3)
+    IdentifierToken [0..2) 'd1'
+    T:WhitespaceTrivia [2..3) ' '
+  SwitchKeyword [3..9) 'switch'
+  T:WhitespaceTrivia [9..10) ' '
+  OpenBraceToken [10..11) '{'
+  T:WhitespaceTrivia [11..12) ' '
+  SwitchExpressionArm [12..36)
+    ConstantPattern [12..17)
+      NullLiteralExpression [12..17)
+        NullKeyword [12..16) 'null'
+        T:WhitespaceTrivia [16..17) ' '
+    EqualsGreaterThanToken [17..19) '=>'
+    T:WhitespaceTrivia [19..20) ' '
+    ParenthesizedLambdaExpression [20..36)
+      RefType [20..28)
+        RefKeyword [20..23) 'ref'
+        T:WhitespaceTrivia [23..24) ' '
+        PredefinedType [24..28)
+          IntKeyword [24..27) 'int'
+          T:WhitespaceTrivia [27..28) ' '
+      ParameterList [28..31)
+        OpenParenToken [28..29) '('
+        CloseParenToken [29..30) ')'
+        T:WhitespaceTrivia [30..31) ' '
+      EqualsGreaterThanToken [31..33) '=>'
+      T:WhitespaceTrivia [33..34) ' '
+      IdentifierName [34..36)
+        IdentifierToken [34..35) 'x'
+        T:WhitespaceTrivia [35..36) ' '
+  CloseBraceToken [36..37) '}'

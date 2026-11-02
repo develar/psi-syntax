@@ -1,0 +1,10 @@
+IdentifierToken [0..10) 'Identifier'
+T:WhitespaceTrivia [10..11) ' '
+RazorContentToken [11..23) '@: More text'
+T:EndOfLineTrivia [23..24) '\n'
+L:SingleLineCommentTrivia [24..42) '// Regular comment'
+L:EndOfLineTrivia [42..43) '\n'
+IdentifierToken [43..59) 'SecondIdentifier'
+EndOfFileToken [59..59) ''
+Diagnostics:
+  CS1646 [12..13) Keyword, identifier, or string expected after verbatim specifier: @

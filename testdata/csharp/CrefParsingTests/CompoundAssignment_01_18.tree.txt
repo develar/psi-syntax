@@ -1,0 +1,25 @@
+L:SingleLineDocumentationCommentTrivia [0..33)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..33)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..31)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      OperatorMemberCref [15..30)
+        OperatorKeyword [15..23) 'operator'
+        L:WhitespaceTrivia [23..24) ' '
+        AmpersandEqualsToken [24..30) '&amp;='
+      DoubleQuoteToken [30..31) '"'
+    SlashGreaterThanToken [31..33) '/>'
+  EndOfDocumentationCommentToken [33..33) ''
+EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1584 [15..30) XML comment has syntactically incorrect cref attribute \'operator &amp;=\'
+  CS1658 [24..30) Feature \'user-defined compound assignment operators\' is not available in C# 13.0. Please use language version 14.0 or greater.. See also error CS9260.

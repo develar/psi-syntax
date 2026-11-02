@@ -1,0 +1,1 @@
+[assembly: a( namespace n { }

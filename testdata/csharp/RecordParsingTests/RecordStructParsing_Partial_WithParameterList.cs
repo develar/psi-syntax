@@ -1,0 +1,1 @@
+partial record struct S(int X);

@@ -1,0 +1,4 @@
+NumericLiteralToken [0..67) '0b10000000000000000000000000000000000000000000000000000000000000000'
+EndOfFileToken [67..67) ''
+Diagnostics:
+  CS1021 [0..0) Integral constant is too large

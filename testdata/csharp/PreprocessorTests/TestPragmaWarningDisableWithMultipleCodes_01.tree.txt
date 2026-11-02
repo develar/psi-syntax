@@ -1,0 +1,21 @@
+CompilationUnit [0..40)
+  L:PragmaWarningDirectiveTrivia [0..40)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    DisableKeyword [16..23) 'disable'
+    T:WhitespaceTrivia [23..24) ' '
+    NumericLiteralExpression [24..27)
+      NumericLiteralToken [24..27) '114'
+    CommaToken [27..28) ','
+    T:WhitespaceTrivia [28..29) ' '
+    IdentifierName [29..35)
+      IdentifierToken [29..35) 'CS0162'
+    CommaToken [35..36) ','
+    T:WhitespaceTrivia [36..37) ' '
+    NumericLiteralExpression [37..40)
+      NumericLiteralToken [37..40) '168'
+    EndOfDirectiveToken [40..40) ''
+  EndOfFileToken [40..40) ''

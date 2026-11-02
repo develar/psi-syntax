@@ -1,0 +1,22 @@
+MethodDeclaration [0..44)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..35)
+    IdentifierToken [7..11) 'Task'
+    TypeArgumentList [11..35)
+      LessThanToken [11..12) '<'
+      QualifiedName [12..35)
+        IdentifierName [12..25)
+          IdentifierToken [12..25) 'SomeNamespace'
+        DotToken [25..26) '.'
+        IdentifierName [26..35)
+          IdentifierToken [26..34) 'SomeType'
+          T:WhitespaceTrivia [34..35) ' '
+      GreaterThanToken [35..35) missing
+  IdentifierToken [35..41) 'Method'
+  ParameterList [41..43)
+    OpenParenToken [41..42) '('
+    CloseParenToken [42..43) ')'
+  SemicolonToken [43..44) ';'
+Diagnostics:
+  CS1003 [35..41) Syntax error, \'>\' expected

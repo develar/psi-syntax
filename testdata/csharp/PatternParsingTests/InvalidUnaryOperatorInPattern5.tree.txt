@@ -1,0 +1,28 @@
+IfStatement [0..19)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IsPatternExpression [4..16)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'x'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    NotPattern [9..16)
+      NotKeyword [9..9) missing
+      T:SkippedTokensTrivia [9..11)
+        ExclamationEqualsToken [9..11) '!='
+      T:WhitespaceTrivia [11..12) ' '
+      ConstantPattern [12..16)
+        NumericLiteralExpression [12..16)
+          L:SkippedTokensTrivia [12..14)
+            EqualsEqualsToken [12..14) '=='
+          L:WhitespaceTrivia [14..15) ' '
+          NumericLiteralToken [15..16) '5'
+  CloseParenToken [16..17) ')'
+  T:WhitespaceTrivia [17..18) ' '
+  EmptyStatement [18..19)
+    SemicolonToken [18..19) ';'
+Diagnostics:
+  CS9345 [9..11) The \'!=\' operator is not supported in a pattern. Use \'not\' to represent a negated pattern.
+  CS9344 [12..14) The \'==\' operator is not supported in a pattern.

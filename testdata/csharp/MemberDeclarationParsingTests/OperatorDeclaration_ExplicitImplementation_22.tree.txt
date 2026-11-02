@@ -1,0 +1,37 @@
+OperatorDeclaration [0..40)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..11)
+    IntKeyword [7..10) 'int'
+    T:WhitespaceTrivia [10..11) ' '
+  ExplicitInterfaceSpecifier [11..17)
+    QualifiedName [11..15)
+      IdentifierName [11..13)
+        IdentifierToken [11..12) 'I'
+        T:WhitespaceTrivia [12..13) ' '
+      DotToken [13..14) '.'
+      T:WhitespaceTrivia [14..15) ' '
+      IdentifierName [15..15)
+        IdentifierToken [15..15) missing
+    DotToken [15..16) '.'
+    T:WhitespaceTrivia [16..17) ' '
+  OperatorKeyword [17..25) 'operator'
+  T:WhitespaceTrivia [25..26) ' '
+  PlusToken [26..27) '+'
+  ParameterList [27..35)
+    OpenParenToken [27..28) '('
+    Parameter [28..33)
+      PredefinedType [28..32)
+        IntKeyword [28..31) 'int'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'x'
+    CloseParenToken [33..34) ')'
+    T:WhitespaceTrivia [34..35) ' '
+  ArrowExpressionClause [35..39)
+    EqualsGreaterThanToken [35..37) '=>'
+    T:WhitespaceTrivia [37..38) ' '
+    IdentifierName [38..39)
+      IdentifierToken [38..39) 'x'
+  SemicolonToken [39..40) ';'
+Diagnostics:
+  CS1001 [15..16) Identifier expected

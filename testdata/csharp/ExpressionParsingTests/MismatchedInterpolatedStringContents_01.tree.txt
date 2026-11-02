@@ -1,0 +1,181 @@
+CompilationUnit [0..204)
+  ClassDeclaration [0..204)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'A'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..180)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..180)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        IfStatement [29..174)
+          L:WhitespaceTrivia [29..37) '        '
+          IfKeyword [37..39) 'if'
+          T:WhitespaceTrivia [39..40) ' '
+          OpenParenToken [40..41) '('
+          IdentifierName [41..42)
+            IdentifierToken [41..42) 'b'
+          CloseParenToken [42..43) ')'
+          T:EndOfLineTrivia [43..44) '\n'
+          Block [44..174)
+            L:WhitespaceTrivia [44..52) '        '
+            OpenBraceToken [52..53) '{'
+            T:EndOfLineTrivia [53..54) '\n'
+            LocalDeclarationStatement [54..91)
+              VariableDeclaration [54..89)
+                IdentifierName [54..68)
+                  L:WhitespaceTrivia [54..66) '            '
+                  IdentifierToken [66..67) 'A'
+                  T:WhitespaceTrivia [67..68) ' '
+                VariableDeclarator [68..89)
+                  IdentifierToken [68..69) 'B'
+                  T:WhitespaceTrivia [69..70) ' '
+                  EqualsValueClause [70..89)
+                    EqualsToken [70..71) '='
+                    T:WhitespaceTrivia [71..72) ' '
+                    ObjectCreationExpression [72..89)
+                      NewKeyword [72..75) 'new'
+                      T:WhitespaceTrivia [75..76) ' '
+                      IdentifierName [76..77)
+                        IdentifierToken [76..77) 'C'
+                      ArgumentList [77..89)
+                        OpenParenToken [77..78) '('
+                        Argument [78..88)
+                          InterpolatedStringExpression [78..88)
+                            InterpolatedVerbatimStringStartToken [78..81) '$@"'
+                            Interpolation [81..87)
+                              OpenBraceToken [81..82) '{'
+                              InvocationExpression [82..87)
+                                IdentifierName [82..83)
+                                  IdentifierToken [82..83) 'D'
+                                ArgumentList [83..87)
+                                  OpenParenToken [83..84) '('
+                                  T:SkippedTokensTrivia [84..85)
+                                    DotToken [84..85) '.'
+                                  Argument [85..87)
+                                    IdentifierName [85..87)
+                                      IdentifierToken [85..86) 'E'
+                                      T:SkippedTokensTrivia [86..87)
+                                        CloseBraceToken [86..87) '}'
+                                  CloseParenToken [87..87) missing
+                              CloseBraceToken [87..87) missing
+                            InterpolatedStringEndToken [87..88) '"'
+                        CloseParenToken [88..89) ')'
+              SemicolonToken [89..90) ';'
+              T:EndOfLineTrivia [90..91) '\n'
+            ExpressionStatement [91..117)
+              InvocationExpression [91..115)
+                SimpleMemberAccessExpression [91..106)
+                  IdentifierName [91..104)
+                    L:WhitespaceTrivia [91..103) '            '
+                    IdentifierToken [103..104) 'N'
+                  DotToken [104..105) '.'
+                  IdentifierName [105..106)
+                    IdentifierToken [105..106) 'O'
+                ArgumentList [106..115)
+                  OpenParenToken [106..107) '('
+                  Argument [107..109)
+                    StringLiteralExpression [107..109)
+                      StringLiteralToken [107..109) '""'
+                  CommaToken [109..110) ','
+                  T:WhitespaceTrivia [110..111) ' '
+                  Argument [111..114)
+                    SimpleMemberAccessExpression [111..114)
+                      IdentifierName [111..112)
+                        IdentifierToken [111..112) 'P'
+                      DotToken [112..113) '.'
+                      IdentifierName [113..114)
+                        IdentifierToken [113..114) 'Q'
+                  CloseParenToken [114..115) ')'
+              SemicolonToken [115..116) ';'
+              T:EndOfLineTrivia [116..117) '\n'
+            ExpressionStatement [117..137)
+              InvocationExpression [117..135)
+                SimpleMemberAccessExpression [117..132)
+                  IdentifierName [117..130)
+                    L:WhitespaceTrivia [117..129) '            '
+                    IdentifierToken [129..130) 'R'
+                  DotToken [130..131) '.'
+                  IdentifierName [131..132)
+                    IdentifierToken [131..132) 'S'
+                ArgumentList [132..135)
+                  OpenParenToken [132..133) '('
+                  Argument [133..134)
+                    IdentifierName [133..134)
+                      IdentifierToken [133..134) 'T'
+                  CloseParenToken [134..135) ')'
+              SemicolonToken [135..136) ';'
+              T:EndOfLineTrivia [136..137) '\n'
+            ExpressionStatement [137..164)
+              InvocationExpression [137..162)
+                SimpleMemberAccessExpression [137..152)
+                  IdentifierName [137..150)
+                    L:WhitespaceTrivia [137..149) '            '
+                    IdentifierToken [149..150) 'U'
+                  DotToken [150..151) '.'
+                  IdentifierName [151..152)
+                    IdentifierToken [151..152) 'V'
+                ArgumentList [152..162)
+                  OpenParenToken [152..153) '('
+                  Argument [153..156)
+                    SimpleMemberAccessExpression [153..156)
+                      IdentifierName [153..154)
+                        IdentifierToken [153..154) 'W'
+                      DotToken [154..155) '.'
+                      IdentifierName [155..156)
+                        IdentifierToken [155..156) 'X'
+                  CommaToken [156..157) ','
+                  T:WhitespaceTrivia [157..158) ' '
+                  Argument [158..161)
+                    SimpleMemberAccessExpression [158..161)
+                      IdentifierName [158..159)
+                        IdentifierToken [158..159) 'Y'
+                      DotToken [159..160) '.'
+                      IdentifierName [160..161)
+                        IdentifierToken [160..161) 'Z'
+                  CloseParenToken [161..162) ')'
+              SemicolonToken [162..163) ';'
+              T:EndOfLineTrivia [163..164) '\n'
+            L:WhitespaceTrivia [164..172) '        '
+            CloseBraceToken [172..173) '}'
+            T:EndOfLineTrivia [173..174) '\n'
+        L:WhitespaceTrivia [174..178) '    '
+        CloseBraceToken [178..179) '}'
+        T:EndOfLineTrivia [179..180) '\n'
+    MethodDeclaration [180..203)
+      PredefinedType [180..192)
+        L:EndOfLineTrivia [180..181) '\n'
+        L:WhitespaceTrivia [181..185) '    '
+        StringKeyword [185..191) 'string'
+        T:WhitespaceTrivia [191..192) ' '
+      IdentifierToken [192..193) 'M'
+      ParameterList [193..196)
+        OpenParenToken [193..194) '('
+        CloseParenToken [194..195) ')'
+        T:WhitespaceTrivia [195..196) ' '
+      ArrowExpressionClause [196..201)
+        EqualsGreaterThanToken [196..198) '=>'
+        T:WhitespaceTrivia [198..199) ' '
+        StringLiteralExpression [199..201)
+          StringLiteralToken [199..201) '""'
+      SemicolonToken [201..202) ';'
+      T:EndOfLineTrivia [202..203) '\n'
+    CloseBraceToken [203..204) '}'
+  EndOfFileToken [204..204) ''
+Diagnostics:
+  CS1003 [86..87) Syntax error, \')\' expected
+  CS1001 [84..85) Identifier expected
+  CS1003 [86..87) Syntax error, \',\' expected
+  CS1026 [87..87) ) expected

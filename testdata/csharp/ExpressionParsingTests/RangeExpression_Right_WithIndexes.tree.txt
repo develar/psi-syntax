@@ -1,0 +1,6 @@
+RangeExpression [0..4)
+  DotDotToken [0..2) '..'
+  IndexExpression [2..4)
+    CaretToken [2..3) '^'
+    NumericLiteralExpression [3..4)
+      NumericLiteralToken [3..4) '3'

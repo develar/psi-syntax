@@ -1,0 +1,30 @@
+ForStatement [0..37)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..31)
+    FunctionPointerType [5..21)
+      DelegateKeyword [5..13) 'delegate'
+      AsteriskToken [13..14) '*'
+      FunctionPointerParameterList [14..21)
+        LessThanToken [14..15) '<'
+        FunctionPointerParameter [15..19)
+          PredefinedType [15..19)
+            VoidKeyword [15..19) 'void'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..31)
+      IdentifierToken [21..24) 'ptr'
+      T:WhitespaceTrivia [24..25) ' '
+      EqualsValueClause [25..31)
+        EqualsToken [25..26) '='
+        T:WhitespaceTrivia [26..27) ' '
+        NullLiteralExpression [27..31)
+          NullKeyword [27..31) 'null'
+  SemicolonToken [31..32) ';'
+  SemicolonToken [32..33) ';'
+  CloseParenToken [33..34) ')'
+  T:WhitespaceTrivia [34..35) ' '
+  Block [35..37)
+    OpenBraceToken [35..36) '{'
+    CloseBraceToken [36..37) '}'

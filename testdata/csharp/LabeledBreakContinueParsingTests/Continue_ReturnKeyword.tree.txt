@@ -1,0 +1,11 @@
+ContinueStatement [0..16)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  SemicolonToken [9..9) missing
+  T:SkippedTokensTrivia [9..15)
+    ReturnKeyword [9..15) 'return'
+  T:SkippedTokensTrivia [15..16)
+    SemicolonToken [15..16) ';'
+Diagnostics:
+  CS1073 [0..9) Unexpected token \'return\'
+  CS1002 [9..15) ; expected

@@ -1,0 +1,48 @@
+CompilationUnit [0..40)
+  ClassDeclaration [0..40)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..39)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..39)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        ForStatement [21..37)
+          ForKeyword [21..24) 'for'
+          T:WhitespaceTrivia [24..25) ' '
+          OpenParenToken [25..26) '('
+          SemicolonToken [26..27) ';'
+          SemicolonToken [27..28) ';'
+          PreIncrementExpression [28..33)
+            PlusPlusToken [28..30) '++'
+            ElementAccessExpression [30..33)
+              IdentifierName [30..31)
+                IdentifierToken [30..31) 'a'
+              BracketedArgumentList [31..33)
+                OpenBracketToken [31..32) '['
+                T:WhitespaceTrivia [32..33) ' '
+                CloseBracketToken [33..33) missing
+          CloseParenToken [33..33) missing
+          Block [33..37)
+            OpenBraceToken [33..34) '{'
+            T:WhitespaceTrivia [34..35) ' '
+            CloseBraceToken [35..36) '}'
+            T:WhitespaceTrivia [36..37) ' '
+        CloseBraceToken [37..38) '}'
+        T:WhitespaceTrivia [38..39) ' '
+    CloseBraceToken [39..40) '}'
+  EndOfFileToken [40..40) ''
+Diagnostics:
+  CS1003 [33..34) Syntax error, \']\' expected
+  CS1026 [33..34) ) expected

@@ -1,0 +1,12 @@
+IsPatternExpression [0..9)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  SlicePattern [5..9)
+    DotDotToken [5..7) '..'
+    SlicePattern [7..9)
+      DotDotToken [7..9) '..'
+Diagnostics:
+  CS8635 [5..5) Unexpected character sequence \'...\'

@@ -1,0 +1,21 @@
+CompilationUnit [0..26)
+  ClassDeclaration [0..26)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..25)
+      VariableDeclaration [11..23)
+        PredefinedType [11..19)
+          L:WhitespaceTrivia [11..15) '    '
+          IntKeyword [15..18) 'int'
+          T:WhitespaceTrivia [18..19) ' '
+        VariableDeclarator [19..23)
+          IdentifierToken [19..23) 'data'
+      SemicolonToken [23..24) ';'
+      T:EndOfLineTrivia [24..25) '\n'
+    CloseBraceToken [25..26) '}'
+  EndOfFileToken [26..26) ''

@@ -1,0 +1,1 @@
+class c : x y class b { }

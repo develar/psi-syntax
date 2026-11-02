@@ -1,0 +1,1 @@
+ref partial union U1(E1);

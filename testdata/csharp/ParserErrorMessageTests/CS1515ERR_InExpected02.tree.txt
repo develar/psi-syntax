@@ -1,0 +1,68 @@
+CompilationUnit [0..109)
+  ClassDeclaration [0..109)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..107)
+      L:WhitespaceTrivia [11..15) '    '
+      StaticKeyword [15..21) 'static'
+      T:WhitespaceTrivia [21..22) ' '
+      PredefinedType [22..27)
+        VoidKeyword [22..26) 'void'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..31) 'Main'
+      ParameterList [31..34)
+        OpenParenToken [31..32) '('
+        CloseParenToken [32..33) ')'
+        T:EndOfLineTrivia [33..34) '\n'
+      Block [34..107)
+        L:WhitespaceTrivia [34..38) '    '
+        OpenBraceToken [38..39) '{'
+        T:EndOfLineTrivia [39..40) '\n'
+        ForEachVariableStatement [40..101)
+          L:WhitespaceTrivia [40..48) '        '
+          ForEachKeyword [48..55) 'foreach'
+          T:WhitespaceTrivia [55..56) ' '
+          OpenParenToken [56..57) '('
+          NumericLiteralExpression [57..58)
+            NumericLiteralToken [57..58) '1'
+          InKeyword [58..58) missing
+          IdentifierName [58..58)
+            IdentifierToken [58..58) missing
+          CloseParenToken [58..59) ')'
+          T:EndOfLineTrivia [59..60) '\n'
+          ExpressionStatement [60..101)
+            InvocationExpression [60..99)
+              SimpleMemberAccessExpression [60..96)
+                SimpleMemberAccessExpression [60..86)
+                  IdentifierName [60..78)
+                    L:WhitespaceTrivia [60..72) '            '
+                    IdentifierToken [72..78) 'System'
+                  DotToken [78..79) '.'
+                  IdentifierName [79..86)
+                    IdentifierToken [79..86) 'Console'
+                DotToken [86..87) '.'
+                IdentifierName [87..96)
+                  IdentifierToken [87..96) 'WriteLine'
+              ArgumentList [96..99)
+                OpenParenToken [96..97) '('
+                Argument [97..98)
+                  NumericLiteralExpression [97..98)
+                    NumericLiteralToken [97..98) '1'
+                CloseParenToken [98..99) ')'
+            SemicolonToken [99..100) ';'
+            T:EndOfLineTrivia [100..101) '\n'
+        L:WhitespaceTrivia [101..105) '    '
+        CloseBraceToken [105..106) '}'
+        T:EndOfLineTrivia [106..107) '\n'
+    CloseBraceToken [107..108) '}'
+    T:EndOfLineTrivia [108..109) '\n'
+  EndOfFileToken [109..109) ''
+Diagnostics:
+  CS1515 [58..59) \'in\' expected
+  CS0230 [58..59) Type and identifier are both required in a foreach statement
+  CS1525 [58..59) Invalid expression term \')\'

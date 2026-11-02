@@ -1,0 +1,21 @@
+CompilationUnit [0..17)
+  DelegateDeclaration [0..17)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..14)
+      VoidKeyword [9..13) 'void'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'd'
+    ParameterList [15..17)
+      OpenParenToken [15..16) '('
+      Parameter [16..17)
+        IdentifierName [16..17)
+          IdentifierToken [16..17) 't'
+        IdentifierToken [17..17) missing
+      CloseParenToken [17..17) missing
+    SemicolonToken [17..17) missing
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1001 [17..17) Identifier expected
+  CS1026 [17..17) ) expected
+  CS1002 [17..17) ; expected

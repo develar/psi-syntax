@@ -1,0 +1,1 @@
+#pragma warning disable 114, CS0162, 168

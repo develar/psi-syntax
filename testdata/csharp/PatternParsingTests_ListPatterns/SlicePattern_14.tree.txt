@@ -1,0 +1,24 @@
+IsPatternExpression [0..13)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  NotPattern [5..13)
+    NotKeyword [5..8) 'not'
+    T:WhitespaceTrivia [8..9) ' '
+    ConstantPattern [9..13)
+      SimpleMemberAccessExpression [9..13)
+        SimpleMemberAccessExpression [9..12)
+          IdentifierName [9..11)
+            IdentifierToken [9..10) 'p'
+            T:WhitespaceTrivia [10..11) ' '
+          DotToken [11..12) '.'
+          IdentifierName [12..12)
+            IdentifierToken [12..12) missing
+        DotToken [12..13) '.'
+        IdentifierName [13..13)
+          IdentifierToken [13..13) missing
+Diagnostics:
+  CS1001 [12..13) Identifier expected
+  CS1001 [13..13) Identifier expected

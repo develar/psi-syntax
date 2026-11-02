@@ -1,0 +1,23 @@
+MethodDeclaration [0..20)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  ExplicitInterfaceSpecifier [4..10)
+    AliasQualifiedName [4..9)
+      IdentifierName [4..6)
+        IdentifierToken [4..6) 'N1'
+      ColonColonToken [6..8) '::'
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'I'
+    DotToken [9..10) '.'
+  IdentifierToken [10..12) 'M1'
+  ParameterList [12..15)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'
+    T:WhitespaceTrivia [14..15) ' '
+  ArrowExpressionClause [15..19)
+    EqualsGreaterThanToken [15..17) '=>'
+    T:WhitespaceTrivia [17..18) ' '
+    NumericLiteralExpression [18..19)
+      NumericLiteralToken [18..19) '0'
+  SemicolonToken [19..20) ';'

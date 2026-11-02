@@ -1,0 +1,14 @@
+CompilationUnit [0..7)
+  EnumDeclaration [0..7)
+    L:EndOfLineTrivia [0..1) '\n'
+    EnumKeyword [1..5) 'enum'
+    T:WhitespaceTrivia [5..6) ' '
+    T:EndOfLineTrivia [6..7) '\n'
+    IdentifierToken [7..7) missing
+    OpenBraceToken [7..7) missing
+    CloseBraceToken [7..7) missing
+  EndOfFileToken [7..7) ''
+Diagnostics:
+  CS1001 [5..5) Identifier expected
+  CS1514 [5..5) { expected
+  CS1513 [5..5) } expected

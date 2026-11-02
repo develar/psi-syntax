@@ -1,0 +1,27 @@
+CompilationUnit [0..26)
+  GlobalStatement [0..26)
+    DoStatement [0..26)
+      DoKeyword [0..2) 'do'
+      T:EndOfLineTrivia [2..3) '\n'
+      Block [3..7)
+        OpenBraceToken [3..4) '{'
+        T:EndOfLineTrivia [4..5) '\n'
+        CloseBraceToken [5..6) '}'
+        T:EndOfLineTrivia [6..7) '\n'
+      WhileKeyword [7..12) 'while'
+      T:WhitespaceTrivia [12..13) ' '
+      OpenParenToken [13..14) '('
+      IdentifierName [14..24)
+        IdentifierToken [14..17) 'Boo'
+        T:WhitespaceTrivia [17..18) ' '
+        T:SkippedTokensTrivia [18..22)
+          IdentifierToken [18..22) 'Quux'
+        T:SkippedTokensTrivia [22..23)
+          OpenParenToken [22..23) '('
+        T:SkippedTokensTrivia [23..24)
+          CloseParenToken [23..24) ')'
+      CloseParenToken [24..25) ')'
+      SemicolonToken [25..26) ';'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1073 [18..22) Unexpected token \'Quux\'

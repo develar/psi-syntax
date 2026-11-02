@@ -1,0 +1,26 @@
+CompilationUnit [0..21)
+  UnionDeclaration [0..21)
+    UnionKeyword [0..5) 'union'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..8) 'U1'
+    ParameterList [8..13)
+      OpenParenToken [8..9) '('
+      Parameter [9..11)
+        IdentifierName [9..11)
+          IdentifierToken [9..11) 'E1'
+      CloseParenToken [11..12) ')'
+      T:WhitespaceTrivia [12..13) ' '
+    BaseList [13..20)
+      ColonToken [13..14) ':'
+      T:WhitespaceTrivia [14..15) ' '
+      PrimaryConstructorBaseType [15..20)
+        IdentifierName [15..17)
+          IdentifierToken [15..17) 'I1'
+        ArgumentList [17..20)
+          OpenParenToken [17..18) '('
+          Argument [18..19)
+            NumericLiteralExpression [18..19)
+              NumericLiteralToken [18..19) '1'
+          CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

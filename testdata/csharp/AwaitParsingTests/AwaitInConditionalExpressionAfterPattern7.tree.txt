@@ -1,0 +1,53 @@
+MethodDeclaration [0..47)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..47)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..46)
+      VariableDeclaration [11..44)
+        IdentifierName [11..19)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..18) 'var'
+          T:WhitespaceTrivia [18..19) ' '
+        VariableDeclarator [19..44)
+          IdentifierToken [19..20) 'c'
+          T:WhitespaceTrivia [20..21) ' '
+          EqualsValueClause [21..44)
+            EqualsToken [21..22) '='
+            T:WhitespaceTrivia [22..23) ' '
+            ConditionalExpression [23..44)
+              IsExpression [23..30)
+                IdentifierName [23..25)
+                  IdentifierToken [23..24) 'x'
+                  T:WhitespaceTrivia [24..25) ' '
+                IsKeyword [25..27) 'is'
+                T:WhitespaceTrivia [27..28) ' '
+                IdentifierName [28..30)
+                  IdentifierToken [28..29) 'X'
+                  T:WhitespaceTrivia [29..30) ' '
+              QuestionToken [30..31) '?'
+              T:WhitespaceTrivia [31..32) ' '
+              InvocationExpression [32..41)
+                IdentifierName [32..37)
+                  IdentifierToken [32..37) 'await'
+                ArgumentList [37..41)
+                  OpenParenToken [37..38) '('
+                  Argument [38..39)
+                    IdentifierName [38..39)
+                      IdentifierToken [38..39) 'y'
+                  CloseParenToken [39..40) ')'
+                  T:WhitespaceTrivia [40..41) ' '
+              ColonToken [41..42) ':'
+              T:WhitespaceTrivia [42..43) ' '
+              IdentifierName [43..44)
+                IdentifierToken [43..44) 'z'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+    CloseBraceToken [46..47) '}'

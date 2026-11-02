@@ -1,0 +1,53 @@
+SwitchExpression [0..39)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..39)
+    RecursivePattern [13..39)
+      PropertyPatternClause [13..39)
+        L:WhitespaceTrivia [13..17) '    '
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        Subpattern [19..26)
+          NameColon [19..25)
+            IdentifierName [19..23)
+              IdentifierToken [19..23) 'Prop'
+            ColonToken [23..24) ':'
+            T:WhitespaceTrivia [24..25) ' '
+          ConstantPattern [25..26)
+            NumericLiteralExpression [25..26)
+              NumericLiteralToken [25..26) '1'
+        CommaToken [26..27) ','
+        T:WhitespaceTrivia [27..28) ' '
+        Subpattern [28..39)
+          RecursivePattern [28..39)
+            PropertyPatternClause [28..39)
+              OpenBraceToken [28..29) '{'
+              T:WhitespaceTrivia [29..30) ' '
+              Subpattern [30..38)
+                NameColon [30..36)
+                  IdentifierName [30..34)
+                    IdentifierToken [30..34) 'Prop'
+                  ColonToken [34..35) ':'
+                  T:WhitespaceTrivia [35..36) ' '
+                ConstantPattern [36..38)
+                  NumericLiteralExpression [36..38)
+                    NumericLiteralToken [36..37) '2'
+                    T:WhitespaceTrivia [37..38) ' '
+              CloseBraceToken [38..39) '}'
+        CloseBraceToken [39..39) missing
+    EqualsGreaterThanToken [39..39) missing
+    IdentifierName [39..39)
+      IdentifierToken [39..39) missing
+  CommaToken [39..39) missing
+  CloseBraceToken [39..39) missing
+Diagnostics:
+  CS1513 [39..39) } expected
+  CS1003 [39..39) Syntax error, \'=>\' expected
+  CS1733 [39..39) Expected expression
+  CS1003 [39..39) Syntax error, \',\' expected
+  CS1513 [39..39) } expected

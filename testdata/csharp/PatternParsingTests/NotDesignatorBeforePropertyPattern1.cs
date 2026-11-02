@@ -1,0 +1,1 @@
+o is string or { Length: 5 }

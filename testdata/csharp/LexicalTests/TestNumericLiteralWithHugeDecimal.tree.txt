@@ -1,0 +1,2 @@
+NumericLiteralToken [0..42) '123.45632434234234234234234234324234234234'
+EndOfFileToken [42..42) ''

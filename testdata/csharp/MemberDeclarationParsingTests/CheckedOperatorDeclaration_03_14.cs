@@ -1,0 +1,1 @@
+C operator checked >(C x, C y) => x;

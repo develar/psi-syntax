@@ -1,0 +1,2 @@
+IdentifierToken [0..26) 'my͏very͏long͏identifier'
+EndOfFileToken [26..26) ''

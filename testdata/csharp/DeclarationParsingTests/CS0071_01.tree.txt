@@ -1,0 +1,43 @@
+CompilationUnit [0..81)
+  InterfaceDeclaration [0..25)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    InterfaceKeyword [8..17) 'interface'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..20) 'I2'
+    T:WhitespaceTrivia [20..21) ' '
+    OpenBraceToken [21..22) '{'
+    T:WhitespaceTrivia [22..23) ' '
+    CloseBraceToken [23..24) '}'
+    T:EndOfLineTrivia [24..25) '\n'
+  InterfaceDeclaration [25..81)
+    PublicKeyword [25..31) 'public'
+    T:WhitespaceTrivia [31..32) ' '
+    InterfaceKeyword [32..41) 'interface'
+    T:WhitespaceTrivia [41..42) ' '
+    IdentifierToken [42..44) 'I1'
+    T:EndOfLineTrivia [44..45) '\n'
+    OpenBraceToken [45..46) '{'
+    T:EndOfLineTrivia [46..47) '\n'
+    EventDeclaration [47..79)
+      L:WhitespaceTrivia [47..51) '    '
+      EventKeyword [51..56) 'event'
+      T:WhitespaceTrivia [56..57) ' '
+      QualifiedName [57..71)
+        IdentifierName [57..63)
+          IdentifierToken [57..63) 'System'
+        DotToken [63..64) '.'
+        IdentifierName [64..71)
+          IdentifierToken [64..70) 'Action'
+          T:WhitespaceTrivia [70..71) ' '
+      ExplicitInterfaceSpecifier [71..74)
+        IdentifierName [71..73)
+          IdentifierToken [71..73) 'I2'
+        DotToken [73..74) '.'
+      IdentifierToken [74..77) 'P10'
+      SemicolonToken [77..78) ';'
+      T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''

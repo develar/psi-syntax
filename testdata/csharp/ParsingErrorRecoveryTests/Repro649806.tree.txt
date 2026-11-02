@@ -1,0 +1,28 @@
+CompilationUnit [0..12)
+  GlobalStatement [0..3)
+    LocalDeclarationStatement [0..3)
+      VariableDeclaration [0..3)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) 'a'
+          T:WhitespaceTrivia [1..2) ' '
+        VariableDeclarator [2..3)
+          IdentifierToken [2..3) 'b'
+      SemicolonToken [3..3) missing
+  GlobalStatement [3..12)
+    ExpressionStatement [3..12)
+      AliasQualifiedName [3..12)
+        IdentifierName [3..3)
+          IdentifierToken [3..3) missing
+        ColonColonToken [3..5) '::'
+        T:WhitespaceTrivia [5..6) ' '
+        T:MultiLineCommentTrivia [6..10) '/**/'
+        T:EndOfLineTrivia [10..12) '\r\n'
+        IdentifierName [12..12)
+          IdentifierToken [12..12) missing
+      SemicolonToken [12..12) missing
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1002 [3..5) ; expected
+  CS1001 [3..5) Identifier expected
+  CS1001 [5..5) Identifier expected
+  CS1002 [5..5) ; expected

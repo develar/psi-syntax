@@ -1,0 +1,10 @@
+CompilationUnit [0..15)
+  RecordDeclaration [0..15)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'file'
+    T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+  EndOfFileToken [15..15) ''

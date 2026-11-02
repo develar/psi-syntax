@@ -1,0 +1,4 @@
+BadToken [0..1) '\\'
+EndOfFileToken [1..1) ''
+Diagnostics:
+  CS1056 [0..0) Unexpected character \'\\\'

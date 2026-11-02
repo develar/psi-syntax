@@ -1,0 +1,55 @@
+CompilationUnit [0..45)
+  ClassDeclaration [0..45)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..44)
+      VariableDeclaration [11..42)
+        PredefinedType [11..22)
+          L:WhitespaceTrivia [11..15) '    '
+          ObjectKeyword [15..21) 'object'
+          T:WhitespaceTrivia [21..22) ' '
+        VariableDeclarator [22..42)
+          IdentifierToken [22..23) 'x'
+          T:WhitespaceTrivia [23..24) ' '
+          EqualsValueClause [24..42)
+            EqualsToken [24..25) '='
+            T:WhitespaceTrivia [25..26) ' '
+            TupleExpression [26..42)
+              OpenParenToken [26..27) '('
+              Argument [27..37)
+                TupleExpression [27..37)
+                  OpenParenToken [27..28) '('
+                  Argument [28..36)
+                    NameColon [28..35)
+                      IdentifierName [28..33)
+                        IdentifierToken [28..33) 'Alice'
+                      ColonToken [33..34) ':'
+                      T:WhitespaceTrivia [34..35) ' '
+                    NumericLiteralExpression [35..36)
+                      NumericLiteralToken [35..36) '1'
+                  CommaToken [36..36) missing
+                  Argument [36..36)
+                    IdentifierName [36..36)
+                      IdentifierToken [36..36) missing
+                  CloseParenToken [36..37) ')'
+              CommaToken [37..38) ','
+              T:WhitespaceTrivia [38..39) ' '
+              Argument [39..41)
+                ParenthesizedExpression [39..41)
+                  OpenParenToken [39..40) '('
+                  IdentifierName [40..40)
+                    IdentifierToken [40..40) missing
+                  CloseParenToken [40..41) ')'
+              CloseParenToken [41..42) ')'
+      SemicolonToken [42..43) ';'
+      T:EndOfLineTrivia [43..44) '\n'
+    CloseBraceToken [44..45) '}'
+  EndOfFileToken [45..45) ''
+Diagnostics:
+  CS8124 [36..37) Tuple must contain at least two elements.
+  CS1525 [40..41) Invalid expression term \')\'

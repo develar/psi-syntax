@@ -1,0 +1,18 @@
+CompilationUnit [0..7)
+  GlobalStatement [0..7)
+    LocalDeclarationStatement [0..7)
+      VariableDeclaration [0..7)
+        IdentifierName [0..3)
+          IdentifierToken [0..3) 'abc'
+        VariableDeclarator [3..7)
+          IdentifierToken [3..3) missing
+          T:SkippedTokensTrivia [3..4)
+            BadToken [3..4) '\u{0000}'
+          T:SkippedTokensTrivia [4..7)
+            IdentifierToken [4..7) 'def'
+      SemicolonToken [7..7) missing
+  EndOfFileToken [7..7) ''
+Diagnostics:
+  CS1001 [3..4) Identifier expected
+  CS1056 [3..3) Unexpected character \'\\0\'
+  CS1002 [7..7) ; expected

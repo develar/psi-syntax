@@ -1,0 +1,2 @@
+IdentifierName [0..9)
+  IdentifierToken [0..9) 'TypeName2'

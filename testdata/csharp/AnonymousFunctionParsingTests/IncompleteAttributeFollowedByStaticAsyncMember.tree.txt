@@ -1,0 +1,53 @@
+CompilationUnit [0..84)
+  ClassDeclaration [0..84)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..83)
+      AttributeList [17..52)
+        L:WhitespaceTrivia [17..21) '    '
+        OpenBracketToken [21..22) '['
+        Attribute [22..52)
+          IdentifierName [22..39)
+            IdentifierToken [22..39) 'ObsoleteAttribute'
+          AttributeArgumentList [39..52)
+            OpenParenToken [39..40) '('
+            AttributeArgument [40..42)
+              IdentifierName [40..42)
+                IdentifierToken [40..41) 'x'
+                T:EndOfLineTrivia [41..42) '\n'
+            CommaToken [42..42) missing
+            AttributeArgument [42..52)
+              IdentifierName [42..52)
+                L:WhitespaceTrivia [42..46) '    '
+                IdentifierToken [46..51) 'async'
+                T:WhitespaceTrivia [51..52) ' '
+            CloseParenToken [52..52) missing
+        CloseBracketToken [52..52) missing
+      StaticKeyword [52..58) 'static'
+      T:WhitespaceTrivia [58..59) ' '
+      IdentifierName [59..64)
+        IdentifierToken [59..63) 'Task'
+        T:WhitespaceTrivia [63..64) ' '
+      IdentifierToken [64..68) 'Main'
+      ParameterList [68..71)
+        OpenParenToken [68..69) '('
+        CloseParenToken [69..70) ')'
+        T:EndOfLineTrivia [70..71) '\n'
+      Block [71..83)
+        L:WhitespaceTrivia [71..75) '    '
+        OpenBraceToken [75..76) '{'
+        T:EndOfLineTrivia [76..77) '\n'
+        L:WhitespaceTrivia [77..81) '    '
+        CloseBraceToken [81..82) '}'
+        T:EndOfLineTrivia [82..83) '\n'
+    CloseBraceToken [83..84) '}'
+  EndOfFileToken [84..84) ''
+Diagnostics:
+  CS1003 [41..41) Syntax error, \',\' expected
+  CS1026 [52..58) ) expected
+  CS1003 [52..58) Syntax error, \']\' expected

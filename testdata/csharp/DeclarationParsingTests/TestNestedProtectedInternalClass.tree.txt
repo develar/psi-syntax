@@ -1,0 +1,23 @@
+CompilationUnit [0..42)
+  ClassDeclaration [0..42)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    ClassDeclaration [10..41)
+      ProtectedKeyword [10..19) 'protected'
+      T:WhitespaceTrivia [19..20) ' '
+      InternalKeyword [20..28) 'internal'
+      T:WhitespaceTrivia [28..29) ' '
+      ClassKeyword [29..34) 'class'
+      T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..36) 'b'
+      T:WhitespaceTrivia [36..37) ' '
+      OpenBraceToken [37..38) '{'
+      T:WhitespaceTrivia [38..39) ' '
+      CloseBraceToken [39..40) '}'
+      T:WhitespaceTrivia [40..41) ' '
+    CloseBraceToken [41..42) '}'
+  EndOfFileToken [42..42) ''

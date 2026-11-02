@@ -1,0 +1,51 @@
+CompilationUnit [0..57)
+  GlobalStatement [0..5)
+    ExpressionStatement [0..5)
+      InvocationExpression [0..3)
+        IdentifierName [0..1)
+          IdentifierToken [0..1) 'a'
+        ArgumentList [1..3)
+          OpenParenToken [1..2) '('
+          CloseParenToken [2..3) ')'
+      SemicolonToken [3..4) ';'
+      T:EndOfLineTrivia [4..5) '\n'
+  GlobalStatement [5..20)
+    ExpressionStatement [5..20)
+      InvocationExpression [5..18)
+        IdentifierName [5..16)
+          L:IfDirectiveTrivia [5..15)
+            HashToken [5..6) '#'
+            IfKeyword [6..8) 'if'
+            T:WhitespaceTrivia [8..9) ' '
+            TrueLiteralExpression [9..14)
+              TrueKeyword [9..13) 'true'
+              T:WhitespaceTrivia [13..14) ' '
+            EndOfDirectiveToken [14..14) ''
+            T:EndOfLineTrivia [14..15) '\n'
+          IdentifierToken [15..16) 'b'
+        ArgumentList [16..18)
+          OpenParenToken [16..17) '('
+          CloseParenToken [17..18) ')'
+      SemicolonToken [18..19) ';'
+      T:EndOfLineTrivia [19..20) '\n'
+  GlobalStatement [20..51)
+    ExpressionStatement [20..51)
+      InvocationExpression [20..49)
+        IdentifierName [20..47)
+          L:MultiLineCommentTrivia [20..33) '/* comment */'
+          L:WhitespaceTrivia [33..34) ' '
+          L:SkippedTokensTrivia [34..46)
+            BadToken [34..46) '#elif false\n'
+          IdentifierToken [46..47) 'c'
+        ArgumentList [47..49)
+          OpenParenToken [47..48) '('
+          CloseParenToken [48..49) ')'
+      SemicolonToken [49..50) ';'
+      T:EndOfLineTrivia [50..51) '\n'
+  L:EndIfDirectiveTrivia [51..57)
+    HashToken [51..52) '#'
+    EndIfKeyword [52..57) 'endif'
+    EndOfDirectiveToken [57..57) ''
+  EndOfFileToken [57..57) ''
+Diagnostics:
+  CS1040 [34..35) Preprocessor directives must appear as the first non-whitespace character on a line

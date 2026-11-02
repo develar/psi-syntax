@@ -1,0 +1,23 @@
+CompilationUnit [0..34)
+  NamespaceDeclaration [0..34)
+    AttributeList [0..18)
+      OpenBracketToken [0..1) '['
+      Attribute [1..16)
+        QualifiedName [1..16)
+          IdentifierName [1..7)
+            IdentifierToken [1..7) 'System'
+          DotToken [7..8) '.'
+          IdentifierName [8..16)
+            IdentifierToken [8..16) 'Obsolete'
+      CloseBracketToken [16..17) ']'
+      T:EndOfLineTrivia [17..18) '\n'
+    NamespaceKeyword [18..27) 'namespace'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierName [28..30)
+      IdentifierToken [28..29) 'N'
+      T:WhitespaceTrivia [29..30) ' '
+    OpenBraceToken [30..31) '{'
+    T:WhitespaceTrivia [31..32) ' '
+    CloseBraceToken [32..33) '}'
+    T:EndOfLineTrivia [33..34) '\n'
+  EndOfFileToken [34..34) ''

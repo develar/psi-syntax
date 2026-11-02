@@ -1,0 +1,29 @@
+ConditionalAccessExpression [0..21)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'x'
+  QuestionToken [1..2) '?'
+  InvocationExpression [2..21)
+    SimpleMemberAccessExpression [2..19)
+      SimpleMemberAccessExpression [2..10)
+        ElementAccessExpression [2..8)
+          SuppressNullableWarningExpression [2..5)
+            MemberBindingExpression [2..4)
+              DotToken [2..3) '.'
+              IdentifierName [3..4)
+                IdentifierToken [3..4) 'y'
+            ExclamationToken [4..5) '!'
+          BracketedArgumentList [5..8)
+            OpenBracketToken [5..6) '['
+            Argument [6..7)
+              NumericLiteralExpression [6..7)
+                NumericLiteralToken [6..7) '1'
+            CloseBracketToken [7..8) ']'
+        DotToken [8..9) '.'
+        IdentifierName [9..10)
+          IdentifierToken [9..10) 'z'
+      DotToken [10..11) '.'
+      IdentifierName [11..19)
+        IdentifierToken [11..19) 'ToString'
+    ArgumentList [19..21)
+      OpenParenToken [19..20) '('
+      CloseParenToken [20..21) ')'

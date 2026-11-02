@@ -1,0 +1,46 @@
+SwitchExpression [0..42)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:EndOfLineTrivia [8..9) '\n'
+  OpenBraceToken [9..10) '{'
+  T:EndOfLineTrivia [10..11) '\n'
+  SwitchExpressionArm [11..24)
+    ConstantPattern [11..21)
+      NumericLiteralExpression [11..21)
+        L:WhitespaceTrivia [11..15) '    '
+        L:SkippedTokensTrivia [15..19)
+          CaseKeyword [15..19) 'case'
+        L:WhitespaceTrivia [19..20) ' '
+        NumericLiteralToken [20..21) '0'
+    EqualsGreaterThanToken [21..21) missing
+    T:SkippedTokensTrivia [21..22)
+      ColonToken [21..22) ':'
+    T:WhitespaceTrivia [22..23) ' '
+    NumericLiteralExpression [23..24)
+      NumericLiteralToken [23..24) '1'
+  CommaToken [24..25) ','
+  T:EndOfLineTrivia [25..26) '\n'
+  SwitchExpressionArm [26..39)
+    ConstantPattern [26..36)
+      NumericLiteralExpression [26..36)
+        L:WhitespaceTrivia [26..30) '    '
+        L:SkippedTokensTrivia [30..34)
+          CaseKeyword [30..34) 'case'
+        L:WhitespaceTrivia [34..35) ' '
+        NumericLiteralToken [35..36) '1'
+    EqualsGreaterThanToken [36..36) missing
+    T:SkippedTokensTrivia [36..37)
+      ColonToken [36..37) ':'
+    T:WhitespaceTrivia [37..38) ' '
+    NumericLiteralExpression [38..39)
+      NumericLiteralToken [38..39) '2'
+  CommaToken [39..40) ','
+  T:EndOfLineTrivia [40..41) '\n'
+  CloseBraceToken [41..42) '}'
+Diagnostics:
+  CS9134 [15..19) A switch expression arm does not begin with a \'case\' keyword.
+  CS1003 [21..22) Syntax error, \'=>\' expected
+  CS9134 [30..34) A switch expression arm does not begin with a \'case\' keyword.
+  CS1003 [36..37) Syntax error, \'=>\' expected

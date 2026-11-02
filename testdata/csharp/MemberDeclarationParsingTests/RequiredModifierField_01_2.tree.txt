@@ -1,0 +1,10 @@
+FieldDeclaration [0..22)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  VariableDeclaration [9..21)
+    PredefinedType [9..16)
+      StringKeyword [9..15) 'string'
+      T:WhitespaceTrivia [15..16) ' '
+    VariableDeclarator [16..21)
+      IdentifierToken [16..21) 'Field'
+  SemicolonToken [21..22) ';'

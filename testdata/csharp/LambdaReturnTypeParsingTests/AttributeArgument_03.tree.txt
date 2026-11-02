@@ -1,0 +1,38 @@
+ClassDeclaration [0..46)
+  AttributeList [0..35)
+    OpenBracketToken [0..1) '['
+    Attribute [1..33)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+      AttributeArgumentList [2..33)
+        OpenParenToken [2..3) '('
+        AttributeArgument [3..32)
+          ParenthesizedLambdaExpression [3..32)
+            FunctionPointerType [3..19)
+              DelegateKeyword [3..11) 'delegate'
+              AsteriskToken [11..12) '*'
+              FunctionPointerParameterList [12..19)
+                LessThanToken [12..13) '<'
+                FunctionPointerParameter [13..17)
+                  PredefinedType [13..17)
+                    VoidKeyword [13..17) 'void'
+                GreaterThanToken [17..18) '>'
+                T:WhitespaceTrivia [18..19) ' '
+            ParameterList [19..22)
+              OpenParenToken [19..20) '('
+              CloseParenToken [20..21) ')'
+              T:WhitespaceTrivia [21..22) ' '
+            EqualsGreaterThanToken [22..24) '=>'
+            T:WhitespaceTrivia [24..25) ' '
+            DefaultLiteralExpression [25..32)
+              DefaultKeyword [25..32) 'default'
+        CloseParenToken [32..33) ')'
+    CloseBracketToken [33..34) ']'
+    T:WhitespaceTrivia [34..35) ' '
+  ClassKeyword [35..40) 'class'
+  T:WhitespaceTrivia [40..41) ' '
+  IdentifierToken [41..42) 'C'
+  T:WhitespaceTrivia [42..43) ' '
+  OpenBraceToken [43..44) '{'
+  T:WhitespaceTrivia [44..45) ' '
+  CloseBraceToken [45..46) '}'

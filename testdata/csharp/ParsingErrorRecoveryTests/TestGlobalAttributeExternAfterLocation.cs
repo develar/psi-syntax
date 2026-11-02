@@ -1,0 +1,1 @@
+[assembly: extern alias a;

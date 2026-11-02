@@ -1,0 +1,1 @@
+partial closed record struct C { }

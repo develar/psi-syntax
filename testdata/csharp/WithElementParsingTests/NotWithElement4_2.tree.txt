@@ -1,0 +1,12 @@
+CollectionExpression [0..13)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..12)
+    AddExpression [1..12)
+      IdentifierName [1..6)
+        IdentifierToken [1..5) 'with'
+        T:WhitespaceTrivia [5..6) ' '
+      PlusToken [6..7) '+'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierName [8..12)
+        IdentifierToken [8..12) 'with'
+  CloseBracketToken [12..13) ']'

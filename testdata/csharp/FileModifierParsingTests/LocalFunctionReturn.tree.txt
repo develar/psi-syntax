@@ -1,0 +1,19 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..16)
+    LocalFunctionStatement [0..16)
+      IdentifierName [0..5)
+        IdentifierToken [0..4) 'file'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..10) 'local'
+      ParameterList [10..13)
+        OpenParenToken [10..11) '('
+        CloseParenToken [11..12) ')'
+        T:WhitespaceTrivia [12..13) ' '
+      Block [13..16)
+        OpenBraceToken [13..14) '{'
+        T:WhitespaceTrivia [14..15) ' '
+        CloseBraceToken [15..16) '}'
+  GlobalStatement [16..17)
+    EmptyStatement [16..17)
+      SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''

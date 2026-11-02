@@ -1,0 +1,16 @@
+RangeExpression [0..13)
+  IsPatternExpression [0..11)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'c'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    VarPattern [5..11)
+      VarKeyword [5..8) 'var'
+      T:WhitespaceTrivia [8..9) ' '
+      SingleVariableDesignation [9..11)
+        IdentifierToken [9..10) 'x'
+        T:WhitespaceTrivia [10..11) ' '
+  DotDotToken [11..13) '..'
+Diagnostics:
+  CS1073 [11..13) Unexpected token \'..\'

@@ -1,0 +1,1 @@
+closed struct C { }

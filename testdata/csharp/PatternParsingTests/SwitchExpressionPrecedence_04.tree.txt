@@ -1,0 +1,14 @@
+AddExpression [0..15)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  PlusToken [2..3) '+'
+  T:WhitespaceTrivia [3..4) ' '
+  SwitchExpression [4..15)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'b'
+      T:WhitespaceTrivia [5..6) ' '
+    SwitchKeyword [6..12) 'switch'
+    T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    CloseBraceToken [14..15) '}'

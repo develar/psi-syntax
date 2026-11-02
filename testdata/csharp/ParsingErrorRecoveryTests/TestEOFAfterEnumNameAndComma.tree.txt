@@ -1,0 +1,16 @@
+CompilationUnit [0..12)
+  EnumDeclaration [0..12)
+    EnumKeyword [0..4) 'enum'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'e'
+    T:WhitespaceTrivia [6..7) ' '
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    EnumMemberDeclaration [9..10)
+      IdentifierToken [9..10) 'n'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    CloseBraceToken [12..12) missing
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1513 [12..12) } expected

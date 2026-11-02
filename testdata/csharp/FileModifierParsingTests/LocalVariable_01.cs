@@ -1,0 +1,4 @@
+void M()
+{
+    file file;
+}

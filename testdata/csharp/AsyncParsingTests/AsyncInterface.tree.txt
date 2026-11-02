@@ -1,0 +1,25 @@
+CompilationUnit [0..31)
+  ClassDeclaration [0..31)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    InterfaceDeclaration [11..31)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      InterfaceKeyword [21..30) 'interface'
+      T:EndOfLineTrivia [30..31) '\n'
+      IdentifierToken [31..31) missing
+      OpenBraceToken [31..31) missing
+      CloseBraceToken [31..31) missing
+    CloseBraceToken [31..31) missing
+  EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1001 [30..30) Identifier expected
+  CS1514 [30..30) { expected
+  CS1513 [30..30) } expected
+  CS1513 [30..30) } expected

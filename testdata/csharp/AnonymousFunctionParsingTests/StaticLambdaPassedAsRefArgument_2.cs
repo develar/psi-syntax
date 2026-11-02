@@ -1,0 +1,1 @@
+M1(ref static x => x);

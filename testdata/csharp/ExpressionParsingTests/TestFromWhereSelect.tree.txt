@@ -1,0 +1,23 @@
+QueryExpression [0..28)
+  FromClause [0..12)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'a'
+    T:WhitespaceTrivia [6..7) ' '
+    InKeyword [7..9) 'in'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'A'
+      T:WhitespaceTrivia [11..12) ' '
+  QueryBody [12..28)
+    WhereClause [12..20)
+      WhereKeyword [12..17) 'where'
+      T:WhitespaceTrivia [17..18) ' '
+      IdentifierName [18..20)
+        IdentifierToken [18..19) 'b'
+        T:WhitespaceTrivia [19..20) ' '
+    SelectClause [20..28)
+      SelectKeyword [20..26) 'select'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierName [27..28)
+        IdentifierToken [27..28) 'c'

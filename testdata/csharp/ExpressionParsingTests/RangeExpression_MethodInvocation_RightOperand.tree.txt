@@ -1,0 +1,13 @@
+RangeExpression [0..15)
+  DotDotToken [0..2) '..'
+  InvocationExpression [2..15)
+    SimpleMemberAccessExpression [2..13)
+      NumericLiteralExpression [2..4)
+        NumericLiteralToken [2..3) '2'
+        T:WhitespaceTrivia [3..4) ' '
+      DotToken [4..5) '.'
+      IdentifierName [5..13)
+        IdentifierToken [5..13) 'ToString'
+    ArgumentList [13..15)
+      OpenParenToken [13..14) '('
+      CloseParenToken [14..15) ')'

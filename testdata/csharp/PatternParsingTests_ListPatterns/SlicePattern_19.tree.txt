@@ -1,0 +1,15 @@
+IsPatternExpression [0..11)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..11)
+    OpenBracketToken [5..6) '['
+    SlicePattern [6..10)
+      DotDotToken [6..8) '..'
+      RelationalPattern [8..10)
+        GreaterThanToken [8..9) '>'
+        NumericLiteralExpression [9..10)
+          NumericLiteralToken [9..10) '5'
+    CloseBracketToken [10..11) ']'

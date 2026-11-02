@@ -1,0 +1,36 @@
+MethodDeclaration [0..29)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..29)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ExpressionStatement [11..29)
+      ElementAccessExpression [11..29)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:WhitespaceTrivia [25..26) ' '
+        BracketedArgumentList [26..29)
+          OpenBracketToken [26..27) '['
+          T:EndOfLineTrivia [27..28) '\n'
+          T:SkippedTokensTrivia [28..29)
+            CloseBraceToken [28..29) '}'
+          CloseBracketToken [29..29) missing
+      SemicolonToken [29..29) missing
+    CloseBraceToken [29..29) missing
+Diagnostics:
+  CS1001 [27..27) Identifier expected
+  CS1003 [29..29) Syntax error, \']\' expected
+  CS1002 [29..29) ; expected
+  CS1513 [29..29) } expected

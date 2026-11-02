@@ -1,0 +1,37 @@
+LocalDeclarationStatement [0..28)
+  VariableDeclaration [0..27)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..27)
+      IdentifierToken [4..5) 'x'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..27)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        IsPatternExpression [8..27)
+          IdentifierName [8..10)
+            IdentifierToken [8..9) 'o'
+            T:WhitespaceTrivia [9..10) ' '
+          IsKeyword [10..12) 'is'
+          T:WhitespaceTrivia [12..13) ' '
+          RecursivePattern [13..27)
+            PropertyPatternClause [13..26)
+              OpenBraceToken [13..14) '{'
+              T:WhitespaceTrivia [14..15) ' '
+              Subpattern [15..24)
+                NameColon [15..22)
+                  IdentifierName [15..20)
+                    IdentifierToken [15..19) 'Prop'
+                    T:WhitespaceTrivia [19..20) ' '
+                  ColonToken [20..21) ':'
+                  T:WhitespaceTrivia [21..22) ' '
+                ConstantPattern [22..24)
+                  NumericLiteralExpression [22..24)
+                    NumericLiteralToken [22..23) '3'
+                    T:WhitespaceTrivia [23..24) ' '
+              CloseBraceToken [24..25) '}'
+              T:WhitespaceTrivia [25..26) ' '
+            SingleVariableDesignation [26..27)
+              IdentifierToken [26..27) 'x'
+  SemicolonToken [27..28) ';'

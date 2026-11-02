@@ -1,0 +1,3 @@
+CompilationUnit [0..12)
+  L:SingleLineCommentTrivia [0..12) '//// <goo />'
+  EndOfFileToken [12..12) ''

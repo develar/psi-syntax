@@ -1,0 +1,8 @@
+PointerType [0..6)
+  PointerType [0..5)
+    PointerType [0..4)
+      IdentifierName [0..3)
+        IdentifierToken [0..3) 'goo'
+      AsteriskToken [3..4) '*'
+    AsteriskToken [4..5) '*'
+  AsteriskToken [5..6) '*'

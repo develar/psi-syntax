@@ -1,0 +1,12 @@
+CompilationUnit [0..15)
+  L:BadDirectiveTrivia [0..15)
+    HashToken [0..1) '#'
+    IdentifierToken [1..7) 'import'
+    T:WhitespaceTrivia [7..8) ' '
+    L:SkippedTokensTrivia [8..15)
+      IdentifierToken [8..14) 'System'
+      BadToken [14..15) ';'
+    EndOfDirectiveToken [15..15) ''
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1024 [1..7) Preprocessor directive expected

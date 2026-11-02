@@ -1,0 +1,1 @@
+implicit N.I operator int(int x) => x;

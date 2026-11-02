@@ -1,0 +1,29 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..20)
+    LocalFunctionStatement [0..20)
+      PredefinedType [0..5)
+        VoidKeyword [0..4) 'void'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'M'
+      ParameterList [6..9)
+        OpenParenToken [6..7) '('
+        CloseParenToken [7..8) ')'
+        T:EndOfLineTrivia [8..9) '\n'
+      Block [9..20)
+        OpenBraceToken [9..10) '{'
+        T:EndOfLineTrivia [10..11) '\n'
+        ExpressionStatement [11..19)
+          LeftShiftExpression [11..17)
+            IdentifierName [11..11)
+              IdentifierToken [11..11) missing
+            L:WhitespaceTrivia [11..15) '    '
+            LessThanLessThanToken [15..17) '<<'
+            IdentifierName [17..17)
+              IdentifierToken [17..17) missing
+          SemicolonToken [17..18) ';'
+          T:EndOfLineTrivia [18..19) '\n'
+        CloseBraceToken [19..20) '}'
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1525 [15..17) Invalid expression term \'<<\'
+  CS1525 [17..18) Invalid expression term \';\'

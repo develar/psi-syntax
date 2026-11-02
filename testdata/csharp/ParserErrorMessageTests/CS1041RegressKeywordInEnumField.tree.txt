@@ -1,0 +1,41 @@
+CompilationUnit [0..66)
+  EnumDeclaration [0..66)
+    EnumKeyword [0..4) 'enum'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..11) 'ColorA'
+    T:WhitespaceTrivia [11..12) ' '
+    T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    T:WhitespaceTrivia [15..19) '    '
+    T:SkippedTokensTrivia [19..24)
+      ConstKeyword [19..24) 'const'
+    T:WhitespaceTrivia [24..25) ' '
+    EnumMemberDeclaration [25..28)
+      IdentifierToken [25..28) 'Red'
+    CommaToken [28..29) ','
+    T:EndOfLineTrivia [29..30) '\n'
+    EnumMemberDeclaration [30..44)
+      L:WhitespaceTrivia [30..34) '    '
+      IdentifierToken [34..39) 'Green'
+      T:WhitespaceTrivia [39..40) ' '
+      EqualsValueClause [40..44)
+        EqualsToken [40..41) '='
+        T:WhitespaceTrivia [41..42) ' '
+        NumericLiteralExpression [42..44)
+          NumericLiteralToken [42..44) '10'
+    CommaToken [44..45) ','
+    T:EndOfLineTrivia [45..46) '\n'
+    T:WhitespaceTrivia [46..50) '    '
+    T:SkippedTokensTrivia [50..58)
+      ReadOnlyKeyword [50..58) 'readonly'
+    T:WhitespaceTrivia [58..59) ' '
+    EnumMemberDeclaration [59..63)
+      IdentifierToken [59..63) 'Blue'
+    CommaToken [63..64) ','
+    T:EndOfLineTrivia [64..65) '\n'
+    CloseBraceToken [65..66) '}'
+  EndOfFileToken [66..66) ''
+Diagnostics:
+  CS1041 [14..14) Identifier expected; \'const\' is a keyword
+  CS1041 [45..45) Identifier expected; \'readonly\' is a keyword

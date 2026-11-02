@@ -1,0 +1,33 @@
+IfStatement [0..28)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IsPatternExpression [4..25)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'x'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    AndPattern [9..25)
+      RelationalPattern [9..17)
+        L:SkippedTokensTrivia [9..11)
+          EqualsEqualsToken [9..11) '=='
+        L:WhitespaceTrivia [11..12) ' '
+        GreaterThanToken [12..13) '>'
+        T:WhitespaceTrivia [13..14) ' '
+        NumericLiteralExpression [14..17)
+          NumericLiteralToken [14..16) '10'
+          T:WhitespaceTrivia [16..17) ' '
+      AndKeyword [17..20) 'and'
+      T:WhitespaceTrivia [20..21) ' '
+      RelationalPattern [21..25)
+        LessThanToken [21..22) '<'
+        T:WhitespaceTrivia [22..23) ' '
+        NumericLiteralExpression [23..25)
+          NumericLiteralToken [23..25) '15'
+  CloseParenToken [25..26) ')'
+  T:WhitespaceTrivia [26..27) ' '
+  EmptyStatement [27..28)
+    SemicolonToken [27..28) ';'
+Diagnostics:
+  CS9344 [9..11) The \'==\' operator is not supported in a pattern.

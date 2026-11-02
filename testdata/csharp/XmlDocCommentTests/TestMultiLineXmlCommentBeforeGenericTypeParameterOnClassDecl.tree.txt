@@ -1,0 +1,30 @@
+CompilationUnit [0..32)
+  ClassDeclaration [0..32)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    TypeParameterList [7..30)
+      LessThanToken [7..8) '<'
+      TypeParameter [8..29)
+        L:MultiLineDocumentationCommentTrivia [8..28)
+          XmlElement [8..26)
+            XmlElementStartTag [8..16)
+              L:DocumentationCommentExteriorTrivia [8..11) '/**'
+              LessThanToken [11..12) '<'
+              XmlName [12..15)
+                IdentifierToken [12..15) 'goo'
+              GreaterThanToken [15..16) '>'
+            XmlText [16..20)
+              XmlTextLiteralToken [16..20) 'test'
+            XmlElementEndTag [20..26)
+              LessThanSlashToken [20..22) '</'
+              XmlName [22..25)
+                IdentifierToken [22..25) 'goo'
+              GreaterThanToken [25..26) '>'
+          L:DocumentationCommentExteriorTrivia [26..28) '*/'
+          EndOfDocumentationCommentToken [28..28) ''
+        IdentifierToken [28..29) 'T'
+      GreaterThanToken [29..30) '>'
+    OpenBraceToken [30..31) '{'
+    CloseBraceToken [31..32) '}'
+  EndOfFileToken [32..32) ''

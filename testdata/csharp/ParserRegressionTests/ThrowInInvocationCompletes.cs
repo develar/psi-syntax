@@ -1,0 +1,1 @@
+SomeMethod(throw new Exception())

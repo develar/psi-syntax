@@ -1,0 +1,18 @@
+CompilationUnit [0..10)
+  GlobalStatement [0..8)
+    ExpressionStatement [0..8)
+      InvocationExpression [0..8)
+        IdentifierName [0..5)
+          IdentifierToken [0..5) 'local'
+        ArgumentList [5..8)
+          OpenParenToken [5..6) '('
+          CloseParenToken [6..7) ')'
+          T:WhitespaceTrivia [7..8) ' '
+      SemicolonToken [8..8) missing
+  GlobalStatement [8..10)
+    Block [8..10)
+      OpenBraceToken [8..9) '{'
+      CloseBraceToken [9..10) '}'
+  EndOfFileToken [10..10) ''
+Diagnostics:
+  CS1002 [8..9) ; expected

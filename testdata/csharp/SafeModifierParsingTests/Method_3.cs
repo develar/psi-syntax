@@ -1,0 +1,1 @@
+public extern safe void M();

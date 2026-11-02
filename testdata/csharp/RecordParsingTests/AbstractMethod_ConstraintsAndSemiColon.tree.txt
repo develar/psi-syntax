@@ -1,0 +1,40 @@
+CompilationUnit [0..59)
+  RecordDeclaration [0..59)
+    AbstractKeyword [0..8) 'abstract'
+    T:WhitespaceTrivia [8..9) ' '
+    RecordKeyword [9..15) 'record'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierToken [16..17) 'R'
+    T:WhitespaceTrivia [17..18) ' '
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    MethodDeclaration [20..58)
+      AbstractKeyword [20..28) 'abstract'
+      T:WhitespaceTrivia [28..29) ' '
+      PredefinedType [29..34)
+        VoidKeyword [29..33) 'void'
+        T:WhitespaceTrivia [33..34) ' '
+      IdentifierToken [34..35) 'M'
+      TypeParameterList [35..38)
+        LessThanToken [35..36) '<'
+        TypeParameter [36..37)
+          IdentifierToken [36..37) 'T'
+        GreaterThanToken [37..38) '>'
+      ParameterList [38..41)
+        OpenParenToken [38..39) '('
+        CloseParenToken [39..40) ')'
+        T:WhitespaceTrivia [40..41) ' '
+      TypeParameterConstraintClause [41..56)
+        WhereKeyword [41..46) 'where'
+        T:WhitespaceTrivia [46..47) ' '
+        IdentifierName [47..49)
+          IdentifierToken [47..48) 'T'
+          T:WhitespaceTrivia [48..49) ' '
+        ColonToken [49..50) ':'
+        T:WhitespaceTrivia [50..51) ' '
+        ClassConstraint [51..56)
+          ClassKeyword [51..56) 'class'
+      SemicolonToken [56..57) ';'
+      T:WhitespaceTrivia [57..58) ' '
+    CloseBraceToken [58..59) '}'
+  EndOfFileToken [59..59) ''

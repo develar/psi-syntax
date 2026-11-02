@@ -1,0 +1,49 @@
+ObjectCreationExpression [0..37)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..11)
+    IdentifierToken [4..10) 'Class1'
+    T:WhitespaceTrivia [10..11) ' '
+  ObjectInitializerExpression [11..37)
+    OpenBraceToken [11..12) '{'
+    T:WhitespaceTrivia [12..13) ' '
+    SimpleAssignmentExpression [13..36)
+      IdentifierName [13..15)
+        IdentifierToken [13..14) 'X'
+        T:WhitespaceTrivia [14..15) ' '
+      EqualsToken [15..16) '='
+      T:WhitespaceTrivia [16..17) ' '
+      ObjectInitializerExpression [17..36)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        SimpleAssignmentExpression [19..34)
+          ImplicitElementAccess [19..23)
+            BracketedArgumentList [19..23)
+              OpenBracketToken [19..20) '['
+              Argument [20..21)
+                NumericLiteralExpression [20..21)
+                  NumericLiteralToken [20..21) '0'
+              CloseBracketToken [21..22) ']'
+              T:WhitespaceTrivia [22..23) ' '
+          EqualsToken [23..24) '='
+          T:WhitespaceTrivia [24..25) ' '
+          ObjectInitializerExpression [25..34)
+            OpenBraceToken [25..26) '{'
+            T:WhitespaceTrivia [26..27) ' '
+            SimpleAssignmentExpression [27..32)
+              IdentifierName [27..28)
+                IdentifierToken [27..28) 'Y'
+              EqualsToken [28..28) missing
+              T:SkippedTokensTrivia [28..29)
+                ColonToken [28..29) ':'
+              T:WhitespaceTrivia [29..30) ' '
+              NumericLiteralExpression [30..32)
+                NumericLiteralToken [30..31) '0'
+                T:WhitespaceTrivia [31..32) ' '
+            CloseBraceToken [32..33) '}'
+            T:WhitespaceTrivia [33..34) ' '
+        CloseBraceToken [34..35) '}'
+        T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'
+Diagnostics:
+  CS1003 [28..29) Syntax error, \'=\' expected

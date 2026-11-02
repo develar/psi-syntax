@@ -1,0 +1,18 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..17)
+    LocalFunctionStatement [0..17)
+      StaticKeyword [0..6) 'static'
+      T:WhitespaceTrivia [6..7) ' '
+      IdentifierName [7..12)
+        IdentifierToken [7..12) 'local'
+      IdentifierToken [12..12) missing
+      ParameterList [12..15)
+        OpenParenToken [12..13) '('
+        CloseParenToken [13..14) ')'
+        T:WhitespaceTrivia [14..15) ' '
+      Block [15..17)
+        OpenBraceToken [15..16) '{'
+        CloseBraceToken [16..17) '}'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1001 [12..13) Identifier expected

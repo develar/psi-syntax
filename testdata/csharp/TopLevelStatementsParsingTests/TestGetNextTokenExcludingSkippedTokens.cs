@@ -1,0 +1,2 @@
+garbage
+using goo.bar;

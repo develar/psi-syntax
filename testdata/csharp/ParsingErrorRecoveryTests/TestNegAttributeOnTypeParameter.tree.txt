@@ -1,0 +1,96 @@
+CompilationUnit [0..316)
+  ClassDeclaration [0..292)
+    L:WhitespaceTrivia [0..4) '    '
+    L:EndOfLineTrivia [4..5) '\n'
+    L:WhitespaceTrivia [5..33) '                            '
+    PublicKeyword [33..39) 'public'
+    T:WhitespaceTrivia [39..40) ' '
+    ClassKeyword [40..45) 'class'
+    T:WhitespaceTrivia [45..46) ' '
+    IdentifierToken [46..47) 'B'
+    T:EndOfLineTrivia [47..48) '\n'
+    L:WhitespaceTrivia [48..76) '                            '
+    OpenBraceToken [76..77) '{'
+    T:EndOfLineTrivia [77..78) '\n'
+    MethodDeclaration [78..261)
+      PredefinedType [78..115)
+        L:WhitespaceTrivia [78..110) '                                '
+        VoidKeyword [110..114) 'void'
+        T:WhitespaceTrivia [114..115) ' '
+      IdentifierToken [115..116) 'M'
+      ParameterList [116..119)
+        OpenParenToken [116..117) '('
+        CloseParenToken [117..118) ')'
+        T:EndOfLineTrivia [118..119) '\n'
+      Block [119..261)
+        L:WhitespaceTrivia [119..151) '                                '
+        OpenBraceToken [151..152) '{'
+        T:EndOfLineTrivia [152..153) '\n'
+        ExpressionStatement [153..198)
+          LessThanExpression [153..198)
+            IdentifierName [153..190)
+              L:WhitespaceTrivia [153..189) '                                    '
+              IdentifierToken [189..190) 'I'
+            LessThanToken [190..191) '<'
+            CollectionExpression [191..198)
+              OpenBracketToken [191..192) '['
+              ExpressionElement [192..196)
+                IdentifierName [192..196)
+                  IdentifierToken [192..196) 'Test'
+              CloseBracketToken [196..197) ']'
+              T:WhitespaceTrivia [197..198) ' '
+          SemicolonToken [198..198) missing
+        LocalDeclarationStatement [198..201)
+          VariableDeclaration [198..201)
+            PredefinedType [198..201)
+              IntKeyword [198..201) 'int'
+            VariableDeclarator [201..201)
+              IdentifierToken [201..201) missing
+          SemicolonToken [201..201) missing
+        ExpressionStatement [201..227)
+          SimpleAssignmentExpression [201..225)
+            GreaterThanExpression [201..205)
+              IdentifierName [201..201)
+                IdentifierToken [201..201) missing
+              GreaterThanToken [201..202) '>'
+              T:WhitespaceTrivia [202..203) ' '
+              IdentifierName [203..205)
+                IdentifierToken [203..205) 'I1'
+            EqualsToken [205..206) '='
+            ObjectCreationExpression [206..225)
+              NewKeyword [206..209) 'new'
+              T:WhitespaceTrivia [209..210) ' '
+              GenericName [210..223)
+                IdentifierToken [210..211) 'I'
+                TypeArgumentList [211..223)
+                  LessThanToken [211..212) '<'
+                  PredefinedType [212..222)
+                    L:SkippedTokensTrivia [212..213)
+                      OpenBracketToken [212..213) '['
+                    L:SkippedTokensTrivia [213..217)
+                      IdentifierToken [213..217) 'Test'
+                    L:SkippedTokensTrivia [217..218)
+                      CloseBracketToken [217..218) ']'
+                    L:WhitespaceTrivia [218..219) ' '
+                    IntKeyword [219..222) 'int'
+                  GreaterThanToken [222..223) '>'
+              ArgumentList [223..225)
+                OpenParenToken [223..224) '('
+                CloseParenToken [224..225) ')'
+          SemicolonToken [225..226) ';'
+          T:EndOfLineTrivia [226..227) '\n'
+        L:WhitespaceTrivia [227..259) '                                '
+        CloseBraceToken [259..260) '}'
+        T:EndOfLineTrivia [260..261) '\n'
+    L:WhitespaceTrivia [261..289) '                            '
+    CloseBraceToken [289..290) '}'
+    T:WhitespaceTrivia [290..291) ' '
+    T:EndOfLineTrivia [291..292) '\n'
+  L:WhitespaceTrivia [292..316) '                        '
+  EndOfFileToken [316..316) ''
+Diagnostics:
+  CS1002 [198..201) ; expected
+  CS1001 [201..202) Identifier expected
+  CS1002 [201..202) ; expected
+  CS1525 [201..202) Invalid expression term \'>\'
+  CS1031 [219..222) Type expected

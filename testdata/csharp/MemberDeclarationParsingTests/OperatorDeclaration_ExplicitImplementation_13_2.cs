@@ -1,0 +1,1 @@
+public int N.I.explicit (int x) => x;

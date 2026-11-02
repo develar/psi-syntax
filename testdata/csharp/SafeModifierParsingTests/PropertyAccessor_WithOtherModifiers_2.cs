@@ -1,0 +1,1 @@
+public int P { safe private get; set; }

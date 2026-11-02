@@ -1,0 +1,49 @@
+ParenthesizedLambdaExpression [0..75)
+  ParameterList [0..68)
+    OpenParenToken [0..1) '('
+    Parameter [1..13)
+      ScopedKeyword [1..7) 'scoped'
+      T:WhitespaceTrivia [7..8) ' '
+      PredefinedType [8..12)
+        IntKeyword [8..11) 'int'
+        T:WhitespaceTrivia [11..12) ' '
+      IdentifierToken [12..13) 'a'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    Parameter [15..31)
+      ScopedKeyword [15..21) 'scoped'
+      T:WhitespaceTrivia [21..22) ' '
+      RefKeyword [22..25) 'ref'
+      T:WhitespaceTrivia [25..26) ' '
+      PredefinedType [26..30)
+        IntKeyword [26..29) 'int'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'b'
+    CommaToken [31..32) ','
+    T:WhitespaceTrivia [32..33) ' '
+    Parameter [33..48)
+      ScopedKeyword [33..39) 'scoped'
+      T:WhitespaceTrivia [39..40) ' '
+      InKeyword [40..42) 'in'
+      T:WhitespaceTrivia [42..43) ' '
+      PredefinedType [43..47)
+        IntKeyword [43..46) 'int'
+        T:WhitespaceTrivia [46..47) ' '
+      IdentifierToken [47..48) 'c'
+    CommaToken [48..49) ','
+    T:WhitespaceTrivia [49..50) ' '
+    Parameter [50..66)
+      ScopedKeyword [50..56) 'scoped'
+      T:WhitespaceTrivia [56..57) ' '
+      OutKeyword [57..60) 'out'
+      T:WhitespaceTrivia [60..61) ' '
+      PredefinedType [61..65)
+        IntKeyword [61..64) 'int'
+        T:WhitespaceTrivia [64..65) ' '
+      IdentifierToken [65..66) 'd'
+    CloseParenToken [66..67) ')'
+    T:WhitespaceTrivia [67..68) ' '
+  EqualsGreaterThanToken [68..70) '=>'
+  T:WhitespaceTrivia [70..71) ' '
+  NullLiteralExpression [71..75)
+    NullKeyword [71..75) 'null'

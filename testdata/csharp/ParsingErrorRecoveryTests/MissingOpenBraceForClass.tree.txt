@@ -1,0 +1,23 @@
+CompilationUnit [0..28)
+  NamespaceDeclaration [0..28)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..26)
+      L:WhitespaceTrivia [14..18) '    '
+      ClassKeyword [18..23) 'class'
+      T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..25) 'c'
+      T:EndOfLineTrivia [25..26) '\n'
+      OpenBraceToken [26..26) missing
+      CloseBraceToken [26..26) missing
+    CloseBraceToken [26..27) '}'
+    T:EndOfLineTrivia [27..28) '\n'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS1514 [25..25) { expected
+  CS1513 [25..25) } expected

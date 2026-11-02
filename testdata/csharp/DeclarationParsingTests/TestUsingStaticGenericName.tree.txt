@@ -1,0 +1,17 @@
+CompilationUnit [0..21)
+  UsingDirective [0..21)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    GenericName [13..20)
+      IdentifierToken [13..14) 'a'
+      TypeArgumentList [14..20)
+        LessThanToken [14..15) '<'
+        NullableType [15..19)
+          PredefinedType [15..18)
+            IntKeyword [15..18) 'int'
+          QuestionToken [18..19) '?'
+        GreaterThanToken [19..20) '>'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

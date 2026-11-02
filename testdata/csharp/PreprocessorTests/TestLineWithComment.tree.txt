@@ -1,0 +1,10 @@
+CompilationUnit [0..17)
+  L:LineDirectiveTrivia [0..17)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..10) '1000'
+    T:WhitespaceTrivia [10..11) ' '
+    T:SingleLineCommentTrivia [11..17) '// XYZ'
+    EndOfDirectiveToken [17..17) ''
+  EndOfFileToken [17..17) ''

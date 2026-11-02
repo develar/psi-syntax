@@ -1,0 +1,111 @@
+CompilationUnit [0..189)
+  ClassDeclaration [0..189)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..187)
+      L:WhitespaceTrivia [17..21) '    '
+      StaticKeyword [21..27) 'static'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..33)
+        VoidKeyword [28..32) 'void'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..37) 'Main'
+      ParameterList [37..53)
+        OpenParenToken [37..38) '('
+        Parameter [38..51)
+          ArrayType [38..47)
+            PredefinedType [38..44)
+              StringKeyword [38..44) 'string'
+            ArrayRankSpecifier [44..47)
+              OpenBracketToken [44..45) '['
+              OmittedArraySizeExpression [45..45)
+                OmittedArraySizeExpressionToken [45..45) ''
+              CloseBracketToken [45..46) ']'
+              T:WhitespaceTrivia [46..47) ' '
+          IdentifierToken [47..51) 'args'
+        CloseParenToken [51..52) ')'
+        T:EndOfLineTrivia [52..53) '\n'
+      Block [53..187)
+        L:WhitespaceTrivia [53..57) '    '
+        OpenBraceToken [57..58) '{'
+        T:EndOfLineTrivia [58..59) '\n'
+        GotoStatement [59..77)
+          L:WhitespaceTrivia [59..67) '        '
+          GotoKeyword [67..71) 'goto'
+          T:WhitespaceTrivia [71..72) ' '
+          IdentifierName [72..76)
+            IdentifierToken [72..76) 'Lab2'
+          SemicolonToken [76..76) missing
+          T:SkippedTokensTrivia [76..77)
+            CommaToken [76..77) ','
+        ExpressionStatement [77..83)
+          IdentifierName [77..81)
+            IdentifierToken [77..81) 'Lab1'
+          SemicolonToken [81..82) ';'
+          T:EndOfLineTrivia [82..83) '\n'
+        LabeledStatement [83..132)
+          L:WhitespaceTrivia [83..87) '    '
+          IdentifierToken [87..91) 'Lab1'
+          ColonToken [91..92) ':'
+          T:EndOfLineTrivia [92..93) '\n'
+          ExpressionStatement [93..132)
+            InvocationExpression [93..130)
+              SimpleMemberAccessExpression [93..125)
+                SimpleMemberAccessExpression [93..115)
+                  IdentifierName [93..107)
+                    L:WhitespaceTrivia [93..101) '        '
+                    IdentifierToken [101..107) 'System'
+                  DotToken [107..108) '.'
+                  IdentifierName [108..115)
+                    IdentifierToken [108..115) 'Console'
+                DotToken [115..116) '.'
+                IdentifierName [116..125)
+                  IdentifierToken [116..125) 'WriteLine'
+              ArgumentList [125..130)
+                OpenParenToken [125..126) '('
+                Argument [126..129)
+                  StringLiteralExpression [126..129)
+                    StringLiteralToken [126..129) '"1"'
+                CloseParenToken [129..130) ')'
+            SemicolonToken [130..131) ';'
+            T:EndOfLineTrivia [131..132) '\n'
+        LabeledStatement [132..181)
+          L:WhitespaceTrivia [132..136) '    '
+          IdentifierToken [136..140) 'Lab2'
+          ColonToken [140..141) ':'
+          T:EndOfLineTrivia [141..142) '\n'
+          ExpressionStatement [142..181)
+            InvocationExpression [142..179)
+              SimpleMemberAccessExpression [142..174)
+                SimpleMemberAccessExpression [142..164)
+                  IdentifierName [142..156)
+                    L:WhitespaceTrivia [142..150) '        '
+                    IdentifierToken [150..156) 'System'
+                  DotToken [156..157) '.'
+                  IdentifierName [157..164)
+                    IdentifierToken [157..164) 'Console'
+                DotToken [164..165) '.'
+                IdentifierName [165..174)
+                  IdentifierToken [165..174) 'WriteLine'
+              ArgumentList [174..179)
+                OpenParenToken [174..175) '('
+                Argument [175..178)
+                  StringLiteralExpression [175..178)
+                    StringLiteralToken [175..178) '"2"'
+                CloseParenToken [178..179) ')'
+            SemicolonToken [179..180) ';'
+            T:EndOfLineTrivia [180..181) '\n'
+        L:WhitespaceTrivia [181..185) '    '
+        CloseBraceToken [185..186) '}'
+        T:EndOfLineTrivia [186..187) '\n'
+    CloseBraceToken [187..188) '}'
+    T:EndOfLineTrivia [188..189) '\n'
+  EndOfFileToken [189..189) ''
+Diagnostics:
+  CS1002 [76..77) ; expected
+  CS1513 [76..77) } expected

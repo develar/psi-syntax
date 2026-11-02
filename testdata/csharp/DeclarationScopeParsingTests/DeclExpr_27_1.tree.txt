@@ -1,0 +1,41 @@
+CompilationUnit [0..24)
+  GlobalStatement [0..19)
+    LocalFunctionStatement [0..19)
+      IdentifierName [0..8)
+        L:EndOfLineTrivia [0..1) '\n'
+        IdentifierToken [1..7) 'scoped'
+        T:WhitespaceTrivia [7..8) ' '
+      IdentifierToken [8..11) 'var'
+      T:WhitespaceTrivia [11..12) ' '
+      ParameterList [12..19)
+        OpenParenToken [12..13) '('
+        Parameter [13..14)
+          IdentifierName [13..14)
+            IdentifierToken [13..14) 'a'
+          IdentifierToken [14..14) missing
+        CommaToken [14..15) ','
+        T:WhitespaceTrivia [15..16) ' '
+        Parameter [16..17)
+          IdentifierName [16..17)
+            IdentifierToken [16..17) 'b'
+          IdentifierToken [17..17) missing
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      SemicolonToken [19..19) missing
+  GlobalStatement [19..24)
+    ExpressionStatement [19..24)
+      SimpleAssignmentExpression [19..22)
+        IdentifierName [19..19)
+          IdentifierToken [19..19) missing
+        EqualsToken [19..20) '='
+        T:WhitespaceTrivia [20..21) ' '
+        IdentifierName [21..22)
+          IdentifierToken [21..22) 'M'
+      SemicolonToken [22..23) ';'
+      T:EndOfLineTrivia [23..24) '\n'
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1001 [14..15) Identifier expected
+  CS1001 [17..18) Identifier expected
+  CS1002 [19..20) ; expected
+  CS1525 [19..20) Invalid expression term \'=\'

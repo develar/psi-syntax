@@ -1,0 +1,43 @@
+SwitchStatement [0..66)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..65)
+    CasePatternSwitchLabel [15..50)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      DeclarationPattern [24..38)
+        NullableType [24..30)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+          QuestionToken [28..29) '?'
+          T:WhitespaceTrivia [29..30) ' '
+        SingleVariableDesignation [30..38)
+          IdentifierToken [30..37) 'varName'
+          T:WhitespaceTrivia [37..38) ' '
+      WhenClause [38..48)
+        WhenKeyword [38..42) 'when'
+        T:WhitespaceTrivia [42..43) ' '
+        GreaterThanExpression [43..48)
+          IdentifierName [43..45)
+            IdentifierToken [43..44) 'x'
+            T:WhitespaceTrivia [44..45) ' '
+          GreaterThanToken [45..46) '>'
+          T:WhitespaceTrivia [46..47) ' '
+          NumericLiteralExpression [47..48)
+            NumericLiteralToken [47..48) '0'
+      ColonToken [48..49) ':'
+      T:EndOfLineTrivia [49..50) '\n'
+    BreakStatement [50..65)
+      L:WhitespaceTrivia [50..58) '        '
+      BreakKeyword [58..63) 'break'
+      SemicolonToken [63..64) ';'
+      T:EndOfLineTrivia [64..65) '\n'
+  CloseBraceToken [65..66) '}'

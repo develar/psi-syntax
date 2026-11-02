@@ -1,0 +1,1 @@
+foreach ((int x, int y) in e) {}

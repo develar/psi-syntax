@@ -1,0 +1,35 @@
+UsingStatement [0..29)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  ConditionalExpression [7..24)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'f'
+      T:WhitespaceTrivia [8..9) ' '
+    QuestionToken [9..10) '?'
+    T:WhitespaceTrivia [10..11) ' '
+    SimpleAssignmentExpression [11..17)
+      IdentifierName [11..13)
+        IdentifierToken [11..12) 'x'
+        T:WhitespaceTrivia [12..13) ' '
+      EqualsToken [13..14) '='
+      T:WhitespaceTrivia [14..15) ' '
+      IdentifierName [15..17)
+        IdentifierToken [15..16) 'a'
+        T:WhitespaceTrivia [16..17) ' '
+    ColonToken [17..18) ':'
+    T:WhitespaceTrivia [18..19) ' '
+    SimpleAssignmentExpression [19..24)
+      IdentifierName [19..21)
+        IdentifierToken [19..20) 'x'
+        T:WhitespaceTrivia [20..21) ' '
+      EqualsToken [21..22) '='
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierName [23..24)
+        IdentifierToken [23..24) 'b'
+  CloseParenToken [24..25) ')'
+  T:WhitespaceTrivia [25..26) ' '
+  Block [26..29)
+    OpenBraceToken [26..27) '{'
+    T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'

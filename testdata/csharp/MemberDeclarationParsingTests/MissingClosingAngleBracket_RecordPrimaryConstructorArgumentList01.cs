@@ -1,0 +1,1 @@
+public record M(ImmutableArray<int Array);

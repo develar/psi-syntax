@@ -1,0 +1,50 @@
+CompilationUnit [0..78)
+  ClassDeclaration [0..78)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    DelegateDeclaration [11..76)
+      L:WhitespaceTrivia [11..15) '    '
+      DelegateKeyword [15..23) 'delegate'
+      T:WhitespaceTrivia [23..24) ' '
+      PredefinedType [24..29)
+        VoidKeyword [24..28) 'void'
+        T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..30) 'D'
+      TypeParameterList [30..33)
+        LessThanToken [30..31) '<'
+        TypeParameter [31..32)
+          IdentifierToken [31..32) 'T'
+        GreaterThanToken [32..33) '>'
+      ParameterList [33..36)
+        OpenParenToken [33..34) '('
+        CloseParenToken [34..35) ')'
+        T:WhitespaceTrivia [35..36) ' '
+      TypeParameterConstraintClause [36..74)
+        WhereKeyword [36..41) 'where'
+        T:WhitespaceTrivia [41..42) ' '
+        IdentifierName [42..44)
+          IdentifierToken [42..43) 'T'
+          T:WhitespaceTrivia [43..44) ' '
+        ColonToken [44..45) ':'
+        T:WhitespaceTrivia [45..46) ' '
+        T:MultiLineCommentTrivia [46..57) '/*comment*/'
+        T:WhitespaceTrivia [57..58) ' '
+        TypeConstraint [58..74)
+          IdentifierName [58..74)
+            IdentifierToken [58..58) missing
+            T:SkippedTokensTrivia [58..62)
+              EnumKeyword [58..62) 'enum'
+            T:WhitespaceTrivia [62..63) ' '
+            T:MultiLineCommentTrivia [63..74) '/*comment*/'
+      SemicolonToken [74..75) ';'
+      T:EndOfLineTrivia [75..76) '\n'
+    CloseBraceToken [76..77) '}'
+    T:EndOfLineTrivia [77..78) '\n'
+  EndOfFileToken [78..78) ''
+Diagnostics:
+  CS9010 [58..62) Keyword \'enum\' cannot be used as a constraint. Did you mean \'struct, System.Enum\'?

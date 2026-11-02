@@ -1,0 +1,88 @@
+CompilationUnit [0..109)
+  ClassDeclaration [0..109)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..108)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..21) 'M'
+      ParameterList [21..24)
+        OpenParenToken [21..22) '('
+        CloseParenToken [22..23) ')'
+        T:EndOfLineTrivia [23..24) '\n'
+      Block [24..108)
+        L:WhitespaceTrivia [24..28) '    '
+        OpenBraceToken [28..29) '{'
+        T:EndOfLineTrivia [29..30) '\n'
+        LocalDeclarationStatement [30..102)
+          VariableDeclaration [30..100)
+            IdentifierName [30..42)
+              L:WhitespaceTrivia [30..38) '        '
+              IdentifierToken [38..41) 'var'
+              T:WhitespaceTrivia [41..42) ' '
+            VariableDeclarator [42..100)
+              IdentifierToken [42..43) 'v'
+              T:WhitespaceTrivia [43..44) ' '
+              EqualsValueClause [44..100)
+                EqualsToken [44..45) '='
+                T:WhitespaceTrivia [45..46) ' '
+                ObjectCreationExpression [46..100)
+                  NewKeyword [46..49) 'new'
+                  T:WhitespaceTrivia [49..50) ' '
+                  GenericName [50..98)
+                    IdentifierToken [50..54) 'List'
+                    TypeArgumentList [54..98)
+                      LessThanToken [54..55) '<'
+                      GenericName [55..95)
+                        IdentifierToken [55..59) 'List'
+                        TypeArgumentList [59..95)
+                          LessThanToken [59..60) '<'
+                          GenericName [60..94)
+                            IdentifierToken [60..64) 'List'
+                            TypeArgumentList [64..94)
+                              LessThanToken [64..65) '<'
+                              GenericName [65..93)
+                                IdentifierToken [65..69) 'List'
+                                TypeArgumentList [69..93)
+                                  LessThanToken [69..70) '<'
+                                  GenericName [70..92)
+                                    IdentifierToken [70..74) 'List'
+                                    TypeArgumentList [74..92)
+                                      LessThanToken [74..75) '<'
+                                      GenericName [75..91)
+                                        IdentifierToken [75..79) 'List'
+                                        TypeArgumentList [79..91)
+                                          LessThanToken [79..80) '<'
+                                          GenericName [80..90)
+                                            IdentifierToken [80..84) 'List'
+                                            TypeArgumentList [84..90)
+                                              LessThanToken [84..85) '<'
+                                              PredefinedType [85..89)
+                                                IntKeyword [85..88) 'int'
+                                                T:EndOfLineTrivia [88..89) '\n'
+                                              GreaterThanToken [89..90) '>'
+                                          GreaterThanToken [90..91) '>'
+                                      GreaterThanToken [91..92) '>'
+                                  GreaterThanToken [92..93) '>'
+                              GreaterThanToken [93..94) '>'
+                          GreaterThanToken [94..95) '>'
+                      GreaterThanToken [95..96) '>'
+                      T:WhitespaceTrivia [96..97) ' '
+                      T:EndOfLineTrivia [97..98) '\n'
+                  ArgumentList [98..100)
+                    OpenParenToken [98..99) '('
+                    CloseParenToken [99..100) ')'
+          SemicolonToken [100..101) ';'
+          T:EndOfLineTrivia [101..102) '\n'
+        L:WhitespaceTrivia [102..106) '    '
+        CloseBraceToken [106..107) '}'
+        T:EndOfLineTrivia [107..108) '\n'
+    CloseBraceToken [108..109) '}'
+  EndOfFileToken [109..109) ''

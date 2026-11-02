@@ -1,0 +1,11 @@
+RangeExpression [0..9)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  DotDotToken [2..4) '..'
+  T:WhitespaceTrivia [4..5) ' '
+  RangeExpression [5..9)
+    DotDotToken [5..7) '..'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierName [8..9)
+      IdentifierToken [8..9) 'b'

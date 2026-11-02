@@ -1,0 +1,66 @@
+CompilationUnit [0..62)
+  ClassDeclaration [0..62)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'X'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    MethodDeclaration [11..60)
+      PredefinedType [11..16)
+        VoidKeyword [11..15) 'void'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'f'
+      ParameterList [17..20)
+        OpenParenToken [17..18) '('
+        CloseParenToken [18..19) ')'
+        T:WhitespaceTrivia [19..20) ' '
+      Block [20..60)
+        OpenBraceToken [20..21) '{'
+        T:EndOfLineTrivia [21..22) '\n'
+        LocalDeclarationStatement [22..40)
+          VariableDeclaration [22..31)
+            PredefinedType [22..26)
+              IntKeyword [22..25) 'int'
+              T:WhitespaceTrivia [25..26) ' '
+            VariableDeclarator [26..31)
+              IdentifierToken [26..27) 'a'
+              T:WhitespaceTrivia [27..28) ' '
+              EqualsValueClause [28..31)
+                EqualsToken [28..29) '='
+                T:WhitespaceTrivia [29..30) ' '
+                NumericLiteralExpression [30..31)
+                  NumericLiteralToken [30..31) '1'
+          SemicolonToken [31..32) ';'
+          T:WhitespaceTrivia [32..33) ' '
+          T:SkippedTokensTrivia [33..39)
+            BadToken [33..39) '\\u000a'
+          T:WhitespaceTrivia [39..40) ' '
+        LocalDeclarationStatement [40..58)
+          VariableDeclaration [40..56)
+            PredefinedType [40..44)
+              IntKeyword [40..43) 'int'
+              T:WhitespaceTrivia [43..44) ' '
+            VariableDeclarator [44..56)
+              IdentifierToken [44..45) 'b'
+              T:WhitespaceTrivia [45..46) ' '
+              EqualsValueClause [46..56)
+                EqualsToken [46..47) '='
+                T:WhitespaceTrivia [47..48) ' '
+                CastExpression [48..56)
+                  OpenParenToken [48..49) '('
+                  PredefinedType [49..52)
+                    IntKeyword [49..52) 'int'
+                  CloseParenToken [52..53) ')'
+                  NumericLiteralExpression [53..56)
+                    NumericLiteralToken [53..56) '2.3'
+          SemicolonToken [56..57) ';'
+          T:EndOfLineTrivia [57..58) '\n'
+        CloseBraceToken [58..59) '}'
+        T:EndOfLineTrivia [59..60) '\n'
+    CloseBraceToken [60..61) '}'
+    T:EndOfLineTrivia [61..62) '\n'
+  EndOfFileToken [62..62) ''
+Diagnostics:
+  CS1056 [33..33) Unexpected character \'\\u000a\'

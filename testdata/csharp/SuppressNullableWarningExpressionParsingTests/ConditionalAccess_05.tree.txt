@@ -1,0 +1,32 @@
+ConditionalExpression [0..20)
+  ConditionalAccessExpression [0..4)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'x'
+    QuestionToken [1..2) '?'
+    MemberBindingExpression [2..4)
+      DotToken [2..3) '.'
+      IdentifierName [3..4)
+        IdentifierToken [3..4) 'y'
+  QuestionToken [4..5) '?'
+  LogicalNotExpression [5..20)
+    ExclamationToken [5..6) '!'
+    InvocationExpression [6..20)
+      SimpleMemberAccessExpression [6..18)
+        CollectionExpression [6..9)
+          OpenBracketToken [6..7) '['
+          ExpressionElement [7..8)
+            NumericLiteralExpression [7..8)
+              NumericLiteralToken [7..8) '0'
+          CloseBracketToken [8..9) ']'
+        DotToken [9..10) '.'
+        IdentifierName [10..18)
+          IdentifierToken [10..18) 'ToString'
+      ArgumentList [18..20)
+        OpenParenToken [18..19) '('
+        CloseParenToken [19..20) ')'
+  ColonToken [20..20) missing
+  IdentifierName [20..20)
+    IdentifierToken [20..20) missing
+Diagnostics:
+  CS1003 [20..20) Syntax error, \':\' expected
+  CS1733 [20..20) Expected expression

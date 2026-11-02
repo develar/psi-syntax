@@ -1,0 +1,17 @@
+CompilationUnit [0..8)
+  ConversionOperatorDeclaration [0..8)
+    ExplicitKeyword [0..0) missing
+    OperatorKeyword [0..8) 'operator'
+    IdentifierName [8..8)
+      IdentifierToken [8..8) missing
+    ParameterList [8..8)
+      OpenParenToken [8..8) missing
+      CloseParenToken [8..8) missing
+    SemicolonToken [8..8) missing
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1003 [0..8) Syntax error, \'explicit\' expected
+  CS1031 [8..8) Type expected
+  CS1003 [8..8) Syntax error, \'(\' expected
+  CS1026 [8..8) ) expected
+  CS1002 [8..8) ; expected

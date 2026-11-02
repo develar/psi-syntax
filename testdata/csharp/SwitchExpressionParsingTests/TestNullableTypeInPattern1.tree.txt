@@ -1,0 +1,22 @@
+SwitchExpression [0..29)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..28)
+    TypePattern [13..23)
+      NullableType [13..23)
+        IdentifierName [13..21)
+          L:WhitespaceTrivia [13..17) '    '
+          IdentifierToken [17..21) 'Type'
+        QuestionToken [21..22) '?'
+        T:WhitespaceTrivia [22..23) ' '
+    EqualsGreaterThanToken [23..25) '=>'
+    T:WhitespaceTrivia [25..26) ' '
+    NumericLiteralExpression [26..28)
+      NumericLiteralToken [26..27) '1'
+      T:EndOfLineTrivia [27..28) '\n'
+  CloseBraceToken [28..29) '}'

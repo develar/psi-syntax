@@ -1,0 +1,29 @@
+AnonymousMethodExpression [0..29)
+  DelegateKeyword [0..8) 'delegate'
+  ParameterList [8..16)
+    OpenParenToken [8..9) '('
+    Parameter [9..14)
+      IdentifierName [9..11)
+        IdentifierToken [9..10) 'x'
+        T:WhitespaceTrivia [10..11) ' '
+      IdentifierToken [11..11) missing
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        NumericLiteralExpression [13..14)
+          NumericLiteralToken [13..14) '3'
+    CloseParenToken [14..15) ')'
+    T:WhitespaceTrivia [15..16) ' '
+  Block [16..29)
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    ReturnStatement [18..28)
+      ReturnKeyword [18..24) 'return'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierName [25..26)
+        IdentifierToken [25..26) 'x'
+      SemicolonToken [26..27) ';'
+      T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'
+Diagnostics:
+  CS1001 [11..12) Identifier expected

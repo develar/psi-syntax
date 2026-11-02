@@ -1,0 +1,1 @@
+enum E : byt { A, B }

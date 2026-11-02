@@ -1,0 +1,1 @@
+for (from a in b select c;from a in b select c;from a in b select c);

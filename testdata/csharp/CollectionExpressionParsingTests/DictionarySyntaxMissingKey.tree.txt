@@ -1,0 +1,21 @@
+CompilationUnit [0..9)
+  GlobalStatement [0..9)
+    ExpressionStatement [0..9)
+      SimpleAssignmentExpression [0..8)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) '_'
+          T:WhitespaceTrivia [1..2) ' '
+        EqualsToken [2..3) '='
+        T:WhitespaceTrivia [3..4) ' '
+        CollectionExpression [4..8)
+          OpenBracketToken [4..5) '['
+          T:SkippedTokensTrivia [5..6)
+            ColonToken [5..6) ':'
+          ExpressionElement [6..7)
+            IdentifierName [6..7)
+              IdentifierToken [6..7) 'B'
+          CloseBracketToken [7..8) ']'
+      SemicolonToken [8..9) ';'
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1001 [5..6) Identifier expected

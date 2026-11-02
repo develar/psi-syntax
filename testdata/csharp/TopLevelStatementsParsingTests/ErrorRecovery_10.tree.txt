@@ -1,0 +1,36 @@
+CompilationUnit [0..35)
+  GlobalStatement [0..8)
+    LocalDeclarationStatement [0..8)
+      VariableDeclaration [0..8)
+        IdentifierName [0..8)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..7) 'record'
+          T:WhitespaceTrivia [7..8) ' '
+        VariableDeclarator [8..8)
+          IdentifierToken [8..8) missing
+      SemicolonToken [8..8) missing
+  ClassDeclaration [8..35)
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..19) 'Point'
+    ParameterList [19..33)
+      OpenParenToken [19..20) '('
+      Parameter [20..25)
+        PredefinedType [20..24)
+          IntKeyword [20..23) 'int'
+          T:WhitespaceTrivia [23..24) ' '
+        IdentifierToken [24..25) 'x'
+      CommaToken [25..26) ','
+      T:WhitespaceTrivia [26..27) ' '
+      Parameter [27..32)
+        PredefinedType [27..31)
+          IntKeyword [27..30) 'int'
+          T:WhitespaceTrivia [30..31) ' '
+        IdentifierToken [31..32) 'y'
+      CloseParenToken [32..33) ')'
+    SemicolonToken [33..34) ';'
+    T:EndOfLineTrivia [34..35) '\n'
+  EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1001 [8..13) Identifier expected
+  CS1002 [8..13) ; expected

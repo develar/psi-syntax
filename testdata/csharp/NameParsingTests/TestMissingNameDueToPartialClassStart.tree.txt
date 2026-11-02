@@ -1,0 +1,10 @@
+IdentifierName [0..13)
+  IdentifierToken [0..0) missing
+  T:SkippedTokensTrivia [0..7)
+    IdentifierToken [0..7) 'partial'
+  T:WhitespaceTrivia [7..8) ' '
+  T:SkippedTokensTrivia [8..13)
+    ClassKeyword [8..13) 'class'
+Diagnostics:
+  CS1073 [0..0) Unexpected token \'partial\'
+  CS1525 [0..7) Invalid expression term \'partial\'

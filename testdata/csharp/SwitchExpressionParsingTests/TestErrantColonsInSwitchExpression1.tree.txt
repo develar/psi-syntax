@@ -1,0 +1,38 @@
+SwitchExpression [0..32)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:EndOfLineTrivia [8..9) '\n'
+  OpenBraceToken [9..10) '{'
+  T:EndOfLineTrivia [10..11) '\n'
+  SwitchExpressionArm [11..19)
+    ConstantPattern [11..16)
+      NumericLiteralExpression [11..16)
+        L:WhitespaceTrivia [11..15) '    '
+        NumericLiteralToken [15..16) '0'
+    EqualsGreaterThanToken [16..16) missing
+    T:SkippedTokensTrivia [16..17)
+      ColonToken [16..17) ':'
+    T:WhitespaceTrivia [17..18) ' '
+    NumericLiteralExpression [18..19)
+      NumericLiteralToken [18..19) '1'
+  CommaToken [19..20) ','
+  T:EndOfLineTrivia [20..21) '\n'
+  SwitchExpressionArm [21..29)
+    ConstantPattern [21..26)
+      NumericLiteralExpression [21..26)
+        L:WhitespaceTrivia [21..25) '    '
+        NumericLiteralToken [25..26) '1'
+    EqualsGreaterThanToken [26..26) missing
+    T:SkippedTokensTrivia [26..27)
+      ColonToken [26..27) ':'
+    T:WhitespaceTrivia [27..28) ' '
+    NumericLiteralExpression [28..29)
+      NumericLiteralToken [28..29) '2'
+  CommaToken [29..30) ','
+  T:EndOfLineTrivia [30..31) '\n'
+  CloseBraceToken [31..32) '}'
+Diagnostics:
+  CS1003 [16..17) Syntax error, \'=>\' expected
+  CS1003 [26..27) Syntax error, \'=>\' expected

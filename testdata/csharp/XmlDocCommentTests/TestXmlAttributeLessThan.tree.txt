@@ -1,0 +1,23 @@
+CompilationUnit [0..27)
+  L:SingleLineDocumentationCommentTrivia [0..27)
+    XmlEmptyElement [0..27)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      LessThanToken [3..4) '<'
+      XmlName [4..7)
+        IdentifierToken [4..7) 'goo'
+      XmlTextAttribute [7..24)
+        XmlName [7..12)
+          L:WhitespaceTrivia [7..8) ' '
+          IdentifierToken [8..12) 'attr'
+        EqualsToken [12..13) '='
+        DoubleQuoteToken [13..14) '"'
+        XmlTextLiteralToken [14..18) 'less'
+        LessThanToken [18..19) '<'
+        XmlTextLiteralToken [19..23) 'than'
+        DoubleQuoteToken [23..24) '"'
+      L:WhitespaceTrivia [24..25) ' '
+      SlashGreaterThanToken [25..27) '/>'
+    EndOfDocumentationCommentToken [27..27) ''
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1570 [18..19) XML comment has badly formed XML -- \'The character \'<\' cannot be used in an attribute value.\'

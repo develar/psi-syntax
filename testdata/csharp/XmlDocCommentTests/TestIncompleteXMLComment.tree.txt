@@ -1,0 +1,9 @@
+CompilationUnit [0..4)
+  L:MultiLineDocumentationCommentTrivia [0..4)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralNewLineToken [3..4) '\n'
+    EndOfDocumentationCommentToken [4..4) ''
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1035 [3..3) End-of-file found, \'*/\' expected

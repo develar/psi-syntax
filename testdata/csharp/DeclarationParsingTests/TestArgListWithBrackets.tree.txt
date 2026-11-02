@@ -1,0 +1,31 @@
+LocalFunctionStatement [0..23)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..20)
+    OpenParenToken [6..7) '('
+    Parameter [7..16)
+      ArgListKeyword [7..16) '__arglist'
+    CommaToken [16..16) missing
+    Parameter [16..18)
+      AttributeList [16..18)
+        OpenBracketToken [16..17) '['
+        Attribute [17..17)
+          IdentifierName [17..17)
+            IdentifierToken [17..17) missing
+        CloseBracketToken [17..18) ']'
+      IdentifierName [18..18)
+        IdentifierToken [18..18) missing
+      IdentifierToken [18..18) missing
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  Block [20..23)
+    OpenBraceToken [20..21) '{'
+    T:WhitespaceTrivia [21..22) ' '
+    CloseBraceToken [22..23) '}'
+Diagnostics:
+  CS1003 [16..17) Syntax error, \',\' expected
+  CS1001 [17..18) Identifier expected
+  CS1031 [18..19) Type expected
+  CS1001 [18..19) Identifier expected

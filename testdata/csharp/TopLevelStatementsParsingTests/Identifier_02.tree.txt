@@ -1,0 +1,16 @@
+CompilationUnit [0..11)
+  IncompleteMember [0..11)
+    AttributeList [0..9)
+      L:EndOfLineTrivia [0..1) '\n'
+      OpenBracketToken [1..2) '['
+      Attribute [2..7)
+        IdentifierName [2..7)
+          IdentifierToken [2..7) 'Flags'
+      CloseBracketToken [7..8) ']'
+      T:EndOfLineTrivia [8..9) '\n'
+    IdentifierName [9..11)
+      IdentifierToken [9..10) 'e'
+      T:EndOfLineTrivia [10..11) '\n'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS0116 [9..10) A namespace cannot directly contain members such as fields, methods or statements

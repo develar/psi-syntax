@@ -1,0 +1,1 @@
+for (string value "hello";;);

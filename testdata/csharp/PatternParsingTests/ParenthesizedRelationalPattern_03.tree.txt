@@ -1,0 +1,62 @@
+LocalFunctionStatement [0..78)
+  PredefinedType [0..5)
+    BoolKeyword [0..4) 'bool'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..18) 'isAsciiLetter'
+  ParameterList [18..27)
+    OpenParenToken [18..19) '('
+    Parameter [19..25)
+      PredefinedType [19..24)
+        CharKeyword [19..23) 'char'
+        T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..25) 'c'
+    CloseParenToken [25..26) ')'
+    T:WhitespaceTrivia [26..27) ' '
+  ArrowExpressionClause [27..77)
+    EqualsGreaterThanToken [27..29) '=>'
+    T:WhitespaceTrivia [29..30) ' '
+    IsPatternExpression [30..77)
+      IdentifierName [30..32)
+        IdentifierToken [30..31) 'c'
+        T:WhitespaceTrivia [31..32) ' '
+      IsKeyword [32..34) 'is'
+      T:WhitespaceTrivia [34..35) ' '
+      OrPattern [35..77)
+        ParenthesizedPattern [35..55)
+          OpenParenToken [35..36) '('
+          AndPattern [36..53)
+            RelationalPattern [36..43)
+              GreaterThanEqualsToken [36..38) '>='
+              T:WhitespaceTrivia [38..39) ' '
+              CharacterLiteralExpression [39..43)
+                CharacterLiteralToken [39..42) '\'A\''
+                T:WhitespaceTrivia [42..43) ' '
+            AndKeyword [43..46) 'and'
+            T:WhitespaceTrivia [46..47) ' '
+            RelationalPattern [47..53)
+              LessThanEqualsToken [47..49) '<='
+              T:WhitespaceTrivia [49..50) ' '
+              CharacterLiteralExpression [50..53)
+                CharacterLiteralToken [50..53) '\'Z\''
+          CloseParenToken [53..54) ')'
+          T:WhitespaceTrivia [54..55) ' '
+        OrKeyword [55..57) 'or'
+        T:WhitespaceTrivia [57..58) ' '
+        ParenthesizedPattern [58..77)
+          OpenParenToken [58..59) '('
+          AndPattern [59..76)
+            RelationalPattern [59..66)
+              GreaterThanEqualsToken [59..61) '>='
+              T:WhitespaceTrivia [61..62) ' '
+              CharacterLiteralExpression [62..66)
+                CharacterLiteralToken [62..65) '\'a\''
+                T:WhitespaceTrivia [65..66) ' '
+            AndKeyword [66..69) 'and'
+            T:WhitespaceTrivia [69..70) ' '
+            RelationalPattern [70..76)
+              LessThanEqualsToken [70..72) '<='
+              T:WhitespaceTrivia [72..73) ' '
+              CharacterLiteralExpression [73..76)
+                CharacterLiteralToken [73..76) '\'z\''
+          CloseParenToken [76..77) ')'
+  SemicolonToken [77..78) ';'

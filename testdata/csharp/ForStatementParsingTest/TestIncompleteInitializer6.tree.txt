@@ -1,0 +1,74 @@
+ForStatement [0..49)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..48)
+    IdentifierName [5..12)
+      IdentifierToken [5..11) 'MyType'
+      T:WhitespaceTrivia [11..12) ' '
+    VariableDeclarator [12..48)
+      IdentifierToken [12..13) 'm'
+      T:WhitespaceTrivia [13..14) ' '
+      EqualsValueClause [14..48)
+        EqualsToken [14..15) '='
+        T:WhitespaceTrivia [15..16) ' '
+        ImplicitObjectCreationExpression [16..48)
+          NewKeyword [16..19) 'new'
+          ArgumentList [19..22)
+            OpenParenToken [19..20) '('
+            CloseParenToken [20..21) ')'
+            T:WhitespaceTrivia [21..22) ' '
+          ObjectInitializerExpression [22..48)
+            OpenBraceToken [22..23) '{'
+            T:WhitespaceTrivia [23..24) ' '
+            SimpleAssignmentExpression [24..29)
+              IdentifierName [24..26)
+                IdentifierToken [24..25) 'A'
+                T:WhitespaceTrivia [25..26) ' '
+              EqualsToken [26..27) '='
+              T:WhitespaceTrivia [27..28) ' '
+              NumericLiteralExpression [28..29)
+                NumericLiteralToken [28..29) '1'
+            CommaToken [29..30) ','
+            T:WhitespaceTrivia [30..31) ' '
+            SimpleAssignmentExpression [31..36)
+              IdentifierName [31..33)
+                IdentifierToken [31..32) 'B'
+                T:WhitespaceTrivia [32..33) ' '
+              EqualsToken [33..34) '='
+              T:WhitespaceTrivia [34..35) ' '
+              NumericLiteralExpression [35..36)
+                NumericLiteralToken [35..36) '1'
+            CommaToken [36..37) ','
+            IdentifierName [37..37)
+              IdentifierToken [37..37) missing
+            SemicolonToken [37..38) ';'
+            T:WhitespaceTrivia [38..39) ' '
+            TrueLiteralExpression [39..43)
+              TrueKeyword [39..43) 'true'
+            SemicolonToken [43..44) ';'
+            T:WhitespaceTrivia [44..45) ' '
+            PostIncrementExpression [45..48)
+              IdentifierName [45..46)
+                IdentifierToken [45..46) 'm'
+              PlusPlusToken [46..48) '++'
+            CloseBraceToken [48..48) missing
+  SemicolonToken [48..48) missing
+  IdentifierName [48..48)
+    IdentifierToken [48..48) missing
+  SemicolonToken [48..48) missing
+  CloseParenToken [48..49) ')'
+  ExpressionStatement [49..49)
+    IdentifierName [49..49)
+      IdentifierToken [49..49) missing
+    SemicolonToken [49..49) missing
+Diagnostics:
+  CS1525 [37..38) Invalid expression term \';\'
+  CS1003 [37..38) Syntax error, \',\' expected
+  CS1003 [43..44) Syntax error, \',\' expected
+  CS1513 [48..49) } expected
+  CS1002 [48..49) ; expected
+  CS1525 [48..49) Invalid expression term \')\'
+  CS1002 [48..49) ; expected
+  CS1733 [49..49) Expected expression
+  CS1002 [49..49) ; expected

@@ -1,0 +1,272 @@
+CompilationUnit [0..518)
+  ClassDeclaration [0..518)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    DelegateDeclaration [10..36)
+      L:WhitespaceTrivia [10..14) '    '
+      DelegateKeyword [14..22) 'delegate'
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'T'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..29) 'Func'
+      TypeParameterList [29..32)
+        LessThanToken [29..30) '<'
+        TypeParameter [30..31)
+          IdentifierToken [30..31) 'T'
+        GreaterThanToken [31..32) '>'
+      ParameterList [32..34)
+        OpenParenToken [32..33) '('
+        CloseParenToken [33..34) ')'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+    DelegateDeclaration [36..71)
+      L:WhitespaceTrivia [36..40) '    '
+      DelegateKeyword [40..48) 'delegate'
+      T:WhitespaceTrivia [48..49) ' '
+      IdentifierName [49..51)
+        IdentifierToken [49..50) 'T'
+        T:WhitespaceTrivia [50..51) ' '
+      IdentifierToken [51..55) 'Func'
+      TypeParameterList [55..62)
+        LessThanToken [55..56) '<'
+        TypeParameter [56..58)
+          IdentifierToken [56..58) 'A0'
+        CommaToken [58..59) ','
+        T:WhitespaceTrivia [59..60) ' '
+        TypeParameter [60..61)
+          IdentifierToken [60..61) 'T'
+        GreaterThanToken [61..62) '>'
+      ParameterList [62..69)
+        OpenParenToken [62..63) '('
+        Parameter [63..68)
+          IdentifierName [63..66)
+            IdentifierToken [63..65) 'A0'
+            T:WhitespaceTrivia [65..66) ' '
+          IdentifierToken [66..68) 'a0'
+        CloseParenToken [68..69) ')'
+      SemicolonToken [69..70) ';'
+      T:EndOfLineTrivia [70..71) '\n'
+    DelegateDeclaration [71..117)
+      L:WhitespaceTrivia [71..75) '    '
+      DelegateKeyword [75..83) 'delegate'
+      T:WhitespaceTrivia [83..84) ' '
+      IdentifierName [84..86)
+        IdentifierToken [84..85) 'T'
+        T:WhitespaceTrivia [85..86) ' '
+      IdentifierToken [86..90) 'Func'
+      TypeParameterList [90..101)
+        LessThanToken [90..91) '<'
+        TypeParameter [91..93)
+          IdentifierToken [91..93) 'A0'
+        CommaToken [93..94) ','
+        T:WhitespaceTrivia [94..95) ' '
+        TypeParameter [95..97)
+          IdentifierToken [95..97) 'A1'
+        CommaToken [97..98) ','
+        T:WhitespaceTrivia [98..99) ' '
+        TypeParameter [99..100)
+          IdentifierToken [99..100) 'T'
+        GreaterThanToken [100..101) '>'
+      ParameterList [101..115)
+        OpenParenToken [101..102) '('
+        Parameter [102..107)
+          IdentifierName [102..105)
+            IdentifierToken [102..104) 'A0'
+            T:WhitespaceTrivia [104..105) ' '
+          IdentifierToken [105..107) 'a0'
+        CommaToken [107..108) ','
+        T:WhitespaceTrivia [108..109) ' '
+        Parameter [109..114)
+          IdentifierName [109..112)
+            IdentifierToken [109..111) 'A1'
+            T:WhitespaceTrivia [111..112) ' '
+          IdentifierToken [112..114) 'a1'
+        CloseParenToken [114..115) ')'
+      SemicolonToken [115..116) ';'
+      T:EndOfLineTrivia [116..117) '\n'
+    DelegateDeclaration [117..185)
+      L:WhitespaceTrivia [117..121) '    '
+      DelegateKeyword [121..129) 'delegate'
+      T:WhitespaceTrivia [129..130) ' '
+      IdentifierName [130..132)
+        IdentifierToken [130..131) 'T'
+        T:WhitespaceTrivia [131..132) ' '
+      IdentifierToken [132..136) 'Func'
+      TypeParameterList [136..155)
+        LessThanToken [136..137) '<'
+        TypeParameter [137..139)
+          IdentifierToken [137..139) 'A0'
+        CommaToken [139..140) ','
+        T:WhitespaceTrivia [140..141) ' '
+        TypeParameter [141..143)
+          IdentifierToken [141..143) 'A1'
+        CommaToken [143..144) ','
+        T:WhitespaceTrivia [144..145) ' '
+        TypeParameter [145..147)
+          IdentifierToken [145..147) 'A2'
+        CommaToken [147..148) ','
+        T:WhitespaceTrivia [148..149) ' '
+        TypeParameter [149..151)
+          IdentifierToken [149..151) 'A3'
+        CommaToken [151..152) ','
+        T:WhitespaceTrivia [152..153) ' '
+        TypeParameter [153..154)
+          IdentifierToken [153..154) 'T'
+        GreaterThanToken [154..155) '>'
+      ParameterList [155..183)
+        OpenParenToken [155..156) '('
+        Parameter [156..161)
+          IdentifierName [156..159)
+            IdentifierToken [156..158) 'A0'
+            T:WhitespaceTrivia [158..159) ' '
+          IdentifierToken [159..161) 'a0'
+        CommaToken [161..162) ','
+        T:WhitespaceTrivia [162..163) ' '
+        Parameter [163..168)
+          IdentifierName [163..166)
+            IdentifierToken [163..165) 'A1'
+            T:WhitespaceTrivia [165..166) ' '
+          IdentifierToken [166..168) 'a1'
+        CommaToken [168..169) ','
+        T:WhitespaceTrivia [169..170) ' '
+        Parameter [170..175)
+          IdentifierName [170..173)
+            IdentifierToken [170..172) 'A2'
+            T:WhitespaceTrivia [172..173) ' '
+          IdentifierToken [173..175) 'a2'
+        CommaToken [175..176) ','
+        T:WhitespaceTrivia [176..177) ' '
+        Parameter [177..182)
+          IdentifierName [177..180)
+            IdentifierToken [177..179) 'A3'
+            T:WhitespaceTrivia [179..180) ' '
+          IdentifierToken [180..182) 'a3'
+        CloseParenToken [182..183) ')'
+      SemicolonToken [183..184) ';'
+      T:EndOfLineTrivia [184..185) '\n'
+    MethodDeclaration [185..516)
+      L:EndOfLineTrivia [185..186) '\n'
+      L:WhitespaceTrivia [186..190) '    '
+      StaticKeyword [190..196) 'static'
+      T:WhitespaceTrivia [196..197) ' '
+      PredefinedType [197..202)
+        VoidKeyword [197..201) 'void'
+        T:WhitespaceTrivia [201..202) ' '
+      IdentifierToken [202..203) 'X'
+      ParameterList [203..206)
+        OpenParenToken [203..204) '('
+        CloseParenToken [204..205) ')'
+        T:EndOfLineTrivia [205..206) '\n'
+      Block [206..516)
+        L:WhitespaceTrivia [206..210) '    '
+        OpenBraceToken [210..211) '{'
+        T:EndOfLineTrivia [211..212) '\n'
+        LocalDeclarationStatement [212..415)
+          VariableDeclaration [212..368)
+            GenericName [212..332)
+              L:WhitespaceTrivia [212..220) '        '
+              L:SingleLineCommentTrivia [220..309) '// Func<int,int> f1      = (int @in) => 1;              // ok: @Keyword as parameter name'
+              L:EndOfLineTrivia [309..310) '\n'
+              L:WhitespaceTrivia [310..318) '        '
+              IdentifierToken [318..322) 'Func'
+              TypeArgumentList [322..332)
+                LessThanToken [322..323) '<'
+                PredefinedType [323..326)
+                  IntKeyword [323..326) 'int'
+                CommaToken [326..327) ','
+                PredefinedType [327..330)
+                  IntKeyword [327..330) 'int'
+                GreaterThanToken [330..331) '>'
+                T:WhitespaceTrivia [331..332) ' '
+            VariableDeclarator [332..368)
+              IdentifierToken [332..334) 'f2'
+              T:WhitespaceTrivia [334..340) '      '
+              EqualsValueClause [340..368)
+                EqualsToken [340..341) '='
+                T:WhitespaceTrivia [341..342) ' '
+                ParenthesizedLambdaExpression [342..368)
+                  ParameterList [342..364)
+                    OpenParenToken [342..343) '('
+                    Parameter [343..352)
+                      PredefinedType [343..347)
+                        IntKeyword [343..346) 'int'
+                        T:WhitespaceTrivia [346..347) ' '
+                      IdentifierToken [347..352) 'where'
+                    CommaToken [352..353) ','
+                    T:WhitespaceTrivia [353..354) ' '
+                    Parameter [354..362)
+                      PredefinedType [354..358)
+                        IntKeyword [354..357) 'int'
+                        T:WhitespaceTrivia [357..358) ' '
+                      IdentifierToken [358..362) 'from'
+                    CloseParenToken [362..363) ')'
+                    T:WhitespaceTrivia [363..364) ' '
+                  EqualsGreaterThanToken [364..366) '=>'
+                  T:WhitespaceTrivia [366..367) ' '
+                  NumericLiteralExpression [367..368)
+                    NumericLiteralToken [367..368) '1'
+          SemicolonToken [368..369) ';'
+          T:WhitespaceTrivia [369..371) '  '
+          T:SingleLineCommentTrivia [371..414) '// ok: contextual keyword as parameter name'
+          T:EndOfLineTrivia [414..415) '\n'
+        LocalDeclarationStatement [415..452)
+          VariableDeclaration [415..452)
+            GenericName [415..437)
+              L:WhitespaceTrivia [415..423) '        '
+              IdentifierToken [423..427) 'Func'
+              TypeArgumentList [427..437)
+                LessThanToken [427..428) '<'
+                PredefinedType [428..431)
+                  IntKeyword [428..431) 'int'
+                CommaToken [431..432) ','
+                PredefinedType [432..435)
+                  IntKeyword [432..435) 'int'
+                GreaterThanToken [435..436) '>'
+                T:WhitespaceTrivia [436..437) ' '
+            VariableDeclarator [437..452)
+              IdentifierToken [437..439) 'f3'
+              T:WhitespaceTrivia [439..445) '      '
+              EqualsValueClause [445..452)
+                EqualsToken [445..446) '='
+                T:WhitespaceTrivia [446..447) ' '
+                ParenthesizedExpression [447..452)
+                  OpenParenToken [447..448) '('
+                  PredefinedType [448..452)
+                    IntKeyword [448..451) 'int'
+                    T:WhitespaceTrivia [451..452) ' '
+                  CloseParenToken [452..452) missing
+          SemicolonToken [452..452) missing
+        ExpressionStatement [452..464)
+          DefaultLiteralExpression [452..459)
+            DefaultKeyword [452..459) 'default'
+          SemicolonToken [459..459) missing
+          T:SkippedTokensTrivia [459..460)
+            CloseParenToken [459..460) ')'
+          T:WhitespaceTrivia [460..461) ' '
+          T:SkippedTokensTrivia [461..463)
+            EqualsGreaterThanToken [461..463) '=>'
+          T:WhitespaceTrivia [463..464) ' '
+        ExpressionStatement [464..510)
+          NumericLiteralExpression [464..465)
+            NumericLiteralToken [464..465) '1'
+          SemicolonToken [465..466) ';'
+          T:WhitespaceTrivia [466..476) '          '
+          T:SingleLineCommentTrivia [476..509) '// err: Keyword as parameter name'
+          T:EndOfLineTrivia [509..510) '\n'
+        L:WhitespaceTrivia [510..514) '    '
+        CloseBraceToken [514..515) '}'
+        T:EndOfLineTrivia [515..516) '\n'
+    CloseBraceToken [516..517) '}'
+    T:EndOfLineTrivia [517..518) '\n'
+  EndOfFileToken [518..518) ''
+Diagnostics:
+  CS1525 [448..451) Invalid expression term \'int\'
+  CS1026 [452..459) ) expected
+  CS1002 [452..459) ; expected
+  CS1002 [459..460) ; expected
+  CS1513 [459..460) } expected

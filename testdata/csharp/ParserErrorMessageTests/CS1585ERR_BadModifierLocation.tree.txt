@@ -1,0 +1,118 @@
+CompilationUnit [0..219)
+  NamespaceDeclaration [0..219)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..14)
+      IdentifierToken [11..13) 'oo'
+      T:WhitespaceTrivia [13..14) ' '
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    ClassDeclaration [16..68)
+      PublicKeyword [16..22) 'public'
+      T:WhitespaceTrivia [22..23) ' '
+      ClassKeyword [23..28) 'class'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..32) 'clx'
+      T:WhitespaceTrivia [32..33) ' '
+      OpenBraceToken [33..34) '{'
+      T:EndOfLineTrivia [34..35) '\n'
+      MethodDeclaration [35..53)
+        PublicKeyword [35..41) 'public'
+        T:WhitespaceTrivia [41..42) ' '
+        PredefinedType [42..47)
+          VoidKeyword [42..46) 'void'
+          T:WhitespaceTrivia [46..47) ' '
+        IdentifierToken [47..48) 'f'
+        ParameterList [48..50)
+          OpenParenToken [48..49) '('
+          CloseParenToken [49..50) ')'
+        Block [50..53)
+          OpenBraceToken [50..51) '{'
+          CloseBraceToken [51..52) '}'
+          T:EndOfLineTrivia [52..53) '\n'
+      CloseBraceToken [53..54) '}'
+      T:WhitespaceTrivia [54..55) ' '
+      T:SingleLineCommentTrivia [55..67) '// class clx'
+      T:EndOfLineTrivia [67..68) '\n'
+    ClassDeclaration [68..134)
+      PublicKeyword [68..74) 'public'
+      T:WhitespaceTrivia [74..75) ' '
+      ClassKeyword [75..80) 'class'
+      T:WhitespaceTrivia [80..81) ' '
+      IdentifierToken [81..85) 'clxx'
+      T:WhitespaceTrivia [85..86) ' '
+      BaseList [86..92)
+        ColonToken [86..87) ':'
+        T:WhitespaceTrivia [87..88) ' '
+        SimpleBaseType [88..92)
+          IdentifierName [88..92)
+            IdentifierToken [88..91) 'clx'
+            T:WhitespaceTrivia [91..92) ' '
+      OpenBraceToken [92..93) '{'
+      T:EndOfLineTrivia [93..94) '\n'
+      IncompleteMember [94..117)
+        L:WhitespaceTrivia [94..98) '    '
+        PublicKeyword [98..104) 'public'
+        T:WhitespaceTrivia [104..105) ' '
+        StaticKeyword [105..111) 'static'
+        T:WhitespaceTrivia [111..112) ' '
+        PredefinedType [112..117)
+          VoidKeyword [112..116) 'void'
+          T:WhitespaceTrivia [116..117) ' '
+      ConstructorDeclaration [117..132)
+        VirtualKeyword [117..124) 'virtual'
+        T:WhitespaceTrivia [124..125) ' '
+        IdentifierToken [125..126) 'f'
+        ParameterList [126..129)
+          OpenParenToken [126..127) '('
+          CloseParenToken [127..128) ')'
+          T:WhitespaceTrivia [128..129) ' '
+        Block [129..132)
+          OpenBraceToken [129..130) '{'
+          CloseBraceToken [130..131) '}'
+          T:EndOfLineTrivia [131..132) '\n'
+      CloseBraceToken [132..133) '}'
+      T:EndOfLineTrivia [133..134) '\n'
+    ClassDeclaration [134..204)
+      PublicKeyword [134..140) 'public'
+      T:WhitespaceTrivia [140..141) ' '
+      ClassKeyword [141..146) 'class'
+      T:WhitespaceTrivia [146..147) ' '
+      IdentifierToken [147..150) 'cly'
+      T:WhitespaceTrivia [150..151) ' '
+      OpenBraceToken [151..152) '{'
+      T:EndOfLineTrivia [152..153) '\n'
+      MethodDeclaration [153..189)
+        PublicKeyword [153..159) 'public'
+        T:WhitespaceTrivia [159..160) ' '
+        StaticKeyword [160..166) 'static'
+        T:WhitespaceTrivia [166..167) ' '
+        PredefinedType [167..171)
+          IntKeyword [167..170) 'int'
+          T:WhitespaceTrivia [170..171) ' '
+        IdentifierToken [171..175) 'Main'
+        ParameterList [175..177)
+          OpenParenToken [175..176) '('
+          CloseParenToken [176..177) ')'
+        Block [177..189)
+          OpenBraceToken [177..178) '{'
+          ReturnStatement [178..187)
+            ReturnKeyword [178..184) 'return'
+            T:WhitespaceTrivia [184..185) ' '
+            NumericLiteralExpression [185..186)
+              NumericLiteralToken [185..186) '0'
+            SemicolonToken [186..187) ';'
+          CloseBraceToken [187..188) '}'
+          T:EndOfLineTrivia [188..189) '\n'
+      CloseBraceToken [189..190) '}'
+      T:WhitespaceTrivia [190..191) ' '
+      T:SingleLineCommentTrivia [191..203) '// class cly'
+      T:EndOfLineTrivia [203..204) '\n'
+    CloseBraceToken [204..205) '}'
+    T:WhitespaceTrivia [205..206) ' '
+    T:SingleLineCommentTrivia [206..218) '// namespace'
+    T:EndOfLineTrivia [218..219) '\n'
+  EndOfFileToken [219..219) ''
+Diagnostics:
+  CS1585 [117..124) Member modifier \'virtual\' must precede the member type and name

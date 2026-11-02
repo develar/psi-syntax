@@ -1,0 +1,23 @@
+CoalesceExpression [0..15)
+  AsExpression [0..11)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    AsKeyword [2..4) 'as'
+    T:WhitespaceTrivia [4..5) ' '
+    NullableType [5..11)
+      ArrayType [5..9)
+        IdentifierName [5..6)
+          IdentifierToken [5..6) 'T'
+        ArrayRankSpecifier [6..9)
+          OpenBracketToken [6..7) '['
+          OmittedArraySizeExpression [7..7)
+            OmittedArraySizeExpressionToken [7..7) ''
+          CloseBracketToken [7..8) ']'
+          T:WhitespaceTrivia [8..9) ' '
+      QuestionToken [9..10) '?'
+      T:WhitespaceTrivia [10..11) ' '
+  QuestionQuestionToken [11..13) '??'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierName [14..15)
+    IdentifierToken [14..15) 'y'

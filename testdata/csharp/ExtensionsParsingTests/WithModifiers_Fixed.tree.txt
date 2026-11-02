@@ -1,0 +1,45 @@
+CompilationUnit [0..41)
+  ClassDeclaration [0..41)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..38)
+      L:WhitespaceTrivia [10..14) '    '
+      FixedKeyword [14..19) 'fixed'
+      T:WhitespaceTrivia [19..20) ' '
+      VariableDeclaration [20..38)
+        IdentifierName [20..29)
+          IdentifierToken [20..29) 'extension'
+        VariableDeclarator [29..38)
+          IdentifierToken [29..29) missing
+          BracketedArgumentList [29..38)
+            OpenBracketToken [29..29) missing
+            T:SkippedTokensTrivia [29..30)
+              OpenParenToken [29..30) '('
+            Argument [30..34)
+              IdentifierName [30..34)
+                IdentifierToken [30..34) 'Type'
+            CloseBracketToken [34..34) missing
+            T:SkippedTokensTrivia [34..35)
+              CloseParenToken [34..35) ')'
+            T:WhitespaceTrivia [35..36) ' '
+            T:SkippedTokensTrivia [36..37)
+              OpenBraceToken [36..37) '{'
+            T:WhitespaceTrivia [37..38) ' '
+      SemicolonToken [38..38) missing
+    CloseBraceToken [38..39) '}'
+    T:EndOfLineTrivia [39..40) '\n'
+    T:SkippedTokensTrivia [40..41)
+      CloseBraceToken [40..41) '}'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1001 [29..30) Identifier expected
+  CS1528 [29..34) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [29..30) Syntax error, \'[\' expected
+  CS1003 [34..35) Syntax error, \']\' expected
+  CS1003 [36..37) Syntax error, \',\' expected
+  CS1002 [38..39) ; expected
+  CS1022 [40..41) Type or namespace definition, or end-of-file expected

@@ -1,0 +1,40 @@
+CompilationUnit [0..41)
+  GlobalStatement [0..41)
+    FixedStatement [0..41)
+      L:EndOfLineTrivia [0..1) '\n'
+      FixedKeyword [1..6) 'fixed'
+      T:WhitespaceTrivia [6..7) ' '
+      OpenParenToken [7..8) '('
+      VariableDeclaration [8..38)
+        IdentifierName [8..15)
+          IdentifierToken [8..14) 'scoped'
+          T:WhitespaceTrivia [14..15) ' '
+        VariableDeclarator [15..38)
+          IdentifierToken [15..15) missing
+          T:SkippedTokensTrivia [15..18)
+            RefKeyword [15..18) 'ref'
+          T:WhitespaceTrivia [18..19) ' '
+          T:SkippedTokensTrivia [19..27)
+            ReadOnlyKeyword [19..27) 'readonly'
+          T:WhitespaceTrivia [27..28) ' '
+          T:SkippedTokensTrivia [28..31)
+            IntKeyword [28..31) 'int'
+          T:SkippedTokensTrivia [31..32)
+            AsteriskToken [31..32) '*'
+          T:WhitespaceTrivia [32..33) ' '
+          T:SkippedTokensTrivia [33..34)
+            IdentifierToken [33..34) 'a'
+          T:WhitespaceTrivia [34..35) ' '
+          T:SkippedTokensTrivia [35..36)
+            EqualsToken [35..36) '='
+          T:WhitespaceTrivia [36..37) ' '
+          T:SkippedTokensTrivia [37..38)
+            IdentifierToken [37..38) 'b'
+      CloseParenToken [38..39) ')'
+      EmptyStatement [39..41)
+        SemicolonToken [39..40) ';'
+        T:EndOfLineTrivia [40..41) '\n'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1001 [15..18) Identifier expected
+  CS1003 [15..18) Syntax error, \',\' expected

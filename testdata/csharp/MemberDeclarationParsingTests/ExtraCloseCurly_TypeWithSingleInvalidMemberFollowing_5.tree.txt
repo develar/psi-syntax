@@ -1,0 +1,53 @@
+CompilationUnit [0..138)
+  NamespaceDeclaration [0..138)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    RecordStructDeclaration [14..138)
+      L:WhitespaceTrivia [14..18) '    '
+      RecordKeyword [18..24) 'record'
+      T:WhitespaceTrivia [24..25) ' '
+      StructKeyword [25..31) 'struct'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Type'
+      T:EndOfLineTrivia [36..37) '\n'
+      L:WhitespaceTrivia [37..41) '    '
+      OpenBraceToken [41..42) '{'
+      T:EndOfLineTrivia [42..43) '\n'
+      MethodDeclaration [43..137)
+        L:WhitespaceTrivia [43..47) '    '
+        L:SkippedTokensTrivia [47..48)
+          CloseBraceToken [47..48) '}'
+        L:EndOfLineTrivia [48..49) '\n'
+        L:EndOfLineTrivia [49..50) '\n'
+        L:WhitespaceTrivia [50..54) '    '
+        L:SingleLineCommentTrivia [54..103) '// One method that will move into the type above.'
+        L:EndOfLineTrivia [103..104) '\n'
+        L:WhitespaceTrivia [104..108) '    '
+        PrivateKeyword [108..115) 'private'
+        T:WhitespaceTrivia [115..116) ' '
+        PredefinedType [116..121)
+          VoidKeyword [116..120) 'void'
+          T:WhitespaceTrivia [120..121) ' '
+        IdentifierToken [121..122) 'M'
+        ParameterList [122..125)
+          OpenParenToken [122..123) '('
+          CloseParenToken [123..124) ')'
+          T:EndOfLineTrivia [124..125) '\n'
+        Block [125..137)
+          L:WhitespaceTrivia [125..129) '    '
+          OpenBraceToken [129..130) '{'
+          T:EndOfLineTrivia [130..131) '\n'
+          L:WhitespaceTrivia [131..135) '    '
+          CloseBraceToken [135..136) '}'
+          T:EndOfLineTrivia [136..137) '\n'
+      CloseBraceToken [137..138) '}'
+    CloseBraceToken [138..138) missing
+  EndOfFileToken [138..138) ''
+Diagnostics:
+  CS1519 [47..48) Invalid token \'}\' in a member declaration
+  CS1513 [138..138) } expected

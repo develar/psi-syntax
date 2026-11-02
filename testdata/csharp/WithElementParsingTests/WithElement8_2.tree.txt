@@ -1,0 +1,16 @@
+CollectionExpression [0..19)
+  OpenBracketToken [0..1) '['
+  WithElement [1..18)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..18)
+      OpenParenToken [5..6) '('
+      Argument [6..17)
+        NameColon [6..12)
+          IdentifierName [6..10)
+            IdentifierToken [6..10) 'name'
+          ColonToken [10..11) ':'
+          T:WhitespaceTrivia [11..12) ' '
+        IdentifierName [12..17)
+          IdentifierToken [12..17) 'value'
+      CloseParenToken [17..18) ')'
+  CloseBracketToken [18..19) ']'

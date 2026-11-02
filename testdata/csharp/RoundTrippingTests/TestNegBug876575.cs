@@ -1,0 +1,1 @@
+partial enum E{}

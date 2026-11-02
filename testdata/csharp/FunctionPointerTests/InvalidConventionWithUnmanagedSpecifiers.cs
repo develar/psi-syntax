@@ -1,0 +1,1 @@
+delegate* invalid[Cdecl]<void> ptr;

@@ -1,0 +1,1 @@
+x switch { (int a, int b) => b, (object c, object d) e => e }

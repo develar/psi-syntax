@@ -1,0 +1,26 @@
+CompilationUnit [0..27)
+  NamespaceDeclaration [0..27)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..13)
+      IdentifierToken [10..12) 'N2'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    IncompleteMember [15..27)
+      AttributeList [15..27)
+        L:WhitespaceTrivia [15..19) '    '
+        OpenBracketToken [19..20) '['
+        AttributeTargetSpecifier [20..27)
+          GlobalKeyword [20..26) 'global'
+          ColonToken [26..27) ':'
+        Attribute [27..27)
+          IdentifierName [27..27)
+            IdentifierToken [27..27) missing
+        CloseBracketToken [27..27) missing
+    CloseBraceToken [27..27) missing
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1001 [27..27) Identifier expected
+  CS1003 [27..27) Syntax error, \']\' expected
+  CS1513 [27..27) } expected

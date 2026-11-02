@@ -1,0 +1,88 @@
+CompilationUnit [0..167)
+  NamespaceDeclaration [0..167)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..110)
+      L:WhitespaceTrivia [15..19) '    '
+      PublicKeyword [19..25) 'public'
+      T:WhitespaceTrivia [25..26) ' '
+      ClassKeyword [26..31) 'class'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..35) 'clx'
+      T:WhitespaceTrivia [35..36) ' '
+      OpenBraceToken [36..37) '{'
+      T:EndOfLineTrivia [37..38) '\n'
+      FieldDeclaration [38..60)
+        L:WhitespaceTrivia [38..46) '        '
+        PublicKeyword [46..52) 'public'
+        T:WhitespaceTrivia [52..53) ' '
+        VariableDeclaration [53..58)
+          PredefinedType [53..57)
+            IntKeyword [53..56) 'int'
+            T:WhitespaceTrivia [56..57) ' '
+          VariableDeclarator [57..58)
+            IdentifierToken [57..58) 'i'
+        SemicolonToken [58..59) ';'
+        T:EndOfLineTrivia [59..60) '\n'
+      MethodDeclaration [60..104)
+        L:WhitespaceTrivia [60..68) '        '
+        PublicKeyword [68..74) 'public'
+        T:WhitespaceTrivia [74..75) ' '
+        StaticKeyword [75..81) 'static'
+        T:WhitespaceTrivia [81..82) ' '
+        PredefinedType [82..86)
+          IntKeyword [82..85) 'int'
+          T:WhitespaceTrivia [85..86) ' '
+        IdentifierToken [86..90) 'Main'
+        ParameterList [90..92)
+          OpenParenToken [90..91) '('
+          CloseParenToken [91..92) ')'
+        Block [92..104)
+          OpenBraceToken [92..93) '{'
+          ReturnStatement [93..102)
+            ReturnKeyword [93..99) 'return'
+            T:WhitespaceTrivia [99..100) ' '
+            NumericLiteralExpression [100..101)
+              NumericLiteralToken [100..101) '0'
+            SemicolonToken [101..102) ';'
+          CloseBraceToken [102..103) '}'
+          T:EndOfLineTrivia [103..104) '\n'
+      L:WhitespaceTrivia [104..108) '    '
+      CloseBraceToken [108..109) '}'
+      T:EndOfLineTrivia [109..110) '\n'
+    ClassDeclaration [110..165)
+      L:WhitespaceTrivia [110..114) '    '
+      PublicKeyword [114..120) 'public'
+      T:WhitespaceTrivia [120..121) ' '
+      ClassKeyword [121..126) 'class'
+      T:WhitespaceTrivia [126..127) ' '
+      IdentifierToken [127..130) 'clz'
+      T:WhitespaceTrivia [130..131) ' '
+      T:EndOfLineTrivia [131..132) '\n'
+      L:WhitespaceTrivia [132..136) '    '
+      OpenBraceToken [136..137) '{'
+      T:EndOfLineTrivia [137..138) '\n'
+      ConstructorDeclaration [138..159)
+        L:WhitespaceTrivia [138..146) '        '
+        PublicKeyword [146..152) 'public'
+        T:WhitespaceTrivia [152..153) ' '
+        IdentifierToken [153..154) 'x'
+        ParameterList [154..156)
+          OpenParenToken [154..155) '('
+          CloseParenToken [155..156) ')'
+        Block [156..159)
+          OpenBraceToken [156..157) '{'
+          CloseBraceToken [157..158) '}'
+          T:EndOfLineTrivia [158..159) '\n'
+      L:WhitespaceTrivia [159..163) '    '
+      CloseBraceToken [163..164) '}'
+      T:EndOfLineTrivia [164..165) '\n'
+    CloseBraceToken [165..166) '}'
+    T:EndOfLineTrivia [166..167) '\n'
+  EndOfFileToken [167..167) ''

@@ -1,0 +1,17 @@
+CompilationUnit [0..15)
+  GlobalStatement [0..15)
+    LocalDeclarationStatement [0..15)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      VolatileKeyword [6..14) 'volatile'
+      VariableDeclaration [14..14)
+        IdentifierName [14..14)
+          IdentifierToken [14..14) missing
+        VariableDeclarator [14..14)
+          IdentifierToken [14..14) missing
+      SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS9229 [6..14) Modifiers cannot be placed on using declarations
+  CS1031 [14..15) Type expected
+  CS1001 [14..15) Identifier expected

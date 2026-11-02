@@ -1,0 +1,40 @@
+L:SingleLineDocumentationCommentTrivia [0..45)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..45)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..43)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      QualifiedCref [15..42)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'E'
+        DotToken [16..17) '.'
+        ExtensionMemberCref [17..42)
+          ExtensionKeyword [17..26) 'extension'
+          CrefParameterList [26..28)
+            OpenParenToken [26..27) '('
+            CloseParenToken [27..28) ')'
+          DotToken [28..29) '.'
+          ExtensionMemberCref [29..42)
+            ExtensionKeyword [29..38) 'extension'
+            CrefParameterList [38..40)
+              OpenParenToken [38..39) '('
+              CloseParenToken [39..40) ')'
+            DotToken [40..41) '.'
+            NameMemberCref [41..42)
+              IdentifierName [41..42)
+                IdentifierToken [41..42) 'M'
+      DoubleQuoteToken [42..43) '"'
+    SlashGreaterThanToken [43..45) '/>'
+  EndOfDocumentationCommentToken [45..45) ''
+EndOfFileToken [45..45) ''
+Diagnostics:
+  CS1584 [15..42) XML comment has syntactically incorrect cref attribute \'E.extension().extension().M\'
+  CS1658 [29..42) An extension member syntax is disallowed in nested position within an extension member syntax. See also error CS9309.

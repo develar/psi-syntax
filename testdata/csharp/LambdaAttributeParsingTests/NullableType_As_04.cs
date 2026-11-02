@@ -1,0 +1,1 @@
+x as string ? ([A] y => y) : z

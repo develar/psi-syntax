@@ -1,0 +1,1 @@
+void M() { switch (e) { case var _: break; } }

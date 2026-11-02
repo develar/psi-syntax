@@ -1,0 +1,26 @@
+CompilationUnit [0..19)
+  L:SingleLineDocumentationCommentTrivia [0..19)
+    XmlElement [0..19)
+      XmlElementStartTag [0..10)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        LessThanToken [3..4) '<'
+        XmlName [4..8)
+          L:WhitespaceTrivia [4..5) ' '
+          IdentifierToken [5..8) 'goo'
+        L:WhitespaceTrivia [8..9) ' '
+        GreaterThanToken [9..10) '>'
+      XmlText [10..11)
+        XmlTextLiteralToken [10..11) ' '
+      XmlElementEndTag [11..19)
+        LessThanSlashToken [11..13) '</'
+        XmlName [13..17)
+          L:WhitespaceTrivia [13..14) ' '
+          IdentifierToken [14..17) 'bar'
+        L:WhitespaceTrivia [17..18) ' '
+        GreaterThanToken [18..19) '>'
+    EndOfDocumentationCommentToken [19..19) ''
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1570 [5..8) XML comment has badly formed XML -- \'Whitespace is not allowed at this location.\'
+  CS1570 [14..17) XML comment has badly formed XML -- \'Whitespace is not allowed at this location.\'
+  CS1570 [14..17) XML comment has badly formed XML -- \'End tag \'bar\' does not match the start tag \'goo\'.\'

@@ -1,0 +1,7 @@
+AttributeArgumentList [0..24)
+  OpenParenToken [0..0) missing
+  CloseParenToken [0..0) missing
+  T:SkippedTokensTrivia [0..24)
+    IdentifierToken [0..24) 'somethingWithoutBrackets'
+Diagnostics:
+  CS1073 [0..0) Unexpected token \'somethingWithoutBrackets\'

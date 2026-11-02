@@ -1,0 +1,31 @@
+SwitchStatement [0..36)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..35)
+    CasePatternSwitchLabel [13..28)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      ConstantPattern [18..22)
+        IdentifierName [18..22)
+          IdentifierToken [18..21) 'var'
+          T:WhitespaceTrivia [21..22) ' '
+      WhenClause [22..26)
+        WhenKeyword [22..26) 'when'
+        IdentifierName [26..26)
+          IdentifierToken [26..26) missing
+      ColonToken [26..27) ':'
+      T:WhitespaceTrivia [27..28) ' '
+    BreakStatement [28..35)
+      BreakKeyword [28..33) 'break'
+      SemicolonToken [33..34) ';'
+      T:WhitespaceTrivia [34..35) ' '
+  CloseBraceToken [35..36) '}'
+Diagnostics:
+  CS1525 [26..27) Invalid expression term \':\'

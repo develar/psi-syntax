@@ -1,0 +1,28 @@
+LocalDeclarationStatement [0..36)
+  VariableDeclaration [0..35)
+    FunctionPointerType [0..32)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      T:WhitespaceTrivia [9..10) ' '
+      FunctionPointerCallingConvention [10..25)
+        UnmanagedKeyword [10..19) 'unmanaged'
+        FunctionPointerUnmanagedCallingConventionList [19..25)
+          OpenBracketToken [19..20) '['
+          FunctionPointerUnmanagedCallingConvention [20..24)
+            IdentifierToken [20..20) missing
+            T:SkippedTokensTrivia [20..24)
+              VoidKeyword [20..24) 'void'
+          CloseBracketToken [24..25) ']'
+      FunctionPointerParameterList [25..32)
+        LessThanToken [25..26) '<'
+        FunctionPointerParameter [26..30)
+          PredefinedType [26..30)
+            VoidKeyword [26..30) 'void'
+        GreaterThanToken [30..31) '>'
+        T:WhitespaceTrivia [31..32) ' '
+    VariableDeclarator [32..35)
+      IdentifierToken [32..35) 'ptr'
+  SemicolonToken [35..36) ';'
+Diagnostics:
+  CS1041 [20..24) Identifier expected; \'void\' is a keyword
+  CS1003 [20..24) Syntax error, \',\' expected

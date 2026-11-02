@@ -1,0 +1,1 @@
+var v = unchecked(Boo Quux());

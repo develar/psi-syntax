@@ -1,0 +1,61 @@
+CompilationUnit [0..99)
+  ClassDeclaration [0..99)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..98)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..30)
+        OpenParenToken [23..24) '('
+        Parameter [24..28)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      OpenBraceToken [34..35) '{'
+      T:EndOfLineTrivia [35..36) '\n'
+      MethodDeclaration [36..57)
+        PredefinedType [36..49)
+          L:WhitespaceTrivia [36..44) '        '
+          VoidKeyword [44..48) 'void'
+          T:WhitespaceTrivia [48..49) ' '
+        IdentifierToken [49..50) 'M'
+        ParameterList [50..53)
+          OpenParenToken [50..51) '('
+          CloseParenToken [51..52) ')'
+          T:WhitespaceTrivia [52..53) ' '
+        Block [53..57)
+          OpenBraceToken [53..54) '{'
+          T:WhitespaceTrivia [54..55) ' '
+          CloseBraceToken [55..56) '}'
+          T:EndOfLineTrivia [56..57) '\n'
+      PropertyDeclaration [57..92)
+        PredefinedType [57..69)
+          L:WhitespaceTrivia [57..65) '        '
+          IntKeyword [65..68) 'int'
+          T:WhitespaceTrivia [68..69) ' '
+        IdentifierToken [69..77) 'Property'
+        T:WhitespaceTrivia [77..78) ' '
+        AccessorList [78..92)
+          OpenBraceToken [78..79) '{'
+          T:WhitespaceTrivia [79..80) ' '
+          GetAccessorDeclaration [80..85)
+            GetKeyword [80..83) 'get'
+            SemicolonToken [83..84) ';'
+            T:WhitespaceTrivia [84..85) ' '
+          SetAccessorDeclaration [85..90)
+            SetKeyword [85..88) 'set'
+            SemicolonToken [88..89) ';'
+            T:WhitespaceTrivia [89..90) ' '
+          CloseBraceToken [90..91) '}'
+          T:EndOfLineTrivia [91..92) '\n'
+      L:WhitespaceTrivia [92..96) '    '
+      CloseBraceToken [96..97) '}'
+      T:EndOfLineTrivia [97..98) '\n'
+    CloseBraceToken [98..99) '}'
+  EndOfFileToken [99..99) ''

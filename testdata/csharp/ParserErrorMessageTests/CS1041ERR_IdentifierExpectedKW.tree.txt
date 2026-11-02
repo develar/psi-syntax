@@ -1,0 +1,74 @@
+CompilationUnit [0..124)
+  ClassDeclaration [0..124)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'MyClass'
+    T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..66)
+      L:WhitespaceTrivia [17..21) '    '
+      PublicKeyword [21..27) 'public'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..33)
+        VoidKeyword [28..32) 'void'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..34) 'f'
+      ParameterList [34..45)
+        OpenParenToken [34..35) '('
+        Parameter [35..39)
+          PredefinedType [35..39)
+            IntKeyword [35..38) 'int'
+            T:WhitespaceTrivia [38..39) ' '
+          IdentifierToken [39..39) missing
+        CommaToken [39..39) missing
+        Parameter [39..43)
+          PredefinedType [39..43)
+            LongKeyword [39..43) 'long'
+          IdentifierToken [43..43) missing
+        CloseParenToken [43..44) ')'
+        T:WhitespaceTrivia [44..45) ' '
+      Block [45..66)
+        OpenBraceToken [45..46) '{'
+        T:WhitespaceTrivia [46..50) '    '
+        T:SingleLineCommentTrivia [50..59) '// CS1041'
+        T:EndOfLineTrivia [59..60) '\n'
+        L:WhitespaceTrivia [60..64) '    '
+        CloseBraceToken [64..65) '}'
+        T:EndOfLineTrivia [65..66) '\n'
+    MethodDeclaration [66..122)
+      L:WhitespaceTrivia [66..70) '    '
+      PublicKeyword [70..76) 'public'
+      T:WhitespaceTrivia [76..77) ' '
+      StaticKeyword [77..83) 'static'
+      T:WhitespaceTrivia [83..84) ' '
+      PredefinedType [84..88)
+        IntKeyword [84..87) 'int'
+        T:WhitespaceTrivia [87..88) ' '
+      IdentifierToken [88..92) 'Main'
+      ParameterList [92..95)
+        OpenParenToken [92..93) '('
+        CloseParenToken [93..94) ')'
+        T:WhitespaceTrivia [94..95) ' '
+      Block [95..122)
+        OpenBraceToken [95..96) '{'
+        T:EndOfLineTrivia [96..97) '\n'
+        ReturnStatement [97..116)
+          L:WhitespaceTrivia [97..105) '        '
+          ReturnKeyword [105..111) 'return'
+          T:WhitespaceTrivia [111..113) '  '
+          NumericLiteralExpression [113..114)
+            NumericLiteralToken [113..114) '1'
+          SemicolonToken [114..115) ';'
+          T:EndOfLineTrivia [115..116) '\n'
+        L:WhitespaceTrivia [116..120) '    '
+        CloseBraceToken [120..121) '}'
+        T:EndOfLineTrivia [121..122) '\n'
+    CloseBraceToken [122..123) '}'
+    T:EndOfLineTrivia [123..124) '\n'
+  EndOfFileToken [124..124) ''
+Diagnostics:
+  CS1001 [39..43) Identifier expected
+  CS1003 [39..43) Syntax error, \',\' expected
+  CS1001 [43..44) Identifier expected

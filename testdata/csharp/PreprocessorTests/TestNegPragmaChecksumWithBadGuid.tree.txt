@@ -1,0 +1,16 @@
+CompilationUnit [0..54)
+  L:PragmaChecksumDirectiveTrivia [0..54)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    ChecksumKeyword [8..16) 'checksum'
+    T:WhitespaceTrivia [16..17) ' '
+    StringLiteralToken [17..27) '"bogus.cs"'
+    T:WhitespaceTrivia [27..28) ' '
+    StringLiteralToken [28..39) '"{abc-123}"'
+    T:WhitespaceTrivia [39..40) ' '
+    StringLiteralToken [40..54) '"ab007f1d23d9"'
+    EndOfDirectiveToken [54..54) ''
+  EndOfFileToken [54..54) ''
+Diagnostics:
+  CS1695 [28..39) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."

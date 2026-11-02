@@ -1,0 +1,1 @@
+x switch { (a, b) => b, (c, d) e => e }

@@ -1,0 +1,105 @@
+CompilationUnit [0..95)
+  GlobalStatement [0..23)
+    LocalDeclarationStatement [0..23)
+      VariableDeclaration [0..7)
+        IdentifierName [0..5)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..5) 'asas'
+        VariableDeclarator [5..7)
+          IdentifierToken [5..5) missing
+          T:SkippedTokensTrivia [5..6)
+            CloseBracketToken [5..6) ']'
+          T:EndOfLineTrivia [6..7) '\n'
+      SemicolonToken [7..7) missing
+      T:SkippedTokensTrivia [7..13)
+        ExternKeyword [7..13) 'extern'
+      T:WhitespaceTrivia [13..14) ' '
+      T:SkippedTokensTrivia [14..19)
+        AliasKeyword [14..19) 'alias'
+      T:WhitespaceTrivia [19..20) ' '
+      T:SkippedTokensTrivia [20..21)
+        IdentifierToken [20..21) 'A'
+      T:SkippedTokensTrivia [21..22)
+        SemicolonToken [21..22) ';'
+      T:EndOfLineTrivia [22..23) '\n'
+  IncompleteMember [23..42)
+    IdentifierName [23..42)
+      IdentifierToken [23..27) 'asas'
+      T:EndOfLineTrivia [27..28) '\n'
+      T:SkippedTokensTrivia [28..33)
+        UsingKeyword [28..33) 'using'
+      T:WhitespaceTrivia [33..34) ' '
+      T:SkippedTokensTrivia [34..40)
+        IdentifierToken [34..40) 'System'
+      T:SkippedTokensTrivia [40..41)
+        SemicolonToken [40..41) ';'
+      T:EndOfLineTrivia [41..42) '\n'
+  GlobalStatement [42..70)
+    LocalDeclarationStatement [42..70)
+      VariableDeclaration [42..53)
+        IdentifierName [42..51)
+          IdentifierToken [42..51) 'sadasdasd'
+        VariableDeclarator [51..53)
+          IdentifierToken [51..51) missing
+          T:SkippedTokensTrivia [51..52)
+            CloseBracketToken [51..52) ']'
+          T:EndOfLineTrivia [52..53) '\n'
+      SemicolonToken [53..53) missing
+      T:EndOfLineTrivia [53..54) '\n'
+      T:SkippedTokensTrivia [54..55)
+        OpenBracketToken [54..55) '['
+      T:SkippedTokensTrivia [55..63)
+        AssemblyKeyword [55..63) 'assembly'
+      T:SkippedTokensTrivia [63..64)
+        ColonToken [63..64) ':'
+      T:WhitespaceTrivia [64..65) ' '
+      T:SkippedTokensTrivia [65..68)
+        IdentifierToken [65..68) 'goo'
+      T:SkippedTokensTrivia [68..69)
+        CloseBracketToken [68..69) ']'
+      T:EndOfLineTrivia [69..70) '\n'
+  ClassDeclaration [70..83)
+    L:EndOfLineTrivia [70..71) '\n'
+    ClassKeyword [71..76) 'class'
+    T:WhitespaceTrivia [76..77) ' '
+    IdentifierToken [77..78) 'C'
+    T:EndOfLineTrivia [78..79) '\n'
+    OpenBraceToken [79..80) '{'
+    T:EndOfLineTrivia [80..81) '\n'
+    CloseBraceToken [81..82) '}'
+    T:EndOfLineTrivia [82..83) '\n'
+  GlobalStatement [83..93)
+    ExpressionStatement [83..93)
+      AttributeList [83..88)
+        L:EndOfLineTrivia [83..84) '\n'
+        L:EndOfLineTrivia [84..85) '\n'
+        OpenBracketToken [85..86) '['
+        Attribute [86..87)
+          IdentifierName [86..87)
+            IdentifierToken [86..87) 'a'
+        CloseBracketToken [87..88) ']'
+      IdentifierName [88..91)
+        IdentifierToken [88..91) 'fod'
+      SemicolonToken [91..92) ';'
+      T:EndOfLineTrivia [92..93) '\n'
+  IncompleteMember [93..95)
+    AttributeList [93..95)
+      OpenBracketToken [93..94) '['
+      Attribute [94..95)
+        IdentifierName [94..95)
+          IdentifierToken [94..95) 'b'
+      CloseBracketToken [95..95) missing
+  EndOfFileToken [95..95) ''
+Diagnostics:
+  CS1001 [5..6) Identifier expected
+  CS1003 [5..6) Syntax error, \',\' expected
+  CS1002 [6..6) ; expected
+  CS0439 [7..13) An extern alias declaration must precede all other elements defined in the namespace
+  CS0116 [23..27) A namespace cannot directly contain members such as fields, methods or statements
+  CS1529 [28..41) A using clause must precede all other elements defined in the namespace except extern alias declarations
+  CS1001 [51..52) Identifier expected
+  CS1003 [51..52) Syntax error, \',\' expected
+  CS1002 [52..52) ; expected
+  CS1730 [55..63) Assembly and module attributes must precede all other elements defined in a file except using clauses and extern alias declarations
+  CS8803 [85..92) Top-level statements must precede namespace and type declarations.
+  CS1003 [95..95) Syntax error, \']\' expected

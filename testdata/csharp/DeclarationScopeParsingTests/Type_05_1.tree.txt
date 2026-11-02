@@ -1,0 +1,42 @@
+CompilationUnit [0..29)
+  DelegateDeclaration [0..29)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    RefType [9..20)
+      RefKeyword [9..12) 'ref'
+      T:WhitespaceTrivia [12..13) ' '
+      IdentifierName [13..20)
+        IdentifierToken [13..19) 'scoped'
+        T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..20) missing
+    ParameterList [20..27)
+      OpenParenToken [20..20) missing
+      Parameter [20..25)
+        PredefinedType [20..24)
+          IntKeyword [20..23) 'int'
+          T:WhitespaceTrivia [23..24) ' '
+        IdentifierToken [24..25) 'B'
+      CommaToken [25..25) missing
+      Parameter [25..27)
+        TupleType [25..27)
+          OpenParenToken [25..26) '('
+          TupleElement [26..26)
+            IdentifierName [26..26)
+              IdentifierToken [26..26) missing
+          CommaToken [26..26) missing
+          TupleElement [26..26)
+            IdentifierName [26..26)
+              IdentifierToken [26..26) missing
+          CloseParenToken [26..27) ')'
+        IdentifierToken [27..27) missing
+      CloseParenToken [27..27) missing
+    SemicolonToken [27..28) ';'
+    T:EndOfLineTrivia [28..29) '\n'
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1001 [20..23) Identifier expected
+  CS1003 [20..23) Syntax error, \'(\' expected
+  CS1003 [25..26) Syntax error, \',\' expected
+  CS8124 [26..27) Tuple must contain at least two elements.
+  CS1001 [27..28) Identifier expected
+  CS1026 [27..28) ) expected

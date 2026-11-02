@@ -1,0 +1,31 @@
+ClassDeclaration [0..42)
+  ClassKeyword [0..5) 'class'
+  T:WhitespaceTrivia [5..6) ' '
+  IdentifierToken [6..7) 'C'
+  T:WhitespaceTrivia [7..8) ' '
+  OpenBraceToken [8..9) '{'
+  T:WhitespaceTrivia [9..10) ' '
+  MethodDeclaration [10..41)
+    PredefinedType [10..15)
+      VoidKeyword [10..14) 'void'
+      T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'M'
+    ParameterList [16..37)
+      OpenParenToken [16..17) '('
+      Parameter [17..35)
+        ReadOnlyKeyword [17..25) 'readonly'
+        T:WhitespaceTrivia [25..26) ' '
+        RefKeyword [26..29) 'ref'
+        T:WhitespaceTrivia [29..30) ' '
+        PredefinedType [30..34)
+          IntKeyword [30..33) 'int'
+          T:WhitespaceTrivia [33..34) ' '
+        IdentifierToken [34..35) 'i'
+      CloseParenToken [35..36) ')'
+      T:WhitespaceTrivia [36..37) ' '
+    Block [37..41)
+      OpenBraceToken [37..38) '{'
+      T:WhitespaceTrivia [38..39) ' '
+      CloseBraceToken [39..40) '}'
+      T:WhitespaceTrivia [40..41) ' '
+  CloseBraceToken [41..42) '}'

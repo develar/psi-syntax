@@ -1,0 +1,148 @@
+CompilationUnit [0..261)
+  StructDeclaration [0..42)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..20) 'closed'
+    T:WhitespaceTrivia [20..21) ' '
+    OpenBraceToken [21..22) '{'
+    T:WhitespaceTrivia [22..23) ' '
+    FieldDeclaration [23..40)
+      PublicKeyword [23..29) 'public'
+      T:WhitespaceTrivia [29..30) ' '
+      VariableDeclaration [30..38)
+        PredefinedType [30..34)
+          IntKeyword [30..33) 'int'
+          T:WhitespaceTrivia [33..34) ' '
+        VariableDeclarator [34..38)
+          IdentifierToken [34..38) 'item'
+      SemicolonToken [38..39) ';'
+      T:WhitespaceTrivia [39..40) ' '
+    CloseBraceToken [40..41) '}'
+    T:EndOfLineTrivia [41..42) '\n'
+  ClassDeclaration [42..261)
+    L:EndOfLineTrivia [42..43) '\n'
+    PublicKeyword [43..49) 'public'
+    T:WhitespaceTrivia [49..50) ' '
+    UnsafeKeyword [50..56) 'unsafe'
+    T:WhitespaceTrivia [56..57) ' '
+    ClassKeyword [57..62) 'class'
+    T:WhitespaceTrivia [62..63) ' '
+    IdentifierToken [63..64) 'C'
+    T:EndOfLineTrivia [64..65) '\n'
+    OpenBraceToken [65..66) '{'
+    T:EndOfLineTrivia [66..67) '\n'
+    IncompleteMember [67..94)
+      L:WhitespaceTrivia [67..71) '    '
+      PublicKeyword [71..77) 'public'
+      T:WhitespaceTrivia [77..78) ' '
+      ClosedKeyword [78..84) 'closed'
+      T:WhitespaceTrivia [84..85) ' '
+      IdentifierName [85..94)
+        IdentifierToken [85..92) '_closed'
+        T:SkippedTokensTrivia [92..93)
+          SemicolonToken [92..93) ';'
+        T:EndOfLineTrivia [93..94) '\n'
+    FieldDeclaration [94..122)
+      L:WhitespaceTrivia [94..98) '    '
+      PublicKeyword [98..104) 'public'
+      T:WhitespaceTrivia [104..105) ' '
+      ClosedKeyword [105..111) 'closed'
+      VariableDeclaration [111..120)
+        ArrayType [111..114)
+          IdentifierName [111..111)
+            IdentifierToken [111..111) missing
+          ArrayRankSpecifier [111..114)
+            OpenBracketToken [111..112) '['
+            OmittedArraySizeExpression [112..112)
+              OmittedArraySizeExpressionToken [112..112) ''
+            CloseBracketToken [112..113) ']'
+            T:WhitespaceTrivia [113..114) ' '
+        VariableDeclarator [114..120)
+          IdentifierToken [114..120) '_array'
+      SemicolonToken [120..121) ';'
+      T:EndOfLineTrivia [121..122) '\n'
+    FieldDeclaration [122..147)
+      L:WhitespaceTrivia [122..126) '    '
+      PublicKeyword [126..132) 'public'
+      T:WhitespaceTrivia [132..133) ' '
+      ClosedKeyword [133..139) 'closed'
+      VariableDeclaration [139..145)
+        PointerType [139..141)
+          IdentifierName [139..139)
+            IdentifierToken [139..139) missing
+          AsteriskToken [139..140) '*'
+          T:WhitespaceTrivia [140..141) ' '
+        VariableDeclarator [141..145)
+          IdentifierToken [141..145) '_ptr'
+      SemicolonToken [145..146) ';'
+      T:EndOfLineTrivia [146..147) '\n'
+    FieldDeclaration [147..177)
+      L:WhitespaceTrivia [147..151) '    '
+      PublicKeyword [151..157) 'public'
+      T:WhitespaceTrivia [157..158) ' '
+      ClosedKeyword [158..164) 'closed'
+      VariableDeclaration [164..175)
+        NullableType [164..166)
+          IdentifierName [164..164)
+            IdentifierToken [164..164) missing
+          QuestionToken [164..165) '?'
+          T:WhitespaceTrivia [165..166) ' '
+        VariableDeclarator [166..175)
+          IdentifierToken [166..175) '_nullable'
+      SemicolonToken [175..176) ';'
+      T:EndOfLineTrivia [176..177) '\n'
+    FieldDeclaration [177..224)
+      L:WhitespaceTrivia [177..181) '    '
+      PublicKeyword [181..187) 'public'
+      T:WhitespaceTrivia [187..188) ' '
+      VariableDeclaration [188..222)
+        FunctionPointerType [188..214)
+          DelegateKeyword [188..196) 'delegate'
+          AsteriskToken [196..197) '*'
+          FunctionPointerParameterList [197..214)
+            LessThanToken [197..198) '<'
+            FunctionPointerParameter [198..204)
+              IdentifierName [198..204)
+                IdentifierToken [198..204) 'closed'
+            CommaToken [204..205) ','
+            T:WhitespaceTrivia [205..206) ' '
+            FunctionPointerParameter [206..212)
+              IdentifierName [206..212)
+                IdentifierToken [206..212) 'closed'
+            GreaterThanToken [212..213) '>'
+            T:WhitespaceTrivia [213..214) ' '
+        VariableDeclarator [214..222)
+          IdentifierToken [214..222) '_funcPtr'
+      SemicolonToken [222..223) ';'
+      T:EndOfLineTrivia [223..224) '\n'
+    FieldDeclaration [224..260)
+      L:WhitespaceTrivia [224..228) '    '
+      PublicKeyword [228..234) 'public'
+      T:WhitespaceTrivia [234..235) ' '
+      VariableDeclaration [235..258)
+        TupleType [235..252)
+          OpenParenToken [235..236) '('
+          TupleElement [236..242)
+            IdentifierName [236..242)
+              IdentifierToken [236..242) 'closed'
+          CommaToken [242..243) ','
+          T:WhitespaceTrivia [243..244) ' '
+          TupleElement [244..250)
+            IdentifierName [244..250)
+              IdentifierToken [244..250) 'closed'
+          CloseParenToken [250..251) ')'
+          T:WhitespaceTrivia [251..252) ' '
+        VariableDeclarator [252..258)
+          IdentifierToken [252..258) '_tuple'
+      SemicolonToken [258..259) ';'
+      T:EndOfLineTrivia [259..260) '\n'
+    CloseBraceToken [260..261) '}'
+  EndOfFileToken [261..261) ''
+Diagnostics:
+  CS1519 [92..93) Invalid token \';\' in a member declaration
+  CS1519 [92..93) Invalid token \';\' in a member declaration
+  CS1031 [111..112) Type expected
+  CS1031 [139..140) Type expected
+  CS1031 [164..165) Type expected

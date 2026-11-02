@@ -1,0 +1,1 @@
+record struct S(int X) : Base(1);

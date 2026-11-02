@@ -1,0 +1,9 @@
+CompilationUnit [0..14)
+  L:DefineDirectiveTrivia [0..14)
+    HashToken [0..1) '#'
+    T:WhitespaceTrivia [1..4) '   '
+    DefineKeyword [4..10) 'define'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..14) 'XYZ'
+    EndOfDirectiveToken [14..14) ''
+  EndOfFileToken [14..14) ''

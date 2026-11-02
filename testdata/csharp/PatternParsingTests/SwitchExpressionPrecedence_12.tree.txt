@@ -1,0 +1,12 @@
+SwitchExpression [0..12)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  CloseBraceToken [10..11) '}'
+  T:SkippedTokensTrivia [11..12)
+    ExclamationToken [11..12) '!'
+Diagnostics:
+  CS1073 [0..11) Unexpected token \'!\'

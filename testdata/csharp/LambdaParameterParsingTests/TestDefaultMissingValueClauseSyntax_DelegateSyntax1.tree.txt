@@ -1,0 +1,37 @@
+AnonymousMethodExpression [0..39)
+  DelegateKeyword [0..8) 'delegate'
+  ParameterList [8..26)
+    OpenParenToken [8..9) '('
+    Parameter [9..17)
+      PredefinedType [9..13)
+        IntKeyword [9..12) 'int'
+        T:WhitespaceTrivia [12..13) ' '
+      IdentifierToken [13..14) 'x'
+      T:WhitespaceTrivia [14..15) ' '
+      EqualsValueClause [15..17)
+        EqualsToken [15..16) '='
+        T:WhitespaceTrivia [16..17) ' '
+        IdentifierName [17..17)
+          IdentifierToken [17..17) missing
+    CommaToken [17..18) ','
+    T:WhitespaceTrivia [18..19) ' '
+    Parameter [19..24)
+      PredefinedType [19..23)
+        IntKeyword [19..22) 'int'
+        T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..24) 'y'
+    CloseParenToken [24..25) ')'
+    T:WhitespaceTrivia [25..26) ' '
+  Block [26..39)
+    OpenBraceToken [26..27) '{'
+    T:WhitespaceTrivia [27..28) ' '
+    ReturnStatement [28..38)
+      ReturnKeyword [28..34) 'return'
+      T:WhitespaceTrivia [34..35) ' '
+      IdentifierName [35..36)
+        IdentifierToken [35..36) 'x'
+      SemicolonToken [36..37) ';'
+      T:WhitespaceTrivia [37..38) ' '
+    CloseBraceToken [38..39) '}'
+Diagnostics:
+  CS1525 [17..18) Invalid expression term \',\'

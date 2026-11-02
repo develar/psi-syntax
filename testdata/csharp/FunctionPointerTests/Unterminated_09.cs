@@ -1,0 +1,1 @@
+delegate* unmanaged.Name[Dotted]<void> ptr;

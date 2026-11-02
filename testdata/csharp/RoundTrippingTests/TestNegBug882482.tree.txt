@@ -1,0 +1,73 @@
+CompilationUnit [0..134)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..134)
+    ClassKeyword [15..20) 'class'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..25) 'main'
+    T:EndOfLineTrivia [25..26) '\n'
+    OpenBraceToken [26..27) '{'
+    T:EndOfLineTrivia [27..28) '\n'
+    MethodDeclaration [28..132)
+      L:WhitespaceTrivia [28..29) ' '
+      PublicKeyword [29..35) 'public'
+      T:WhitespaceTrivia [35..36) ' '
+      StaticKeyword [36..42) 'static'
+      T:WhitespaceTrivia [42..43) ' '
+      PredefinedType [43..48)
+        VoidKeyword [43..47) 'void'
+        T:WhitespaceTrivia [47..48) ' '
+      IdentifierToken [48..52) 'Main'
+      ParameterList [52..55)
+        OpenParenToken [52..53) '('
+        CloseParenToken [53..54) ')'
+        T:EndOfLineTrivia [54..55) '\n'
+      Block [55..132)
+        L:WhitespaceTrivia [55..56) ' '
+        OpenBraceToken [56..57) '{'
+        T:EndOfLineTrivia [57..58) '\n'
+        ExpressionStatement [58..75)
+          InvocationExpression [58..75)
+            IdentifierName [58..68)
+              L:WhitespaceTrivia [58..60) '  '
+              IdentifierToken [60..67) 'i\\u0066'
+              T:WhitespaceTrivia [67..68) ' '
+            ArgumentList [68..75)
+              OpenParenToken [68..69) '('
+              Argument [69..73)
+                TrueLiteralExpression [69..73)
+                  TrueKeyword [69..73) 'true'
+              CloseParenToken [73..74) ')'
+              T:EndOfLineTrivia [74..75) '\n'
+          SemicolonToken [75..75) missing
+        ExpressionStatement [75..129)
+          InvocationExpression [75..127)
+            SimpleMemberAccessExpression [75..95)
+              IdentifierName [75..85)
+                L:WhitespaceTrivia [75..78) '   '
+                IdentifierToken [78..85) 'Console'
+              DotToken [85..86) '.'
+              IdentifierName [86..95)
+                IdentifierToken [86..95) 'WriteLine'
+            ArgumentList [95..127)
+              OpenParenToken [95..96) '('
+              Argument [96..126)
+                StringLiteralExpression [96..126)
+                  StringLiteralToken [96..126) '"This should not have worked!"'
+              CloseParenToken [126..127) ')'
+          SemicolonToken [127..128) ';'
+          T:EndOfLineTrivia [128..129) '\n'
+        L:WhitespaceTrivia [129..130) ' '
+        CloseBraceToken [130..131) '}'
+        T:EndOfLineTrivia [131..132) '\n'
+    CloseBraceToken [132..133) '}'
+    T:EndOfLineTrivia [133..134) '\n'
+  EndOfFileToken [134..134) ''
+Diagnostics:
+  CS1002 [74..74) ; expected

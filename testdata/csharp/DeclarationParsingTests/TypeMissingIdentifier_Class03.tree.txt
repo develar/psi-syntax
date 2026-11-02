@@ -1,0 +1,146 @@
+CompilationUnit [0..206)
+  ClassDeclaration [0..206)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..13) missing
+    BaseList [13..23)
+      ColonToken [13..14) ':'
+      T:WhitespaceTrivia [14..15) ' '
+      SimpleBaseType [15..23)
+        GenericName [15..23)
+          IdentifierToken [15..19) 'Base'
+          TypeArgumentList [19..23)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..21)
+              IdentifierToken [20..21) 'T'
+            GreaterThanToken [21..22) '>'
+            T:EndOfLineTrivia [22..23) '\n'
+    TypeParameterConstraintClause [23..45)
+      L:WhitespaceTrivia [23..27) '    '
+      WhereKeyword [27..32) 'where'
+      T:WhitespaceTrivia [32..33) ' '
+      IdentifierName [33..35)
+        IdentifierToken [33..34) 'T'
+        T:WhitespaceTrivia [34..35) ' '
+      ColonToken [35..36) ':'
+      T:WhitespaceTrivia [36..37) ' '
+      TypeConstraint [37..45)
+        GenericName [37..45)
+          IdentifierToken [37..41) 'List'
+          TypeArgumentList [41..45)
+            LessThanToken [41..42) '<'
+            IdentifierName [42..43)
+              IdentifierToken [42..43) 'T'
+            GreaterThanToken [43..44) '>'
+            T:EndOfLineTrivia [44..45) '\n'
+    OpenBraceToken [45..46) '{'
+    T:EndOfLineTrivia [46..47) '\n'
+    PropertyDeclaration [47..85)
+      L:WhitespaceTrivia [47..51) '    '
+      PublicKeyword [51..57) 'public'
+      T:WhitespaceTrivia [57..58) ' '
+      PredefinedType [58..62)
+        IntKeyword [58..61) 'int'
+        T:WhitespaceTrivia [61..62) ' '
+      IdentifierToken [62..70) 'Property'
+      T:WhitespaceTrivia [70..71) ' '
+      AccessorList [71..85)
+        OpenBraceToken [71..72) '{'
+        T:WhitespaceTrivia [72..73) ' '
+        GetAccessorDeclaration [73..78)
+          GetKeyword [73..76) 'get'
+          SemicolonToken [76..77) ';'
+          T:WhitespaceTrivia [77..78) ' '
+        SetAccessorDeclaration [78..83)
+          SetKeyword [78..81) 'set'
+          SemicolonToken [81..82) ';'
+          T:WhitespaceTrivia [82..83) ' '
+        CloseBraceToken [83..84) '}'
+        T:EndOfLineTrivia [84..85) '\n'
+    MethodDeclaration [85..115)
+      L:WhitespaceTrivia [85..89) '    '
+      PublicKeyword [89..95) 'public'
+      T:WhitespaceTrivia [95..96) ' '
+      PredefinedType [96..101)
+        VoidKeyword [96..100) 'void'
+        T:WhitespaceTrivia [100..101) ' '
+      IdentifierToken [101..108) 'Method1'
+      ParameterList [108..111)
+        OpenParenToken [108..109) '('
+        CloseParenToken [109..110) ')'
+        T:WhitespaceTrivia [110..111) ' '
+      Block [111..115)
+        OpenBraceToken [111..112) '{'
+        T:WhitespaceTrivia [112..113) ' '
+        CloseBraceToken [113..114) '}'
+        T:EndOfLineTrivia [114..115) '\n'
+    ClassDeclaration [115..174)
+      L:EndOfLineTrivia [115..116) '\n'
+      L:WhitespaceTrivia [116..120) '    '
+      PublicKeyword [120..126) 'public'
+      T:WhitespaceTrivia [126..127) ' '
+      ClassKeyword [127..132) 'class'
+      T:WhitespaceTrivia [132..133) ' '
+      IdentifierToken [133..133) missing
+      TypeParameterList [133..137)
+        LessThanToken [133..134) '<'
+        TypeParameter [134..135)
+          IdentifierToken [134..135) 'U'
+        GreaterThanToken [135..136) '>'
+        T:WhitespaceTrivia [136..137) ' '
+      BaseList [137..147)
+        ColonToken [137..138) ':'
+        T:WhitespaceTrivia [138..139) ' '
+        SimpleBaseType [139..147)
+          GenericName [139..147)
+            IdentifierToken [139..143) 'Base'
+            TypeArgumentList [143..147)
+              LessThanToken [143..144) '<'
+              IdentifierName [144..145)
+                IdentifierToken [144..145) 'U'
+              GreaterThanToken [145..146) '>'
+              T:EndOfLineTrivia [146..147) '\n'
+      TypeParameterConstraintClause [147..172)
+        L:WhitespaceTrivia [147..155) '        '
+        WhereKeyword [155..160) 'where'
+        T:WhitespaceTrivia [160..161) ' '
+        IdentifierName [161..163)
+          IdentifierToken [161..162) 'U'
+          T:WhitespaceTrivia [162..163) ' '
+        ColonToken [163..164) ':'
+        T:WhitespaceTrivia [164..165) ' '
+        TypeConstraint [165..172)
+          GenericName [165..172)
+            IdentifierToken [165..169) 'List'
+            TypeArgumentList [169..172)
+              LessThanToken [169..170) '<'
+              IdentifierName [170..171)
+                IdentifierToken [170..171) 'U'
+              GreaterThanToken [171..172) '>'
+      SemicolonToken [172..173) ';'
+      T:EndOfLineTrivia [173..174) '\n'
+    MethodDeclaration [174..205)
+      L:EndOfLineTrivia [174..175) '\n'
+      L:WhitespaceTrivia [175..179) '    '
+      PublicKeyword [179..185) 'public'
+      T:WhitespaceTrivia [185..186) ' '
+      PredefinedType [186..191)
+        VoidKeyword [186..190) 'void'
+        T:WhitespaceTrivia [190..191) ' '
+      IdentifierToken [191..198) 'Method2'
+      ParameterList [198..201)
+        OpenParenToken [198..199) '('
+        CloseParenToken [199..200) ')'
+        T:WhitespaceTrivia [200..201) ' '
+      Block [201..205)
+        OpenBraceToken [201..202) '{'
+        T:WhitespaceTrivia [202..203) ' '
+        CloseBraceToken [203..204) '}'
+        T:EndOfLineTrivia [204..205) '\n'
+    CloseBraceToken [205..206) '}'
+  EndOfFileToken [206..206) ''
+Diagnostics:
+  CS1001 [13..14) Identifier expected
+  CS1001 [133..134) Identifier expected

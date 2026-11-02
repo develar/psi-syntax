@@ -1,0 +1,59 @@
+CompilationUnit [0..46)
+  GlobalStatement [0..46)
+    LocalFunctionStatement [0..46)
+      PredefinedType [0..6)
+        L:EndOfLineTrivia [0..1) '\n'
+        VoidKeyword [1..5) 'void'
+        T:WhitespaceTrivia [5..6) ' '
+      IdentifierToken [6..7) 'C'
+      ParameterList [7..10)
+        OpenParenToken [7..8) '('
+        CloseParenToken [8..9) ')'
+        T:EndOfLineTrivia [9..10) '\n'
+      Block [10..46)
+        OpenBraceToken [10..11) '{'
+        T:EndOfLineTrivia [11..12) '\n'
+        LocalDeclarationStatement [12..26)
+          VariableDeclaration [12..26)
+            FunctionPointerType [12..26)
+              L:WhitespaceTrivia [12..16) '    '
+              DelegateKeyword [16..24) 'delegate'
+              AsteriskToken [24..25) '*'
+              T:EndOfLineTrivia [25..26) '\n'
+              FunctionPointerParameterList [26..26)
+                LessThanToken [26..26) missing
+                FunctionPointerParameter [26..26)
+                  IdentifierName [26..26)
+                    IdentifierToken [26..26) missing
+                GreaterThanToken [26..26) missing
+            VariableDeclarator [26..26)
+              IdentifierToken [26..26) missing
+          SemicolonToken [26..26) missing
+        LocalDeclarationStatement [26..45)
+          VariableDeclaration [26..43)
+            ArrayType [26..36)
+              PredefinedType [26..33)
+                L:WhitespaceTrivia [26..30) '    '
+                IntKeyword [30..33) 'int'
+              ArrayRankSpecifier [33..36)
+                OpenBracketToken [33..34) '['
+                OmittedArraySizeExpression [34..34)
+                  OmittedArraySizeExpressionToken [34..34) ''
+                CloseBracketToken [34..35) ']'
+                T:WhitespaceTrivia [35..36) ' '
+            VariableDeclarator [36..43)
+              IdentifierToken [36..39) 'ptr'
+              T:WhitespaceTrivia [39..40) ' '
+              EqualsValueClause [40..43)
+                EqualsToken [40..41) '='
+                T:WhitespaceTrivia [41..42) ' '
+                NumericLiteralExpression [42..43)
+                  NumericLiteralToken [42..43) '1'
+          SemicolonToken [43..44) ';'
+          T:EndOfLineTrivia [44..45) '\n'
+        CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1003 [25..25) Syntax error, \'<\' expected
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected

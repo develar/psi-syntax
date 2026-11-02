@@ -1,0 +1,55 @@
+CompilationUnit [0..60)
+  GlobalStatement [0..29)
+    LocalDeclarationStatement [0..29)
+      VariableDeclaration [0..27)
+        ScopedType [0..14)
+          ScopedKeyword [0..6) 'scoped'
+          T:WhitespaceTrivia [6..7) ' '
+          IdentifierName [7..14)
+            IdentifierToken [7..13) 'scoped'
+            T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..27)
+          IdentifierToken [14..15) 'R'
+          T:WhitespaceTrivia [15..16) ' '
+          T:SkippedTokensTrivia [16..17)
+            IdentifierToken [16..17) 'x'
+          T:WhitespaceTrivia [17..18) ' '
+          T:SkippedTokensTrivia [18..19)
+            EqualsToken [18..19) '='
+          T:WhitespaceTrivia [19..20) ' '
+          T:SkippedTokensTrivia [20..27)
+            DefaultKeyword [20..27) 'default'
+      SemicolonToken [27..28) ';'
+      T:EndOfLineTrivia [28..29) '\n'
+  GlobalStatement [29..60)
+    LocalDeclarationStatement [29..60)
+      VariableDeclaration [29..58)
+        IdentifierName [29..36)
+          IdentifierToken [29..35) 'scoped'
+          T:WhitespaceTrivia [35..36) ' '
+        VariableDeclarator [36..58)
+          IdentifierToken [36..42) 'scoped'
+          T:WhitespaceTrivia [42..43) ' '
+          T:SkippedTokensTrivia [43..46)
+            RefKeyword [43..46) 'ref'
+          T:WhitespaceTrivia [46..47) ' '
+          T:SkippedTokensTrivia [47..48)
+            IdentifierToken [47..48) 'R'
+          T:WhitespaceTrivia [48..49) ' '
+          T:SkippedTokensTrivia [49..50)
+            IdentifierToken [49..50) 'z'
+          T:WhitespaceTrivia [50..51) ' '
+          T:SkippedTokensTrivia [51..52)
+            EqualsToken [51..52) '='
+          T:WhitespaceTrivia [52..53) ' '
+          T:SkippedTokensTrivia [53..56)
+            RefKeyword [53..56) 'ref'
+          T:WhitespaceTrivia [56..57) ' '
+          T:SkippedTokensTrivia [57..58)
+            IdentifierToken [57..58) 'x'
+      SemicolonToken [58..59) ';'
+      T:EndOfLineTrivia [59..60) '\n'
+  EndOfFileToken [60..60) ''
+Diagnostics:
+  CS1003 [16..17) Syntax error, \',\' expected
+  CS1003 [43..46) Syntax error, \',\' expected

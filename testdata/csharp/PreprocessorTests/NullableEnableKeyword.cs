@@ -1,0 +1,4 @@
+#nullable enable
+class enable
+{
+}

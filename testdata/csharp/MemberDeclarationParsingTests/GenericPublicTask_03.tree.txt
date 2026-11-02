@@ -1,0 +1,22 @@
+MethodDeclaration [0..37)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..28)
+    IdentifierToken [7..11) 'Task'
+    TypeArgumentList [11..28)
+      LessThanToken [11..12) '<'
+      QualifiedName [12..26)
+        IdentifierName [12..25)
+          IdentifierToken [12..25) 'SomeNamespace'
+        DotToken [25..26) '.'
+        IdentifierName [26..26)
+          IdentifierToken [26..26) missing
+      GreaterThanToken [26..27) '>'
+      T:WhitespaceTrivia [27..28) ' '
+  IdentifierToken [28..34) 'Method'
+  ParameterList [34..36)
+    OpenParenToken [34..35) '('
+    CloseParenToken [35..36) ')'
+  SemicolonToken [36..37) ';'
+Diagnostics:
+  CS1001 [26..27) Identifier expected

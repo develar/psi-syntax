@@ -1,0 +1,1 @@
+for (MyType m = x with { A = 1, B = ; true; m++)

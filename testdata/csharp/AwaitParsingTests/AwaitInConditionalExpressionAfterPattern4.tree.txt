@@ -1,0 +1,27 @@
+ConditionalExpression [0..29)
+  IsExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+  QuestionToken [9..10) '?'
+  T:WhitespaceTrivia [10..11) ' '
+  InvocationExpression [11..26)
+    IdentifierName [11..17)
+      IdentifierToken [11..16) 'await'
+      T:WhitespaceTrivia [16..17) ' '
+    ArgumentList [17..26)
+      OpenParenToken [17..18) '('
+      Argument [18..24)
+        IdentifierName [18..24)
+          IdentifierToken [18..24) 'myTask'
+      CloseParenToken [24..25) ')'
+      T:WhitespaceTrivia [25..26) ' '
+  ColonToken [26..27) ':'
+  T:WhitespaceTrivia [27..28) ' '
+  IdentifierName [28..29)
+    IdentifierToken [28..29) 'z'

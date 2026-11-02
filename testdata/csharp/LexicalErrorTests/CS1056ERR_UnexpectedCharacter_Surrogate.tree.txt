@@ -1,0 +1,64 @@
+CompilationUnit [0..95)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..95)
+    ClassKeyword [14..19) 'class'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..24) 'Test'
+    T:EndOfLineTrivia [24..25) '\n'
+    OpenBraceToken [25..26) '{'
+    T:EndOfLineTrivia [26..27) '\n'
+    MethodDeclaration [27..94)
+      L:WhitespaceTrivia [27..31) '    '
+      PublicKeyword [31..37) 'public'
+      T:WhitespaceTrivia [37..38) ' '
+      StaticKeyword [38..44) 'static'
+      T:WhitespaceTrivia [44..45) ' '
+      PredefinedType [45..50)
+        VoidKeyword [45..49) 'void'
+        T:WhitespaceTrivia [49..50) ' '
+      IdentifierToken [50..54) 'Main'
+      ParameterList [54..57)
+        OpenParenToken [54..55) '('
+        CloseParenToken [55..56) ')'
+        T:EndOfLineTrivia [56..57) '\n'
+      Block [57..94)
+        L:WhitespaceTrivia [57..61) '    '
+        OpenBraceToken [61..62) '{'
+        T:EndOfLineTrivia [62..63) '\n'
+        LocalDeclarationStatement [63..79)
+          VariableDeclaration [63..79)
+            PredefinedType [63..75)
+              L:WhitespaceTrivia [63..71) '        '
+              IntKeyword [71..74) 'int'
+              T:WhitespaceTrivia [74..75) ' '
+            VariableDeclarator [75..79)
+              IdentifierToken [75..75) missing
+              T:SkippedTokensTrivia [75..79)
+                BadToken [75..79) '𫓧'
+          SemicolonToken [79..79) missing
+        ExpressionStatement [79..88)
+          SimpleAssignmentExpression [79..86)
+            IdentifierName [79..83)
+              IdentifierToken [79..82) '龦'
+              T:WhitespaceTrivia [82..83) ' '
+            EqualsToken [83..84) '='
+            T:WhitespaceTrivia [84..85) ' '
+            NumericLiteralExpression [85..86)
+              NumericLiteralToken [85..86) '1'
+          SemicolonToken [86..87) ';'
+          T:EndOfLineTrivia [87..88) '\n'
+        L:WhitespaceTrivia [88..92) '    '
+        CloseBraceToken [92..93) '}'
+        T:EndOfLineTrivia [93..94) '\n'
+    CloseBraceToken [94..95) '}'
+  EndOfFileToken [95..95) ''
+Diagnostics:
+  CS1001 [75..79) Identifier expected
+  CS1056 [75..75) Unexpected character \'𫓧\'
+  CS1002 [79..82) ; expected

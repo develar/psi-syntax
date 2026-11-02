@@ -1,0 +1,15 @@
+DelegateDeclaration [0..30)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  DelegateKeyword [12..20) 'delegate'
+  T:WhitespaceTrivia [20..21) ' '
+  PredefinedType [21..26)
+    VoidKeyword [21..25) 'void'
+    T:WhitespaceTrivia [25..26) ' '
+  IdentifierToken [26..27) 'D'
+  ParameterList [27..29)
+    OpenParenToken [27..28) '('
+    CloseParenToken [28..29) ')'
+  SemicolonToken [29..30) ';'

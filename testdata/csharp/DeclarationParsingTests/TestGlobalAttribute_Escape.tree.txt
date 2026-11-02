@@ -1,0 +1,11 @@
+CompilationUnit [0..17)
+  AttributeList [0..17)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..15)
+      IdentifierToken [1..14) 'as\\u0073embly'
+      ColonToken [14..15) ':'
+    Attribute [15..16)
+      IdentifierName [15..16)
+        IdentifierToken [15..16) 'a'
+    CloseBracketToken [16..17) ']'
+  EndOfFileToken [17..17) ''

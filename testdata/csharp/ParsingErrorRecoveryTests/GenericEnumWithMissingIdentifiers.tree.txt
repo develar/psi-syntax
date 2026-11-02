@@ -1,0 +1,27 @@
+CompilationUnit [0..18)
+  EnumDeclaration [0..13)
+    EnumKeyword [0..4) 'enum'
+    T:EndOfLineTrivia [4..5) '\n'
+    IdentifierToken [5..5) missing
+    T:SkippedTokensTrivia [5..6)
+      LessThanToken [5..6) '<'
+    T:SingleLineCommentTrivia [6..12) '//aaaa'
+    T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..13) missing
+    CloseBraceToken [13..13) missing
+  EnumDeclaration [13..18)
+    EnumKeyword [13..17) 'enum'
+    T:EndOfLineTrivia [17..18) '\n'
+    IdentifierToken [18..18) missing
+    OpenBraceToken [18..18) missing
+    CloseBraceToken [18..18) missing
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1001 [4..4) Identifier expected
+  CS1003 [6..6) Syntax error, \'>\' expected
+  CS7002 [5..6) Unexpected use of a generic name
+  CS1514 [6..6) { expected
+  CS1513 [6..6) } expected
+  CS1001 [17..17) Identifier expected
+  CS1514 [17..17) { expected
+  CS1513 [17..17) } expected

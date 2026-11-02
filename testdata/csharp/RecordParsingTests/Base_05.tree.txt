@@ -1,0 +1,25 @@
+CompilationUnit [0..22)
+  InterfaceDeclaration [0..22)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'C'
+    T:WhitespaceTrivia [11..12) ' '
+    BaseList [12..21)
+      ColonToken [12..13) ':'
+      T:WhitespaceTrivia [13..14) ' '
+      PrimaryConstructorBaseType [14..21)
+        IdentifierName [14..15)
+          IdentifierToken [14..15) 'B'
+        ArgumentList [15..21)
+          OpenParenToken [15..16) '('
+          Argument [16..17)
+            IdentifierName [16..17)
+              IdentifierToken [16..17) 'X'
+          CommaToken [17..18) ','
+          T:WhitespaceTrivia [18..19) ' '
+          Argument [19..20)
+            IdentifierName [19..20)
+              IdentifierToken [19..20) 'Y'
+          CloseParenToken [20..21) ')'
+    SemicolonToken [21..22) ';'
+  EndOfFileToken [22..22) ''

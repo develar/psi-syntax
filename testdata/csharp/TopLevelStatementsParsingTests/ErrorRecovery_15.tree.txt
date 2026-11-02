@@ -1,0 +1,22 @@
+CompilationUnit [0..18)
+  GlobalStatement [0..18)
+    LocalDeclarationStatement [0..18)
+      VariableDeclaration [0..18)
+        IdentifierName [0..15)
+          L:EndOfLineTrivia [0..1) '\n'
+          L:WhitespaceTrivia [1..11) '\t\t\t       '
+          IdentifierToken [11..12) 'W'
+          T:WhitespaceTrivia [12..15) '   '
+        VariableDeclarator [15..18)
+          IdentifierToken [15..15) missing
+          T:SkippedTokensTrivia [15..16)
+            CloseParenToken [15..16) ')'
+          T:SkippedTokensTrivia [16..17)
+            IdentifierToken [16..17) 'b'
+          T:EndOfLineTrivia [17..18) '\n'
+      SemicolonToken [18..18) missing
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1001 [15..16) Identifier expected
+  CS1003 [15..16) Syntax error, \',\' expected
+  CS1002 [17..17) ; expected

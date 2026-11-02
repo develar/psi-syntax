@@ -1,0 +1,1 @@
+(ref readonly a) => { }

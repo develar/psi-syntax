@@ -1,0 +1,31 @@
+CompilationUnit [0..46)
+  StructDeclaration [0..46)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'a'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    MethodDeclaration [11..45)
+      ReadOnlyKeyword [11..19) 'readonly'
+      T:WhitespaceTrivia [19..20) ' '
+      RefType [20..37)
+        RefKeyword [20..23) 'ref'
+        T:WhitespaceTrivia [23..24) ' '
+        ReadOnlyKeyword [24..32) 'readonly'
+        T:WhitespaceTrivia [32..33) ' '
+        PredefinedType [33..37)
+          IntKeyword [33..36) 'int'
+          T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..38) 'M'
+      ParameterList [38..41)
+        OpenParenToken [38..39) '('
+        CloseParenToken [39..40) ')'
+        T:WhitespaceTrivia [40..41) ' '
+      Block [41..45)
+        OpenBraceToken [41..42) '{'
+        T:WhitespaceTrivia [42..43) ' '
+        CloseBraceToken [43..44) '}'
+        T:WhitespaceTrivia [44..45) ' '
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''

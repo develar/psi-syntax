@@ -1,0 +1,43 @@
+CompilationUnit [0..69)
+  NamespaceDeclaration [0..69)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'x'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..68)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      ClassKeyword [25..30) 'class'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..32) 'a'
+      T:EndOfLineTrivia [32..33) '\n'
+      L:WhitespaceTrivia [33..37) '    '
+      OpenBraceToken [37..38) '{'
+      T:EndOfLineTrivia [38..39) '\n'
+      FieldDeclaration [39..62)
+        VariableDeclaration [39..60)
+          PredefinedType [39..52)
+            L:WhitespaceTrivia [39..47) '        '
+            CharKeyword [47..51) 'char'
+            T:WhitespaceTrivia [51..52) ' '
+          VariableDeclarator [52..60)
+            IdentifierToken [52..53) 'a'
+            T:WhitespaceTrivia [53..54) ' '
+            EqualsValueClause [54..60)
+              EqualsToken [54..55) '='
+              T:WhitespaceTrivia [55..56) ' '
+              CharacterLiteralExpression [56..60)
+                CharacterLiteralToken [56..60) '\'\\e\''
+        SemicolonToken [60..61) ';'
+        T:EndOfLineTrivia [61..62) '\n'
+      L:WhitespaceTrivia [62..66) '    '
+      CloseBraceToken [66..67) '}'
+      T:EndOfLineTrivia [67..68) '\n'
+    CloseBraceToken [68..69) '}'
+  EndOfFileToken [69..69) ''
+Diagnostics:
+  CS9202 [57..59) Feature \'string escape character\' is not available in C# 12.0. Please use language version 13.0 or greater.

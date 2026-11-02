@@ -1,0 +1,16 @@
+CompilationUnit [0..13)
+  NamespaceDeclaration [0..13)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    QualifiedName [10..13)
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'A'
+      DotToken [11..12) '.'
+      IdentifierName [12..13)
+        IdentifierToken [12..13) 'B'
+    OpenBraceToken [13..13) missing
+    CloseBraceToken [13..13) missing
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS1514 [13..13) { expected
+  CS1513 [13..13) } expected

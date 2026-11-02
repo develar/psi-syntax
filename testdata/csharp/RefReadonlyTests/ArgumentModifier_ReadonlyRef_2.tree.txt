@@ -1,0 +1,16 @@
+InvocationExpression [0..17)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'M'
+  ArgumentList [1..17)
+    OpenParenToken [1..2) '('
+    T:SkippedTokensTrivia [2..10)
+      ReadOnlyKeyword [2..10) 'readonly'
+    T:WhitespaceTrivia [10..11) ' '
+    Argument [11..16)
+      RefKeyword [11..14) 'ref'
+      T:WhitespaceTrivia [14..15) ' '
+      IdentifierName [15..16)
+        IdentifierToken [15..16) 'x'
+    CloseParenToken [16..17) ')'
+Diagnostics:
+  CS1041 [2..10) Identifier expected; \'readonly\' is a keyword

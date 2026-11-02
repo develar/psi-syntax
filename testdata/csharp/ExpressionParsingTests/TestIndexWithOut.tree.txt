@@ -1,0 +1,11 @@
+ElementAccessExpression [0..8)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'a'
+  BracketedArgumentList [1..8)
+    OpenBracketToken [1..2) '['
+    Argument [2..7)
+      OutKeyword [2..5) 'out'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..7)
+        IdentifierToken [6..7) 'b'
+    CloseBracketToken [7..8) ']'

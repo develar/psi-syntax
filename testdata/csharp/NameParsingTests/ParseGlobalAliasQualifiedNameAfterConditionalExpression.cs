@@ -1,0 +1,1 @@
+x is X ? global::X.Y.Z : default

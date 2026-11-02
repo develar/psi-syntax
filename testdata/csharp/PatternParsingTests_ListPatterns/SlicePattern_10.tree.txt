@@ -1,0 +1,12 @@
+IsPatternExpression [0..12)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  SlicePattern [5..12)
+    DotDotToken [5..7) '..'
+    T:WhitespaceTrivia [7..8) ' '
+    ConstantPattern [8..12)
+      IdentifierName [8..12)
+        IdentifierToken [8..12) 'Type'

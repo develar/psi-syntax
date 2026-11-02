@@ -1,0 +1,28 @@
+CompilationUnit [0..36)
+  UsingDirective [0..18)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    NameEquals [7..11)
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'X'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsToken [9..10) '='
+      T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..18)
+      IdentifierToken [11..17) 'scoped'
+      T:WhitespaceTrivia [17..18) ' '
+    SemicolonToken [18..18) missing
+  GlobalStatement [18..36)
+    ExpressionStatement [18..36)
+      SimpleMemberAccessExpression [18..34)
+        IdentifierName [18..24)
+          IdentifierToken [18..24) 'System'
+        DotToken [24..25) '.'
+        IdentifierName [25..34)
+          IdentifierToken [25..34) 'AppDomain'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1002 [18..24) ; expected

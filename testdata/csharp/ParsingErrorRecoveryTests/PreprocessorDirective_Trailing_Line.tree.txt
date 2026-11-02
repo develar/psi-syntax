@@ -1,0 +1,22 @@
+CompilationUnit [0..43)
+  L:LineDirectiveTrivia [0..10)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..9) '200'
+    EndOfDirectiveToken [9..9) ''
+    T:EndOfLineTrivia [9..10) '\n'
+  L:MultiLineCommentTrivia [10..23) '/* comment */'
+  L:WhitespaceTrivia [23..24) ' '
+  L:SkippedTokensTrivia [24..34)
+    BadToken [24..34) '#line 100\n'
+  L:ErrorDirectiveTrivia [34..43)
+    HashToken [34..35) '#'
+    ErrorKeyword [35..40) 'error'
+    T:WhitespaceTrivia [40..41) ' '
+    L:PreprocessingMessageTrivia [41..43) 'E1'
+    EndOfDirectiveToken [43..43) ''
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1040 [24..25) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1029 [41..43) #error: \'E1\'

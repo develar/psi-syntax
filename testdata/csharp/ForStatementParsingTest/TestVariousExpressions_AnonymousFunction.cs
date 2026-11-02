@@ -1,0 +1,1 @@
+for (delegate() {};delegate() {};delegate() {});

@@ -1,0 +1,2 @@
+NumericLiteralToken [0..5) '123lU'
+EndOfFileToken [5..5) ''

@@ -1,0 +1,50 @@
+QueryExpression [0..53)
+  FromClause [0..18)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..9) 'elem'
+    T:WhitespaceTrivia [9..10) ' '
+    InKeyword [10..12) 'in'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierName [13..18)
+      IdentifierToken [13..17) 'aRay'
+      T:WhitespaceTrivia [17..18) ' '
+  QueryBody [18..53)
+    SelectClause [18..53)
+      SelectKeyword [18..24) 'select'
+      T:WhitespaceTrivia [24..25) ' '
+      ObjectCreationExpression [25..53)
+        NewKeyword [25..28) 'new'
+        T:WhitespaceTrivia [28..29) ' '
+        IdentifierName [29..36)
+          IdentifierToken [29..35) 'Result'
+          T:WhitespaceTrivia [35..36) ' '
+        ObjectInitializerExpression [36..53)
+          OpenBraceToken [36..37) '{'
+          T:WhitespaceTrivia [37..38) ' '
+          SimpleAssignmentExpression [38..45)
+            IdentifierName [38..40)
+              IdentifierToken [38..39) 'A'
+              T:WhitespaceTrivia [39..40) ' '
+            EqualsToken [40..41) '='
+            T:WhitespaceTrivia [41..42) ' '
+            IdentifierName [42..45)
+              IdentifierToken [42..42) missing
+              T:SkippedTokensTrivia [42..44)
+                IdentifierToken [42..44) 'on'
+              T:WhitespaceTrivia [44..45) ' '
+          CommaToken [45..45) missing
+          SimpleAssignmentExpression [45..52)
+            IdentifierName [45..45)
+              IdentifierToken [45..45) missing
+            EqualsToken [45..46) '='
+            T:WhitespaceTrivia [46..47) ' '
+            TrueLiteralExpression [47..52)
+              TrueKeyword [47..51) 'true'
+              T:WhitespaceTrivia [51..52) ' '
+          CloseBraceToken [52..53) '}'
+Diagnostics:
+  CS1525 [42..44) Invalid expression term \'on\'
+  CS1003 [42..44) Syntax error, \',\' expected
+  CS1003 [45..46) Syntax error, \',\' expected
+  CS1525 [45..46) Invalid expression term \'=\'

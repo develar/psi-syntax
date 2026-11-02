@@ -1,0 +1,37 @@
+CompilationUnit [0..60)
+  UsingDirective [0..60)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    UnsafeKeyword [13..19) 'unsafe'
+    T:WhitespaceTrivia [19..20) ' '
+    QualifiedName [20..59)
+      QualifiedName [20..46)
+        QualifiedName [20..38)
+          IdentifierName [20..26)
+            IdentifierToken [20..26) 'System'
+          DotToken [26..27) '.'
+          IdentifierName [27..38)
+            IdentifierToken [27..38) 'Collections'
+        DotToken [38..39) '.'
+        IdentifierName [39..46)
+          IdentifierToken [39..46) 'Generic'
+      DotToken [46..47) '.'
+      GenericName [47..59)
+        IdentifierToken [47..51) 'List'
+        TypeArgumentList [51..59)
+          LessThanToken [51..52) '<'
+          ArrayType [52..58)
+            PointerType [52..56)
+              PredefinedType [52..55)
+                IntKeyword [52..55) 'int'
+              AsteriskToken [55..56) '*'
+            ArrayRankSpecifier [56..58)
+              OpenBracketToken [56..57) '['
+              OmittedArraySizeExpression [57..57)
+                OmittedArraySizeExpressionToken [57..57) ''
+              CloseBracketToken [57..58) ']'
+          GreaterThanToken [58..59) '>'
+    SemicolonToken [59..60) ';'
+  EndOfFileToken [60..60) ''

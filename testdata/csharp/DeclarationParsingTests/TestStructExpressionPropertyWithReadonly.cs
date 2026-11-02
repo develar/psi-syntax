@@ -1,0 +1,1 @@
+struct a { readonly int M => 42; }

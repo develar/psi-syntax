@@ -1,0 +1,56 @@
+FieldDeclaration [0..58)
+  VariableDeclaration [0..57)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..57)
+      IdentifierToken [21..26) 'func0'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..57)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        TupleExpression [29..57)
+          OpenParenToken [29..30) '('
+          Argument [30..38)
+            DeclarationExpression [30..38)
+              PredefinedType [30..37)
+                StringKeyword [30..36) 'string'
+                T:WhitespaceTrivia [36..37) ' '
+              SingleVariableDesignation [37..38)
+                IdentifierToken [37..38) 'y'
+          CommaToken [38..39) ','
+          T:WhitespaceTrivia [39..40) ' '
+          Argument [40..47)
+            PredefinedType [40..47)
+              StringKeyword [40..46) 'string'
+              T:WhitespaceTrivia [46..47) ' '
+          CloseParenToken [47..47) missing
+          T:SkippedTokensTrivia [47..48)
+            IdentifierToken [47..48) 'x'
+          T:SkippedTokensTrivia [48..49)
+            ExclamationToken [48..49) '!'
+          T:WhitespaceTrivia [49..50) ' '
+          T:SkippedTokensTrivia [50..51)
+            ExclamationToken [50..51) '!'
+          T:SkippedTokensTrivia [51..52)
+            CloseParenToken [51..52) ')'
+          T:WhitespaceTrivia [52..53) ' '
+          T:SkippedTokensTrivia [53..55)
+            EqualsGreaterThanToken [53..55) '=>'
+          T:WhitespaceTrivia [55..56) ' '
+          T:SkippedTokensTrivia [56..57)
+            IdentifierToken [56..57) 'x'
+  SemicolonToken [57..58) ';'
+Diagnostics:
+  CS1525 [40..46) Invalid expression term \'string\'
+  CS1026 [47..48) ) expected
+  CS1003 [47..48) Syntax error, \',\' expected

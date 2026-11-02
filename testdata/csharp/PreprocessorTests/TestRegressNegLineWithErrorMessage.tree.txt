@@ -1,0 +1,34 @@
+CompilationUnit [0..38)
+  ClassDeclaration [0..38)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'A'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    IncompleteMember [10..37)
+      IdentifierName [10..37)
+        L:LineDirectiveTrivia [10..30)
+          HashToken [10..11) '#'
+          LineKeyword [11..15) 'line'
+          T:WhitespaceTrivia [15..16) ' '
+          NumericLiteralToken [16..19) '100'
+          T:WhitespaceTrivia [19..20) ' '
+          StringLiteralToken [20..29) '"test.cs"'
+          EndOfDirectiveToken [29..29) ''
+          T:EndOfLineTrivia [29..30) '\n'
+        IdentifierToken [30..31) 'x'
+        T:WhitespaceTrivia [31..32) ' '
+        T:SkippedTokensTrivia [32..33)
+          EqualsToken [32..33) '='
+        T:WhitespaceTrivia [33..34) ' '
+        T:SkippedTokensTrivia [34..35)
+          NumericLiteralToken [34..35) '1'
+        T:SkippedTokensTrivia [35..36)
+          SemicolonToken [35..36) ';'
+        T:EndOfLineTrivia [36..37) '\n'
+    CloseBraceToken [37..38) '}'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1519 [32..33) Invalid token \'=\' in a member declaration
+  CS1519 [32..33) Invalid token \'=\' in a member declaration

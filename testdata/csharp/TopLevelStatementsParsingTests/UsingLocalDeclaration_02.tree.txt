@@ -1,0 +1,17 @@
+CompilationUnit [0..23)
+  GlobalStatement [0..23)
+    LocalDeclarationStatement [0..23)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      StaticKeyword [6..12) 'static'
+      T:WhitespaceTrivia [12..13) ' '
+      VariableDeclaration [13..22)
+        IdentifierName [13..18)
+          IdentifierToken [13..17) 'type'
+          T:WhitespaceTrivia [17..18) ' '
+        VariableDeclarator [18..22)
+          IdentifierToken [18..22) 'name'
+      SemicolonToken [22..23) ';'
+  EndOfFileToken [23..23) ''
+Diagnostics:
+  CS9229 [6..12) Modifiers cannot be placed on using declarations

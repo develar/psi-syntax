@@ -1,0 +1,1 @@
+_ = e switch { int => 1, long => 2, };

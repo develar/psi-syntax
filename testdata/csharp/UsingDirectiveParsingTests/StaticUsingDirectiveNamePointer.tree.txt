@@ -1,0 +1,20 @@
+CompilationUnit [0..16)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierName [13..14)
+      IdentifierToken [13..14) 'A'
+    SemicolonToken [14..14) missing
+  GlobalStatement [14..16)
+    ExpressionStatement [14..16)
+      PointerIndirectionExpression [14..15)
+        AsteriskToken [14..15) '*'
+        IdentifierName [15..15)
+          IdentifierToken [15..15) missing
+      SemicolonToken [15..16) ';'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1002 [14..15) ; expected
+  CS1525 [15..16) Invalid expression term \';\'

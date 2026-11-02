@@ -1,0 +1,1 @@
+fixed (delegate*<void> ptr = &MyMethod) {}

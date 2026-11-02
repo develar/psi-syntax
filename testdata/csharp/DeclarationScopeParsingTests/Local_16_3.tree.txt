@@ -1,0 +1,16 @@
+CompilationUnit [0..18)
+  GlobalStatement [0..18)
+    LocalDeclarationStatement [0..18)
+      VariableDeclaration [0..16)
+        ScopedType [0..15)
+          L:EndOfLineTrivia [0..1) '\n'
+          ScopedKeyword [1..7) 'scoped'
+          T:WhitespaceTrivia [7..8) ' '
+          IdentifierName [8..15)
+            IdentifierToken [8..14) 'record'
+            T:WhitespaceTrivia [14..15) ' '
+        VariableDeclarator [15..16)
+          IdentifierToken [15..16) 'A'
+      SemicolonToken [16..17) ';'
+      T:EndOfLineTrivia [17..18) '\n'
+  EndOfFileToken [18..18) ''

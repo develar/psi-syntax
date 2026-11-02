@@ -1,0 +1,35 @@
+CompilationUnit [0..28)
+  GlobalStatement [0..28)
+    ExpressionStatement [0..28)
+      SimpleAssignmentExpression [0..26)
+        TupleExpression [0..23)
+          L:EndOfLineTrivia [0..1) '\n'
+          OpenParenToken [1..2) '('
+          Argument [2..7)
+            DeclarationExpression [2..7)
+              IdentifierName [2..6)
+                IdentifierToken [2..5) 'var'
+                T:WhitespaceTrivia [5..6) ' '
+              SingleVariableDesignation [6..7)
+                IdentifierToken [6..7) 'a'
+          CommaToken [7..8) ','
+          T:WhitespaceTrivia [8..9) ' '
+          Argument [9..21)
+            DeclarationExpression [9..21)
+              ScopedType [9..20)
+                ScopedKeyword [9..15) 'scoped'
+                T:WhitespaceTrivia [15..16) ' '
+                PredefinedType [16..20)
+                  IntKeyword [16..19) 'int'
+                  T:WhitespaceTrivia [19..20) ' '
+              SingleVariableDesignation [20..21)
+                IdentifierToken [20..21) 'b'
+          CloseParenToken [21..22) ')'
+          T:WhitespaceTrivia [22..23) ' '
+        EqualsToken [23..24) '='
+        T:WhitespaceTrivia [24..25) ' '
+        IdentifierName [25..26)
+          IdentifierToken [25..26) 'M'
+      SemicolonToken [26..27) ';'
+      T:EndOfLineTrivia [27..28) '\n'
+  EndOfFileToken [28..28) ''

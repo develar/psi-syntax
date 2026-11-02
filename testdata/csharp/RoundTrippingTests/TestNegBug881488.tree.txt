@@ -1,0 +1,61 @@
+CompilationUnit [0..59)
+  ClassDeclaration [0..59)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'A'
+    T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    MethodDeclaration [18..50)
+      L:WhitespaceTrivia [18..25) '       '
+      PartialKeyword [25..32) 'partial'
+      T:WhitespaceTrivia [32..33) ' '
+      PredefinedType [33..38)
+        VoidKeyword [33..37) 'void'
+        T:WhitespaceTrivia [37..38) ' '
+      IdentifierToken [38..39) 'C'
+      TypeParameterList [39..42)
+        LessThanToken [39..40) '<'
+        TypeParameter [40..41)
+          IdentifierToken [40..41) 'T'
+        GreaterThanToken [41..42) '>'
+      ParameterList [42..46)
+        OpenParenToken [42..43) '('
+        Parameter [43..45)
+          IdentifierName [43..45)
+            IdentifierToken [43..44) 'T'
+            T:WhitespaceTrivia [44..45) ' '
+          IdentifierToken [45..45) missing
+        CloseParenToken [45..46) ')'
+      ArrowExpressionClause [46..48)
+        EqualsGreaterThanToken [46..48) '=>'
+        IdentifierName [48..48)
+          IdentifierToken [48..48) missing
+      SemicolonToken [48..48) missing
+      T:SkippedTokensTrivia [48..49)
+        OpenBraceToken [48..49) '{'
+      T:WhitespaceTrivia [49..50) ' '
+    IncompleteMember [50..57)
+      IdentifierName [50..57)
+        IdentifierToken [50..51) 't'
+        T:SkippedTokensTrivia [51..52)
+          CloseParenToken [51..52) ')'
+        T:WhitespaceTrivia [52..53) ' '
+        T:SkippedTokensTrivia [53..54)
+          OpenBraceToken [53..54) '{'
+        T:WhitespaceTrivia [54..55) ' '
+        T:SkippedTokensTrivia [55..56)
+          CloseBraceToken [55..56) '}'
+        T:EndOfLineTrivia [56..57) '\n'
+    CloseBraceToken [57..58) '}'
+    T:EndOfLineTrivia [58..59) '\n'
+  EndOfFileToken [59..59) ''
+Diagnostics:
+  CS1001 [45..46) Identifier expected
+  CS1525 [48..49) Invalid expression term \'{\'
+  CS1002 [48..49) ; expected
+  CS1519 [48..49) Invalid token \'{\' in a member declaration
+  CS1519 [51..52) Invalid token \')\' in a member declaration
+  CS1519 [51..52) Invalid token \')\' in a member declaration

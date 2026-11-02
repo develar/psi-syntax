@@ -1,0 +1,1 @@
+record R<T> where T : class;

@@ -1,0 +1,1 @@
+implicit N1::N2::I.operator int(int x) => x;

@@ -1,0 +1,18 @@
+SimpleAssignmentExpression [0..12)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsToken [2..3) '='
+  T:WhitespaceTrivia [3..4) ' '
+  SimpleAssignmentExpression [4..12)
+    NotEqualsExpression [4..7)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'o'
+      ExclamationEqualsToken [5..7) '!='
+      IdentifierName [7..7)
+        IdentifierToken [7..7) missing
+    EqualsToken [7..8) '='
+    NullLiteralExpression [8..12)
+      NullKeyword [8..12) 'null'
+Diagnostics:
+  CS1525 [7..8) Invalid expression term \'=\'

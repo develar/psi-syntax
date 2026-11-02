@@ -1,0 +1,29 @@
+OperatorDeclaration [0..42)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  RequiredKeyword [7..15) 'required'
+  T:WhitespaceTrivia [15..16) ' '
+  IdentifierName [16..18)
+    IdentifierToken [16..17) 'C'
+    T:WhitespaceTrivia [17..18) ' '
+  OperatorKeyword [18..26) 'operator'
+  PlusToken [26..27) '+'
+  ParameterList [27..40)
+    OpenParenToken [27..28) '('
+    Parameter [28..32)
+      IdentifierName [28..30)
+        IdentifierToken [28..29) 'C'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..32) 'c1'
+    CommaToken [32..33) ','
+    T:WhitespaceTrivia [33..34) ' '
+    Parameter [34..38)
+      IdentifierName [34..36)
+        IdentifierToken [34..35) 'C'
+        T:WhitespaceTrivia [35..36) ' '
+      IdentifierToken [36..38) 'c2'
+    CloseParenToken [38..39) ')'
+    T:WhitespaceTrivia [39..40) ' '
+  Block [40..42)
+    OpenBraceToken [40..41) '{'
+    CloseBraceToken [41..42) '}'

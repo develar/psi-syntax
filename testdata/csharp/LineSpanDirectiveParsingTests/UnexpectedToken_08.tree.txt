@@ -1,0 +1,40 @@
+CompilationUnit [0..32)
+  L:LineSpanDirectiveTrivia [0..32)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..8)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..8) '1'
+      CommaToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CloseParenToken [8..8) missing
+    MinusToken [8..8) missing
+    LineDirectivePosition [8..8)
+      OpenParenToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CommaToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CloseParenToken [8..8) missing
+    StringLiteralToken [8..8) missing
+    L:SkippedTokensTrivia [8..32)
+      IdentifierToken [8..9) 'u'
+      CommaToken [9..10) ','
+      T:WhitespaceTrivia [10..11) ' '
+      NumericLiteralToken [11..12) '2'
+      CloseParenToken [12..13) ')'
+      T:WhitespaceTrivia [13..14) ' '
+      MinusToken [14..15) '-'
+      T:WhitespaceTrivia [15..16) ' '
+      OpenParenToken [16..17) '('
+      NumericLiteralToken [17..18) '3'
+      CommaToken [18..19) ','
+      T:WhitespaceTrivia [19..20) ' '
+      NumericLiteralToken [20..21) '4'
+      CloseParenToken [21..22) ')'
+      T:WhitespaceTrivia [22..23) ' '
+      StringLiteralToken [23..32) '"file.cs"'
+    EndOfDirectiveToken [32..32) ''
+  EndOfFileToken [32..32) ''
+Diagnostics:
+  CS1003 [8..9) Syntax error, \',\' expected

@@ -1,0 +1,155 @@
+SwitchExpression [0..144)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:EndOfLineTrivia [10..11) '\n'
+  SwitchExpressionArm [11..26)
+    VarPattern [11..22)
+      L:WhitespaceTrivia [11..15) '    '
+      VarKeyword [15..18) 'var'
+      T:WhitespaceTrivia [18..19) ' '
+      ParenthesizedVariableDesignation [19..22)
+        OpenParenToken [19..20) '('
+        CloseParenToken [20..21) ')'
+        T:WhitespaceTrivia [21..22) ' '
+    EqualsGreaterThanToken [22..24) '=>'
+    T:WhitespaceTrivia [24..25) ' '
+    NumericLiteralExpression [25..26)
+      NumericLiteralToken [25..26) '1'
+  CommaToken [26..27) ','
+  T:EndOfLineTrivia [27..28) '\n'
+  SwitchExpressionArm [28..39)
+    RecursivePattern [28..35)
+      PositionalPatternClause [28..35)
+        L:WhitespaceTrivia [28..32) '    '
+        OpenParenToken [32..33) '('
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+    EqualsGreaterThanToken [35..37) '=>'
+    T:WhitespaceTrivia [37..38) ' '
+    NumericLiteralExpression [38..39)
+      NumericLiteralToken [38..39) '2'
+  CommaToken [39..40) ','
+  T:EndOfLineTrivia [40..41) '\n'
+  SwitchExpressionArm [41..57)
+    VarPattern [41..53)
+      L:WhitespaceTrivia [41..45) '    '
+      VarKeyword [45..48) 'var'
+      T:WhitespaceTrivia [48..49) ' '
+      ParenthesizedVariableDesignation [49..53)
+        OpenParenToken [49..50) '('
+        SingleVariableDesignation [50..51)
+          IdentifierToken [50..51) 'x'
+        CloseParenToken [51..52) ')'
+        T:WhitespaceTrivia [52..53) ' '
+    EqualsGreaterThanToken [53..55) '=>'
+    T:WhitespaceTrivia [55..56) ' '
+    NumericLiteralExpression [56..57)
+      NumericLiteralToken [56..57) '3'
+  CommaToken [57..58) ','
+  T:EndOfLineTrivia [58..59) '\n'
+  SwitchExpressionArm [59..73)
+    RecursivePattern [59..69)
+      PositionalPatternClause [59..67)
+        L:WhitespaceTrivia [59..63) '    '
+        OpenParenToken [63..64) '('
+        Subpattern [64..65)
+          ConstantPattern [64..65)
+            NumericLiteralExpression [64..65)
+              NumericLiteralToken [64..65) '1'
+        CloseParenToken [65..66) ')'
+        T:WhitespaceTrivia [66..67) ' '
+      DiscardDesignation [67..69)
+        UnderscoreToken [67..68) '_'
+        T:WhitespaceTrivia [68..69) ' '
+    EqualsGreaterThanToken [69..71) '=>'
+    T:WhitespaceTrivia [71..72) ' '
+    NumericLiteralExpression [72..73)
+      NumericLiteralToken [72..73) '4'
+  CommaToken [73..74) ','
+  T:EndOfLineTrivia [74..75) '\n'
+  SwitchExpressionArm [75..89)
+    RecursivePattern [75..85)
+      PositionalPatternClause [75..83)
+        L:WhitespaceTrivia [75..79) '    '
+        OpenParenToken [79..80) '('
+        Subpattern [80..81)
+          ConstantPattern [80..81)
+            NumericLiteralExpression [80..81)
+              NumericLiteralToken [80..81) '1'
+        CloseParenToken [81..82) ')'
+        T:WhitespaceTrivia [82..83) ' '
+      SingleVariableDesignation [83..85)
+        IdentifierToken [83..84) 'x'
+        T:WhitespaceTrivia [84..85) ' '
+    EqualsGreaterThanToken [85..87) '=>'
+    T:WhitespaceTrivia [87..88) ' '
+    NumericLiteralExpression [88..89)
+      NumericLiteralToken [88..89) '5'
+  CommaToken [89..90) ','
+  T:EndOfLineTrivia [90..91) '\n'
+  SwitchExpressionArm [91..106)
+    RecursivePattern [91..102)
+      PositionalPatternClause [91..99)
+        L:WhitespaceTrivia [91..95) '    '
+        OpenParenToken [95..96) '('
+        Subpattern [96..97)
+          ConstantPattern [96..97)
+            NumericLiteralExpression [96..97)
+              NumericLiteralToken [96..97) '1'
+        CloseParenToken [97..98) ')'
+        T:WhitespaceTrivia [98..99) ' '
+      PropertyPatternClause [99..102)
+        OpenBraceToken [99..100) '{'
+        CloseBraceToken [100..101) '}'
+        T:WhitespaceTrivia [101..102) ' '
+    EqualsGreaterThanToken [102..104) '=>'
+    T:WhitespaceTrivia [104..105) ' '
+    NumericLiteralExpression [105..106)
+      NumericLiteralToken [105..106) '6'
+  CommaToken [106..107) ','
+  T:EndOfLineTrivia [107..108) '\n'
+  SwitchExpressionArm [108..127)
+    RecursivePattern [108..123)
+      PositionalPatternClause [108..123)
+        L:WhitespaceTrivia [108..112) '    '
+        OpenParenToken [112..113) '('
+        Subpattern [113..121)
+          NameColon [113..120)
+            IdentifierName [113..118)
+              IdentifierToken [113..118) 'Item1'
+            ColonToken [118..119) ':'
+            T:WhitespaceTrivia [119..120) ' '
+          ConstantPattern [120..121)
+            NumericLiteralExpression [120..121)
+              NumericLiteralToken [120..121) '1'
+        CloseParenToken [121..122) ')'
+        T:WhitespaceTrivia [122..123) ' '
+    EqualsGreaterThanToken [123..125) '=>'
+    T:WhitespaceTrivia [125..126) ' '
+    NumericLiteralExpression [126..127)
+      NumericLiteralToken [126..127) '7'
+  CommaToken [127..128) ','
+  T:EndOfLineTrivia [128..129) '\n'
+  SwitchExpressionArm [129..143)
+    RecursivePattern [129..138)
+      IdentifierName [129..134)
+        L:WhitespaceTrivia [129..133) '    '
+        IdentifierToken [133..134) 'C'
+      PositionalPatternClause [134..138)
+        OpenParenToken [134..135) '('
+        Subpattern [135..136)
+          ConstantPattern [135..136)
+            NumericLiteralExpression [135..136)
+              NumericLiteralToken [135..136) '1'
+        CloseParenToken [136..137) ')'
+        T:WhitespaceTrivia [137..138) ' '
+    EqualsGreaterThanToken [138..140) '=>'
+    T:WhitespaceTrivia [140..141) ' '
+    NumericLiteralExpression [141..143)
+      NumericLiteralToken [141..142) '8'
+      T:EndOfLineTrivia [142..143) '\n'
+  CloseBraceToken [143..144) '}'

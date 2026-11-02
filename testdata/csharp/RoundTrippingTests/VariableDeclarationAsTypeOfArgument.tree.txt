@@ -1,0 +1,18 @@
+TypeOfExpression [0..27)
+  TypeOfKeyword [0..6) 'typeof'
+  OpenParenToken [6..7) '('
+  QualifiedName [7..21)
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    DotToken [13..14) '.'
+    IdentifierName [14..21)
+      IdentifierToken [14..20) 'String'
+      T:WhitespaceTrivia [20..21) ' '
+  CloseParenToken [21..21) missing
+  T:SkippedTokensTrivia [21..26)
+    IdentifierToken [21..26) 'value'
+  T:SkippedTokensTrivia [26..27)
+    CloseParenToken [26..27) ')'
+Diagnostics:
+  CS1073 [0..21) Unexpected token \'value\'
+  CS1026 [21..26) ) expected

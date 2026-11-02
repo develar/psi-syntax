@@ -1,0 +1,44 @@
+SwitchExpression [0..46)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..45)
+    ParenthesizedPattern [13..30)
+      L:WhitespaceTrivia [13..17) '    '
+      OpenParenToken [17..18) '('
+      DeclarationPattern [18..28)
+        NullableType [18..24)
+          IdentifierName [18..22)
+            IdentifierToken [18..22) 'Type'
+          QuestionToken [22..23) '?'
+          T:WhitespaceTrivia [23..24) ' '
+        SingleVariableDesignation [24..28)
+          IdentifierToken [24..28) 'when'
+      CloseParenToken [28..29) ')'
+      T:WhitespaceTrivia [29..30) ' '
+    WhenClause [30..41)
+      WhenKeyword [30..34) 'when'
+      T:WhitespaceTrivia [34..35) ' '
+      GreaterThanExpression [35..41)
+        IdentifierName [35..37)
+          IdentifierToken [35..36) 'x'
+          T:WhitespaceTrivia [36..37) ' '
+        GreaterThanToken [37..38) '>'
+        T:WhitespaceTrivia [38..39) ' '
+        NumericLiteralExpression [39..41)
+          NumericLiteralToken [39..40) '0'
+          T:WhitespaceTrivia [40..41) ' '
+    EqualsGreaterThanToken [41..41) missing
+    T:SkippedTokensTrivia [41..42)
+      ColonToken [41..42) ':'
+    T:WhitespaceTrivia [42..43) ' '
+    NumericLiteralExpression [43..45)
+      NumericLiteralToken [43..44) '1'
+      T:EndOfLineTrivia [44..45) '\n'
+  CloseBraceToken [45..46) '}'
+Diagnostics:
+  CS1003 [41..42) Syntax error, \'=>\' expected

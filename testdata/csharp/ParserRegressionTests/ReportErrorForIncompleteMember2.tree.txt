@@ -1,0 +1,29 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..45)
+      L:WhitespaceTrivia [11..15) '    '
+      L:WarningDirectiveTrivia [15..30)
+        HashToken [15..16) '#'
+        WarningKeyword [16..23) 'warning'
+        T:WhitespaceTrivia [23..24) ' '
+        L:PreprocessingMessageTrivia [24..29) 'hello'
+        EndOfDirectiveToken [29..29) ''
+        T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      PublicKeyword [34..40) 'public'
+      T:WhitespaceTrivia [40..41) ' '
+      PredefinedType [41..45)
+        IntKeyword [41..44) 'int'
+        T:EndOfLineTrivia [44..45) '\n'
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1519 [45..46) Invalid token \'}\' in a member declaration
+  CS1030 [24..29) #warning: \'hello\'

@@ -1,0 +1,29 @@
+IsPatternExpression [0..19)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..19)
+    OpenBracketToken [5..6) '['
+    T:WhitespaceTrivia [6..7) ' '
+    ConstantPattern [7..8)
+      NumericLiteralExpression [7..8)
+        NumericLiteralToken [7..8) '1'
+    CommaToken [8..9) ','
+    T:WhitespaceTrivia [9..10) ' '
+    ConstantPattern [10..16)
+      IdentifierName [10..16)
+        IdentifierToken [10..14) 'prop'
+        T:SkippedTokensTrivia [14..15)
+          ColonToken [14..15) ':'
+        T:WhitespaceTrivia [15..16) ' '
+    CommaToken [16..16) missing
+    ConstantPattern [16..18)
+      NumericLiteralExpression [16..18)
+        NumericLiteralToken [16..17) '0'
+        T:WhitespaceTrivia [17..18) ' '
+    CloseBracketToken [18..19) ']'
+Diagnostics:
+  CS1003 [14..15) Syntax error, \',\' expected
+  CS1003 [16..17) Syntax error, \',\' expected

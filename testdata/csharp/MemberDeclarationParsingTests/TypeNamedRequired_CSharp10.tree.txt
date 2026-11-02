@@ -1,0 +1,111 @@
+CompilationUnit [0..200)
+  ClassDeclaration [0..19)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..14) 'required'
+    T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:WhitespaceTrivia [16..17) ' '
+    CloseBraceToken [17..18) '}'
+    T:EndOfLineTrivia [18..19) '\n'
+  ClassDeclaration [19..200)
+    L:EndOfLineTrivia [19..20) '\n'
+    ClassKeyword [20..25) 'class'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierToken [26..27) 'C'
+    T:EndOfLineTrivia [27..28) '\n'
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    FieldDeclaration [30..54)
+      VariableDeclaration [30..52)
+        IdentifierName [30..43)
+          L:WhitespaceTrivia [30..34) '    '
+          IdentifierToken [34..42) 'required'
+          T:WhitespaceTrivia [42..43) ' '
+        VariableDeclarator [43..52)
+          IdentifierToken [43..52) '_required'
+      SemicolonToken [52..53) ';'
+      T:EndOfLineTrivia [53..54) '\n'
+    FieldDeclaration [54..77)
+      VariableDeclaration [54..75)
+        ArrayType [54..69)
+          IdentifierName [54..66)
+            L:WhitespaceTrivia [54..58) '    '
+            IdentifierToken [58..66) 'required'
+          ArrayRankSpecifier [66..69)
+            OpenBracketToken [66..67) '['
+            OmittedArraySizeExpression [67..67)
+              OmittedArraySizeExpressionToken [67..67) ''
+            CloseBracketToken [67..68) ']'
+            T:WhitespaceTrivia [68..69) ' '
+        VariableDeclarator [69..75)
+          IdentifierToken [69..75) '_array'
+      SemicolonToken [75..76) ';'
+      T:EndOfLineTrivia [76..77) '\n'
+    FieldDeclaration [77..97)
+      VariableDeclaration [77..95)
+        PointerType [77..91)
+          IdentifierName [77..89)
+            L:WhitespaceTrivia [77..81) '    '
+            IdentifierToken [81..89) 'required'
+          AsteriskToken [89..90) '*'
+          T:WhitespaceTrivia [90..91) ' '
+        VariableDeclarator [91..95)
+          IdentifierToken [91..95) '_ptr'
+      SemicolonToken [95..96) ';'
+      T:EndOfLineTrivia [96..97) '\n'
+    FieldDeclaration [97..122)
+      VariableDeclaration [97..120)
+        NullableType [97..111)
+          IdentifierName [97..109)
+            L:WhitespaceTrivia [97..101) '    '
+            IdentifierToken [101..109) 'required'
+          QuestionToken [109..110) '?'
+          T:WhitespaceTrivia [110..111) ' '
+        VariableDeclarator [111..120)
+          IdentifierToken [111..120) '_nullable'
+      SemicolonToken [120..121) ';'
+      T:EndOfLineTrivia [121..122) '\n'
+    FieldDeclaration [122..166)
+      VariableDeclaration [122..164)
+        FunctionPointerType [122..156)
+          L:WhitespaceTrivia [122..126) '    '
+          DelegateKeyword [126..134) 'delegate'
+          AsteriskToken [134..135) '*'
+          FunctionPointerParameterList [135..156)
+            LessThanToken [135..136) '<'
+            FunctionPointerParameter [136..144)
+              IdentifierName [136..144)
+                IdentifierToken [136..144) 'required'
+            CommaToken [144..145) ','
+            T:WhitespaceTrivia [145..146) ' '
+            FunctionPointerParameter [146..154)
+              IdentifierName [146..154)
+                IdentifierToken [146..154) 'required'
+            GreaterThanToken [154..155) '>'
+            T:WhitespaceTrivia [155..156) ' '
+        VariableDeclarator [156..164)
+          IdentifierToken [156..164) '_funcPtr'
+      SemicolonToken [164..165) ';'
+      T:EndOfLineTrivia [165..166) '\n'
+    FieldDeclaration [166..199)
+      VariableDeclaration [166..197)
+        TupleType [166..191)
+          L:WhitespaceTrivia [166..170) '    '
+          OpenParenToken [170..171) '('
+          TupleElement [171..179)
+            IdentifierName [171..179)
+              IdentifierToken [171..179) 'required'
+          CommaToken [179..180) ','
+          T:WhitespaceTrivia [180..181) ' '
+          TupleElement [181..189)
+            IdentifierName [181..189)
+              IdentifierToken [181..189) 'required'
+          CloseParenToken [189..190) ')'
+          T:WhitespaceTrivia [190..191) ' '
+        VariableDeclarator [191..197)
+          IdentifierToken [191..197) '_tuple'
+      SemicolonToken [197..198) ';'
+      T:EndOfLineTrivia [198..199) '\n'
+    CloseBraceToken [199..200) '}'
+  EndOfFileToken [200..200) ''

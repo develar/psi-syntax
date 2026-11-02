@@ -1,0 +1,11 @@
+SimpleLambdaExpression [0..6)
+  Parameter [0..0)
+    IdentifierToken [0..0) missing
+  EqualsGreaterThanToken [0..2) '=>'
+  T:WhitespaceTrivia [2..3) ' '
+  Block [3..6)
+    OpenBraceToken [3..4) '{'
+    T:WhitespaceTrivia [4..5) ' '
+    CloseBraceToken [5..6) '}'
+Diagnostics:
+  CS1001 [0..2) Identifier expected

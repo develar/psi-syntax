@@ -1,0 +1,116 @@
+CompilationUnit [0..215)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  UsingDirective [15..49)
+    UsingKeyword [15..20) 'using'
+    T:WhitespaceTrivia [20..21) ' '
+    QualifiedName [21..47)
+      QualifiedName [21..39)
+        IdentifierName [21..27)
+          IdentifierToken [21..27) 'System'
+        DotToken [27..28) '.'
+        IdentifierName [28..39)
+          IdentifierToken [28..39) 'Collections'
+      DotToken [39..40) '.'
+      IdentifierName [40..47)
+        IdentifierToken [40..47) 'Generic'
+    SemicolonToken [47..48) ';'
+    T:EndOfLineTrivia [48..49) '\n'
+  UsingDirective [49..68)
+    UsingKeyword [49..54) 'using'
+    T:WhitespaceTrivia [54..55) ' '
+    QualifiedName [55..66)
+      IdentifierName [55..61)
+        IdentifierToken [55..61) 'System'
+      DotToken [61..62) '.'
+      IdentifierName [62..66)
+        IdentifierToken [62..66) 'Linq'
+    SemicolonToken [66..67) ';'
+    T:EndOfLineTrivia [67..68) '\n'
+  UsingDirective [68..87)
+    UsingKeyword [68..73) 'using'
+    T:WhitespaceTrivia [73..74) ' '
+    QualifiedName [74..85)
+      IdentifierName [74..80)
+        IdentifierToken [74..80) 'System'
+      DotToken [80..81) '.'
+      IdentifierName [81..85)
+        IdentifierToken [81..85) 'Text'
+    SemicolonToken [85..86) ';'
+    T:EndOfLineTrivia [86..87) '\n'
+  NamespaceDeclaration [87..184)
+    NamespaceKeyword [87..96) 'namespace'
+    T:WhitespaceTrivia [96..97) ' '
+    IdentifierName [97..117)
+      IdentifierToken [97..116) 'ConsoleApplication1'
+      T:EndOfLineTrivia [116..117) '\n'
+    OpenBraceToken [117..118) '{'
+    T:EndOfLineTrivia [118..119) '\n'
+    ClassDeclaration [119..182)
+      L:WhitespaceTrivia [119..120) ' '
+      ClassKeyword [120..125) 'class'
+      T:WhitespaceTrivia [125..126) ' '
+      IdentifierToken [126..133) 'Program'
+      T:EndOfLineTrivia [133..134) '\n'
+      L:WhitespaceTrivia [134..135) ' '
+      OpenBraceToken [135..136) '{'
+      T:EndOfLineTrivia [136..137) '\n'
+      MethodDeclaration [137..179)
+        L:WhitespaceTrivia [137..139) '  '
+        StaticKeyword [139..145) 'static'
+        T:WhitespaceTrivia [145..146) ' '
+        PredefinedType [146..151)
+          VoidKeyword [146..150) 'void'
+          T:WhitespaceTrivia [150..151) ' '
+        IdentifierToken [151..155) 'Main'
+        ParameterList [155..171)
+          OpenParenToken [155..156) '('
+          Parameter [156..169)
+            ArrayType [156..165)
+              PredefinedType [156..162)
+                StringKeyword [156..162) 'string'
+              ArrayRankSpecifier [162..165)
+                OpenBracketToken [162..163) '['
+                OmittedArraySizeExpression [163..163)
+                  OmittedArraySizeExpressionToken [163..163) ''
+                CloseBracketToken [163..164) ']'
+                T:WhitespaceTrivia [164..165) ' '
+            IdentifierToken [165..169) 'args'
+          CloseParenToken [169..170) ')'
+          T:EndOfLineTrivia [170..171) '\n'
+        Block [171..179)
+          L:WhitespaceTrivia [171..173) '  '
+          OpenBraceToken [173..174) '{'
+          T:EndOfLineTrivia [174..175) '\n'
+          L:WhitespaceTrivia [175..177) '  '
+          CloseBraceToken [177..178) '}'
+          T:EndOfLineTrivia [178..179) '\n'
+      L:WhitespaceTrivia [179..180) ' '
+      CloseBraceToken [180..181) '}'
+      T:EndOfLineTrivia [181..182) '\n'
+    CloseBraceToken [182..183) '}'
+    T:EndOfLineTrivia [183..184) '\n'
+  ClassDeclaration [184..215)
+    L:WhitespaceTrivia [184..187) '　'
+    L:EndOfLineTrivia [187..188) '\n'
+    PublicKeyword [188..194) 'public'
+    T:WhitespaceTrivia [194..195) ' '
+    ClassKeyword [195..200) 'class'
+    T:WhitespaceTrivia [200..201) ' '
+    IdentifierToken [201..211) 'Class_1_L0'
+    T:EndOfLineTrivia [211..212) '\n'
+    OpenBraceToken [212..213) '{'
+    T:EndOfLineTrivia [213..214) '\n'
+    T:SkippedTokensTrivia [214..215)
+      SlashToken [214..215) '/'
+    CloseBraceToken [215..215) missing
+  EndOfFileToken [215..215) ''
+Diagnostics:
+  CS1519 [214..215) Invalid token \'/\' in a member declaration
+  CS1513 [215..215) } expected

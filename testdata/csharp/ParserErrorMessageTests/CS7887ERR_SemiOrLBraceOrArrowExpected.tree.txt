@@ -1,0 +1,79 @@
+CompilationUnit [0..130)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..130)
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    ClassKeyword [22..27) 'class'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierToken [28..32) 'Test'
+    T:EndOfLineTrivia [32..33) '\n'
+    OpenBraceToken [33..34) '{'
+    T:EndOfLineTrivia [34..35) '\n'
+    PropertyDeclaration [35..89)
+      L:WhitespaceTrivia [35..39) '    '
+      PublicKeyword [39..45) 'public'
+      T:WhitespaceTrivia [45..49) '    '
+      PredefinedType [49..53)
+        IntKeyword [49..52) 'int'
+        T:WhitespaceTrivia [52..53) ' '
+      IdentifierToken [53..57) 'Prop'
+      T:WhitespaceTrivia [57..58) ' '
+      T:EndOfLineTrivia [58..59) '\n'
+      AccessorList [59..89)
+        L:WhitespaceTrivia [59..63) '    '
+        OpenBraceToken [63..64) '{'
+        T:EndOfLineTrivia [64..65) '\n'
+        GetAccessorDeclaration [65..89)
+          L:WhitespaceTrivia [65..73) '        '
+          GetKeyword [73..76) 'get'
+          T:WhitespaceTrivia [76..77) ' '
+          Block [77..89)
+            OpenBraceToken [77..77) missing
+            ReturnStatement [77..87)
+              ReturnKeyword [77..83) 'return'
+              T:WhitespaceTrivia [83..84) ' '
+              NumericLiteralExpression [84..85)
+                NumericLiteralToken [84..85) '1'
+              SemicolonToken [85..86) ';'
+              T:EndOfLineTrivia [86..87) '\n'
+            CloseBraceToken [87..88) '}'
+            T:EndOfLineTrivia [88..89) '\n'
+        CloseBraceToken [89..89) missing
+    MethodDeclaration [89..128)
+      PublicKeyword [89..95) 'public'
+      T:WhitespaceTrivia [95..96) ' '
+      StaticKeyword [96..102) 'static'
+      T:WhitespaceTrivia [102..103) ' '
+      PredefinedType [103..107)
+        IntKeyword [103..106) 'int'
+        T:WhitespaceTrivia [106..107) ' '
+      IdentifierToken [107..111) 'Main'
+      ParameterList [111..114)
+        OpenParenToken [111..112) '('
+        CloseParenToken [112..113) ')'
+        T:EndOfLineTrivia [113..114) '\n'
+      Block [114..128)
+        OpenBraceToken [114..115) '{'
+        T:EndOfLineTrivia [115..116) '\n'
+        ReturnStatement [116..126)
+          ReturnKeyword [116..122) 'return'
+          T:WhitespaceTrivia [122..123) ' '
+          NumericLiteralExpression [123..124)
+            NumericLiteralToken [123..124) '1'
+          SemicolonToken [124..125) ';'
+          T:EndOfLineTrivia [125..126) '\n'
+        CloseBraceToken [126..127) '}'
+        T:EndOfLineTrivia [127..128) '\n'
+    CloseBraceToken [128..129) '}'
+    T:EndOfLineTrivia [129..130) '\n'
+  EndOfFileToken [130..130) ''
+Diagnostics:
+  CS8180 [77..83) { or ; or => expected
+  CS1513 [88..88) } expected

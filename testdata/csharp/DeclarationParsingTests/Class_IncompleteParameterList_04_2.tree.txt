@@ -1,0 +1,21 @@
+CompilationUnit [0..19)
+  StructDeclaration [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:EndOfLineTrivia [9..10) '\n'
+    ParameterList [10..12)
+      OpenParenToken [10..11) '('
+      T:EndOfLineTrivia [11..12) '\n'
+      CloseParenToken [12..12) missing
+    BaseList [12..18)
+      ColonToken [12..13) ':'
+      T:WhitespaceTrivia [13..14) ' '
+      SimpleBaseType [14..18)
+        IdentifierName [14..18)
+          IdentifierToken [14..18) 'Base'
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1026 [11..11) ) expected

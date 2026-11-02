@@ -1,0 +1,2 @@
+StringLiteralToken [0..10) '@"literal"'
+EndOfFileToken [10..10) ''

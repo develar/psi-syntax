@@ -1,0 +1,12 @@
+CompilationUnit [0..18)
+  InterfaceDeclaration [0..18)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..13) 'IC'
+    T:WhitespaceTrivia [13..14) ' '
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'
+    T:EndOfLineTrivia [17..18) '\n'
+  EndOfFileToken [18..18) ''

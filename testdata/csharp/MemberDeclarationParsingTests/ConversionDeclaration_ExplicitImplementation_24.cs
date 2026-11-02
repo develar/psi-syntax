@@ -1,0 +1,1 @@
+explicit I.T(int x) => x;

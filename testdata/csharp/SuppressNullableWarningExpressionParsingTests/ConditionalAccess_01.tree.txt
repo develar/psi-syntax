@@ -1,0 +1,14 @@
+ConditionalAccessExpression [0..14)
+  SuppressNullableWarningExpression [0..2)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'o'
+    ExclamationToken [1..2) '!'
+  QuestionToken [2..3) '?'
+  InvocationExpression [3..14)
+    MemberBindingExpression [3..12)
+      DotToken [3..4) '.'
+      IdentifierName [4..12)
+        IdentifierToken [4..12) 'ToString'
+    ArgumentList [12..14)
+      OpenParenToken [12..13) '('
+      CloseParenToken [13..14) ')'

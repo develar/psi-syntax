@@ -1,0 +1,1 @@
+closed partial class C { }

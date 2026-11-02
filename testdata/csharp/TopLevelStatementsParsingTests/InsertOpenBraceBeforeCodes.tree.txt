@@ -1,0 +1,32 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..27)
+    Block [0..27)
+      OpenBraceToken [0..1) '{'
+      T:EndOfLineTrivia [1..2) '\n'
+      ExpressionStatement [2..22)
+        SimpleAssignmentExpression [2..20)
+          SimpleMemberAccessExpression [2..17)
+            ThisExpression [2..14)
+              L:WhitespaceTrivia [2..10) '        '
+              ThisKeyword [10..14) 'this'
+            DotToken [14..15) '.'
+            IdentifierName [15..17)
+              IdentifierToken [15..16) 'I'
+              T:WhitespaceTrivia [16..17) ' '
+          EqualsToken [17..18) '='
+          T:WhitespaceTrivia [18..19) ' '
+          IdentifierName [19..20)
+            IdentifierToken [19..20) 'i'
+        SemicolonToken [20..21) ';'
+        T:EndOfLineTrivia [21..22) '\n'
+      L:WhitespaceTrivia [22..26) '    '
+      CloseBraceToken [26..27) '}'
+  GlobalStatement [27..30)
+    EmptyStatement [27..30)
+      SemicolonToken [27..28) ';'
+      T:EndOfLineTrivia [28..29) '\n'
+      T:SkippedTokensTrivia [29..30)
+        CloseBraceToken [29..30) '}'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1022 [29..30) Type or namespace definition, or end-of-file expected

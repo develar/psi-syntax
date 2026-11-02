@@ -1,0 +1,57 @@
+CompilationUnit [0..82)
+  ClassDeclaration [0..82)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..81)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      TypeParameterList [23..31)
+        LessThanToken [23..24) '<'
+        TypeParameter [24..26)
+          IdentifierToken [24..26) 'T1'
+        CommaToken [26..27) ','
+        T:WhitespaceTrivia [27..28) ' '
+        TypeParameter [28..30)
+          IdentifierToken [28..30) 'T2'
+        GreaterThanToken [30..31) '>'
+      ParameterList [31..42)
+        OpenParenToken [31..32) '('
+        Parameter [32..40)
+          PredefinedType [32..39)
+            ObjectKeyword [32..38) 'object'
+            T:WhitespaceTrivia [38..39) ' '
+          IdentifierToken [39..40) 'o'
+        CloseParenToken [40..41) ')'
+        T:WhitespaceTrivia [41..42) ' '
+      TypeParameterConstraintClause [42..60)
+        WhereKeyword [42..47) 'where'
+        T:WhitespaceTrivia [47..48) ' '
+        IdentifierName [48..51)
+          IdentifierToken [48..50) 'T1'
+          T:WhitespaceTrivia [50..51) ' '
+        ColonToken [51..52) ':'
+        T:WhitespaceTrivia [52..53) ' '
+        StructConstraint [53..60)
+          StructKeyword [53..59) 'struct'
+          T:WhitespaceTrivia [59..60) ' '
+      TypeParameterConstraintClause [60..77)
+        WhereKeyword [60..65) 'where'
+        T:WhitespaceTrivia [65..66) ' '
+        IdentifierName [66..69)
+          IdentifierToken [66..68) 'T2'
+          T:WhitespaceTrivia [68..69) ' '
+        ColonToken [69..70) ':'
+        T:WhitespaceTrivia [70..71) ' '
+        ClassConstraint [71..77)
+          ClassKeyword [71..76) 'class'
+          T:WhitespaceTrivia [76..77) ' '
+      OpenBraceToken [77..78) '{'
+      T:WhitespaceTrivia [78..79) ' '
+      CloseBraceToken [79..80) '}'
+      T:EndOfLineTrivia [80..81) '\n'
+    CloseBraceToken [81..82) '}'
+  EndOfFileToken [82..82) ''

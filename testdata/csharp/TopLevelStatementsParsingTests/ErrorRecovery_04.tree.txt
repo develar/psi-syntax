@@ -1,0 +1,10 @@
+CompilationUnit [0..13)
+  IncompleteMember [0..13)
+    ExternKeyword [0..6) 'extern'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..12) 'alias'
+      T:WhitespaceTrivia [12..13) ' '
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS0116 [7..12) A namespace cannot directly contain members such as fields, methods or statements

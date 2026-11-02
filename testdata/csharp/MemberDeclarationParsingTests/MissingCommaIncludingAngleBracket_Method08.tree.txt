@@ -1,0 +1,75 @@
+IncompleteMember [0..94)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..94)
+    IdentifierToken [7..18) 'IDictionary'
+    TypeArgumentList [18..94)
+      LessThanToken [18..19) '<'
+      TupleType [19..54)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      GreaterThanToken [54..54) missing
+      T:SkippedTokensTrivia [54..55)
+        OpenParenToken [54..55) '('
+      T:SkippedTokensTrivia [55..56)
+        IdentifierToken [55..56) 'X'
+      T:SkippedTokensTrivia [56..57)
+        CommaToken [56..57) ','
+      T:WhitespaceTrivia [57..58) ' '
+      T:SkippedTokensTrivia [58..59)
+        IdentifierToken [58..59) 'X'
+      T:SkippedTokensTrivia [59..60)
+        DotToken [59..60) '.'
+      T:SkippedTokensTrivia [60..61)
+        IdentifierToken [60..61) 'X'
+      T:SkippedTokensTrivia [61..62)
+        CommaToken [61..62) ','
+      T:WhitespaceTrivia [62..63) ' '
+      T:SkippedTokensTrivia [63..64)
+        IdentifierToken [63..64) 'X'
+      T:SkippedTokensTrivia [64..65)
+        DotToken [64..65) '.'
+      T:SkippedTokensTrivia [65..66)
+        IdentifierToken [65..66) 'X'
+      T:SkippedTokensTrivia [66..67)
+        DotToken [66..67) '.'
+      T:SkippedTokensTrivia [67..68)
+        IdentifierToken [67..68) 'X'
+      T:SkippedTokensTrivia [68..69)
+        CloseParenToken [68..69) ')'
+      T:SkippedTokensTrivia [69..70)
+        GreaterThanToken [69..70) '>'
+      T:WhitespaceTrivia [70..71) ' '
+      T:SkippedTokensTrivia [71..83)
+        IdentifierToken [71..83) 'GetAllValues'
+      T:SkippedTokensTrivia [83..84)
+        LessThanToken [83..84) '<'
+      T:SkippedTokensTrivia [84..85)
+        IdentifierToken [84..85) 'T'
+      T:SkippedTokensTrivia [85..86)
+        OpenParenToken [85..86) '('
+      T:SkippedTokensTrivia [86..90)
+        IdentifierToken [86..90) 'Type'
+      T:WhitespaceTrivia [90..91) ' '
+      T:SkippedTokensTrivia [91..92)
+        IdentifierToken [91..92) 't'
+      T:SkippedTokensTrivia [92..93)
+        CloseParenToken [92..93) ')'
+      T:SkippedTokensTrivia [93..94)
+        SemicolonToken [93..94) ';'
+Diagnostics:
+  CS1073 [0..54) Unexpected token \'(\'
+  CS1003 [54..55) Syntax error, \'>\' expected

@@ -1,0 +1,1 @@
+delegate* unmanaged[Cdecl]<string, Goo, int> ptr;

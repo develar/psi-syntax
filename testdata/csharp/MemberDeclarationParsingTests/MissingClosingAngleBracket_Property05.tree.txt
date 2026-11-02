@@ -1,0 +1,33 @@
+PropertyDeclaration [0..61)
+  GenericName [0..46)
+    IdentifierToken [0..11) 'IEnumerable'
+    TypeArgumentList [11..46)
+      LessThanToken [11..12) '<'
+      TupleType [12..46)
+        OpenParenToken [12..13) '('
+        TupleElement [13..25)
+          PredefinedType [13..20)
+            StringKeyword [13..19) 'string'
+            T:WhitespaceTrivia [19..20) ' '
+          IdentifierToken [20..25) 'Value'
+        CommaToken [25..26) ','
+        T:WhitespaceTrivia [26..27) ' '
+        TupleElement [27..46)
+          PredefinedType [27..34)
+            StringKeyword [27..33) 'string'
+            T:WhitespaceTrivia [33..34) ' '
+          IdentifierToken [34..45) 'Description'
+          T:WhitespaceTrivia [45..46) ' '
+        CloseParenToken [46..46) missing
+      GreaterThanToken [46..46) missing
+  IdentifierToken [46..52) 'Values'
+  T:WhitespaceTrivia [52..53) ' '
+  ArrowExpressionClause [53..60)
+    EqualsGreaterThanToken [53..55) '=>'
+    T:WhitespaceTrivia [55..56) ' '
+    NullLiteralExpression [56..60)
+      NullKeyword [56..60) 'null'
+  SemicolonToken [60..61) ';'
+Diagnostics:
+  CS1026 [46..52) ) expected
+  CS1003 [46..52) Syntax error, \'>\' expected

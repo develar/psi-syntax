@@ -1,0 +1,32 @@
+CompilationUnit [0..87)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:DisabledTextTrivia [11..26) ' // Bug#911464\n'
+  L:EndIfDirectiveTrivia [26..33)
+    HashToken [26..27) '#'
+    EndIfKeyword [27..32) 'endif'
+    EndOfDirectiveToken [32..32) ''
+    T:EndOfLineTrivia [32..33) '\n'
+  L:EndOfLineTrivia [33..34) '\n'
+  L:IfDirectiveTrivia [34..44)
+    HashToken [34..35) '#'
+    IfKeyword [35..37) 'if'
+    T:WhitespaceTrivia [37..38) ' '
+    FalseLiteralExpression [38..43)
+      FalseKeyword [38..43) 'false'
+    EndOfDirectiveToken [43..43) ''
+    T:EndOfLineTrivia [43..44) '\n'
+  L:DisabledTextTrivia [44..80) ' class X { void f() { R("# s"); } }\n'
+  L:EndIfDirectiveTrivia [80..87)
+    HashToken [80..81) '#'
+    EndIfKeyword [81..86) 'endif'
+    EndOfDirectiveToken [86..86) ''
+    T:EndOfLineTrivia [86..87) '\n'
+  EndOfFileToken [87..87) ''

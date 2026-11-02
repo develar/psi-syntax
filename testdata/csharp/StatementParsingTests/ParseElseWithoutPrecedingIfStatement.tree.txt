@@ -1,0 +1,23 @@
+IfStatement [0..7)
+  IfKeyword [0..0) missing
+  OpenParenToken [0..0) missing
+  IdentifierName [0..0)
+    IdentifierToken [0..0) missing
+  CloseParenToken [0..0) missing
+  ExpressionStatement [0..0)
+    IdentifierName [0..0)
+      IdentifierToken [0..0) missing
+    SemicolonToken [0..0) missing
+  ElseClause [0..7)
+    ElseKeyword [0..4) 'else'
+    T:WhitespaceTrivia [4..5) ' '
+    Block [5..7)
+      OpenBraceToken [5..6) '{'
+      CloseBraceToken [6..7) '}'
+Diagnostics:
+  CS8641 [0..4) \'else\' cannot start a statement.
+  CS1003 [0..4) Syntax error, \'(\' expected
+  CS1525 [0..4) Invalid expression term \'else\'
+  CS1026 [0..4) ) expected
+  CS1525 [0..4) Invalid expression term \'else\'
+  CS1002 [0..4) ; expected

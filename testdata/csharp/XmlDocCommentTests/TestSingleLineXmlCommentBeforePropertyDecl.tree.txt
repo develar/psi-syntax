@@ -1,0 +1,43 @@
+CompilationUnit [0..48)
+  ClassDeclaration [0..48)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    OpenBraceToken [7..8) '{'
+    T:EndOfLineTrivia [8..9) '\n'
+    PropertyDeclaration [9..47)
+      PredefinedType [9..33)
+        L:SingleLineDocumentationCommentTrivia [9..27)
+          XmlEmptyElement [9..26)
+            L:DocumentationCommentExteriorTrivia [9..12) '///'
+            LessThanToken [12..13) '<'
+            XmlName [13..16)
+              IdentifierToken [13..16) 'goo'
+            XmlTextAttribute [16..24)
+              XmlName [16..18)
+                L:WhitespaceTrivia [16..17) ' '
+                IdentifierToken [17..18) 'a'
+              EqualsToken [18..19) '='
+              DoubleQuoteToken [19..20) '"'
+              XmlTextLiteralToken [20..23) 'val'
+              DoubleQuoteToken [23..24) '"'
+            SlashGreaterThanToken [24..26) '/>'
+          XmlText [26..27)
+            XmlTextLiteralNewLineToken [26..27) '\n'
+          EndOfDocumentationCommentToken [27..27) ''
+        L:WhitespaceTrivia [27..29) '  '
+        IntKeyword [29..32) 'int'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..36) 'Goo'
+      AccessorList [36..47)
+        OpenBraceToken [36..37) '{'
+        GetAccessorDeclaration [37..41)
+          GetKeyword [37..40) 'get'
+          SemicolonToken [40..41) ';'
+        SetAccessorDeclaration [41..45)
+          SetKeyword [41..44) 'set'
+          SemicolonToken [44..45) ';'
+        CloseBraceToken [45..46) '}'
+        T:EndOfLineTrivia [46..47) '\n'
+    CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''

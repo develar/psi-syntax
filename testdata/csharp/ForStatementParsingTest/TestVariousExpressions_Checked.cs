@@ -1,0 +1,1 @@
+for (checked(0);checked(0);checked(0));

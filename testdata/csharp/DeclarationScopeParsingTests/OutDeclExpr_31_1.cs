@@ -1,0 +1,2 @@
+
+M(scoped S a);

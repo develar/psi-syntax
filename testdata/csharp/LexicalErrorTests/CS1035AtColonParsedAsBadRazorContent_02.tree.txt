@@ -1,0 +1,6 @@
+CompilationUnit [0..17)
+  L:SkippedTokensTrivia [0..17)
+    RazorContentToken [0..17) '@:<div>test</div>'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1646 [1..2) Keyword, identifier, or string expected after verbatim specifier: @

@@ -1,0 +1,20 @@
+AddExpression [0..12)
+  IsPatternExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'o'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    DeclarationPattern [5..9)
+      IdentifierName [5..7)
+        IdentifierToken [5..6) 'C'
+        T:WhitespaceTrivia [6..7) ' '
+      SingleVariableDesignation [7..9)
+        IdentifierToken [7..8) 'c'
+        T:WhitespaceTrivia [8..9) ' '
+  PlusToken [9..10) '+'
+  T:WhitespaceTrivia [10..11) ' '
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'd'
+Diagnostics:
+  CS1073 [9..10) Unexpected token \'+\'

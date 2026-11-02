@@ -1,0 +1,114 @@
+CompilationUnit [0..284)
+  FileScopedNamespaceDeclaration [0..284)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'N'
+    SemicolonToken [11..12) ';'
+    T:EndOfLineTrivia [12..13) '\n'
+    EventFieldDeclaration [13..76)
+      L:EndOfLineTrivia [13..14) '\n'
+      L:SingleLineCommentTrivia [14..45) '// This has no type to go into.'
+      L:EndOfLineTrivia [45..46) '\n'
+      EventKeyword [46..51) 'event'
+      T:WhitespaceTrivia [51..52) ' '
+      VariableDeclaration [52..74)
+        IdentifierName [52..59)
+          IdentifierToken [52..58) 'Action'
+          T:WhitespaceTrivia [58..59) ' '
+        VariableDeclarator [59..74)
+          IdentifierToken [59..74) 'BeforeTypeEvent'
+      SemicolonToken [74..75) ';'
+      T:EndOfLineTrivia [75..76) '\n'
+    InterfaceDeclaration [76..192)
+      L:EndOfLineTrivia [76..77) '\n'
+      InterfaceKeyword [77..86) 'interface'
+      T:WhitespaceTrivia [86..87) ' '
+      IdentifierToken [87..91) 'Type'
+      T:EndOfLineTrivia [91..92) '\n'
+      OpenBraceToken [92..93) '{'
+      T:EndOfLineTrivia [93..94) '\n'
+      MethodDeclaration [94..169)
+        L:SkippedTokensTrivia [94..95)
+          CloseBraceToken [94..95) '}'
+        L:EndOfLineTrivia [95..96) '\n'
+        L:EndOfLineTrivia [96..97) '\n'
+        L:SingleLineCommentTrivia [97..147) '// Two members that will move into the type above.'
+        L:EndOfLineTrivia [147..148) '\n'
+        PrivateKeyword [148..155) 'private'
+        T:WhitespaceTrivia [155..156) ' '
+        PredefinedType [156..161)
+          VoidKeyword [156..160) 'void'
+          T:WhitespaceTrivia [160..161) ' '
+        IdentifierToken [161..162) 'M'
+        ParameterList [162..165)
+          OpenParenToken [162..163) '('
+          CloseParenToken [163..164) ')'
+          T:EndOfLineTrivia [164..165) '\n'
+        Block [165..169)
+          OpenBraceToken [165..166) '{'
+          T:EndOfLineTrivia [166..167) '\n'
+          CloseBraceToken [167..168) '}'
+          T:EndOfLineTrivia [168..169) '\n'
+      PropertyDeclaration [169..192)
+        L:EndOfLineTrivia [169..170) '\n'
+        PublicKeyword [170..176) 'public'
+        T:WhitespaceTrivia [176..177) ' '
+        PredefinedType [177..181)
+          IntKeyword [177..180) 'int'
+          T:WhitespaceTrivia [180..181) ' '
+        IdentifierToken [181..185) 'Prop'
+        T:WhitespaceTrivia [185..186) ' '
+        ArrowExpressionClause [186..190)
+          EqualsGreaterThanToken [186..188) '=>'
+          T:WhitespaceTrivia [188..189) ' '
+          NumericLiteralExpression [189..190)
+            NumericLiteralToken [189..190) '0'
+        SemicolonToken [190..191) ';'
+        T:EndOfLineTrivia [191..192) '\n'
+      CloseBraceToken [192..192) missing
+    ClassDeclaration [192..284)
+      L:EndOfLineTrivia [192..193) '\n'
+      L:SingleLineCommentTrivia [193..222) '// Following type declaration'
+      L:EndOfLineTrivia [222..223) '\n'
+      ClassKeyword [223..228) 'class'
+      T:WhitespaceTrivia [228..229) ' '
+      IdentifierToken [229..233) 'Type'
+      T:EndOfLineTrivia [233..234) '\n'
+      OpenBraceToken [234..235) '{'
+      T:EndOfLineTrivia [235..236) '\n'
+      ConstructorDeclaration [236..265)
+        L:SkippedTokensTrivia [236..237)
+          CloseBraceToken [236..237) '}'
+        L:EndOfLineTrivia [237..238) '\n'
+        L:EndOfLineTrivia [238..239) '\n'
+        PrivateKeyword [239..246) 'private'
+        T:WhitespaceTrivia [246..247) ' '
+        IdentifierToken [247..258) 'Constructor'
+        ParameterList [258..261)
+          OpenParenToken [258..259) '('
+          CloseParenToken [259..260) ')'
+          T:WhitespaceTrivia [260..261) ' '
+        Block [261..265)
+          OpenBraceToken [261..262) '{'
+          T:WhitespaceTrivia [262..263) ' '
+          CloseBraceToken [263..264) '}'
+          T:EndOfLineTrivia [264..265) '\n'
+      FieldDeclaration [265..284)
+        L:EndOfLineTrivia [265..266) '\n'
+        PrivateKeyword [266..273) 'private'
+        T:WhitespaceTrivia [273..274) ' '
+        VariableDeclaration [274..283)
+          PredefinedType [274..278)
+            IntKeyword [274..277) 'int'
+            T:WhitespaceTrivia [277..278) ' '
+          VariableDeclarator [278..283)
+            IdentifierToken [278..283) 'field'
+        SemicolonToken [283..284) ';'
+      CloseBraceToken [284..284) missing
+  EndOfFileToken [284..284) ''
+Diagnostics:
+  CS1519 [94..95) Invalid token \'}\' in a member declaration
+  CS1513 [192..192) } expected
+  CS1519 [236..237) Invalid token \'}\' in a member declaration
+  CS1513 [284..284) } expected

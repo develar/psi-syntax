@@ -1,0 +1,1 @@
+class C<[] where T : class { }

@@ -1,0 +1,16 @@
+CompilationUnit [0..17)
+  StructDeclaration [0..17)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    ParameterList [9..16)
+      OpenParenToken [9..10) '('
+      Parameter [10..15)
+        PredefinedType [10..14)
+          IntKeyword [10..13) 'int'
+          T:WhitespaceTrivia [13..14) ' '
+        IdentifierToken [14..15) 'x'
+      CloseParenToken [15..16) ')'
+    SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''

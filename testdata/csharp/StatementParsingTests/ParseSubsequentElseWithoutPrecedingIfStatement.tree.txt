@@ -1,0 +1,50 @@
+Block [0..32)
+  OpenBraceToken [0..1) '{'
+  T:WhitespaceTrivia [1..2) ' '
+  IfStatement [2..22)
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    OpenParenToken [5..6) '('
+    IdentifierName [6..7)
+      IdentifierToken [6..7) 'a'
+    CloseParenToken [7..8) ')'
+    T:WhitespaceTrivia [8..9) ' '
+    Block [9..13)
+      OpenBraceToken [9..10) '{'
+      T:WhitespaceTrivia [10..11) ' '
+      CloseBraceToken [11..12) '}'
+      T:WhitespaceTrivia [12..13) ' '
+    ElseClause [13..22)
+      ElseKeyword [13..17) 'else'
+      T:WhitespaceTrivia [17..18) ' '
+      Block [18..22)
+        OpenBraceToken [18..19) '{'
+        T:WhitespaceTrivia [19..20) ' '
+        CloseBraceToken [20..21) '}'
+        T:WhitespaceTrivia [21..22) ' '
+  IfStatement [22..31)
+    IfKeyword [22..22) missing
+    OpenParenToken [22..22) missing
+    IdentifierName [22..22)
+      IdentifierToken [22..22) missing
+    CloseParenToken [22..22) missing
+    ExpressionStatement [22..22)
+      IdentifierName [22..22)
+        IdentifierToken [22..22) missing
+      SemicolonToken [22..22) missing
+    ElseClause [22..31)
+      ElseKeyword [22..26) 'else'
+      T:WhitespaceTrivia [26..27) ' '
+      Block [27..31)
+        OpenBraceToken [27..28) '{'
+        T:WhitespaceTrivia [28..29) ' '
+        CloseBraceToken [29..30) '}'
+        T:WhitespaceTrivia [30..31) ' '
+  CloseBraceToken [31..32) '}'
+Diagnostics:
+  CS8641 [22..26) \'else\' cannot start a statement.
+  CS1003 [22..26) Syntax error, \'(\' expected
+  CS1525 [22..26) Invalid expression term \'else\'
+  CS1026 [22..26) ) expected
+  CS1525 [22..26) Invalid expression term \'else\'
+  CS1002 [22..26) ; expected

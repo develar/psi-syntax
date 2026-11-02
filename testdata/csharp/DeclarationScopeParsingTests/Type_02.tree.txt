@@ -1,0 +1,54 @@
+CompilationUnit [0..88)
+  PropertyDeclaration [0..20)
+    ScopedKeyword [0..6) 'scoped'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..14)
+      IdentifierToken [7..13) 'record'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'A'
+    T:WhitespaceTrivia [15..16) ' '
+    AccessorList [16..20)
+      OpenBraceToken [16..17) '{'
+      T:WhitespaceTrivia [17..18) ' '
+      CloseBraceToken [18..19) '}'
+      T:EndOfLineTrivia [19..20) '\n'
+  IncompleteMember [20..27)
+    ScopedKeyword [20..26) 'scoped'
+    T:WhitespaceTrivia [26..27) ' '
+  RecordStructDeclaration [27..53)
+    ReadOnlyKeyword [27..35) 'readonly'
+    T:WhitespaceTrivia [35..36) ' '
+    RecordKeyword [36..42) 'record'
+    T:WhitespaceTrivia [42..43) ' '
+    StructKeyword [43..49) 'struct'
+    T:WhitespaceTrivia [49..50) ' '
+    IdentifierToken [50..51) 'B'
+    SemicolonToken [51..52) ';'
+    T:EndOfLineTrivia [52..53) '\n'
+  GlobalStatement [53..76)
+    LocalDeclarationStatement [53..76)
+      ReadOnlyKeyword [53..61) 'readonly'
+      T:WhitespaceTrivia [61..62) ' '
+      VariableDeclaration [62..76)
+        IdentifierName [62..69)
+          IdentifierToken [62..68) 'scoped'
+          T:WhitespaceTrivia [68..69) ' '
+        VariableDeclarator [69..76)
+          IdentifierToken [69..75) 'record'
+          T:WhitespaceTrivia [75..76) ' '
+      SemicolonToken [76..76) missing
+  StructDeclaration [76..88)
+    StructKeyword [76..82) 'struct'
+    T:WhitespaceTrivia [82..83) ' '
+    IdentifierToken [83..84) 'C'
+    ParameterList [84..86)
+      OpenParenToken [84..85) '('
+      CloseParenToken [85..86) ')'
+    SemicolonToken [86..87) ';'
+    T:EndOfLineTrivia [87..88) '\n'
+  EndOfFileToken [88..88) ''
+Diagnostics:
+  CS0116 [20..26) A namespace cannot directly contain members such as fields, methods or statements
+  CS8803 [53..76) Top-level statements must precede namespace and type declarations.
+  CS0106 [53..61) The modifier \'readonly\' is not valid for this item
+  CS1002 [76..82) ; expected

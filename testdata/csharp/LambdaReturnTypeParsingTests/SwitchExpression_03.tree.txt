@@ -1,0 +1,48 @@
+SwitchExpression [0..37)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..31)
+    ConstantPattern [11..11)
+      IdentifierName [11..11)
+        IdentifierToken [11..11) missing
+    EqualsGreaterThanToken [11..11) missing
+    ParenthesizedLambdaExpression [11..31)
+      StaticKeyword [11..17) 'static'
+      T:WhitespaceTrivia [17..18) ' '
+      NullableType [18..21)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'T'
+        QuestionToken [19..20) '?'
+        T:WhitespaceTrivia [20..21) ' '
+      ParameterList [21..24)
+        OpenParenToken [21..22) '('
+        CloseParenToken [22..23) ')'
+        T:WhitespaceTrivia [23..24) ' '
+      EqualsGreaterThanToken [24..26) '=>'
+      T:WhitespaceTrivia [26..27) ' '
+      Block [27..31)
+        OpenBraceToken [27..28) '{'
+        T:WhitespaceTrivia [28..29) ' '
+        CloseBraceToken [29..30) '}'
+        T:WhitespaceTrivia [30..31) ' '
+  CommaToken [31..31) missing
+  SwitchExpressionArm [31..36)
+    ConstantPattern [31..31)
+      IdentifierName [31..31)
+        IdentifierToken [31..31) missing
+    EqualsGreaterThanToken [31..33) '=>'
+    T:WhitespaceTrivia [33..34) ' '
+    NumericLiteralExpression [34..36)
+      NumericLiteralToken [34..35) '1'
+      T:WhitespaceTrivia [35..36) ' '
+  CloseBraceToken [36..37) '}'
+Diagnostics:
+  CS1525 [11..17) Invalid expression term \'static\'
+  CS1003 [11..17) Syntax error, \'=>\' expected
+  CS1003 [31..33) Syntax error, \',\' expected
+  CS8504 [31..33) Pattern missing

@@ -1,0 +1,61 @@
+CompilationUnit [0..130)
+  StructDeclaration [0..32)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    StructKeyword [8..14) 'struct'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..26) 'MemberClass'
+    TypeParameterList [26..30)
+      LessThanToken [26..27) '<'
+      TypeParameter [27..28)
+        IdentifierToken [27..28) 'T'
+      GreaterThanToken [28..29) '>'
+      T:EndOfLineTrivia [29..30) '\n'
+    OpenBraceToken [30..31) '{'
+    T:EndOfLineTrivia [31..32) '\n'
+    CloseBraceToken [32..32) missing
+  L:SingleLineDocumentationCommentTrivia [32..130)
+    XmlText [32..36)
+      L:DocumentationCommentExteriorTrivia [32..35) '///'
+      XmlTextLiteralToken [35..36) ' '
+    XmlElement [36..117)
+      XmlElementStartTag [36..45)
+        LessThanToken [36..37) '<'
+        XmlName [37..44)
+          IdentifierToken [37..44) 'summary'
+        GreaterThanToken [44..45) '>'
+      XmlText [45..107)
+        XmlTextLiteralNewLineToken [45..46) '\n'
+        L:DocumentationCommentExteriorTrivia [46..49) '///'
+        XmlTextLiteralToken [49..102) ' We use this to get the values we cannot get directly'
+        XmlTextLiteralNewLineToken [102..103) '\n'
+        L:DocumentationCommentExteriorTrivia [103..106) '///'
+        XmlTextLiteralToken [106..107) ' '
+      XmlElementEndTag [107..117)
+        LessThanSlashToken [107..109) '</'
+        XmlName [109..116)
+          IdentifierToken [109..116) 'summary'
+        GreaterThanToken [116..117) '>'
+    XmlText [117..122)
+      XmlTextLiteralNewLineToken [117..118) '\n'
+      L:DocumentationCommentExteriorTrivia [118..121) '///'
+      XmlTextLiteralToken [121..122) ' '
+    XmlEmptyElement [122..130)
+      LessThanToken [122..123) '<'
+      XmlName [123..128)
+        IdentifierToken [123..128) 'param'
+      XmlTextAttribute [128..130)
+        XmlName [128..130)
+          L:WhitespaceTrivia [128..129) ' '
+          IdentifierToken [129..130) 'n'
+        EqualsToken [130..130) missing
+        DoubleQuoteToken [130..130) missing
+        DoubleQuoteToken [130..130) missing
+      SlashGreaterThanToken [130..130) missing
+    EndOfDocumentationCommentToken [130..130) ''
+  EndOfFileToken [130..130) ''
+Diagnostics:
+  CS1513 [31..31) } expected
+  CS1570 [130..130) XML comment has badly formed XML -- \'Missing equals sign between attribute and attribute value.\'
+  CS1570 [130..130) XML comment has badly formed XML -- \'Expected \'>\' or \'/>\' to close tag \'param\'.\'

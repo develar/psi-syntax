@@ -1,0 +1,46 @@
+CompilationUnit [0..109)
+  ClassDeclaration [0..109)
+    L:SingleLineCommentTrivia [0..80) '// Lambda inside attribute with attributes of its own will cause us to bail out.'
+    L:EndOfLineTrivia [80..81) '\n'
+    L:SkippedTokensTrivia [81..82)
+      OpenBracketToken [81..82) '['
+    L:SkippedTokensTrivia [82..83)
+      IdentifierToken [82..83) 'A'
+    L:SkippedTokensTrivia [83..84)
+      OpenParenToken [83..84) '('
+    L:SkippedTokensTrivia [84..85)
+      OpenBracketToken [84..85) '['
+    L:SkippedTokensTrivia [85..86)
+      IdentifierToken [85..86) 'B'
+    L:SkippedTokensTrivia [86..87)
+      CloseBracketToken [86..87) ']'
+    L:SkippedTokensTrivia [87..88)
+      OpenParenToken [87..88) '('
+    L:SkippedTokensTrivia [88..89)
+      CloseParenToken [88..89) ')'
+    L:WhitespaceTrivia [89..90) ' '
+    L:SkippedTokensTrivia [90..92)
+      EqualsGreaterThanToken [90..92) '=>'
+    L:WhitespaceTrivia [92..93) ' '
+    L:SkippedTokensTrivia [93..94)
+      OpenBraceToken [93..94) '{'
+    L:SkippedTokensTrivia [94..95)
+      CloseBraceToken [94..95) '}'
+    L:SkippedTokensTrivia [95..96)
+      CloseParenToken [95..96) ')'
+    L:SkippedTokensTrivia [96..97)
+      CloseBracketToken [96..97) ']'
+    L:EndOfLineTrivia [97..98) '\n'
+    ClassKeyword [98..103) 'class'
+    T:WhitespaceTrivia [103..104) ' '
+    IdentifierToken [104..105) 'C'
+    T:EndOfLineTrivia [105..106) '\n'
+    OpenBraceToken [106..107) '{'
+    T:EndOfLineTrivia [107..108) '\n'
+    CloseBraceToken [108..109) '}'
+  EndOfFileToken [109..109) ''
+Diagnostics:
+  CS1003 [90..92) Syntax error, \',\' expected
+  CS1022 [94..95) Type or namespace definition, or end-of-file expected
+  CS1022 [95..96) Type or namespace definition, or end-of-file expected
+  CS1003 [94..95) Syntax error, \']\' expected

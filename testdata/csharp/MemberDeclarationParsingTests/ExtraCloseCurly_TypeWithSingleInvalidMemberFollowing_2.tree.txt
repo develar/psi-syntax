@@ -1,0 +1,51 @@
+CompilationUnit [0..131)
+  NamespaceDeclaration [0..131)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    StructDeclaration [14..131)
+      L:WhitespaceTrivia [14..18) '    '
+      StructKeyword [18..24) 'struct'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..29) 'Type'
+      T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      OpenBraceToken [34..35) '{'
+      T:EndOfLineTrivia [35..36) '\n'
+      MethodDeclaration [36..130)
+        L:WhitespaceTrivia [36..40) '    '
+        L:SkippedTokensTrivia [40..41)
+          CloseBraceToken [40..41) '}'
+        L:EndOfLineTrivia [41..42) '\n'
+        L:EndOfLineTrivia [42..43) '\n'
+        L:WhitespaceTrivia [43..47) '    '
+        L:SingleLineCommentTrivia [47..96) '// One method that will move into the type above.'
+        L:EndOfLineTrivia [96..97) '\n'
+        L:WhitespaceTrivia [97..101) '    '
+        PrivateKeyword [101..108) 'private'
+        T:WhitespaceTrivia [108..109) ' '
+        PredefinedType [109..114)
+          VoidKeyword [109..113) 'void'
+          T:WhitespaceTrivia [113..114) ' '
+        IdentifierToken [114..115) 'M'
+        ParameterList [115..118)
+          OpenParenToken [115..116) '('
+          CloseParenToken [116..117) ')'
+          T:EndOfLineTrivia [117..118) '\n'
+        Block [118..130)
+          L:WhitespaceTrivia [118..122) '    '
+          OpenBraceToken [122..123) '{'
+          T:EndOfLineTrivia [123..124) '\n'
+          L:WhitespaceTrivia [124..128) '    '
+          CloseBraceToken [128..129) '}'
+          T:EndOfLineTrivia [129..130) '\n'
+      CloseBraceToken [130..131) '}'
+    CloseBraceToken [131..131) missing
+  EndOfFileToken [131..131) ''
+Diagnostics:
+  CS1519 [40..41) Invalid token \'}\' in a member declaration
+  CS1513 [131..131) } expected

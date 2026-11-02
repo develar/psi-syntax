@@ -1,0 +1,15 @@
+CompilationUnit [0..17)
+  StructDeclaration [0..17)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:WhitespaceTrivia [9..10) ' '
+    BaseList [10..16)
+      ColonToken [10..11) ':'
+      T:WhitespaceTrivia [11..12) ' '
+      SimpleBaseType [12..16)
+        IdentifierName [12..16)
+          IdentifierToken [12..16) 'Base'
+    SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''

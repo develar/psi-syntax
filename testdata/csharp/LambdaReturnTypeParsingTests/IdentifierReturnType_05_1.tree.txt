@@ -1,0 +1,13 @@
+IdentifierName [0..8)
+  IdentifierToken [0..1) 'T'
+  T:WhitespaceTrivia [1..2) ' '
+  T:SkippedTokensTrivia [2..3)
+    IdentifierToken [2..3) 'x'
+  T:WhitespaceTrivia [3..4) ' '
+  T:SkippedTokensTrivia [4..6)
+    EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  T:SkippedTokensTrivia [7..8)
+    IdentifierToken [7..8) 'y'
+Diagnostics:
+  CS1073 [0..1) Unexpected token \'x\'

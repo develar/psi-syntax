@@ -1,0 +1,6 @@
+CompilationUnit [0..9)
+  L:SkippedTokensTrivia [0..9)
+    RazorContentToken [0..9) '@: M() {}'
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1646 [1..2) Keyword, identifier, or string expected after verbatim specifier: @

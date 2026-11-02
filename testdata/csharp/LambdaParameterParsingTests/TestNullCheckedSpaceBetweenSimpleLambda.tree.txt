@@ -1,0 +1,36 @@
+FieldDeclaration [0..39)
+  VariableDeclaration [0..38)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..38)
+      IdentifierToken [21..26) 'func0'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..38)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        SuppressNullableWarningExpression [29..38)
+          SuppressNullableWarningExpression [29..32)
+            IdentifierName [29..30)
+              IdentifierToken [29..30) 'x'
+            ExclamationToken [30..31) '!'
+            T:WhitespaceTrivia [31..32) ' '
+          ExclamationToken [32..33) '!'
+          T:WhitespaceTrivia [33..34) ' '
+          T:SkippedTokensTrivia [34..36)
+            EqualsGreaterThanToken [34..36) '=>'
+          T:WhitespaceTrivia [36..37) ' '
+          T:SkippedTokensTrivia [37..38)
+            IdentifierToken [37..38) 'x'
+  SemicolonToken [38..39) ';'
+Diagnostics:
+  CS1003 [34..36) Syntax error, \',\' expected

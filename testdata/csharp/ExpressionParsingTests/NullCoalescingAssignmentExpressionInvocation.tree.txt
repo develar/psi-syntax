@@ -1,0 +1,15 @@
+CoalesceAssignmentExpression [0..10)
+  InvocationExpression [0..5)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'M'
+    ArgumentList [1..5)
+      OpenParenToken [1..2) '('
+      Argument [2..3)
+        IdentifierName [2..3)
+          IdentifierToken [2..3) 'a'
+      CloseParenToken [3..4) ')'
+      T:WhitespaceTrivia [4..5) ' '
+  QuestionQuestionEqualsToken [5..8) '??='
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..10)
+    IdentifierToken [9..10) 'b'

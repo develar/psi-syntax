@@ -1,0 +1,26 @@
+AnonymousObjectCreationExpression [0..20)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenBraceToken [4..5) '{'
+  T:WhitespaceTrivia [5..6) ' '
+  AnonymousObjectMemberDeclarator [6..15)
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'P'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    RefExpression [10..15)
+      RefKeyword [10..13) 'ref'
+      T:WhitespaceTrivia [13..14) ' '
+      IdentifierName [14..15)
+        IdentifierToken [14..15) 'x'
+  CommaToken [15..16) ','
+  T:WhitespaceTrivia [16..17) ' '
+  AnonymousObjectMemberDeclarator [17..19)
+    IdentifierName [17..19)
+      IdentifierToken [17..18) 'y'
+      T:WhitespaceTrivia [18..19) ' '
+  CloseBraceToken [19..20) '}'
+Diagnostics:
+  CS1525 [10..15) Invalid expression term \'ref\'

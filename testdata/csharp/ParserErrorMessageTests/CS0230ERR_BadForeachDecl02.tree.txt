@@ -1,0 +1,113 @@
+CompilationUnit [0..164)
+  ClassDeclaration [0..164)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..162)
+      L:WhitespaceTrivia [21..25) '    '
+      StaticKeyword [25..31) 'static'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..37)
+        VoidKeyword [32..36) 'void'
+        T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..41) 'Main'
+      ParameterList [41..57)
+        OpenParenToken [41..42) '('
+        Parameter [42..55)
+          ArrayType [42..51)
+            PredefinedType [42..48)
+              StringKeyword [42..48) 'string'
+            ArrayRankSpecifier [48..51)
+              OpenBracketToken [48..49) '['
+              OmittedArraySizeExpression [49..49)
+                OmittedArraySizeExpressionToken [49..49) ''
+              CloseBracketToken [49..50) ']'
+              T:WhitespaceTrivia [50..51) ' '
+          IdentifierToken [51..55) 'args'
+        CloseParenToken [55..56) ')'
+        T:EndOfLineTrivia [56..57) '\n'
+      Block [57..162)
+        L:WhitespaceTrivia [57..61) '    '
+        OpenBraceToken [61..62) '{'
+        T:EndOfLineTrivia [62..63) '\n'
+        LocalDeclarationStatement [63..111)
+          VariableDeclaration [63..109)
+            ArrayType [63..77)
+              PredefinedType [63..74)
+                L:WhitespaceTrivia [63..71) '        '
+                IntKeyword [71..74) 'int'
+              ArrayRankSpecifier [74..77)
+                OpenBracketToken [74..75) '['
+                OmittedArraySizeExpression [75..75)
+                  OmittedArraySizeExpressionToken [75..75) ''
+                CloseBracketToken [75..76) ']'
+                T:WhitespaceTrivia [76..77) ' '
+            VariableDeclarator [77..109)
+              IdentifierToken [77..84) 'myarray'
+              T:WhitespaceTrivia [84..85) ' '
+              EqualsValueClause [85..109)
+                EqualsToken [85..86) '='
+                T:WhitespaceTrivia [86..87) ' '
+                ArrayCreationExpression [87..109)
+                  NewKeyword [87..90) 'new'
+                  T:WhitespaceTrivia [90..91) ' '
+                  ArrayType [91..98)
+                    PredefinedType [91..94)
+                      IntKeyword [91..94) 'int'
+                    ArrayRankSpecifier [94..98)
+                      OpenBracketToken [94..95) '['
+                      NumericLiteralExpression [95..96)
+                        NumericLiteralToken [95..96) '3'
+                      CloseBracketToken [96..97) ']'
+                      T:WhitespaceTrivia [97..98) ' '
+                  ArrayInitializerExpression [98..109)
+                    OpenBraceToken [98..99) '{'
+                    T:WhitespaceTrivia [99..100) ' '
+                    NumericLiteralExpression [100..101)
+                      NumericLiteralToken [100..101) '1'
+                    CommaToken [101..102) ','
+                    T:WhitespaceTrivia [102..103) ' '
+                    NumericLiteralExpression [103..104)
+                      NumericLiteralToken [103..104) '2'
+                    CommaToken [104..105) ','
+                    T:WhitespaceTrivia [105..106) ' '
+                    NumericLiteralExpression [106..108)
+                      NumericLiteralToken [106..107) '3'
+                      T:WhitespaceTrivia [107..108) ' '
+                    CloseBraceToken [108..109) '}'
+          SemicolonToken [109..110) ';'
+          T:EndOfLineTrivia [110..111) '\n'
+        ForEachVariableStatement [111..156)
+          L:WhitespaceTrivia [111..119) '        '
+          ForEachKeyword [119..126) 'foreach'
+          T:WhitespaceTrivia [126..127) ' '
+          OpenParenToken [127..128) '('
+          IdentifierName [128..130)
+            IdentifierToken [128..129) 'x'
+            T:WhitespaceTrivia [129..130) ' '
+          InKeyword [130..132) 'in'
+          T:WhitespaceTrivia [132..133) ' '
+          IdentifierName [133..140)
+            IdentifierToken [133..140) 'myarray'
+          CloseParenToken [140..141) ')'
+          T:WhitespaceTrivia [141..142) ' '
+          Block [142..156)
+            OpenBraceToken [142..143) '{'
+            T:WhitespaceTrivia [143..144) ' '
+            CloseBraceToken [144..145) '}'
+            T:SingleLineCommentTrivia [145..155) '// Invalid'
+            T:EndOfLineTrivia [155..156) '\n'
+        L:WhitespaceTrivia [156..160) '    '
+        CloseBraceToken [160..161) '}'
+        T:EndOfLineTrivia [161..162) '\n'
+    CloseBraceToken [162..163) '}'
+    T:EndOfLineTrivia [163..164) '\n'
+  EndOfFileToken [164..164) ''
+Diagnostics:
+  CS0230 [130..132) Type and identifier are both required in a foreach statement

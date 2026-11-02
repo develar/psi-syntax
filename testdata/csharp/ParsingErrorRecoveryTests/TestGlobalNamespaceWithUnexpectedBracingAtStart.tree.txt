@@ -1,0 +1,16 @@
+CompilationUnit [0..17)
+  NamespaceDeclaration [0..17)
+    L:SkippedTokensTrivia [0..1)
+      CloseBraceToken [0..1) '}'
+    L:WhitespaceTrivia [1..2) ' '
+    NamespaceKeyword [2..11) 'namespace'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierName [12..14)
+      IdentifierToken [12..13) 'n'
+      T:WhitespaceTrivia [13..14) ' '
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1022 [0..1) Type or namespace definition, or end-of-file expected

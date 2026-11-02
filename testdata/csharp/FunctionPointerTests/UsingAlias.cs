@@ -1,0 +1,1 @@
+using t = delegate*<void>;

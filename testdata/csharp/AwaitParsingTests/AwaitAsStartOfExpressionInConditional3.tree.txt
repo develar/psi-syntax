@@ -1,0 +1,32 @@
+IsPatternExpression [0..25)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..25)
+    PropertyPatternClause [5..25)
+      OpenBraceToken [5..6) '{'
+      T:WhitespaceTrivia [6..7) ' '
+      Subpattern [7..18)
+        NameColon [7..13)
+          IdentifierName [7..11)
+            IdentifierToken [7..11) 'Prop'
+          ColonToken [11..12) ':'
+          T:WhitespaceTrivia [12..13) ' '
+        TypePattern [13..18)
+          PredefinedType [13..18)
+            IntKeyword [13..16) 'int'
+            T:SkippedTokensTrivia [16..17)
+              QuestionToken [16..17) '?'
+            T:WhitespaceTrivia [17..18) ' '
+      CommaToken [18..18) missing
+      Subpattern [18..24)
+        ConstantPattern [18..24)
+          IdentifierName [18..24)
+            IdentifierToken [18..23) 'await'
+            T:WhitespaceTrivia [23..24) ' '
+      CloseBraceToken [24..25) '}'
+Diagnostics:
+  CS1003 [16..17) Syntax error, \',\' expected
+  CS1003 [18..23) Syntax error, \',\' expected

@@ -1,0 +1,46 @@
+CompilationUnit [0..48)
+  GlobalStatement [0..48)
+    LocalFunctionStatement [0..48)
+      PredefinedType [0..6)
+        L:EndOfLineTrivia [0..1) '\n'
+        VoidKeyword [1..5) 'void'
+        T:WhitespaceTrivia [5..6) ' '
+      IdentifierToken [6..7) 'C'
+      ParameterList [7..10)
+        OpenParenToken [7..8) '('
+        CloseParenToken [8..9) ')'
+        T:EndOfLineTrivia [9..10) '\n'
+      Block [10..48)
+        OpenBraceToken [10..11) '{'
+        T:EndOfLineTrivia [11..12) '\n'
+        LocalDeclarationStatement [12..47)
+          VariableDeclaration [12..47)
+            FunctionPointerType [12..47)
+              L:WhitespaceTrivia [12..16) '    '
+              DelegateKeyword [16..24) 'delegate'
+              AsteriskToken [24..25) '*'
+              T:EndOfLineTrivia [25..26) '\n'
+              FunctionPointerCallingConvention [26..47)
+                L:WhitespaceTrivia [26..30) '    '
+                UnmanagedKeyword [30..39) 'unmanaged'
+                FunctionPointerUnmanagedCallingConventionList [39..47)
+                  OpenBracketToken [39..40) '['
+                  FunctionPointerUnmanagedCallingConvention [40..45)
+                    IdentifierToken [40..45) 'Cdecl'
+                  CloseBracketToken [45..46) ']'
+                  T:EndOfLineTrivia [46..47) '\n'
+              FunctionPointerParameterList [47..47)
+                LessThanToken [47..47) missing
+                FunctionPointerParameter [47..47)
+                  IdentifierName [47..47)
+                    IdentifierToken [47..47) missing
+                GreaterThanToken [47..47) missing
+            VariableDeclarator [47..47)
+              IdentifierToken [47..47) missing
+          SemicolonToken [47..47) missing
+        CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1003 [46..46) Syntax error, \'<\' expected
+  CS1001 [46..46) Identifier expected
+  CS1002 [46..46) ; expected

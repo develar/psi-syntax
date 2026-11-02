@@ -1,0 +1,27 @@
+CastExpression [0..42)
+  OpenParenToken [0..1) '('
+  FunctionPointerType [1..38)
+    DelegateKeyword [1..9) 'delegate'
+    AsteriskToken [9..10) '*'
+    T:WhitespaceTrivia [10..11) ' '
+    FunctionPointerCallingConvention [11..30)
+      UnmanagedKeyword [11..20) 'unmanaged'
+      FunctionPointerUnmanagedCallingConventionList [20..30)
+        OpenBracketToken [20..21) '['
+        FunctionPointerUnmanagedCallingConvention [21..29)
+          IdentifierToken [21..29) 'thiscall'
+        CloseBracketToken [29..30) ']'
+    FunctionPointerParameterList [30..38)
+      LessThanToken [30..31) '<'
+      FunctionPointerParameter [31..34)
+        PredefinedType [31..34)
+          IntKeyword [31..34) 'int'
+      CommaToken [34..35) ','
+      T:WhitespaceTrivia [35..36) ' '
+      FunctionPointerParameter [36..37)
+        IdentifierName [36..37)
+          IdentifierToken [36..37) 'C'
+      GreaterThanToken [37..38) '>'
+  CloseParenToken [38..39) ')'
+  IdentifierName [39..42)
+    IdentifierToken [39..42) 'ptr'

@@ -1,0 +1,13 @@
+SizeOfExpression [0..23)
+  SizeOfKeyword [0..6) 'sizeof'
+  OpenParenToken [6..7) '('
+  FunctionPointerType [7..22)
+    DelegateKeyword [7..15) 'delegate'
+    AsteriskToken [15..16) '*'
+    FunctionPointerParameterList [16..22)
+      LessThanToken [16..17) '<'
+      FunctionPointerParameter [17..21)
+        PredefinedType [17..21)
+          VoidKeyword [17..21) 'void'
+      GreaterThanToken [21..22) '>'
+  CloseParenToken [22..23) ')'

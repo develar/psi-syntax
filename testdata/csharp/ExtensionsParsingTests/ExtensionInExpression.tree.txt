@@ -1,0 +1,67 @@
+CompilationUnit [0..110)
+  ClassDeclaration [0..110)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..48)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..28) 'extension'
+      ParameterList [28..31)
+        OpenParenToken [28..29) '('
+        CloseParenToken [29..30) ')'
+        T:WhitespaceTrivia [30..31) ' '
+      Block [31..48)
+        OpenBraceToken [31..32) '{'
+        T:WhitespaceTrivia [32..33) ' '
+        ExpressionStatement [33..46)
+          InvocationExpression [33..44)
+            IdentifierName [33..42)
+              IdentifierToken [33..42) 'extension'
+            ArgumentList [42..44)
+              OpenParenToken [42..43) '('
+              CloseParenToken [43..44) ')'
+          SemicolonToken [44..45) ';'
+          T:WhitespaceTrivia [45..46) ' '
+        CloseBraceToken [46..47) '}'
+        T:EndOfLineTrivia [47..48) '\n'
+    MethodDeclaration [48..109)
+      PredefinedType [48..57)
+        L:WhitespaceTrivia [48..52) '    '
+        VoidKeyword [52..56) 'void'
+        T:WhitespaceTrivia [56..57) ' '
+      IdentifierToken [57..58) 'M'
+      ParameterList [58..61)
+        OpenParenToken [58..59) '('
+        CloseParenToken [59..60) ')'
+        T:EndOfLineTrivia [60..61) '\n'
+      Block [61..109)
+        L:WhitespaceTrivia [61..65) '    '
+        OpenBraceToken [65..66) '{'
+        T:EndOfLineTrivia [66..67) '\n'
+        LocalDeclarationStatement [67..103)
+          VariableDeclaration [67..101)
+            IdentifierName [67..85)
+              L:WhitespaceTrivia [67..75) '        '
+              IdentifierToken [75..84) 'extension'
+              T:WhitespaceTrivia [84..85) ' '
+            VariableDeclarator [85..101)
+              IdentifierToken [85..94) 'extension'
+              T:WhitespaceTrivia [94..95) ' '
+              EqualsValueClause [95..101)
+                EqualsToken [95..96) '='
+                T:WhitespaceTrivia [96..97) ' '
+                NullLiteralExpression [97..101)
+                  NullKeyword [97..101) 'null'
+          SemicolonToken [101..102) ';'
+          T:EndOfLineTrivia [102..103) '\n'
+        L:WhitespaceTrivia [103..107) '    '
+        CloseBraceToken [107..108) '}'
+        T:EndOfLineTrivia [108..109) '\n'
+    CloseBraceToken [109..110) '}'
+  EndOfFileToken [110..110) ''

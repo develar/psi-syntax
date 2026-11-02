@@ -1,0 +1,1 @@
+class C { public ReadOnlySpan<byte> B => [true: A] () => { }; }

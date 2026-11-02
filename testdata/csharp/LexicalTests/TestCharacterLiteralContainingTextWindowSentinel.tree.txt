@@ -1,0 +1,2 @@
+CharacterLiteralToken [0..5) '\'￿\''
+EndOfFileToken [5..5) ''

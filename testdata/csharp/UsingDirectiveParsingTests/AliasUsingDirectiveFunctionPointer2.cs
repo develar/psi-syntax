@@ -1,0 +1,1 @@
+using unsafe x = delegate*<int, void>;

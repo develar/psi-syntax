@@ -1,0 +1,56 @@
+CompilationUnit [0..60)
+  ClassDeclaration [0..60)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..59)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      TypeParameterList [20..28)
+        LessThanToken [20..21) '<'
+        TypeParameter [21..23)
+          IdentifierToken [21..23) 'T1'
+        CommaToken [23..24) ','
+        T:WhitespaceTrivia [24..25) ' '
+        TypeParameter [25..27)
+          IdentifierToken [25..27) 'T2'
+        GreaterThanToken [27..28) '>'
+      ParameterList [28..31)
+        OpenParenToken [28..29) '('
+        CloseParenToken [29..30) ')'
+        T:EndOfLineTrivia [30..31) '\n'
+      Block [31..59)
+        L:WhitespaceTrivia [31..35) '    '
+        OpenBraceToken [35..36) '{'
+        T:EndOfLineTrivia [36..37) '\n'
+        ExpressionStatement [37..53)
+          InvocationExpression [37..51)
+            GenericName [37..49)
+              L:WhitespaceTrivia [37..45) '        '
+              IdentifierToken [45..46) 'M'
+              TypeArgumentList [46..49)
+                LessThanToken [46..47) '<'
+                OmittedTypeArgument [47..47)
+                  OmittedTypeArgumentToken [47..47) ''
+                CommaToken [47..48) ','
+                OmittedTypeArgument [48..48)
+                  OmittedTypeArgumentToken [48..48) ''
+                GreaterThanToken [48..49) '>'
+            ArgumentList [49..51)
+              OpenParenToken [49..50) '('
+              CloseParenToken [50..51) ')'
+          SemicolonToken [51..52) ';'
+          T:EndOfLineTrivia [52..53) '\n'
+        L:WhitespaceTrivia [53..57) '    '
+        CloseBraceToken [57..58) '}'
+        T:EndOfLineTrivia [58..59) '\n'
+    CloseBraceToken [59..60) '}'
+  EndOfFileToken [60..60) ''
+Diagnostics:
+  CS8022 [46..47) Feature \'generics\' is not available in C# 1. Please use language version 2 or greater.

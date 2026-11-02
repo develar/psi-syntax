@@ -1,0 +1,37 @@
+CompilationUnit [0..38)
+  ClassDeclaration [0..38)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..37)
+      L:WhitespaceTrivia [10..14) '    '
+      FixedKeyword [14..19) 'fixed'
+      T:WhitespaceTrivia [19..20) ' '
+      VariableDeclaration [20..35)
+        ArrayType [20..26)
+          PredefinedType [20..23)
+            IntKeyword [20..23) 'int'
+          ArrayRankSpecifier [23..26)
+            OpenBracketToken [23..24) '['
+            OmittedArraySizeExpression [24..24)
+              OmittedArraySizeExpressionToken [24..24) ''
+            CloseBracketToken [24..25) ']'
+            T:WhitespaceTrivia [25..26) ' '
+        VariableDeclarator [26..35)
+          IdentifierToken [26..31) 'value'
+          T:WhitespaceTrivia [31..32) ' '
+          T:SkippedTokensTrivia [32..33)
+            EqualsToken [32..33) '='
+          T:WhitespaceTrivia [33..34) ' '
+          T:SkippedTokensTrivia [34..35)
+            NumericLiteralToken [34..35) '5'
+      SemicolonToken [35..36) ';'
+      T:EndOfLineTrivia [36..37) '\n'
+    CloseBraceToken [37..38) '}'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1641 [26..31) A fixed size buffer field must have the array size specifier after the field name
+  CS1003 [32..33) Syntax error, \',\' expected

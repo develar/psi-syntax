@@ -1,0 +1,38 @@
+FieldDeclaration [0..39)
+  VariableDeclaration [0..38)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..38)
+      IdentifierToken [21..26) 'func6'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..38)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        NotEqualsExpression [29..38)
+          SuppressNullableWarningExpression [29..32)
+            IdentifierName [29..31)
+              IdentifierToken [29..30) 'x'
+              T:WhitespaceTrivia [30..31) ' '
+            ExclamationToken [31..32) '!'
+          ExclamationEqualsToken [32..34) '!='
+          T:WhitespaceTrivia [34..35) ' '
+          GreaterThanExpression [35..38)
+            IdentifierName [35..35)
+              IdentifierToken [35..35) missing
+            GreaterThanToken [35..36) '>'
+            T:WhitespaceTrivia [36..37) ' '
+            IdentifierName [37..38)
+              IdentifierToken [37..38) 'x'
+  SemicolonToken [38..39) ';'
+Diagnostics:
+  CS1525 [35..36) Invalid expression term \'>\'

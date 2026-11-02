@@ -1,0 +1,15 @@
+CompilationUnit [0..21)
+  UnionDeclaration [0..21)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    UnionKeyword [8..13) 'union'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..16) 'U1'
+    ParameterList [16..20)
+      OpenParenToken [16..17) '('
+      Parameter [17..19)
+        IdentifierName [17..19)
+          IdentifierToken [17..19) 'E1'
+      CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

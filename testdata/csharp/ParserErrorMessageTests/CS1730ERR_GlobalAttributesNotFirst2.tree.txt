@@ -1,0 +1,29 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..10) 'Test'
+    T:EndOfLineTrivia [10..11) '\n'
+    OpenBraceToken [11..12) '{'
+    T:EndOfLineTrivia [12..13) '\n'
+    CloseBraceToken [13..14) '}'
+    T:EndOfLineTrivia [14..15) '\n'
+    T:SkippedTokensTrivia [15..16)
+      OpenBracketToken [15..16) '['
+    T:WhitespaceTrivia [16..18) '  '
+    T:SkippedTokensTrivia [18..26)
+      AssemblyKeyword [18..26) 'assembly'
+    T:WhitespaceTrivia [26..28) '  '
+    T:SkippedTokensTrivia [28..29)
+      ColonToken [28..29) ':'
+    T:SkippedTokensTrivia [29..35)
+      IdentifierToken [29..35) 'System'
+    T:SkippedTokensTrivia [35..36)
+      DotToken [35..36) '.'
+    T:SkippedTokensTrivia [36..45)
+      IdentifierToken [36..45) 'Attribute'
+    T:SkippedTokensTrivia [45..46)
+      CloseBracketToken [45..46) ']'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1730 [18..26) Assembly and module attributes must precede all other elements defined in a file except using clauses and extern alias declarations

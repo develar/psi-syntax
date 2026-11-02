@@ -1,0 +1,30 @@
+ParenthesizedLambdaExpression [0..19)
+  ParameterList [0..14)
+    OpenParenToken [0..1) '('
+    Parameter [1..12)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'x'
+      T:WhitespaceTrivia [6..7) ' '
+      EqualsValueClause [7..12)
+        EqualsToken [7..8) '='
+        T:WhitespaceTrivia [8..9) ' '
+        GreaterThanExpression [9..12)
+          IdentifierName [9..9)
+            IdentifierToken [9..9) missing
+          GreaterThanToken [9..10) '>'
+          T:WhitespaceTrivia [10..11) ' '
+          NumericLiteralExpression [11..12)
+            NumericLiteralToken [11..12) '0'
+    CloseParenToken [12..13) ')'
+    T:WhitespaceTrivia [13..14) ' '
+  EqualsGreaterThanToken [14..16) '=>'
+  T:WhitespaceTrivia [16..17) ' '
+  IdentifierName [17..19)
+    IdentifierToken [17..18) 'x'
+    T:SkippedTokensTrivia [18..19)
+      SemicolonToken [18..19) ';'
+Diagnostics:
+  CS1073 [0..18) Unexpected token \';\'
+  CS1525 [9..10) Invalid expression term \'>\'

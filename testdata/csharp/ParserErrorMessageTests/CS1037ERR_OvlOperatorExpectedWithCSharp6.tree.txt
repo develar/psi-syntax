@@ -1,0 +1,83 @@
+CompilationUnit [0..150)
+  ClassDeclaration [0..150)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ConversionOperatorDeclaration [11..84)
+      L:WhitespaceTrivia [11..15) '    '
+      PublicKeyword [15..21) 'public'
+      T:WhitespaceTrivia [21..22) ' '
+      StaticKeyword [22..28) 'static'
+      T:WhitespaceTrivia [28..29) ' '
+      L:SkippedTokensTrivia [29..32)
+        IntKeyword [29..32) 'int'
+      L:WhitespaceTrivia [32..33) ' '
+      ExplicitKeyword [33..41) 'explicit'
+      T:WhitespaceTrivia [41..42) ' '
+      OperatorKeyword [42..50) 'operator'
+      T:WhitespaceTrivia [50..51) ' '
+      IdentifierName [51..51)
+        IdentifierToken [51..51) missing
+      ParameterList [51..54)
+        OpenParenToken [51..52) '('
+        CloseParenToken [52..53) ')'
+        T:EndOfLineTrivia [53..54) '\n'
+      Block [54..84)
+        L:WhitespaceTrivia [54..58) '    '
+        OpenBraceToken [58..59) '{'
+        T:EndOfLineTrivia [59..60) '\n'
+        ReturnStatement [60..78)
+          L:WhitespaceTrivia [60..68) '        '
+          ReturnKeyword [68..74) 'return'
+          T:WhitespaceTrivia [74..75) ' '
+          NumericLiteralExpression [75..76)
+            NumericLiteralToken [75..76) '0'
+          SemicolonToken [76..77) ';'
+          T:EndOfLineTrivia [77..78) '\n'
+        L:WhitespaceTrivia [78..82) '    '
+        CloseBraceToken [82..83) '}'
+        T:EndOfLineTrivia [83..84) '\n'
+    OperatorDeclaration [84..149)
+      L:WhitespaceTrivia [84..88) '    '
+      PublicKeyword [88..94) 'public'
+      T:WhitespaceTrivia [94..95) ' '
+      StaticKeyword [95..101) 'static'
+      T:WhitespaceTrivia [101..102) ' '
+      IdentifierName [102..104)
+        IdentifierToken [102..103) 'A'
+        T:WhitespaceTrivia [103..104) ' '
+      OperatorKeyword [104..112) 'operator'
+      T:WhitespaceTrivia [112..113) ' '
+      PlusToken [113..113) missing
+      T:SkippedTokensTrivia [113..114)
+        OpenParenToken [113..114) '('
+      ParameterList [114..116)
+        OpenParenToken [114..114) missing
+        CloseParenToken [114..115) ')'
+        T:EndOfLineTrivia [115..116) '\n'
+      Block [116..149)
+        L:WhitespaceTrivia [116..120) '    '
+        OpenBraceToken [120..121) '{'
+        T:EndOfLineTrivia [121..122) '\n'
+        ReturnStatement [122..143)
+          L:WhitespaceTrivia [122..130) '        '
+          ReturnKeyword [130..136) 'return'
+          T:WhitespaceTrivia [136..137) ' '
+          NullLiteralExpression [137..141)
+            NullKeyword [137..141) 'null'
+          SemicolonToken [141..142) ';'
+          T:EndOfLineTrivia [142..143) '\n'
+        L:WhitespaceTrivia [143..147) '    '
+        CloseBraceToken [147..148) '}'
+        T:EndOfLineTrivia [148..149) '\n'
+    CloseBraceToken [149..150) '}'
+  EndOfFileToken [150..150) ''
+Diagnostics:
+  CS1553 [29..32) Declaration is not valid; use \'explicit operator <dest-type> (...\' instead
+  CS1001 [51..52) Identifier expected
+  CS1037 [113..114) Overloadable operator expected
+  CS1003 [114..115) Syntax error, \'(\' expected

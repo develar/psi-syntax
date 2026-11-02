@@ -1,0 +1,25 @@
+CompilationUnit [0..33)
+  GlobalStatement [0..33)
+    LocalDeclarationStatement [0..33)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      VariableDeclaration [6..32)
+        IdentifierName [6..10)
+          IdentifierToken [6..9) 'var'
+          T:WhitespaceTrivia [9..10) ' '
+        VariableDeclarator [10..32)
+          IdentifierToken [10..11) 'a'
+          T:WhitespaceTrivia [11..12) ' '
+          EqualsValueClause [12..32)
+            EqualsToken [12..13) '='
+            T:WhitespaceTrivia [13..14) ' '
+            ObjectCreationExpression [14..32)
+              NewKeyword [14..17) 'new'
+              T:WhitespaceTrivia [17..18) ' '
+              IdentifierName [18..30)
+                IdentifierToken [18..30) 'MyDisposable'
+              ArgumentList [30..32)
+                OpenParenToken [30..31) '('
+                CloseParenToken [31..32) ')'
+      SemicolonToken [32..33) ';'
+  EndOfFileToken [33..33) ''

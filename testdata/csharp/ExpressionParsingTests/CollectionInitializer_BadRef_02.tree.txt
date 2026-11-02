@@ -1,0 +1,27 @@
+ObjectCreationExpression [0..20)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'C'
+    T:WhitespaceTrivia [5..6) ' '
+  CollectionInitializerExpression [6..20)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    ComplexElementInitializerExpression [8..19)
+      OpenBraceToken [8..9) '{'
+      T:WhitespaceTrivia [9..10) ' '
+      NumericLiteralExpression [10..11)
+        NumericLiteralToken [10..11) '0'
+      CommaToken [11..12) ','
+      T:WhitespaceTrivia [12..13) ' '
+      RefExpression [13..17)
+        RefKeyword [13..16) 'ref'
+        T:WhitespaceTrivia [16..17) ' '
+        IdentifierName [17..17)
+          IdentifierToken [17..17) missing
+      CloseBraceToken [17..18) '}'
+      T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'
+Diagnostics:
+  CS1525 [13..17) Invalid expression term \'ref\'
+  CS1525 [17..18) Invalid expression term \'}\'

@@ -1,0 +1,9 @@
+InterpolatedStringExpression [0..16)
+  InterpolatedMultiLineRawStringStartToken [0..5) '$"""\n'
+  InterpolatedStringText [5..10)
+    InterpolatedStringTextToken [5..10) 'hello'
+  InterpolatedRawStringEndToken [10..14) '\n"""'
+  T:SkippedTokensTrivia [14..16)
+    IdentifierToken [14..16) 'U8'
+Diagnostics:
+  CS1073 [0..14) Unexpected token \'U8\'

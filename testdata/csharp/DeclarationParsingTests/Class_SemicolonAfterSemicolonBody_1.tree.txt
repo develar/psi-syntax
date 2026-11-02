@@ -1,0 +1,14 @@
+CompilationUnit [0..12)
+  StructDeclaration [0..11)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    SemicolonToken [9..10) ';'
+    T:EndOfLineTrivia [10..11) '\n'
+  GlobalStatement [11..12)
+    EmptyStatement [11..12)
+      SemicolonToken [11..12) ';'
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS8803 [11..12) Top-level statements must precede namespace and type declarations.

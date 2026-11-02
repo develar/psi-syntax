@@ -1,0 +1,68 @@
+CompilationUnit [0..85)
+  ClassDeclaration [0..85)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..85)
+      L:WhitespaceTrivia [21..25) '    '
+      PublicKeyword [25..31) 'public'
+      T:WhitespaceTrivia [31..32) ' '
+      StaticKeyword [32..38) 'static'
+      T:WhitespaceTrivia [38..39) ' '
+      PredefinedType [39..44)
+        VoidKeyword [39..43) 'void'
+        T:WhitespaceTrivia [43..44) ' '
+      IdentifierToken [44..48) 'Main'
+      ParameterList [48..64)
+        OpenParenToken [48..49) '('
+        Parameter [49..62)
+          ArrayType [49..58)
+            PredefinedType [49..55)
+              StringKeyword [49..55) 'string'
+            ArrayRankSpecifier [55..58)
+              OpenBracketToken [55..56) '['
+              OmittedArraySizeExpression [56..56)
+                OmittedArraySizeExpressionToken [56..56) ''
+              CloseBracketToken [56..57) ']'
+              T:WhitespaceTrivia [57..58) ' '
+          IdentifierToken [58..62) 'args'
+        CloseParenToken [62..63) ')'
+        T:EndOfLineTrivia [63..64) '\n'
+      Block [64..85)
+        L:WhitespaceTrivia [64..68) '    '
+        OpenBraceToken [68..69) '{'
+        T:EndOfLineTrivia [69..70) '\n'
+        ForEachVariableStatement [70..85)
+          L:WhitespaceTrivia [70..78) '        '
+          ForEachKeyword [78..85) 'foreach'
+          OpenParenToken [85..85) missing
+          IdentifierName [85..85)
+            IdentifierToken [85..85) missing
+          InKeyword [85..85) missing
+          IdentifierName [85..85)
+            IdentifierToken [85..85) missing
+          CloseParenToken [85..85) missing
+          ExpressionStatement [85..85)
+            IdentifierName [85..85)
+              IdentifierToken [85..85) missing
+            SemicolonToken [85..85) missing
+        CloseBraceToken [85..85) missing
+    CloseBraceToken [85..85) missing
+  EndOfFileToken [85..85) ''
+Diagnostics:
+  CS1003 [85..85) Syntax error, \'(\' expected
+  CS1733 [85..85) Expected expression
+  CS1515 [85..85) \'in\' expected
+  CS0230 [85..85) Type and identifier are both required in a foreach statement
+  CS1733 [85..85) Expected expression
+  CS1026 [85..85) ) expected
+  CS1733 [85..85) Expected expression
+  CS1002 [85..85) ; expected
+  CS1513 [85..85) } expected
+  CS1513 [85..85) } expected

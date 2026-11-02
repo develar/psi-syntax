@@ -1,0 +1,19 @@
+CompilationUnit [0..15)
+  GlobalStatement [0..15)
+    ExpressionStatement [0..15)
+      SimpleAssignmentExpression [0..14)
+        UnsafeExpression [0..11)
+          UnsafeKeyword [0..6) 'unsafe'
+          OpenParenToken [6..7) '('
+          PointerIndirectionExpression [7..9)
+            AsteriskToken [7..8) '*'
+            IdentifierName [8..9)
+              IdentifierToken [8..9) 'p'
+          CloseParenToken [9..10) ')'
+          T:WhitespaceTrivia [10..11) ' '
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        NumericLiteralExpression [13..14)
+          NumericLiteralToken [13..14) '2'
+      SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

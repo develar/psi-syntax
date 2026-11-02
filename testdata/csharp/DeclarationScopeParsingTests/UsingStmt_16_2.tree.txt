@@ -1,0 +1,26 @@
+CompilationUnit [0..34)
+  GlobalStatement [0..34)
+    UsingStatement [0..34)
+      L:EndOfLineTrivia [0..1) '\n'
+      UsingKeyword [1..6) 'using'
+      T:WhitespaceTrivia [6..7) ' '
+      OpenParenToken [7..8) '('
+      VariableDeclaration [8..31)
+        ScopedType [8..30)
+          ScopedKeyword [8..14) 'scoped'
+          T:WhitespaceTrivia [14..15) ' '
+          RefType [15..30)
+            RefKeyword [15..18) 'ref'
+            T:WhitespaceTrivia [18..19) ' '
+            ReadOnlyKeyword [19..27) 'readonly'
+            T:WhitespaceTrivia [27..28) ' '
+            IdentifierName [28..30)
+              IdentifierToken [28..29) 'S'
+              T:WhitespaceTrivia [29..30) ' '
+        VariableDeclarator [30..31)
+          IdentifierToken [30..31) 'a'
+      CloseParenToken [31..32) ')'
+      EmptyStatement [32..34)
+        SemicolonToken [32..33) ';'
+        T:EndOfLineTrivia [33..34) '\n'
+  EndOfFileToken [34..34) ''

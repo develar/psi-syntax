@@ -1,0 +1,6 @@
+AliasQualifiedName [0..11)
+  IdentifierName [0..6)
+    GlobalKeyword [0..6) 'global'
+  ColonColonToken [6..8) '::'
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'bar'

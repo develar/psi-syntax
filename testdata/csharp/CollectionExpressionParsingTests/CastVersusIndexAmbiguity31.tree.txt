@@ -1,0 +1,28 @@
+LocalDeclarationStatement [0..18)
+  VariableDeclaration [0..17)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..17)
+      IdentifierToken [4..5) 'x'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..17)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        CastExpression [8..17)
+          OpenParenToken [8..9) '('
+          GenericName [9..13)
+            IdentifierToken [9..10) 'A'
+            TypeArgumentList [10..13)
+              LessThanToken [10..11) '<'
+              IdentifierName [11..12)
+                IdentifierToken [11..12) 'B'
+              GreaterThanToken [12..13) '>'
+          CloseParenToken [13..14) ')'
+          CollectionExpression [14..17)
+            OpenBracketToken [14..15) '['
+            ExpressionElement [15..16)
+              NumericLiteralExpression [15..16)
+                NumericLiteralToken [15..16) '1'
+            CloseBracketToken [16..17) ']'
+  SemicolonToken [17..18) ';'

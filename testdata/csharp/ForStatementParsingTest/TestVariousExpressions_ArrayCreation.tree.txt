@@ -1,0 +1,57 @@
+ForStatement [0..48)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ArrayCreationExpression [5..18)
+    NewKeyword [5..8) 'new'
+    T:WhitespaceTrivia [8..9) ' '
+    ArrayType [9..15)
+      PredefinedType [9..12)
+        IntKeyword [9..12) 'int'
+      ArrayRankSpecifier [12..15)
+        OpenBracketToken [12..13) '['
+        OmittedArraySizeExpression [13..13)
+          OmittedArraySizeExpressionToken [13..13) ''
+        CloseBracketToken [13..14) ']'
+        T:WhitespaceTrivia [14..15) ' '
+    ArrayInitializerExpression [15..18)
+      OpenBraceToken [15..16) '{'
+      T:WhitespaceTrivia [16..17) ' '
+      CloseBraceToken [17..18) '}'
+  SemicolonToken [18..19) ';'
+  ArrayCreationExpression [19..32)
+    NewKeyword [19..22) 'new'
+    T:WhitespaceTrivia [22..23) ' '
+    ArrayType [23..29)
+      PredefinedType [23..26)
+        IntKeyword [23..26) 'int'
+      ArrayRankSpecifier [26..29)
+        OpenBracketToken [26..27) '['
+        OmittedArraySizeExpression [27..27)
+          OmittedArraySizeExpressionToken [27..27) ''
+        CloseBracketToken [27..28) ']'
+        T:WhitespaceTrivia [28..29) ' '
+    ArrayInitializerExpression [29..32)
+      OpenBraceToken [29..30) '{'
+      T:WhitespaceTrivia [30..31) ' '
+      CloseBraceToken [31..32) '}'
+  SemicolonToken [32..33) ';'
+  ArrayCreationExpression [33..46)
+    NewKeyword [33..36) 'new'
+    T:WhitespaceTrivia [36..37) ' '
+    ArrayType [37..43)
+      PredefinedType [37..40)
+        IntKeyword [37..40) 'int'
+      ArrayRankSpecifier [40..43)
+        OpenBracketToken [40..41) '['
+        OmittedArraySizeExpression [41..41)
+          OmittedArraySizeExpressionToken [41..41) ''
+        CloseBracketToken [41..42) ']'
+        T:WhitespaceTrivia [42..43) ' '
+    ArrayInitializerExpression [43..46)
+      OpenBraceToken [43..44) '{'
+      T:WhitespaceTrivia [44..45) ' '
+      CloseBraceToken [45..46) '}'
+  CloseParenToken [46..47) ')'
+  EmptyStatement [47..48)
+    SemicolonToken [47..48) ';'

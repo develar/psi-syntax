@@ -1,0 +1,1 @@
+(delegate* unmanaged[thiscall]<int, C>)ptr

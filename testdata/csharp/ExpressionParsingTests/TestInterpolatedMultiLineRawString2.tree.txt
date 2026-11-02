@@ -1,0 +1,18 @@
+InterpolatedStringExpression [0..29)
+  InterpolatedMultiLineRawStringStartToken [0..6) '$$"""\n'
+  InterpolatedStringText [6..11)
+    InterpolatedStringTextToken [6..11) '    {'
+  Interpolation [11..20)
+    OpenBraceToken [11..13) '{{'
+    AddExpression [13..18)
+      NumericLiteralExpression [13..15)
+        NumericLiteralToken [13..14) '1'
+        T:WhitespaceTrivia [14..15) ' '
+      PlusToken [15..16) '+'
+      T:WhitespaceTrivia [16..17) ' '
+      NumericLiteralExpression [17..18)
+        NumericLiteralToken [17..18) '1'
+    CloseBraceToken [18..20) '}}'
+  InterpolatedStringText [20..21)
+    InterpolatedStringTextToken [20..21) '}'
+  InterpolatedRawStringEndToken [21..29) '\n    """'

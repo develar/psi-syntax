@@ -1,0 +1,10 @@
+CompilationUnit [0..7)
+  L:PragmaWarningDirectiveTrivia [0..7)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    WarningKeyword [7..7) missing
+    DisableKeyword [7..7) missing
+    EndOfDirectiveToken [7..7) ''
+  EndOfFileToken [7..7) ''
+Diagnostics:
+  CS1633 [7..7) Unrecognized #pragma directive

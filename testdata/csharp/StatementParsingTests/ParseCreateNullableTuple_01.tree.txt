@@ -1,0 +1,28 @@
+ExpressionStatement [0..23)
+  SimpleAssignmentExpression [0..22)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ObjectCreationExpression [4..22)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      NullableType [8..20)
+        TupleType [8..18)
+          OpenParenToken [8..9) '('
+          TupleElement [9..12)
+            PredefinedType [9..12)
+              IntKeyword [9..12) 'int'
+          CommaToken [12..13) ','
+          T:WhitespaceTrivia [13..14) ' '
+          TupleElement [14..17)
+            PredefinedType [14..17)
+              IntKeyword [14..17) 'int'
+          CloseParenToken [17..18) ')'
+        QuestionToken [18..19) '?'
+        T:WhitespaceTrivia [19..20) ' '
+      ObjectInitializerExpression [20..22)
+        OpenBraceToken [20..21) '{'
+        CloseBraceToken [21..22) '}'
+  SemicolonToken [22..23) ';'

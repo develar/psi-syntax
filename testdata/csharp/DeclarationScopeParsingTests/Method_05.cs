@@ -1,0 +1,1 @@
+ref scoped R F() => default;

@@ -1,0 +1,9 @@
+ObjectCreationExpression [0..3)
+  NewKeyword [0..3) 'new'
+  IdentifierName [3..3)
+    IdentifierToken [3..3) missing
+  ArgumentList [3..3)
+    OpenParenToken [3..3) missing
+    CloseParenToken [3..3) missing
+Diagnostics:
+  CS1526 [3..3) A new expression requires an argument list or (), [], or {} after type

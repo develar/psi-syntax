@@ -1,0 +1,19 @@
+ImplicitArrayCreationExpression [0..10)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenBracketToken [4..5) '['
+  T:SkippedTokensTrivia [5..6)
+    IdentifierToken [5..6) 'A'
+  CommaToken [6..7) ','
+  T:WhitespaceTrivia [7..8) ' '
+  T:SkippedTokensTrivia [8..9)
+    IdentifierToken [8..9) 'B'
+  CloseBracketToken [9..10) ']'
+  ArrayInitializerExpression [10..10)
+    OpenBraceToken [10..10) missing
+    CloseBraceToken [10..10) missing
+Diagnostics:
+  CS0178 [5..6) Invalid rank specifier: expected \',\' or \']\'
+  CS0178 [8..9) Invalid rank specifier: expected \',\' or \']\'
+  CS1514 [10..10) { expected
+  CS1513 [10..10) } expected

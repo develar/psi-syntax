@@ -1,0 +1,100 @@
+CompilationUnit [0..211)
+  NamespaceDeclaration [0..211)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    InterfaceDeclaration [15..95)
+      L:WhitespaceTrivia [15..19) '    '
+      InterfaceKeyword [19..28) 'interface'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..31) 'ii'
+      T:EndOfLineTrivia [31..32) '\n'
+      L:WhitespaceTrivia [32..36) '    '
+      OpenBraceToken [36..37) '{'
+      T:EndOfLineTrivia [37..38) '\n'
+      PropertyDeclaration [38..89)
+        PredefinedType [38..50)
+          L:WhitespaceTrivia [38..46) '        '
+          IntKeyword [46..49) 'int'
+          T:WhitespaceTrivia [49..50) ' '
+        IdentifierToken [50..51) 'i'
+        T:EndOfLineTrivia [51..52) '\n'
+        AccessorList [52..89)
+          L:WhitespaceTrivia [52..60) '        '
+          OpenBraceToken [60..61) '{'
+          T:EndOfLineTrivia [61..62) '\n'
+          GetAccessorDeclaration [62..79)
+            L:WhitespaceTrivia [62..74) '            '
+            GetKeyword [74..77) 'get'
+            SemicolonToken [77..78) ';'
+            T:EndOfLineTrivia [78..79) '\n'
+          L:WhitespaceTrivia [79..87) '        '
+          CloseBraceToken [87..88) '}'
+          T:EndOfLineTrivia [88..89) '\n'
+      L:WhitespaceTrivia [89..93) '    '
+      CloseBraceToken [93..94) '}'
+      T:EndOfLineTrivia [94..95) '\n'
+    ClassDeclaration [95..209)
+      L:WhitespaceTrivia [95..99) '    '
+      PublicKeyword [99..105) 'public'
+      T:WhitespaceTrivia [105..106) ' '
+      ClassKeyword [106..111) 'class'
+      T:WhitespaceTrivia [111..112) ' '
+      IdentifierToken [112..113) 'a'
+      T:WhitespaceTrivia [113..114) ' '
+      T:EndOfLineTrivia [114..115) '\n'
+      L:WhitespaceTrivia [115..119) '    '
+      OpenBraceToken [119..120) '{'
+      T:EndOfLineTrivia [120..121) '\n'
+      ConversionOperatorDeclaration [121..203)
+        L:WhitespaceTrivia [121..129) '        '
+        PublicKeyword [129..135) 'public'
+        T:WhitespaceTrivia [135..136) ' '
+        ExplicitKeyword [136..136) missing
+        OperatorKeyword [136..144) 'operator'
+        T:WhitespaceTrivia [144..145) ' '
+        IdentifierName [145..147)
+          IdentifierToken [145..147) 'ii'
+        ParameterList [147..154)
+          OpenParenToken [147..148) '('
+          Parameter [148..152)
+            IdentifierName [148..150)
+              IdentifierToken [148..149) 'a'
+              T:WhitespaceTrivia [149..150) ' '
+            IdentifierToken [150..152) 'aa'
+          CloseParenToken [152..153) ')'
+          T:EndOfLineTrivia [153..154) '\n'
+        Block [154..203)
+          L:WhitespaceTrivia [154..162) '        '
+          OpenBraceToken [162..163) '{'
+          T:EndOfLineTrivia [163..164) '\n'
+          ReturnStatement [164..193)
+            L:WhitespaceTrivia [164..176) '            '
+            ReturnKeyword [176..182) 'return'
+            T:WhitespaceTrivia [182..183) ' '
+            ObjectCreationExpression [183..191)
+              NewKeyword [183..186) 'new'
+              T:WhitespaceTrivia [186..187) ' '
+              IdentifierName [187..189)
+                IdentifierToken [187..189) 'ii'
+              ArgumentList [189..191)
+                OpenParenToken [189..190) '('
+                CloseParenToken [190..191) ')'
+            SemicolonToken [191..192) ';'
+            T:EndOfLineTrivia [192..193) '\n'
+          L:WhitespaceTrivia [193..201) '        '
+          CloseBraceToken [201..202) '}'
+          T:EndOfLineTrivia [202..203) '\n'
+      L:WhitespaceTrivia [203..207) '    '
+      CloseBraceToken [207..208) '}'
+      T:EndOfLineTrivia [208..209) '\n'
+    CloseBraceToken [209..210) '}'
+    T:EndOfLineTrivia [210..211) '\n'
+  EndOfFileToken [211..211) ''
+Diagnostics:
+  CS1003 [136..144) Syntax error, \'explicit\' expected

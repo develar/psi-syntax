@@ -1,0 +1,37 @@
+ParenthesizedLambdaExpression [0..35)
+  ParameterList [0..4)
+    L:EndOfLineTrivia [0..1) '\n'
+    OpenParenToken [1..2) '('
+    CloseParenToken [2..3) ')'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  Block [7..35)
+    OpenBraceToken [7..8) '{'
+    T:EndOfLineTrivia [8..9) '\n'
+    LocalDeclarationStatement [9..33)
+      L:WhitespaceTrivia [9..13) '    '
+      StaticKeyword [13..19) 'static'
+      T:WhitespaceTrivia [19..20) ' '
+      VariableDeclaration [20..31)
+        IdentifierName [20..26)
+          IdentifierToken [20..25) 'await'
+          T:WhitespaceTrivia [25..26) ' '
+        VariableDeclarator [26..31)
+          IdentifierToken [26..29) 'goo'
+          BracketedArgumentList [29..31)
+            OpenBracketToken [29..29) missing
+            T:SkippedTokensTrivia [29..30)
+              OpenParenToken [29..30) '('
+            CloseBracketToken [30..30) missing
+            T:SkippedTokensTrivia [30..31)
+              CloseParenToken [30..31) ')'
+      SemicolonToken [31..32) ';'
+      T:EndOfLineTrivia [32..33) '\n'
+    CloseBraceToken [33..34) '}'
+    T:EndOfLineTrivia [34..35) '\n'
+Diagnostics:
+  CS0106 [13..19) The modifier \'static\' is not valid for this item
+  CS1528 [29..30) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [29..30) Syntax error, \'[\' expected
+  CS1003 [30..31) Syntax error, \']\' expected

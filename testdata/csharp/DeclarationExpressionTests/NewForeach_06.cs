@@ -1,0 +1,1 @@
+foreach ((int x, var (y, z)) in e) {}

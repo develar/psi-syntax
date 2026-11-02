@@ -1,0 +1,22 @@
+UsingStatement [0..19)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..14)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'T'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..10) 'a'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        IdentifierName [13..14)
+          IdentifierToken [13..14) 'b'
+  CloseParenToken [14..15) ')'
+  T:WhitespaceTrivia [15..16) ' '
+  Block [16..19)
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'

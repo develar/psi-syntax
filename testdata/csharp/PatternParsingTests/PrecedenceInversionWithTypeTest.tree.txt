@@ -1,0 +1,17 @@
+IsPatternExpression [0..12)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ConstantPattern [5..12)
+    AddExpression [5..12)
+      PredefinedType [5..9)
+        IntKeyword [5..8) 'int'
+        T:WhitespaceTrivia [8..9) ' '
+      PlusToken [9..10) '+'
+      T:WhitespaceTrivia [10..11) ' '
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'd'
+Diagnostics:
+  CS1525 [5..8) Invalid expression term \'int\'

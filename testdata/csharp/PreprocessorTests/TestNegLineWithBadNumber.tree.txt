@@ -1,0 +1,12 @@
+CompilationUnit [0..9)
+  L:LineDirectiveTrivia [0..9)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..6) missing
+    L:SkippedTokensTrivia [6..9)
+      IdentifierToken [6..9) 'Goo'
+    EndOfDirectiveToken [9..9) ''
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1576 [6..9) The line number specified for #line directive is missing or invalid

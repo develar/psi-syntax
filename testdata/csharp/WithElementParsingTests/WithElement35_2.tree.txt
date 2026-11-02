@@ -1,0 +1,17 @@
+CollectionExpression [0..10)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..3)
+    IdentifierName [1..3)
+      IdentifierToken [1..2) 'x'
+      T:SkippedTokensTrivia [2..3)
+        ColonToken [2..3) ':'
+  CommaToken [3..3) missing
+  WithElement [3..9)
+    WithKeyword [3..7) 'with'
+    ArgumentList [7..9)
+      OpenParenToken [7..8) '('
+      CloseParenToken [8..9) ')'
+  CloseBracketToken [9..10) ']'
+Diagnostics:
+  CS1003 [2..3) Syntax error, \',\' expected
+  CS1003 [3..7) Syntax error, \',\' expected

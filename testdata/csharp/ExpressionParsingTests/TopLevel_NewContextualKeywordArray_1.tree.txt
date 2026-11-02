@@ -1,0 +1,19 @@
+CompilationUnit [0..13)
+  IncompleteMember [0..12)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayType [4..12)
+      IdentifierName [4..8)
+        IdentifierToken [4..8) 'file'
+      ArrayRankSpecifier [8..12)
+        OpenBracketToken [8..9) '['
+        NumericLiteralExpression [9..11)
+          NumericLiteralToken [9..10) '1'
+          T:EndOfLineTrivia [10..11) '\n'
+        CloseBracketToken [11..12) ']'
+  GlobalStatement [12..13)
+    EmptyStatement [12..13)
+      SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS0116 [11..12) A namespace cannot directly contain members such as fields, methods or statements

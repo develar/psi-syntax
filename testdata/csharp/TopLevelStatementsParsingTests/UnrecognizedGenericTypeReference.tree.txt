@@ -1,0 +1,30 @@
+CompilationUnit [0..37)
+  GlobalStatement [0..20)
+    ExpressionStatement [0..20)
+      LessThanExpression [0..18)
+        IdentifierName [0..11)
+          L:MultiLineCommentTrivia [0..10) '/*<bind>*/'
+          IdentifierToken [10..11) 'C'
+        LessThanToken [11..12) '<'
+        PredefinedType [12..18)
+          ObjectKeyword [12..18) 'object'
+      SemicolonToken [18..18) missing
+      T:SkippedTokensTrivia [18..19)
+        CommaToken [18..19) ','
+      T:WhitespaceTrivia [19..20) ' '
+  GlobalStatement [20..37)
+    LocalDeclarationStatement [20..37)
+      VariableDeclaration [20..37)
+        PredefinedType [20..37)
+          StringKeyword [20..26) 'string'
+          T:MultiLineCommentTrivia [26..37) '/*</bind>*/'
+        VariableDeclarator [37..37)
+          IdentifierToken [37..37) missing
+      SemicolonToken [37..37) missing
+  EndOfFileToken [37..37) ''
+Diagnostics:
+  CS1525 [12..18) Invalid expression term \'object\'
+  CS1002 [18..19) ; expected
+  CS1022 [18..19) Type or namespace definition, or end-of-file expected
+  CS1001 [37..37) Identifier expected
+  CS1002 [37..37) ; expected

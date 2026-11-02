@@ -1,0 +1,4 @@
+AnonymousObjectCreationExpression [0..5)
+  NewKeyword [0..3) 'new'
+  OpenBraceToken [3..4) '{'
+  CloseBraceToken [4..5) '}'

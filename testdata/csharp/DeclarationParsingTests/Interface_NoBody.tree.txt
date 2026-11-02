@@ -1,0 +1,12 @@
+CompilationUnit [0..12)
+  InterfaceDeclaration [0..12)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'C'
+    OpenBraceToken [12..12) missing
+    CloseBraceToken [12..12) missing
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1514 [12..12) { expected
+  CS1513 [12..12) } expected

@@ -1,0 +1,1 @@
+C operator >>=(C x) => x;

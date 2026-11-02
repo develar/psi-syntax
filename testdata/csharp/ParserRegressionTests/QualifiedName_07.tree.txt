@@ -1,0 +1,52 @@
+CompilationUnit [0..71)
+  ClassDeclaration [0..71)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..70)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..32)
+        VoidKeyword [27..31) 'void'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..70)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        LocalDeclarationStatement [45..64)
+          VariableDeclaration [45..62)
+            QualifiedName [45..61)
+              GenericName [45..57)
+                L:WhitespaceTrivia [45..53) '        '
+                IdentifierToken [53..54) 'A'
+                TypeArgumentList [54..57)
+                  LessThanToken [54..55) '<'
+                  IdentifierName [55..56)
+                    IdentifierToken [55..56) 'B'
+                  GreaterThanToken [56..57) '>'
+              DotToken [57..57) missing
+              T:SkippedTokensTrivia [57..59)
+                ColonColonToken [57..59) '::'
+              IdentifierName [59..61)
+                IdentifierToken [59..60) 'C'
+                T:WhitespaceTrivia [60..61) ' '
+            VariableDeclarator [61..62)
+              IdentifierToken [61..62) 'd'
+          SemicolonToken [62..63) ';'
+          T:EndOfLineTrivia [63..64) '\n'
+        L:WhitespaceTrivia [64..68) '    '
+        CloseBraceToken [68..69) '}'
+        T:EndOfLineTrivia [69..70) '\n'
+    CloseBraceToken [70..71) '}'
+  EndOfFileToken [71..71) ''
+Diagnostics:
+  CS7000 [57..59) Unexpected use of an aliased name

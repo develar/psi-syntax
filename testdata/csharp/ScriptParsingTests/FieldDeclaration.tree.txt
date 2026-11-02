@@ -1,0 +1,56 @@
+CompilationUnit [0..60)
+  GlobalStatement [0..17)
+    LocalDeclarationStatement [0..17)
+      L:EndOfLineTrivia [0..1) '\n'
+      VolatileKeyword [1..9) 'volatile'
+      T:WhitespaceTrivia [9..10) ' '
+      VariableDeclaration [10..15)
+        PredefinedType [10..14)
+          IntKeyword [10..13) 'int'
+          T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..15)
+          IdentifierToken [14..15) 'x'
+      SemicolonToken [15..16) ';'
+      T:EndOfLineTrivia [16..17) '\n'
+  GlobalStatement [17..30)
+    LocalDeclarationStatement [17..30)
+      ConstKeyword [17..22) 'const'
+      T:WhitespaceTrivia [22..23) ' '
+      VariableDeclaration [23..28)
+        PredefinedType [23..27)
+          IntKeyword [23..26) 'int'
+          T:WhitespaceTrivia [26..27) ' '
+        VariableDeclarator [27..28)
+          IdentifierToken [27..28) 'w'
+      SemicolonToken [28..29) ';'
+      T:EndOfLineTrivia [29..30) '\n'
+  GlobalStatement [30..46)
+    LocalDeclarationStatement [30..46)
+      ReadOnlyKeyword [30..38) 'readonly'
+      T:WhitespaceTrivia [38..39) ' '
+      VariableDeclaration [39..44)
+        PredefinedType [39..43)
+          IntKeyword [39..42) 'int'
+          T:WhitespaceTrivia [42..43) ' '
+        VariableDeclarator [43..44)
+          IdentifierToken [43..44) 'y'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+  GlobalStatement [46..60)
+    LocalDeclarationStatement [46..60)
+      StaticKeyword [46..52) 'static'
+      T:WhitespaceTrivia [52..53) ' '
+      VariableDeclaration [53..58)
+        PredefinedType [53..57)
+          IntKeyword [53..56) 'int'
+          T:WhitespaceTrivia [56..57) ' '
+        VariableDeclarator [57..58)
+          IdentifierToken [57..58) 'z'
+      SemicolonToken [58..59) ';'
+      T:EndOfLineTrivia [59..60) '\n'
+  EndOfFileToken [60..60) ''
+Diagnostics:
+  CS0106 [1..9) The modifier \'volatile\' is not valid for this item
+  CS0145 [27..28) A const field requires a value to be provided
+  CS0106 [30..38) The modifier \'readonly\' is not valid for this item
+  CS0106 [46..52) The modifier \'static\' is not valid for this item

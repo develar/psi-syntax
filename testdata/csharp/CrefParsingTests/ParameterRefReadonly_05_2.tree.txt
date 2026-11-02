@@ -1,0 +1,37 @@
+L:SingleLineDocumentationCommentTrivia [0..35)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..35)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..33)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      NameMemberCref [15..32)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'A'
+        CrefParameterList [16..32)
+          OpenParenToken [16..17) '('
+          CloseParenToken [17..17) missing
+          T:SkippedTokensTrivia [17..25)
+            ReadOnlyKeyword [17..25) 'readonly'
+          T:WhitespaceTrivia [25..26) ' '
+          T:SkippedTokensTrivia [26..29)
+            RefKeyword [26..29) 'ref'
+          T:WhitespaceTrivia [29..30) ' '
+          T:SkippedTokensTrivia [30..31)
+            IdentifierToken [30..31) 'B'
+          T:SkippedTokensTrivia [31..32)
+            CloseParenToken [31..32) ')'
+      DoubleQuoteToken [32..33) '"'
+    SlashGreaterThanToken [33..35) '/>'
+  EndOfDocumentationCommentToken [35..35) ''
+EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1584 [15..17) XML comment has syntactically incorrect cref attribute \'A(readonly ref B)\'
+  CS1658 [17..25) ) expected. See also error CS1026.

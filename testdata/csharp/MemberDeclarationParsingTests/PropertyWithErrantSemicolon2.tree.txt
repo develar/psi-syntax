@@ -1,0 +1,38 @@
+CompilationUnit [0..107)
+  ClassDeclaration [0..107)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..19) 'Class'
+    T:EndOfLineTrivia [19..20) '\n'
+    OpenBraceToken [20..21) '{'
+    T:EndOfLineTrivia [21..22) '\n'
+    PropertyDeclaration [22..55)
+      L:WhitespaceTrivia [22..26) '    '
+      PublicKeyword [26..32) 'public'
+      T:WhitespaceTrivia [32..33) ' '
+      PredefinedType [33..37)
+        IntKeyword [33..36) 'int'
+        T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..47) 'MyProperty'
+      T:SkippedTokensTrivia [47..48)
+        SemicolonToken [47..48) ';'
+      T:WhitespaceTrivia [48..49) ' '
+      ArrowExpressionClause [49..53)
+        EqualsGreaterThanToken [49..51) '=>'
+        T:WhitespaceTrivia [51..52) ' '
+        NumericLiteralExpression [52..53)
+          NumericLiteralToken [52..53) '0'
+      SemicolonToken [53..54) ';'
+      T:EndOfLineTrivia [54..55) '\n'
+    L:EndOfLineTrivia [55..56) '\n'
+    L:WhitespaceTrivia [56..60) '    '
+    L:SingleLineCommentTrivia [60..104) '// Pretty much anything here causes an error'
+    L:EndOfLineTrivia [104..105) '\n'
+    CloseBraceToken [105..106) '}'
+    T:EndOfLineTrivia [106..107) '\n'
+  EndOfFileToken [107..107) ''
+Diagnostics:
+  CS1514 [47..48) { expected

@@ -1,0 +1,34 @@
+ExpressionStatement [0..40)
+  InvocationExpression [0..39)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'F'
+    ArgumentList [1..39)
+      OpenParenToken [1..2) '('
+      Argument [2..38)
+        ParenthesizedLambdaExpression [2..38)
+          AsyncKeyword [2..7) 'async'
+          T:WhitespaceTrivia [7..8) ' '
+          ParameterList [8..11)
+            OpenParenToken [8..9) '('
+            CloseParenToken [9..10) ')'
+            T:WhitespaceTrivia [10..11) ' '
+          EqualsGreaterThanToken [11..13) '=>'
+          T:WhitespaceTrivia [13..14) ' '
+          AwaitExpression [14..38)
+            AwaitKeyword [14..19) 'await'
+            T:WhitespaceTrivia [19..20) ' '
+            InvocationExpression [20..38)
+              SimpleMemberAccessExpression [20..35)
+                IdentifierName [20..24)
+                  IdentifierToken [20..24) 'Task'
+                DotToken [24..25) '.'
+                IdentifierName [25..35)
+                  IdentifierToken [25..35) 'FromResult'
+              ArgumentList [35..38)
+                OpenParenToken [35..36) '('
+                Argument [36..37)
+                  NumericLiteralExpression [36..37)
+                    NumericLiteralToken [36..37) '4'
+                CloseParenToken [37..38) ')'
+      CloseParenToken [38..39) ')'
+  SemicolonToken [39..40) ';'

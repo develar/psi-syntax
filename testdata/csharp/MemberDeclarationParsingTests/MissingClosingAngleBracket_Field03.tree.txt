@@ -1,0 +1,46 @@
+FieldDeclaration [0..99)
+  VariableDeclaration [0..98)
+    GenericName [0..47)
+      IdentifierToken [0..11) 'IEnumerable'
+      TypeArgumentList [11..47)
+        LessThanToken [11..12) '<'
+        TupleType [12..47)
+          OpenParenToken [12..13) '('
+          TupleElement [13..25)
+            PredefinedType [13..20)
+              StringKeyword [13..19) 'string'
+              T:WhitespaceTrivia [19..20) ' '
+            IdentifierToken [20..25) 'Value'
+          CommaToken [25..26) ','
+          T:WhitespaceTrivia [26..27) ' '
+          TupleElement [27..45)
+            PredefinedType [27..34)
+              StringKeyword [27..33) 'string'
+              T:WhitespaceTrivia [33..34) ' '
+            IdentifierToken [34..45) 'Description'
+          CloseParenToken [45..46) ')'
+          T:EndOfLineTrivia [46..47) '\n'
+        GreaterThanToken [47..47) missing
+    VariableDeclarator [47..64)
+      L:WhitespaceTrivia [47..51) '    '
+      IdentifierToken [51..57) 'values'
+      T:WhitespaceTrivia [57..58) ' '
+      EqualsValueClause [58..64)
+        EqualsToken [58..59) '='
+        T:WhitespaceTrivia [59..60) ' '
+        NullLiteralExpression [60..64)
+          NullKeyword [60..64) 'null'
+    CommaToken [64..65) ','
+    T:EndOfLineTrivia [65..66) '\n'
+    VariableDeclarator [66..81)
+      L:WhitespaceTrivia [66..70) '    '
+      IdentifierToken [70..81) 'otherValues'
+    CommaToken [81..82) ','
+    T:EndOfLineTrivia [82..83) '\n'
+    VariableDeclarator [83..98)
+      L:WhitespaceTrivia [83..87) '    '
+      IdentifierToken [87..97) 'moreValues'
+      T:EndOfLineTrivia [97..98) '\n'
+  SemicolonToken [98..99) ';'
+Diagnostics:
+  CS1003 [46..46) Syntax error, \'>\' expected

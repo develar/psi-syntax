@@ -1,0 +1,37 @@
+CompilationUnit [0..42)
+  GlobalStatement [0..21)
+    LocalDeclarationStatement [0..21)
+      VariableDeclaration [0..19)
+        IdentifierName [0..7)
+          IdentifierToken [0..6) 'scoped'
+          T:WhitespaceTrivia [6..7) ' '
+        VariableDeclarator [7..19)
+          IdentifierToken [7..13) 'scoped'
+          T:WhitespaceTrivia [13..14) ' '
+          T:SkippedTokensTrivia [14..17)
+            IntKeyword [14..17) 'int'
+          T:WhitespaceTrivia [17..18) ' '
+          T:SkippedTokensTrivia [18..19)
+            IdentifierToken [18..19) 'a'
+      SemicolonToken [19..20) ';'
+      T:EndOfLineTrivia [20..21) '\n'
+  GlobalStatement [21..42)
+    LocalDeclarationStatement [21..42)
+      VariableDeclaration [21..40)
+        ScopedType [21..35)
+          ScopedKeyword [21..27) 'scoped'
+          T:WhitespaceTrivia [27..28) ' '
+          IdentifierName [28..35)
+            IdentifierToken [28..34) 'scoped'
+            T:WhitespaceTrivia [34..35) ' '
+        VariableDeclarator [35..40)
+          IdentifierToken [35..38) 'var'
+          T:WhitespaceTrivia [38..39) ' '
+          T:SkippedTokensTrivia [39..40)
+            IdentifierToken [39..40) 'b'
+      SemicolonToken [40..41) ';'
+      T:EndOfLineTrivia [41..42) '\n'
+  EndOfFileToken [42..42) ''
+Diagnostics:
+  CS1003 [14..17) Syntax error, \',\' expected
+  CS1003 [39..40) Syntax error, \',\' expected

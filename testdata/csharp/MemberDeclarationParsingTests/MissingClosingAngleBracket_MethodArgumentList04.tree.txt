@@ -1,0 +1,50 @@
+MethodDeclaration [0..68)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..24)
+    IdentifierToken [7..21) 'ImmutableArray'
+    TypeArgumentList [21..24)
+      LessThanToken [21..22) '<'
+      IdentifierName [22..24)
+        IdentifierToken [22..23) 'T'
+        T:WhitespaceTrivia [23..24) ' '
+      GreaterThanToken [24..24) missing
+  IdentifierToken [24..25) 'M'
+  TypeParameterList [25..27)
+    LessThanToken [25..26) '<'
+    TypeParameter [26..27)
+      IdentifierToken [26..27) 'T'
+    GreaterThanToken [27..27) missing
+  ParameterList [27..67)
+    OpenParenToken [27..28) '('
+    Parameter [28..66)
+      GenericName [28..65)
+        IdentifierToken [28..42) 'ImmutableArray'
+        TypeArgumentList [42..65)
+          LessThanToken [42..43) '<'
+          IdentifierName [43..45)
+            IdentifierToken [43..44) 'T'
+            T:WhitespaceTrivia [44..45) ' '
+          CommaToken [45..45) missing
+          IdentifierName [45..46)
+            IdentifierToken [45..46) 'a'
+          CommaToken [46..47) ','
+          T:WhitespaceTrivia [47..48) ' '
+          GenericName [48..65)
+            IdentifierToken [48..62) 'ImmutableArray'
+            TypeArgumentList [62..65)
+              LessThanToken [62..63) '<'
+              IdentifierName [63..65)
+                IdentifierToken [63..64) 'T'
+                T:WhitespaceTrivia [64..65) ' '
+              GreaterThanToken [65..65) missing
+          GreaterThanToken [65..65) missing
+      IdentifierToken [65..66) 'b'
+    CloseParenToken [66..67) ')'
+  SemicolonToken [67..68) ';'
+Diagnostics:
+  CS1003 [24..25) Syntax error, \'>\' expected
+  CS1003 [27..28) Syntax error, \'>\' expected
+  CS1003 [45..46) Syntax error, \',\' expected
+  CS1003 [65..66) Syntax error, \'>\' expected
+  CS1003 [65..66) Syntax error, \'>\' expected

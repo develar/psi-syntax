@@ -1,0 +1,16 @@
+Block [0..15)
+  OpenBraceToken [0..1) '{'
+  T:WhitespaceTrivia [1..2) ' '
+  LabeledStatement [2..15)
+    IdentifierToken [2..7) 'label'
+    ColonToken [7..8) ':'
+    T:WhitespaceTrivia [8..9) ' '
+    EmptyStatement [9..15)
+      SemicolonToken [9..9) missing
+      T:SkippedTokensTrivia [9..15)
+        PublicKeyword [9..15) 'public'
+  CloseBraceToken [15..15) missing
+Diagnostics:
+  CS1002 [9..15) ; expected
+  CS1513 [9..15) } expected
+  CS1513 [15..15) } expected

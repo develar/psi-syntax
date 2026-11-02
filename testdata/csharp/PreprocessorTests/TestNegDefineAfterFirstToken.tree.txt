@@ -1,0 +1,21 @@
+CompilationUnit [0..25)
+  ClassDeclaration [0..13)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+    T:EndOfLineTrivia [12..13) '\n'
+  L:DefineDirectiveTrivia [13..25)
+    HashToken [13..14) '#'
+    DefineKeyword [14..20) 'define'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..24) 'XXX'
+    EndOfDirectiveToken [24..24) ''
+    T:EndOfLineTrivia [24..25) '\n'
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1032 [14..20) Cannot define/undefine preprocessor symbols after first token in file

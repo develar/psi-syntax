@@ -1,0 +1,9 @@
+CharacterLiteralToken [0..1) '\''
+T:EndOfLineTrivia [1..2) '\r'
+CharacterLiteralToken [2..3) '\''
+EndOfFileToken [3..3) ''
+Diagnostics:
+  CS1010 [0..0) Newline in constant
+  CS1011 [0..0) Empty character literal
+  CS1010 [2..2) Newline in constant
+  CS1011 [2..2) Empty character literal

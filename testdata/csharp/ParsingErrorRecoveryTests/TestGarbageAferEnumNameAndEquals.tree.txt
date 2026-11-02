@@ -1,0 +1,24 @@
+CompilationUnit [0..16)
+  EnumDeclaration [0..16)
+    EnumKeyword [0..4) 'enum'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'e'
+    T:WhitespaceTrivia [6..7) ' '
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    EnumMemberDeclaration [9..15)
+      IdentifierToken [9..10) 'n'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..15)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        IdentifierName [13..15)
+          IdentifierToken [13..13) missing
+          T:SkippedTokensTrivia [13..14)
+            BadToken [13..14) '$'
+          T:WhitespaceTrivia [14..15) ' '
+    CloseBraceToken [15..16) '}'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1525 [13..14) Invalid expression term \'\'
+  CS1056 [13..13) Unexpected character \'$\'

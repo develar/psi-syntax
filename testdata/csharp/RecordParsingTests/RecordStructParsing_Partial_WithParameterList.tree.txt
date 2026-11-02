@@ -1,0 +1,19 @@
+CompilationUnit [0..31)
+  RecordStructDeclaration [0..31)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    RecordKeyword [8..14) 'record'
+    T:WhitespaceTrivia [14..15) ' '
+    StructKeyword [15..21) 'struct'
+    T:WhitespaceTrivia [21..22) ' '
+    IdentifierToken [22..23) 'S'
+    ParameterList [23..30)
+      OpenParenToken [23..24) '('
+      Parameter [24..29)
+        PredefinedType [24..28)
+          IntKeyword [24..27) 'int'
+          T:WhitespaceTrivia [27..28) ' '
+        IdentifierToken [28..29) 'X'
+      CloseParenToken [29..30) ')'
+    SemicolonToken [30..31) ';'
+  EndOfFileToken [31..31) ''

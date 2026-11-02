@@ -1,0 +1,34 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..45)
+      AttributeList [11..30)
+        L:WhitespaceTrivia [11..15) '    '
+        OpenBracketToken [15..16) '['
+        Attribute [16..28)
+          IdentifierName [16..24)
+            IdentifierToken [16..24) 'Obsolete'
+          AttributeArgumentList [24..28)
+            OpenParenToken [24..25) '('
+            AttributeArgument [25..27)
+              NumericLiteralExpression [25..27)
+                NumericLiteralToken [25..27) '2l'
+            CloseParenToken [27..28) ')'
+        CloseBracketToken [28..29) ']'
+        T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      PublicKeyword [34..40) 'public'
+      T:WhitespaceTrivia [40..41) ' '
+      PredefinedType [41..45)
+        IntKeyword [41..44) 'int'
+        T:EndOfLineTrivia [44..45) '\n'
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1519 [45..46) Invalid token \'}\' in a member declaration

@@ -1,0 +1,1 @@
+implicit N.I int(int x) => x;

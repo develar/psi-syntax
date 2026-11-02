@@ -1,0 +1,11 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..14)
+    LocalDeclarationStatement [0..14)
+      VariableDeclaration [0..13)
+        IdentifierName [0..7)
+          IdentifierToken [0..6) 'closed'
+          T:WhitespaceTrivia [6..7) ' '
+        VariableDeclarator [7..13)
+          IdentifierToken [7..13) 'closed'
+      SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

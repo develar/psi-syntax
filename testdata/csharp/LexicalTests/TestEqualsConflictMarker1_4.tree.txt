@@ -1,0 +1,4 @@
+L:ConflictMarkerTrivia [0..22) '======= trailing chars'
+EndOfFileToken [22..22) ''
+Diagnostics:
+  CS8300 [0..7) Merge conflict marker encountered

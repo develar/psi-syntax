@@ -1,0 +1,3 @@
+
+fg implicit//
+class C { }

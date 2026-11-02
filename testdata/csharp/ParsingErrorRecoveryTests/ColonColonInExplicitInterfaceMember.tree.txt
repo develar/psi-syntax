@@ -1,0 +1,27 @@
+CompilationUnit [0..11)
+  IndexerDeclaration [0..11)
+    IdentifierName [0..3)
+      L:EndOfLineTrivia [0..1) '\n'
+      IdentifierToken [1..2) '_'
+      T:WhitespaceTrivia [2..3) ' '
+    ExplicitInterfaceSpecifier [3..6)
+      IdentifierName [3..4)
+        IdentifierToken [3..4) '_'
+      DotToken [4..4) missing
+      T:SkippedTokensTrivia [4..6)
+        ColonColonToken [4..6) '::'
+    ThisKeyword [6..10) 'this'
+    T:EndOfLineTrivia [10..11) '\n'
+    BracketedParameterList [11..11)
+      OpenBracketToken [11..11) missing
+      CloseBracketToken [11..11) missing
+    AccessorList [11..11)
+      OpenBraceToken [11..11) missing
+      CloseBraceToken [11..11) missing
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1003 [4..6) Syntax error, \'.\' expected
+  CS1003 [10..10) Syntax error, \'[\' expected
+  CS1003 [10..10) Syntax error, \']\' expected
+  CS1514 [10..10) { expected
+  CS1513 [10..10) } expected

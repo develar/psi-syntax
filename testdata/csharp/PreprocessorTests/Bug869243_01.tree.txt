@@ -1,0 +1,45 @@
+CompilationUnit [0..81)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:WhitespaceTrivia [11..15) '    '
+  L:DefineDirectiveTrivia [15..25)
+    HashToken [15..16) '#'
+    DefineKeyword [16..22) 'define'
+    T:WhitespaceTrivia [22..23) ' '
+    IdentifierToken [23..24) 'Z'
+    EndOfDirectiveToken [24..24) ''
+    T:EndOfLineTrivia [24..25) '\n'
+  L:ElseDirectiveTrivia [25..31)
+    HashToken [25..26) '#'
+    ElseKeyword [26..30) 'else'
+    EndOfDirectiveToken [30..30) ''
+    T:EndOfLineTrivia [30..31) '\n'
+  L:WhitespaceTrivia [31..35) '    '
+  L:IfDirectiveTrivia [35..41)
+    HashToken [35..36) '#'
+    IfKeyword [36..38) 'if'
+    T:WhitespaceTrivia [38..39) ' '
+    IdentifierName [39..40)
+      IdentifierToken [39..40) 'Z'
+    EndOfDirectiveToken [40..40) ''
+    T:EndOfLineTrivia [40..41) '\n'
+  L:DisabledTextTrivia [41..63) ' ?1 // no errors here\n'
+  L:WhitespaceTrivia [63..67) '    '
+  L:EndIfDirectiveTrivia [67..74)
+    HashToken [67..68) '#'
+    EndIfKeyword [68..73) 'endif'
+    EndOfDirectiveToken [73..73) ''
+    T:EndOfLineTrivia [73..74) '\n'
+  L:EndIfDirectiveTrivia [74..81)
+    HashToken [74..75) '#'
+    EndIfKeyword [75..80) 'endif'
+    EndOfDirectiveToken [80..80) ''
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''

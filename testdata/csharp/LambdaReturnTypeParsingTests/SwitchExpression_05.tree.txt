@@ -1,0 +1,67 @@
+SwitchExpression [0..61)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..30)
+    RecursivePattern [11..26)
+      PositionalPatternClause [11..26)
+        OpenParenToken [11..12) '('
+        Subpattern [12..17)
+          DeclarationPattern [12..17)
+            PredefinedType [12..16)
+              IntKeyword [12..15) 'int'
+              T:WhitespaceTrivia [15..16) ' '
+            SingleVariableDesignation [16..17)
+              IdentifierToken [16..17) 'a'
+        CommaToken [17..18) ','
+        T:WhitespaceTrivia [18..19) ' '
+        Subpattern [19..24)
+          DeclarationPattern [19..24)
+            PredefinedType [19..23)
+              IntKeyword [19..22) 'int'
+              T:WhitespaceTrivia [22..23) ' '
+            SingleVariableDesignation [23..24)
+              IdentifierToken [23..24) 'b'
+        CloseParenToken [24..25) ')'
+        T:WhitespaceTrivia [25..26) ' '
+    EqualsGreaterThanToken [26..28) '=>'
+    T:WhitespaceTrivia [28..29) ' '
+    IdentifierName [29..30)
+      IdentifierToken [29..30) 'b'
+  CommaToken [30..31) ','
+  T:WhitespaceTrivia [31..32) ' '
+  SwitchExpressionArm [32..60)
+    RecursivePattern [32..55)
+      PositionalPatternClause [32..53)
+        OpenParenToken [32..33) '('
+        Subpattern [33..41)
+          DeclarationPattern [33..41)
+            PredefinedType [33..40)
+              ObjectKeyword [33..39) 'object'
+              T:WhitespaceTrivia [39..40) ' '
+            SingleVariableDesignation [40..41)
+              IdentifierToken [40..41) 'c'
+        CommaToken [41..42) ','
+        T:WhitespaceTrivia [42..43) ' '
+        Subpattern [43..51)
+          DeclarationPattern [43..51)
+            PredefinedType [43..50)
+              ObjectKeyword [43..49) 'object'
+              T:WhitespaceTrivia [49..50) ' '
+            SingleVariableDesignation [50..51)
+              IdentifierToken [50..51) 'd'
+        CloseParenToken [51..52) ')'
+        T:WhitespaceTrivia [52..53) ' '
+      SingleVariableDesignation [53..55)
+        IdentifierToken [53..54) 'e'
+        T:WhitespaceTrivia [54..55) ' '
+    EqualsGreaterThanToken [55..57) '=>'
+    T:WhitespaceTrivia [57..58) ' '
+    IdentifierName [58..60)
+      IdentifierToken [58..59) 'e'
+      T:WhitespaceTrivia [59..60) ' '
+  CloseBraceToken [60..61) '}'

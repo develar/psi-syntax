@@ -1,0 +1,13 @@
+CompilationUnit [0..18)
+  MethodDeclaration [0..18)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..12)
+      IdentifierToken [4..11) 'partial'
+      T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..15) 'Goo'
+    ParameterList [15..17)
+      OpenParenToken [15..16) '('
+      CloseParenToken [16..17) ')'
+    SemicolonToken [17..18) ';'
+  EndOfFileToken [18..18) ''

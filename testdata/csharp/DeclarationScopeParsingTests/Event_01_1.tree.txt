@@ -1,0 +1,32 @@
+CompilationUnit [0..44)
+  StructDeclaration [0..44)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    IncompleteMember [17..28)
+      IdentifierName [17..28)
+        L:WhitespaceTrivia [17..21) '    '
+        IdentifierToken [21..27) 'scoped'
+        T:WhitespaceTrivia [27..28) ' '
+    EventFieldDeclaration [28..42)
+      EventKeyword [28..33) 'event'
+      T:WhitespaceTrivia [33..34) ' '
+      VariableDeclaration [34..40)
+        PredefinedType [34..38)
+          IntKeyword [34..37) 'int'
+          T:WhitespaceTrivia [37..38) ' '
+        VariableDeclarator [38..40)
+          IdentifierToken [38..40) 'F3'
+      SemicolonToken [40..41) ';'
+      T:EndOfLineTrivia [41..42) '\n'
+    CloseBraceToken [42..43) '}'
+    T:EndOfLineTrivia [43..44) '\n'
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1519 [28..33) Invalid token \'event\' in a member declaration

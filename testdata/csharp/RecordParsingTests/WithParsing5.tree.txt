@@ -1,0 +1,26 @@
+WithExpression [0..15)
+  NumericLiteralExpression [0..2)
+    NumericLiteralToken [0..1) '0'
+    T:WhitespaceTrivia [1..2) ' '
+  WithKeyword [2..6) 'with'
+  T:WhitespaceTrivia [6..7) ' '
+  WithInitializerExpression [7..15)
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..11)
+      IdentifierToken [9..10) 'X'
+      T:WhitespaceTrivia [10..11) ' '
+    CommaToken [11..11) missing
+    SimpleAssignmentExpression [11..14)
+      NumericLiteralExpression [11..13)
+        NumericLiteralToken [11..12) '3'
+        T:WhitespaceTrivia [12..13) ' '
+      EqualsToken [13..14) '='
+      IdentifierName [14..14)
+        IdentifierToken [14..14) missing
+    CommaToken [14..15) ','
+    CloseBraceToken [15..15) missing
+Diagnostics:
+  CS1003 [11..12) Syntax error, \',\' expected
+  CS1525 [14..15) Invalid expression term \',\'
+  CS1513 [15..15) } expected

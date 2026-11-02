@@ -1,0 +1,60 @@
+CompilationUnit [0..33)
+  GlobalStatement [0..16)
+    ExpressionStatement [0..16)
+      TupleExpression [0..16)
+        L:EndOfLineTrivia [0..1) '\n'
+        OpenParenToken [1..2) '('
+        Argument [2..7)
+          DeclarationExpression [2..7)
+            IdentifierName [2..6)
+              IdentifierToken [2..5) 'var'
+              T:WhitespaceTrivia [5..6) ' '
+            SingleVariableDesignation [6..7)
+              IdentifierToken [6..7) 'a'
+        CommaToken [7..8) ','
+        T:WhitespaceTrivia [8..9) ' '
+        Argument [9..16)
+          IdentifierName [9..16)
+            IdentifierToken [9..15) 'scoped'
+            T:WhitespaceTrivia [15..16) ' '
+        CloseParenToken [16..16) missing
+      SemicolonToken [16..16) missing
+  GlobalStatement [16..28)
+    ExpressionStatement [16..28)
+      InvocationExpression [16..26)
+        IdentifierName [16..20)
+          IdentifierToken [16..19) 'var'
+          T:WhitespaceTrivia [19..20) ' '
+        ArgumentList [20..26)
+          OpenParenToken [20..21) '('
+          Argument [21..22)
+            IdentifierName [21..22)
+              IdentifierToken [21..22) 'b'
+          CommaToken [22..23) ','
+          T:WhitespaceTrivia [23..24) ' '
+          Argument [24..25)
+            IdentifierName [24..25)
+              IdentifierToken [24..25) 'c'
+          CloseParenToken [25..26) ')'
+      SemicolonToken [26..26) missing
+      T:SkippedTokensTrivia [26..27)
+        CloseParenToken [26..27) ')'
+      T:WhitespaceTrivia [27..28) ' '
+  GlobalStatement [28..33)
+    ExpressionStatement [28..33)
+      SimpleAssignmentExpression [28..31)
+        IdentifierName [28..28)
+          IdentifierToken [28..28) missing
+        EqualsToken [28..29) '='
+        T:WhitespaceTrivia [29..30) ' '
+        IdentifierName [30..31)
+          IdentifierToken [30..31) 'M'
+      SemicolonToken [31..32) ';'
+      T:EndOfLineTrivia [32..33) '\n'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1026 [16..19) ) expected
+  CS1002 [16..19) ; expected
+  CS1002 [26..27) ; expected
+  CS1022 [26..27) Type or namespace definition, or end-of-file expected
+  CS1525 [28..29) Invalid expression term \'=\'

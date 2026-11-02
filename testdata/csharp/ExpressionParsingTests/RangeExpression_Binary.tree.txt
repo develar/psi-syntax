@@ -1,0 +1,6 @@
+RangeExpression [0..4)
+  NumericLiteralExpression [0..1)
+    NumericLiteralToken [0..1) '1'
+  DotDotToken [1..3) '..'
+  NumericLiteralExpression [3..4)
+    NumericLiteralToken [3..4) '1'

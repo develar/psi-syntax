@@ -1,0 +1,307 @@
+CompilationUnit [0..474)
+  ClassDeclaration [0..474)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..194)
+      L:WhitespaceTrivia [10..14) '    '
+      StaticKeyword [14..20) 'static'
+      T:WhitespaceTrivia [20..21) ' '
+      PredefinedType [21..26)
+        VoidKeyword [21..25) 'void'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..27) 'F'
+      ParameterList [27..42)
+        OpenParenToken [27..28) '('
+        Parameter [28..40)
+          PredefinedType [28..35)
+            ObjectKeyword [28..34) 'object'
+            T:WhitespaceTrivia [34..35) ' '
+          IdentifierToken [35..40) 'async'
+        CloseParenToken [40..41) ')'
+        T:EndOfLineTrivia [41..42) '\n'
+      Block [42..194)
+        L:WhitespaceTrivia [42..46) '    '
+        OpenBraceToken [46..47) '{'
+        T:EndOfLineTrivia [47..48) '\n'
+        ExpressionStatement [48..67)
+          InvocationExpression [48..65)
+            SimpleMemberAccessExpression [48..63)
+              IdentifierName [48..61)
+                L:WhitespaceTrivia [48..56) '        '
+                IdentifierToken [56..61) 'async'
+              DotToken [61..62) '.'
+              IdentifierName [62..63)
+                IdentifierToken [62..63) 'F'
+            ArgumentList [63..65)
+              OpenParenToken [63..64) '('
+              CloseParenToken [64..65) ')'
+          SemicolonToken [65..66) ';'
+          T:EndOfLineTrivia [66..67) '\n'
+        ExpressionStatement [67..87)
+          InvocationExpression [67..85)
+            PointerMemberAccessExpression [67..83)
+              IdentifierName [67..80)
+                L:WhitespaceTrivia [67..75) '        '
+                IdentifierToken [75..80) 'async'
+              MinusGreaterThanToken [80..82) '->'
+              IdentifierName [82..83)
+                IdentifierToken [82..83) 'F'
+            ArgumentList [83..85)
+              OpenParenToken [83..84) '('
+              CloseParenToken [84..85) ')'
+          SemicolonToken [85..86) ';'
+          T:EndOfLineTrivia [86..87) '\n'
+        ExpressionStatement [87..109)
+          SimpleAssignmentExpression [87..107)
+            IdentifierName [87..101)
+              L:WhitespaceTrivia [87..95) '        '
+              IdentifierToken [95..100) 'async'
+              T:WhitespaceTrivia [100..101) ' '
+            EqualsToken [101..102) '='
+            T:WhitespaceTrivia [102..103) ' '
+            NullLiteralExpression [103..107)
+              NullKeyword [103..107) 'null'
+          SemicolonToken [107..108) ';'
+          T:EndOfLineTrivia [108..109) '\n'
+        ExpressionStatement [109..129)
+          AddAssignmentExpression [109..127)
+            IdentifierName [109..123)
+              L:WhitespaceTrivia [109..117) '        '
+              IdentifierToken [117..122) 'async'
+              T:WhitespaceTrivia [122..123) ' '
+            PlusEqualsToken [123..125) '+='
+            T:WhitespaceTrivia [125..126) ' '
+            NumericLiteralExpression [126..127)
+              NumericLiteralToken [126..127) '1'
+          SemicolonToken [127..128) ';'
+          T:EndOfLineTrivia [128..129) '\n'
+        ExpressionStatement [129..146)
+          PostIncrementExpression [129..144)
+            IdentifierName [129..142)
+              L:WhitespaceTrivia [129..137) '        '
+              IdentifierToken [137..142) 'async'
+            PlusPlusToken [142..144) '++'
+          SemicolonToken [144..145) ';'
+          T:EndOfLineTrivia [145..146) '\n'
+        ExpressionStatement [146..171)
+          SimpleAssignmentExpression [146..169)
+            ElementAccessExpression [146..163)
+              IdentifierName [146..159)
+                L:WhitespaceTrivia [146..154) '        '
+                IdentifierToken [154..159) 'async'
+              BracketedArgumentList [159..163)
+                OpenBracketToken [159..160) '['
+                Argument [160..161)
+                  NumericLiteralExpression [160..161)
+                    NumericLiteralToken [160..161) '0'
+                CloseBracketToken [161..162) ']'
+                T:WhitespaceTrivia [162..163) ' '
+            EqualsToken [163..164) '='
+            T:WhitespaceTrivia [164..165) ' '
+            NullLiteralExpression [165..169)
+              NullKeyword [165..169) 'null'
+          SemicolonToken [169..170) ';'
+          T:EndOfLineTrivia [170..171) '\n'
+        ExpressionStatement [171..188)
+          InvocationExpression [171..186)
+            IdentifierName [171..184)
+              L:WhitespaceTrivia [171..179) '        '
+              IdentifierToken [179..184) 'async'
+            ArgumentList [184..186)
+              OpenParenToken [184..185) '('
+              CloseParenToken [185..186) ')'
+          SemicolonToken [186..187) ';'
+          T:EndOfLineTrivia [187..188) '\n'
+        L:WhitespaceTrivia [188..192) '    '
+        CloseBraceToken [192..193) '}'
+        T:EndOfLineTrivia [193..194) '\n'
+    MethodDeclaration [194..291)
+      L:WhitespaceTrivia [194..198) '    '
+      StaticKeyword [198..204) 'static'
+      T:WhitespaceTrivia [204..205) ' '
+      PredefinedType [205..210)
+        VoidKeyword [205..209) 'void'
+        T:WhitespaceTrivia [209..210) ' '
+      IdentifierToken [210..211) 'G'
+      ParameterList [211..214)
+        OpenParenToken [211..212) '('
+        CloseParenToken [212..213) ')'
+        T:EndOfLineTrivia [213..214) '\n'
+      Block [214..291)
+        L:WhitespaceTrivia [214..218) '    '
+        OpenBraceToken [218..219) '{'
+        T:EndOfLineTrivia [219..220) '\n'
+        LocalDeclarationStatement [220..241)
+          VariableDeclaration [220..239)
+            IdentifierName [220..234)
+              L:WhitespaceTrivia [220..228) '        '
+              IdentifierToken [228..233) 'async'
+              T:WhitespaceTrivia [233..234) ' '
+            VariableDeclarator [234..239)
+              IdentifierToken [234..239) 'async'
+          SemicolonToken [239..240) ';'
+          T:EndOfLineTrivia [240..241) '\n'
+        LocalDeclarationStatement [241..260)
+          VariableDeclaration [241..258)
+            QualifiedName [241..257)
+              IdentifierName [241..254)
+                L:WhitespaceTrivia [241..249) '        '
+                IdentifierToken [249..254) 'async'
+              DotToken [254..255) '.'
+              IdentifierName [255..257)
+                IdentifierToken [255..256) 'T'
+                T:WhitespaceTrivia [256..257) ' '
+            VariableDeclarator [257..258)
+              IdentifierToken [257..258) 't'
+          SemicolonToken [258..259) ';'
+          T:EndOfLineTrivia [259..260) '\n'
+        LocalDeclarationStatement [260..285)
+          VariableDeclaration [260..283)
+            GenericName [260..282)
+              L:WhitespaceTrivia [260..268) '        '
+              IdentifierToken [268..273) 'async'
+              TypeArgumentList [273..282)
+                LessThanToken [273..274) '<'
+                PredefinedType [274..280)
+                  ObjectKeyword [274..280) 'object'
+                GreaterThanToken [280..281) '>'
+                T:WhitespaceTrivia [281..282) ' '
+            VariableDeclarator [282..283)
+              IdentifierToken [282..283) 'u'
+          SemicolonToken [283..284) ';'
+          T:EndOfLineTrivia [284..285) '\n'
+        L:WhitespaceTrivia [285..289) '    '
+        CloseBraceToken [289..290) '}'
+        T:EndOfLineTrivia [290..291) '\n'
+    MethodDeclaration [291..473)
+      L:WhitespaceTrivia [291..295) '    '
+      StaticKeyword [295..301) 'static'
+      T:WhitespaceTrivia [301..302) ' '
+      PredefinedType [302..307)
+        VoidKeyword [302..306) 'void'
+        T:WhitespaceTrivia [306..307) ' '
+      IdentifierToken [307..308) 'H'
+      ParameterList [308..311)
+        OpenParenToken [308..309) '('
+        CloseParenToken [309..310) ')'
+        T:EndOfLineTrivia [310..311) '\n'
+      Block [311..473)
+        L:WhitespaceTrivia [311..315) '    '
+        OpenBraceToken [315..316) '{'
+        T:EndOfLineTrivia [316..317) '\n'
+        LocalFunctionStatement [317..345)
+          IdentifierName [317..331)
+            L:WhitespaceTrivia [317..325) '        '
+            IdentifierToken [325..330) 'async'
+            T:WhitespaceTrivia [330..331) ' '
+          IdentifierToken [331..336) 'async'
+          ParameterList [336..339)
+            OpenParenToken [336..337) '('
+            CloseParenToken [337..338) ')'
+            T:WhitespaceTrivia [338..339) ' '
+          ArrowExpressionClause [339..343)
+            EqualsGreaterThanToken [339..341) '=>'
+            T:WhitespaceTrivia [341..342) ' '
+            NumericLiteralExpression [342..343)
+              NumericLiteralToken [342..343) '0'
+          SemicolonToken [343..344) ';'
+          T:EndOfLineTrivia [344..345) '\n'
+        LocalFunctionStatement [345..372)
+          IdentifierName [345..359)
+            L:WhitespaceTrivia [345..353) '        '
+            IdentifierToken [353..358) 'async'
+            T:WhitespaceTrivia [358..359) ' '
+          IdentifierToken [359..360) 'F'
+          TypeParameterList [360..363)
+            LessThanToken [360..361) '<'
+            TypeParameter [361..362)
+              IdentifierToken [361..362) 'T'
+            GreaterThanToken [362..363) '>'
+          ParameterList [363..366)
+            OpenParenToken [363..364) '('
+            CloseParenToken [364..365) ')'
+            T:WhitespaceTrivia [365..366) ' '
+          ArrowExpressionClause [366..370)
+            EqualsGreaterThanToken [366..368) '=>'
+            T:WhitespaceTrivia [368..369) ' '
+            NumericLiteralExpression [369..370)
+              NumericLiteralToken [369..370) '1'
+          SemicolonToken [370..371) ';'
+          T:EndOfLineTrivia [371..372) '\n'
+        LocalFunctionStatement [372..403)
+          L:WhitespaceTrivia [372..380) '        '
+          AsyncKeyword [380..385) 'async'
+          T:WhitespaceTrivia [385..386) ' '
+          IdentifierName [386..392)
+            IdentifierToken [386..391) 'async'
+            T:WhitespaceTrivia [391..392) ' '
+          IdentifierToken [392..393) 'G'
+          TypeParameterList [393..396)
+            LessThanToken [393..394) '<'
+            TypeParameter [394..395)
+              IdentifierToken [394..395) 'T'
+            GreaterThanToken [395..396) '>'
+          ParameterList [396..399)
+            OpenParenToken [396..397) '('
+            CloseParenToken [397..398) ')'
+            T:WhitespaceTrivia [398..399) ' '
+          Block [399..403)
+            OpenBraceToken [399..400) '{'
+            T:WhitespaceTrivia [400..401) ' '
+            CloseBraceToken [401..402) '}'
+            T:EndOfLineTrivia [402..403) '\n'
+        LocalFunctionStatement [403..427)
+          QualifiedName [403..419)
+            IdentifierName [403..416)
+              L:WhitespaceTrivia [403..411) '        '
+              IdentifierToken [411..416) 'async'
+            DotToken [416..417) '.'
+            IdentifierName [417..419)
+              IdentifierToken [417..418) 'T'
+              T:WhitespaceTrivia [418..419) ' '
+          IdentifierToken [419..420) 't'
+          ParameterList [420..423)
+            OpenParenToken [420..421) '('
+            CloseParenToken [421..422) ')'
+            T:WhitespaceTrivia [422..423) ' '
+          Block [423..427)
+            OpenBraceToken [423..424) '{'
+            T:WhitespaceTrivia [424..425) ' '
+            CloseBraceToken [425..426) '}'
+            T:EndOfLineTrivia [426..427) '\n'
+        LocalFunctionStatement [427..467)
+          GenericName [427..449)
+            L:WhitespaceTrivia [427..435) '        '
+            IdentifierToken [435..440) 'async'
+            TypeArgumentList [440..449)
+              LessThanToken [440..441) '<'
+              PredefinedType [441..447)
+                ObjectKeyword [441..447) 'object'
+              GreaterThanToken [447..448) '>'
+              T:WhitespaceTrivia [448..449) ' '
+          IdentifierToken [449..450) 'u'
+          ParameterList [450..461)
+            OpenParenToken [450..451) '('
+            Parameter [451..459)
+              PredefinedType [451..458)
+                ObjectKeyword [451..457) 'object'
+                T:WhitespaceTrivia [457..458) ' '
+              IdentifierToken [458..459) 'o'
+            CloseParenToken [459..460) ')'
+            T:WhitespaceTrivia [460..461) ' '
+          ArrowExpressionClause [461..465)
+            EqualsGreaterThanToken [461..463) '=>'
+            T:WhitespaceTrivia [463..464) ' '
+            IdentifierName [464..465)
+              IdentifierToken [464..465) 'o'
+          SemicolonToken [465..466) ';'
+          T:EndOfLineTrivia [466..467) '\n'
+        L:WhitespaceTrivia [467..471) '    '
+        CloseBraceToken [471..472) '}'
+        T:EndOfLineTrivia [472..473) '\n'
+    CloseBraceToken [473..474) '}'
+  EndOfFileToken [474..474) ''

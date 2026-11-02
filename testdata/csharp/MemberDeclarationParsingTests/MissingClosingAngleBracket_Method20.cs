@@ -1,0 +1,1 @@
+static IEnumerable<(string Value, string Description) B.GetAllValues<T>(Type t);

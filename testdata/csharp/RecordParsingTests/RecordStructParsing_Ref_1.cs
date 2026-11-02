@@ -1,0 +1,1 @@
+ref record struct S;

@@ -1,0 +1,32 @@
+CompilationUnit [0..34)
+  L:SingleLineDocumentationCommentTrivia [0..15)
+    XmlElement [0..14)
+      XmlElementStartTag [0..8)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        LessThanToken [3..4) '<'
+        XmlName [4..7)
+          IdentifierToken [4..7) 'goo'
+        GreaterThanToken [7..8) '>'
+      XmlElementEndTag [8..14)
+        LessThanSlashToken [8..10) '</'
+        XmlName [10..13)
+          IdentifierToken [10..13) 'goo'
+        GreaterThanToken [13..14) '>'
+    XmlText [14..15)
+      XmlTextLiteralNewLineToken [14..15) '\n'
+    EndOfDocumentationCommentToken [15..15) ''
+  L:IfDirectiveTrivia [15..27)
+    HashToken [15..16) '#'
+    T:WhitespaceTrivia [16..17) ' '
+    IfKeyword [17..19) 'if'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierName [20..26)
+      IdentifierToken [20..26) 'DOODAD'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  L:EndIfDirectiveTrivia [27..34)
+    HashToken [27..28) '#'
+    T:WhitespaceTrivia [28..29) ' '
+    EndIfKeyword [29..34) 'endif'
+    EndOfDirectiveToken [34..34) ''
+  EndOfFileToken [34..34) ''

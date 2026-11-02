@@ -1,0 +1,1 @@
+delegate*<scoped, ref scoped> f;

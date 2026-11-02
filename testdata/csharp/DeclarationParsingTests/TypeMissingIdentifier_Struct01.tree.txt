@@ -1,0 +1,106 @@
+CompilationUnit [0..197)
+  StructDeclaration [0..197)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    StaticKeyword [7..13) 'static'
+    T:WhitespaceTrivia [13..14) ' '
+    StructKeyword [14..20) 'struct'
+    T:EndOfLineTrivia [20..21) '\n'
+    IdentifierToken [21..21) missing
+    OpenBraceToken [21..22) '{'
+    T:EndOfLineTrivia [22..23) '\n'
+    PropertyDeclaration [23..74)
+      L:WhitespaceTrivia [23..27) '    '
+      PublicKeyword [27..33) 'public'
+      T:WhitespaceTrivia [33..34) ' '
+      StaticKeyword [34..40) 'static'
+      T:WhitespaceTrivia [40..41) ' '
+      PredefinedType [41..45)
+        IntKeyword [41..44) 'int'
+        T:WhitespaceTrivia [44..45) ' '
+      IdentifierToken [45..59) 'StaticProperty'
+      T:WhitespaceTrivia [59..60) ' '
+      AccessorList [60..74)
+        OpenBraceToken [60..61) '{'
+        T:WhitespaceTrivia [61..62) ' '
+        GetAccessorDeclaration [62..67)
+          GetKeyword [62..65) 'get'
+          SemicolonToken [65..66) ';'
+          T:WhitespaceTrivia [66..67) ' '
+        SetAccessorDeclaration [67..72)
+          SetKeyword [67..70) 'set'
+          SemicolonToken [70..71) ';'
+          T:WhitespaceTrivia [71..72) ' '
+        CloseBraceToken [72..73) '}'
+        T:EndOfLineTrivia [73..74) '\n'
+    PropertyDeclaration [74..113)
+      L:EndOfLineTrivia [74..75) '\n'
+      L:WhitespaceTrivia [75..79) '    '
+      PublicKeyword [79..85) 'public'
+      T:WhitespaceTrivia [85..86) ' '
+      PredefinedType [86..90)
+        IntKeyword [86..89) 'int'
+        T:WhitespaceTrivia [89..90) ' '
+      IdentifierToken [90..98) 'Property'
+      T:WhitespaceTrivia [98..99) ' '
+      AccessorList [99..113)
+        OpenBraceToken [99..100) '{'
+        T:WhitespaceTrivia [100..101) ' '
+        GetAccessorDeclaration [101..106)
+          GetKeyword [101..104) 'get'
+          SemicolonToken [104..105) ';'
+          T:WhitespaceTrivia [105..106) ' '
+        SetAccessorDeclaration [106..111)
+          SetKeyword [106..109) 'set'
+          SemicolonToken [109..110) ';'
+          T:WhitespaceTrivia [110..111) ' '
+        CloseBraceToken [111..112) '}'
+        T:EndOfLineTrivia [112..113) '\n'
+    MethodDeclaration [113..143)
+      L:EndOfLineTrivia [113..114) '\n'
+      L:WhitespaceTrivia [114..118) '    '
+      PublicKeyword [118..124) 'public'
+      T:WhitespaceTrivia [124..125) ' '
+      PredefinedType [125..130)
+        VoidKeyword [125..129) 'void'
+        T:WhitespaceTrivia [129..130) ' '
+      IdentifierToken [130..136) 'Method'
+      ParameterList [136..139)
+        OpenParenToken [136..137) '('
+        CloseParenToken [137..138) ')'
+        T:WhitespaceTrivia [138..139) ' '
+      Block [139..143)
+        OpenBraceToken [139..140) '{'
+        T:WhitespaceTrivia [140..141) ' '
+        CloseBraceToken [141..142) '}'
+        T:EndOfLineTrivia [142..143) '\n'
+    StructDeclaration [143..166)
+      L:EndOfLineTrivia [143..144) '\n'
+      L:WhitespaceTrivia [144..148) '    '
+      PublicKeyword [148..154) 'public'
+      T:WhitespaceTrivia [154..155) ' '
+      StructKeyword [155..161) 'struct'
+      T:WhitespaceTrivia [161..162) ' '
+      IdentifierToken [162..162) missing
+      OpenBraceToken [162..163) '{'
+      T:WhitespaceTrivia [163..164) ' '
+      CloseBraceToken [164..165) '}'
+      T:EndOfLineTrivia [165..166) '\n'
+    StructDeclaration [166..196)
+      L:EndOfLineTrivia [166..167) '\n'
+      L:WhitespaceTrivia [167..171) '    '
+      PublicKeyword [171..177) 'public'
+      T:WhitespaceTrivia [177..178) ' '
+      StructKeyword [178..184) 'struct'
+      T:WhitespaceTrivia [184..185) ' '
+      IdentifierToken [185..191) 'Nested'
+      T:WhitespaceTrivia [191..192) ' '
+      OpenBraceToken [192..193) '{'
+      T:WhitespaceTrivia [193..194) ' '
+      CloseBraceToken [194..195) '}'
+      T:EndOfLineTrivia [195..196) '\n'
+    CloseBraceToken [196..197) '}'
+  EndOfFileToken [197..197) ''
+Diagnostics:
+  CS1001 [20..20) Identifier expected
+  CS1001 [162..163) Identifier expected

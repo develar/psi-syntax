@@ -1,0 +1,1 @@
+[attr] class a { }

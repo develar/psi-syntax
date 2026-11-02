@@ -1,0 +1,44 @@
+CompilationUnit [0..56)
+  ClassDeclaration [0..56)
+    L:SingleLineDocumentationCommentTrivia [0..45)
+      XmlText [0..4)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..4) ' '
+      XmlElement [4..28)
+        XmlElementStartTag [4..9)
+          LessThanToken [4..5) '<'
+          XmlName [5..8)
+            IdentifierToken [5..8) 'goo'
+          GreaterThanToken [8..9) '>'
+        XmlText [9..22)
+          XmlTextLiteralNewLineToken [9..10) '\n'
+          L:DocumentationCommentExteriorTrivia [10..13) '///'
+          XmlTextLiteralToken [13..17) ' bar'
+          XmlTextLiteralNewLineToken [17..18) '\n'
+          L:DocumentationCommentExteriorTrivia [18..21) '///'
+          XmlTextLiteralToken [21..22) ' '
+        XmlElementEndTag [22..28)
+          LessThanSlashToken [22..24) '</'
+          XmlName [24..27)
+            IdentifierToken [24..27) 'goo'
+          GreaterThanToken [27..28) '>'
+      XmlText [28..33)
+        XmlTextLiteralNewLineToken [28..29) '\n'
+        L:DocumentationCommentExteriorTrivia [29..32) '///'
+        XmlTextLiteralToken [32..33) ' '
+      XmlText [33..45)
+        XmlTextLiteralToken [33..40) '</uhoh>'
+        XmlTextLiteralNewLineToken [40..41) '\n'
+        L:DocumentationCommentExteriorTrivia [41..44) '///'
+        XmlTextLiteralNewLineToken [44..45) '\n'
+      EndOfDocumentationCommentToken [45..45) ''
+    ClassKeyword [45..50) 'class'
+    T:WhitespaceTrivia [50..51) ' '
+    IdentifierToken [51..52) 'C'
+    T:WhitespaceTrivia [52..53) ' '
+    OpenBraceToken [53..54) '{'
+    T:WhitespaceTrivia [54..55) ' '
+    CloseBraceToken [55..56) '}'
+  EndOfFileToken [56..56) ''
+Diagnostics:
+  CS1570 [33..34) XML comment has badly formed XML -- \'End tag was not expected at this location.\'

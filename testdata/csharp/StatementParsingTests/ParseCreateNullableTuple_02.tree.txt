@@ -1,0 +1,47 @@
+ExpressionStatement [0..31)
+  SimpleAssignmentExpression [0..25)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ObjectCreationExpression [4..25)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      NullableType [8..21)
+        TupleType [8..19)
+          OpenParenToken [8..9) '('
+          TupleElement [9..12)
+            PredefinedType [9..12)
+              IntKeyword [9..12) 'int'
+          CommaToken [12..13) ','
+          T:WhitespaceTrivia [13..14) ' '
+          TupleElement [14..17)
+            PredefinedType [14..17)
+              IntKeyword [14..17) 'int'
+          CloseParenToken [17..18) ')'
+          T:WhitespaceTrivia [18..19) ' '
+        QuestionToken [19..20) '?'
+        T:WhitespaceTrivia [20..21) ' '
+      ArgumentList [21..25)
+        OpenParenToken [21..22) '('
+        Argument [22..23)
+          IdentifierName [22..23)
+            IdentifierToken [22..23) 'x'
+        CloseParenToken [23..24) ')'
+        T:WhitespaceTrivia [24..25) ' '
+  SemicolonToken [25..25) missing
+  T:SkippedTokensTrivia [25..26)
+    ColonToken [25..26) ':'
+  T:WhitespaceTrivia [26..27) ' '
+  T:SkippedTokensTrivia [27..28)
+    OpenParenToken [27..28) '('
+  T:SkippedTokensTrivia [28..29)
+    IdentifierToken [28..29) 'y'
+  T:SkippedTokensTrivia [29..30)
+    CloseParenToken [29..30) ')'
+  T:SkippedTokensTrivia [30..31)
+    SemicolonToken [30..31) ';'
+Diagnostics:
+  CS1073 [0..25) Unexpected token \':\'
+  CS1002 [25..26) ; expected

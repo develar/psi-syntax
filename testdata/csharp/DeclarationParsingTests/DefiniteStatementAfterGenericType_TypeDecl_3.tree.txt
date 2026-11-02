@@ -1,0 +1,28 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..11)
+    LocalDeclarationStatement [0..11)
+      VariableDeclaration [0..11)
+        GenericName [0..11)
+          IdentifierToken [0..4) 'List'
+          TypeArgumentList [4..11)
+            LessThanToken [4..5) '<'
+            IdentifierName [5..9)
+              IdentifierToken [5..9) 'Type'
+            GreaterThanToken [9..10) '>'
+            T:EndOfLineTrivia [10..11) '\n'
+        VariableDeclarator [11..11)
+          IdentifierToken [11..11) missing
+      SemicolonToken [11..11) missing
+  InterfaceDeclaration [11..21)
+    L:EndOfLineTrivia [11..12) '\n'
+    InterfaceKeyword [12..21) 'interface'
+    IdentifierToken [21..21) missing
+    OpenBraceToken [21..21) missing
+    CloseBraceToken [21..21) missing
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1001 [10..10) Identifier expected
+  CS1002 [10..10) ; expected
+  CS1001 [21..21) Identifier expected
+  CS1514 [21..21) { expected
+  CS1513 [21..21) } expected

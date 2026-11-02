@@ -1,0 +1,26 @@
+EventDeclaration [0..52)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  ExternKeyword [12..18) 'extern'
+  T:WhitespaceTrivia [18..19) ' '
+  EventKeyword [19..24) 'event'
+  T:WhitespaceTrivia [24..25) ' '
+  IdentifierName [25..34)
+    IdentifierToken [25..33) 'EHandler'
+    T:WhitespaceTrivia [33..34) ' '
+  IdentifierToken [34..35) 'E'
+  T:WhitespaceTrivia [35..36) ' '
+  AccessorList [36..52)
+    OpenBraceToken [36..37) '{'
+    T:WhitespaceTrivia [37..38) ' '
+    AddAccessorDeclaration [38..43)
+      AddKeyword [38..41) 'add'
+      SemicolonToken [41..42) ';'
+      T:WhitespaceTrivia [42..43) ' '
+    RemoveAccessorDeclaration [43..51)
+      RemoveKeyword [43..49) 'remove'
+      SemicolonToken [49..50) ';'
+      T:WhitespaceTrivia [50..51) ' '
+    CloseBraceToken [51..52) '}'

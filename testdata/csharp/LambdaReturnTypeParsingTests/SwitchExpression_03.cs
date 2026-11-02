@@ -1,0 +1,1 @@
+x switch { static T? () => { } => 1 }

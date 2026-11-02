@@ -1,0 +1,15 @@
+ForStatement [0..21)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  TrueLiteralExpression [5..9)
+    TrueKeyword [5..9) 'true'
+  SemicolonToken [9..10) ';'
+  TrueLiteralExpression [10..14)
+    TrueKeyword [10..14) 'true'
+  SemicolonToken [14..15) ';'
+  TrueLiteralExpression [15..19)
+    TrueKeyword [15..19) 'true'
+  CloseParenToken [19..20) ')'
+  EmptyStatement [20..21)
+    SemicolonToken [20..21) ';'

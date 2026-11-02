@@ -1,0 +1,95 @@
+SwitchStatement [0..113)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchSection [13..112)
+    CaseSwitchLabel [13..26)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      LeftShiftExpression [18..24)
+        NumericLiteralExpression [18..20)
+          NumericLiteralToken [18..19) '1'
+          T:WhitespaceTrivia [19..20) ' '
+        LessThanLessThanToken [20..22) '<<'
+        T:WhitespaceTrivia [22..23) ' '
+        NumericLiteralExpression [23..24)
+          NumericLiteralToken [23..24) '2'
+      ColonToken [24..25) ':'
+      T:EndOfLineTrivia [25..26) '\n'
+    CaseSwitchLabel [26..39)
+      CaseKeyword [26..30) 'case'
+      T:WhitespaceTrivia [30..31) ' '
+      LeftShiftExpression [31..37)
+        IdentifierName [31..33)
+          IdentifierToken [31..32) 'B'
+          T:WhitespaceTrivia [32..33) ' '
+        LessThanLessThanToken [33..35) '<<'
+        T:WhitespaceTrivia [35..36) ' '
+        IdentifierName [36..37)
+          IdentifierToken [36..37) 'C'
+      ColonToken [37..38) ':'
+      T:EndOfLineTrivia [38..39) '\n'
+    CaseSwitchLabel [39..54)
+      CaseKeyword [39..43) 'case'
+      T:WhitespaceTrivia [43..44) ' '
+      LessThanExpression [44..52)
+        NullLiteralExpression [44..49)
+          NullKeyword [44..48) 'null'
+          T:WhitespaceTrivia [48..49) ' '
+        LessThanToken [49..50) '<'
+        T:WhitespaceTrivia [50..51) ' '
+        IdentifierName [51..52)
+          IdentifierToken [51..52) 'B'
+      ColonToken [52..53) ':'
+      T:EndOfLineTrivia [53..54) '\n'
+    CaseSwitchLabel [54..70)
+      CaseKeyword [54..58) 'case'
+      T:WhitespaceTrivia [58..59) ' '
+      EqualsExpression [59..68)
+        NullLiteralExpression [59..64)
+          NullKeyword [59..63) 'null'
+          T:WhitespaceTrivia [63..64) ' '
+        EqualsEqualsToken [64..66) '=='
+        T:WhitespaceTrivia [66..67) ' '
+        IdentifierName [67..68)
+          IdentifierToken [67..68) 'B'
+      ColonToken [68..69) ':'
+      T:EndOfLineTrivia [69..70) '\n'
+    CaseSwitchLabel [70..85)
+      CaseKeyword [70..74) 'case'
+      T:WhitespaceTrivia [74..75) ' '
+      BitwiseAndExpression [75..83)
+        NullLiteralExpression [75..80)
+          NullKeyword [75..79) 'null'
+          T:WhitespaceTrivia [79..80) ' '
+        AmpersandToken [80..81) '&'
+        T:WhitespaceTrivia [81..82) ' '
+        IdentifierName [82..83)
+          IdentifierToken [82..83) 'B'
+      ColonToken [83..84) ':'
+      T:EndOfLineTrivia [84..85) '\n'
+    CaseSwitchLabel [85..101)
+      CaseKeyword [85..89) 'case'
+      T:WhitespaceTrivia [89..90) ' '
+      LogicalAndExpression [90..99)
+        NullLiteralExpression [90..95)
+          NullKeyword [90..94) 'null'
+          T:WhitespaceTrivia [94..95) ' '
+        AmpersandAmpersandToken [95..97) '&&'
+        T:WhitespaceTrivia [97..98) ' '
+        IdentifierName [98..99)
+          IdentifierToken [98..99) 'B'
+      ColonToken [99..100) ':'
+      T:EndOfLineTrivia [100..101) '\n'
+    BreakStatement [101..112)
+      L:WhitespaceTrivia [101..105) '    '
+      BreakKeyword [105..110) 'break'
+      SemicolonToken [110..111) ';'
+      T:EndOfLineTrivia [111..112) '\n'
+  CloseBraceToken [112..113) '}'

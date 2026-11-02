@@ -1,0 +1,26 @@
+ConditionalExpression [0..31)
+  IsExpression [0..10)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..10)
+      IdentifierToken [5..9) 'Type'
+      T:WhitespaceTrivia [9..10) ' '
+  QuestionToken [10..11) '?'
+  T:WhitespaceTrivia [11..12) ' '
+  ElementAccessExpression [12..22)
+    IdentifierName [12..16)
+      IdentifierToken [12..16) 'dict'
+    BracketedArgumentList [16..22)
+      OpenBracketToken [16..17) '['
+      Argument [17..20)
+        IdentifierName [17..20)
+          IdentifierToken [17..20) 'key'
+      CloseBracketToken [20..21) ']'
+      T:WhitespaceTrivia [21..22) ' '
+  ColonToken [22..23) ':'
+  T:WhitespaceTrivia [23..24) ' '
+  DefaultLiteralExpression [24..31)
+    DefaultKeyword [24..31) 'default'

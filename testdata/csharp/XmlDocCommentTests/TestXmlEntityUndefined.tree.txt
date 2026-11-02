@@ -1,0 +1,10 @@
+CompilationUnit [0..12)
+  L:SingleLineDocumentationCommentTrivia [0..12)
+    XmlText [0..12)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlEntityLiteralToken [3..5) '&#'
+      XmlTextLiteralToken [5..12) 'abcdef;'
+    EndOfDocumentationCommentToken [12..12) ''
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1570 [3..3) XML comment has badly formed XML -- \'An invalid character was found inside an entity reference.\'

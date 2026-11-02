@@ -1,0 +1,14 @@
+CompilationUnit [0..21)
+  DelegateDeclaration [0..21)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..16)
+      IdentifierToken [9..15) 'scoped'
+      T:WhitespaceTrivia [15..16) ' '
+    IdentifierToken [16..17) 'A'
+    ParameterList [17..19)
+      OpenParenToken [17..18) '('
+      CloseParenToken [18..19) ')'
+    SemicolonToken [19..20) ';'
+    T:EndOfLineTrivia [20..21) '\n'
+  EndOfFileToken [21..21) ''

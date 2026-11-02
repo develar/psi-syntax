@@ -1,0 +1,84 @@
+CompilationUnit [0..152)
+  ClassDeclaration [0..152)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..91)
+      L:LineDirectiveTrivia [21..39)
+        HashToken [21..22) '#'
+        T:WhitespaceTrivia [22..23) ' '
+        LineKeyword [23..27) 'line'
+        T:WhitespaceTrivia [27..28) ' '
+        HiddenKeyword [28..34) 'hidden'
+        T:WhitespaceTrivia [34..35) ' '
+        L:SkippedTokensTrivia [35..38)
+          NumericLiteralToken [35..38) '123'
+        EndOfDirectiveToken [38..38) ''
+        T:EndOfLineTrivia [38..39) '\n'
+      L:WhitespaceTrivia [39..43) '    '
+      PublicKeyword [43..49) 'public'
+      T:WhitespaceTrivia [49..50) ' '
+      StaticKeyword [50..56) 'static'
+      T:WhitespaceTrivia [56..57) ' '
+      PredefinedType [57..62)
+        VoidKeyword [57..61) 'void'
+        T:WhitespaceTrivia [61..62) ' '
+      IdentifierToken [62..76) 'MyHiddenMethod'
+      ParameterList [76..79)
+        OpenParenToken [76..77) '('
+        CloseParenToken [77..78) ')'
+        T:EndOfLineTrivia [78..79) '\n'
+      Block [79..91)
+        L:WhitespaceTrivia [79..83) '    '
+        OpenBraceToken [83..84) '{'
+        T:EndOfLineTrivia [84..85) '\n'
+        L:WhitespaceTrivia [85..89) '    '
+        CloseBraceToken [89..90) '}'
+        T:EndOfLineTrivia [90..91) '\n'
+    MethodDeclaration [91..150)
+      L:EndOfLineTrivia [91..92) '\n'
+      L:WhitespaceTrivia [92..96) '    '
+      L:UndefDirectiveTrivia [96..107)
+        HashToken [96..97) '#'
+        UndefKeyword [97..102) 'undef'
+        T:WhitespaceTrivia [102..103) ' '
+        IdentifierToken [103..104) 'x'
+        T:WhitespaceTrivia [104..105) ' '
+        L:SkippedTokensTrivia [105..106)
+          IdentifierToken [105..106) 'y'
+        EndOfDirectiveToken [106..106) ''
+        T:EndOfLineTrivia [106..107) '\n'
+      L:WhitespaceTrivia [107..111) '    '
+      PublicKeyword [111..117) 'public'
+      T:WhitespaceTrivia [117..118) ' '
+      StaticKeyword [118..124) 'static'
+      T:WhitespaceTrivia [124..125) ' '
+      PredefinedType [125..130)
+        VoidKeyword [125..129) 'void'
+        T:WhitespaceTrivia [129..130) ' '
+      IdentifierToken [130..134) 'Main'
+      ParameterList [134..138)
+        OpenParenToken [134..135) '('
+        CloseParenToken [135..136) ')'
+        T:WhitespaceTrivia [136..137) ' '
+        T:EndOfLineTrivia [137..138) '\n'
+      Block [138..150)
+        L:WhitespaceTrivia [138..142) '    '
+        OpenBraceToken [142..143) '{'
+        T:EndOfLineTrivia [143..144) '\n'
+        L:WhitespaceTrivia [144..148) '    '
+        CloseBraceToken [148..149) '}'
+        T:EndOfLineTrivia [149..150) '\n'
+    CloseBraceToken [150..151) '}'
+    T:EndOfLineTrivia [151..152) '\n'
+  EndOfFileToken [152..152) ''
+Diagnostics:
+  CS1025 [35..38) Single-line comment or end-of-line expected
+  CS1032 [97..102) Cannot define/undefine preprocessor symbols after first token in file
+  CS1025 [105..106) Single-line comment or end-of-line expected

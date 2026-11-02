@@ -1,0 +1,2 @@
+EmptyStatement [0..1)
+  SemicolonToken [0..1) ';'

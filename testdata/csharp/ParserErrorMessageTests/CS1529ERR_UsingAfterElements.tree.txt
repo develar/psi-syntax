@@ -1,0 +1,44 @@
+CompilationUnit [0..81)
+  NamespaceDeclaration [0..81)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..15)
+      IdentifierToken [11..13) 'NS'
+      T:WhitespaceTrivia [13..14) ' '
+      T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    ClassDeclaration [17..62)
+      L:WhitespaceTrivia [17..21) '    '
+      ClassKeyword [21..26) 'class'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..36) 'SomeClass'
+      T:EndOfLineTrivia [36..37) '\n'
+      L:WhitespaceTrivia [37..41) '    '
+      OpenBraceToken [41..42) '{'
+      CloseBraceToken [42..43) '}'
+      T:EndOfLineTrivia [43..44) '\n'
+      T:WhitespaceTrivia [44..48) '    '
+      T:SkippedTokensTrivia [48..53)
+        UsingKeyword [48..53) 'using'
+      T:WhitespaceTrivia [53..54) ' '
+      T:SkippedTokensTrivia [54..60)
+        IdentifierToken [54..60) 'System'
+      T:SkippedTokensTrivia [60..61)
+        SemicolonToken [60..61) ';'
+      T:EndOfLineTrivia [61..62) '\n'
+    CloseBraceToken [62..63) '}'
+    T:EndOfLineTrivia [63..64) '\n'
+    T:SkippedTokensTrivia [64..69)
+      UsingKeyword [64..69) 'using'
+    T:WhitespaceTrivia [69..70) ' '
+    T:SkippedTokensTrivia [70..79)
+      IdentifierToken [70..79) 'Microsoft'
+    T:SkippedTokensTrivia [79..80)
+      SemicolonToken [79..80) ';'
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''
+Diagnostics:
+  CS1529 [48..61) A using clause must precede all other elements defined in the namespace except extern alias declarations
+  CS1529 [64..80) A using clause must precede all other elements defined in the namespace except extern alias declarations

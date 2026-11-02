@@ -1,0 +1,19 @@
+CompilationUnit [0..31)
+  NamespaceDeclaration [0..31)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'a'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    ExternAliasDirective [14..30)
+      ExternKeyword [14..20) 'extern'
+      T:WhitespaceTrivia [20..21) ' '
+      AliasKeyword [21..26) 'alias'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..28) 'b'
+      SemicolonToken [28..29) ';'
+      T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''

@@ -1,0 +1,31 @@
+ClassDeclaration [0..32)
+  AttributeList [0..21)
+    OpenBracketToken [0..1) '['
+    Attribute [1..19)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+      AttributeArgumentList [2..19)
+        OpenParenToken [2..3) '('
+        AttributeArgument [3..18)
+          ParenthesizedLambdaExpression [3..18)
+            IdentifierName [3..5)
+              IdentifierToken [3..4) 'T'
+              T:WhitespaceTrivia [4..5) ' '
+            ParameterList [5..8)
+              OpenParenToken [5..6) '('
+              CloseParenToken [6..7) ')'
+              T:WhitespaceTrivia [7..8) ' '
+            EqualsGreaterThanToken [8..10) '=>'
+            T:WhitespaceTrivia [10..11) ' '
+            DefaultLiteralExpression [11..18)
+              DefaultKeyword [11..18) 'default'
+        CloseParenToken [18..19) ')'
+    CloseBracketToken [19..20) ']'
+    T:WhitespaceTrivia [20..21) ' '
+  ClassKeyword [21..26) 'class'
+  T:WhitespaceTrivia [26..27) ' '
+  IdentifierToken [27..28) 'C'
+  T:WhitespaceTrivia [28..29) ' '
+  OpenBraceToken [29..30) '{'
+  T:WhitespaceTrivia [30..31) ' '
+  CloseBraceToken [31..32) '}'

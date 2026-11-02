@@ -1,0 +1,40 @@
+CompilationUnit [0..52)
+  GlobalStatement [0..52)
+    LocalFunctionStatement [0..52)
+      PredefinedType [0..5)
+        VoidKeyword [0..4) 'void'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'M'
+      ParameterList [6..9)
+        OpenParenToken [6..7) '('
+        CloseParenToken [7..8) ')'
+        T:EndOfLineTrivia [8..9) '\n'
+      Block [9..52)
+        OpenBraceToken [9..10) '{'
+        T:EndOfLineTrivia [10..11) '\n'
+        ExpressionStatement [11..51)
+          SimpleAssignmentExpression [11..49)
+            IdentifierName [11..11)
+              IdentifierToken [11..11) missing
+            L:WhitespaceTrivia [11..15) '    '
+            L:SingleLineCommentTrivia [15..25) '// comment'
+            L:EndOfLineTrivia [25..26) '\n'
+            L:WhitespaceTrivia [26..30) '    '
+            EqualsToken [30..31) '='
+            T:WhitespaceTrivia [31..32) ' '
+            InvocationExpression [32..49)
+              SimpleMemberAccessExpression [32..47)
+                IdentifierName [32..39)
+                  IdentifierToken [32..39) 'Console'
+                DotToken [39..40) '.'
+                IdentifierName [40..47)
+                  IdentifierToken [40..47) 'ReadKey'
+              ArgumentList [47..49)
+                OpenParenToken [47..48) '('
+                CloseParenToken [48..49) ')'
+          SemicolonToken [49..50) ';'
+          T:EndOfLineTrivia [50..51) '\n'
+        CloseBraceToken [51..52) '}'
+  EndOfFileToken [52..52) ''
+Diagnostics:
+  CS1525 [30..31) Invalid expression term \'=\'

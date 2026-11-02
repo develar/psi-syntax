@@ -1,0 +1,52 @@
+CompilationUnit [0..66)
+  UsingDirective [0..24)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    UnsafeKeyword [7..13) 'unsafe'
+    T:WhitespaceTrivia [13..14) ' '
+    NameEquals [14..18)
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'X'
+        T:WhitespaceTrivia [15..16) ' '
+      EqualsToken [16..17) '='
+      T:WhitespaceTrivia [17..18) ' '
+    PointerType [18..22)
+      PredefinedType [18..21)
+        IntKeyword [18..21) 'int'
+      AsteriskToken [21..22) '*'
+    SemicolonToken [22..23) ';'
+    T:EndOfLineTrivia [23..24) '\n'
+  NamespaceDeclaration [24..66)
+    L:EndOfLineTrivia [24..25) '\n'
+    NamespaceKeyword [25..34) 'namespace'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierName [35..37)
+      IdentifierToken [35..36) 'N'
+      T:EndOfLineTrivia [36..37) '\n'
+    OpenBraceToken [37..38) '{'
+    T:EndOfLineTrivia [38..39) '\n'
+    UsingDirective [39..65)
+      L:WhitespaceTrivia [39..43) '    '
+      UsingKeyword [43..48) 'using'
+      T:WhitespaceTrivia [48..49) ' '
+      UnsafeKeyword [49..55) 'unsafe'
+      T:WhitespaceTrivia [55..56) ' '
+      NameEquals [56..60)
+        IdentifierName [56..58)
+          IdentifierToken [56..57) 'Y'
+          T:WhitespaceTrivia [57..58) ' '
+        EqualsToken [58..59) '='
+        T:WhitespaceTrivia [59..60) ' '
+      ArrayType [60..63)
+        IdentifierName [60..61)
+          IdentifierToken [60..61) 'X'
+        ArrayRankSpecifier [61..63)
+          OpenBracketToken [61..62) '['
+          OmittedArraySizeExpression [62..62)
+            OmittedArraySizeExpressionToken [62..62) ''
+          CloseBracketToken [62..63) ']'
+      SemicolonToken [63..64) ';'
+      T:EndOfLineTrivia [64..65) '\n'
+    CloseBraceToken [65..66) '}'
+  EndOfFileToken [66..66) ''

@@ -1,0 +1,12 @@
+CompilationUnit [0..8)
+  GlobalStatement [0..8)
+    ExpressionStatement [0..8)
+      PointerMemberAccessExpression [0..7)
+        CollectionExpression [0..2)
+          OpenBracketToken [0..1) '['
+          CloseBracketToken [1..2) ']'
+        MinusGreaterThanToken [2..4) '->'
+        IdentifierName [4..7)
+          IdentifierToken [4..7) 'Goo'
+      SemicolonToken [7..8) ';'
+  EndOfFileToken [8..8) ''

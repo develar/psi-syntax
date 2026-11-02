@@ -1,0 +1,4 @@
+
+() => {
+    const await goo();
+}

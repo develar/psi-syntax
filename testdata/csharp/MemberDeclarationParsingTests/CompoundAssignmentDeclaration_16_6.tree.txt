@@ -1,0 +1,38 @@
+OperatorDeclaration [0..37)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  MinusEqualsToken [11..13) '-='
+  ParameterList [13..32)
+    OpenParenToken [13..14) '('
+    Parameter [14..18)
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'C'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..18) 'x1'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    Parameter [20..24)
+      IdentifierName [20..22)
+        IdentifierToken [20..21) 'C'
+        T:WhitespaceTrivia [21..22) ' '
+      IdentifierToken [22..24) 'x2'
+    CommaToken [24..25) ','
+    T:WhitespaceTrivia [25..26) ' '
+    Parameter [26..30)
+      IdentifierName [26..28)
+        IdentifierToken [26..27) 'C'
+        T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..30) 'x3'
+    CloseParenToken [30..31) ')'
+    T:WhitespaceTrivia [31..32) ' '
+  ArrowExpressionClause [32..36)
+    EqualsGreaterThanToken [32..34) '=>'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierName [35..36)
+      IdentifierToken [35..36) 'x'
+  SemicolonToken [36..37) ';'
+Diagnostics:
+  CS9313 [11..13) Overloaded compound assignment operator \'-=\' takes one parameter

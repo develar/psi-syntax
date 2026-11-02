@@ -1,0 +1,18 @@
+AddExpression [0..12)
+  ParenthesizedLambdaExpression [0..9)
+    ParameterList [0..3)
+      OpenParenToken [0..1) '('
+      CloseParenToken [1..2) ')'
+      T:WhitespaceTrivia [2..3) ' '
+    EqualsGreaterThanToken [3..5) '=>'
+    T:WhitespaceTrivia [5..6) ' '
+    Block [6..9)
+      OpenBraceToken [6..7) '{'
+      CloseBraceToken [7..8) '}'
+      T:WhitespaceTrivia [8..9) ' '
+  PlusToken [9..10) '+'
+  T:WhitespaceTrivia [10..11) ' '
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'd'
+Diagnostics:
+  CS8848 [9..10) Operator \'+\' cannot be used here due to precedence. Use parentheses to disambiguate.

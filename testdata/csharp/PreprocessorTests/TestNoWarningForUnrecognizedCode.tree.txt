@@ -1,0 +1,13 @@
+CompilationUnit [0..29)
+  L:PragmaWarningDirectiveTrivia [0..29)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    DisableKeyword [16..23) 'disable'
+    T:WhitespaceTrivia [23..24) ' '
+    NumericLiteralExpression [24..29)
+      NumericLiteralToken [24..29) '99999'
+    EndOfDirectiveToken [29..29) ''
+  EndOfFileToken [29..29) ''

@@ -1,0 +1,46 @@
+ExpressionStatement [0..32)
+  SimpleAssignmentExpression [0..32)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    IsPatternExpression [4..32)
+      ThisExpression [4..9)
+        ThisKeyword [4..8) 'this'
+        T:WhitespaceTrivia [8..9) ' '
+      IsKeyword [9..11) 'is'
+      T:WhitespaceTrivia [11..12) ' '
+      RecursivePattern [12..32)
+        IdentifierName [12..20)
+          IdentifierToken [12..19) 'Program'
+          T:WhitespaceTrivia [19..20) ' '
+        PropertyPatternClause [20..32)
+          OpenBraceToken [20..21) '{'
+          T:WhitespaceTrivia [21..22) ' '
+          Subpattern [22..31)
+            NameColon [22..26)
+              IdentifierName [22..24)
+                IdentifierToken [22..24) 'P1'
+              ColonToken [24..25) ':'
+              T:WhitespaceTrivia [25..26) ' '
+            RecursivePattern [26..31)
+              PositionalPatternClause [26..31)
+                OpenParenToken [26..27) '('
+                Subpattern [27..28)
+                  ConstantPattern [27..28)
+                    NumericLiteralExpression [27..28)
+                      NumericLiteralToken [27..28) '1'
+                CommaToken [28..29) ','
+                T:WhitespaceTrivia [29..31) '  '
+                Subpattern [31..31)
+                  ConstantPattern [31..31)
+                    IdentifierName [31..31)
+                      IdentifierToken [31..31) missing
+                CloseParenToken [31..31) missing
+          CloseBraceToken [31..32) '}'
+  SemicolonToken [32..32) missing
+Diagnostics:
+  CS8504 [31..32) Pattern missing
+  CS1026 [31..32) ) expected
+  CS1002 [32..32) ; expected

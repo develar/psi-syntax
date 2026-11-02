@@ -1,0 +1,28 @@
+CompilationUnit [0..16)
+  IndexerDeclaration [0..16)
+    PredefinedType [0..7)
+      StringKeyword [0..6) 'string'
+      T:WhitespaceTrivia [6..7) ' '
+    ThisKeyword [7..11) 'this'
+    T:WhitespaceTrivia [11..12) ' '
+    BracketedParameterList [12..15)
+      OpenBracketToken [12..12) missing
+      T:SkippedTokensTrivia [12..13)
+        EqualsToken [12..13) '='
+      T:SkippedTokensTrivia [13..15)
+        StringLiteralToken [13..15) '""'
+      CloseBracketToken [15..15) missing
+    AccessorList [15..16)
+      OpenBraceToken [15..15) missing
+      UnknownAccessorDeclaration [15..16)
+        IdentifierToken [15..15) missing
+        SemicolonToken [15..16) ';'
+      CloseBraceToken [16..16) missing
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1003 [12..13) Syntax error, \'[\' expected
+  CS1001 [12..13) Identifier expected
+  CS1003 [15..16) Syntax error, \']\' expected
+  CS1514 [15..16) { expected
+  CS1014 [15..16) A get or set accessor expected
+  CS1513 [16..16) } expected

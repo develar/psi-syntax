@@ -1,0 +1,455 @@
+CompilationUnit [0..749)
+  UsingDirective [0..101)
+    L:DefineDirectiveTrivia [0..14)
+      HashToken [0..1) '#'
+      DefineKeyword [1..7) 'define'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierToken [8..13) 'True1'
+      EndOfDirectiveToken [13..13) ''
+      T:EndOfLineTrivia [13..14) '\n'
+    L:DefineDirectiveTrivia [14..28)
+      HashToken [14..15) '#'
+      DefineKeyword [15..21) 'define'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierToken [22..27) 'True2'
+      EndOfDirectiveToken [27..27) ''
+      T:EndOfLineTrivia [27..28) '\n'
+    L:EndOfLineTrivia [28..29) '\n'
+    L:DefineDirectiveTrivia [29..44)
+      HashToken [29..30) '#'
+      DefineKeyword [30..36) 'define'
+      T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..43) 'False1'
+      EndOfDirectiveToken [43..43) ''
+      T:EndOfLineTrivia [43..44) '\n'
+    L:UndefDirectiveTrivia [44..58)
+      HashToken [44..45) '#'
+      UndefKeyword [45..50) 'undef'
+      T:WhitespaceTrivia [50..51) ' '
+      IdentifierToken [51..57) 'False1'
+      EndOfDirectiveToken [57..57) ''
+      T:EndOfLineTrivia [57..58) '\n'
+    L:UndefDirectiveTrivia [58..72)
+      HashToken [58..59) '#'
+      UndefKeyword [59..64) 'undef'
+      T:WhitespaceTrivia [64..65) ' '
+      IdentifierToken [65..71) 'False1'
+      EndOfDirectiveToken [71..71) ''
+      T:EndOfLineTrivia [71..72) '\n'
+    L:UndefDirectiveTrivia [72..86)
+      HashToken [72..73) '#'
+      UndefKeyword [73..78) 'undef'
+      T:WhitespaceTrivia [78..79) ' '
+      IdentifierToken [79..85) 'False2'
+      EndOfDirectiveToken [85..85) ''
+      T:EndOfLineTrivia [85..86) '\n'
+    L:EndOfLineTrivia [86..87) '\n'
+    UsingKeyword [87..92) 'using'
+    T:WhitespaceTrivia [92..93) ' '
+    IdentifierName [93..99)
+      IdentifierToken [93..99) 'System'
+    SemicolonToken [99..100) ';'
+    T:EndOfLineTrivia [100..101) '\n'
+  ClassDeclaration [101..749)
+    L:EndOfLineTrivia [101..102) '\n'
+    PublicKeyword [102..108) 'public'
+    T:WhitespaceTrivia [108..109) ' '
+    ClassKeyword [109..114) 'class'
+    T:WhitespaceTrivia [114..115) ' '
+    IdentifierToken [115..119) 'Test'
+    T:EndOfLineTrivia [119..120) '\n'
+    OpenBraceToken [120..121) '{'
+    T:EndOfLineTrivia [121..122) '\n'
+    MethodDeclaration [122..748)
+      L:WhitespaceTrivia [122..126) '    '
+      PublicKeyword [126..132) 'public'
+      T:WhitespaceTrivia [132..133) ' '
+      StaticKeyword [133..139) 'static'
+      T:WhitespaceTrivia [139..140) ' '
+      PredefinedType [140..144)
+        IntKeyword [140..143) 'int'
+        T:WhitespaceTrivia [143..144) ' '
+      IdentifierToken [144..148) 'Main'
+      ParameterList [148..165)
+        OpenParenToken [148..149) '('
+        Parameter [149..163)
+          ArrayType [149..159)
+            PredefinedType [149..156)
+              StringKeyword [149..155) 'string'
+              T:WhitespaceTrivia [155..156) ' '
+            ArrayRankSpecifier [156..159)
+              OpenBracketToken [156..157) '['
+              OmittedArraySizeExpression [157..157)
+                OmittedArraySizeExpressionToken [157..157) ''
+              CloseBracketToken [157..158) ']'
+              T:WhitespaceTrivia [158..159) ' '
+          IdentifierToken [159..163) 'args'
+        CloseParenToken [163..164) ')'
+        T:EndOfLineTrivia [164..165) '\n'
+      Block [165..748)
+        L:WhitespaceTrivia [165..169) '    '
+        OpenBraceToken [169..170) '{'
+        T:EndOfLineTrivia [170..171) '\n'
+        LocalDeclarationStatement [171..184)
+          VariableDeclaration [171..182)
+            PredefinedType [171..177)
+              L:WhitespaceTrivia [171..173) '\t\t'
+              IntKeyword [173..176) 'int'
+              T:WhitespaceTrivia [176..177) ' '
+            VariableDeclarator [177..182)
+              IdentifierToken [177..178) 'i'
+              T:WhitespaceTrivia [178..179) ' '
+              EqualsValueClause [179..182)
+                EqualsToken [179..180) '='
+                T:WhitespaceTrivia [180..181) ' '
+                NumericLiteralExpression [181..182)
+                  NumericLiteralToken [181..182) '6'
+          SemicolonToken [182..183) ';'
+          T:EndOfLineTrivia [183..184) '\n'
+        ExpressionStatement [184..211)
+          PostDecrementExpression [184..209)
+            IdentifierName [184..207)
+              L:EndOfLineTrivia [184..185) '\n'
+              L:WhitespaceTrivia [185..186) ' '
+              L:IfDirectiveTrivia [186..204)
+                HashToken [186..187) '#'
+                IfKeyword [187..189) 'if'
+                T:WhitespaceTrivia [189..190) ' '
+                EqualsExpression [190..203)
+                  IdentifierName [190..196)
+                    IdentifierToken [190..195) 'True1'
+                    T:WhitespaceTrivia [195..196) ' '
+                  EqualsEqualsToken [196..198) '=='
+                  T:WhitespaceTrivia [198..199) ' '
+                  TrueLiteralExpression [199..203)
+                    TrueKeyword [199..203) 'true'
+                EndOfDirectiveToken [203..203) ''
+                T:EndOfLineTrivia [203..204) '\n'
+              L:WhitespaceTrivia [204..206) '\t\t'
+              IdentifierToken [206..207) 'i'
+            MinusMinusToken [207..209) '--'
+          SemicolonToken [209..210) ';'
+          T:EndOfLineTrivia [210..211) '\n'
+        ExpressionStatement [211..247)
+          PostDecrementExpression [211..245)
+            IdentifierName [211..243)
+              L:WhitespaceTrivia [211..212) ' '
+              L:EndIfDirectiveTrivia [212..219)
+                HashToken [212..213) '#'
+                EndIfKeyword [213..218) 'endif'
+                EndOfDirectiveToken [218..218) ''
+                T:EndOfLineTrivia [218..219) '\n'
+              L:EndOfLineTrivia [219..220) '\n'
+              L:IfDirectiveTrivia [220..240)
+                HashToken [220..221) '#'
+                IfKeyword [221..223) 'if'
+                T:WhitespaceTrivia [223..224) ' '
+                EqualsExpression [224..239)
+                  IdentifierName [224..231)
+                    IdentifierToken [224..230) 'False1'
+                    T:WhitespaceTrivia [230..231) ' '
+                  EqualsEqualsToken [231..233) '=='
+                  T:WhitespaceTrivia [233..234) ' '
+                  FalseLiteralExpression [234..239)
+                    FalseKeyword [234..239) 'false'
+                EndOfDirectiveToken [239..239) ''
+                T:EndOfLineTrivia [239..240) '\n'
+              L:WhitespaceTrivia [240..242) '\t\t'
+              IdentifierToken [242..243) 'i'
+            MinusMinusToken [243..245) '--'
+          SemicolonToken [245..246) ';'
+          T:EndOfLineTrivia [246..247) '\n'
+        ExpressionStatement [247..323)
+          PostDecrementExpression [247..321)
+            IdentifierName [247..319)
+              L:EndIfDirectiveTrivia [247..254)
+                HashToken [247..248) '#'
+                EndIfKeyword [248..253) 'endif'
+                EndOfDirectiveToken [253..253) ''
+                T:EndOfLineTrivia [253..254) '\n'
+              L:EndOfLineTrivia [254..255) '\n'
+              L:IfDirectiveTrivia [255..266)
+                HashToken [255..256) '#'
+                T:WhitespaceTrivia [256..257) ' '
+                IfKeyword [257..259) 'if'
+                T:WhitespaceTrivia [259..260) ' '
+                FalseLiteralExpression [260..265)
+                  FalseKeyword [260..265) 'false'
+                EndOfDirectiveToken [265..265) ''
+                T:EndOfLineTrivia [265..266) '\n'
+              L:WhitespaceTrivia [266..267) '\t'
+              L:ErrorDirectiveTrivia [267..295)
+                HashToken [267..268) '#'
+                ErrorKeyword [268..273) 'error'
+                T:WhitespaceTrivia [273..274) ' '
+                L:PreprocessingMessageTrivia [274..294) '#elif True2 == True1'
+                EndOfDirectiveToken [294..294) ''
+                T:EndOfLineTrivia [294..295) '\n'
+              L:ElifDirectiveTrivia [295..316)
+                HashToken [295..296) '#'
+                ElifKeyword [296..300) 'elif'
+                T:WhitespaceTrivia [300..301) ' '
+                EqualsExpression [301..315)
+                  IdentifierName [301..307)
+                    IdentifierToken [301..306) 'True2'
+                    T:WhitespaceTrivia [306..307) ' '
+                  EqualsEqualsToken [307..309) '=='
+                  T:WhitespaceTrivia [309..310) ' '
+                  IdentifierName [310..315)
+                    IdentifierToken [310..315) 'True1'
+                EndOfDirectiveToken [315..315) ''
+                T:EndOfLineTrivia [315..316) '\n'
+              L:WhitespaceTrivia [316..318) '\t\t'
+              IdentifierToken [318..319) 'i'
+            MinusMinusToken [319..321) '--'
+          SemicolonToken [321..322) ';'
+          T:EndOfLineTrivia [322..323) '\n'
+        ExpressionStatement [323..444)
+          PostDecrementExpression [323..442)
+            IdentifierName [323..440)
+              L:ElseDirectiveTrivia [323..329)
+                HashToken [323..324) '#'
+                ElseKeyword [324..328) 'else'
+                EndOfDirectiveToken [328..328) ''
+                T:EndOfLineTrivia [328..329) '\n'
+              L:WhitespaceTrivia [329..330) '\t'
+              L:ErrorDirectiveTrivia [330..364)
+                HashToken [330..331) '#'
+                ErrorKeyword [331..336) 'error'
+                T:WhitespaceTrivia [336..337) ' '
+                L:PreprocessingMessageTrivia [337..363) '#else #elif True2 == True1'
+                EndOfDirectiveToken [363..363) ''
+                T:EndOfLineTrivia [363..364) '\n'
+              L:WhitespaceTrivia [364..365) ' '
+              L:EndIfDirectiveTrivia [365..372)
+                HashToken [365..366) '#'
+                EndIfKeyword [366..371) 'endif'
+                EndOfDirectiveToken [371..371) ''
+                T:EndOfLineTrivia [371..372) '\n'
+              L:EndOfLineTrivia [372..373) '\n'
+              L:IfDirectiveTrivia [373..437)
+                HashToken [373..374) '#'
+                IfKeyword [374..376) 'if'
+                T:WhitespaceTrivia [376..377) ' '
+                LogicalAndExpression [377..436)
+                  LogicalAndExpression [377..418)
+                    ParenthesizedExpression [377..394)
+                      OpenParenToken [377..378) '('
+                      NotEqualsExpression [378..392)
+                        IdentifierName [378..384)
+                          IdentifierToken [378..383) 'True1'
+                          T:WhitespaceTrivia [383..384) ' '
+                        ExclamationEqualsToken [384..386) '!='
+                        T:WhitespaceTrivia [386..387) ' '
+                        FalseLiteralExpression [387..392)
+                          FalseKeyword [387..392) 'false'
+                      CloseParenToken [392..393) ')'
+                      T:WhitespaceTrivia [393..394) ' '
+                    AmpersandAmpersandToken [394..396) '&&'
+                    T:WhitespaceTrivia [396..397) ' '
+                    ParenthesizedExpression [397..418)
+                      OpenParenToken [397..398) '('
+                      EqualsExpression [398..416)
+                        ParenthesizedExpression [398..407)
+                          OpenParenToken [398..399) '('
+                          IdentifierName [399..405)
+                            IdentifierToken [399..405) 'False1'
+                          CloseParenToken [405..406) ')'
+                          T:WhitespaceTrivia [406..407) ' '
+                        EqualsEqualsToken [407..409) '=='
+                        T:WhitespaceTrivia [409..410) ' '
+                        IdentifierName [410..416)
+                          IdentifierToken [410..416) 'False2'
+                      CloseParenToken [416..417) ')'
+                      T:WhitespaceTrivia [417..418) ' '
+                  AmpersandAmpersandToken [418..420) '&&'
+                  T:WhitespaceTrivia [420..421) ' '
+                  ParenthesizedExpression [421..436)
+                    OpenParenToken [421..422) '('
+                    LogicalOrExpression [422..435)
+                      TrueLiteralExpression [422..427)
+                        TrueKeyword [422..426) 'true'
+                        T:WhitespaceTrivia [426..427) ' '
+                      BarBarToken [427..429) '||'
+                      T:WhitespaceTrivia [429..430) ' '
+                      FalseLiteralExpression [430..435)
+                        FalseKeyword [430..435) 'false'
+                    CloseParenToken [435..436) ')'
+                EndOfDirectiveToken [436..436) ''
+                T:EndOfLineTrivia [436..437) '\n'
+              L:WhitespaceTrivia [437..439) '\t\t'
+              IdentifierToken [439..440) 'i'
+            MinusMinusToken [440..442) '--'
+          SemicolonToken [442..443) ';'
+          T:EndOfLineTrivia [443..444) '\n'
+        ExpressionStatement [444..579)
+          PostDecrementExpression [444..577)
+            IdentifierName [444..575)
+              L:ElseDirectiveTrivia [444..451)
+                HashToken [444..445) '#'
+                T:WhitespaceTrivia [445..446) ' '
+                ElseKeyword [446..450) 'else'
+                EndOfDirectiveToken [450..450) ''
+                T:EndOfLineTrivia [450..451) '\n'
+              L:WhitespaceTrivia [451..452) '\t'
+              L:ErrorDirectiveTrivia [452..522)
+                HashToken [452..453) '#'
+                ErrorKeyword [453..458) 'error'
+                T:WhitespaceTrivia [458..459) ' '
+                L:PreprocessingMessageTrivia [459..521) '#if (True != false) && ((False1) == False2) && (true || false)'
+                EndOfDirectiveToken [521..521) ''
+                T:EndOfLineTrivia [521..522) '\n'
+              L:EndIfDirectiveTrivia [522..530)
+                HashToken [522..523) '#'
+                T:WhitespaceTrivia [523..524) ' '
+                EndIfKeyword [524..529) 'endif'
+                EndOfDirectiveToken [529..529) ''
+                T:EndOfLineTrivia [529..530) '\n'
+              L:EndOfLineTrivia [530..531) '\n'
+              L:IfDirectiveTrivia [531..572)
+                HashToken [531..532) '#'
+                IfKeyword [532..534) 'if'
+                T:WhitespaceTrivia [534..535) ' '
+                ParenthesizedExpression [535..571)
+                  OpenParenToken [535..536) '('
+                  NotEqualsExpression [536..570)
+                    ParenthesizedExpression [536..552)
+                      OpenParenToken [536..537) '('
+                      EqualsExpression [537..550)
+                        TrueLiteralExpression [537..542)
+                          TrueKeyword [537..541) 'true'
+                          T:WhitespaceTrivia [541..542) ' '
+                        EqualsEqualsToken [542..544) '=='
+                        T:WhitespaceTrivia [544..545) ' '
+                        IdentifierName [545..550)
+                          IdentifierToken [545..550) 'True1'
+                      CloseParenToken [550..551) ')'
+                      T:WhitespaceTrivia [551..552) ' '
+                    ExclamationEqualsToken [552..554) '!='
+                    T:WhitespaceTrivia [554..555) ' '
+                    ParenthesizedExpression [555..570)
+                      OpenParenToken [555..556) '('
+                      LogicalAndExpression [556..569)
+                        FalseLiteralExpression [556..562)
+                          FalseKeyword [556..561) 'false'
+                          T:WhitespaceTrivia [561..562) ' '
+                        AmpersandAmpersandToken [562..564) '&&'
+                        T:WhitespaceTrivia [564..565) ' '
+                        TrueLiteralExpression [565..569)
+                          TrueKeyword [565..569) 'true'
+                      CloseParenToken [569..570) ')'
+                  CloseParenToken [570..571) ')'
+                EndOfDirectiveToken [571..571) ''
+                T:EndOfLineTrivia [571..572) '\n'
+              L:WhitespaceTrivia [572..574) '\t\t'
+              IdentifierToken [574..575) 'i'
+            MinusMinusToken [575..577) '--'
+          SemicolonToken [577..578) ';'
+          T:EndOfLineTrivia [578..579) '\n'
+        ExpressionStatement [579..672)
+          PostDecrementExpression [579..670)
+            IdentifierName [579..668)
+              L:ElseDirectiveTrivia [579..585)
+                HashToken [579..580) '#'
+                ElseKeyword [580..584) 'else'
+                EndOfDirectiveToken [584..584) ''
+                T:EndOfLineTrivia [584..585) '\n'
+              L:ErrorDirectiveTrivia [585..629)
+                HashToken [585..586) '#'
+                ErrorKeyword [586..591) 'error'
+                T:WhitespaceTrivia [591..592) ' '
+                L:PreprocessingMessageTrivia [592..628) '((true == True1) != (false && true))'
+                EndOfDirectiveToken [628..628) ''
+                T:EndOfLineTrivia [628..629) '\n'
+              L:EndIfDirectiveTrivia [629..636)
+                HashToken [629..630) '#'
+                EndIfKeyword [630..635) 'endif'
+                EndOfDirectiveToken [635..635) ''
+                T:EndOfLineTrivia [635..636) '\n'
+              L:EndOfLineTrivia [636..637) '\n'
+              L:IfDirectiveTrivia [637..665)
+                HashToken [637..638) '#'
+                IfKeyword [638..640) 'if'
+                T:WhitespaceTrivia [640..641) ' '
+                NotEqualsExpression [641..664)
+                  LogicalNotExpression [641..656)
+                    ExclamationToken [641..642) '!'
+                    ParenthesizedExpression [642..656)
+                      OpenParenToken [642..643) '('
+                      LogicalNotExpression [643..654)
+                        ExclamationToken [643..644) '!'
+                        ParenthesizedExpression [644..654)
+                          OpenParenToken [644..645) '('
+                          LogicalNotExpression [645..653)
+                            ExclamationToken [645..646) '!'
+                            LogicalNotExpression [646..653)
+                              ExclamationToken [646..647) '!'
+                              ParenthesizedExpression [647..653)
+                                OpenParenToken [647..648) '('
+                                TrueLiteralExpression [648..652)
+                                  TrueKeyword [648..652) 'true'
+                                CloseParenToken [652..653) ')'
+                          CloseParenToken [653..654) ')'
+                      CloseParenToken [654..655) ')'
+                      T:WhitespaceTrivia [655..656) ' '
+                  ExclamationEqualsToken [656..658) '!='
+                  T:WhitespaceTrivia [658..659) ' '
+                  FalseLiteralExpression [659..664)
+                    FalseKeyword [659..664) 'false'
+                EndOfDirectiveToken [664..664) ''
+                T:EndOfLineTrivia [664..665) '\n'
+              L:WhitespaceTrivia [665..667) '\t\t'
+              IdentifierToken [667..668) 'i'
+            MinusMinusToken [668..670) '--'
+          SemicolonToken [670..671) ';'
+          T:EndOfLineTrivia [671..672) '\n'
+        ReturnStatement [672..742)
+          L:ElseDirectiveTrivia [672..678)
+            HashToken [672..673) '#'
+            ElseKeyword [673..677) 'else'
+            EndOfDirectiveToken [677..677) ''
+            T:EndOfLineTrivia [677..678) '\n'
+          L:ErrorDirectiveTrivia [678..709)
+            HashToken [678..679) '#'
+            ErrorKeyword [679..684) 'error'
+            T:WhitespaceTrivia [684..685) ' '
+            L:PreprocessingMessageTrivia [685..708) '!(!(!!(true))) != false'
+            EndOfDirectiveToken [708..708) ''
+            T:EndOfLineTrivia [708..709) '\n'
+          L:EndIfDirectiveTrivia [709..716)
+            HashToken [709..710) '#'
+            EndIfKeyword [710..715) 'endif'
+            EndOfDirectiveToken [715..715) ''
+            T:EndOfLineTrivia [715..716) '\n'
+          L:EndOfLineTrivia [716..717) '\n'
+          L:WhitespaceTrivia [717..719) '\t\t'
+          ReturnKeyword [719..725) 'return'
+          ParenthesizedExpression [725..740)
+            OpenParenToken [725..726) '('
+            ConditionalExpression [726..739)
+              GreaterThanExpression [726..732)
+                IdentifierName [726..728)
+                  IdentifierToken [726..727) 'i'
+                  T:WhitespaceTrivia [727..728) ' '
+                GreaterThanToken [728..729) '>'
+                T:WhitespaceTrivia [729..730) ' '
+                NumericLiteralExpression [730..732)
+                  NumericLiteralToken [730..731) '0'
+                  T:WhitespaceTrivia [731..732) ' '
+              QuestionToken [732..733) '?'
+              T:WhitespaceTrivia [733..734) ' '
+              NumericLiteralExpression [734..736)
+                NumericLiteralToken [734..735) '1'
+                T:WhitespaceTrivia [735..736) ' '
+              ColonToken [736..737) ':'
+              T:WhitespaceTrivia [737..738) ' '
+              NumericLiteralExpression [738..739)
+                NumericLiteralToken [738..739) '0'
+            CloseParenToken [739..740) ')'
+          SemicolonToken [740..741) ';'
+          T:EndOfLineTrivia [741..742) '\n'
+        L:WhitespaceTrivia [742..746) '    '
+        CloseBraceToken [746..747) '}'
+        T:EndOfLineTrivia [747..748) '\n'
+    CloseBraceToken [748..749) '}'
+  EndOfFileToken [749..749) ''

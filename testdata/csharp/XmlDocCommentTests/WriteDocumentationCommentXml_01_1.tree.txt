@@ -1,0 +1,26 @@
+CompilationUnit [0..32)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:SingleLineDocumentationCommentTrivia [1..32)
+    XmlText [1..5)
+      L:DocumentationCommentExteriorTrivia [1..4) '///'
+      XmlTextLiteralToken [4..5) ' '
+    XmlElement [5..31)
+      XmlElementStartTag [5..14)
+        LessThanToken [5..6) '<'
+        XmlName [6..13)
+          IdentifierToken [6..13) 'summary'
+        GreaterThanToken [13..14) '>'
+      XmlText [14..21)
+        XmlTextLiteralToken [14..16) ' a'
+        XmlTextLiteralNewLineToken [16..17) '\n'
+        L:DocumentationCommentExteriorTrivia [17..20) '///'
+        XmlTextLiteralToken [20..21) ' '
+      XmlElementEndTag [21..31)
+        LessThanSlashToken [21..23) '</'
+        XmlName [23..30)
+          IdentifierToken [23..30) 'summary'
+        GreaterThanToken [30..31) '>'
+    XmlText [31..32)
+      XmlTextLiteralNewLineToken [31..32) '\n'
+    EndOfDocumentationCommentToken [32..32) ''
+  EndOfFileToken [32..32) ''

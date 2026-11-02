@@ -1,0 +1,36 @@
+CompilationUnit [0..34)
+  ClassDeclaration [0..34)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    PropertyDeclaration [10..33)
+      IdentifierName [10..12)
+        IdentifierToken [10..11) 'b'
+        T:WhitespaceTrivia [11..12) ' '
+      IdentifierToken [12..13) 'c'
+      T:WhitespaceTrivia [13..14) ' '
+      AccessorList [14..28)
+        OpenBraceToken [14..15) '{'
+        T:WhitespaceTrivia [15..16) ' '
+        GetAccessorDeclaration [16..21)
+          GetKeyword [16..19) 'get'
+          SemicolonToken [19..20) ';'
+          T:WhitespaceTrivia [20..21) ' '
+        SetAccessorDeclaration [21..26)
+          SetKeyword [21..24) 'set'
+          SemicolonToken [24..25) ';'
+          T:WhitespaceTrivia [25..26) ' '
+        CloseBraceToken [26..27) '}'
+        T:WhitespaceTrivia [27..28) ' '
+      EqualsValueClause [28..31)
+        EqualsToken [28..29) '='
+        T:WhitespaceTrivia [29..30) ' '
+        IdentifierName [30..31)
+          IdentifierToken [30..31) 'd'
+      SemicolonToken [31..32) ';'
+      T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''

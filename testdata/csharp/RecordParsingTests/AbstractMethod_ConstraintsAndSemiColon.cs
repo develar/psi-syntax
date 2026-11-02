@@ -1,0 +1,1 @@
+abstract record R { abstract void M<T>() where T : class; }

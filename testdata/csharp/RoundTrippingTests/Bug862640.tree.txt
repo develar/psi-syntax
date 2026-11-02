@@ -1,0 +1,156 @@
+CompilationUnit [0..317)
+  ClassDeclaration [0..317)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..24) 'Production'
+    T:EndOfLineTrivia [24..25) '\n'
+    OpenBraceToken [25..26) '{'
+    T:EndOfLineTrivia [26..27) '\n'
+    ConstructorDeclaration [27..315)
+      L:WhitespaceTrivia [27..31) '    '
+      PublicKeyword [31..37) 'public'
+      T:WhitespaceTrivia [37..38) ' '
+      IdentifierToken [38..48) 'Production'
+      ParameterList [48..51)
+        OpenParenToken [48..49) '('
+        CloseParenToken [49..50) ')'
+        T:EndOfLineTrivia [50..51) '\n'
+      Block [51..315)
+        L:WhitespaceTrivia [51..55) '    '
+        OpenBraceToken [55..56) '{'
+        T:EndOfLineTrivia [56..57) '\n'
+        ExpressionStatement [57..309)
+          InvocationExpression [57..307)
+            ParenthesizedExpression [57..305)
+              L:WhitespaceTrivia [57..65) '        '
+              OpenParenToken [65..66) '('
+              CastExpression [66..304)
+                OpenParenToken [66..67) '('
+                IdentifierName [67..79)
+                  IdentifierToken [67..79) 'VoidDelegate'
+                CloseParenToken [79..80) ')'
+                AnonymousMethodExpression [80..304)
+                  DelegateKeyword [80..88) 'delegate'
+                  T:EndOfLineTrivia [88..89) '\n'
+                  Block [89..304)
+                    L:WhitespaceTrivia [89..97) '        '
+                    OpenBraceToken [97..98) '{'
+                    T:EndOfLineTrivia [98..99) '\n'
+                    ExpressionStatement [99..295)
+                      InvocationExpression [99..293)
+                        SimpleMemberAccessExpression [99..132)
+                          SimpleMemberAccessExpression [99..124)
+                            ThisExpression [99..115)
+                              L:WhitespaceTrivia [99..111) '            '
+                              ThisKeyword [111..115) 'this'
+                            DotToken [115..116) '.'
+                            IdentifierName [116..124)
+                              IdentifierToken [116..124) 'someType'
+                          DotToken [124..125) '.'
+                          IdentifierName [125..132)
+                            IdentifierToken [125..132) 'Iterate'
+                        ArgumentList [132..293)
+                          OpenParenToken [132..133) '('
+                          Argument [133..292)
+                            AnonymousMethodExpression [133..292)
+                              DelegateKeyword [133..141) 'delegate'
+                              ParameterList [141..152)
+                                OpenParenToken [141..142) '('
+                                Parameter [142..150)
+                                  PredefinedType [142..149)
+                                    ObjectKeyword [142..148) 'object'
+                                    T:WhitespaceTrivia [148..149) ' '
+                                  IdentifierToken [149..150) 'o'
+                                CloseParenToken [150..151) ')'
+                                T:EndOfLineTrivia [151..152) '\n'
+                              Block [152..292)
+                                L:WhitespaceTrivia [152..164) '            '
+                                OpenBraceToken [164..165) '{'
+                                T:EndOfLineTrivia [165..166) '\n'
+                                ExpressionStatement [166..279)
+                                  InvocationExpression [166..277)
+                                    SimpleMemberAccessExpression [166..206)
+                                      SimpleMemberAccessExpression [166..196)
+                                        IdentifierName [166..188)
+                                          L:WhitespaceTrivia [166..182) '                '
+                                          IdentifierToken [182..188) 'System'
+                                        DotToken [188..189) '.'
+                                        IdentifierName [189..196)
+                                          IdentifierToken [189..196) 'Console'
+                                      DotToken [196..197) '.'
+                                      IdentifierName [197..206)
+                                        IdentifierToken [197..206) 'WriteLine'
+                                    ArgumentList [206..277)
+                                      OpenParenToken [206..207) '('
+                                      Argument [207..276)
+                                        InvocationExpression [207..276)
+                                          ParenthesizedExpression [207..274)
+                                            OpenParenToken [207..208) '('
+                                            CastExpression [208..273)
+                                              OpenParenToken [208..209) '('
+                                              IdentifierName [209..221)
+                                                IdentifierToken [209..221) 'BoolDelegate'
+                                              CloseParenToken [221..222) ')'
+                                              AnonymousMethodExpression [222..273)
+                                                DelegateKeyword [222..230) 'delegate'
+                                                T:WhitespaceTrivia [230..231) ' '
+                                                Block [231..273)
+                                                  OpenBraceToken [231..232) '{'
+                                                  T:WhitespaceTrivia [232..233) ' '
+                                                  ReturnStatement [233..272)
+                                                    ReturnKeyword [233..239) 'return'
+                                                    T:WhitespaceTrivia [239..240) ' '
+                                                    InvocationExpression [240..270)
+                                                      SimpleMemberAccessExpression [240..253)
+                                                        PredefinedType [240..246)
+                                                          ObjectKeyword [240..246) 'object'
+                                                        DotToken [246..247) '.'
+                                                        IdentifierName [247..253)
+                                                          IdentifierToken [247..253) 'Equals'
+                                                      ArgumentList [253..270)
+                                                        OpenParenToken [253..254) '('
+                                                        Argument [254..255)
+                                                          IdentifierName [254..255)
+                                                            IdentifierToken [254..255) 'o'
+                                                        CommaToken [255..256) ','
+                                                        T:WhitespaceTrivia [256..257) ' '
+                                                        Argument [257..269)
+                                                          SimpleMemberAccessExpression [257..269)
+                                                            ThisExpression [257..261)
+                                                              ThisKeyword [257..261) 'this'
+                                                            DotToken [261..262) '.'
+                                                            IdentifierName [262..269)
+                                                              IdentifierToken [262..269) 'epsilon'
+                                                        CloseParenToken [269..270) ')'
+                                                    SemicolonToken [270..271) ';'
+                                                    T:WhitespaceTrivia [271..272) ' '
+                                                  CloseBraceToken [272..273) '}'
+                                            CloseParenToken [273..274) ')'
+                                          ArgumentList [274..276)
+                                            OpenParenToken [274..275) '('
+                                            CloseParenToken [275..276) ')'
+                                      CloseParenToken [276..277) ')'
+                                  SemicolonToken [277..278) ';'
+                                  T:EndOfLineTrivia [278..279) '\n'
+                                L:WhitespaceTrivia [279..291) '            '
+                                CloseBraceToken [291..292) '}'
+                          CloseParenToken [292..293) ')'
+                      SemicolonToken [293..294) ';'
+                      T:EndOfLineTrivia [294..295) '\n'
+                    L:WhitespaceTrivia [295..303) '        '
+                    CloseBraceToken [303..304) '}'
+              CloseParenToken [304..305) ')'
+            ArgumentList [305..307)
+              OpenParenToken [305..306) '('
+              CloseParenToken [306..307) ')'
+          SemicolonToken [307..308) ';'
+          T:EndOfLineTrivia [308..309) '\n'
+        L:WhitespaceTrivia [309..313) '    '
+        CloseBraceToken [313..314) '}'
+        T:EndOfLineTrivia [314..315) '\n'
+    CloseBraceToken [315..316) '}'
+    T:EndOfLineTrivia [316..317) '\n'
+  EndOfFileToken [317..317) ''

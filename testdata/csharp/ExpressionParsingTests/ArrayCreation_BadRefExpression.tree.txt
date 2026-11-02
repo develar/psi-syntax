@@ -1,0 +1,17 @@
+ImplicitArrayCreationExpression [0..17)
+  NewKeyword [0..3) 'new'
+  OpenBracketToken [3..4) '['
+  CloseBracketToken [4..5) ']'
+  T:WhitespaceTrivia [5..6) ' '
+  ArrayInitializerExpression [6..17)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    RefExpression [8..16)
+      RefKeyword [8..11) 'ref'
+      T:WhitespaceTrivia [11..12) ' '
+      IdentifierName [12..16)
+        IdentifierToken [12..15) 'obj'
+        T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'
+Diagnostics:
+  CS1525 [8..15) Invalid expression term \'ref\'

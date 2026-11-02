@@ -1,0 +1,3 @@
+CompilationUnit [0..15)
+  L:MultiLineCommentTrivia [0..15) '/*** <goo /> */'
+  EndOfFileToken [15..15) ''

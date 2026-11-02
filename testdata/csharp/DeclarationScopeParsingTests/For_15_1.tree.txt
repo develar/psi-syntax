@@ -1,0 +1,23 @@
+ForStatement [0..25)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForKeyword [1..4) 'for'
+  T:WhitespaceTrivia [4..5) ' '
+  OpenParenToken [5..6) '('
+  VariableDeclaration [6..20)
+    ScopedType [6..19)
+      ScopedKeyword [6..12) 'scoped'
+      T:WhitespaceTrivia [12..13) ' '
+      RefType [13..19)
+        RefKeyword [13..16) 'ref'
+        T:WhitespaceTrivia [16..17) ' '
+        IdentifierName [17..19)
+          IdentifierToken [17..18) 'S'
+          T:WhitespaceTrivia [18..19) ' '
+    VariableDeclarator [19..20)
+      IdentifierToken [19..20) 'b'
+  SemicolonToken [20..21) ';'
+  SemicolonToken [21..22) ';'
+  CloseParenToken [22..23) ')'
+  EmptyStatement [23..25)
+    SemicolonToken [23..24) ';'
+    T:EndOfLineTrivia [24..25) '\n'

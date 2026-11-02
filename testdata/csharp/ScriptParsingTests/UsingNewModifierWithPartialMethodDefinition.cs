@@ -1,0 +1,2 @@
+
+new partial void Goo();

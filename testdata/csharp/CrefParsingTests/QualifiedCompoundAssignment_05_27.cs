@@ -1,0 +1,1 @@
+/// <see cref="T.operator &lt;&lt;=(A, A)"/>

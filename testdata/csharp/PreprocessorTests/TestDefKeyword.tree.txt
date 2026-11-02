@@ -1,0 +1,59 @@
+CompilationUnit [0..86)
+  L:DefineDirectiveTrivia [0..14)
+    HashToken [0..1) '#'
+    DefineKeyword [1..7) 'define'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..13) 'error'
+    EndOfDirectiveToken [13..13) ''
+    T:EndOfLineTrivia [13..14) '\n'
+  L:IfDirectiveTrivia [14..24)
+    HashToken [14..15) '#'
+    IfKeyword [15..17) 'if'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierName [18..23)
+      IdentifierToken [18..23) 'error'
+    EndOfDirectiveToken [23..23) ''
+    T:EndOfLineTrivia [23..24) '\n'
+  L:WarningDirectiveTrivia [24..36)
+    HashToken [24..25) '#'
+    WarningKeyword [25..32) 'warning'
+    T:WhitespaceTrivia [32..33) ' '
+    L:PreprocessingMessageTrivia [33..35) 'W1'
+    EndOfDirectiveToken [35..35) ''
+    T:EndOfLineTrivia [35..36) '\n'
+  L:EndIfDirectiveTrivia [36..43)
+    HashToken [36..37) '#'
+    EndIfKeyword [37..42) 'endif'
+    EndOfDirectiveToken [42..42) ''
+    T:EndOfLineTrivia [42..43) '\n'
+  L:EndOfLineTrivia [43..44) '\n'
+  L:UndefDirectiveTrivia [44..57)
+    HashToken [44..45) '#'
+    UndefKeyword [45..50) 'undef'
+    T:WhitespaceTrivia [50..51) ' '
+    IdentifierToken [51..56) 'error'
+    EndOfDirectiveToken [56..56) ''
+    T:EndOfLineTrivia [56..57) '\n'
+  L:IfDirectiveTrivia [57..67)
+    HashToken [57..58) '#'
+    IfKeyword [58..60) 'if'
+    T:WhitespaceTrivia [60..61) ' '
+    IdentifierName [61..66)
+      IdentifierToken [61..66) 'error'
+    EndOfDirectiveToken [66..66) ''
+    T:EndOfLineTrivia [66..67) '\n'
+  L:WarningDirectiveTrivia [67..79)
+    HashToken [67..68) '#'
+    WarningKeyword [68..75) 'warning'
+    T:WhitespaceTrivia [75..76) ' '
+    L:PreprocessingMessageTrivia [76..78) 'W2'
+    EndOfDirectiveToken [78..78) ''
+    T:EndOfLineTrivia [78..79) '\n'
+  L:EndIfDirectiveTrivia [79..86)
+    HashToken [79..80) '#'
+    EndIfKeyword [80..85) 'endif'
+    EndOfDirectiveToken [85..85) ''
+    T:EndOfLineTrivia [85..86) '\n'
+  EndOfFileToken [86..86) ''
+Diagnostics:
+  CS1030 [33..35) #warning: \'W1\'

@@ -1,0 +1,39 @@
+CompilationUnit [0..35)
+  ClassDeclaration [0..35)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    BaseList [9..19)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      PrimaryConstructorBaseType [11..19)
+        IdentifierName [11..15)
+          IdentifierToken [11..15) 'Base'
+        ArgumentList [15..19)
+          OpenParenToken [15..16) '('
+          Argument [16..17)
+            IdentifierName [16..17)
+              IdentifierToken [16..17) 'x'
+          CommaToken [17..18) ','
+          T:WhitespaceTrivia [18..19) ' '
+          Argument [19..19)
+            IdentifierName [19..19)
+              IdentifierToken [19..19) missing
+          CloseParenToken [19..19) missing
+    TypeParameterConstraintClause [19..34)
+      WhereKeyword [19..24) 'where'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierName [25..27)
+        IdentifierToken [25..26) 'T'
+        T:WhitespaceTrivia [26..27) ' '
+      ColonToken [27..28) ':'
+      T:WhitespaceTrivia [28..29) ' '
+      ClassConstraint [29..34)
+        ClassKeyword [29..34) 'class'
+    SemicolonToken [34..35) ';'
+  EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1525 [19..24) Invalid expression term \'where\'
+  CS1026 [19..24) ) expected

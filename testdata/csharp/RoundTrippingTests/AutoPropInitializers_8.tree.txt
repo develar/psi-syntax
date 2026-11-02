@@ -1,0 +1,34 @@
+CompilationUnit [0..47)
+  InterfaceDeclaration [0..47)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'I'
+    T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    PropertyDeclaration [14..46)
+      PublicKeyword [14..20) 'public'
+      T:WhitespaceTrivia [20..21) ' '
+      PredefinedType [21..25)
+        IntKeyword [21..24) 'int'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..31) 'GetInt'
+      T:WhitespaceTrivia [31..32) ' '
+      AccessorList [32..41)
+        OpenBraceToken [32..33) '{'
+        T:WhitespaceTrivia [33..34) ' '
+        GetAccessorDeclaration [34..39)
+          GetKeyword [34..37) 'get'
+          SemicolonToken [37..38) ';'
+          T:WhitespaceTrivia [38..39) ' '
+        CloseBraceToken [39..40) '}'
+        T:WhitespaceTrivia [40..41) ' '
+      EqualsValueClause [41..44)
+        EqualsToken [41..42) '='
+        T:WhitespaceTrivia [42..43) ' '
+        NumericLiteralExpression [43..44)
+          NumericLiteralToken [43..44) '0'
+      SemicolonToken [44..45) ';'
+      T:WhitespaceTrivia [45..46) ' '
+    CloseBraceToken [46..47) '}'
+  EndOfFileToken [47..47) ''

@@ -1,0 +1,25 @@
+ArrayCreationExpression [0..17)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..8)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'a'
+    ArrayRankSpecifier [5..8)
+      OpenBracketToken [5..6) '['
+      OmittedArraySizeExpression [6..6)
+        OmittedArraySizeExpressionToken [6..6) ''
+      CloseBracketToken [6..7) ']'
+      T:WhitespaceTrivia [7..8) ' '
+  ArrayInitializerExpression [8..17)
+    OpenBraceToken [8..9) '{'
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'b'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierName [12..13)
+      IdentifierToken [12..13) 'c'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'd'
+    CloseBraceToken [16..17) '}'

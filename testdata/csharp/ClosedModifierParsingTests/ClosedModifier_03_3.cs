@@ -1,0 +1,1 @@
+partial closed interface C { }

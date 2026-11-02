@@ -1,0 +1,38 @@
+ForEachStatement [0..46)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  ScopedType [10..24)
+    ScopedKeyword [10..16) 'scoped'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..24)
+      IdentifierToken [17..23) 'scoped'
+      T:WhitespaceTrivia [23..24) ' '
+  IdentifierToken [24..27) 'var'
+  T:WhitespaceTrivia [27..28) ' '
+  InKeyword [28..28) missing
+  IdentifierName [28..30)
+    IdentifierToken [28..29) 'b'
+    T:WhitespaceTrivia [29..30) ' '
+  CloseParenToken [30..30) missing
+  ExpressionStatement [30..46)
+    IdentifierName [30..30)
+      IdentifierToken [30..30) missing
+    SemicolonToken [30..30) missing
+    T:SkippedTokensTrivia [30..32)
+      InKeyword [30..32) 'in'
+    T:WhitespaceTrivia [32..33) ' '
+    T:SkippedTokensTrivia [33..43)
+      IdentifierToken [33..43) 'collection'
+    T:SkippedTokensTrivia [43..44)
+      CloseParenToken [43..44) ')'
+    T:SkippedTokensTrivia [44..45)
+      SemicolonToken [44..45) ';'
+    T:EndOfLineTrivia [45..46) '\n'
+Diagnostics:
+  CS1073 [1..30) Unexpected token \'in\'
+  CS1515 [28..29) \'in\' expected
+  CS1026 [30..32) ) expected
+  CS1525 [30..32) Invalid expression term \'in\'
+  CS1002 [30..32) ; expected

@@ -1,0 +1,36 @@
+ElementAccessExpression [0..22)
+  ParenthesizedExpression [0..13)
+    OpenParenToken [0..1) '('
+    SimpleMemberAccessExpression [1..12)
+      GenericName [1..9)
+        IdentifierToken [1..2) 'a'
+        T:WhitespaceTrivia [2..3) ' '
+        TypeArgumentList [3..9)
+          LessThanToken [3..4) '<'
+          T:WhitespaceTrivia [4..5) ' '
+          IdentifierName [5..7)
+            IdentifierToken [5..6) 'b'
+            T:WhitespaceTrivia [6..7) ' '
+          GreaterThanToken [7..8) '>'
+          T:WhitespaceTrivia [8..9) ' '
+      DotToken [9..10) '.'
+      T:WhitespaceTrivia [10..11) ' '
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'c'
+    CloseParenToken [12..13) ')'
+  BracketedArgumentList [13..22)
+    OpenBracketToken [13..14) '['
+    Argument [14..15)
+      NumericLiteralExpression [14..15)
+        NumericLiteralToken [14..15) '1'
+    CommaToken [15..16) ','
+    T:WhitespaceTrivia [16..17) ' '
+    Argument [17..18)
+      NumericLiteralExpression [17..18)
+        NumericLiteralToken [17..18) '2'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    Argument [20..21)
+      NumericLiteralExpression [20..21)
+        NumericLiteralToken [20..21) '3'
+    CloseBracketToken [21..22) ']'

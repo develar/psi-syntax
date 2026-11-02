@@ -1,0 +1,20 @@
+L:SingleLineDocumentationCommentTrivia [0..23)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..23)
+    LessThanToken [4..5) '<'
+    XmlName [5..10)
+      IdentifierToken [5..10) 'param'
+    XmlNameAttribute [10..21)
+      XmlName [10..15)
+        L:WhitespaceTrivia [10..11) ' '
+        IdentifierToken [11..15) 'name'
+      EqualsToken [15..16) '='
+      DoubleQuoteToken [16..17) '"'
+      IdentifierName [17..20)
+        IdentifierToken [17..20) 'int'
+      DoubleQuoteToken [20..21) '"'
+    SlashGreaterThanToken [21..23) '/>'
+  EndOfDocumentationCommentToken [23..23) ''
+EndOfFileToken [23..23) ''

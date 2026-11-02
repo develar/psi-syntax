@@ -1,0 +1,1 @@
+///<goo attr="less<than" />

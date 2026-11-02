@@ -1,0 +1,21 @@
+ExpressionStatement [0..16)
+  AwaitExpression [0..10)
+    AwaitKeyword [0..5) 'await'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..10)
+      IdentifierToken [6..9) 'var'
+      T:WhitespaceTrivia [9..10) ' '
+  SemicolonToken [10..10) missing
+  T:SkippedTokensTrivia [10..11)
+    IdentifierToken [10..11) 'a'
+  T:WhitespaceTrivia [11..12) ' '
+  T:SkippedTokensTrivia [12..13)
+    EqualsToken [12..13) '='
+  T:WhitespaceTrivia [13..14) ' '
+  T:SkippedTokensTrivia [14..15)
+    IdentifierToken [14..15) 'b'
+  T:SkippedTokensTrivia [15..16)
+    SemicolonToken [15..16) ';'
+Diagnostics:
+  CS1073 [0..10) Unexpected token \'a\'
+  CS1002 [10..11) ; expected

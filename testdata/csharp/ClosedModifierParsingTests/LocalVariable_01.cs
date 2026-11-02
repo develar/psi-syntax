@@ -1,0 +1,4 @@
+void M()
+{
+    closed closed;
+}

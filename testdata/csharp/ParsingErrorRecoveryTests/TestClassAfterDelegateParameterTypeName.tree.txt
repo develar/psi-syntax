@@ -1,0 +1,30 @@
+CompilationUnit [0..31)
+  DelegateDeclaration [0..20)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..14)
+      VoidKeyword [9..13) 'void'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'd'
+    ParameterList [15..20)
+      OpenParenToken [15..16) '('
+      Parameter [16..20)
+        IdentifierName [16..18)
+          IdentifierToken [16..17) 't'
+          T:WhitespaceTrivia [17..18) ' '
+        IdentifierToken [18..19) 'n'
+        T:WhitespaceTrivia [19..20) ' '
+      CloseParenToken [20..20) missing
+    SemicolonToken [20..20) missing
+  ClassDeclaration [20..31)
+    ClassKeyword [20..25) 'class'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierToken [26..27) 'c'
+    T:WhitespaceTrivia [27..28) ' '
+    OpenBraceToken [28..29) '{'
+    T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1026 [20..25) ) expected
+  CS1002 [20..25) ; expected

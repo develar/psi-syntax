@@ -1,0 +1,1 @@
+enum e { n, class c { }

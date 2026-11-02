@@ -1,0 +1,9 @@
+IdentifierName [0..30)
+  L:MultiLineCommentTrivia [0..11) '/*comment*/'
+  IdentifierToken [11..14) 'goo'
+  T:MultiLineCommentTrivia [14..26) '/*comment2*/'
+  T:WhitespaceTrivia [26..27) ' '
+  T:SkippedTokensTrivia [27..30)
+    IdentifierToken [27..30) 'bar'
+Diagnostics:
+  CS1073 [11..14) Unexpected token \'bar\'

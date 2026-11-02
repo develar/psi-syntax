@@ -1,0 +1,27 @@
+MethodDeclaration [0..34)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'F'
+  ParameterList [6..31)
+    OpenParenToken [6..7) '('
+    Parameter [7..15)
+      IdentifierName [7..14)
+        IdentifierToken [7..13) 'scoped'
+        T:WhitespaceTrivia [13..14) ' '
+      IdentifierToken [14..15) 'x'
+    CommaToken [15..16) ','
+    T:WhitespaceTrivia [16..17) ' '
+    Parameter [17..29)
+      RefKeyword [17..20) 'ref'
+      T:WhitespaceTrivia [20..21) ' '
+      IdentifierName [21..28)
+        IdentifierToken [21..27) 'scoped'
+        T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..29) 'y'
+    CloseParenToken [29..30) ')'
+    T:WhitespaceTrivia [30..31) ' '
+  Block [31..34)
+    OpenBraceToken [31..32) '{'
+    T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'

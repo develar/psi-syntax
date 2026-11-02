@@ -1,0 +1,23 @@
+CompilationUnit [0..16)
+  ClassDeclaration [0..16)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    TypeParameterList [7..11)
+      LessThanToken [7..8) '<'
+      TypeParameter [8..9)
+        IdentifierToken [8..9) 't'
+      GreaterThanToken [9..10) '>'
+      T:WhitespaceTrivia [10..11) ' '
+    BaseList [11..13)
+      ColonToken [11..12) ':'
+      T:WhitespaceTrivia [12..13) ' '
+      SimpleBaseType [13..13)
+        IdentifierName [13..13)
+          IdentifierToken [13..13) missing
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    CloseBraceToken [15..16) '}'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1031 [13..14) Type expected

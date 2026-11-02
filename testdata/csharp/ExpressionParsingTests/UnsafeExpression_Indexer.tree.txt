@@ -1,0 +1,13 @@
+ElementAccessExpression [0..12)
+  UnsafeExpression [0..9)
+    UnsafeKeyword [0..6) 'unsafe'
+    OpenParenToken [6..7) '('
+    IdentifierName [7..8)
+      IdentifierToken [7..8) 'x'
+    CloseParenToken [8..9) ')'
+  BracketedArgumentList [9..12)
+    OpenBracketToken [9..10) '['
+    Argument [10..11)
+      NumericLiteralExpression [10..11)
+        NumericLiteralToken [10..11) '0'
+    CloseBracketToken [11..12) ']'

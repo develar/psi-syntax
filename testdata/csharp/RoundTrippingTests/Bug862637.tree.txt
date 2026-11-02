@@ -1,0 +1,73 @@
+CompilationUnit [0..134)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..134)
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    ClassKeyword [22..27) 'class'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierToken [28..32) 'Test'
+    T:EndOfLineTrivia [32..33) '\n'
+    OpenBraceToken [33..34) '{'
+    T:EndOfLineTrivia [34..35) '\n'
+    MethodDeclaration [35..132)
+      L:WhitespaceTrivia [35..39) '    '
+      StaticKeyword [39..45) 'static'
+      T:WhitespaceTrivia [45..46) ' '
+      PredefinedType [46..51)
+        VoidKeyword [46..50) 'void'
+        T:WhitespaceTrivia [50..51) ' '
+      IdentifierToken [51..55) 'Main'
+      ParameterList [55..58)
+        OpenParenToken [55..56) '('
+        CloseParenToken [56..57) ')'
+        T:EndOfLineTrivia [57..58) '\n'
+      Block [58..132)
+        L:WhitespaceTrivia [58..62) '    '
+        OpenBraceToken [62..63) '{'
+        T:EndOfLineTrivia [63..64) '\n'
+        ExpressionStatement [64..126)
+          InvocationExpression [64..124)
+            SimpleMemberAccessExpression [64..90)
+              IdentifierName [64..80)
+                L:WhitespaceTrivia [64..73) '         '
+                IdentifierToken [73..80) 'Console'
+              DotToken [80..81) '.'
+              IdentifierName [81..90)
+                IdentifierToken [81..90) 'WriteLine'
+            ArgumentList [90..124)
+              OpenParenToken [90..91) '('
+              Argument [91..123)
+                SimpleMemberAccessExpression [91..123)
+                  SimpleMemberAccessExpression [91..114)
+                    InvocationExpression [91..105)
+                      SimpleMemberAccessExpression [91..103)
+                        IdentifierName [91..95)
+                          IdentifierToken [91..95) 'dDep'
+                        DotToken [95..96) '.'
+                        IdentifierName [96..103)
+                          IdentifierToken [96..103) 'GetType'
+                      ArgumentList [103..105)
+                        OpenParenToken [103..104) '('
+                        CloseParenToken [104..105) ')'
+                    DotToken [105..106) '.'
+                    IdentifierName [106..114)
+                      IdentifierToken [106..114) 'Assembly'
+                  DotToken [114..115) '.'
+                  IdentifierName [115..123)
+                    IdentifierToken [115..123) 'FullName'
+              CloseParenToken [123..124) ')'
+          SemicolonToken [124..125) ';'
+          T:EndOfLineTrivia [125..126) '\n'
+        L:WhitespaceTrivia [126..130) '    '
+        CloseBraceToken [130..131) '}'
+        T:EndOfLineTrivia [131..132) '\n'
+    CloseBraceToken [132..133) '}'
+    T:EndOfLineTrivia [133..134) '\n'
+  EndOfFileToken [134..134) ''

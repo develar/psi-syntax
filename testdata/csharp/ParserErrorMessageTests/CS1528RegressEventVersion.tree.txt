@@ -1,0 +1,39 @@
+CompilationUnit [0..42)
+  ClassDeclaration [0..42)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    EventFieldDeclaration [11..40)
+      L:WhitespaceTrivia [11..15) '    '
+      EventKeyword [15..20) 'event'
+      T:WhitespaceTrivia [20..21) ' '
+      VariableDeclaration [21..38)
+        QualifiedName [21..35)
+          IdentifierName [21..27)
+            IdentifierToken [21..27) 'System'
+          DotToken [27..28) '.'
+          IdentifierName [28..35)
+            IdentifierToken [28..34) 'Action'
+            T:WhitespaceTrivia [34..35) ' '
+        VariableDeclarator [35..38)
+          IdentifierToken [35..36) 'E'
+          BracketedArgumentList [36..38)
+            OpenBracketToken [36..36) missing
+            T:SkippedTokensTrivia [36..37)
+              OpenParenToken [36..37) '('
+            CloseBracketToken [37..37) missing
+            T:SkippedTokensTrivia [37..38)
+              CloseParenToken [37..38) ')'
+      SemicolonToken [38..39) ';'
+      T:EndOfLineTrivia [39..40) '\n'
+    CloseBraceToken [40..41) '}'
+    T:EndOfLineTrivia [41..42) '\n'
+  EndOfFileToken [42..42) ''
+Diagnostics:
+  CS1528 [36..37) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [36..37) Syntax error, \'[\' expected
+  CS1003 [37..38) Syntax error, \']\' expected

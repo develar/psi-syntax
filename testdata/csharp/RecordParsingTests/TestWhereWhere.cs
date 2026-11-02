@@ -1,0 +1,1 @@
+public class Goo<T> : System.Object where where { }

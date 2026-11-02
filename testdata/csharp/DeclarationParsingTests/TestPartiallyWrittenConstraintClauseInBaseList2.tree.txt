@@ -1,0 +1,31 @@
+CompilationUnit [0..22)
+  ClassDeclaration [0..22)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    TypeParameterList [8..12)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..10)
+        IdentifierToken [9..10) 'T'
+      GreaterThanToken [10..11) '>'
+      T:WhitespaceTrivia [11..12) ' '
+    BaseList [12..22)
+      ColonToken [12..13) ':'
+      T:WhitespaceTrivia [13..14) ' '
+      SimpleBaseType [14..20)
+        IdentifierName [14..20)
+          IdentifierToken [14..19) 'where'
+          T:WhitespaceTrivia [19..20) ' '
+      CommaToken [20..20) missing
+      SimpleBaseType [20..22)
+        IdentifierName [20..22)
+          IdentifierToken [20..21) 'T'
+          T:EndOfLineTrivia [21..22) '\n'
+    OpenBraceToken [22..22) missing
+    CloseBraceToken [22..22) missing
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1003 [20..21) Syntax error, \',\' expected
+  CS1514 [21..21) { expected
+  CS1513 [21..21) } expected

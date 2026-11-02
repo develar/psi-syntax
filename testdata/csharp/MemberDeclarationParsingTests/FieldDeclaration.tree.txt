@@ -1,0 +1,26 @@
+FieldDeclaration [0..26)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  VariableDeclaration [7..25)
+    PredefinedType [7..11)
+      IntKeyword [7..10) 'int'
+      T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..17)
+      IdentifierToken [11..13) 'F1'
+      T:WhitespaceTrivia [13..14) ' '
+      EqualsValueClause [14..17)
+        EqualsToken [14..15) '='
+        T:WhitespaceTrivia [15..16) ' '
+        IdentifierName [16..17)
+          IdentifierToken [16..17) 'a'
+    CommaToken [17..18) ','
+    T:WhitespaceTrivia [18..19) ' '
+    VariableDeclarator [19..25)
+      IdentifierToken [19..21) 'F2'
+      T:WhitespaceTrivia [21..22) ' '
+      EqualsValueClause [22..25)
+        EqualsToken [22..23) '='
+        T:WhitespaceTrivia [23..24) ' '
+        IdentifierName [24..25)
+          IdentifierToken [24..25) 'b'
+  SemicolonToken [25..26) ';'

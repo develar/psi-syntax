@@ -1,0 +1,18 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..20)
+    LocalFunctionStatement [0..20)
+      IdentifierName [0..8)
+        IdentifierToken [0..7) 'partial'
+        T:WhitespaceTrivia [7..8) ' '
+      IdentifierToken [8..9) 'F'
+      ParameterList [9..12)
+        OpenParenToken [9..10) '('
+        CloseParenToken [10..11) ')'
+        T:WhitespaceTrivia [11..12) ' '
+      ArrowExpressionClause [12..19)
+        EqualsGreaterThanToken [12..14) '=>'
+        T:WhitespaceTrivia [14..15) ' '
+        NullLiteralExpression [15..19)
+          NullKeyword [15..19) 'null'
+      SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''

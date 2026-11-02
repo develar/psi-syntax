@@ -1,0 +1,28 @@
+CompilationUnit [0..19)
+  ClassDeclaration [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    BaseList [9..18)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      PrimaryConstructorBaseType [11..18)
+        IdentifierName [11..15)
+          IdentifierToken [11..15) 'Base'
+        ArgumentList [15..18)
+          OpenParenToken [15..16) '('
+          Argument [16..17)
+            IdentifierName [16..17)
+              IdentifierToken [16..17) 'x'
+          CommaToken [17..18) ','
+          Argument [18..18)
+            IdentifierName [18..18)
+              IdentifierToken [18..18) missing
+          CloseParenToken [18..18) missing
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1525 [18..19) Invalid expression term \';\'
+  CS1026 [18..19) ) expected

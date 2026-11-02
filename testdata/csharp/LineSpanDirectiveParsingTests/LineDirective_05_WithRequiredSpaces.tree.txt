@@ -1,0 +1,22 @@
+CompilationUnit [0..27)
+  L:LineSpanDirectiveTrivia [0..27)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..11)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..8) '1'
+      CommaToken [8..9) ','
+      NumericLiteralToken [9..10) '2'
+      CloseParenToken [10..11) ')'
+    MinusToken [11..12) '-'
+    LineDirectivePosition [12..18)
+      OpenParenToken [12..13) '('
+      NumericLiteralToken [13..14) '3'
+      CommaToken [14..15) ','
+      NumericLiteralToken [15..16) '4'
+      CloseParenToken [16..17) ')'
+      T:WhitespaceTrivia [17..18) ' '
+    StringLiteralToken [18..27) '"file.cs"'
+    EndOfDirectiveToken [27..27) ''
+  EndOfFileToken [27..27) ''

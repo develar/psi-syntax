@@ -1,0 +1,20 @@
+IfStatement [0..19)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IdentifierName [4..5)
+    IdentifierToken [4..5) 'a'
+  CloseParenToken [5..6) ')'
+  T:WhitespaceTrivia [6..7) ' '
+  Block [7..11)
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    CloseBraceToken [9..10) '}'
+    T:WhitespaceTrivia [10..11) ' '
+  ElseClause [11..19)
+    ElseKeyword [11..15) 'else'
+    T:WhitespaceTrivia [15..16) ' '
+    Block [16..19)
+      OpenBraceToken [16..17) '{'
+      T:WhitespaceTrivia [17..18) ' '
+      CloseBraceToken [18..19) '}'

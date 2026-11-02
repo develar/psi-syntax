@@ -1,0 +1,37 @@
+CompilationUnit [0..48)
+  StructDeclaration [0..48)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    IncompleteMember [17..32)
+      L:WhitespaceTrivia [17..21) '    '
+      ScopedKeyword [21..27) 'scoped'
+      T:WhitespaceTrivia [27..28) ' '
+      RefType [28..32)
+        RefKeyword [28..31) 'ref'
+        T:WhitespaceTrivia [31..32) ' '
+        IdentifierName [32..32)
+          IdentifierToken [32..32) missing
+    FieldDeclaration [32..46)
+      ConstKeyword [32..37) 'const'
+      T:WhitespaceTrivia [37..38) ' '
+      VariableDeclaration [38..44)
+        PredefinedType [38..42)
+          IntKeyword [38..41) 'int'
+          T:WhitespaceTrivia [41..42) ' '
+        VariableDeclarator [42..44)
+          IdentifierToken [42..44) 'F3'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+    CloseBraceToken [46..47) '}'
+    T:EndOfLineTrivia [47..48) '\n'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1031 [32..37) Type expected
+  CS0145 [42..44) A const field requires a value to be provided

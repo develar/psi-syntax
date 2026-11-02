@@ -1,0 +1,52 @@
+CompilationUnit [0..71)
+  GlobalStatement [0..18)
+    LocalDeclarationStatement [0..18)
+      VariableDeclaration [0..16)
+        QualifiedName [0..15)
+          IdentifierName [0..7)
+            IdentifierToken [0..7) '@scoped'
+          DotToken [7..8) '.'
+          IdentifierName [8..15)
+            IdentifierToken [8..14) 'nested'
+            T:WhitespaceTrivia [14..15) ' '
+        VariableDeclarator [15..16)
+          IdentifierToken [15..16) 'a'
+      SemicolonToken [16..17) ';'
+      T:EndOfLineTrivia [17..18) '\n'
+  GlobalStatement [18..40)
+    LocalDeclarationStatement [18..40)
+      VariableDeclaration [18..38)
+        RefType [18..37)
+          RefKeyword [18..21) 'ref'
+          T:WhitespaceTrivia [21..22) ' '
+          QualifiedName [22..37)
+            IdentifierName [22..29)
+              IdentifierToken [22..29) '@scoped'
+            DotToken [29..30) '.'
+            IdentifierName [30..37)
+              IdentifierToken [30..36) 'nested'
+              T:WhitespaceTrivia [36..37) ' '
+        VariableDeclarator [37..38)
+          IdentifierToken [37..38) 'b'
+      SemicolonToken [38..39) ';'
+      T:EndOfLineTrivia [39..40) '\n'
+  GlobalStatement [40..71)
+    LocalDeclarationStatement [40..71)
+      VariableDeclaration [40..69)
+        RefType [40..68)
+          RefKeyword [40..43) 'ref'
+          T:WhitespaceTrivia [43..44) ' '
+          ReadOnlyKeyword [44..52) 'readonly'
+          T:WhitespaceTrivia [52..53) ' '
+          QualifiedName [53..68)
+            IdentifierName [53..60)
+              IdentifierToken [53..60) '@scoped'
+            DotToken [60..61) '.'
+            IdentifierName [61..68)
+              IdentifierToken [61..67) 'nested'
+              T:WhitespaceTrivia [67..68) ' '
+        VariableDeclarator [68..69)
+          IdentifierToken [68..69) 'c'
+      SemicolonToken [69..70) ';'
+      T:EndOfLineTrivia [70..71) '\n'
+  EndOfFileToken [71..71) ''

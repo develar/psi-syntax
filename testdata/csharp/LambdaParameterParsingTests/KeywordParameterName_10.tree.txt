@@ -1,0 +1,17 @@
+ParenthesizedLambdaExpression [0..12)
+  ParameterList [0..6)
+    OpenParenToken [0..1) '('
+    Parameter [1..4)
+      PredefinedType [1..4)
+        IntKeyword [1..4) 'int'
+      IdentifierToken [4..4) missing
+    CloseParenToken [4..5) ')'
+    T:WhitespaceTrivia [5..6) ' '
+  EqualsGreaterThanToken [6..8) '=>'
+  T:WhitespaceTrivia [8..9) ' '
+  Block [9..12)
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+Diagnostics:
+  CS1001 [4..5) Identifier expected

@@ -1,0 +1,26 @@
+LocalDeclarationStatement [0..12)
+  VariableDeclaration [0..12)
+    GenericName [0..11)
+      IdentifierToken [0..1) 'A'
+      T:WhitespaceTrivia [1..2) ' '
+      TypeArgumentList [2..11)
+        LessThanToken [2..3) '<'
+        T:WhitespaceTrivia [3..4) ' '
+        ArrayType [4..9)
+          NullableType [4..6)
+            IdentifierName [4..5)
+              IdentifierToken [4..5) 'B'
+            QuestionToken [5..6) '?'
+          ArrayRankSpecifier [6..9)
+            OpenBracketToken [6..7) '['
+            OmittedArraySizeExpression [7..7)
+              OmittedArraySizeExpressionToken [7..7) ''
+            CloseBracketToken [7..8) ']'
+            T:WhitespaceTrivia [8..9) ' '
+        GreaterThanToken [9..10) '>'
+        T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..12)
+      IdentifierToken [11..12) 'D'
+  SemicolonToken [12..12) missing
+Diagnostics:
+  CS1002 [12..12) ; expected

@@ -1,0 +1,56 @@
+MethodDeclaration [0..36)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..36)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..26)
+      VariableDeclaration [11..26)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:EndOfLineTrivia [25..26) '\n'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    IfStatement [26..35)
+      IfKeyword [26..26) missing
+      OpenParenToken [26..26) missing
+      IdentifierName [26..26)
+        IdentifierToken [26..26) missing
+      CloseParenToken [26..26) missing
+      ExpressionStatement [26..26)
+        IdentifierName [26..26)
+          IdentifierToken [26..26) missing
+        SemicolonToken [26..26) missing
+      ElseClause [26..35)
+        L:WhitespaceTrivia [26..30) '    '
+        ElseKeyword [30..34) 'else'
+        T:EndOfLineTrivia [34..35) '\n'
+        ExpressionStatement [35..35)
+          IdentifierName [35..35)
+            IdentifierToken [35..35) missing
+          SemicolonToken [35..35) missing
+    CloseBraceToken [35..36) '}'
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected
+  CS8641 [25..25) \'else\' cannot start a statement.
+  CS1003 [25..25) Syntax error, \'(\' expected
+  CS1525 [25..25) Invalid expression term \'else\'
+  CS1026 [25..25) ) expected
+  CS1525 [25..25) Invalid expression term \'else\'
+  CS1002 [25..25) ; expected
+  CS1525 [34..34) Invalid expression term \'}\'
+  CS1002 [34..34) ; expected

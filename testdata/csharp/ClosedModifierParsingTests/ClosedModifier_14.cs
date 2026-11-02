@@ -1,0 +1,1 @@
+closed delegate void D();

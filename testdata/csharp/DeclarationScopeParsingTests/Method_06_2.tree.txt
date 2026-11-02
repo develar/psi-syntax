@@ -1,0 +1,71 @@
+CompilationUnit [0..87)
+  GlobalStatement [0..24)
+    LocalFunctionStatement [0..24)
+      IdentifierName [0..7)
+        IdentifierToken [0..6) 'scoped'
+        T:WhitespaceTrivia [6..7) ' '
+      IdentifierToken [7..9) 'F1'
+      ParameterList [9..12)
+        OpenParenToken [9..10) '('
+        CloseParenToken [10..11) ')'
+        T:WhitespaceTrivia [11..12) ' '
+      ArrowExpressionClause [12..22)
+        EqualsGreaterThanToken [12..14) '=>'
+        T:WhitespaceTrivia [14..15) ' '
+        DefaultLiteralExpression [15..22)
+          DefaultKeyword [15..22) 'default'
+      SemicolonToken [22..23) ';'
+      T:EndOfLineTrivia [23..24) '\n'
+  GlobalStatement [24..52)
+    LocalFunctionStatement [24..52)
+      RefType [24..35)
+        RefKeyword [24..27) 'ref'
+        T:WhitespaceTrivia [27..28) ' '
+        IdentifierName [28..35)
+          IdentifierToken [28..34) 'scoped'
+          T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..37) 'F2'
+      ParameterList [37..40)
+        OpenParenToken [37..38) '('
+        CloseParenToken [38..39) ')'
+        T:WhitespaceTrivia [39..40) ' '
+      ArrowExpressionClause [40..50)
+        EqualsGreaterThanToken [40..42) '=>'
+        T:WhitespaceTrivia [42..43) ' '
+        DefaultLiteralExpression [43..50)
+          DefaultKeyword [43..50) 'default'
+      SemicolonToken [50..51) ';'
+      T:EndOfLineTrivia [51..52) '\n'
+  GlobalStatement [52..68)
+    LocalFunctionStatement [52..68)
+      IdentifierName [52..59)
+        IdentifierToken [52..58) 'scoped'
+        T:WhitespaceTrivia [58..59) ' '
+      IdentifierToken [59..61) 'F3'
+      ParameterList [61..64)
+        OpenParenToken [61..62) '('
+        CloseParenToken [62..63) ')'
+        T:WhitespaceTrivia [63..64) ' '
+      Block [64..68)
+        OpenBraceToken [64..65) '{'
+        T:WhitespaceTrivia [65..66) ' '
+        CloseBraceToken [66..67) '}'
+        T:EndOfLineTrivia [67..68) '\n'
+  GlobalStatement [68..87)
+    LocalFunctionStatement [68..87)
+      RefType [68..79)
+        RefKeyword [68..71) 'ref'
+        T:WhitespaceTrivia [71..72) ' '
+        IdentifierName [72..79)
+          IdentifierToken [72..78) 'scoped'
+          T:WhitespaceTrivia [78..79) ' '
+      IdentifierToken [79..81) 'F4'
+      ParameterList [81..84)
+        OpenParenToken [81..82) '('
+        CloseParenToken [82..83) ')'
+        T:WhitespaceTrivia [83..84) ' '
+      Block [84..87)
+        OpenBraceToken [84..85) '{'
+        T:WhitespaceTrivia [85..86) ' '
+        CloseBraceToken [86..87) '}'
+  EndOfFileToken [87..87) ''

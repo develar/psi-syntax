@@ -1,0 +1,24 @@
+ElementAccessExpression [0..15)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 's'
+  BracketedArgumentList [1..15)
+    OpenBracketToken [1..2) '['
+    Argument [2..14)
+      SimpleLambdaExpression [2..14)
+        AttributeList [2..6)
+          OpenBracketToken [2..3) '['
+          Attribute [3..4)
+            IdentifierName [3..4)
+              IdentifierToken [3..4) 'A'
+          CloseBracketToken [4..5) ']'
+          T:WhitespaceTrivia [5..6) ' '
+        Parameter [6..8)
+          IdentifierToken [6..7) 'x'
+          T:WhitespaceTrivia [7..8) ' '
+        EqualsGreaterThanToken [8..10) '=>'
+        T:WhitespaceTrivia [10..11) ' '
+        RangeExpression [11..14)
+          IdentifierName [11..12)
+            IdentifierToken [11..12) 'x'
+          DotDotToken [12..14) '..'
+    CloseBracketToken [14..15) ']'

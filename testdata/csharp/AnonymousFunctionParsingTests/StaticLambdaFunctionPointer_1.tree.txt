@@ -1,0 +1,42 @@
+LocalDeclarationStatement [0..40)
+  VariableDeclaration [0..39)
+    FunctionPointerType [0..16)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..16)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..14)
+          PredefinedType [10..14)
+            VoidKeyword [10..14) 'void'
+        GreaterThanToken [14..15) '>'
+        T:WhitespaceTrivia [15..16) ' '
+    VariableDeclarator [16..39)
+      IdentifierToken [16..19) 'ptr'
+      T:WhitespaceTrivia [19..20) ' '
+      EqualsValueClause [20..39)
+        EqualsToken [20..21) '='
+        T:WhitespaceTrivia [21..22) ' '
+        AddressOfExpression [22..39)
+          AmpersandToken [22..23) '&'
+          IdentifierName [23..39)
+            IdentifierToken [23..23) missing
+            T:SkippedTokensTrivia [23..29)
+              StaticKeyword [23..29) 'static'
+            T:WhitespaceTrivia [29..30) ' '
+            T:SkippedTokensTrivia [30..31)
+              OpenParenToken [30..31) '('
+            T:SkippedTokensTrivia [31..32)
+              CloseParenToken [31..32) ')'
+            T:WhitespaceTrivia [32..33) ' '
+            T:SkippedTokensTrivia [33..35)
+              EqualsGreaterThanToken [33..35) '=>'
+            T:WhitespaceTrivia [35..36) ' '
+            T:SkippedTokensTrivia [36..37)
+              OpenBraceToken [36..37) '{'
+            T:WhitespaceTrivia [37..38) ' '
+            T:SkippedTokensTrivia [38..39)
+              CloseBraceToken [38..39) '}'
+  SemicolonToken [39..40) ';'
+Diagnostics:
+  CS1525 [23..29) Invalid expression term \'static\'
+  CS1003 [23..29) Syntax error, \',\' expected

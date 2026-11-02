@@ -1,0 +1,28 @@
+ConstructorDeclaration [0..41)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..20) 'ThisClassName'
+  ParameterList [20..28)
+    OpenParenToken [20..21) '('
+    Parameter [21..26)
+      PredefinedType [21..25)
+        IntKeyword [21..24) 'int'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'x'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  BaseConstructorInitializer [28..38)
+    ColonToken [28..29) ':'
+    T:WhitespaceTrivia [29..30) ' '
+    BaseKeyword [30..34) 'base'
+    ArgumentList [34..38)
+      OpenParenToken [34..35) '('
+      Argument [35..36)
+        IdentifierName [35..36)
+          IdentifierToken [35..36) 'x'
+      CloseParenToken [36..37) ')'
+      T:WhitespaceTrivia [37..38) ' '
+  Block [38..41)
+    OpenBraceToken [38..39) '{'
+    T:WhitespaceTrivia [39..40) ' '
+    CloseBraceToken [40..41) '}'

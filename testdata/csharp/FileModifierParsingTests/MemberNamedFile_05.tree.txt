@@ -1,0 +1,12 @@
+CompilationUnit [0..19)
+  ClassDeclaration [0..19)
+    FileKeyword [0..4) 'file'
+    T:WhitespaceTrivia [4..5) ' '
+    ClassKeyword [5..10) 'class'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..15) 'file'
+    T:WhitespaceTrivia [15..16) ' '
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'
+  EndOfFileToken [19..19) ''

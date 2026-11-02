@@ -1,0 +1,1 @@
+using (f ? x = a : x = b) { }

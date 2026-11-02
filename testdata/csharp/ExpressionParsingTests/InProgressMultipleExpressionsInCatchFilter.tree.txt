@@ -1,0 +1,43 @@
+CompilationUnit [0..49)
+  GlobalStatement [0..49)
+    TryStatement [0..49)
+      TryKeyword [0..3) 'try'
+      T:EndOfLineTrivia [3..4) '\n'
+      Block [4..8)
+        OpenBraceToken [4..5) '{'
+        T:EndOfLineTrivia [5..6) '\n'
+        CloseBraceToken [6..7) '}'
+        T:EndOfLineTrivia [7..8) '\n'
+      CatchClause [8..49)
+        CatchKeyword [8..13) 'catch'
+        T:WhitespaceTrivia [13..14) ' '
+        CatchDeclaration [14..28)
+          OpenParenToken [14..15) '('
+          IdentifierName [15..25)
+            IdentifierToken [15..24) 'Exception'
+            T:WhitespaceTrivia [24..25) ' '
+          IdentifierToken [25..26) 'e'
+          CloseParenToken [26..27) ')'
+          T:WhitespaceTrivia [27..28) ' '
+        CatchFilterClause [28..46)
+          WhenKeyword [28..32) 'when'
+          T:WhitespaceTrivia [32..33) ' '
+          OpenParenToken [33..34) '('
+          IdentifierName [34..44)
+            IdentifierToken [34..37) 'Boo'
+            T:WhitespaceTrivia [37..38) ' '
+            T:SkippedTokensTrivia [38..42)
+              IdentifierToken [38..42) 'Quux'
+            T:SkippedTokensTrivia [42..43)
+              OpenParenToken [42..43) '('
+            T:SkippedTokensTrivia [43..44)
+              CloseParenToken [43..44) ')'
+          CloseParenToken [44..45) ')'
+          T:EndOfLineTrivia [45..46) '\n'
+        Block [46..49)
+          OpenBraceToken [46..47) '{'
+          T:EndOfLineTrivia [47..48) '\n'
+          CloseBraceToken [48..49) '}'
+  EndOfFileToken [49..49) ''
+Diagnostics:
+  CS1073 [38..42) Unexpected token \'Quux\'

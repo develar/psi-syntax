@@ -1,0 +1,41 @@
+FieldDeclaration [0..44)
+  VariableDeclaration [0..43)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..43)
+      IdentifierToken [21..26) 'func1'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..43)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        SuppressNullableWarningExpression [29..43)
+          SuppressNullableWarningExpression [29..31)
+            IdentifierName [29..30)
+              IdentifierToken [29..30) 'x'
+            ExclamationToken [30..31) '!'
+          ExclamationToken [31..32) '!'
+          T:WhitespaceTrivia [32..33) ' '
+          T:SkippedTokensTrivia [33..35)
+            EqualsGreaterThanToken [33..35) '=>'
+          T:WhitespaceTrivia [35..36) ' '
+          T:SkippedTokensTrivia [36..37)
+            IdentifierToken [36..37) 'x'
+          T:WhitespaceTrivia [37..38) ' '
+          T:SkippedTokensTrivia [38..39)
+            PlusToken [38..39) '+'
+          T:WhitespaceTrivia [39..40) ' '
+          T:SkippedTokensTrivia [40..43)
+            StringLiteralToken [40..43) '"1"'
+  SemicolonToken [43..44) ';'
+Diagnostics:
+  CS1003 [33..35) Syntax error, \',\' expected

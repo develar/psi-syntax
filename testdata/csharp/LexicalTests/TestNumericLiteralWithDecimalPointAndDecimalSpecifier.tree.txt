@@ -1,0 +1,2 @@
+NumericLiteralToken [0..8) '123.456m'
+EndOfFileToken [8..8) ''

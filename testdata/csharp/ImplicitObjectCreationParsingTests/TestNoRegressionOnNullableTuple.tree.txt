@@ -1,0 +1,17 @@
+ObjectCreationExpression [0..19)
+  NewKeyword [0..3) 'new'
+  NullableType [3..17)
+    TupleType [3..16)
+      OpenParenToken [3..4) '('
+      TupleElement [4..9)
+        IdentifierName [4..9)
+          IdentifierToken [4..9) 'Int32'
+      CommaToken [9..10) ','
+      TupleElement [10..15)
+        IdentifierName [10..15)
+          IdentifierToken [10..15) 'Int32'
+      CloseParenToken [15..16) ')'
+    QuestionToken [16..17) '?'
+  ArgumentList [17..19)
+    OpenParenToken [17..18) '('
+    CloseParenToken [18..19) ')'

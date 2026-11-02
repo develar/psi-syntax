@@ -1,0 +1,102 @@
+CompilationUnit [0..127)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..86)
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    StaticKeyword [22..28) 'static'
+    T:WhitespaceTrivia [28..29) ' '
+    ClassKeyword [29..34) 'class'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierToken [35..45) 'Extensions'
+    T:EndOfLineTrivia [45..46) '\n'
+    OpenBraceToken [46..47) '{'
+    T:EndOfLineTrivia [47..48) '\n'
+    DestructorDeclaration [48..73)
+      L:WhitespaceTrivia [48..49) ' '
+      StaticKeyword [49..55) 'static'
+      T:WhitespaceTrivia [55..56) ' '
+      TildeToken [56..57) '~'
+      IdentifierToken [57..67) 'Extensions'
+      ParameterList [67..68)
+        OpenParenToken [67..68) '('
+        CloseParenToken [68..68) missing
+      SemicolonToken [68..68) missing
+      T:SkippedTokensTrivia [68..72)
+        ThisKeyword [68..72) 'this'
+      T:WhitespaceTrivia [72..73) ' '
+    FieldDeclaration [73..84)
+      VariableDeclaration [73..84)
+        IdentifierName [73..80)
+          IdentifierToken [73..79) 'Struct'
+          T:WhitespaceTrivia [79..80) ' '
+        VariableDeclarator [80..84)
+          IdentifierToken [80..81) 's'
+          T:SkippedTokensTrivia [81..82)
+            CloseParenToken [81..82) ')'
+          T:WhitespaceTrivia [82..83) ' '
+          T:SkippedTokensTrivia [83..84)
+            OpenBraceToken [83..84) '{'
+      SemicolonToken [84..84) missing
+    CloseBraceToken [84..85) '}'
+    T:EndOfLineTrivia [85..86) '\n'
+  IncompleteMember [86..94)
+    L:WhitespaceTrivia [86..87) ' '
+    StaticKeyword [87..93) 'static'
+    T:WhitespaceTrivia [93..94) ' '
+  GlobalStatement [94..122)
+    ExpressionStatement [94..122)
+      BitwiseNotExpression [94..122)
+        TildeToken [94..95) '~'
+        InvocationExpression [95..122)
+          IdentifierName [95..105)
+            IdentifierToken [95..105) 'Extensions'
+          ArgumentList [105..122)
+            OpenParenToken [105..106) '('
+            Argument [106..111)
+              ThisExpression [106..111)
+                ThisKeyword [106..110) 'this'
+                T:WhitespaceTrivia [110..111) ' '
+            CommaToken [111..111) missing
+            Argument [111..120)
+              ConditionalExpression [111..120)
+                IdentifierName [111..117)
+                  IdentifierToken [111..117) 'Struct'
+                QuestionToken [117..118) '?'
+                T:WhitespaceTrivia [118..119) ' '
+                IdentifierName [119..120)
+                  IdentifierToken [119..120) 's'
+                ColonToken [120..120) missing
+                IdentifierName [120..120)
+                  IdentifierToken [120..120) missing
+            CloseParenToken [120..121) ')'
+            T:WhitespaceTrivia [121..122) ' '
+      SemicolonToken [122..122) missing
+  GlobalStatement [122..127)
+    Block [122..127)
+      OpenBraceToken [122..123) '{'
+      CloseBraceToken [123..124) '}'
+      T:EndOfLineTrivia [124..125) '\n'
+      T:SkippedTokensTrivia [125..126)
+        CloseBraceToken [125..126) '}'
+      T:EndOfLineTrivia [126..127) '\n'
+  EndOfFileToken [127..127) ''
+Diagnostics:
+  CS1026 [68..72) ) expected
+  CS1002 [68..72) ; expected
+  CS1519 [68..72) Invalid token \'this\' in a member declaration
+  CS1003 [81..82) Syntax error, \',\' expected
+  CS1002 [84..85) ; expected
+  CS0116 [87..93) A namespace cannot directly contain members such as fields, methods or statements
+  CS8803 [94..122) Top-level statements must precede namespace and type declarations.
+  CS1003 [111..117) Syntax error, \',\' expected
+  CS1003 [120..121) Syntax error, \':\' expected
+  CS1525 [120..121) Invalid expression term \')\'
+  CS1002 [122..123) ; expected
+  CS1022 [125..126) Type or namespace definition, or end-of-file expected

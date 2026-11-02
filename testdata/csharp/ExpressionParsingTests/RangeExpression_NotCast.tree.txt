@@ -1,0 +1,18 @@
+RangeExpression [0..26)
+  ParenthesizedExpression [0..8)
+    OpenParenToken [0..1) '('
+    IdentifierName [1..7)
+      IdentifierToken [1..7) 'Offset'
+    CloseParenToken [7..8) ')'
+  DotDotToken [8..10) '..'
+  ParenthesizedExpression [10..26)
+    OpenParenToken [10..11) '('
+    AddExpression [11..25)
+      IdentifierName [11..18)
+        IdentifierToken [11..17) 'Offset'
+        T:WhitespaceTrivia [17..18) ' '
+      PlusToken [18..19) '+'
+      T:WhitespaceTrivia [19..20) ' '
+      IdentifierName [20..25)
+        IdentifierToken [20..25) 'Count'
+    CloseParenToken [25..26) ')'

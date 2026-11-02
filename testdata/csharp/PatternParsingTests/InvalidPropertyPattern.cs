@@ -1,0 +1,1 @@
+new object() is { {}: 1 }

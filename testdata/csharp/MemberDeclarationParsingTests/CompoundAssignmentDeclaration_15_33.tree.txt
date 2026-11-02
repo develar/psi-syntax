@@ -1,0 +1,31 @@
+OperatorDeclaration [0..33)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  GreaterThanGreaterThanGreaterThanEqualsToken [11..15) '>>>='
+  ParameterList [15..28)
+    OpenParenToken [15..16) '('
+    Parameter [16..20)
+      IdentifierName [16..18)
+        IdentifierToken [16..17) 'C'
+        T:WhitespaceTrivia [17..18) ' '
+      IdentifierToken [18..20) 'x1'
+    CommaToken [20..21) ','
+    T:WhitespaceTrivia [21..22) ' '
+    Parameter [22..26)
+      IdentifierName [22..24)
+        IdentifierToken [22..23) 'C'
+        T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..26) 'x2'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  ArrowExpressionClause [28..32)
+    EqualsGreaterThanToken [28..30) '=>'
+    T:WhitespaceTrivia [30..31) ' '
+    IdentifierName [31..32)
+      IdentifierToken [31..32) 'x'
+  SemicolonToken [32..33) ';'
+Diagnostics:
+  CS1020 [11..15) Overloadable binary operator expected

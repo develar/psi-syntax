@@ -1,0 +1,1 @@
+record class C(int X, int Y);

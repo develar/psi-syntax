@@ -1,0 +1,1 @@
+class C { int P { set {} } = 0; }

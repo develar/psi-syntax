@@ -1,0 +1,78 @@
+SwitchStatement [0..82)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchSection [13..81)
+    CaseSwitchLabel [13..74)
+      L:WhitespaceTrivia [13..17) '    '
+      CaseKeyword [17..21) 'case'
+      T:WhitespaceTrivia [21..22) ' '
+      AddExpression [22..72)
+        AddExpression [22..67)
+          AddExpression [22..52)
+            ParenthesizedExpression [22..36)
+              OpenParenToken [22..23) '('
+              LeftShiftExpression [23..34)
+                ParenthesizedExpression [23..29)
+                  OpenParenToken [23..24) '('
+                  CharacterLiteralExpression [24..27)
+                    CharacterLiteralToken [24..27) '\'C\''
+                  CloseParenToken [27..28) ')'
+                  T:WhitespaceTrivia [28..29) ' '
+                LessThanLessThanToken [29..31) '<<'
+                T:WhitespaceTrivia [31..32) ' '
+                NumericLiteralExpression [32..34)
+                  NumericLiteralToken [32..34) '24'
+              CloseParenToken [34..35) ')'
+              T:WhitespaceTrivia [35..36) ' '
+            PlusToken [36..37) '+'
+            T:WhitespaceTrivia [37..38) ' '
+            ParenthesizedExpression [38..52)
+              OpenParenToken [38..39) '('
+              LeftShiftExpression [39..50)
+                ParenthesizedExpression [39..45)
+                  OpenParenToken [39..40) '('
+                  CharacterLiteralExpression [40..43)
+                    CharacterLiteralToken [40..43) '\'g\''
+                  CloseParenToken [43..44) ')'
+                  T:WhitespaceTrivia [44..45) ' '
+                LessThanLessThanToken [45..47) '<<'
+                T:WhitespaceTrivia [47..48) ' '
+                NumericLiteralExpression [48..50)
+                  NumericLiteralToken [48..50) '16'
+              CloseParenToken [50..51) ')'
+              T:WhitespaceTrivia [51..52) ' '
+          PlusToken [52..53) '+'
+          T:WhitespaceTrivia [53..54) ' '
+          ParenthesizedExpression [54..67)
+            OpenParenToken [54..55) '('
+            LeftShiftExpression [55..65)
+              ParenthesizedExpression [55..61)
+                OpenParenToken [55..56) '('
+                CharacterLiteralExpression [56..59)
+                  CharacterLiteralToken [56..59) '\'B\''
+                CloseParenToken [59..60) ')'
+                T:WhitespaceTrivia [60..61) ' '
+              LessThanLessThanToken [61..63) '<<'
+              T:WhitespaceTrivia [63..64) ' '
+              NumericLiteralExpression [64..65)
+                NumericLiteralToken [64..65) '8'
+            CloseParenToken [65..66) ')'
+            T:WhitespaceTrivia [66..67) ' '
+        PlusToken [67..68) '+'
+        T:WhitespaceTrivia [68..69) ' '
+        CharacterLiteralExpression [69..72)
+          CharacterLiteralToken [69..72) '\'I\''
+      ColonToken [72..73) ':'
+      T:WhitespaceTrivia [73..74) ' '
+    BreakStatement [74..81)
+      BreakKeyword [74..79) 'break'
+      SemicolonToken [79..80) ';'
+      T:EndOfLineTrivia [80..81) '\n'
+  CloseBraceToken [81..82) '}'

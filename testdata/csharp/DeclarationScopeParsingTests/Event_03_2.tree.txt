@@ -1,0 +1,41 @@
+CompilationUnit [0..48)
+  StructDeclaration [0..48)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    EventDeclaration [17..34)
+      L:WhitespaceTrivia [17..21) '    '
+      EventKeyword [21..26) 'event'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierName [27..34)
+        IdentifierToken [27..33) 'scoped'
+        T:WhitespaceTrivia [33..34) ' '
+      IdentifierToken [34..34) missing
+      AccessorList [34..34)
+        OpenBraceToken [34..34) missing
+        CloseBraceToken [34..34) missing
+    FieldDeclaration [34..46)
+      VariableDeclaration [34..44)
+        RefType [34..42)
+          RefKeyword [34..37) 'ref'
+          T:WhitespaceTrivia [37..38) ' '
+          PredefinedType [38..42)
+            IntKeyword [38..41) 'int'
+            T:WhitespaceTrivia [41..42) ' '
+        VariableDeclarator [42..44)
+          IdentifierToken [42..44) 'F3'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+    CloseBraceToken [46..47) '}'
+    T:EndOfLineTrivia [47..48) '\n'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1001 [34..37) Identifier expected
+  CS1514 [34..37) { expected
+  CS1513 [34..37) } expected

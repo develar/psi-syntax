@@ -1,0 +1,1 @@
+new C { P = ref }

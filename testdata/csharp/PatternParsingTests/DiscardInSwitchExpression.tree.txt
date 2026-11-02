@@ -1,0 +1,18 @@
+SwitchExpression [0..19)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..18)
+    DiscardPattern [11..13)
+      UnderscoreToken [11..12) '_'
+      T:WhitespaceTrivia [12..13) ' '
+    EqualsGreaterThanToken [13..15) '=>'
+    T:WhitespaceTrivia [15..16) ' '
+    NumericLiteralExpression [16..18)
+      NumericLiteralToken [16..17) '1'
+      T:WhitespaceTrivia [17..18) ' '
+  CloseBraceToken [18..19) '}'

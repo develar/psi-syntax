@@ -1,0 +1,22 @@
+CompilationUnit [0..60)
+  GlobalStatement [0..60)
+    LocalFunctionStatement [0..60)
+      ExternKeyword [0..6) 'extern'
+      T:WhitespaceTrivia [6..7) ' '
+      IdentifierName [7..13)
+        IdentifierToken [7..12) 'alias'
+        T:WhitespaceTrivia [12..13) ' '
+      IdentifierToken [13..18) 'Alias'
+      ParameterList [18..60)
+        OpenParenToken [18..19) '('
+        T:SkippedTokensTrivia [19..20)
+          AsteriskToken [19..20) '*'
+        T:SkippedTokensTrivia [20..60)
+          BadToken [20..60) '#$@^%*&); class D : Alias(*#$@^%*&).C {}'
+        CloseParenToken [60..60) missing
+      SemicolonToken [60..60) missing
+  EndOfFileToken [60..60) ''
+Diagnostics:
+  CS1040 [20..21) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1026 [60..60) ) expected
+  CS1002 [60..60) ; expected

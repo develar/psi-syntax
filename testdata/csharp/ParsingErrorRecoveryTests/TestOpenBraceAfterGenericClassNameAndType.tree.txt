@@ -1,0 +1,17 @@
+CompilationUnit [0..13)
+  ClassDeclaration [0..13)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    TypeParameterList [7..10)
+      LessThanToken [7..8) '<'
+      TypeParameter [8..10)
+        IdentifierToken [8..9) 't'
+        T:WhitespaceTrivia [9..10) ' '
+      GreaterThanToken [10..10) missing
+    OpenBraceToken [10..11) '{'
+    T:WhitespaceTrivia [11..12) ' '
+    CloseBraceToken [12..13) '}'
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS1003 [10..11) Syntax error, \'>\' expected

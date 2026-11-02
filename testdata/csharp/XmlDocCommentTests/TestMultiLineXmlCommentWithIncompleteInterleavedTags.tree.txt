@@ -1,0 +1,42 @@
+CompilationUnit [0..33)
+  ClassDeclaration [0..33)
+    L:MultiLineDocumentationCommentTrivia [0..23)
+      XmlElement [0..21)
+        XmlElementStartTag [0..8)
+          L:DocumentationCommentExteriorTrivia [0..3) '/**'
+          LessThanToken [3..4) '<'
+          XmlName [4..7)
+            IdentifierToken [4..7) 'goo'
+          GreaterThanToken [7..8) '>'
+        XmlText [8..9)
+          XmlTextLiteralNewLineToken [8..9) '\n'
+        XmlElement [9..20)
+          XmlElementStartTag [9..14)
+            LessThanToken [9..10) '<'
+            XmlName [10..13)
+              IdentifierToken [10..13) 'bar'
+            GreaterThanToken [13..14) '>'
+          XmlElementEndTag [14..20)
+            LessThanSlashToken [14..16) '</'
+            XmlName [16..19)
+              IdentifierToken [16..19) 'goo'
+            GreaterThanToken [19..20) '>'
+        XmlText [20..21)
+          XmlTextLiteralNewLineToken [20..21) '\n'
+        XmlElementEndTag [21..21)
+          LessThanSlashToken [21..21) missing
+          XmlName [21..21)
+            IdentifierToken [21..21) missing
+          GreaterThanToken [21..21) missing
+      L:DocumentationCommentExteriorTrivia [21..23) '*/'
+      EndOfDocumentationCommentToken [23..23) ''
+    L:EndOfLineTrivia [23..24) '\n'
+    ClassKeyword [24..29) 'class'
+    T:WhitespaceTrivia [29..30) ' '
+    IdentifierToken [30..31) 'C'
+    OpenBraceToken [31..32) '{'
+    CloseBraceToken [32..33) '}'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1570 [16..19) XML comment has badly formed XML -- \'End tag \'goo\' does not match the start tag \'bar\'.\'
+  CS1570 [21..21) XML comment has badly formed XML -- \'Expected an end tag for element \'goo\'.\'

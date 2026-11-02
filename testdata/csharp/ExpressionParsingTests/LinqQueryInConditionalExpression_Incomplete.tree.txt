@@ -1,0 +1,41 @@
+ConditionalExpression [0..20)
+  IsExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    QualifiedName [5..9)
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'X'
+      DotToken [6..7) '.'
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'Y'
+        T:WhitespaceTrivia [8..9) ' '
+  QuestionToken [9..10) '?'
+  T:WhitespaceTrivia [10..11) ' '
+  QueryExpression [11..20)
+    FromClause [11..20)
+      FromKeyword [11..15) 'from'
+      T:WhitespaceTrivia [15..16) ' '
+      IdentifierName [16..20)
+        IdentifierToken [16..20) 'item'
+      IdentifierToken [20..20) missing
+      InKeyword [20..20) missing
+      IdentifierName [20..20)
+        IdentifierToken [20..20) missing
+    QueryBody [20..20)
+      SelectClause [20..20)
+        SelectKeyword [20..20) missing
+        IdentifierName [20..20)
+          IdentifierToken [20..20) missing
+  ColonToken [20..20) missing
+  IdentifierName [20..20)
+    IdentifierToken [20..20) missing
+Diagnostics:
+  CS1001 [20..20) Identifier expected
+  CS1003 [20..20) Syntax error, \'in\' expected
+  CS1733 [20..20) Expected expression
+  CS0742 [20..20) A query body must end with a select clause or a group clause
+  CS1003 [20..20) Syntax error, \':\' expected
+  CS1733 [20..20) Expected expression

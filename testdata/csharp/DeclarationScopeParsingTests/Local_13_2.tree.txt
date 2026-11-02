@@ -1,0 +1,53 @@
+CompilationUnit [0..86)
+  ClassDeclaration [0..86)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..84)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..32)
+        VoidKeyword [27..31) 'void'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..84)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        ExpressionStatement [45..60)
+          IdentifierName [45..60)
+            L:WhitespaceTrivia [45..53) '        '
+            IdentifierToken [53..59) 'scoped'
+            T:WhitespaceTrivia [59..60) ' '
+          SemicolonToken [60..60) missing
+        LocalDeclarationStatement [60..78)
+          ExternKeyword [60..66) 'extern'
+          T:WhitespaceTrivia [66..67) ' '
+          VariableDeclaration [67..76)
+            RefType [67..75)
+              RefKeyword [67..70) 'ref'
+              T:WhitespaceTrivia [70..71) ' '
+              PredefinedType [71..75)
+                IntKeyword [71..74) 'int'
+                T:WhitespaceTrivia [74..75) ' '
+            VariableDeclarator [75..76)
+              IdentifierToken [75..76) 'b'
+          SemicolonToken [76..77) ';'
+          T:EndOfLineTrivia [77..78) '\n'
+        L:WhitespaceTrivia [78..82) '    '
+        CloseBraceToken [82..83) '}'
+        T:EndOfLineTrivia [83..84) '\n'
+    CloseBraceToken [84..85) '}'
+    T:EndOfLineTrivia [85..86) '\n'
+  EndOfFileToken [86..86) ''
+Diagnostics:
+  CS1002 [60..66) ; expected
+  CS0106 [60..66) The modifier \'extern\' is not valid for this item

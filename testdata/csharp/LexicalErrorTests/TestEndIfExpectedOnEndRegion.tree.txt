@@ -1,0 +1,27 @@
+CompilationUnit [0..45)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:RegionDirectiveTrivia [1..13)
+    HashToken [1..2) '#'
+    RegionKeyword [2..8) 'region'
+    T:WhitespaceTrivia [8..9) ' '
+    L:PreprocessingMessageTrivia [9..12) 'xyz'
+    EndOfDirectiveToken [12..12) ''
+    T:EndOfLineTrivia [12..13) '\n'
+  L:IfDirectiveTrivia [13..23)
+    HashToken [13..14) '#'
+    IfKeyword [14..16) 'if'
+    T:WhitespaceTrivia [16..17) ' '
+    FalseLiteralExpression [17..22)
+      FalseKeyword [17..22) 'false'
+    EndOfDirectiveToken [22..22) ''
+    T:EndOfLineTrivia [22..23) '\n'
+  L:DisabledTextTrivia [23..34) 'int 1 = 0;\n'
+  L:BadDirectiveTrivia [34..45)
+    HashToken [34..35) '#'
+    EndRegionKeyword [35..44) 'endregion'
+    EndOfDirectiveToken [44..44) ''
+    T:EndOfLineTrivia [44..45) '\n'
+  EndOfFileToken [45..45) ''
+Diagnostics:
+  CS1027 [34..44) #endif directive expected
+  CS1027 [45..45) #endif directive expected

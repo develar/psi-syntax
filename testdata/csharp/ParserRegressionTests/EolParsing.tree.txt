@@ -1,0 +1,4 @@
+CompilationUnit [0..2)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:EndOfLineTrivia [1..2) '\r'
+  EndOfFileToken [2..2) ''

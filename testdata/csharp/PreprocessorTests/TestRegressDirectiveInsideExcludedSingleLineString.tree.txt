@@ -1,0 +1,17 @@
+CompilationUnit [0..59)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:DisabledTextTrivia [11..52) 'class A\n{\n   string X = "#define XYZ";\n}\n'
+  L:EndIfDirectiveTrivia [52..59)
+    HashToken [52..53) '#'
+    EndIfKeyword [53..58) 'endif'
+    EndOfDirectiveToken [58..58) ''
+    T:EndOfLineTrivia [58..59) '\n'
+  EndOfFileToken [59..59) ''

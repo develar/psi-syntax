@@ -1,0 +1,13 @@
+CollectionExpression [0..10)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..9)
+    DotDotToken [1..3) '..'
+    CoalesceExpression [3..9)
+      IdentifierName [3..5)
+        IdentifierToken [3..4) 'x'
+        T:WhitespaceTrivia [4..5) ' '
+      QuestionQuestionToken [5..7) '??'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'y'
+  CloseBracketToken [9..10) ']'

@@ -1,0 +1,30 @@
+CompilationUnit [0..33)
+  NamespaceDeclaration [0..33)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    StructDeclaration [14..31)
+      L:WhitespaceTrivia [14..18) '    '
+      StructKeyword [18..24) 'struct'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'c'
+      T:WhitespaceTrivia [26..27) ' '
+      BaseList [27..31)
+        ColonToken [27..28) ':'
+        T:WhitespaceTrivia [28..29) ' '
+        SimpleBaseType [29..31)
+          IdentifierName [29..31)
+            IdentifierToken [29..30) 'I'
+            T:EndOfLineTrivia [30..31) '\n'
+      OpenBraceToken [31..31) missing
+      CloseBraceToken [31..31) missing
+    CloseBraceToken [31..32) '}'
+    T:EndOfLineTrivia [32..33) '\n'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1514 [30..30) { expected
+  CS1513 [30..30) } expected

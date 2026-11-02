@@ -1,0 +1,54 @@
+CompilationUnit [0..68)
+  ClassDeclaration [0..68)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..67)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..23) 'Goo'
+      ParameterList [23..26)
+        OpenParenToken [23..24) '('
+        CloseParenToken [24..25) ')'
+        T:EndOfLineTrivia [25..26) '\n'
+      Block [26..67)
+        L:WhitespaceTrivia [26..30) '    '
+        OpenBraceToken [30..31) '{'
+        T:EndOfLineTrivia [31..32) '\n'
+        LocalDeclarationStatement [32..61)
+          AttributeList [32..43)
+            L:WhitespaceTrivia [32..40) '        '
+            OpenBracketToken [40..41) '['
+            Attribute [41..42)
+              IdentifierName [41..42)
+                IdentifierToken [41..42) 'A'
+            CloseBracketToken [42..43) ']'
+          PublicKeyword [43..49) 'public'
+          T:WhitespaceTrivia [49..50) ' '
+          VariableDeclaration [50..59)
+            PredefinedType [50..54)
+              IntKeyword [50..53) 'int'
+              T:WhitespaceTrivia [53..54) ' '
+            VariableDeclarator [54..59)
+              IdentifierToken [54..55) 'i'
+              T:WhitespaceTrivia [55..56) ' '
+              EqualsValueClause [56..59)
+                EqualsToken [56..57) '='
+                T:WhitespaceTrivia [57..58) ' '
+                NumericLiteralExpression [58..59)
+                  NumericLiteralToken [58..59) '0'
+          SemicolonToken [59..60) ';'
+          T:EndOfLineTrivia [60..61) '\n'
+        L:WhitespaceTrivia [61..65) '    '
+        CloseBraceToken [65..66) '}'
+        T:EndOfLineTrivia [66..67) '\n'
+    CloseBraceToken [67..68) '}'
+  EndOfFileToken [68..68) ''
+Diagnostics:
+  CS0106 [43..49) The modifier \'public\' is not valid for this item

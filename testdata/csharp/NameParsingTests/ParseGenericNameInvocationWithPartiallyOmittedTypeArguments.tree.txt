@@ -1,0 +1,104 @@
+CompilationUnit [0..227)
+  ClassDeclaration [0..227)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..226)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      TypeParameterList [20..28)
+        LessThanToken [20..21) '<'
+        TypeParameter [21..23)
+          IdentifierToken [21..23) 'T1'
+        CommaToken [23..24) ','
+        T:WhitespaceTrivia [24..25) ' '
+        TypeParameter [25..27)
+          IdentifierToken [25..27) 'T2'
+        GreaterThanToken [27..28) '>'
+      ParameterList [28..31)
+        OpenParenToken [28..29) '('
+        CloseParenToken [29..30) ')'
+        T:EndOfLineTrivia [30..31) '\n'
+      Block [31..226)
+        L:WhitespaceTrivia [31..35) '    '
+        OpenBraceToken [35..36) '{'
+        T:EndOfLineTrivia [36..37) '\n'
+        ExpressionStatement [37..87)
+          InvocationExpression [37..54)
+            GenericName [37..52)
+              L:WhitespaceTrivia [37..45) '        '
+              IdentifierToken [45..46) 'M'
+              TypeArgumentList [46..52)
+                LessThanToken [46..47) '<'
+                IdentifierName [47..47)
+                  IdentifierToken [47..47) missing
+                CommaToken [47..48) ','
+                PredefinedType [48..51)
+                  IntKeyword [48..51) 'int'
+                GreaterThanToken [51..52) '>'
+            ArgumentList [52..54)
+              OpenParenToken [52..53) '('
+              CloseParenToken [53..54) ')'
+          SemicolonToken [54..55) ';'
+          T:WhitespaceTrivia [55..61) '      '
+          T:SingleLineCommentTrivia [61..86) '// First argument omitted'
+          T:EndOfLineTrivia [86..87) '\n'
+        ExpressionStatement [87..138)
+          InvocationExpression [87..107)
+            GenericName [87..105)
+              L:WhitespaceTrivia [87..95) '        '
+              IdentifierToken [95..96) 'M'
+              TypeArgumentList [96..105)
+                LessThanToken [96..97) '<'
+                PredefinedType [97..103)
+                  StringKeyword [97..103) 'string'
+                CommaToken [103..104) ','
+                IdentifierName [104..104)
+                  IdentifierToken [104..104) missing
+                GreaterThanToken [104..105) '>'
+            ArgumentList [105..107)
+              OpenParenToken [105..106) '('
+              CloseParenToken [106..107) ')'
+          SemicolonToken [107..108) ';'
+          T:WhitespaceTrivia [108..111) '   '
+          T:SingleLineCommentTrivia [111..137) '// Second argument omitted'
+          T:EndOfLineTrivia [137..138) '\n'
+        ExpressionStatement [138..220)
+          InvocationExpression [138..156)
+            GenericName [138..154)
+              L:WhitespaceTrivia [138..146) '        '
+              IdentifierToken [146..147) 'M'
+              TypeArgumentList [147..154)
+                LessThanToken [147..148) '<'
+                IdentifierName [148..148)
+                  IdentifierToken [148..148) missing
+                CommaToken [148..149) ','
+                PredefinedType [149..152)
+                  IntKeyword [149..152) 'int'
+                CommaToken [152..153) ','
+                IdentifierName [153..153)
+                  IdentifierToken [153..153) missing
+                GreaterThanToken [153..154) '>'
+            ArgumentList [154..156)
+              OpenParenToken [154..155) '('
+              CloseParenToken [155..156) ')'
+          SemicolonToken [156..157) ';'
+          T:WhitespaceTrivia [157..162) '     '
+          T:SingleLineCommentTrivia [162..219) '// First and third arguments omitted (if we had 3 params)'
+          T:EndOfLineTrivia [219..220) '\n'
+        L:WhitespaceTrivia [220..224) '    '
+        CloseBraceToken [224..225) '}'
+        T:EndOfLineTrivia [225..226) '\n'
+    CloseBraceToken [226..227) '}'
+  EndOfFileToken [227..227) ''
+Diagnostics:
+  CS1031 [47..48) Type expected
+  CS1031 [104..105) Type expected
+  CS1031 [148..149) Type expected
+  CS1031 [153..154) Type expected

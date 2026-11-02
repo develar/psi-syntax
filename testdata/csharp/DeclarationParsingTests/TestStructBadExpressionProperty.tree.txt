@@ -1,0 +1,42 @@
+CompilationUnit [0..52)
+  StructDeclaration [0..52)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'S'
+    T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    FieldDeclaration [18..35)
+      L:WhitespaceTrivia [18..22) '    '
+      PublicKeyword [22..28) 'public'
+      T:WhitespaceTrivia [28..29) ' '
+      VariableDeclaration [29..35)
+        PredefinedType [29..33)
+          IntKeyword [29..32) 'int'
+          T:WhitespaceTrivia [32..33) ' '
+        VariableDeclarator [33..35)
+          IdentifierToken [33..34) 'P'
+          T:WhitespaceTrivia [34..35) ' '
+      SemicolonToken [35..35) missing
+    PropertyDeclaration [35..50)
+      ReadOnlyKeyword [35..43) 'readonly'
+      T:WhitespaceTrivia [43..44) ' '
+      IdentifierName [44..44)
+        IdentifierToken [44..44) missing
+      IdentifierToken [44..44) missing
+      ArrowExpressionClause [44..48)
+        EqualsGreaterThanToken [44..46) '=>'
+        T:WhitespaceTrivia [46..47) ' '
+        NumericLiteralExpression [47..48)
+          NumericLiteralToken [47..48) '0'
+      SemicolonToken [48..49) ';'
+      T:EndOfLineTrivia [49..50) '\n'
+    CloseBraceToken [50..51) '}'
+    T:EndOfLineTrivia [51..52) '\n'
+  EndOfFileToken [52..52) ''
+Diagnostics:
+  CS1002 [35..43) ; expected
+  CS1031 [44..46) Type expected
+  CS1001 [44..46) Identifier expected

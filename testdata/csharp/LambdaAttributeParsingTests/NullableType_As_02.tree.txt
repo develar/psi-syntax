@@ -1,0 +1,22 @@
+AsExpression [0..20)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  AsKeyword [2..4) 'as'
+  T:WhitespaceTrivia [4..5) ' '
+  ArrayType [5..20)
+    NullableType [5..14)
+      PredefinedType [5..12)
+        StringKeyword [5..11) 'string'
+        T:WhitespaceTrivia [11..12) ' '
+      QuestionToken [12..13) '?'
+      T:WhitespaceTrivia [13..14) ' '
+    ArrayRankSpecifier [14..20)
+      OpenBracketToken [14..15) '['
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '2'
+      CommaToken [16..17) ','
+      T:WhitespaceTrivia [17..18) ' '
+      NumericLiteralExpression [18..19)
+        NumericLiteralToken [18..19) '3'
+      CloseBracketToken [19..20) ']'

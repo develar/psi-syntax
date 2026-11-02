@@ -1,0 +1,45 @@
+LocalDeclarationStatement [0..51)
+  VariableDeclaration [0..50)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..50)
+      IdentifierToken [4..5) 'v'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..50)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        SwitchExpression [8..50)
+          NumericLiteralExpression [8..10)
+            NumericLiteralToken [8..9) '0'
+            T:WhitespaceTrivia [9..10) ' '
+          SwitchKeyword [10..16) 'switch'
+          T:EndOfLineTrivia [16..17) '\n'
+          OpenBraceToken [17..18) '{'
+          T:EndOfLineTrivia [18..19) '\n'
+          SwitchExpressionArm [19..29)
+            ConstantPattern [19..25)
+              NumericLiteralExpression [19..25)
+                L:WhitespaceTrivia [19..23) '    '
+                NumericLiteralToken [23..24) '0'
+                T:WhitespaceTrivia [24..25) ' '
+            EqualsGreaterThanToken [25..27) '=>'
+            T:WhitespaceTrivia [27..28) ' '
+            NumericLiteralExpression [28..29)
+              NumericLiteralToken [28..29) '1'
+          CommaToken [29..30) ','
+          T:EndOfLineTrivia [30..31) '\n'
+          SwitchExpressionArm [31..47)
+            ConstantPattern [31..43)
+              DefaultLiteralExpression [31..43)
+                L:WhitespaceTrivia [31..35) '    '
+                DefaultKeyword [35..42) 'default'
+                T:WhitespaceTrivia [42..43) ' '
+            EqualsGreaterThanToken [43..45) '=>'
+            T:WhitespaceTrivia [45..46) ' '
+            NumericLiteralExpression [46..47)
+              NumericLiteralToken [46..47) '2'
+          CommaToken [47..48) ','
+          T:EndOfLineTrivia [48..49) '\n'
+          CloseBraceToken [49..50) '}'
+  SemicolonToken [50..51) ';'

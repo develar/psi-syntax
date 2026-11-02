@@ -1,0 +1,24 @@
+CompilationUnit [0..22)
+  L:SingleLineDocumentationCommentTrivia [0..10)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..10)
+      XmlElementStartTag [4..9)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'goo'
+        GreaterThanToken [8..9) '>'
+      XmlText [9..10)
+        XmlTextLiteralNewLineToken [9..10) '\n'
+      XmlElementEndTag [10..10)
+        LessThanSlashToken [10..10) missing
+        XmlName [10..10)
+          IdentifierToken [10..10) missing
+        GreaterThanToken [10..10) missing
+    EndOfDocumentationCommentToken [10..10) ''
+  L:SingleLineCommentTrivia [10..21) '//// </goo>'
+  L:EndOfLineTrivia [21..22) '\n'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1570 [10..10) XML comment has badly formed XML -- \'Expected an end tag for element \'goo\'.\'

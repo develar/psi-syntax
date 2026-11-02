@@ -1,0 +1,8 @@
+OpenBraceToken [0..1) '{'
+T:EndOfLineTrivia [1..3) '\r\n'
+L:ConflictMarkerTrivia [3..19) '======= Trailing'
+L:EndOfLineTrivia [19..21) '\r\n'
+L:DisabledTextTrivia [21..55) 'disabled text\r\n>>>> still disabled'
+EndOfFileToken [55..55) ''
+Diagnostics:
+  CS8300 [3..10) Merge conflict marker encountered

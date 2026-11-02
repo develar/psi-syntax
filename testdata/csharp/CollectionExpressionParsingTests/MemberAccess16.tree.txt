@@ -1,0 +1,60 @@
+CompilationUnit [0..85)
+  ClassDeclaration [0..85)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..84)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..32)
+        VoidKeyword [27..31) 'void'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..84)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        ExpressionStatement [45..78)
+          InvocationExpression [45..76)
+            SimpleMemberAccessExpression [45..74)
+              SuppressNullableWarningExpression [45..62)
+                ElementAccessExpression [45..61)
+                  CollectionExpression [45..58)
+                    L:WhitespaceTrivia [45..53) '        '
+                    OpenBracketToken [53..54) '['
+                    ExpressionElement [54..57)
+                      InvocationExpression [54..57)
+                        IdentifierName [54..55)
+                          IdentifierToken [54..55) 'A'
+                        ArgumentList [55..57)
+                          OpenParenToken [55..56) '('
+                          CloseParenToken [56..57) ')'
+                    CloseBracketToken [57..58) ']'
+                  BracketedArgumentList [58..61)
+                    OpenBracketToken [58..59) '['
+                    Argument [59..60)
+                      NumericLiteralExpression [59..60)
+                        NumericLiteralToken [59..60) '0'
+                    CloseBracketToken [60..61) ']'
+                ExclamationToken [61..62) '!'
+              DotToken [62..63) '.'
+              IdentifierName [63..74)
+                IdentifierToken [63..74) 'GetHashCode'
+            ArgumentList [74..76)
+              OpenParenToken [74..75) '('
+              CloseParenToken [75..76) ')'
+          SemicolonToken [76..77) ';'
+          T:EndOfLineTrivia [77..78) '\n'
+        L:WhitespaceTrivia [78..82) '    '
+        CloseBraceToken [82..83) '}'
+        T:EndOfLineTrivia [83..84) '\n'
+    CloseBraceToken [84..85) '}'
+  EndOfFileToken [85..85) ''

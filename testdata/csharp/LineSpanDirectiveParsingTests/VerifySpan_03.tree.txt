@@ -1,0 +1,28 @@
+CompilationUnit [0..34)
+  L:LineSpanDirectiveTrivia [0..34)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..15)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..9) '10'
+      CommaToken [9..10) ','
+      T:WhitespaceTrivia [10..11) ' '
+      NumericLiteralToken [11..13) '20'
+      CloseParenToken [13..14) ')'
+      T:WhitespaceTrivia [14..15) ' '
+    MinusToken [15..16) '-'
+    T:WhitespaceTrivia [16..17) ' '
+    LineDirectivePosition [17..25)
+      OpenParenToken [17..18) '('
+      NumericLiteralToken [18..19) '9'
+      CommaToken [19..20) ','
+      T:WhitespaceTrivia [20..21) ' '
+      NumericLiteralToken [21..23) '20'
+      CloseParenToken [23..24) ')'
+      T:WhitespaceTrivia [24..25) ' '
+    StringLiteralToken [25..34) '"file.cs"'
+    EndOfDirectiveToken [34..34) ''
+  EndOfFileToken [34..34) ''
+Diagnostics:
+  CS8939 [17..24) The #line directive end position must be greater than or equal to the start position

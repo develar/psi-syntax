@@ -1,0 +1,26 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    LocalDeclarationStatement [0..27)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      VariableDeclaration [6..26)
+        FunctionPointerType [6..26)
+          DelegateKeyword [6..14) 'delegate'
+          AsteriskToken [14..15) '*'
+          FunctionPointerParameterList [15..26)
+            LessThanToken [15..16) '<'
+            FunctionPointerParameter [16..19)
+              PredefinedType [16..19)
+                IntKeyword [16..19) 'int'
+            CommaToken [19..20) ','
+            T:WhitespaceTrivia [20..21) ' '
+            FunctionPointerParameter [21..25)
+              PredefinedType [21..25)
+                VoidKeyword [21..25) 'void'
+            GreaterThanToken [25..26) '>'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..27) ';'
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1001 [26..27) Identifier expected

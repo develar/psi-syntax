@@ -1,0 +1,34 @@
+SwitchExpression [0..31)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..30)
+    DeclarationPattern [11..25)
+      ArrayType [11..23)
+        NullableType [11..19)
+          PredefinedType [11..17)
+            StringKeyword [11..17) 'string'
+          QuestionToken [17..18) '?'
+          T:WhitespaceTrivia [18..19) ' '
+        ArrayRankSpecifier [19..23)
+          OpenBracketToken [19..20) '['
+          OmittedArraySizeExpression [20..20)
+            OmittedArraySizeExpressionToken [20..20) ''
+          CommaToken [20..21) ','
+          OmittedArraySizeExpression [21..21)
+            OmittedArraySizeExpressionToken [21..21) ''
+          CloseBracketToken [21..22) ']'
+          T:WhitespaceTrivia [22..23) ' '
+      SingleVariableDesignation [23..25)
+        IdentifierToken [23..24) 'y'
+        T:WhitespaceTrivia [24..25) ' '
+    EqualsGreaterThanToken [25..27) '=>'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierName [28..30)
+      IdentifierToken [28..29) 'y'
+      T:WhitespaceTrivia [29..30) ' '
+  CloseBraceToken [30..31) '}'

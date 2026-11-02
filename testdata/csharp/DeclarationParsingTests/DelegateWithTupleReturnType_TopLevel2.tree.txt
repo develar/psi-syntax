@@ -1,0 +1,198 @@
+CompilationUnit [0..172)
+  DelegateDeclaration [0..29)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    TupleType [9..24)
+      OpenParenToken [9..10) '('
+      TupleElement [10..15)
+        PredefinedType [10..14)
+          IntKeyword [10..13) 'int'
+          T:WhitespaceTrivia [13..14) ' '
+        IdentifierToken [14..15) 'a'
+      CommaToken [15..16) ','
+      T:WhitespaceTrivia [16..17) ' '
+      TupleElement [17..22)
+        PredefinedType [17..21)
+          IntKeyword [17..20) 'int'
+          T:WhitespaceTrivia [20..21) ' '
+        IdentifierToken [21..22) 'b'
+      CloseParenToken [22..23) ')'
+      T:WhitespaceTrivia [23..24) ' '
+    IdentifierToken [24..25) 'I'
+    ParameterList [25..27)
+      OpenParenToken [25..26) '('
+      CloseParenToken [26..27) ')'
+    SemicolonToken [27..28) ';'
+    T:EndOfLineTrivia [28..29) '\n'
+  DelegateDeclaration [29..54)
+    DelegateKeyword [29..37) 'delegate'
+    T:WhitespaceTrivia [37..38) ' '
+    TupleType [38..49)
+      OpenParenToken [38..39) '('
+      TupleElement [39..42)
+        QualifiedName [39..42)
+          IdentifierName [39..40)
+            IdentifierToken [39..40) 'A'
+          DotToken [40..41) '.'
+          IdentifierName [41..42)
+            IdentifierToken [41..42) 'B'
+      CommaToken [42..43) ','
+      T:WhitespaceTrivia [43..44) ' '
+      TupleElement [44..47)
+        QualifiedName [44..47)
+          IdentifierName [44..45)
+            IdentifierToken [44..45) 'C'
+          DotToken [45..46) '.'
+          IdentifierName [46..47)
+            IdentifierToken [46..47) 'D'
+      CloseParenToken [47..48) ')'
+      T:WhitespaceTrivia [48..49) ' '
+    IdentifierToken [49..50) 'I'
+    ParameterList [50..52)
+      OpenParenToken [50..51) '('
+      CloseParenToken [51..52) ')'
+    SemicolonToken [52..53) ';'
+    T:EndOfLineTrivia [53..54) '\n'
+  DelegateDeclaration [54..83)
+    DelegateKeyword [54..62) 'delegate'
+    T:WhitespaceTrivia [62..63) ' '
+    TupleType [63..78)
+      OpenParenToken [63..64) '('
+      TupleElement [64..69)
+        QualifiedName [64..68)
+          IdentifierName [64..65)
+            IdentifierToken [64..65) 'A'
+          DotToken [65..66) '.'
+          IdentifierName [66..68)
+            IdentifierToken [66..67) 'B'
+            T:WhitespaceTrivia [67..68) ' '
+        IdentifierToken [68..69) 'b'
+      CommaToken [69..70) ','
+      T:WhitespaceTrivia [70..71) ' '
+      TupleElement [71..76)
+        QualifiedName [71..75)
+          IdentifierName [71..72)
+            IdentifierToken [71..72) 'C'
+          DotToken [72..73) '.'
+          IdentifierName [73..75)
+            IdentifierToken [73..74) 'D'
+            T:WhitespaceTrivia [74..75) ' '
+        IdentifierToken [75..76) 'd'
+      CloseParenToken [76..77) ')'
+      T:WhitespaceTrivia [77..78) ' '
+    IdentifierToken [78..79) 'I'
+    ParameterList [79..81)
+      OpenParenToken [79..80) '('
+      CloseParenToken [80..81) ')'
+    SemicolonToken [81..82) ';'
+    T:EndOfLineTrivia [82..83) '\n'
+  DelegateDeclaration [83..111)
+    DelegateKeyword [83..91) 'delegate'
+    T:WhitespaceTrivia [91..92) ' '
+    TupleType [92..106)
+      OpenParenToken [92..93) '('
+      TupleElement [93..99)
+        QualifiedName [93..99)
+          IdentifierName [93..94)
+            IdentifierToken [93..94) 'A'
+          DotToken [94..95) '.'
+          GenericName [95..99)
+            IdentifierToken [95..96) 'B'
+            TypeArgumentList [96..99)
+              LessThanToken [96..97) '<'
+              IdentifierName [97..98)
+                IdentifierToken [97..98) 'C'
+              GreaterThanToken [98..99) '>'
+      CommaToken [99..100) ','
+      T:WhitespaceTrivia [100..101) ' '
+      TupleElement [101..104)
+        ArrayType [101..104)
+          IdentifierName [101..102)
+            IdentifierToken [101..102) 'T'
+          ArrayRankSpecifier [102..104)
+            OpenBracketToken [102..103) '['
+            OmittedArraySizeExpression [103..103)
+              OmittedArraySizeExpressionToken [103..103) ''
+            CloseBracketToken [103..104) ']'
+      CloseParenToken [104..105) ')'
+      T:WhitespaceTrivia [105..106) ' '
+    IdentifierToken [106..107) 'I'
+    ParameterList [107..109)
+      OpenParenToken [107..108) '('
+      CloseParenToken [108..109) ')'
+    SemicolonToken [109..110) ';'
+    T:EndOfLineTrivia [110..111) '\n'
+  DelegateDeclaration [111..143)
+    DelegateKeyword [111..119) 'delegate'
+    T:WhitespaceTrivia [119..120) ' '
+    TupleType [120..138)
+      OpenParenToken [120..121) '('
+      TupleElement [121..129)
+        QualifiedName [121..128)
+          IdentifierName [121..122)
+            IdentifierToken [121..122) 'A'
+          DotToken [122..123) '.'
+          GenericName [123..128)
+            IdentifierToken [123..124) 'B'
+            TypeArgumentList [124..128)
+              LessThanToken [124..125) '<'
+              IdentifierName [125..126)
+                IdentifierToken [125..126) 'C'
+              GreaterThanToken [126..127) '>'
+              T:WhitespaceTrivia [127..128) ' '
+        IdentifierToken [128..129) 'g'
+      CommaToken [129..130) ','
+      T:WhitespaceTrivia [130..131) ' '
+      TupleElement [131..136)
+        ArrayType [131..135)
+          IdentifierName [131..132)
+            IdentifierToken [131..132) 'T'
+          ArrayRankSpecifier [132..135)
+            OpenBracketToken [132..133) '['
+            OmittedArraySizeExpression [133..133)
+              OmittedArraySizeExpressionToken [133..133) ''
+            CloseBracketToken [133..134) ']'
+            T:WhitespaceTrivia [134..135) ' '
+        IdentifierToken [135..136) 'a'
+      CloseParenToken [136..137) ')'
+      T:WhitespaceTrivia [137..138) ' '
+    IdentifierToken [138..139) 'I'
+    ParameterList [139..141)
+      OpenParenToken [139..140) '('
+      CloseParenToken [140..141) ')'
+    SemicolonToken [141..142) ';'
+    T:EndOfLineTrivia [142..143) '\n'
+  DelegateDeclaration [143..172)
+    DelegateKeyword [143..151) 'delegate'
+    T:WhitespaceTrivia [151..152) ' '
+    TupleType [152..168)
+      OpenParenToken [152..153) '('
+      TupleElement [153..161)
+        TupleType [153..160)
+          OpenParenToken [153..154) '('
+          TupleElement [154..155)
+            IdentifierName [154..155)
+              IdentifierToken [154..155) 'A'
+          CommaToken [155..156) ','
+          T:WhitespaceTrivia [156..157) ' '
+          TupleElement [157..158)
+            IdentifierName [157..158)
+              IdentifierToken [157..158) 'B'
+          CloseParenToken [158..159) ')'
+          T:WhitespaceTrivia [159..160) ' '
+        IdentifierToken [160..161) 'c'
+      CommaToken [161..162) ','
+      T:WhitespaceTrivia [162..163) ' '
+      TupleElement [163..166)
+        IdentifierName [163..165)
+          IdentifierToken [163..164) 'D'
+          T:WhitespaceTrivia [164..165) ' '
+        IdentifierToken [165..166) 'd'
+      CloseParenToken [166..167) ')'
+      T:WhitespaceTrivia [167..168) ' '
+    IdentifierToken [168..169) 'I'
+    ParameterList [169..171)
+      OpenParenToken [169..170) '('
+      CloseParenToken [170..171) ')'
+    SemicolonToken [171..172) ';'
+  EndOfFileToken [172..172) ''

@@ -1,0 +1,4 @@
+CharacterLiteralToken [0..4) '\'ab\''
+EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1012 [0..0) Too many characters in character literal

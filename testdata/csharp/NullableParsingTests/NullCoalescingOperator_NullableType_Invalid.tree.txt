@@ -1,0 +1,24 @@
+ConditionalExpression [0..11)
+  CoalesceExpression [0..8)
+    AsExpression [0..6)
+      IdentifierName [0..2)
+        IdentifierToken [0..1) 'x'
+        T:WhitespaceTrivia [1..2) ' '
+      AsKeyword [2..4) 'as'
+      T:WhitespaceTrivia [4..5) ' '
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'T'
+    QuestionQuestionToken [6..8) '??'
+    IdentifierName [8..8)
+      IdentifierToken [8..8) missing
+  QuestionToken [8..9) '?'
+  T:WhitespaceTrivia [9..10) ' '
+  IdentifierName [10..11)
+    IdentifierToken [10..11) 'y'
+  ColonToken [11..11) missing
+  IdentifierName [11..11)
+    IdentifierToken [11..11) missing
+Diagnostics:
+  CS1525 [8..9) Invalid expression term \'?\'
+  CS1003 [11..11) Syntax error, \':\' expected
+  CS1733 [11..11) Expected expression

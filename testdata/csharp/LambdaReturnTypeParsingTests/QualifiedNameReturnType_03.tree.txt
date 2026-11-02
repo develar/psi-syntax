@@ -1,0 +1,16 @@
+ParenthesizedLambdaExpression [0..20)
+  AliasQualifiedName [0..10)
+    IdentifierName [0..6)
+      GlobalKeyword [0..6) 'global'
+    ColonColonToken [6..8) '::'
+    IdentifierName [8..10)
+      IdentifierToken [8..9) 'T'
+      T:WhitespaceTrivia [9..10) ' '
+  ParameterList [10..13)
+    OpenParenToken [10..11) '('
+    CloseParenToken [11..12) ')'
+    T:WhitespaceTrivia [12..13) ' '
+  EqualsGreaterThanToken [13..15) '=>'
+  T:WhitespaceTrivia [15..16) ' '
+  NullLiteralExpression [16..20)
+    NullKeyword [16..20) 'null'

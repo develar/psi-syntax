@@ -1,0 +1,22 @@
+ForEachStatement [0..42)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  QualifiedName [10..24)
+    IdentifierName [10..16)
+      IdentifierToken [10..16) 'scoped'
+    DotToken [16..17) '.'
+    IdentifierName [17..24)
+      IdentifierToken [17..23) 'nested'
+      T:WhitespaceTrivia [23..24) ' '
+  IdentifierToken [24..25) 'a'
+  T:WhitespaceTrivia [25..26) ' '
+  InKeyword [26..28) 'in'
+  T:WhitespaceTrivia [28..29) ' '
+  IdentifierName [29..39)
+    IdentifierToken [29..39) 'collection'
+  CloseParenToken [39..40) ')'
+  EmptyStatement [40..42)
+    SemicolonToken [40..41) ';'
+    T:EndOfLineTrivia [41..42) '\n'

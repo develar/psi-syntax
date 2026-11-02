@@ -1,0 +1,30 @@
+ConversionOperatorDeclaration [0..34)
+  ExplicitKeyword [0..8) 'explicit'
+  T:WhitespaceTrivia [8..9) ' '
+  ExplicitInterfaceSpecifier [9..11)
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'I'
+    DotToken [10..11) '.'
+  OperatorKeyword [11..19) 'operator'
+  T:WhitespaceTrivia [19..20) ' '
+  IdentifierName [20..20)
+    IdentifierToken [20..20) missing
+  ParameterList [20..33)
+    OpenParenToken [20..21) '('
+    Parameter [21..27)
+      PredefinedType [21..25)
+        IntKeyword [21..24) 'int'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'x'
+      T:WhitespaceTrivia [26..27) ' '
+    CommaToken [27..27) missing
+    Parameter [27..32)
+      PredefinedType [27..31)
+        IntKeyword [27..30) 'int'
+        T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..32) 'y'
+    CloseParenToken [32..33) ')'
+  SemicolonToken [33..34) ';'
+Diagnostics:
+  CS1001 [20..21) Identifier expected
+  CS1003 [27..30) Syntax error, \',\' expected

@@ -1,0 +1,8 @@
+CollectionExpression [0..9)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..8)
+    DotDotToken [1..3) '..'
+    T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..8)
+      IdentifierToken [4..8) 'with'
+  CloseBracketToken [8..9) ']'

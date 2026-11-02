@@ -1,0 +1,1 @@
+delegate scoped int A();

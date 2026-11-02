@@ -1,0 +1,46 @@
+CompilationUnit [0..34)
+  ClassDeclaration [0..34)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..33)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..33)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        ExpressionStatement [21..28)
+          InvocationExpression [21..28)
+            IdentifierName [21..22)
+              IdentifierToken [21..22) 'm'
+            ArgumentList [22..28)
+              OpenParenToken [22..23) '('
+              Argument [23..24)
+                IdentifierName [23..24)
+                  IdentifierToken [23..24) 'a'
+              CommaToken [24..25) ','
+              T:WhitespaceTrivia [25..27) '\t\t'
+              T:EndOfLineTrivia [27..28) '\n'
+              Argument [28..28)
+                IdentifierName [28..28)
+                  IdentifierToken [28..28) missing
+              CloseParenToken [28..28) missing
+          SemicolonToken [28..28) missing
+        L:WhitespaceTrivia [28..31) '\t\t\t'
+        CloseBraceToken [31..32) '}'
+        T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''
+Diagnostics:
+  CS1525 [25..25) Invalid expression term \'}\'
+  CS1026 [25..25) ) expected
+  CS1002 [25..25) ; expected

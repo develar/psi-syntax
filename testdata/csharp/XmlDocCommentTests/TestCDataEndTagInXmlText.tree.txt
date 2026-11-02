@@ -1,0 +1,76 @@
+CompilationUnit [0..76)
+  ClassDeclaration [0..76)
+    L:SingleLineDocumentationCommentTrivia [0..66)
+      XmlText [0..4)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..4) ' '
+      XmlElement [4..20)
+        XmlElementStartTag [4..9)
+          LessThanToken [4..5) '<'
+          XmlName [5..8)
+            IdentifierToken [5..8) 'doc'
+          GreaterThanToken [8..9) '>'
+        XmlText [9..14)
+          XmlTextLiteralToken [9..10) ' '
+          XmlTextLiteralToken [10..13) ']]>'
+          XmlTextLiteralToken [13..14) ' '
+        XmlElementEndTag [14..20)
+          LessThanSlashToken [14..16) '</'
+          XmlName [16..19)
+            IdentifierToken [16..19) 'doc'
+          GreaterThanToken [19..20) '>'
+      XmlText [20..25)
+        XmlTextLiteralNewLineToken [20..21) '\n'
+        L:DocumentationCommentExteriorTrivia [21..24) '///'
+        XmlTextLiteralToken [24..25) ' '
+      XmlElement [25..42)
+        XmlElementStartTag [25..28)
+          LessThanToken [25..26) '<'
+          XmlName [26..27)
+            IdentifierToken [26..27) 'a'
+          GreaterThanToken [27..28) '>'
+        XmlText [28..38)
+          XmlTextLiteralToken [28..32) 'abc]'
+          XmlTextLiteralToken [32..35) ']]>'
+          XmlTextLiteralToken [35..38) 'def'
+        XmlElementEndTag [38..42)
+          LessThanSlashToken [38..40) '</'
+          XmlName [40..41)
+            IdentifierToken [40..41) 'a'
+          GreaterThanToken [41..42) '>'
+      XmlText [42..47)
+        XmlTextLiteralNewLineToken [42..43) '\n'
+        L:DocumentationCommentExteriorTrivia [43..46) '///'
+        XmlTextLiteralToken [46..47) ' '
+      XmlElement [47..65)
+        XmlElementStartTag [47..61)
+          LessThanToken [47..48) '<'
+          XmlName [48..49)
+            IdentifierToken [48..49) 'a'
+          XmlTextAttribute [49..60)
+            XmlName [49..54)
+              L:WhitespaceTrivia [49..50) ' '
+              IdentifierToken [50..54) 'attr'
+            EqualsToken [54..55) '='
+            DoubleQuoteToken [55..56) '"'
+            XmlTextLiteralToken [56..59) ']]>'
+            DoubleQuoteToken [59..60) '"'
+          GreaterThanToken [60..61) '>'
+        XmlElementEndTag [61..65)
+          LessThanSlashToken [61..63) '</'
+          XmlName [63..64)
+            IdentifierToken [63..64) 'a'
+          GreaterThanToken [64..65) '>'
+      XmlText [65..66)
+        XmlTextLiteralNewLineToken [65..66) '\n'
+      EndOfDocumentationCommentToken [66..66) ''
+    ClassKeyword [66..71) 'class'
+    T:WhitespaceTrivia [71..72) ' '
+    IdentifierToken [72..73) 'A'
+    T:WhitespaceTrivia [73..74) ' '
+    OpenBraceToken [74..75) '{'
+    CloseBraceToken [75..76) '}'
+  EndOfFileToken [76..76) ''
+Diagnostics:
+  CS1570 [10..10) XML comment has badly formed XML -- \'The literal string \']]>\' is not allowed in element content.\'
+  CS1570 [32..32) XML comment has badly formed XML -- \'The literal string \']]>\' is not allowed in element content.\'

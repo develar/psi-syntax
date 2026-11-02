@@ -1,0 +1,17 @@
+CollectionExpression [0..17)
+  OpenBracketToken [0..1) '['
+  WithElement [1..16)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..16)
+      OpenParenToken [5..6) '('
+      Argument [6..15)
+        OutKeyword [6..9) 'out'
+        T:WhitespaceTrivia [9..10) ' '
+        DeclarationExpression [10..15)
+          IdentifierName [10..14)
+            IdentifierToken [10..13) 'var'
+            T:WhitespaceTrivia [13..14) ' '
+          SingleVariableDesignation [14..15)
+            IdentifierToken [14..15) 'a'
+      CloseParenToken [15..16) ')'
+  CloseBracketToken [16..17) ']'

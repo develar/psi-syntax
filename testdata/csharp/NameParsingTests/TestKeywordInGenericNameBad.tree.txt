@@ -1,0 +1,11 @@
+GenericName [0..11)
+  IdentifierToken [0..3) 'goo'
+  TypeArgumentList [3..11)
+    LessThanToken [3..4) '<'
+    IdentifierName [4..10)
+      IdentifierToken [4..4) missing
+      T:SkippedTokensTrivia [4..10)
+        StaticKeyword [4..10) 'static'
+    GreaterThanToken [10..11) '>'
+Diagnostics:
+  CS1031 [4..10) Type expected

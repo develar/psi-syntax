@@ -1,0 +1,4 @@
+L:MultiLineCommentTrivia [0..37) '@** \n xml comment \n on many lines\n**@'
+EndOfFileToken [37..37) ''
+Diagnostics:
+  CS1056 [0..1) Unexpected character \'@\'

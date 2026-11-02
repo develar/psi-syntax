@@ -1,0 +1,22 @@
+ExpressionStatement [0..14)
+  InvocationExpression [0..13)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'M'
+    ArgumentList [1..13)
+      OpenParenToken [1..2) '('
+      Argument [2..12)
+        OutKeyword [2..5) 'out'
+        T:WhitespaceTrivia [5..6) ' '
+        TupleExpression [6..12)
+          OpenParenToken [6..7) '('
+          Argument [7..8)
+            IdentifierName [7..8)
+              IdentifierToken [7..8) 'x'
+          CommaToken [8..9) ','
+          T:WhitespaceTrivia [9..10) ' '
+          Argument [10..11)
+            IdentifierName [10..11)
+              IdentifierToken [10..11) 'y'
+          CloseParenToken [11..12) ')'
+      CloseParenToken [12..13) ')'
+  SemicolonToken [13..14) ';'

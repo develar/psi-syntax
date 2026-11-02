@@ -1,0 +1,65 @@
+CompilationUnit [0..71)
+  L:SingleLineDocumentationCommentTrivia [0..71)
+    XmlElement [0..71)
+      XmlElementStartTag [0..8)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        LessThanToken [3..4) '<'
+        XmlName [4..7)
+          IdentifierToken [4..7) 'goo'
+        GreaterThanToken [7..8) '>'
+      XmlText [8..13)
+        XmlTextLiteralNewLineToken [8..9) '\n'
+        L:DocumentationCommentExteriorTrivia [9..12) '///'
+        XmlTextLiteralToken [12..13) ' '
+      XmlElement [13..61)
+        XmlElementStartTag [13..18)
+          LessThanToken [13..14) '<'
+          XmlName [14..17)
+            IdentifierToken [14..17) 'bar'
+          GreaterThanToken [17..18) '>'
+        XmlText [18..24)
+          XmlTextLiteralNewLineToken [18..19) '\n'
+          L:DocumentationCommentExteriorTrivia [19..22) '///'
+          XmlTextLiteralToken [22..24) '  '
+        XmlElement [24..50)
+          XmlElementStartTag [24..38)
+            LessThanToken [24..25) '<'
+            XmlName [25..28)
+              IdentifierToken [25..28) 'baz'
+            XmlTextAttribute [28..37)
+              XmlName [28..33)
+                L:WhitespaceTrivia [28..29) ' '
+                IdentifierToken [29..33) 'attr'
+              EqualsToken [33..34) '='
+              DoubleQuoteToken [34..35) '"'
+              XmlTextLiteralToken [35..36) 'a'
+              DoubleQuoteToken [36..37) '"'
+            GreaterThanToken [37..38) '>'
+          XmlText [38..44)
+            XmlTextLiteralNewLineToken [38..39) '\n'
+            L:DocumentationCommentExteriorTrivia [39..42) '///'
+            XmlTextLiteralToken [42..44) '  '
+          XmlElementEndTag [44..50)
+            LessThanSlashToken [44..46) '</'
+            XmlName [46..49)
+              IdentifierToken [46..49) 'baz'
+            GreaterThanToken [49..50) '>'
+        XmlText [50..55)
+          XmlTextLiteralNewLineToken [50..51) '\n'
+          L:DocumentationCommentExteriorTrivia [51..54) '///'
+          XmlTextLiteralToken [54..55) ' '
+        XmlElementEndTag [55..61)
+          LessThanSlashToken [55..57) '</'
+          XmlName [57..60)
+            IdentifierToken [57..60) 'bar'
+          GreaterThanToken [60..61) '>'
+      XmlText [61..62)
+        XmlTextLiteralNewLineToken [61..62) '\n'
+      XmlElementEndTag [62..71)
+        L:DocumentationCommentExteriorTrivia [62..65) '///'
+        LessThanSlashToken [65..67) '</'
+        XmlName [67..70)
+          IdentifierToken [67..70) 'goo'
+        GreaterThanToken [70..71) '>'
+    EndOfDocumentationCommentToken [71..71) ''
+  EndOfFileToken [71..71) ''

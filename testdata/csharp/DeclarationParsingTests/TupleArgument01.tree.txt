@@ -1,0 +1,158 @@
+CompilationUnit [0..206)
+  ClassDeclaration [0..206)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..9) 'C1'
+    T:EndOfLineTrivia [9..10) '\n'
+    OpenBraceToken [10..11) '{'
+    T:EndOfLineTrivia [11..12) '\n'
+    MethodDeclaration [12..109)
+      L:WhitespaceTrivia [12..16) '    '
+      StaticKeyword [16..22) 'static'
+      T:WhitespaceTrivia [22..23) ' '
+      TupleType [23..30)
+        OpenParenToken [23..24) '('
+        TupleElement [24..25)
+          IdentifierName [24..25)
+            IdentifierToken [24..25) 'T'
+        CommaToken [25..26) ','
+        T:WhitespaceTrivia [26..27) ' '
+        TupleElement [27..28)
+          IdentifierName [27..28)
+            IdentifierToken [27..28) 'T'
+        CloseParenToken [28..29) ')'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..35) 'Test1'
+      TypeParameterList [35..38)
+        LessThanToken [35..36) '<'
+        TypeParameter [36..37)
+          IdentifierToken [36..37) 'T'
+        GreaterThanToken [37..38) '>'
+      ParameterList [38..65)
+        OpenParenToken [38..39) '('
+        Parameter [39..44)
+          PredefinedType [39..43)
+            IntKeyword [39..42) 'int'
+            T:WhitespaceTrivia [42..43) ' '
+          IdentifierToken [43..44) 'a'
+        CommaToken [44..45) ','
+        T:WhitespaceTrivia [45..46) ' '
+        Parameter [46..63)
+          TupleType [46..59)
+            OpenParenToken [46..47) '('
+            TupleElement [47..51)
+              PredefinedType [47..51)
+                ByteKeyword [47..51) 'byte'
+            CommaToken [51..52) ','
+            T:WhitespaceTrivia [52..53) ' '
+            TupleElement [53..57)
+              PredefinedType [53..57)
+                ByteKeyword [53..57) 'byte'
+            CloseParenToken [57..58) ')'
+            T:WhitespaceTrivia [58..59) ' '
+          IdentifierToken [59..63) 'arg0'
+        CloseParenToken [63..64) ')'
+        T:EndOfLineTrivia [64..65) '\n'
+      Block [65..109)
+        L:WhitespaceTrivia [65..69) '    '
+        OpenBraceToken [69..70) '{'
+        T:EndOfLineTrivia [70..71) '\n'
+        ReturnStatement [71..103)
+          L:WhitespaceTrivia [71..79) '        '
+          ReturnKeyword [79..85) 'return'
+          T:WhitespaceTrivia [85..86) ' '
+          DefaultExpression [86..101)
+            DefaultKeyword [86..93) 'default'
+            OpenParenToken [93..94) '('
+            TupleType [94..100)
+              OpenParenToken [94..95) '('
+              TupleElement [95..96)
+                IdentifierName [95..96)
+                  IdentifierToken [95..96) 'T'
+              CommaToken [96..97) ','
+              T:WhitespaceTrivia [97..98) ' '
+              TupleElement [98..99)
+                IdentifierName [98..99)
+                  IdentifierToken [98..99) 'T'
+              CloseParenToken [99..100) ')'
+            CloseParenToken [100..101) ')'
+          SemicolonToken [101..102) ';'
+          T:EndOfLineTrivia [102..103) '\n'
+        L:WhitespaceTrivia [103..107) '    '
+        CloseBraceToken [107..108) '}'
+        T:EndOfLineTrivia [108..109) '\n'
+    MethodDeclaration [109..204)
+      L:EndOfLineTrivia [109..110) '\n'
+      L:WhitespaceTrivia [110..114) '    '
+      StaticKeyword [114..120) 'static'
+      T:WhitespaceTrivia [120..121) ' '
+      TupleType [121..128)
+        OpenParenToken [121..122) '('
+        TupleElement [122..123)
+          IdentifierName [122..123)
+            IdentifierToken [122..123) 'T'
+        CommaToken [123..124) ','
+        T:WhitespaceTrivia [124..125) ' '
+        TupleElement [125..126)
+          IdentifierName [125..126)
+            IdentifierToken [125..126) 'T'
+        CloseParenToken [126..127) ')'
+        T:WhitespaceTrivia [127..128) ' '
+      IdentifierToken [128..133) 'Test2'
+      TypeParameterList [133..136)
+        LessThanToken [133..134) '<'
+        TypeParameter [134..135)
+          IdentifierToken [134..135) 'T'
+        GreaterThanToken [135..136) '>'
+      ParameterList [136..160)
+        OpenParenToken [136..137) '('
+        Parameter [137..158)
+          RefKeyword [137..140) 'ref'
+          T:WhitespaceTrivia [140..141) ' '
+          TupleType [141..154)
+            OpenParenToken [141..142) '('
+            TupleElement [142..146)
+              PredefinedType [142..146)
+                ByteKeyword [142..146) 'byte'
+            CommaToken [146..147) ','
+            T:WhitespaceTrivia [147..148) ' '
+            TupleElement [148..152)
+              PredefinedType [148..152)
+                ByteKeyword [148..152) 'byte'
+            CloseParenToken [152..153) ')'
+            T:WhitespaceTrivia [153..154) ' '
+          IdentifierToken [154..158) 'arg0'
+        CloseParenToken [158..159) ')'
+        T:EndOfLineTrivia [159..160) '\n'
+      Block [160..204)
+        L:WhitespaceTrivia [160..164) '    '
+        OpenBraceToken [164..165) '{'
+        T:EndOfLineTrivia [165..166) '\n'
+        ReturnStatement [166..198)
+          L:WhitespaceTrivia [166..174) '        '
+          ReturnKeyword [174..180) 'return'
+          T:WhitespaceTrivia [180..181) ' '
+          DefaultExpression [181..196)
+            DefaultKeyword [181..188) 'default'
+            OpenParenToken [188..189) '('
+            TupleType [189..195)
+              OpenParenToken [189..190) '('
+              TupleElement [190..191)
+                IdentifierName [190..191)
+                  IdentifierToken [190..191) 'T'
+              CommaToken [191..192) ','
+              T:WhitespaceTrivia [192..193) ' '
+              TupleElement [193..194)
+                IdentifierName [193..194)
+                  IdentifierToken [193..194) 'T'
+              CloseParenToken [194..195) ')'
+            CloseParenToken [195..196) ')'
+          SemicolonToken [196..197) ';'
+          T:EndOfLineTrivia [197..198) '\n'
+        L:WhitespaceTrivia [198..202) '    '
+        CloseBraceToken [202..203) '}'
+        T:EndOfLineTrivia [203..204) '\n'
+    CloseBraceToken [204..205) '}'
+    T:EndOfLineTrivia [205..206) '\n'
+  EndOfFileToken [206..206) ''

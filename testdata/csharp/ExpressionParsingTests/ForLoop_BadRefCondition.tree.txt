@@ -1,0 +1,37 @@
+ForStatement [0..29)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..14)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..10) 'i'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        NumericLiteralExpression [13..14)
+          NumericLiteralToken [13..14) '0'
+  SemicolonToken [14..15) ';'
+  T:WhitespaceTrivia [15..16) ' '
+  RefExpression [16..19)
+    RefKeyword [16..19) 'ref'
+    IdentifierName [19..19)
+      IdentifierToken [19..19) missing
+  SemicolonToken [19..20) ';'
+  T:WhitespaceTrivia [20..21) ' '
+  PostIncrementExpression [21..24)
+    IdentifierName [21..22)
+      IdentifierToken [21..22) 'i'
+    PlusPlusToken [22..24) '++'
+  CloseParenToken [24..25) ')'
+  T:WhitespaceTrivia [25..26) ' '
+  Block [26..29)
+    OpenBraceToken [26..27) '{'
+    T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'
+Diagnostics:
+  CS1525 [16..19) Invalid expression term \'ref\'
+  CS1525 [19..20) Invalid expression term \';\'

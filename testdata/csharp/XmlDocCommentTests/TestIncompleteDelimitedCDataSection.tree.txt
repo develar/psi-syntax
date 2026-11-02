@@ -1,0 +1,14 @@
+CompilationUnit [0..26)
+  L:MultiLineDocumentationCommentTrivia [0..26)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlCDataSection [4..24)
+      XmlCDataStartToken [4..13) '<![CDATA['
+      XmlTextLiteralToken [13..24) ' incomplete'
+      XmlCDataEndToken [24..24) missing
+    L:DocumentationCommentExteriorTrivia [24..26) '*/'
+    EndOfDocumentationCommentToken [26..26) ''
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1570 [24..24) XML comment has badly formed XML -- \'The character(s) \'\' cannot be used at this location.\'

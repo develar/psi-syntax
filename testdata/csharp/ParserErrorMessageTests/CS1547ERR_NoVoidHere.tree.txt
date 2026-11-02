@@ -1,0 +1,83 @@
+CompilationUnit [0..165)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..165)
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    ClassKeyword [22..27) 'class'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierToken [28..37) 'MainClass'
+    T:EndOfLineTrivia [37..38) '\n'
+    L:WhitespaceTrivia [38..42) '    '
+    OpenBraceToken [42..43) '{'
+    T:EndOfLineTrivia [43..44) '\n'
+    MethodDeclaration [44..159)
+      L:WhitespaceTrivia [44..48) '    '
+      PublicKeyword [48..54) 'public'
+      T:WhitespaceTrivia [54..55) ' '
+      StaticKeyword [55..61) 'static'
+      T:WhitespaceTrivia [61..62) ' '
+      PredefinedType [62..66)
+        IntKeyword [62..65) 'int'
+        T:WhitespaceTrivia [65..66) ' '
+      IdentifierToken [66..70) 'Main'
+      T:WhitespaceTrivia [70..71) ' '
+      ParameterList [71..74)
+        OpenParenToken [71..72) '('
+        CloseParenToken [72..73) ')'
+        T:EndOfLineTrivia [73..74) '\n'
+      Block [74..159)
+        L:WhitespaceTrivia [74..82) '        '
+        OpenBraceToken [82..83) '{'
+        T:EndOfLineTrivia [83..84) '\n'
+        LocalDeclarationStatement [84..100)
+          VariableDeclaration [84..98)
+            PredefinedType [84..97)
+              L:WhitespaceTrivia [84..92) '        '
+              VoidKeyword [92..96) 'void'
+              T:WhitespaceTrivia [96..97) ' '
+            VariableDeclarator [97..98)
+              IdentifierToken [97..98) 'v'
+          SemicolonToken [98..99) ';'
+          T:EndOfLineTrivia [99..100) '\n'
+        ExpressionStatement [100..131)
+          InvocationExpression [100..129)
+            SimpleMemberAccessExpression [100..126)
+              IdentifierName [100..115)
+                L:WhitespaceTrivia [100..108) '        '
+                IdentifierToken [108..115) 'Console'
+              DotToken [115..116) '.'
+              IdentifierName [116..126)
+                IdentifierToken [116..125) 'WriteLine'
+                T:WhitespaceTrivia [125..126) ' '
+            ArgumentList [126..129)
+              OpenParenToken [126..127) '('
+              Argument [127..128)
+                NumericLiteralExpression [127..128)
+                  NumericLiteralToken [127..128) '5'
+              CloseParenToken [128..129) ')'
+          SemicolonToken [129..130) ';'
+          T:EndOfLineTrivia [130..131) '\n'
+        ReturnStatement [131..149)
+          L:WhitespaceTrivia [131..139) '        '
+          ReturnKeyword [139..145) 'return'
+          T:WhitespaceTrivia [145..146) ' '
+          NumericLiteralExpression [146..147)
+            NumericLiteralToken [146..147) '1'
+          SemicolonToken [147..148) ';'
+          T:EndOfLineTrivia [148..149) '\n'
+        L:WhitespaceTrivia [149..157) '        '
+        CloseBraceToken [157..158) '}'
+        T:EndOfLineTrivia [158..159) '\n'
+    L:WhitespaceTrivia [159..163) '    '
+    CloseBraceToken [163..164) '}'
+    T:EndOfLineTrivia [164..165) '\n'
+  EndOfFileToken [165..165) ''
+Diagnostics:
+  CS1547 [92..96) Keyword \'void\' cannot be used in this context

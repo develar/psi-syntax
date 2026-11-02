@@ -1,0 +1,46 @@
+CompilationUnit [0..100)
+  ClassDeclaration [0..100)
+    StaticKeyword [0..6) 'static'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'C'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    ExtensionBlockDeclaration [17..99)
+      L:WhitespaceTrivia [17..21) '    '
+      ExtensionKeyword [21..30) 'extension'
+      ParameterList [30..41)
+        OpenParenToken [30..31) '('
+        Parameter [31..39)
+          PredefinedType [31..38)
+            ObjectKeyword [31..37) 'object'
+            T:WhitespaceTrivia [37..38) ' '
+          IdentifierToken [38..39) 'o'
+        CloseParenToken [39..40) ')'
+        T:EndOfLineTrivia [40..41) '\n'
+      L:WhitespaceTrivia [41..45) '    '
+      OpenBraceToken [45..46) '{'
+      T:EndOfLineTrivia [46..47) '\n'
+      EventFieldDeclaration [47..93)
+        L:WhitespaceTrivia [47..55) '        '
+        EventKeyword [55..60) 'event'
+        T:WhitespaceTrivia [60..61) ' '
+        VariableDeclaration [61..91)
+          QualifiedName [61..81)
+            IdentifierName [61..67)
+              IdentifierToken [61..67) 'System'
+            DotToken [67..68) '.'
+            IdentifierName [68..81)
+              IdentifierToken [68..80) 'EventHandler'
+              T:WhitespaceTrivia [80..81) ' '
+          VariableDeclarator [81..91)
+            IdentifierToken [81..91) 'eventField'
+        SemicolonToken [91..92) ';'
+        T:EndOfLineTrivia [92..93) '\n'
+      L:WhitespaceTrivia [93..97) '    '
+      CloseBraceToken [97..98) '}'
+      T:EndOfLineTrivia [98..99) '\n'
+    CloseBraceToken [99..100) '}'
+  EndOfFileToken [100..100) ''

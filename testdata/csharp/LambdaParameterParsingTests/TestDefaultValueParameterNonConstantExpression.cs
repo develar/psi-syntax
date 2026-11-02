@@ -1,0 +1,1 @@
+(double d = x + y) => d * 2

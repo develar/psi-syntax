@@ -1,0 +1,44 @@
+CompilationUnit [0..119)
+  NamespaceDeclaration [0..119)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    EnumDeclaration [14..40)
+      L:WhitespaceTrivia [14..18) '    '
+      EnumKeyword [18..22) 'enum'
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..27) 'Type'
+      T:EndOfLineTrivia [27..28) '\n'
+      L:WhitespaceTrivia [28..32) '    '
+      OpenBraceToken [32..33) '{'
+      T:EndOfLineTrivia [33..34) '\n'
+      L:WhitespaceTrivia [34..38) '    '
+      CloseBraceToken [38..39) '}'
+      T:EndOfLineTrivia [39..40) '\n'
+    MethodDeclaration [40..118)
+      L:EndOfLineTrivia [40..41) '\n'
+      L:WhitespaceTrivia [41..45) '    '
+      L:SingleLineCommentTrivia [45..87) '// This should not be sucked into the enum'
+      L:EndOfLineTrivia [87..88) '\n'
+      L:WhitespaceTrivia [88..92) '    '
+      PrivateKeyword [92..99) 'private'
+      T:WhitespaceTrivia [99..100) ' '
+      PredefinedType [100..105)
+        VoidKeyword [100..104) 'void'
+        T:WhitespaceTrivia [104..105) ' '
+      IdentifierToken [105..111) 'Method'
+      ParameterList [111..114)
+        OpenParenToken [111..112) '('
+        CloseParenToken [112..113) ')'
+        T:WhitespaceTrivia [113..114) ' '
+      Block [114..118)
+        OpenBraceToken [114..115) '{'
+        T:WhitespaceTrivia [115..116) ' '
+        CloseBraceToken [116..117) '}'
+        T:EndOfLineTrivia [117..118) '\n'
+    CloseBraceToken [118..119) '}'
+  EndOfFileToken [119..119) ''

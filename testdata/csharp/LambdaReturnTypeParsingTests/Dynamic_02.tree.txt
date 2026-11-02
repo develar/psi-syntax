@@ -1,0 +1,24 @@
+FieldDeclaration [0..35)
+  VariableDeclaration [0..34)
+    IdentifierName [0..9)
+      IdentifierToken [0..8) 'Delegate'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..34)
+      IdentifierToken [9..10) 'd'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..34)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        ParenthesizedLambdaExpression [13..34)
+          IdentifierName [13..21)
+            IdentifierToken [13..20) 'dynamic'
+            T:WhitespaceTrivia [20..21) ' '
+          ParameterList [21..24)
+            OpenParenToken [21..22) '('
+            CloseParenToken [22..23) ')'
+            T:WhitespaceTrivia [23..24) ' '
+          EqualsGreaterThanToken [24..26) '=>'
+          T:WhitespaceTrivia [26..27) ' '
+          DefaultLiteralExpression [27..34)
+            DefaultKeyword [27..34) 'default'
+  SemicolonToken [34..35) ';'

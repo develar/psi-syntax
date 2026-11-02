@@ -1,0 +1,27 @@
+LocalDeclarationStatement [0..39)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  VariableDeclaration [6..38)
+    FunctionPointerType [6..22)
+      DelegateKeyword [6..14) 'delegate'
+      AsteriskToken [14..15) '*'
+      FunctionPointerParameterList [15..22)
+        LessThanToken [15..16) '<'
+        FunctionPointerParameter [16..20)
+          PredefinedType [16..20)
+            VoidKeyword [16..20) 'void'
+        GreaterThanToken [20..21) '>'
+        T:WhitespaceTrivia [21..22) ' '
+    VariableDeclarator [22..38)
+      IdentifierToken [22..25) 'ptr'
+      T:WhitespaceTrivia [25..26) ' '
+      EqualsValueClause [26..38)
+        EqualsToken [26..27) '='
+        T:WhitespaceTrivia [27..28) ' '
+        InvocationExpression [28..38)
+          IdentifierName [28..36)
+            IdentifierToken [28..36) 'MyMethod'
+          ArgumentList [36..38)
+            OpenParenToken [36..37) '('
+            CloseParenToken [37..38) ')'
+  SemicolonToken [38..39) ';'

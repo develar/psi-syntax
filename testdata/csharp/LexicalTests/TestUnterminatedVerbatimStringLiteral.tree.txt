@@ -1,0 +1,4 @@
+StringLiteralToken [0..9) '@"literal'
+EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1039 [0..0) Unterminated string literal

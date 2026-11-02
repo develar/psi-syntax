@@ -1,0 +1,28 @@
+CompilationUnit [0..22)
+  RecordDeclaration [0..22)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    BaseList [9..19)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      PrimaryConstructorBaseType [11..19)
+        IdentifierName [11..12)
+          IdentifierToken [11..12) 'B'
+        ArgumentList [12..19)
+          OpenParenToken [12..13) '('
+          Argument [13..14)
+            IdentifierName [13..14)
+              IdentifierToken [13..14) 'X'
+          CommaToken [14..15) ','
+          T:WhitespaceTrivia [15..16) ' '
+          Argument [16..17)
+            IdentifierName [16..17)
+              IdentifierToken [16..17) 'Y'
+          CloseParenToken [17..18) ')'
+          T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:WhitespaceTrivia [20..21) ' '
+    CloseBraceToken [21..22) '}'
+  EndOfFileToken [22..22) ''

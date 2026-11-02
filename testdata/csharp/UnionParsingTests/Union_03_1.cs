@@ -1,0 +1,4 @@
+union M()
+{
+    return default;
+}

@@ -1,0 +1,100 @@
+CompilationUnit [0..126)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..126)
+    ClassKeyword [14..19) 'class'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..27) 'Program'
+    T:EndOfLineTrivia [27..28) '\n'
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    MethodDeclaration [30..64)
+      L:WhitespaceTrivia [30..34) '    '
+      StaticKeyword [34..40) 'static'
+      T:WhitespaceTrivia [40..41) ' '
+      PredefinedType [41..46)
+        VoidKeyword [41..45) 'void'
+        T:WhitespaceTrivia [45..46) ' '
+      IdentifierToken [46..47) 'F'
+      ParameterList [47..60)
+        OpenParenToken [47..48) '('
+        Parameter [48..58)
+          ArrayType [48..57)
+            IdentifierName [48..54)
+              IdentifierToken [48..54) 'Action'
+            ArrayRankSpecifier [54..57)
+              OpenBracketToken [54..55) '['
+              OmittedArraySizeExpression [55..55)
+                OmittedArraySizeExpressionToken [55..55) ''
+              CloseBracketToken [55..56) ']'
+              T:WhitespaceTrivia [56..57) ' '
+          IdentifierToken [57..58) 'a'
+        CloseParenToken [58..59) ')'
+        T:WhitespaceTrivia [59..60) ' '
+      Block [60..64)
+        OpenBraceToken [60..61) '{'
+        T:WhitespaceTrivia [61..62) ' '
+        CloseBraceToken [62..63) '}'
+        T:EndOfLineTrivia [63..64) '\n'
+    MethodDeclaration [64..125)
+      L:WhitespaceTrivia [64..68) '    '
+      StaticKeyword [68..74) 'static'
+      T:WhitespaceTrivia [74..75) ' '
+      PredefinedType [75..80)
+        VoidKeyword [75..79) 'void'
+        T:WhitespaceTrivia [79..80) ' '
+      IdentifierToken [80..84) 'Main'
+      ParameterList [84..87)
+        OpenParenToken [84..85) '('
+        CloseParenToken [85..86) ')'
+        T:EndOfLineTrivia [86..87) '\n'
+      Block [87..125)
+        L:WhitespaceTrivia [87..91) '    '
+        OpenBraceToken [91..92) '{'
+        T:EndOfLineTrivia [92..93) '\n'
+        ExpressionStatement [93..119)
+          InvocationExpression [93..117)
+            IdentifierName [93..102)
+              L:WhitespaceTrivia [93..101) '        '
+              IdentifierToken [101..102) 'F'
+            ArgumentList [102..117)
+              OpenParenToken [102..103) '('
+              Argument [103..116)
+                CollectionExpression [103..116)
+                  OpenBracketToken [103..104) '['
+                  ExpressionElement [104..106)
+                    IdentifierName [104..106)
+                      IdentifierToken [104..105) 'X'
+                      T:WhitespaceTrivia [105..106) ' '
+                  CommaToken [106..106) missing
+                  ExpressionElement [106..116)
+                    ParenthesizedLambdaExpression [106..116)
+                      IdentifierName [106..108)
+                        IdentifierToken [106..107) 'Y'
+                        T:WhitespaceTrivia [107..108) ' '
+                      ParameterList [108..111)
+                        OpenParenToken [108..109) '('
+                        CloseParenToken [109..110) ')'
+                        T:WhitespaceTrivia [110..111) ' '
+                      EqualsGreaterThanToken [111..113) '=>'
+                      T:WhitespaceTrivia [113..114) ' '
+                      Block [114..116)
+                        OpenBraceToken [114..115) '{'
+                        CloseBraceToken [115..116) '}'
+                  CloseBracketToken [116..116) missing
+              CloseParenToken [116..117) ')'
+          SemicolonToken [117..118) ';'
+          T:EndOfLineTrivia [118..119) '\n'
+        L:WhitespaceTrivia [119..123) '    '
+        CloseBraceToken [123..124) '}'
+        T:EndOfLineTrivia [124..125) '\n'
+    CloseBraceToken [125..126) '}'
+  EndOfFileToken [126..126) ''
+Diagnostics:
+  CS1003 [106..107) Syntax error, \',\' expected
+  CS1003 [116..117) Syntax error, \']\' expected

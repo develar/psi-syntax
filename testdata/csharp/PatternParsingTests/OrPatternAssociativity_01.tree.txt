@@ -1,0 +1,31 @@
+ExpressionStatement [0..21)
+  SimpleAssignmentExpression [0..20)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    IsPatternExpression [4..20)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      IsKeyword [6..8) 'is'
+      T:WhitespaceTrivia [8..9) ' '
+      OrPattern [9..20)
+        OrPattern [9..16)
+          ConstantPattern [9..11)
+            IdentifierName [9..11)
+              IdentifierToken [9..10) 'A'
+              T:WhitespaceTrivia [10..11) ' '
+          OrKeyword [11..13) 'or'
+          T:WhitespaceTrivia [13..14) ' '
+          ConstantPattern [14..16)
+            IdentifierName [14..16)
+              IdentifierToken [14..15) 'B'
+              T:WhitespaceTrivia [15..16) ' '
+        OrKeyword [16..18) 'or'
+        T:WhitespaceTrivia [18..19) ' '
+        ConstantPattern [19..20)
+          IdentifierName [19..20)
+            IdentifierToken [19..20) 'C'
+  SemicolonToken [20..21) ';'

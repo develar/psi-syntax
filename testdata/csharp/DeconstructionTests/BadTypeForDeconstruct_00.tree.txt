@@ -1,0 +1,21 @@
+ExpressionStatement [0..15)
+  SimpleAssignmentExpression [0..14)
+    DeclarationExpression [0..11)
+      IdentifierName [0..4)
+        IdentifierToken [0..3) 'var'
+        T:WhitespaceTrivia [3..4) ' '
+      ParenthesizedVariableDesignation [4..11)
+        OpenParenToken [4..5) '('
+        SingleVariableDesignation [5..6)
+          IdentifierToken [5..6) 'x'
+        CommaToken [6..7) ','
+        T:WhitespaceTrivia [7..8) ' '
+        SingleVariableDesignation [8..9)
+          IdentifierToken [8..9) 'y'
+        CloseParenToken [9..10) ')'
+        T:WhitespaceTrivia [10..11) ' '
+    EqualsToken [11..12) '='
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierName [13..14)
+      IdentifierToken [13..14) 'e'
+  SemicolonToken [14..15) ';'

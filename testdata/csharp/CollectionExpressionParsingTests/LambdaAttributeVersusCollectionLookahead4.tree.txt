@@ -1,0 +1,42 @@
+ParenthesizedLambdaExpression [0..26)
+  AttributeList [0..3)
+    OpenBracketToken [0..1) '['
+    Attribute [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+  AttributeList [3..7)
+    OpenBracketToken [3..4) '['
+    Attribute [4..5)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'B'
+    CloseBracketToken [5..6) ']'
+    T:WhitespaceTrivia [6..7) ' '
+  NullableType [7..15)
+    TupleType [7..13)
+      OpenParenToken [7..8) '('
+      TupleElement [8..9)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'C'
+      CommaToken [9..10) ','
+      T:WhitespaceTrivia [10..11) ' '
+      TupleElement [11..12)
+        IdentifierName [11..12)
+          IdentifierToken [11..12) 'D'
+      CloseParenToken [12..13) ')'
+    QuestionToken [13..14) '?'
+    T:WhitespaceTrivia [14..15) ' '
+  ParameterList [15..22)
+    OpenParenToken [15..16) '('
+    Parameter [16..17)
+      IdentifierToken [16..17) 'e'
+    CommaToken [17..18) ','
+    T:WhitespaceTrivia [18..19) ' '
+    Parameter [19..20)
+      IdentifierToken [19..20) 'f'
+    CloseParenToken [20..21) ')'
+    T:WhitespaceTrivia [21..22) ' '
+  EqualsGreaterThanToken [22..24) '=>'
+  T:WhitespaceTrivia [24..25) ' '
+  IdentifierName [25..26)
+    IdentifierToken [25..26) 'g'

@@ -1,0 +1,8 @@
+OpenBraceToken [0..1) '{'
+T:EndOfLineTrivia [1..3) '\r\n'
+L:WhitespaceTrivia [3..4) ' '
+EqualsEqualsToken [4..6) '=='
+EqualsEqualsToken [6..8) '=='
+EqualsEqualsToken [8..10) '=='
+EqualsToken [10..11) '='
+EndOfFileToken [11..11) ''

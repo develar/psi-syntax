@@ -1,0 +1,25 @@
+CompilationUnit [0..36)
+  L:IfDirectiveTrivia [0..10)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    FalseLiteralExpression [4..9)
+      FalseKeyword [4..9) 'false'
+    EndOfDirectiveToken [9..9) ''
+    T:EndOfLineTrivia [9..10) '\n'
+  L:NullableDirectiveTrivia [10..29)
+    HashToken [10..11) '#'
+    NullableKeyword [11..19) 'nullable'
+    T:WhitespaceTrivia [19..20) ' '
+    DisableKeyword [20..20) missing
+    WarningsKeyword [20..20) missing
+    L:SkippedTokensTrivia [20..28)
+      IdentifierToken [20..28) 'disabled'
+    EndOfDirectiveToken [28..28) ''
+    T:EndOfLineTrivia [28..29) '\n'
+  L:EndIfDirectiveTrivia [29..36)
+    HashToken [29..30) '#'
+    EndIfKeyword [30..35) 'endif'
+    EndOfDirectiveToken [35..35) ''
+    T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''

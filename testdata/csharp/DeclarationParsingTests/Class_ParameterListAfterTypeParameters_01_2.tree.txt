@@ -1,0 +1,16 @@
+CompilationUnit [0..15)
+  StructDeclaration [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    TypeParameterList [9..12)
+      LessThanToken [9..10) '<'
+      TypeParameter [10..11)
+        IdentifierToken [10..11) 'T'
+      GreaterThanToken [11..12) '>'
+    ParameterList [12..14)
+      OpenParenToken [12..13) '('
+      CloseParenToken [13..14) ')'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

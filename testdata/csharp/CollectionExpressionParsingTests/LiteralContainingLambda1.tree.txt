@@ -1,0 +1,26 @@
+SimpleAssignmentExpression [0..21)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) '_'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsToken [2..3) '='
+  T:WhitespaceTrivia [3..4) ' '
+  CollectionExpression [4..21)
+    OpenBracketToken [4..5) '['
+    ExpressionElement [5..9)
+      IdentifierName [5..9)
+        IdentifierToken [5..9) 'Main'
+    CommaToken [9..10) ','
+    T:WhitespaceTrivia [10..11) ' '
+    ExpressionElement [11..20)
+      ParenthesizedLambdaExpression [11..20)
+        ParameterList [11..14)
+          OpenParenToken [11..12) '('
+          CloseParenToken [12..13) ')'
+          T:WhitespaceTrivia [13..14) ' '
+        EqualsGreaterThanToken [14..16) '=>'
+        T:WhitespaceTrivia [16..17) ' '
+        Block [17..20)
+          OpenBraceToken [17..18) '{'
+          T:WhitespaceTrivia [18..19) ' '
+          CloseBraceToken [19..20) '}'
+    CloseBracketToken [20..21) ']'

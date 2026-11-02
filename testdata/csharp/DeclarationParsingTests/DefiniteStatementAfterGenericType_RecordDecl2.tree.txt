@@ -1,0 +1,23 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    LocalDeclarationStatement [0..27)
+      VariableDeclaration [0..27)
+        GenericName [0..11)
+          IdentifierToken [0..4) 'List'
+          TypeArgumentList [4..11)
+            LessThanToken [4..5) '<'
+            IdentifierName [5..9)
+              IdentifierToken [5..9) 'Type'
+            GreaterThanToken [9..10) '>'
+            T:EndOfLineTrivia [10..11) '\n'
+        VariableDeclarator [11..27)
+          L:EndOfLineTrivia [11..12) '\n'
+          IdentifierToken [12..18) 'record'
+          T:WhitespaceTrivia [18..19) ' '
+          T:SkippedTokensTrivia [19..27)
+            IdentifierToken [19..27) 'TypeName'
+      SemicolonToken [27..27) missing
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1003 [19..27) Syntax error, \',\' expected
+  CS1002 [27..27) ; expected

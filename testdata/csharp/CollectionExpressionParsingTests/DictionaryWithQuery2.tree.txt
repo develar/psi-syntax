@@ -1,0 +1,32 @@
+CollectionExpression [0..26)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..5)
+    IdentifierName [1..5)
+      IdentifierToken [1..2) 'a'
+      T:WhitespaceTrivia [2..3) ' '
+      T:SkippedTokensTrivia [3..4)
+        ColonToken [3..4) ':'
+      T:WhitespaceTrivia [4..5) ' '
+  CommaToken [5..5) missing
+  ExpressionElement [5..25)
+    QueryExpression [5..25)
+      FromClause [5..17)
+        FromKeyword [5..9) 'from'
+        T:WhitespaceTrivia [9..10) ' '
+        IdentifierToken [10..11) 'x'
+        T:WhitespaceTrivia [11..12) ' '
+        InKeyword [12..14) 'in'
+        T:WhitespaceTrivia [14..15) ' '
+        IdentifierName [15..17)
+          IdentifierToken [15..16) 'y'
+          T:WhitespaceTrivia [16..17) ' '
+      QueryBody [17..25)
+        SelectClause [17..25)
+          SelectKeyword [17..23) 'select'
+          T:WhitespaceTrivia [23..24) ' '
+          IdentifierName [24..25)
+            IdentifierToken [24..25) 'x'
+  CloseBracketToken [25..26) ']'
+Diagnostics:
+  CS1003 [3..4) Syntax error, \',\' expected
+  CS1003 [5..9) Syntax error, \',\' expected

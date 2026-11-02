@@ -1,0 +1,23 @@
+CompilationUnit [0..8)
+  L:LineSpanDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..8)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..8) '1'
+      CommaToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CloseParenToken [8..8) missing
+    MinusToken [8..8) missing
+    LineDirectivePosition [8..8)
+      OpenParenToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CommaToken [8..8) missing
+      NumericLiteralToken [8..8) missing
+      CloseParenToken [8..8) missing
+    StringLiteralToken [8..8) missing
+    EndOfDirectiveToken [8..8) ''
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1003 [8..8) Syntax error, \',\' expected

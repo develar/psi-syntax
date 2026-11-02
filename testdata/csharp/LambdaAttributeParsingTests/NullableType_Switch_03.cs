@@ -1,0 +1,1 @@
+x switch { string? [A] y => y }

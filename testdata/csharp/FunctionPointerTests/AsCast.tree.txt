@@ -1,0 +1,28 @@
+AsExpression [0..46)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'ptr'
+    T:WhitespaceTrivia [3..4) ' '
+  AsKeyword [4..6) 'as'
+  T:WhitespaceTrivia [6..7) ' '
+  FunctionPointerType [7..46)
+    DelegateKeyword [7..15) 'delegate'
+    AsteriskToken [15..16) '*'
+    T:WhitespaceTrivia [16..17) ' '
+    FunctionPointerCallingConvention [17..35)
+      UnmanagedKeyword [17..26) 'unmanaged'
+      FunctionPointerUnmanagedCallingConventionList [26..35)
+        OpenBracketToken [26..27) '['
+        FunctionPointerUnmanagedCallingConvention [27..34)
+          IdentifierToken [27..34) 'stdcall'
+        CloseBracketToken [34..35) ']'
+    FunctionPointerParameterList [35..46)
+      LessThanToken [35..36) '<'
+      FunctionPointerParameter [36..39)
+        PredefinedType [36..39)
+          IntKeyword [36..39) 'int'
+      CommaToken [39..40) ','
+      T:WhitespaceTrivia [40..41) ' '
+      FunctionPointerParameter [41..45)
+        PredefinedType [41..45)
+          VoidKeyword [41..45) 'void'
+      GreaterThanToken [45..46) '>'

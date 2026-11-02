@@ -1,0 +1,2 @@
+IdentifierToken [0..4) 'Æsh'
+EndOfFileToken [4..4) ''

@@ -1,0 +1,3 @@
+
+void goo() { }
+using Goo;

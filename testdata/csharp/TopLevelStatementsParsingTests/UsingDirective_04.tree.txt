@@ -1,0 +1,12 @@
+CompilationUnit [0..14)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    QualifiedName [6..13)
+      IdentifierName [6..8)
+        IdentifierToken [6..8) 'ns'
+      DotToken [8..9) '.'
+      IdentifierName [9..13)
+        IdentifierToken [9..13) 'type'
+    SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

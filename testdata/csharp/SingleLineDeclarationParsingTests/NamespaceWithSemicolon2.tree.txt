@@ -1,0 +1,14 @@
+CompilationUnit [0..13)
+  FileScopedNamespaceDeclaration [0..13)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    QualifiedName [10..12)
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'A'
+      DotToken [11..12) '.'
+      IdentifierName [12..12)
+        IdentifierToken [12..12) missing
+    SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS1001 [12..13) Identifier expected

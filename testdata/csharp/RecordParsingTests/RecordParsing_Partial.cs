@@ -1,0 +1,1 @@
+partial record S;

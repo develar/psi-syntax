@@ -1,0 +1,30 @@
+ConditionalExpression [0..16)
+  ArrayCreationExpression [0..15)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayType [4..15)
+      PredefinedType [4..10)
+        ObjectKeyword [4..10) 'object'
+      ArrayRankSpecifier [10..13)
+        OpenBracketToken [10..11) '['
+        OmittedArraySizeExpression [11..11)
+          OmittedArraySizeExpressionToken [11..11) ''
+        CommaToken [11..12) ','
+        OmittedArraySizeExpression [12..12)
+          OmittedArraySizeExpressionToken [12..12) ''
+        CloseBracketToken [12..13) ']'
+      ArrayRankSpecifier [13..15)
+        OpenBracketToken [13..14) '['
+        OmittedArraySizeExpression [14..14)
+          OmittedArraySizeExpressionToken [14..14) ''
+        CloseBracketToken [14..15) ']'
+  QuestionToken [15..16) '?'
+  IdentifierName [16..16)
+    IdentifierToken [16..16) missing
+  ColonToken [16..16) missing
+  IdentifierName [16..16)
+    IdentifierToken [16..16) missing
+Diagnostics:
+  CS1733 [16..16) Expected expression
+  CS1003 [16..16) Syntax error, \':\' expected
+  CS1733 [16..16) Expected expression

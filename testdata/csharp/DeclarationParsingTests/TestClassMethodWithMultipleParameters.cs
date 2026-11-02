@@ -1,0 +1,1 @@
+class a { b X(c d, e f) { } }

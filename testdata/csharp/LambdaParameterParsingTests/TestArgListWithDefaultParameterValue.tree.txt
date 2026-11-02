@@ -1,0 +1,22 @@
+ParenthesizedExpression [0..25)
+  OpenParenToken [0..1) '('
+  SimpleAssignmentExpression [1..17)
+    ArgListExpression [1..11)
+      ArgListKeyword [1..10) '__arglist'
+      T:WhitespaceTrivia [10..11) ' '
+    EqualsToken [11..12) '='
+    T:WhitespaceTrivia [12..13) ' '
+    NullLiteralExpression [13..17)
+      NullKeyword [13..17) 'null'
+  CloseParenToken [17..18) ')'
+  T:WhitespaceTrivia [18..19) ' '
+  T:SkippedTokensTrivia [19..21)
+    EqualsGreaterThanToken [19..21) '=>'
+  T:WhitespaceTrivia [21..22) ' '
+  T:SkippedTokensTrivia [22..23)
+    OpenBraceToken [22..23) '{'
+  T:WhitespaceTrivia [23..24) ' '
+  T:SkippedTokensTrivia [24..25)
+    CloseBraceToken [24..25) '}'
+Diagnostics:
+  CS1073 [0..18) Unexpected token \'=>\'

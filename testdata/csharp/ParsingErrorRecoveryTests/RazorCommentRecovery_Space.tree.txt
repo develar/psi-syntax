@@ -1,0 +1,22 @@
+CompilationUnit [0..6)
+  GlobalStatement [0..6)
+    ExpressionStatement [0..6)
+      PointerIndirectionExpression [0..5)
+        L:SkippedTokensTrivia [0..1)
+          BadToken [0..1) '@'
+        L:WhitespaceTrivia [1..2) ' '
+        AsteriskToken [2..3) '*'
+        T:WhitespaceTrivia [3..4) ' '
+        PointerIndirectionExpression [4..5)
+          AsteriskToken [4..5) '*'
+          IdentifierName [5..5)
+            IdentifierToken [5..5) missing
+      SemicolonToken [5..5) missing
+      T:SkippedTokensTrivia [5..6)
+        BadToken [5..6) '@'
+  EndOfFileToken [6..6) ''
+Diagnostics:
+  CS1646 [0..0) Keyword, identifier, or string expected after verbatim specifier: @
+  CS1525 [5..6) Invalid expression term \'\'
+  CS1002 [5..6) ; expected
+  CS1646 [5..5) Keyword, identifier, or string expected after verbatim specifier: @

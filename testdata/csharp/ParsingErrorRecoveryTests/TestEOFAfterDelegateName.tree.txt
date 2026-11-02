@@ -1,0 +1,17 @@
+CompilationUnit [0..15)
+  DelegateDeclaration [0..15)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..14)
+      VoidKeyword [9..13) 'void'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'd'
+    ParameterList [15..15)
+      OpenParenToken [15..15) missing
+      CloseParenToken [15..15) missing
+    SemicolonToken [15..15) missing
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1003 [15..15) Syntax error, \'(\' expected
+  CS1026 [15..15) ) expected
+  CS1002 [15..15) ; expected

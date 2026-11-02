@@ -1,0 +1,1 @@
+C operator checked true(C x) => x;

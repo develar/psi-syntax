@@ -1,0 +1,76 @@
+SwitchStatement [0..103)
+  L:EndOfLineTrivia [0..1) '\n'
+  SwitchKeyword [1..7) 'switch'
+  T:WhitespaceTrivia [7..8) ' '
+  OpenParenToken [8..9) '('
+  IdentifierName [9..10)
+    IdentifierToken [9..10) 'o'
+  CloseParenToken [10..11) ')'
+  T:EndOfLineTrivia [11..12) '\n'
+  OpenBraceToken [12..13) '{'
+  T:EndOfLineTrivia [13..14) '\n'
+  SwitchSection [14..102)
+    CasePatternSwitchLabel [14..46)
+      L:WhitespaceTrivia [14..18) '    '
+      CaseKeyword [18..22) 'case'
+      T:WhitespaceTrivia [22..23) ' '
+      RecursivePattern [23..44)
+        FunctionPointerType [23..39)
+          DelegateKeyword [23..31) 'delegate'
+          AsteriskToken [31..32) '*'
+          FunctionPointerParameterList [32..39)
+            LessThanToken [32..33) '<'
+            FunctionPointerParameter [33..37)
+              PredefinedType [33..37)
+                VoidKeyword [33..37) 'void'
+            GreaterThanToken [37..38) '>'
+            T:WhitespaceTrivia [38..39) ' '
+        PropertyPatternClause [39..43)
+          OpenBraceToken [39..40) '{'
+          T:WhitespaceTrivia [40..41) ' '
+          CloseBraceToken [41..42) '}'
+          T:WhitespaceTrivia [42..43) ' '
+        DiscardDesignation [43..44)
+          UnderscoreToken [43..44) '_'
+      ColonToken [44..45) ':'
+      T:EndOfLineTrivia [45..46) '\n'
+    CasePatternSwitchLabel [46..87)
+      L:WhitespaceTrivia [46..50) '    '
+      CaseKeyword [50..54) 'case'
+      T:WhitespaceTrivia [54..55) ' '
+      RecursivePattern [55..85)
+        FunctionPointerType [55..71)
+          DelegateKeyword [55..63) 'delegate'
+          AsteriskToken [63..64) '*'
+          FunctionPointerParameterList [64..71)
+            LessThanToken [64..65) '<'
+            FunctionPointerParameter [65..69)
+              PredefinedType [65..69)
+                VoidKeyword [65..69) 'void'
+            GreaterThanToken [69..70) '>'
+            T:WhitespaceTrivia [70..71) ' '
+        PositionalPatternClause [71..85)
+          OpenParenToken [71..72) '('
+          Subpattern [72..77)
+            VarPattern [72..77)
+              VarKeyword [72..75) 'var'
+              T:WhitespaceTrivia [75..76) ' '
+              SingleVariableDesignation [76..77)
+                IdentifierToken [76..77) 'x'
+          CommaToken [77..78) ','
+          T:WhitespaceTrivia [78..79) ' '
+          Subpattern [79..84)
+            VarPattern [79..84)
+              VarKeyword [79..82) 'var'
+              T:WhitespaceTrivia [82..83) ' '
+              SingleVariableDesignation [83..84)
+                IdentifierToken [83..84) 'y'
+          CloseParenToken [84..85) ')'
+      ColonToken [85..86) ':'
+      T:EndOfLineTrivia [86..87) '\n'
+    BreakStatement [87..102)
+      L:WhitespaceTrivia [87..95) '        '
+      BreakKeyword [95..100) 'break'
+      SemicolonToken [100..101) ';'
+      T:EndOfLineTrivia [101..102) '\n'
+  CloseBraceToken [102..103) '}'

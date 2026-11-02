@@ -1,0 +1,48 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..30)
+    ExpressionStatement [0..30)
+      ElementAccessExpression [0..29)
+        InvocationExpression [0..26)
+          ElementAccessExpression [0..23)
+            CollectionExpression [0..10)
+              OpenBracketToken [0..1) '['
+              ExpressionElement [1..9)
+                ParenthesizedLambdaExpression [1..9)
+                  ParameterList [1..4)
+                    OpenParenToken [1..2) '('
+                    CloseParenToken [2..3) ')'
+                    T:WhitespaceTrivia [3..4) ' '
+                  EqualsGreaterThanToken [4..6) '=>'
+                  T:WhitespaceTrivia [6..7) ' '
+                  Block [7..9)
+                    OpenBraceToken [7..8) '{'
+                    CloseBraceToken [8..9) '}'
+              CloseBracketToken [9..10) ']'
+            BracketedArgumentList [10..23)
+              OpenBracketToken [10..11) '['
+              Argument [11..22)
+                InvocationExpression [11..22)
+                  SimpleMemberAccessExpression [11..20)
+                    IdentifierName [11..15)
+                      IdentifierToken [11..15) 'rand'
+                    DotToken [15..16) '.'
+                    IdentifierName [16..20)
+                      IdentifierToken [16..20) 'Next'
+                  ArgumentList [20..22)
+                    OpenParenToken [20..21) '('
+                    CloseParenToken [21..22) ')'
+              CloseBracketToken [22..23) ']'
+          ArgumentList [23..26)
+            OpenParenToken [23..24) '('
+            Argument [24..25)
+              IdentifierName [24..25)
+                IdentifierToken [24..25) 'A'
+            CloseParenToken [25..26) ')'
+        BracketedArgumentList [26..29)
+          OpenBracketToken [26..27) '['
+          Argument [27..28)
+            NumericLiteralExpression [27..28)
+              NumericLiteralToken [27..28) '0'
+          CloseBracketToken [28..29) ']'
+      SemicolonToken [29..30) ';'
+  EndOfFileToken [30..30) ''

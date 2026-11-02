@@ -1,0 +1,1 @@
+foreach (int _ in e) {}

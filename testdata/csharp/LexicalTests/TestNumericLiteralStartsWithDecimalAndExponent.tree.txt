@@ -1,0 +1,2 @@
+NumericLiteralToken [0..7) '.456e10'
+EndOfFileToken [7..7) ''

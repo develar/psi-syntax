@@ -1,0 +1,2 @@
+NumericLiteralToken [0..4) '.456'
+EndOfFileToken [4..4) ''

@@ -1,0 +1,50 @@
+CompilationUnit [0..57)
+  ClassDeclaration [0..57)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    PropertyDeclaration [10..56)
+      PredefinedType [10..21)
+        L:WhitespaceTrivia [10..14) '    '
+        ObjectKeyword [14..20) 'object'
+        T:WhitespaceTrivia [20..21) ' '
+      ExplicitInterfaceSpecifier [21..31)
+        GenericName [21..30)
+          IdentifierToken [21..22) 'I'
+          TypeArgumentList [22..30)
+            LessThanToken [22..23) '<'
+            PredefinedType [23..29)
+              ObjectKeyword [23..29) 'object'
+            GreaterThanToken [29..30) '>'
+        DotToken [30..31) '.'
+      IdentifierToken [31..32) 'P'
+      T:WhitespaceTrivia [32..33) ' '
+      AccessorList [33..56)
+        OpenBraceToken [33..34) '{'
+        T:WhitespaceTrivia [34..35) ' '
+        SetAccessorDeclaration [35..54)
+          SetKeyword [35..38) 'set'
+          T:WhitespaceTrivia [38..39) ' '
+          Block [39..54)
+            OpenBraceToken [39..40) '{'
+            T:WhitespaceTrivia [40..41) ' '
+            ExpressionStatement [41..52)
+              SimpleAssignmentExpression [41..50)
+                IdentifierName [41..47)
+                  IdentifierToken [41..46) 'field'
+                  T:WhitespaceTrivia [46..47) ' '
+                EqualsToken [47..48) '='
+                T:WhitespaceTrivia [48..49) ' '
+                NumericLiteralExpression [49..50)
+                  NumericLiteralToken [49..50) '0'
+              SemicolonToken [50..51) ';'
+              T:WhitespaceTrivia [51..52) ' '
+            CloseBraceToken [52..53) '}'
+            T:WhitespaceTrivia [53..54) ' '
+        CloseBraceToken [54..55) '}'
+        T:EndOfLineTrivia [55..56) '\n'
+    CloseBraceToken [56..57) '}'
+  EndOfFileToken [57..57) ''

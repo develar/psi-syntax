@@ -1,0 +1,21 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    LocalFunctionStatement [0..21)
+      L:EndOfLineTrivia [0..1) '\n'
+      StaticKeyword [1..7) 'static'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierName [8..14)
+        IdentifierToken [8..14) 'Script'
+      IdentifierToken [14..14) missing
+      ParameterList [14..17)
+        OpenParenToken [14..15) '('
+        CloseParenToken [15..16) ')'
+        T:WhitespaceTrivia [16..17) ' '
+      Block [17..21)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        CloseBraceToken [19..20) '}'
+        T:EndOfLineTrivia [20..21) '\n'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1001 [14..15) Identifier expected

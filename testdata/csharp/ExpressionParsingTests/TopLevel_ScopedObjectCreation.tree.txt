@@ -1,0 +1,13 @@
+CompilationUnit [0..13)
+  GlobalStatement [0..13)
+    ExpressionStatement [0..13)
+      ObjectCreationExpression [0..12)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        IdentifierName [4..10)
+          IdentifierToken [4..10) 'scoped'
+        ArgumentList [10..12)
+          OpenParenToken [10..11) '('
+          CloseParenToken [11..12) ')'
+      SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''

@@ -1,0 +1,1 @@
+new partial partial Goo();

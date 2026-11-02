@@ -1,0 +1,64 @@
+CompilationUnit [0..117)
+  ClassDeclaration [0..117)
+    StaticKeyword [0..6) 'static'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'C'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    ExtensionBlockDeclaration [17..116)
+      L:WhitespaceTrivia [17..21) '    '
+      ExtensionKeyword [21..30) 'extension'
+      ParameterList [30..41)
+        OpenParenToken [30..31) '('
+        Parameter [31..39)
+          PredefinedType [31..38)
+            ObjectKeyword [31..37) 'object'
+            T:WhitespaceTrivia [37..38) ' '
+          IdentifierToken [38..39) 'o'
+        CloseParenToken [39..40) ')'
+        T:EndOfLineTrivia [40..41) '\n'
+      L:WhitespaceTrivia [41..45) '    '
+      OpenBraceToken [45..46) '{'
+      T:EndOfLineTrivia [46..47) '\n'
+      EventDeclaration [47..110)
+        L:WhitespaceTrivia [47..55) '        '
+        EventKeyword [55..60) 'event'
+        T:WhitespaceTrivia [60..61) ' '
+        QualifiedName [61..81)
+          IdentifierName [61..67)
+            IdentifierToken [61..67) 'System'
+          DotToken [67..68) '.'
+          IdentifierName [68..81)
+            IdentifierToken [68..80) 'EventHandler'
+            T:WhitespaceTrivia [80..81) ' '
+        IdentifierToken [81..86) 'Event'
+        T:WhitespaceTrivia [86..87) ' '
+        AccessorList [87..110)
+          OpenBraceToken [87..88) '{'
+          T:WhitespaceTrivia [88..89) ' '
+          AddAccessorDeclaration [89..97)
+            AddKeyword [89..92) 'add'
+            T:WhitespaceTrivia [92..93) ' '
+            Block [93..97)
+              OpenBraceToken [93..94) '{'
+              T:WhitespaceTrivia [94..95) ' '
+              CloseBraceToken [95..96) '}'
+              T:WhitespaceTrivia [96..97) ' '
+          RemoveAccessorDeclaration [97..108)
+            RemoveKeyword [97..103) 'remove'
+            T:WhitespaceTrivia [103..104) ' '
+            Block [104..108)
+              OpenBraceToken [104..105) '{'
+              T:WhitespaceTrivia [105..106) ' '
+              CloseBraceToken [106..107) '}'
+              T:WhitespaceTrivia [107..108) ' '
+          CloseBraceToken [108..109) '}'
+          T:EndOfLineTrivia [109..110) '\n'
+      L:WhitespaceTrivia [110..114) '    '
+      CloseBraceToken [114..115) '}'
+      T:EndOfLineTrivia [115..116) '\n'
+    CloseBraceToken [116..117) '}'
+  EndOfFileToken [117..117) ''

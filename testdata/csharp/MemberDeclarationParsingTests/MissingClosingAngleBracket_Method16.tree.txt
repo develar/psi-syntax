@@ -1,0 +1,50 @@
+IncompleteMember [0..80)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..80)
+    IdentifierToken [7..18) 'IEnumerable'
+    TypeArgumentList [18..80)
+      LessThanToken [18..19) '<'
+      TupleType [19..54)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      CommaToken [54..54) missing
+      QualifiedName [54..71)
+        AliasQualifiedName [54..58)
+          IdentifierName [54..55)
+            IdentifierToken [54..55) 'A'
+          ColonColonToken [55..57) '::'
+          IdentifierName [57..58)
+            IdentifierToken [57..58) 'B'
+        DotToken [58..59) '.'
+        IdentifierName [59..71)
+          IdentifierToken [59..71) 'GetAllValues'
+      GreaterThanToken [71..71) missing
+      T:SkippedTokensTrivia [71..72)
+        OpenParenToken [71..72) '('
+      T:SkippedTokensTrivia [72..76)
+        IdentifierToken [72..76) 'Type'
+      T:WhitespaceTrivia [76..77) ' '
+      T:SkippedTokensTrivia [77..78)
+        IdentifierToken [77..78) 't'
+      T:SkippedTokensTrivia [78..79)
+        CloseParenToken [78..79) ')'
+      T:SkippedTokensTrivia [79..80)
+        SemicolonToken [79..80) ';'
+Diagnostics:
+  CS1073 [0..71) Unexpected token \'(\'
+  CS1003 [54..55) Syntax error, \',\' expected
+  CS1003 [71..72) Syntax error, \'>\' expected

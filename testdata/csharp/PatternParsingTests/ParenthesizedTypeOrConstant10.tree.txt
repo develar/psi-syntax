@@ -1,0 +1,31 @@
+SwitchExpression [0..54)
+  IdentifierName [0..5)
+    IdentifierToken [0..4) 'reqs'
+    T:WhitespaceTrivia [4..5) ' '
+  SwitchKeyword [5..11) 'switch'
+  T:EndOfLineTrivia [11..12) '\n'
+  OpenBraceToken [12..13) '{'
+  T:EndOfLineTrivia [13..14) '\n'
+  SwitchExpressionArm [14..51)
+    ParenthesizedPattern [14..44)
+      L:WhitespaceTrivia [14..18) '    '
+      OpenParenToken [18..19) '('
+      DeclarationPattern [19..42)
+        QualifiedName [19..38)
+          IdentifierName [19..29)
+            IdentifierToken [19..29) 'CustomEnum'
+          DotToken [29..30) '.'
+          IdentifierName [30..38)
+            IdentifierToken [30..37) 'EnumTwo'
+            T:WhitespaceTrivia [37..38) ' '
+        SingleVariableDesignation [38..42)
+          IdentifierToken [38..42) 'when'
+      CloseParenToken [42..43) ')'
+      T:WhitespaceTrivia [43..44) ' '
+    EqualsGreaterThanToken [44..46) '=>'
+    T:WhitespaceTrivia [46..47) ' '
+    StringLiteralExpression [47..51)
+      StringLiteralToken [47..51) '"ok"'
+  CommaToken [51..52) ','
+  T:EndOfLineTrivia [52..53) '\n'
+  CloseBraceToken [53..54) '}'

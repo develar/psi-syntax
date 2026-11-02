@@ -1,0 +1,19 @@
+IncompleteMember [0..17)
+  ExternKeyword [0..6) 'extern'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierName [7..17)
+    IdentifierToken [7..11) 'safe'
+    T:WhitespaceTrivia [11..12) ' '
+    T:SkippedTokensTrivia [12..13)
+      TildeToken [12..13) '~'
+    T:SkippedTokensTrivia [13..14)
+      IdentifierToken [13..14) 'C'
+    T:SkippedTokensTrivia [14..15)
+      OpenParenToken [14..15) '('
+    T:SkippedTokensTrivia [15..16)
+      CloseParenToken [15..16) ')'
+    T:SkippedTokensTrivia [16..17)
+      SemicolonToken [16..17) ';'
+Diagnostics:
+  CS1519 [12..13) Invalid token \'~\' in a member declaration
+  CS1073 [0..11) Unexpected token \'~\'

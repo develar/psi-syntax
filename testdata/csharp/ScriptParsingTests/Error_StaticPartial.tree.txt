@@ -1,0 +1,23 @@
+CompilationUnit [0..33)
+  IncompleteMember [0..5)
+    PredefinedType [0..5)
+      L:EndOfLineTrivia [0..1) '\n'
+      IntKeyword [1..4) 'int'
+      T:EndOfLineTrivia [4..5) '\n'
+  ClassDeclaration [5..33)
+    L:EndOfLineTrivia [5..6) '\n'
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    PartialKeyword [13..20) 'partial'
+    T:WhitespaceTrivia [20..21) ' '
+    ClassKeyword [21..26) 'class'
+    T:WhitespaceTrivia [26..27) ' '
+    IdentifierToken [27..28) 'C'
+    T:WhitespaceTrivia [28..29) ' '
+    OpenBraceToken [29..30) '{'
+    T:WhitespaceTrivia [30..31) ' '
+    CloseBraceToken [31..32) '}'
+    T:EndOfLineTrivia [32..33) '\n'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1585 [6..12) Member modifier \'static\' must precede the member type and name

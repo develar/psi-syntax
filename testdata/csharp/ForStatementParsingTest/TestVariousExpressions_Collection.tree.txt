@@ -1,0 +1,18 @@
+ForStatement [0..15)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  CollectionExpression [5..7)
+    OpenBracketToken [5..6) '['
+    CloseBracketToken [6..7) ']'
+  SemicolonToken [7..8) ';'
+  CollectionExpression [8..10)
+    OpenBracketToken [8..9) '['
+    CloseBracketToken [9..10) ']'
+  SemicolonToken [10..11) ';'
+  CollectionExpression [11..13)
+    OpenBracketToken [11..12) '['
+    CloseBracketToken [12..13) ']'
+  CloseParenToken [13..14) ')'
+  EmptyStatement [14..15)
+    SemicolonToken [14..15) ';'

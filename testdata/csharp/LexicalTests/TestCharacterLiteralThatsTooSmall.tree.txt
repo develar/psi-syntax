@@ -1,0 +1,4 @@
+CharacterLiteralToken [0..2) '\'\''
+EndOfFileToken [2..2) ''
+Diagnostics:
+  CS1011 [0..0) Empty character literal

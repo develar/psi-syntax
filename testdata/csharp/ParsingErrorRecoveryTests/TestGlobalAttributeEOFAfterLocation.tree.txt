@@ -1,0 +1,15 @@
+CompilationUnit [0..11)
+  AttributeList [0..11)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..11)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+    Attribute [11..11)
+      IdentifierName [11..11)
+        IdentifierToken [11..11) missing
+    CloseBracketToken [11..11) missing
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1001 [11..11) Identifier expected
+  CS1003 [11..11) Syntax error, \']\' expected

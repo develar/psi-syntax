@@ -1,0 +1,2 @@
+IdentifierName [0..3)
+  IdentifierToken [0..3) 'goo'

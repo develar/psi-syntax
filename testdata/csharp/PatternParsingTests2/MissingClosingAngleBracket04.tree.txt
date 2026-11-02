@@ -1,0 +1,34 @@
+LessThanExpression [0..41)
+  IsPatternExpression [0..37)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'e'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    AndPattern [5..37)
+      NotPattern [5..18)
+        NotKeyword [5..8) 'not'
+        T:WhitespaceTrivia [8..9) ' '
+        TypePattern [9..18)
+          GenericName [9..18)
+            IdentifierToken [9..13) 'List'
+            TypeArgumentList [13..18)
+              LessThanToken [13..14) '<'
+              PredefinedType [14..18)
+                IntKeyword [14..17) 'int'
+                T:WhitespaceTrivia [17..18) ' '
+              GreaterThanToken [18..18) missing
+      AndKeyword [18..21) 'and'
+      T:WhitespaceTrivia [21..22) ' '
+      NotPattern [22..37)
+        NotKeyword [22..25) 'not'
+        T:WhitespaceTrivia [25..26) ' '
+        ConstantPattern [26..37)
+          IdentifierName [26..37)
+            IdentifierToken [26..37) 'IEnumerable'
+  LessThanToken [37..38) '<'
+  PredefinedType [38..41)
+    IntKeyword [38..41) 'int'
+Diagnostics:
+  CS1003 [18..21) Syntax error, \'>\' expected
+  CS1525 [38..41) Invalid expression term \'int\'

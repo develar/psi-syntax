@@ -1,0 +1,15 @@
+CompilationUnit [0..15)
+  EnumDeclaration [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    EnumKeyword [1..5) 'enum'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    BaseList [8..14)
+      ColonToken [8..9) ':'
+      T:WhitespaceTrivia [9..10) ' '
+      SimpleBaseType [10..14)
+        IdentifierName [10..14)
+          IdentifierToken [10..14) 'Base'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

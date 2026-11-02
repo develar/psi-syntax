@@ -1,0 +1,28 @@
+CompilationUnit [0..71)
+  L:MultiLineCommentTrivia [0..13) '/* comment */'
+  L:WhitespaceTrivia [13..14) ' '
+  L:SkippedTokensTrivia [14..24)
+    BadToken [14..24) '#error E1\n'
+  L:MultiLineCommentTrivia [24..37) '/* comment */'
+  L:WhitespaceTrivia [37..38) ' '
+  L:SkippedTokensTrivia [38..50)
+    BadToken [38..50) '#warning W1\n'
+  L:ErrorDirectiveTrivia [50..60)
+    HashToken [50..51) '#'
+    ErrorKeyword [51..56) 'error'
+    T:WhitespaceTrivia [56..57) ' '
+    L:PreprocessingMessageTrivia [57..59) 'E2'
+    EndOfDirectiveToken [59..59) ''
+    T:EndOfLineTrivia [59..60) '\n'
+  L:WarningDirectiveTrivia [60..71)
+    HashToken [60..61) '#'
+    WarningKeyword [61..68) 'warning'
+    T:WhitespaceTrivia [68..69) ' '
+    L:PreprocessingMessageTrivia [69..71) 'W2'
+    EndOfDirectiveToken [71..71) ''
+  EndOfFileToken [71..71) ''
+Diagnostics:
+  CS1040 [14..15) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1040 [38..39) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1029 [57..59) #error: \'E2\'
+  CS1030 [69..71) #warning: \'W2\'

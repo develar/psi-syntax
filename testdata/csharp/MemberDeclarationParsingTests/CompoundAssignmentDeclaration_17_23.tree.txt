@@ -1,0 +1,19 @@
+OperatorDeclaration [0..21)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  CaretEqualsToken [11..13) '^='
+  ParameterList [13..16)
+    OpenParenToken [13..14) '('
+    CloseParenToken [14..15) ')'
+    T:WhitespaceTrivia [15..16) ' '
+  ArrowExpressionClause [16..20)
+    EqualsGreaterThanToken [16..18) '=>'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..20)
+      IdentifierToken [19..20) 'x'
+  SemicolonToken [20..21) ';'
+Diagnostics:
+  CS9313 [11..13) Overloaded compound assignment operator \'^=\' takes one parameter

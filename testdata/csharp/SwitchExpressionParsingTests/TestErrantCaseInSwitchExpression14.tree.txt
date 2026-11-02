@@ -1,0 +1,69 @@
+CompilationUnit [0..102)
+  ClassDeclaration [0..102)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..101)
+      L:WhitespaceTrivia [10..14) '    '
+      PublicKeyword [14..20) 'public'
+      T:WhitespaceTrivia [20..21) ' '
+      StaticKeyword [21..27) 'static'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..32)
+        IntKeyword [28..31) 'int'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'X'
+      ParameterList [33..36)
+        OpenParenToken [33..34) '('
+        CloseParenToken [34..35) ')'
+        T:EndOfLineTrivia [35..36) '\n'
+      ArrowExpressionClause [36..99)
+        L:WhitespaceTrivia [36..44) '        '
+        EqualsGreaterThanToken [44..46) '=>'
+        T:WhitespaceTrivia [46..47) ' '
+        SwitchExpression [47..99)
+          NumericLiteralExpression [47..49)
+            NumericLiteralToken [47..48) '5'
+            T:WhitespaceTrivia [48..49) ' '
+          SwitchKeyword [49..55) 'switch'
+          T:EndOfLineTrivia [55..56) '\n'
+          L:WhitespaceTrivia [56..64) '        '
+          OpenBraceToken [64..65) '{'
+          T:EndOfLineTrivia [65..66) '\n'
+          SwitchExpressionArm [66..83)
+            ConstantPattern [66..83)
+              IdentifierName [66..83)
+                L:WhitespaceTrivia [66..78) '            '
+                IdentifierToken [78..82) 'when'
+                T:WhitespaceTrivia [82..83) ' '
+            EqualsGreaterThanToken [83..83) missing
+            IdentifierName [83..83)
+              IdentifierToken [83..83) missing
+          CommaToken [83..83) missing
+          SwitchExpressionArm [83..90)
+            ConstantPattern [83..90)
+              NumericLiteralExpression [83..90)
+                L:SkippedTokensTrivia [83..87)
+                  CaseKeyword [83..87) 'case'
+                L:WhitespaceTrivia [87..88) ' '
+                NumericLiteralToken [88..89) '0'
+                T:EndOfLineTrivia [89..90) '\n'
+            EqualsGreaterThanToken [90..90) missing
+            IdentifierName [90..90)
+              IdentifierToken [90..90) missing
+          L:WhitespaceTrivia [90..98) '        '
+          CloseBraceToken [98..99) '}'
+      SemicolonToken [99..100) ';'
+      T:EndOfLineTrivia [100..101) '\n'
+    CloseBraceToken [101..102) '}'
+  EndOfFileToken [102..102) ''
+Diagnostics:
+  CS1003 [83..87) Syntax error, \'=>\' expected
+  CS1525 [83..87) Invalid expression term \'case\'
+  CS1003 [83..87) Syntax error, \',\' expected
+  CS9134 [83..87) A switch expression arm does not begin with a \'case\' keyword.
+  CS1003 [89..89) Syntax error, \'=>\' expected
+  CS1525 [89..89) Invalid expression term \'}\'

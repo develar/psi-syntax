@@ -1,0 +1,42 @@
+InterpolatedStringExpression [0..85)
+  InterpolatedStringStartToken [0..2) '$"'
+  InterpolatedStringText [2..12)
+    InterpolatedStringTextToken [2..12) 'Text with '
+  Interpolation [12..52)
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ElementAccessExpression [14..51)
+      ImplicitArrayCreationExpression [14..47)
+        L:WhitespaceTrivia [14..18) '    '
+        NewKeyword [18..21) 'new'
+        OpenBracketToken [21..22) '['
+        CloseBracketToken [22..23) ']'
+        T:WhitespaceTrivia [23..24) ' '
+        ArrayInitializerExpression [24..47)
+          OpenBraceToken [24..25) '{'
+          T:EndOfLineTrivia [25..26) '\n'
+          NumericLiteralExpression [26..35)
+            L:WhitespaceTrivia [26..34) '        '
+            NumericLiteralToken [34..35) '1'
+          CommaToken [35..36) ','
+          T:WhitespaceTrivia [36..37) ' '
+          NumericLiteralExpression [37..38)
+            NumericLiteralToken [37..38) '2'
+          CommaToken [38..39) ','
+          T:WhitespaceTrivia [39..40) ' '
+          NumericLiteralExpression [40..42)
+            NumericLiteralToken [40..41) '3'
+            T:EndOfLineTrivia [41..42) '\n'
+          L:WhitespaceTrivia [42..46) '    '
+          CloseBraceToken [46..47) '}'
+      BracketedArgumentList [47..51)
+        OpenBracketToken [47..48) '['
+        Argument [48..49)
+          NumericLiteralExpression [48..49)
+            NumericLiteralToken [48..49) '2'
+        CloseBracketToken [49..50) ']'
+        T:EndOfLineTrivia [50..51) '\n'
+    CloseBraceToken [51..52) '}'
+  InterpolatedStringText [52..84)
+    InterpolatedStringTextToken [52..84) ' parts and new line expressions!'
+  InterpolatedStringEndToken [84..85) '"'

@@ -1,0 +1,77 @@
+CompilationUnit [0..76)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..76)
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    ClassKeyword [22..27) 'class'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierToken [28..29) 'A'
+    T:EndOfLineTrivia [29..30) '\n'
+    OpenBraceToken [30..31) '{'
+    T:EndOfLineTrivia [31..32) '\n'
+    OperatorDeclaration [32..71)
+      L:WhitespaceTrivia [32..33) ' '
+      PublicKeyword [33..39) 'public'
+      T:WhitespaceTrivia [39..40) ' '
+      StaticKeyword [40..46) 'static'
+      T:WhitespaceTrivia [46..47) ' '
+      IdentifierName [47..47)
+        IdentifierToken [47..47) missing
+      OperatorKeyword [47..55) 'operator'
+      T:WhitespaceTrivia [55..56) ' '
+      PlusPlusToken [56..58) '++'
+      T:WhitespaceTrivia [58..59) ' '
+      ParameterList [59..71)
+        OpenParenToken [59..59) missing
+        Parameter [59..60)
+          IdentifierName [59..60)
+            IdentifierToken [59..60) 'A'
+          IdentifierToken [60..60) missing
+        CommaToken [60..60) missing
+        Parameter [60..71)
+          TupleType [60..68)
+            OpenParenToken [60..61) '('
+            TupleElement [61..66)
+              PredefinedType [61..65)
+                IntKeyword [61..64) 'int'
+                T:WhitespaceTrivia [64..65) ' '
+              IdentifierToken [65..66) 'i'
+            CommaToken [66..66) missing
+            TupleElement [66..66)
+              IdentifierName [66..66)
+                IdentifierToken [66..66) missing
+            CloseParenToken [66..67) ')'
+            T:EndOfLineTrivia [67..68) '\n'
+          IdentifierToken [68..68) missing
+          T:WhitespaceTrivia [68..69) ' '
+          T:SkippedTokensTrivia [69..70)
+            OpenBraceToken [69..70) '{'
+          T:EndOfLineTrivia [70..71) '\n'
+        CloseParenToken [71..71) missing
+      SemicolonToken [71..71) missing
+    L:WhitespaceTrivia [71..72) ' '
+    CloseBraceToken [72..73) '}'
+    T:EndOfLineTrivia [73..74) '\n'
+    T:SkippedTokensTrivia [74..75)
+      CloseBraceToken [74..75) '}'
+    T:EndOfLineTrivia [75..76) '\n'
+  EndOfFileToken [76..76) ''
+Diagnostics:
+  CS1031 [47..55) Type expected
+  CS1020 [56..58) Overloadable binary operator expected
+  CS1003 [59..60) Syntax error, \'(\' expected
+  CS1001 [60..61) Identifier expected
+  CS1003 [60..61) Syntax error, \',\' expected
+  CS8124 [66..67) Tuple must contain at least two elements.
+  CS1001 [67..67) Identifier expected
+  CS1003 [67..67) Syntax error, \',\' expected
+  CS1026 [70..70) ) expected
+  CS1002 [70..70) ; expected
+  CS1022 [74..75) Type or namespace definition, or end-of-file expected

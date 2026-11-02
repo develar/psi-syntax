@@ -1,0 +1,16 @@
+CompilationUnit [0..24)
+  ClassDeclaration [0..24)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+    T:WhitespaceTrivia [12..13) ' '
+    T:SkippedTokensTrivia [13..24)
+      BadToken [13..24) '#undef XXX\n'
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1040 [13..14) Preprocessor directives must appear as the first non-whitespace character on a line

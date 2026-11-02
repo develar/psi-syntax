@@ -1,0 +1,140 @@
+CompilationUnit [0..241)
+  StructDeclaration [0..40)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'file'
+    T:WhitespaceTrivia [18..19) ' '
+    OpenBraceToken [19..20) '{'
+    T:WhitespaceTrivia [20..21) ' '
+    FieldDeclaration [21..38)
+      PublicKeyword [21..27) 'public'
+      T:WhitespaceTrivia [27..28) ' '
+      VariableDeclaration [28..36)
+        PredefinedType [28..32)
+          IntKeyword [28..31) 'int'
+          T:WhitespaceTrivia [31..32) ' '
+        VariableDeclarator [32..36)
+          IdentifierToken [32..36) 'item'
+      SemicolonToken [36..37) ';'
+      T:WhitespaceTrivia [37..38) ' '
+    CloseBraceToken [38..39) '}'
+    T:EndOfLineTrivia [39..40) '\n'
+  ClassDeclaration [40..241)
+    L:EndOfLineTrivia [40..41) '\n'
+    PublicKeyword [41..47) 'public'
+    T:WhitespaceTrivia [47..48) ' '
+    UnsafeKeyword [48..54) 'unsafe'
+    T:WhitespaceTrivia [54..55) ' '
+    ClassKeyword [55..60) 'class'
+    T:WhitespaceTrivia [60..61) ' '
+    IdentifierToken [61..62) 'C'
+    T:EndOfLineTrivia [62..63) '\n'
+    OpenBraceToken [63..64) '{'
+    T:EndOfLineTrivia [64..65) '\n'
+    FieldDeclaration [65..88)
+      L:WhitespaceTrivia [65..69) '    '
+      PublicKeyword [69..75) 'public'
+      T:WhitespaceTrivia [75..76) ' '
+      VariableDeclaration [76..86)
+        IdentifierName [76..81)
+          IdentifierToken [76..80) 'file'
+          T:WhitespaceTrivia [80..81) ' '
+        VariableDeclarator [81..86)
+          IdentifierToken [81..86) '_file'
+      SemicolonToken [86..87) ';'
+      T:EndOfLineTrivia [87..88) '\n'
+    FieldDeclaration [88..114)
+      L:WhitespaceTrivia [88..92) '    '
+      PublicKeyword [92..98) 'public'
+      T:WhitespaceTrivia [98..99) ' '
+      VariableDeclaration [99..112)
+        ArrayType [99..106)
+          IdentifierName [99..103)
+            IdentifierToken [99..103) 'file'
+          ArrayRankSpecifier [103..106)
+            OpenBracketToken [103..104) '['
+            OmittedArraySizeExpression [104..104)
+              OmittedArraySizeExpressionToken [104..104) ''
+            CloseBracketToken [104..105) ']'
+            T:WhitespaceTrivia [105..106) ' '
+        VariableDeclarator [106..112)
+          IdentifierToken [106..112) '_array'
+      SemicolonToken [112..113) ';'
+      T:EndOfLineTrivia [113..114) '\n'
+    FieldDeclaration [114..137)
+      L:WhitespaceTrivia [114..118) '    '
+      PublicKeyword [118..124) 'public'
+      T:WhitespaceTrivia [124..125) ' '
+      VariableDeclaration [125..135)
+        PointerType [125..131)
+          IdentifierName [125..129)
+            IdentifierToken [125..129) 'file'
+          AsteriskToken [129..130) '*'
+          T:WhitespaceTrivia [130..131) ' '
+        VariableDeclarator [131..135)
+          IdentifierToken [131..135) '_ptr'
+      SemicolonToken [135..136) ';'
+      T:EndOfLineTrivia [136..137) '\n'
+    FieldDeclaration [137..165)
+      L:WhitespaceTrivia [137..141) '    '
+      PublicKeyword [141..147) 'public'
+      T:WhitespaceTrivia [147..148) ' '
+      VariableDeclaration [148..163)
+        NullableType [148..154)
+          IdentifierName [148..152)
+            IdentifierToken [148..152) 'file'
+          QuestionToken [152..153) '?'
+          T:WhitespaceTrivia [153..154) ' '
+        VariableDeclarator [154..163)
+          IdentifierToken [154..163) '_nullable'
+      SemicolonToken [163..164) ';'
+      T:EndOfLineTrivia [164..165) '\n'
+    FieldDeclaration [165..208)
+      L:WhitespaceTrivia [165..169) '    '
+      PublicKeyword [169..175) 'public'
+      T:WhitespaceTrivia [175..176) ' '
+      VariableDeclaration [176..206)
+        FunctionPointerType [176..198)
+          DelegateKeyword [176..184) 'delegate'
+          AsteriskToken [184..185) '*'
+          FunctionPointerParameterList [185..198)
+            LessThanToken [185..186) '<'
+            FunctionPointerParameter [186..190)
+              IdentifierName [186..190)
+                IdentifierToken [186..190) 'file'
+            CommaToken [190..191) ','
+            T:WhitespaceTrivia [191..192) ' '
+            FunctionPointerParameter [192..196)
+              IdentifierName [192..196)
+                IdentifierToken [192..196) 'file'
+            GreaterThanToken [196..197) '>'
+            T:WhitespaceTrivia [197..198) ' '
+        VariableDeclarator [198..206)
+          IdentifierToken [198..206) '_funcPtr'
+      SemicolonToken [206..207) ';'
+      T:EndOfLineTrivia [207..208) '\n'
+    FieldDeclaration [208..240)
+      L:WhitespaceTrivia [208..212) '    '
+      PublicKeyword [212..218) 'public'
+      T:WhitespaceTrivia [218..219) ' '
+      VariableDeclaration [219..238)
+        TupleType [219..232)
+          OpenParenToken [219..220) '('
+          TupleElement [220..224)
+            IdentifierName [220..224)
+              IdentifierToken [220..224) 'file'
+          CommaToken [224..225) ','
+          T:WhitespaceTrivia [225..226) ' '
+          TupleElement [226..230)
+            IdentifierName [226..230)
+              IdentifierToken [226..230) 'file'
+          CloseParenToken [230..231) ')'
+          T:WhitespaceTrivia [231..232) ' '
+        VariableDeclarator [232..238)
+          IdentifierToken [232..238) '_tuple'
+      SemicolonToken [238..239) ';'
+      T:EndOfLineTrivia [239..240) '\n'
+    CloseBraceToken [240..241) '}'
+  EndOfFileToken [241..241) ''

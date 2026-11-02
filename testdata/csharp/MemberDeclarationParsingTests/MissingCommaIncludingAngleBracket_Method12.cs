@@ -1,0 +1,1 @@
+static IDictionary<(string Value, string Description) void*> GetAllValues(Type t);

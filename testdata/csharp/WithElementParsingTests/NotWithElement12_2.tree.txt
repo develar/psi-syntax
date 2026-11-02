@@ -1,0 +1,14 @@
+CollectionExpression [0..14)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..13)
+    RangeExpression [1..13)
+      IdentifierName [1..5)
+        IdentifierToken [1..5) 'with'
+      DotDotToken [5..7) '..'
+      InvocationExpression [7..13)
+        IdentifierName [7..11)
+          IdentifierToken [7..11) 'with'
+        ArgumentList [11..13)
+          OpenParenToken [11..12) '('
+          CloseParenToken [12..13) ')'
+  CloseBracketToken [13..14) ']'

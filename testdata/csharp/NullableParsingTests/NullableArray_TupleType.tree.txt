@@ -1,0 +1,33 @@
+LocalDeclarationStatement [0..20)
+  VariableDeclaration [0..19)
+    TupleType [0..18)
+      OpenParenToken [0..1) '('
+      TupleElement [1..10)
+        NullableType [1..10)
+          ArrayType [1..9)
+            PredefinedType [1..7)
+              ObjectKeyword [1..7) 'object'
+            ArrayRankSpecifier [7..9)
+              OpenBracketToken [7..8) '['
+              OmittedArraySizeExpression [8..8)
+                OmittedArraySizeExpressionToken [8..8) ''
+              CloseBracketToken [8..9) ']'
+          QuestionToken [9..10) '?'
+      CommaToken [10..11) ','
+      T:WhitespaceTrivia [11..12) ' '
+      TupleElement [12..16)
+        NullableType [12..16)
+          ArrayType [12..15)
+            IdentifierName [12..13)
+              IdentifierToken [12..13) 'A'
+            ArrayRankSpecifier [13..15)
+              OpenBracketToken [13..14) '['
+              OmittedArraySizeExpression [14..14)
+                OmittedArraySizeExpressionToken [14..14) ''
+              CloseBracketToken [14..15) ']'
+          QuestionToken [15..16) '?'
+      CloseParenToken [16..17) ')'
+      T:WhitespaceTrivia [17..18) ' '
+    VariableDeclarator [18..19)
+      IdentifierToken [18..19) 't'
+  SemicolonToken [19..20) ';'

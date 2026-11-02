@@ -1,0 +1,38 @@
+SwitchStatement [0..54)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..53)
+    CasePatternSwitchLabel [15..27)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      ListPattern [24..25)
+        OpenBracketToken [24..25) '['
+        CloseBracketToken [25..25) missing
+      ColonToken [25..26) ':'
+      T:EndOfLineTrivia [26..27) '\n'
+    CasePatternSwitchLabel [27..39)
+      L:WhitespaceTrivia [27..31) '    '
+      CaseKeyword [31..35) 'case'
+      T:WhitespaceTrivia [35..36) ' '
+      ListPattern [36..37)
+        OpenBracketToken [36..37) '['
+        CloseBracketToken [37..37) missing
+      ColonToken [37..38) ':'
+      T:EndOfLineTrivia [38..39) '\n'
+    BreakStatement [39..53)
+      L:WhitespaceTrivia [39..46) '       '
+      BreakKeyword [46..51) 'break'
+      SemicolonToken [51..52) ';'
+      T:EndOfLineTrivia [52..53) '\n'
+  CloseBraceToken [53..54) '}'
+Diagnostics:
+  CS1003 [25..26) Syntax error, \']\' expected
+  CS1003 [37..38) Syntax error, \']\' expected

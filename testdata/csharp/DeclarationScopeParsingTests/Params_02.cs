@@ -1,0 +1,1 @@
+void F(params scoped object[] args);

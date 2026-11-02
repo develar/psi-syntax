@@ -1,0 +1,9 @@
+CompilationUnit [0..15)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..14)
+      IdentifierToken [7..14) 'dynamic'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

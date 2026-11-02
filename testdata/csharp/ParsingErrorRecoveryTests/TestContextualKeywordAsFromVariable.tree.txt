@@ -1,0 +1,66 @@
+CompilationUnit [0..69)
+  ClassDeclaration [0..69)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    T:EndOfLineTrivia [9..10) '\n'
+    OpenBraceToken [10..11) '{'
+    T:WhitespaceTrivia [11..12) ' '
+    T:EndOfLineTrivia [12..13) '\n'
+    FieldDeclaration [13..68)
+      VariableDeclaration [13..66)
+        PredefinedType [13..21)
+          L:WhitespaceTrivia [13..17) '    '
+          IntKeyword [17..20) 'int'
+          T:WhitespaceTrivia [20..21) ' '
+        VariableDeclarator [21..66)
+          IdentifierToken [21..22) 'x'
+          T:WhitespaceTrivia [22..23) ' '
+          EqualsValueClause [23..66)
+            EqualsToken [23..24) '='
+            T:WhitespaceTrivia [24..25) ' '
+            QueryExpression [25..66)
+              FromClause [25..58)
+                FromKeyword [25..29) 'from'
+                T:WhitespaceTrivia [29..30) ' '
+                IdentifierToken [30..30) missing
+                T:SkippedTokensTrivia [30..36)
+                  IdentifierToken [30..36) 'equals'
+                T:WhitespaceTrivia [36..37) ' '
+                InKeyword [37..39) 'in'
+                T:WhitespaceTrivia [39..40) ' '
+                ImplicitArrayCreationExpression [40..58)
+                  NewKeyword [40..43) 'new'
+                  OpenBracketToken [43..44) '['
+                  CloseBracketToken [44..45) ']'
+                  T:WhitespaceTrivia [45..46) ' '
+                  ArrayInitializerExpression [46..58)
+                    OpenBraceToken [46..47) '{'
+                    T:WhitespaceTrivia [47..48) ' '
+                    NumericLiteralExpression [48..49)
+                      NumericLiteralToken [48..49) '1'
+                    CommaToken [49..50) ','
+                    T:WhitespaceTrivia [50..51) ' '
+                    NumericLiteralExpression [51..52)
+                      NumericLiteralToken [51..52) '2'
+                    CommaToken [52..53) ','
+                    T:WhitespaceTrivia [53..54) ' '
+                    NumericLiteralExpression [54..56)
+                      NumericLiteralToken [54..55) '3'
+                      T:WhitespaceTrivia [55..56) ' '
+                    CloseBraceToken [56..57) '}'
+                    T:WhitespaceTrivia [57..58) ' '
+              QueryBody [58..66)
+                SelectClause [58..66)
+                  SelectKeyword [58..64) 'select'
+                  T:WhitespaceTrivia [64..65) ' '
+                  NumericLiteralExpression [65..66)
+                    NumericLiteralToken [65..66) '1'
+      SemicolonToken [66..67) ';'
+      T:EndOfLineTrivia [67..68) '\n'
+    CloseBraceToken [68..69) '}'
+  EndOfFileToken [69..69) ''
+Diagnostics:
+  CS1001 [30..36) Identifier expected

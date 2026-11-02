@@ -1,0 +1,5 @@
+ImplicitObjectCreationExpression [0..5)
+  NewKeyword [0..3) 'new'
+  ArgumentList [3..5)
+    OpenParenToken [3..4) '('
+    CloseParenToken [4..5) ')'

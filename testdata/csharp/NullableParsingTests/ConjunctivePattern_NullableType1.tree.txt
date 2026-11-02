@@ -1,0 +1,20 @@
+IsPatternExpression [0..18)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  AndPattern [5..18)
+    TypePattern [5..11)
+      NullableType [5..11)
+        IdentifierName [5..9)
+          IdentifierToken [5..9) 'Type'
+        QuestionToken [9..10) '?'
+        T:WhitespaceTrivia [10..11) ' '
+    AndKeyword [11..14) 'and'
+    T:WhitespaceTrivia [14..15) ' '
+    RecursivePattern [15..18)
+      PropertyPatternClause [15..18)
+        OpenBraceToken [15..16) '{'
+        T:WhitespaceTrivia [16..17) ' '
+        CloseBraceToken [17..18) '}'

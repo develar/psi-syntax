@@ -1,0 +1,15 @@
+RangeExpression [0..15)
+  NumericLiteralExpression [0..1)
+    NumericLiteralToken [0..1) '1'
+  DotDotToken [1..3) '..'
+  T:WhitespaceTrivia [3..4) ' '
+  T:SkippedTokensTrivia [4..5)
+    DotToken [4..5) '.'
+  T:SkippedTokensTrivia [5..13)
+    IdentifierToken [5..13) 'ToString'
+  T:SkippedTokensTrivia [13..14)
+    OpenParenToken [13..14) '('
+  T:SkippedTokensTrivia [14..15)
+    CloseParenToken [14..15) ')'
+Diagnostics:
+  CS1073 [0..3) Unexpected token \'.\'

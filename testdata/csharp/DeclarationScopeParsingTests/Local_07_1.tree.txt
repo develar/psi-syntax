@@ -1,0 +1,49 @@
+CompilationUnit [0..68)
+  GlobalStatement [0..17)
+    LocalDeclarationStatement [0..17)
+      VariableDeclaration [0..15)
+        ScopedType [0..14)
+          ScopedKeyword [0..6) 'scoped'
+          T:WhitespaceTrivia [6..7) ' '
+          IdentifierName [7..14)
+            IdentifierToken [7..13) 'scoped'
+            T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..15)
+          IdentifierToken [14..15) 'a'
+      SemicolonToken [15..16) ';'
+      T:EndOfLineTrivia [16..17) '\n'
+  GlobalStatement [17..38)
+    LocalDeclarationStatement [17..38)
+      VariableDeclaration [17..36)
+        ScopedType [17..35)
+          ScopedKeyword [17..23) 'scoped'
+          T:WhitespaceTrivia [23..24) ' '
+          RefType [24..35)
+            RefKeyword [24..27) 'ref'
+            T:WhitespaceTrivia [27..28) ' '
+            IdentifierName [28..35)
+              IdentifierToken [28..34) 'scoped'
+              T:WhitespaceTrivia [34..35) ' '
+        VariableDeclarator [35..36)
+          IdentifierToken [35..36) 'b'
+      SemicolonToken [36..37) ';'
+      T:EndOfLineTrivia [37..38) '\n'
+  GlobalStatement [38..68)
+    LocalDeclarationStatement [38..68)
+      VariableDeclaration [38..66)
+        ScopedType [38..65)
+          ScopedKeyword [38..44) 'scoped'
+          T:WhitespaceTrivia [44..45) ' '
+          RefType [45..65)
+            RefKeyword [45..48) 'ref'
+            T:WhitespaceTrivia [48..49) ' '
+            ReadOnlyKeyword [49..57) 'readonly'
+            T:WhitespaceTrivia [57..58) ' '
+            IdentifierName [58..65)
+              IdentifierToken [58..64) 'scoped'
+              T:WhitespaceTrivia [64..65) ' '
+        VariableDeclarator [65..66)
+          IdentifierToken [65..66) 'c'
+      SemicolonToken [66..67) ';'
+      T:EndOfLineTrivia [67..68) '\n'
+  EndOfFileToken [68..68) ''

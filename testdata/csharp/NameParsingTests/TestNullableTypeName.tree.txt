@@ -1,0 +1,4 @@
+NullableType [0..4)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  QuestionToken [3..4) '?'

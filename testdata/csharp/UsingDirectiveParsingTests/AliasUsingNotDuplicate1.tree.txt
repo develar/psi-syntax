@@ -1,0 +1,36 @@
+CompilationUnit [0..43)
+  UsingDirective [0..16)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'X'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    NullableType [10..14)
+      PredefinedType [10..13)
+        IntKeyword [10..13) 'int'
+      QuestionToken [13..14) '?'
+    SemicolonToken [14..15) ';'
+    T:EndOfLineTrivia [15..16) '\n'
+  FileScopedNamespaceDeclaration [16..43)
+    NamespaceKeyword [16..25) 'namespace'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierName [26..27)
+      IdentifierToken [26..27) 'N'
+    SemicolonToken [27..28) ';'
+    T:EndOfLineTrivia [28..29) '\n'
+    UsingDirective [29..43)
+      UsingKeyword [29..34) 'using'
+      T:WhitespaceTrivia [34..35) ' '
+      NameEquals [35..39)
+        IdentifierName [35..37)
+          IdentifierToken [35..36) 'X'
+          T:WhitespaceTrivia [36..37) ' '
+        EqualsToken [37..38) '='
+        T:WhitespaceTrivia [38..39) ' '
+      PredefinedType [39..42)
+        IntKeyword [39..42) 'int'
+      SemicolonToken [42..43) ';'
+  EndOfFileToken [43..43) ''

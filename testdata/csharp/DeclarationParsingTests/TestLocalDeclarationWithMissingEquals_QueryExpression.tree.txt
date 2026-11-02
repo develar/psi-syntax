@@ -1,0 +1,33 @@
+LocalDeclarationStatement [0..29)
+  VariableDeclaration [0..28)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'C'
+      T:WhitespaceTrivia [1..2) ' '
+    VariableDeclarator [2..28)
+      IdentifierToken [2..3) 'x'
+      T:WhitespaceTrivia [3..4) ' '
+      EqualsValueClause [4..28)
+        EqualsToken [4..4) missing
+        QueryExpression [4..28)
+          FromClause [4..20)
+            FromKeyword [4..8) 'from'
+            T:WhitespaceTrivia [8..9) ' '
+            PredefinedType [9..13)
+              IntKeyword [9..12) 'int'
+              T:WhitespaceTrivia [12..13) ' '
+            IdentifierToken [13..14) 'x'
+            T:WhitespaceTrivia [14..15) ' '
+            InKeyword [15..17) 'in'
+            T:WhitespaceTrivia [17..18) ' '
+            IdentifierName [18..20)
+              IdentifierToken [18..19) 'y'
+              T:WhitespaceTrivia [19..20) ' '
+          QueryBody [20..28)
+            SelectClause [20..28)
+              SelectKeyword [20..26) 'select'
+              T:WhitespaceTrivia [26..27) ' '
+              IdentifierName [27..28)
+                IdentifierToken [27..28) 'x'
+  SemicolonToken [28..29) ';'
+Diagnostics:
+  CS1003 [4..8) Syntax error, \'=\' expected

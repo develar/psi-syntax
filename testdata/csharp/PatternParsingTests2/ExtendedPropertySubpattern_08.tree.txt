@@ -1,0 +1,30 @@
+IsPatternExpression [0..17)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..17)
+    PropertyPatternClause [5..17)
+      OpenBraceToken [5..6) '{'
+      T:WhitespaceTrivia [6..7) ' '
+      Subpattern [7..14)
+        NotPattern [7..14)
+          NotKeyword [7..10) 'not'
+          T:WhitespaceTrivia [10..11) ' '
+          ConstantPattern [11..14)
+            IdentifierName [11..14)
+              IdentifierToken [11..12) 'a'
+              T:SkippedTokensTrivia [12..13)
+                ColonToken [12..13) ':'
+              T:WhitespaceTrivia [13..14) ' '
+      CommaToken [14..14) missing
+      Subpattern [14..16)
+        ConstantPattern [14..16)
+          IdentifierName [14..16)
+            IdentifierToken [14..15) 'p'
+            T:WhitespaceTrivia [15..16) ' '
+      CloseBraceToken [16..17) '}'
+Diagnostics:
+  CS1003 [12..13) Syntax error, \',\' expected
+  CS1003 [14..15) Syntax error, \',\' expected

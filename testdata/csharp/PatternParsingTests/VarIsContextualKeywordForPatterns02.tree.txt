@@ -1,0 +1,17 @@
+IfStatement [0..16)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IsExpression [4..12)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'e'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..12)
+      IdentifierToken [9..12) 'var'
+  CloseParenToken [12..13) ')'
+  T:WhitespaceTrivia [13..14) ' '
+  Block [14..16)
+    OpenBraceToken [14..15) '{'
+    CloseBraceToken [15..16) '}'

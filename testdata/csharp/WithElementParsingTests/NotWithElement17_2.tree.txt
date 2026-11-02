@@ -1,0 +1,20 @@
+SimpleLambdaExpression [0..21)
+  AttributeList [0..9)
+    OpenBracketToken [0..1) '['
+    Attribute [1..7)
+      IdentifierName [1..5)
+        IdentifierToken [1..5) 'with'
+      AttributeArgumentList [5..7)
+        OpenParenToken [5..6) '('
+        CloseParenToken [6..7) ')'
+    CloseBracketToken [7..8) ']'
+    T:WhitespaceTrivia [8..9) ' '
+  AsyncKeyword [9..14) 'async'
+  T:WhitespaceTrivia [14..15) ' '
+  Parameter [15..17)
+    IdentifierToken [15..16) 'a'
+    T:WhitespaceTrivia [16..17) ' '
+  EqualsGreaterThanToken [17..19) '=>'
+  T:WhitespaceTrivia [19..20) ' '
+  IdentifierName [20..21)
+    IdentifierToken [20..21) 'b'

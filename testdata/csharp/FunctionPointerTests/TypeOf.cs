@@ -1,0 +1,1 @@
+typeof(delegate* unmanaged[cdecl]<ref int, readonly ref D>)

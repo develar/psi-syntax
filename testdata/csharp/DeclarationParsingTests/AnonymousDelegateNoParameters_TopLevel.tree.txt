@@ -1,0 +1,12 @@
+CompilationUnit [0..13)
+  GlobalStatement [0..13)
+    ExpressionStatement [0..13)
+      AnonymousMethodExpression [0..12)
+        DelegateKeyword [0..8) 'delegate'
+        T:WhitespaceTrivia [8..9) ' '
+        Block [9..12)
+          OpenBraceToken [9..10) '{'
+          T:WhitespaceTrivia [10..11) ' '
+          CloseBraceToken [11..12) '}'
+      SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''

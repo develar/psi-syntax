@@ -1,0 +1,10 @@
+CompilationUnit [0..19)
+  FileScopedNamespaceDeclaration [0..19)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    NamespaceKeyword [7..16) 'namespace'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..18)
+      IdentifierToken [17..18) 'A'
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''

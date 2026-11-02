@@ -1,0 +1,21 @@
+SwitchStatement [0..17)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..17)
+    CaseSwitchLabel [13..17)
+      CaseKeyword [13..17) 'case'
+      IdentifierName [17..17)
+        IdentifierToken [17..17) missing
+      ColonToken [17..17) missing
+  CloseBraceToken [17..17) missing
+Diagnostics:
+  CS1733 [17..17) Expected expression
+  CS1003 [17..17) Syntax error, \':\' expected
+  CS1513 [17..17) } expected

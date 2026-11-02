@@ -1,0 +1,76 @@
+CompilationUnit [0..146)
+  NamespaceDeclaration [0..146)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..15)
+      IdentifierToken [11..14) 'nms'
+      T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    ClassDeclaration [17..146)
+      PublicKeyword [17..23) 'public'
+      T:WhitespaceTrivia [23..24) ' '
+      ClassKeyword [24..29) 'class'
+      T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..41) 'MyException'
+      T:WhitespaceTrivia [41..42) ' '
+      BaseList [42..65)
+        ColonToken [42..43) ':'
+        T:WhitespaceTrivia [43..44) ' '
+        SimpleBaseType [44..65)
+          IdentifierName [44..65)
+            IdentifierToken [44..64) 'ApplicationException'
+            T:WhitespaceTrivia [64..65) ' '
+      OpenBraceToken [65..66) '{'
+      T:EndOfLineTrivia [66..67) '\n'
+      ConstructorDeclaration [67..109)
+        L:WhitespaceTrivia [67..71) '    '
+        PublicKeyword [71..77) 'public'
+        T:WhitespaceTrivia [77..78) ' '
+        IdentifierToken [78..89) 'MyException'
+        ParameterList [89..102)
+          OpenParenToken [89..90) '('
+          Parameter [90..100)
+            IdentifierName [90..97)
+              IdentifierToken [90..96) 'String'
+              T:WhitespaceTrivia [96..97) ' '
+            IdentifierToken [97..100) 'str'
+          CloseParenToken [100..101) ')'
+          T:WhitespaceTrivia [101..102) ' '
+        BaseConstructorInitializer [102..109)
+          ColonToken [102..103) ':'
+          T:WhitespaceTrivia [103..104) ' '
+          BaseKeyword [104..108) 'base'
+          T:WhitespaceTrivia [108..109) ' '
+          ArgumentList [109..109)
+            OpenParenToken [109..109) missing
+            CloseParenToken [109..109) missing
+        SemicolonToken [109..109) missing
+      ConstructorDeclaration [109..143)
+        IdentifierToken [109..129) 'ApplicationException'
+        T:WhitespaceTrivia [129..130) ' '
+        ParameterList [130..136)
+          OpenParenToken [130..131) '('
+          Parameter [131..134)
+            IdentifierName [131..134)
+              IdentifierToken [131..134) 'str'
+            IdentifierToken [134..134) missing
+          CloseParenToken [134..135) ')'
+          T:EndOfLineTrivia [135..136) '\n'
+        Block [136..143)
+          L:WhitespaceTrivia [136..140) '    '
+          OpenBraceToken [140..141) '{'
+          CloseBraceToken [141..142) '}'
+          T:EndOfLineTrivia [142..143) '\n'
+      CloseBraceToken [143..144) '}'
+      SemicolonToken [144..145) ';'
+      T:EndOfLineTrivia [145..146) '\n'
+    CloseBraceToken [146..146) missing
+  EndOfFileToken [146..146) ''
+Diagnostics:
+  CS1003 [109..129) Syntax error, \'(\' expected
+  CS1026 [109..129) ) expected
+  CS1002 [109..129) ; expected
+  CS1001 [134..135) Identifier expected
+  CS1513 [145..145) } expected

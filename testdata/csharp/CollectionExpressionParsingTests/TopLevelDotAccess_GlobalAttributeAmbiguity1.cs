@@ -1,0 +1,1 @@
+[assembly: A, B].C();

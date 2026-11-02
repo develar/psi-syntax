@@ -1,0 +1,26 @@
+ParenthesizedExpression [0..38)
+  OpenParenToken [0..1) '('
+  IsExpression [1..37)
+    IdentifierName [1..6)
+      IdentifierToken [1..5) 'item'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    ArrayType [9..37)
+      GenericName [9..35)
+        IdentifierToken [9..19) 'Dictionary'
+        TypeArgumentList [19..35)
+          LessThanToken [19..20) '<'
+          PredefinedType [20..26)
+            StringKeyword [20..26) 'string'
+          CommaToken [26..27) ','
+          T:WhitespaceTrivia [27..28) ' '
+          PredefinedType [28..34)
+            ObjectKeyword [28..34) 'object'
+          GreaterThanToken [34..35) '>'
+      ArrayRankSpecifier [35..37)
+        OpenBracketToken [35..36) '['
+        OmittedArraySizeExpression [36..36)
+          OmittedArraySizeExpressionToken [36..36) ''
+        CloseBracketToken [36..37) ']'
+  CloseParenToken [37..38) ')'

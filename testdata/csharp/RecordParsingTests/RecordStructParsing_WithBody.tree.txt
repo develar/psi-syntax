@@ -1,0 +1,27 @@
+CompilationUnit [0..33)
+  RecordStructDeclaration [0..33)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'C'
+    ParameterList [15..30)
+      OpenParenToken [15..16) '('
+      Parameter [16..21)
+        PredefinedType [16..20)
+          IntKeyword [16..19) 'int'
+          T:WhitespaceTrivia [19..20) ' '
+        IdentifierToken [20..21) 'X'
+      CommaToken [21..22) ','
+      T:WhitespaceTrivia [22..23) ' '
+      Parameter [23..28)
+        PredefinedType [23..27)
+          IntKeyword [23..26) 'int'
+          T:WhitespaceTrivia [26..27) ' '
+        IdentifierToken [27..28) 'Y'
+      CloseParenToken [28..29) ')'
+      T:WhitespaceTrivia [29..30) ' '
+    OpenBraceToken [30..31) '{'
+    T:WhitespaceTrivia [31..32) ' '
+    CloseBraceToken [32..33) '}'
+  EndOfFileToken [33..33) ''

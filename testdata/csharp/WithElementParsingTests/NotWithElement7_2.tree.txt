@@ -1,0 +1,17 @@
+CollectionExpression [0..20)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..19)
+    ConditionalExpression [1..19)
+      IdentifierName [1..6)
+        IdentifierToken [1..5) 'with'
+        T:WhitespaceTrivia [5..6) ' '
+      QuestionToken [6..7) '?'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierName [8..13)
+        IdentifierToken [8..12) 'with'
+        T:WhitespaceTrivia [12..13) ' '
+      ColonToken [13..14) ':'
+      T:WhitespaceTrivia [14..15) ' '
+      IdentifierName [15..19)
+        IdentifierToken [15..19) 'with'
+  CloseBracketToken [19..20) ']'

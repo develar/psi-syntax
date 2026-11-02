@@ -1,0 +1,1 @@
+from a in A from b in B select c

@@ -1,0 +1,67 @@
+CompilationUnit [0..78)
+  ClassDeclaration [0..78)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..77)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..77)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        LocalDeclarationStatement [29..71)
+          VariableDeclaration [29..69)
+            IdentifierName [29..41)
+              L:WhitespaceTrivia [29..37) '        '
+              IdentifierToken [37..40) 'var'
+              T:WhitespaceTrivia [40..41) ' '
+            VariableDeclarator [41..69)
+              IdentifierToken [41..46) 'added'
+              T:WhitespaceTrivia [46..47) ' '
+              EqualsValueClause [47..69)
+                EqualsToken [47..48) '='
+                T:WhitespaceTrivia [48..49) ' '
+                SimpleMemberAccessExpression [49..69)
+                  GenericName [49..60)
+                    IdentifierToken [49..52) 'Goo'
+                    TypeArgumentList [52..60)
+                      LessThanToken [52..53) '<'
+                      ArrayType [53..57)
+                        IdentifierName [53..55)
+                          IdentifierToken [53..55) 'Id'
+                        ArrayRankSpecifier [55..57)
+                          OpenBracketToken [55..56) '['
+                          OmittedArraySizeExpression [56..56)
+                            OmittedArraySizeExpressionToken [56..56) ''
+                          CloseBracketToken [56..57) ']'
+                      CommaToken [57..58) ','
+                      IdentifierName [58..58)
+                        IdentifierToken [58..58) missing
+                      CommaToken [58..59) ','
+                      IdentifierName [59..59)
+                        IdentifierToken [59..59) missing
+                      GreaterThanToken [59..60) '>'
+                  DotToken [60..61) '.'
+                  IdentifierName [61..69)
+                    IdentifierToken [61..69) 'Instance'
+          SemicolonToken [69..70) ';'
+          T:EndOfLineTrivia [70..71) '\n'
+        L:WhitespaceTrivia [71..75) '    '
+        CloseBraceToken [75..76) '}'
+        T:EndOfLineTrivia [76..77) '\n'
+    CloseBraceToken [77..78) '}'
+  EndOfFileToken [78..78) ''
+Diagnostics:
+  CS1031 [58..59) Type expected
+  CS1031 [59..60) Type expected

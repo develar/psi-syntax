@@ -1,0 +1,50 @@
+StructDeclaration [0..63)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  FieldDeclaration [11..32)
+    FixedKeyword [11..16) 'fixed'
+    T:WhitespaceTrivia [16..17) ' '
+    VariableDeclaration [17..30)
+      RefType [17..25)
+        RefKeyword [17..20) 'ref'
+        T:WhitespaceTrivia [20..21) ' '
+        PredefinedType [21..25)
+          IntKeyword [21..24) 'int'
+          T:WhitespaceTrivia [24..25) ' '
+      VariableDeclarator [25..30)
+        IdentifierToken [25..27) 'F1'
+        BracketedArgumentList [27..30)
+          OpenBracketToken [27..28) '['
+          Argument [28..29)
+            NumericLiteralExpression [28..29)
+              NumericLiteralToken [28..29) '1'
+          CloseBracketToken [29..30) ']'
+    SemicolonToken [30..31) ';'
+    T:WhitespaceTrivia [31..32) ' '
+  FieldDeclaration [32..62)
+    FixedKeyword [32..37) 'fixed'
+    T:WhitespaceTrivia [37..38) ' '
+    VariableDeclaration [38..60)
+      RefType [38..55)
+        RefKeyword [38..41) 'ref'
+        T:WhitespaceTrivia [41..42) ' '
+        ReadOnlyKeyword [42..50) 'readonly'
+        T:WhitespaceTrivia [50..51) ' '
+        PredefinedType [51..55)
+          IntKeyword [51..54) 'int'
+          T:WhitespaceTrivia [54..55) ' '
+      VariableDeclarator [55..60)
+        IdentifierToken [55..57) 'F2'
+        BracketedArgumentList [57..60)
+          OpenBracketToken [57..58) '['
+          Argument [58..59)
+            NumericLiteralExpression [58..59)
+              NumericLiteralToken [58..59) '2'
+          CloseBracketToken [59..60) ']'
+    SemicolonToken [60..61) ';'
+    T:WhitespaceTrivia [61..62) ' '
+  CloseBraceToken [62..63) '}'

@@ -1,0 +1,26 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..3)
+    LocalDeclarationStatement [0..3)
+      VariableDeclaration [0..3)
+        IdentifierName [0..3)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'p'
+          T:WhitespaceTrivia [2..3) ' '
+        VariableDeclarator [3..3)
+          IdentifierToken [3..3) missing
+      SemicolonToken [3..3) missing
+  ClassDeclaration [3..17)
+    ClassKeyword [3..8) 'class'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierToken [9..10) 'A'
+    T:EndOfLineTrivia [10..11) '\n'
+    L:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    L:WhitespaceTrivia [14..15) ' '
+    CloseBraceToken [15..16) '}'
+    T:EndOfLineTrivia [16..17) '\n'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1001 [3..8) Identifier expected
+  CS1002 [3..8) ; expected

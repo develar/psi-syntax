@@ -1,0 +1,1 @@
+extension<T>(object o) { }

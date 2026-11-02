@@ -1,0 +1,16 @@
+CompilationUnit [0..19)
+  ClassDeclaration [0..19)
+    L:SingleLineDocumentationCommentTrivia [0..10)
+      XmlText [0..10)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..9) '</Goo>'
+        XmlTextLiteralNewLineToken [9..10) '\n'
+      EndOfDocumentationCommentToken [10..10) ''
+    ClassKeyword [10..15) 'class'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierToken [16..17) 'C'
+    OpenBraceToken [17..18) '{'
+    CloseBraceToken [18..19) '}'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1570 [3..4) XML comment has badly formed XML -- \'End tag was not expected at this location.\'

@@ -1,0 +1,68 @@
+IsPatternExpression [0..80)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  OrPattern [5..80)
+    OrPattern [5..56)
+      ParenthesizedPattern [5..44)
+        OpenParenToken [5..6) '('
+        AndPattern [6..42)
+          NotPattern [6..19)
+            NotKeyword [6..9) 'not'
+            T:WhitespaceTrivia [9..10) ' '
+            TypePattern [10..19)
+              GenericName [10..19)
+                IdentifierToken [10..14) 'List'
+                TypeArgumentList [14..19)
+                  LessThanToken [14..15) '<'
+                  PredefinedType [15..19)
+                    IntKeyword [15..18) 'int'
+                    T:WhitespaceTrivia [18..19) ' '
+                  GreaterThanToken [19..19) missing
+          AndKeyword [19..22) 'and'
+          T:WhitespaceTrivia [22..23) ' '
+          NotPattern [23..42)
+            NotKeyword [23..26) 'not'
+            T:WhitespaceTrivia [26..27) ' '
+            ConstantPattern [27..42)
+              LessThanExpression [27..42)
+                IdentifierName [27..38)
+                  IdentifierToken [27..38) 'IEnumerable'
+                LessThanToken [38..39) '<'
+                PredefinedType [39..42)
+                  IntKeyword [39..42) 'int'
+        CloseParenToken [42..43) ')'
+        T:WhitespaceTrivia [43..44) ' '
+      OrKeyword [44..46) 'or'
+      T:WhitespaceTrivia [46..47) ' '
+      TypePattern [47..56)
+        GenericName [47..56)
+          IdentifierToken [47..51) 'List'
+          TypeArgumentList [51..56)
+            LessThanToken [51..52) '<'
+            PredefinedType [52..56)
+              IntKeyword [52..55) 'int'
+              T:WhitespaceTrivia [55..56) ' '
+            GreaterThanToken [56..56) missing
+    OrKeyword [56..58) 'or'
+    T:WhitespaceTrivia [58..59) ' '
+    ParenthesizedPattern [59..80)
+      OpenParenToken [59..60) '('
+      NotPattern [60..79)
+        NotKeyword [60..63) 'not'
+        T:WhitespaceTrivia [63..64) ' '
+        ConstantPattern [64..79)
+          LessThanExpression [64..79)
+            IdentifierName [64..75)
+              IdentifierToken [64..75) 'IEnumerable'
+            LessThanToken [75..76) '<'
+            PredefinedType [76..79)
+              IntKeyword [76..79) 'int'
+      CloseParenToken [79..80) ')'
+Diagnostics:
+  CS1003 [19..22) Syntax error, \'>\' expected
+  CS1525 [39..42) Invalid expression term \'int\'
+  CS1003 [56..58) Syntax error, \'>\' expected
+  CS1525 [76..79) Invalid expression term \'int\'

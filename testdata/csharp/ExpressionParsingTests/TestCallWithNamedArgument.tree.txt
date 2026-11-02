@@ -1,0 +1,14 @@
+InvocationExpression [0..7)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'a'
+  ArgumentList [1..7)
+    OpenParenToken [1..2) '('
+    Argument [2..6)
+      NameColon [2..5)
+        IdentifierName [2..3)
+          IdentifierToken [2..3) 'B'
+        ColonToken [3..4) ':'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'b'
+    CloseParenToken [6..7) ')'

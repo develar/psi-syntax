@@ -1,0 +1,10 @@
+CollectionExpression [0..11)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..10)
+    DotDotToken [1..3) '..'
+    ThrowExpression [3..10)
+      ThrowKeyword [3..8) 'throw'
+      T:WhitespaceTrivia [8..9) ' '
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'e'
+  CloseBracketToken [10..11) ']'

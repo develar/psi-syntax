@@ -1,0 +1,67 @@
+CompilationUnit [0..139)
+  ClassDeclaration [0..139)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:WhitespaceTrivia [1..9) '        '
+    ClassKeyword [9..14) 'class'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'C'
+    T:EndOfLineTrivia [16..17) '\n'
+    L:WhitespaceTrivia [17..25) '        '
+    OpenBraceToken [25..26) '{'
+    T:EndOfLineTrivia [26..27) '\n'
+    MethodDeclaration [27..130)
+      PredefinedType [27..44)
+        L:WhitespaceTrivia [27..39) '            '
+        VoidKeyword [39..43) 'void'
+        T:WhitespaceTrivia [43..44) ' '
+      IdentifierToken [44..47) 'Goo'
+      ParameterList [47..50)
+        OpenParenToken [47..48) '('
+        CloseParenToken [48..49) ')'
+        T:EndOfLineTrivia [49..50) '\n'
+      Block [50..130)
+        L:WhitespaceTrivia [50..62) '            '
+        OpenBraceToken [62..63) '{'
+        T:EndOfLineTrivia [63..64) '\n'
+        ForEachVariableStatement [64..116)
+          L:WhitespaceTrivia [64..80) '                '
+          ForEachKeyword [80..87) 'foreach'
+          T:WhitespaceTrivia [87..88) ' '
+          OpenParenToken [88..89) '('
+          TupleExpression [89..104)
+            OpenParenToken [89..90) '('
+            Argument [90..95)
+              DeclarationExpression [90..95)
+                PredefinedType [90..94)
+                  IntKeyword [90..93) 'int'
+                  T:WhitespaceTrivia [93..94) ' '
+                SingleVariableDesignation [94..95)
+                  IdentifierToken [94..95) 'x'
+            CommaToken [95..96) ','
+            T:WhitespaceTrivia [96..97) ' '
+            Argument [97..102)
+              DeclarationExpression [97..102)
+                IdentifierName [97..101)
+                  IdentifierToken [97..100) 'var'
+                  T:WhitespaceTrivia [100..101) ' '
+                SingleVariableDesignation [101..102)
+                  IdentifierToken [101..102) 'y'
+            CloseParenToken [102..103) ')'
+            T:WhitespaceTrivia [103..104) ' '
+          InKeyword [104..106) 'in'
+          T:WhitespaceTrivia [106..107) ' '
+          IdentifierName [107..110)
+            IdentifierToken [107..110) 'goo'
+          CloseParenToken [110..111) ')'
+          T:WhitespaceTrivia [111..112) ' '
+          Block [112..116)
+            OpenBraceToken [112..113) '{'
+            T:WhitespaceTrivia [113..114) ' '
+            CloseBraceToken [114..115) '}'
+            T:EndOfLineTrivia [115..116) '\n'
+        L:WhitespaceTrivia [116..128) '            '
+        CloseBraceToken [128..129) '}'
+        T:EndOfLineTrivia [129..130) '\n'
+    L:WhitespaceTrivia [130..138) '        '
+    CloseBraceToken [138..139) '}'
+  EndOfFileToken [139..139) ''

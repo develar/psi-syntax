@@ -1,0 +1,9 @@
+ForStatement [0..9)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  SemicolonToken [5..6) ';'
+  SemicolonToken [6..7) ';'
+  CloseParenToken [7..8) ')'
+  EmptyStatement [8..9)
+    SemicolonToken [8..9) ';'

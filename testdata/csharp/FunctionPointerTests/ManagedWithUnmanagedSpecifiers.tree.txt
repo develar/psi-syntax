@@ -1,0 +1,25 @@
+LocalDeclarationStatement [0..35)
+  VariableDeclaration [0..34)
+    FunctionPointerType [0..31)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      T:WhitespaceTrivia [9..10) ' '
+      FunctionPointerCallingConvention [10..24)
+        ManagedKeyword [10..17) 'managed'
+        FunctionPointerUnmanagedCallingConventionList [17..24)
+          OpenBracketToken [17..18) '['
+          FunctionPointerUnmanagedCallingConvention [18..23)
+            IdentifierToken [18..23) 'Cdecl'
+          CloseBracketToken [23..24) ']'
+      FunctionPointerParameterList [24..31)
+        LessThanToken [24..25) '<'
+        FunctionPointerParameter [25..29)
+          PredefinedType [25..29)
+            VoidKeyword [25..29) 'void'
+        GreaterThanToken [29..30) '>'
+        T:WhitespaceTrivia [30..31) ' '
+    VariableDeclarator [31..34)
+      IdentifierToken [31..34) 'ptr'
+  SemicolonToken [34..35) ';'
+Diagnostics:
+  CS8888 [17..24) \'managed\' calling convention cannot be combined with unmanaged calling convention specifiers.

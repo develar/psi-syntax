@@ -1,0 +1,4 @@
+RazorContentToken [0..12) '@: More text'
+EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1646 [1..2) Keyword, identifier, or string expected after verbatim specifier: @

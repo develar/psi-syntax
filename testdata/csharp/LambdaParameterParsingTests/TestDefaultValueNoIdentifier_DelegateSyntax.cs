@@ -1,0 +1,1 @@
+delegate(int = 3) { return 4; }

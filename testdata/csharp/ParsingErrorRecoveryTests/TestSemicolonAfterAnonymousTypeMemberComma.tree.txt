@@ -1,0 +1,55 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..45)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..45)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..43)
+          VariableDeclaration [21..41)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..41)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..41)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                AnonymousObjectCreationExpression [29..41)
+                  NewKeyword [29..32) 'new'
+                  T:WhitespaceTrivia [32..33) ' '
+                  OpenBraceToken [33..34) '{'
+                  AnonymousObjectMemberDeclarator [34..39)
+                    NameEquals [34..38)
+                      IdentifierName [34..36)
+                        IdentifierToken [34..35) 'a'
+                        T:WhitespaceTrivia [35..36) ' '
+                      EqualsToken [36..37) '='
+                      T:WhitespaceTrivia [37..38) ' '
+                    IdentifierName [38..39)
+                      IdentifierToken [38..39) 'b'
+                  CommaToken [39..40) ','
+                  T:WhitespaceTrivia [40..41) ' '
+                  CloseBraceToken [41..41) missing
+          SemicolonToken [41..42) ';'
+          T:WhitespaceTrivia [42..43) ' '
+        CloseBraceToken [43..44) '}'
+        T:WhitespaceTrivia [44..45) ' '
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1513 [41..42) } expected

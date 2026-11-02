@@ -1,0 +1,23 @@
+CompilationUnit [0..21)
+  UsingDirective [0..21)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'x'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    TupleType [10..20)
+      OpenParenToken [10..11) '('
+      TupleElement [11..14)
+        PredefinedType [11..14)
+          IntKeyword [11..14) 'int'
+      CommaToken [14..15) ','
+      T:WhitespaceTrivia [15..16) ' '
+      TupleElement [16..19)
+        PredefinedType [16..19)
+          IntKeyword [16..19) 'int'
+      CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

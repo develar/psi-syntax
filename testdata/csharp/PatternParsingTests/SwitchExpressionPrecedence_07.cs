@@ -1,0 +1,1 @@
+(Type)a++ switch {}

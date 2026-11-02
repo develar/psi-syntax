@@ -1,0 +1,77 @@
+CompilationUnit [0..97)
+  GlobalStatement [0..97)
+    LocalFunctionStatement [0..97)
+      L:EndOfLineTrivia [0..1) '\n'
+      PublicKeyword [1..7) 'public'
+      T:WhitespaceTrivia [7..8) ' '
+      PredefinedType [8..13)
+        VoidKeyword [8..12) 'void'
+        T:WhitespaceTrivia [12..13) ' '
+      IdentifierToken [13..14) 'M'
+      ParameterList [14..17)
+        OpenParenToken [14..15) '('
+        CloseParenToken [15..16) ')'
+        T:EndOfLineTrivia [16..17) '\n'
+      Block [17..97)
+        OpenBraceToken [17..18) '{'
+        T:EndOfLineTrivia [18..19) '\n'
+        LocalDeclarationStatement [19..43)
+          VariableDeclaration [19..41)
+            FunctionPointerType [19..39)
+              L:WhitespaceTrivia [19..23) '    '
+              DelegateKeyword [23..31) 'delegate'
+              AsteriskToken [31..32) '*'
+              FunctionPointerParameterList [32..39)
+                LessThanToken [32..33) '<'
+                FunctionPointerParameter [33..37)
+                  PredefinedType [33..37)
+                    VoidKeyword [33..37) 'void'
+                GreaterThanToken [37..38) '>'
+                T:WhitespaceTrivia [38..39) ' '
+            VariableDeclarator [39..41)
+              IdentifierToken [39..41) 'l1'
+          SemicolonToken [41..42) ';'
+          T:EndOfLineTrivia [42..43) '\n'
+        LocalFunctionStatement [43..72)
+          FunctionPointerType [43..63)
+            L:WhitespaceTrivia [43..47) '    '
+            DelegateKeyword [47..55) 'delegate'
+            AsteriskToken [55..56) '*'
+            FunctionPointerParameterList [56..63)
+              LessThanToken [56..57) '<'
+              FunctionPointerParameter [57..61)
+                PredefinedType [57..61)
+                  VoidKeyword [57..61) 'void'
+              GreaterThanToken [61..62) '>'
+              T:WhitespaceTrivia [62..63) ' '
+          IdentifierToken [63..65) 'L2'
+          ParameterList [65..68)
+            OpenParenToken [65..66) '('
+            CloseParenToken [66..67) ')'
+            T:WhitespaceTrivia [67..68) ' '
+          Block [68..72)
+            OpenBraceToken [68..69) '{'
+            T:WhitespaceTrivia [69..70) ' '
+            CloseBraceToken [70..71) '}'
+            T:EndOfLineTrivia [71..72) '\n'
+        LocalDeclarationStatement [72..96)
+          VariableDeclaration [72..94)
+            FunctionPointerType [72..92)
+              L:WhitespaceTrivia [72..76) '    '
+              DelegateKeyword [76..84) 'delegate'
+              AsteriskToken [84..85) '*'
+              FunctionPointerParameterList [85..92)
+                LessThanToken [85..86) '<'
+                FunctionPointerParameter [86..90)
+                  PredefinedType [86..90)
+                    VoidKeyword [86..90) 'void'
+                GreaterThanToken [90..91) '>'
+                T:WhitespaceTrivia [91..92) ' '
+            VariableDeclarator [92..94)
+              IdentifierToken [92..94) 'l3'
+          SemicolonToken [94..95) ';'
+          T:EndOfLineTrivia [95..96) '\n'
+        CloseBraceToken [96..97) '}'
+  EndOfFileToken [97..97) ''
+Diagnostics:
+  CS0106 [1..7) The modifier \'public\' is not valid for this item

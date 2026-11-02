@@ -1,0 +1,1 @@
+Action<object> a = public => { };

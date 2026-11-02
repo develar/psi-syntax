@@ -1,0 +1,23 @@
+CompilationUnit [0..22)
+  GlobalStatement [0..22)
+    LocalFunctionStatement [0..22)
+      AttributeList [0..12)
+        OpenBracketToken [0..1) '['
+        Attribute [1..10)
+          IdentifierName [1..10)
+            IdentifierToken [1..10) 'attribute'
+        CloseBracketToken [10..11) ']'
+        T:WhitespaceTrivia [11..12) ' '
+      IdentifierName [12..17)
+        IdentifierToken [12..17) 'local'
+      IdentifierToken [17..17) missing
+      ParameterList [17..20)
+        OpenParenToken [17..18) '('
+        CloseParenToken [18..19) ')'
+        T:WhitespaceTrivia [19..20) ' '
+      Block [20..22)
+        OpenBraceToken [20..21) '{'
+        CloseBraceToken [21..22) '}'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1001 [17..18) Identifier expected

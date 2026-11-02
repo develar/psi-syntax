@@ -1,0 +1,14 @@
+CompilationUnit [0..13)
+  GlobalStatement [0..13)
+    LocalDeclarationStatement [0..13)
+      VariableDeclaration [0..12)
+        RefType [0..11)
+          RefKeyword [0..3) 'ref'
+          T:WhitespaceTrivia [3..4) ' '
+          IdentifierName [4..11)
+            IdentifierToken [4..10) 'record'
+            T:WhitespaceTrivia [10..11) ' '
+        VariableDeclarator [11..12)
+          IdentifierToken [11..12) 'R'
+      SemicolonToken [12..13) ';'
+  EndOfFileToken [13..13) ''

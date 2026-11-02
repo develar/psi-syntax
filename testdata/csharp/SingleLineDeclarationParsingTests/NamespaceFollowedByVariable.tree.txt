@@ -1,0 +1,17 @@
+CompilationUnit [0..19)
+  FileScopedNamespaceDeclaration [0..19)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'A'
+    SemicolonToken [11..12) ';'
+    T:WhitespaceTrivia [12..13) ' '
+    FieldDeclaration [13..19)
+      VariableDeclaration [13..18)
+        PredefinedType [13..17)
+          IntKeyword [13..16) 'int'
+          T:WhitespaceTrivia [16..17) ' '
+        VariableDeclarator [17..18)
+          IdentifierToken [17..18) 'x'
+      SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''

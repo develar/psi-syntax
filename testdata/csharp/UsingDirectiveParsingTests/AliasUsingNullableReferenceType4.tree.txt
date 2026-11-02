@@ -1,0 +1,47 @@
+CompilationUnit [0..68)
+  UsingDirective [0..35)
+    L:NullableDirectiveTrivia [0..17)
+      HashToken [0..1) '#'
+      NullableKeyword [1..9) 'nullable'
+      T:WhitespaceTrivia [9..10) ' '
+      EnableKeyword [10..16) 'enable'
+      EndOfDirectiveToken [16..16) ''
+      T:EndOfLineTrivia [16..17) '\n'
+    UsingKeyword [17..22) 'using'
+    T:WhitespaceTrivia [22..23) ' '
+    NameEquals [23..27)
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'X'
+        T:WhitespaceTrivia [24..25) ' '
+      EqualsToken [25..26) '='
+      T:WhitespaceTrivia [26..27) ' '
+    PredefinedType [27..33)
+      StringKeyword [27..33) 'string'
+    SemicolonToken [33..34) ';'
+    T:EndOfLineTrivia [34..35) '\n'
+  NamespaceDeclaration [35..68)
+    NamespaceKeyword [35..44) 'namespace'
+    T:WhitespaceTrivia [44..45) ' '
+    IdentifierName [45..47)
+      IdentifierToken [45..46) 'N'
+      T:EndOfLineTrivia [46..47) '\n'
+    OpenBraceToken [47..48) '{'
+    T:EndOfLineTrivia [48..49) '\n'
+    UsingDirective [49..67)
+      L:WhitespaceTrivia [49..53) '    '
+      UsingKeyword [53..58) 'using'
+      T:WhitespaceTrivia [58..59) ' '
+      NameEquals [59..63)
+        IdentifierName [59..61)
+          IdentifierToken [59..60) 'Y'
+          T:WhitespaceTrivia [60..61) ' '
+        EqualsToken [61..62) '='
+        T:WhitespaceTrivia [62..63) ' '
+      NullableType [63..65)
+        IdentifierName [63..64)
+          IdentifierToken [63..64) 'X'
+        QuestionToken [64..65) '?'
+      SemicolonToken [65..66) ';'
+      T:EndOfLineTrivia [66..67) '\n'
+    CloseBraceToken [67..68) '}'
+  EndOfFileToken [68..68) ''

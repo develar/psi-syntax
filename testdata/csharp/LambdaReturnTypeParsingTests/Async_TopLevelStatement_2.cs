@@ -1,0 +1,1 @@
+async MyMethod() => null;

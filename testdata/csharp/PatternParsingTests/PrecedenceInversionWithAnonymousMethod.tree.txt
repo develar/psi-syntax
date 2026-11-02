@@ -1,0 +1,14 @@
+AddExpression [0..15)
+  AnonymousMethodExpression [0..12)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    Block [9..12)
+      OpenBraceToken [9..10) '{'
+      CloseBraceToken [10..11) '}'
+      T:WhitespaceTrivia [11..12) ' '
+  PlusToken [12..13) '+'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierName [14..15)
+    IdentifierToken [14..15) 'd'
+Diagnostics:
+  CS8848 [12..13) Operator \'+\' cannot be used here due to precedence. Use parentheses to disambiguate.

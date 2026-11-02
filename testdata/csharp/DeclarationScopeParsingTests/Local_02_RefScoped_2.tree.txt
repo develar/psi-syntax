@@ -1,0 +1,78 @@
+CompilationUnit [0..113)
+  ClassDeclaration [0..113)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..112)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..32)
+        VoidKeyword [27..31) 'void'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..112)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        LocalDeclarationStatement [45..64)
+          VariableDeclaration [45..64)
+            RefType [45..64)
+              L:WhitespaceTrivia [45..53) '        '
+              RefKeyword [53..56) 'ref'
+              T:WhitespaceTrivia [56..57) ' '
+              IdentifierName [57..64)
+                IdentifierToken [57..63) 'scoped'
+                T:WhitespaceTrivia [63..64) ' '
+            VariableDeclarator [64..64)
+              IdentifierToken [64..64) missing
+          SemicolonToken [64..64) missing
+        LocalDeclarationStatement [64..71)
+          VariableDeclaration [64..69)
+            PredefinedType [64..68)
+              IntKeyword [64..67) 'int'
+              T:WhitespaceTrivia [67..68) ' '
+            VariableDeclarator [68..69)
+              IdentifierToken [68..69) 'd'
+          SemicolonToken [69..70) ';'
+          T:EndOfLineTrivia [70..71) '\n'
+        LocalDeclarationStatement [71..99)
+          VariableDeclaration [71..99)
+            RefType [71..99)
+              L:WhitespaceTrivia [71..79) '        '
+              RefKeyword [79..82) 'ref'
+              T:WhitespaceTrivia [82..83) ' '
+              ReadOnlyKeyword [83..91) 'readonly'
+              T:WhitespaceTrivia [91..92) ' '
+              IdentifierName [92..99)
+                IdentifierToken [92..98) 'scoped'
+                T:WhitespaceTrivia [98..99) ' '
+            VariableDeclarator [99..99)
+              IdentifierToken [99..99) missing
+          SemicolonToken [99..99) missing
+        LocalDeclarationStatement [99..106)
+          VariableDeclaration [99..104)
+            PredefinedType [99..103)
+              IntKeyword [99..102) 'int'
+              T:WhitespaceTrivia [102..103) ' '
+            VariableDeclarator [103..104)
+              IdentifierToken [103..104) 'e'
+          SemicolonToken [104..105) ';'
+          T:EndOfLineTrivia [105..106) '\n'
+        L:WhitespaceTrivia [106..110) '    '
+        CloseBraceToken [110..111) '}'
+        T:EndOfLineTrivia [111..112) '\n'
+    CloseBraceToken [112..113) '}'
+  EndOfFileToken [113..113) ''
+Diagnostics:
+  CS1001 [64..67) Identifier expected
+  CS1002 [64..67) ; expected
+  CS1001 [99..102) Identifier expected
+  CS1002 [99..102) ; expected

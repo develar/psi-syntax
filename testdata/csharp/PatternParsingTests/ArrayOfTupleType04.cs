@@ -1,0 +1,1 @@
+if (o is (int a, int b)[] q) { }

@@ -1,0 +1,1 @@
+delegate* invalid<void> ptr;

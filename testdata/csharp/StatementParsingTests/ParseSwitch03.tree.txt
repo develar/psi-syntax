@@ -1,0 +1,27 @@
+SwitchStatement [0..22)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  TupleExpression [7..20)
+    OpenParenToken [7..8) '('
+    Argument [8..12)
+      NameColon [8..11)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'a'
+        ColonToken [9..10) ':'
+        T:WhitespaceTrivia [10..11) ' '
+      NumericLiteralExpression [11..12)
+        NumericLiteralToken [11..12) '0'
+    CommaToken [12..13) ','
+    T:WhitespaceTrivia [13..14) ' '
+    Argument [14..18)
+      NameColon [14..17)
+        IdentifierName [14..15)
+          IdentifierToken [14..15) 'b'
+        ColonToken [15..16) ':'
+        T:WhitespaceTrivia [16..17) ' '
+      NumericLiteralExpression [17..18)
+        NumericLiteralToken [17..18) '4'
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  OpenBraceToken [20..21) '{'
+  CloseBraceToken [21..22) '}'

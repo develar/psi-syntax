@@ -1,0 +1,15 @@
+GenericName [0..12)
+  IdentifierToken [0..3) 'goo'
+  TypeArgumentList [3..12)
+    LessThanToken [3..4) '<'
+    IdentifierName [4..11)
+      L:SkippedTokensTrivia [4..5)
+        OpenBracketToken [4..5) '['
+      L:SkippedTokensTrivia [5..7)
+        IdentifierToken [5..7) 'My'
+      L:SkippedTokensTrivia [7..8)
+        CloseBracketToken [7..8) ']'
+      IdentifierToken [8..11) 'bar'
+    GreaterThanToken [11..12) '>'
+Diagnostics:
+  CS1031 [8..11) Type expected

@@ -1,0 +1,23 @@
+InterpolatedStringExpression [0..14)
+  InterpolatedStringStartToken [0..2) '$"'
+  Interpolation [2..13)
+    OpenBraceToken [2..3) '{'
+    ConditionalExpression [3..9)
+      IdentifierName [3..5)
+        IdentifierToken [3..4) 'a'
+        T:WhitespaceTrivia [4..5) ' '
+      QuestionToken [5..6) '?'
+      T:WhitespaceTrivia [6..7) ' '
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'b'
+        T:WhitespaceTrivia [8..9) ' '
+      ColonToken [9..9) missing
+      IdentifierName [9..9)
+        IdentifierToken [9..9) missing
+    InterpolationFormatClause [9..12)
+      ColonToken [9..10) ':'
+      InterpolatedStringTextToken [10..12) ' d'
+    CloseBraceToken [12..13) '}'
+  InterpolatedStringEndToken [13..14) '"'
+Diagnostics:
+  CS8361 [3..9) A conditional expression cannot be used directly in a string interpolation because the \':\' ends the interpolation. Parenthesize the conditional expression.

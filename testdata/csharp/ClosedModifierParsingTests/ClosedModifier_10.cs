@@ -1,0 +1,1 @@
+abstract closed class C { }

@@ -1,0 +1,1 @@
+(int arg = a ? b ? w : x : c ? y : z)  => arg

@@ -1,0 +1,25 @@
+ForStatement [0..24)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForKeyword [1..4) 'for'
+  T:WhitespaceTrivia [4..5) ' '
+  OpenParenToken [5..6) '('
+  IdentifierName [6..14)
+    IdentifierToken [6..13) '@scoped'
+    T:WhitespaceTrivia [13..14) ' '
+  CommaToken [14..14) missing
+  PredefinedType [14..18)
+    IntKeyword [14..17) 'int'
+    T:WhitespaceTrivia [17..18) ' '
+  CommaToken [18..18) missing
+  IdentifierName [18..19)
+    IdentifierToken [18..19) 'a'
+  SemicolonToken [19..20) ';'
+  SemicolonToken [20..21) ';'
+  CloseParenToken [21..22) ')'
+  EmptyStatement [22..24)
+    SemicolonToken [22..23) ';'
+    T:EndOfLineTrivia [23..24) '\n'
+Diagnostics:
+  CS1003 [14..17) Syntax error, \',\' expected
+  CS1525 [14..17) Invalid expression term \'int\'
+  CS1003 [18..19) Syntax error, \',\' expected

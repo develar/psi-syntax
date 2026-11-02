@@ -1,0 +1,1 @@
+C I.operator checked true(C x) => x;

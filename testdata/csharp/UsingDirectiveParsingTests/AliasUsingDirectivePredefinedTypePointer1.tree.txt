@@ -1,0 +1,16 @@
+CompilationUnit [0..15)
+  UsingDirective [0..15)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'x'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    PointerType [10..14)
+      PredefinedType [10..13)
+        IntKeyword [10..13) 'int'
+      AsteriskToken [13..14) '*'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

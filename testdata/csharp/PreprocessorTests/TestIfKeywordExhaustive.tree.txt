@@ -1,0 +1,128 @@
+CompilationUnit [0..192)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..10)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    TrueLiteralExpression [5..9)
+      TrueKeyword [5..9) 'true'
+    EndOfDirectiveToken [9..9) ''
+    T:EndOfLineTrivia [9..10) '\n'
+  L:ElifDirectiveTrivia [10..22)
+    HashToken [10..11) '#'
+    ElifKeyword [11..15) 'elif'
+    T:WhitespaceTrivia [15..16) ' '
+    FalseLiteralExpression [16..21)
+      FalseKeyword [16..21) 'false'
+    EndOfDirectiveToken [21..21) ''
+    T:EndOfLineTrivia [21..22) '\n'
+  L:ElifDirectiveTrivia [22..31)
+    HashToken [22..23) '#'
+    ElifKeyword [23..27) 'elif'
+    T:WhitespaceTrivia [27..28) ' '
+    IdentifierName [28..30)
+      IdentifierToken [28..30) 'if'
+    EndOfDirectiveToken [30..30) ''
+    T:EndOfLineTrivia [30..31) '\n'
+  L:ElifDirectiveTrivia [31..42)
+    HashToken [31..32) '#'
+    ElifKeyword [32..36) 'elif'
+    T:WhitespaceTrivia [36..37) ' '
+    IdentifierName [37..41)
+      IdentifierToken [37..41) 'else'
+    EndOfDirectiveToken [41..41) ''
+    T:EndOfLineTrivia [41..42) '\n'
+  L:ElifDirectiveTrivia [42..53)
+    HashToken [42..43) '#'
+    ElifKeyword [43..47) 'elif'
+    T:WhitespaceTrivia [47..48) ' '
+    IdentifierName [48..52)
+      IdentifierToken [48..52) 'elif'
+    EndOfDirectiveToken [52..52) ''
+    T:EndOfLineTrivia [52..53) '\n'
+  L:ElifDirectiveTrivia [53..65)
+    HashToken [53..54) '#'
+    ElifKeyword [54..58) 'elif'
+    T:WhitespaceTrivia [58..59) ' '
+    IdentifierName [59..64)
+      IdentifierToken [59..64) 'endif'
+    EndOfDirectiveToken [64..64) ''
+    T:EndOfLineTrivia [64..65) '\n'
+  L:ElifDirectiveTrivia [65..78)
+    HashToken [65..66) '#'
+    ElifKeyword [66..70) 'elif'
+    T:WhitespaceTrivia [70..71) ' '
+    IdentifierName [71..77)
+      IdentifierToken [71..77) 'region'
+    EndOfDirectiveToken [77..77) ''
+    T:EndOfLineTrivia [77..78) '\n'
+  L:ElifDirectiveTrivia [78..94)
+    HashToken [78..79) '#'
+    ElifKeyword [79..83) 'elif'
+    T:WhitespaceTrivia [83..84) ' '
+    IdentifierName [84..93)
+      IdentifierToken [84..93) 'endregion'
+    EndOfDirectiveToken [93..93) ''
+    T:EndOfLineTrivia [93..94) '\n'
+  L:ElifDirectiveTrivia [94..107)
+    HashToken [94..95) '#'
+    ElifKeyword [95..99) 'elif'
+    T:WhitespaceTrivia [99..100) ' '
+    IdentifierName [100..106)
+      IdentifierToken [100..106) 'define'
+    EndOfDirectiveToken [106..106) ''
+    T:EndOfLineTrivia [106..107) '\n'
+  L:ElifDirectiveTrivia [107..119)
+    HashToken [107..108) '#'
+    ElifKeyword [108..112) 'elif'
+    T:WhitespaceTrivia [112..113) ' '
+    IdentifierName [113..118)
+      IdentifierToken [113..118) 'undef'
+    EndOfDirectiveToken [118..118) ''
+    T:EndOfLineTrivia [118..119) '\n'
+  L:ElifDirectiveTrivia [119..133)
+    HashToken [119..120) '#'
+    ElifKeyword [120..124) 'elif'
+    T:WhitespaceTrivia [124..125) ' '
+    IdentifierName [125..132)
+      IdentifierToken [125..132) 'warning'
+    EndOfDirectiveToken [132..132) ''
+    T:EndOfLineTrivia [132..133) '\n'
+  L:ElifDirectiveTrivia [133..145)
+    HashToken [133..134) '#'
+    ElifKeyword [134..138) 'elif'
+    T:WhitespaceTrivia [138..139) ' '
+    IdentifierName [139..144)
+      IdentifierToken [139..144) 'error'
+    EndOfDirectiveToken [144..144) ''
+    T:EndOfLineTrivia [144..145) '\n'
+  L:ElifDirectiveTrivia [145..156)
+    HashToken [145..146) '#'
+    ElifKeyword [146..150) 'elif'
+    T:WhitespaceTrivia [150..151) ' '
+    IdentifierName [151..155)
+      IdentifierToken [151..155) 'line'
+    EndOfDirectiveToken [155..155) ''
+    T:EndOfLineTrivia [155..156) '\n'
+  L:ElifDirectiveTrivia [156..169)
+    HashToken [156..157) '#'
+    ElifKeyword [157..161) 'elif'
+    T:WhitespaceTrivia [161..162) ' '
+    IdentifierName [162..168)
+      IdentifierToken [162..168) 'pragma'
+    EndOfDirectiveToken [168..168) ''
+    T:EndOfLineTrivia [168..169) '\n'
+  L:ElifDirectiveTrivia [169..185)
+    HashToken [169..170) '#'
+    ElifKeyword [170..174) 'elif'
+    T:WhitespaceTrivia [174..175) ' '
+    IdentifierName [175..184)
+      IdentifierToken [175..184) 'reference'
+    EndOfDirectiveToken [184..184) ''
+    T:EndOfLineTrivia [184..185) '\n'
+  L:EndIfDirectiveTrivia [185..192)
+    HashToken [185..186) '#'
+    EndIfKeyword [186..191) 'endif'
+    EndOfDirectiveToken [191..191) ''
+    T:EndOfLineTrivia [191..192) '\n'
+  EndOfFileToken [192..192) ''

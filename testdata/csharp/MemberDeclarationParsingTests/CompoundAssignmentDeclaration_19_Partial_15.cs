@@ -1,0 +1,1 @@
+partial C operator %=(C x) => x;

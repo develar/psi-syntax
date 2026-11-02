@@ -1,0 +1,19 @@
+IsExpression [0..11)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ArrayType [5..11)
+    GenericName [5..9)
+      IdentifierToken [5..6) 'A'
+      TypeArgumentList [6..9)
+        LessThanToken [6..7) '<'
+        IdentifierName [7..8)
+          IdentifierToken [7..8) 'B'
+        GreaterThanToken [8..9) '>'
+    ArrayRankSpecifier [9..11)
+      OpenBracketToken [9..10) '['
+      OmittedArraySizeExpression [10..10)
+        OmittedArraySizeExpressionToken [10..10) ''
+      CloseBracketToken [10..11) ']'

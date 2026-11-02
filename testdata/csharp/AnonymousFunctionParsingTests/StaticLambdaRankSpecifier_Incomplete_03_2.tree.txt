@@ -1,0 +1,28 @@
+ExpressionStatement [0..25)
+  SimpleAssignmentExpression [0..24)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..24)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..24)
+        PredefinedType [8..11)
+          IntKeyword [8..11) 'int'
+        ArrayRankSpecifier [11..24)
+          OpenBracketToken [11..12) '['
+          SimpleLambdaExpression [12..23)
+            StaticKeyword [12..18) 'static'
+            T:WhitespaceTrivia [18..19) ' '
+            Parameter [19..21)
+              IdentifierToken [19..20) 'x'
+              T:WhitespaceTrivia [20..21) ' '
+            EqualsGreaterThanToken [21..23) '=>'
+            IdentifierName [23..23)
+              IdentifierToken [23..23) missing
+          CloseBracketToken [23..24) ']'
+  SemicolonToken [24..25) ';'
+Diagnostics:
+  CS1525 [23..24) Invalid expression term \']\'

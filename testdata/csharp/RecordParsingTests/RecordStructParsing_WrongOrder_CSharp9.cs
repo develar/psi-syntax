@@ -1,0 +1,1 @@
+struct record C(int X, int Y);

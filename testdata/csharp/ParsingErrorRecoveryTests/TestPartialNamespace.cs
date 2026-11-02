@@ -1,0 +1,1 @@
+partial namespace n { }

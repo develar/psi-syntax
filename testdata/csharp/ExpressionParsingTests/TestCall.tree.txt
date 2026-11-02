@@ -1,0 +1,9 @@
+InvocationExpression [0..4)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'a'
+  ArgumentList [1..4)
+    OpenParenToken [1..2) '('
+    Argument [2..3)
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'b'
+    CloseParenToken [3..4) ')'

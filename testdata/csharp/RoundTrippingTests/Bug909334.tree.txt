@@ -1,0 +1,79 @@
+CompilationUnit [0..117)
+  ClassDeclaration [0..117)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    MethodDeclaration [14..115)
+      UnsafeKeyword [14..20) 'unsafe'
+      T:WhitespaceTrivia [20..21) ' '
+      StaticKeyword [21..27) 'static'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..32)
+        IntKeyword [28..31) 'int'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..115)
+        OpenBraceToken [39..40) '{'
+        T:EndOfLineTrivia [40..41) '\n'
+        LocalDeclarationStatement [41..103)
+          VariableDeclaration [41..101)
+            PointerType [41..63)
+              QualifiedName [41..61)
+                AliasQualifiedName [41..55)
+                  IdentifierName [41..47)
+                    GlobalKeyword [41..47) 'global'
+                  ColonColonToken [47..49) '::'
+                  IdentifierName [49..55)
+                    IdentifierToken [49..55) 'System'
+                DotToken [55..56) '.'
+                IdentifierName [56..61)
+                  IdentifierToken [56..61) 'Int32'
+              AsteriskToken [61..62) '*'
+              T:WhitespaceTrivia [62..63) ' '
+            VariableDeclarator [63..101)
+              IdentifierToken [63..64) 'p'
+              T:WhitespaceTrivia [64..65) ' '
+              EqualsValueClause [65..101)
+                EqualsToken [65..66) '='
+                T:WhitespaceTrivia [66..67) ' '
+                StackAllocArrayCreationExpression [67..101)
+                  StackAllocKeyword [67..77) 'stackalloc'
+                  T:WhitespaceTrivia [77..78) ' '
+                  ArrayType [78..101)
+                    QualifiedName [78..98)
+                      AliasQualifiedName [78..92)
+                        IdentifierName [78..84)
+                          GlobalKeyword [78..84) 'global'
+                        ColonColonToken [84..86) '::'
+                        IdentifierName [86..92)
+                          IdentifierToken [86..92) 'System'
+                      DotToken [92..93) '.'
+                      IdentifierName [93..98)
+                        IdentifierToken [93..98) 'Int32'
+                    ArrayRankSpecifier [98..101)
+                      OpenBracketToken [98..99) '['
+                      NumericLiteralExpression [99..100)
+                        NumericLiteralToken [99..100) '5'
+                      CloseBracketToken [100..101) ']'
+          SemicolonToken [101..102) ';'
+          T:EndOfLineTrivia [102..103) '\n'
+        ReturnStatement [103..113)
+          ReturnKeyword [103..109) 'return'
+          T:WhitespaceTrivia [109..110) ' '
+          NumericLiteralExpression [110..111)
+            NumericLiteralToken [110..111) '0'
+          SemicolonToken [111..112) ';'
+          T:EndOfLineTrivia [112..113) '\n'
+        CloseBraceToken [113..114) '}'
+        T:EndOfLineTrivia [114..115) '\n'
+    CloseBraceToken [115..116) '}'
+    T:EndOfLineTrivia [116..117) '\n'
+  EndOfFileToken [117..117) ''

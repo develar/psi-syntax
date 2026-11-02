@@ -1,0 +1,12 @@
+CompilationUnit [0..9)
+  UsingDirective [0..9)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..8)
+      IdentifierToken [6..6) missing
+      T:SkippedTokensTrivia [6..8)
+        NumericLiteralToken [6..8) '10'
+    SemicolonToken [8..9) ';'
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1001 [6..8) Identifier expected

@@ -1,0 +1,37 @@
+CompilationUnit [0..15)
+  GlobalStatement [0..6)
+    LocalDeclarationStatement [0..6)
+      VariableDeclaration [0..6)
+        IdentifierName [0..1)
+          IdentifierToken [0..1) 'i'
+        VariableDeclarator [1..1)
+          IdentifierToken [1..1) missing
+        CommaToken [1..2) ','
+        VariableDeclarator [2..6)
+          IdentifierToken [2..2) missing
+          BracketedArgumentList [2..6)
+            OpenBracketToken [2..2) missing
+            T:SkippedTokensTrivia [2..3)
+              OpenParenToken [2..3) '('
+            T:SkippedTokensTrivia [3..5)
+              BadToken [3..5) '#\n'
+            T:EndOfLineTrivia [5..6) '\n'
+            CloseBracketToken [6..6) missing
+      SemicolonToken [6..6) missing
+  InterfaceDeclaration [6..15)
+    InterfaceKeyword [6..15) 'interface'
+    IdentifierToken [15..15) missing
+    OpenBraceToken [15..15) missing
+    CloseBraceToken [15..15) missing
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1001 [1..2) Identifier expected
+  CS1001 [2..3) Identifier expected
+  CS1528 [2..3) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [2..3) Syntax error, \'[\' expected
+  CS1040 [3..4) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1003 [3..3) Syntax error, \']\' expected
+  CS1002 [3..3) ; expected
+  CS1001 [15..15) Identifier expected
+  CS1514 [15..15) { expected
+  CS1513 [15..15) } expected

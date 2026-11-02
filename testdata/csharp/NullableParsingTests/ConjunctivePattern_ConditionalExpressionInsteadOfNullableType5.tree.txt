@@ -1,0 +1,28 @@
+ConditionalExpression [0..17)
+  IsExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..9)
+      IdentifierToken [5..9) 'Type'
+  QuestionToken [9..10) '?'
+  T:WhitespaceTrivia [10..11) ' '
+  ElementAccessExpression [11..17)
+    IdentifierName [11..15)
+      IdentifierToken [11..14) 'and'
+      T:WhitespaceTrivia [14..15) ' '
+    BracketedArgumentList [15..17)
+      OpenBracketToken [15..16) '['
+      Argument [16..16)
+        IdentifierName [16..16)
+          IdentifierToken [16..16) missing
+      CloseBracketToken [16..17) ']'
+  ColonToken [17..17) missing
+  IdentifierName [17..17)
+    IdentifierToken [17..17) missing
+Diagnostics:
+  CS0443 [16..17) Syntax error; value expected
+  CS1003 [17..17) Syntax error, \':\' expected
+  CS1733 [17..17) Expected expression

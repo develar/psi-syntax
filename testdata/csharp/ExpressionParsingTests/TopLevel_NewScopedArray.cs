@@ -1,0 +1,1 @@
+new scoped[1];

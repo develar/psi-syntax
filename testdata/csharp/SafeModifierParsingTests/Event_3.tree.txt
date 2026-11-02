@@ -1,0 +1,22 @@
+EventFieldDeclaration [0..48)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  ExternKeyword [7..13) 'extern'
+  T:WhitespaceTrivia [13..14) ' '
+  SafeKeyword [14..18) 'safe'
+  T:WhitespaceTrivia [18..19) ' '
+  StaticKeyword [19..25) 'static'
+  T:WhitespaceTrivia [25..26) ' '
+  EventKeyword [26..31) 'event'
+  T:WhitespaceTrivia [31..32) ' '
+  VariableDeclaration [32..47)
+    QualifiedName [32..46)
+      IdentifierName [32..38)
+        IdentifierToken [32..38) 'System'
+      DotToken [38..39) '.'
+      IdentifierName [39..46)
+        IdentifierToken [39..45) 'Action'
+        T:WhitespaceTrivia [45..46) ' '
+    VariableDeclarator [46..47)
+      IdentifierToken [46..47) 'E'
+  SemicolonToken [47..48) ';'

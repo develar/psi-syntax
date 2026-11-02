@@ -1,0 +1,23 @@
+MethodDeclaration [0..38)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..12)
+    VoidKeyword [7..11) 'void'
+    T:WhitespaceTrivia [11..12) ' '
+  IdentifierToken [12..13) 'M'
+  ParameterList [13..37)
+    OpenParenToken [13..14) '('
+    Parameter [14..36)
+      GenericName [14..33)
+        IdentifierToken [14..28) 'ImmutableArray'
+        TypeArgumentList [28..33)
+          LessThanToken [28..29) '<'
+          PredefinedType [29..33)
+            IntKeyword [29..32) 'int'
+            T:WhitespaceTrivia [32..33) ' '
+          GreaterThanToken [33..33) missing
+      IdentifierToken [33..36) 'arr'
+    CloseParenToken [36..37) ')'
+  SemicolonToken [37..38) ';'
+Diagnostics:
+  CS1003 [33..36) Syntax error, \'>\' expected

@@ -1,0 +1,94 @@
+CompilationUnit [0..222)
+  GlobalStatement [0..222)
+    LocalDeclarationStatement [0..222)
+      VariableDeclaration [0..221)
+        IdentifierName [0..4)
+          IdentifierToken [0..3) 'var'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..221)
+          IdentifierToken [4..5) 'v'
+          T:WhitespaceTrivia [5..6) ' '
+          EqualsValueClause [6..221)
+            EqualsToken [6..7) '='
+            T:WhitespaceTrivia [7..8) ' '
+            QueryExpression [8..221)
+              FromClause [8..20)
+                FromKeyword [8..12) 'from'
+                T:WhitespaceTrivia [12..13) ' '
+                IdentifierToken [13..14) 'x'
+                T:WhitespaceTrivia [14..15) ' '
+                InKeyword [15..17) 'in'
+                T:WhitespaceTrivia [17..18) ' '
+                IdentifierName [18..20)
+                  IdentifierToken [18..19) 'y'
+                  T:EndOfLineTrivia [19..20) '\n'
+              QueryBody [20..221)
+                LetClause [20..205)
+                  L:WhitespaceTrivia [20..28) '        '
+                  LetKeyword [28..31) 'let'
+                  T:WhitespaceTrivia [31..32) ' '
+                  IdentifierToken [32..33) 'z'
+                  T:WhitespaceTrivia [33..34) ' '
+                  EqualsToken [34..35) '='
+                  T:WhitespaceTrivia [35..36) ' '
+                  ParenthesizedLambdaExpression [36..205)
+                    ParameterList [36..39)
+                      OpenParenToken [36..37) '('
+                      CloseParenToken [37..38) ')'
+                      T:WhitespaceTrivia [38..39) ' '
+                    EqualsGreaterThanToken [39..41) '=>'
+                    T:EndOfLineTrivia [41..42) '\n'
+                    Block [42..205)
+                      L:WhitespaceTrivia [42..50) '        '
+                      OpenBraceToken [50..51) '{'
+                      T:EndOfLineTrivia [51..52) '\n'
+                      LocalFunctionStatement [52..195)
+                        PredefinedType [52..178)
+                          L:WhitespaceTrivia [52..64) '            '
+                          L:SingleLineCommentTrivia [64..129) '// Inside this query \'from\' is a keyword, and is not a legal type'
+                          L:EndOfLineTrivia [129..130) '\n'
+                          L:WhitespaceTrivia [130..142) '            '
+                          L:SingleLineCommentTrivia [142..160) '// parameter name.'
+                          L:EndOfLineTrivia [160..161) '\n'
+                          L:WhitespaceTrivia [161..173) '            '
+                          VoidKeyword [173..177) 'void'
+                          T:WhitespaceTrivia [177..178) ' '
+                        IdentifierToken [178..179) 'X'
+                        TypeParameterList [179..188)
+                          LessThanToken [179..180) '<'
+                          TypeParameter [180..187)
+                            AttributeList [180..183)
+                              OpenBracketToken [180..181) '['
+                              Attribute [181..181)
+                                IdentifierName [181..181)
+                                  IdentifierToken [181..181) missing
+                              CloseBracketToken [181..182) ']'
+                              T:WhitespaceTrivia [182..183) ' '
+                            IdentifierToken [183..183) missing
+                            T:SkippedTokensTrivia [183..187)
+                              IdentifierToken [183..187) 'from'
+                          GreaterThanToken [187..188) '>'
+                        ParameterList [188..191)
+                          OpenParenToken [188..189) '('
+                          CloseParenToken [189..190) ')'
+                          T:WhitespaceTrivia [190..191) ' '
+                        Block [191..195)
+                          OpenBraceToken [191..192) '{'
+                          T:WhitespaceTrivia [192..193) ' '
+                          CloseBraceToken [193..194) '}'
+                          T:EndOfLineTrivia [194..195) '\n'
+                      L:WhitespaceTrivia [195..203) '        '
+                      CloseBraceToken [203..204) '}'
+                      T:EndOfLineTrivia [204..205) '\n'
+                SelectClause [205..221)
+                  L:WhitespaceTrivia [205..213) '        '
+                  SelectKeyword [213..219) 'select'
+                  T:WhitespaceTrivia [219..220) ' '
+                  IdentifierName [220..221)
+                    IdentifierToken [220..221) 'x'
+      SemicolonToken [221..222) ';'
+  EndOfFileToken [222..222) ''
+Diagnostics:
+  CS1001 [181..182) Identifier expected
+  CS1525 [183..187) Invalid expression term \'from\'
+  CS1003 [183..187) Syntax error, \',\' expected

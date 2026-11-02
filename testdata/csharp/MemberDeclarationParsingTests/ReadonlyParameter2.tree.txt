@@ -1,0 +1,19 @@
+ParenthesizedLambdaExpression [0..24)
+  ParameterList [0..18)
+    L:EndOfLineTrivia [0..1) '\n'
+    OpenParenToken [1..2) '('
+    Parameter [2..16)
+      ReadOnlyKeyword [2..10) 'readonly'
+      T:WhitespaceTrivia [10..11) ' '
+      PredefinedType [11..15)
+        IntKeyword [11..14) 'int'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'i'
+    CloseParenToken [16..17) ')'
+    T:WhitespaceTrivia [17..18) ' '
+  EqualsGreaterThanToken [18..20) '=>'
+  T:WhitespaceTrivia [20..21) ' '
+  Block [21..24)
+    OpenBraceToken [21..22) '{'
+    T:WhitespaceTrivia [22..23) ' '
+    CloseBraceToken [23..24) '}'

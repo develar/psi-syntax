@@ -1,0 +1,85 @@
+ExpressionStatement [0..87)
+  SimpleAssignmentExpression [0..86)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    SwitchExpression [4..86)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      SwitchKeyword [6..12) 'switch'
+      T:WhitespaceTrivia [12..13) ' '
+      OpenBraceToken [13..14) '{'
+      T:EndOfLineTrivia [14..15) '\n'
+      SwitchExpressionArm [15..30)
+        OrPattern [15..26)
+          ConstantPattern [15..21)
+            IdentifierName [15..21)
+              L:WhitespaceTrivia [15..19) '    '
+              IdentifierToken [19..20) 'a'
+              T:WhitespaceTrivia [20..21) ' '
+          OrKeyword [21..23) 'or'
+          T:WhitespaceTrivia [23..24) ' '
+          ConstantPattern [24..26)
+            IdentifierName [24..26)
+              IdentifierToken [24..25) 'b'
+              T:WhitespaceTrivia [25..26) ' '
+        EqualsGreaterThanToken [26..28) '=>'
+        T:WhitespaceTrivia [28..29) ' '
+        NumericLiteralExpression [29..30)
+          NumericLiteralToken [29..30) '1'
+      CommaToken [30..31) ','
+      T:EndOfLineTrivia [31..32) '\n'
+      SwitchExpressionArm [32..48)
+        AndPattern [32..44)
+          ConstantPattern [32..38)
+            IdentifierName [32..38)
+              L:WhitespaceTrivia [32..36) '    '
+              IdentifierToken [36..37) 'c'
+              T:WhitespaceTrivia [37..38) ' '
+          AndKeyword [38..41) 'and'
+          T:WhitespaceTrivia [41..42) ' '
+          ConstantPattern [42..44)
+            IdentifierName [42..44)
+              IdentifierToken [42..43) 'd'
+              T:WhitespaceTrivia [43..44) ' '
+        EqualsGreaterThanToken [44..46) '=>'
+        T:WhitespaceTrivia [46..47) ' '
+        NumericLiteralExpression [47..48)
+          NumericLiteralToken [47..48) '2'
+      CommaToken [48..49) ','
+      T:EndOfLineTrivia [49..50) '\n'
+      SwitchExpressionArm [50..64)
+        NotPattern [50..60)
+          L:WhitespaceTrivia [50..54) '    '
+          NotKeyword [54..57) 'not'
+          T:WhitespaceTrivia [57..58) ' '
+          ConstantPattern [58..60)
+            IdentifierName [58..60)
+              IdentifierToken [58..59) 'e'
+              T:WhitespaceTrivia [59..60) ' '
+        EqualsGreaterThanToken [60..62) '=>'
+        T:WhitespaceTrivia [62..63) ' '
+        NumericLiteralExpression [63..64)
+          NumericLiteralToken [63..64) '3'
+      CommaToken [64..65) ','
+      T:EndOfLineTrivia [65..66) '\n'
+      SwitchExpressionArm [66..83)
+        NotPattern [66..79)
+          L:WhitespaceTrivia [66..70) '    '
+          NotKeyword [70..73) 'not'
+          T:WhitespaceTrivia [73..74) ' '
+          ConstantPattern [74..79)
+            NullLiteralExpression [74..79)
+              NullKeyword [74..78) 'null'
+              T:WhitespaceTrivia [78..79) ' '
+        EqualsGreaterThanToken [79..81) '=>'
+        T:WhitespaceTrivia [81..82) ' '
+        NumericLiteralExpression [82..83)
+          NumericLiteralToken [82..83) '4'
+      CommaToken [83..84) ','
+      T:EndOfLineTrivia [84..85) '\n'
+      CloseBraceToken [85..86) '}'
+  SemicolonToken [86..87) ';'

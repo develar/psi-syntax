@@ -1,0 +1,1 @@
+public implicit operator long(int x) => x;

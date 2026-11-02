@@ -1,0 +1,1 @@
+delegate*<int param1, string param2 = default, void> ptr;

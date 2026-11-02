@@ -1,0 +1,15 @@
+ParenthesizedLambdaExpression [0..15)
+  RefType [0..8)
+    RefKeyword [0..3) 'ref'
+    T:WhitespaceTrivia [3..4) ' '
+    PredefinedType [4..8)
+      IntKeyword [4..7) 'int'
+      T:WhitespaceTrivia [7..8) ' '
+  ParameterList [8..11)
+    OpenParenToken [8..9) '('
+    CloseParenToken [9..10) ')'
+    T:WhitespaceTrivia [10..11) ' '
+  EqualsGreaterThanToken [11..13) '=>'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierName [14..15)
+    IdentifierToken [14..15) 'x'

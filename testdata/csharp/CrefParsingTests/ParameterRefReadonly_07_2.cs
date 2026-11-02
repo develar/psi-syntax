@@ -1,0 +1,1 @@
+/// <see cref="A(in readonly B)"/>

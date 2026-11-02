@@ -1,0 +1,1 @@
+for (MyType m = new() { A = 1, B; true; m++)

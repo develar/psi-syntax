@@ -1,0 +1,8 @@
+IsExpression [0..6)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  IdentifierName [5..6)
+    IdentifierToken [5..6) '_'

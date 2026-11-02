@@ -1,0 +1,35 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..17)
+    ExpressionStatement [0..17)
+      SimpleAssignmentExpression [0..16)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) '_'
+          T:WhitespaceTrivia [1..2) ' '
+        EqualsToken [2..3) '='
+        T:WhitespaceTrivia [3..4) ' '
+        CollectionExpression [4..16)
+          OpenBracketToken [4..5) '['
+          ExpressionElement [5..11)
+            AliasQualifiedName [5..11)
+              IdentifierName [5..6)
+                IdentifierToken [5..6) 'A'
+              ColonColonToken [6..8) '::'
+              IdentifierName [8..11)
+                IdentifierToken [8..9) 'B'
+                T:SkippedTokensTrivia [9..10)
+                  ColonToken [9..10) ':'
+                T:WhitespaceTrivia [10..11) ' '
+          CommaToken [11..11) missing
+          ExpressionElement [11..15)
+            AliasQualifiedName [11..15)
+              IdentifierName [11..12)
+                IdentifierToken [11..12) 'C'
+              ColonColonToken [12..14) '::'
+              IdentifierName [14..15)
+                IdentifierToken [14..15) 'D'
+          CloseBracketToken [15..16) ']'
+      SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1003 [9..10) Syntax error, \',\' expected
+  CS1003 [11..12) Syntax error, \',\' expected

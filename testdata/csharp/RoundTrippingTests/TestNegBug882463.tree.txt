@@ -1,0 +1,55 @@
+CompilationUnit [0..75)
+  ClassDeclaration [0..75)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    IncompleteMember [21..35)
+      IdentifierName [21..35)
+        L:WhitespaceTrivia [21..22) ' '
+        IdentifierToken [22..27) 'yield'
+        T:WhitespaceTrivia [27..28) ' '
+        T:SkippedTokensTrivia [28..33)
+          BreakKeyword [28..33) 'break'
+        T:SkippedTokensTrivia [33..34)
+          SemicolonToken [33..34) ';'
+        T:EndOfLineTrivia [34..35) '\n'
+    MethodDeclaration [35..73)
+      L:WhitespaceTrivia [35..36) ' '
+      StaticKeyword [36..42) 'static'
+      T:WhitespaceTrivia [42..43) ' '
+      PredefinedType [43..47)
+        IntKeyword [43..46) 'int'
+        T:WhitespaceTrivia [46..47) ' '
+      IdentifierToken [47..51) 'Main'
+      ParameterList [51..54)
+        OpenParenToken [51..52) '('
+        CloseParenToken [52..53) ')'
+        T:EndOfLineTrivia [53..54) '\n'
+      Block [54..73)
+        L:WhitespaceTrivia [54..55) ' '
+        OpenBraceToken [55..56) '{'
+        T:WhitespaceTrivia [56..57) ' '
+        T:EndOfLineTrivia [57..58) '\n'
+        ReturnStatement [58..70)
+          L:WhitespaceTrivia [58..60) '  '
+          ReturnKeyword [60..66) 'return'
+          T:WhitespaceTrivia [66..67) ' '
+          NumericLiteralExpression [67..68)
+            NumericLiteralToken [67..68) '1'
+          SemicolonToken [68..69) ';'
+          T:EndOfLineTrivia [69..70) '\n'
+        L:WhitespaceTrivia [70..71) ' '
+        CloseBraceToken [71..72) '}'
+        T:EndOfLineTrivia [72..73) '\n'
+    CloseBraceToken [73..74) '}'
+    T:EndOfLineTrivia [74..75) '\n'
+  EndOfFileToken [75..75) ''
+Diagnostics:
+  CS1519 [28..33) Invalid token \'break\' in a member declaration
+  CS1519 [28..33) Invalid token \'break\' in a member declaration

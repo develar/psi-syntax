@@ -1,0 +1,26 @@
+CompilationUnit [0..53)
+  ClassDeclaration [0..53)
+    AttributeList [0..34)
+      OpenBracketToken [0..1) '['
+      Attribute [1..5)
+        IdentifierName [1..5)
+          IdentifierToken [1..4) 'One'
+          T:WhitespaceTrivia [4..5) ' '
+      CommaToken [5..5) missing
+      Attribute [5..8)
+        IdentifierName [5..8)
+          IdentifierToken [5..8) 'Two'
+      CloseBracketToken [8..9) ']'
+      T:WhitespaceTrivia [9..10) ' '
+      T:SingleLineCommentTrivia [10..33) '// error: missing comma'
+      T:EndOfLineTrivia [33..34) '\n'
+    ClassKeyword [34..39) 'class'
+    T:WhitespaceTrivia [39..40) ' '
+    IdentifierToken [40..49) 'TestClass'
+    T:WhitespaceTrivia [49..50) ' '
+    OpenBraceToken [50..51) '{'
+    T:WhitespaceTrivia [51..52) ' '
+    CloseBraceToken [52..53) '}'
+  EndOfFileToken [53..53) ''
+Diagnostics:
+  CS1003 [5..8) Syntax error, \',\' expected

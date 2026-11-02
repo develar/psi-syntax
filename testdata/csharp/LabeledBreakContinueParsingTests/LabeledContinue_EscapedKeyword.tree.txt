@@ -1,0 +1,6 @@
+ContinueStatement [0..16)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..15)
+    IdentifierToken [9..15) '@while'
+  SemicolonToken [15..16) ';'

@@ -1,0 +1,1 @@
+(scoped int a, scoped ref int b, scoped in int c, scoped out int d) => null

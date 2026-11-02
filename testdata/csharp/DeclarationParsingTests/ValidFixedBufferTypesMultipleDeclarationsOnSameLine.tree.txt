@@ -1,0 +1,54 @@
+CompilationUnit [0..79)
+  StructDeclaration [0..79)
+    L:EndOfLineTrivia [0..1) '\n'
+    UnsafeKeyword [1..7) 'unsafe'
+    T:WhitespaceTrivia [7..8) ' '
+    StructKeyword [8..14) 'struct'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 's'
+    T:EndOfLineTrivia [16..17) '\n'
+    OpenBraceToken [17..18) '{'
+    T:EndOfLineTrivia [18..19) '\n'
+    FieldDeclaration [19..77)
+      L:WhitespaceTrivia [19..23) '    '
+      PublicKeyword [23..29) 'public'
+      T:WhitespaceTrivia [29..30) ' '
+      FixedKeyword [30..35) 'fixed'
+      T:WhitespaceTrivia [35..36) ' '
+      VariableDeclaration [36..75)
+        PredefinedType [36..41)
+          BoolKeyword [36..40) 'bool'
+          T:WhitespaceTrivia [40..41) ' '
+        VariableDeclarator [41..51)
+          IdentifierToken [41..47) '_Type1'
+          BracketedArgumentList [47..51)
+            OpenBracketToken [47..48) '['
+            Argument [48..50)
+              NumericLiteralExpression [48..50)
+                NumericLiteralToken [48..50) '10'
+            CloseBracketToken [50..51) ']'
+        CommaToken [51..52) ','
+        T:WhitespaceTrivia [52..53) ' '
+        VariableDeclarator [53..63)
+          IdentifierToken [53..59) '_Type2'
+          BracketedArgumentList [59..63)
+            OpenBracketToken [59..60) '['
+            Argument [60..62)
+              NumericLiteralExpression [60..62)
+                NumericLiteralToken [60..62) '10'
+            CloseBracketToken [62..63) ']'
+        CommaToken [63..64) ','
+        T:WhitespaceTrivia [64..65) ' '
+        VariableDeclarator [65..75)
+          IdentifierToken [65..71) '_Type3'
+          BracketedArgumentList [71..75)
+            OpenBracketToken [71..72) '['
+            Argument [72..74)
+              NumericLiteralExpression [72..74)
+                NumericLiteralToken [72..74) '20'
+            CloseBracketToken [74..75) ']'
+      SemicolonToken [75..76) ';'
+      T:EndOfLineTrivia [76..77) '\n'
+    CloseBraceToken [77..78) '}'
+    T:EndOfLineTrivia [78..79) '\n'
+  EndOfFileToken [79..79) ''

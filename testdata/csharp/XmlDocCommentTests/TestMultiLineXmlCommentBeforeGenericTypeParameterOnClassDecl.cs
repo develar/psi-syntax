@@ -1,0 +1,1 @@
+class C</**<goo>test</goo>*/T>{}

@@ -1,0 +1,28 @@
+RecordDeclaration [0..42)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  RecordKeyword [7..13) 'record'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierToken [14..15) 'M'
+  TypeParameterList [15..17)
+    LessThanToken [15..16) '<'
+    TypeParameter [16..17)
+      IdentifierToken [16..17) 'T'
+    GreaterThanToken [17..17) missing
+  ParameterList [17..41)
+    OpenParenToken [17..18) '('
+    Parameter [18..40)
+      GenericName [18..35)
+        IdentifierToken [18..32) 'ImmutableArray'
+        TypeArgumentList [32..35)
+          LessThanToken [32..33) '<'
+          IdentifierName [33..35)
+            IdentifierToken [33..34) 'T'
+            T:WhitespaceTrivia [34..35) ' '
+          GreaterThanToken [35..35) missing
+      IdentifierToken [35..40) 'Array'
+    CloseParenToken [40..41) ')'
+  SemicolonToken [41..42) ';'
+Diagnostics:
+  CS1003 [17..18) Syntax error, \'>\' expected
+  CS1003 [35..40) Syntax error, \'>\' expected

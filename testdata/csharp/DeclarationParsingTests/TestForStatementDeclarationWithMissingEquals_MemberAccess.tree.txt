@@ -1,0 +1,26 @@
+ForStatement [0..16)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..12)
+    IdentifierName [5..7)
+      IdentifierToken [5..6) 'C'
+      T:WhitespaceTrivia [6..7) ' '
+    VariableDeclarator [7..12)
+      IdentifierToken [7..8) 'x'
+      T:WhitespaceTrivia [8..9) ' '
+      EqualsValueClause [9..12)
+        EqualsToken [9..9) missing
+        SimpleMemberAccessExpression [9..12)
+          IdentifierName [9..10)
+            IdentifierToken [9..10) 'X'
+          DotToken [10..11) '.'
+          IdentifierName [11..12)
+            IdentifierToken [11..12) 'Y'
+  SemicolonToken [12..13) ';'
+  SemicolonToken [13..14) ';'
+  CloseParenToken [14..15) ')'
+  EmptyStatement [15..16)
+    SemicolonToken [15..16) ';'
+Diagnostics:
+  CS1003 [9..10) Syntax error, \'=\' expected

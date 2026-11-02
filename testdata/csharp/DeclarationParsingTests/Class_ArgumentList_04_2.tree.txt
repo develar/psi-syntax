@@ -1,0 +1,29 @@
+CompilationUnit [0..27)
+  StructDeclaration [0..27)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    ParameterList [9..17)
+      OpenParenToken [9..10) '('
+      Parameter [10..15)
+        PredefinedType [10..14)
+          IntKeyword [10..13) 'int'
+          T:WhitespaceTrivia [13..14) ' '
+        IdentifierToken [14..15) 'x'
+      CloseParenToken [15..16) ')'
+      T:WhitespaceTrivia [16..17) ' '
+    BaseList [17..26)
+      ColonToken [17..18) ':'
+      T:WhitespaceTrivia [18..19) ' '
+      PrimaryConstructorBaseType [19..26)
+        IdentifierName [19..23)
+          IdentifierToken [19..23) 'Base'
+        ArgumentList [23..26)
+          OpenParenToken [23..24) '('
+          Argument [24..25)
+            IdentifierName [24..25)
+              IdentifierToken [24..25) 'x'
+          CloseParenToken [25..26) ')'
+    SemicolonToken [26..27) ';'
+  EndOfFileToken [27..27) ''

@@ -1,0 +1,33 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..14)
+    LocalDeclarationStatement [0..14)
+      VariableDeclaration [0..13)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) 'C'
+          T:WhitespaceTrivia [1..2) ' '
+        VariableDeclarator [2..13)
+          IdentifierToken [2..3) 'x'
+          T:WhitespaceTrivia [3..4) ' '
+          BracketedArgumentList [4..13)
+            OpenBracketToken [4..5) '['
+            Argument [5..6)
+              NumericLiteralExpression [5..6)
+                NumericLiteralToken [5..6) '1'
+            CommaToken [6..7) ','
+            T:WhitespaceTrivia [7..8) ' '
+            Argument [8..9)
+              NumericLiteralExpression [8..9)
+                NumericLiteralToken [8..9) '2'
+            CommaToken [9..10) ','
+            T:WhitespaceTrivia [10..11) ' '
+            Argument [11..12)
+              NumericLiteralExpression [11..12)
+                NumericLiteralToken [11..12) '3'
+            CloseBracketToken [12..13) ']'
+      SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS0650 [4..13) Bad array declarator: To declare a managed array the rank specifier precedes the variable\'s identifier. To declare a fixed size buffer field, use the fixed keyword before the field type.
+  CS0270 [5..6) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)
+  CS0270 [8..9) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)
+  CS0270 [11..12) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)

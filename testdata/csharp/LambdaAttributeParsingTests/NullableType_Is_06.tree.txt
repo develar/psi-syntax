@@ -1,0 +1,45 @@
+SimpleAssignmentExpression [0..42)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) '_'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsToken [2..3) '='
+  T:WhitespaceTrivia [3..4) ' '
+  ConditionalExpression [4..42)
+    IsExpression [4..16)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'x'
+        T:WhitespaceTrivia [5..6) ' '
+      IsKeyword [6..8) 'is'
+      T:WhitespaceTrivia [8..9) ' '
+      PredefinedType [9..16)
+        StringKeyword [9..15) 'string'
+        T:WhitespaceTrivia [15..16) ' '
+    QuestionToken [16..17) '?'
+    T:WhitespaceTrivia [17..18) ' '
+    ParenthesizedExpression [18..39)
+      OpenParenToken [18..19) '('
+      SimpleLambdaExpression [19..37)
+        AttributeList [19..31)
+          OpenBracketToken [19..20) '['
+          AttributeTargetSpecifier [20..28)
+            ReturnKeyword [20..26) 'return'
+            ColonToken [26..27) ':'
+            T:WhitespaceTrivia [27..28) ' '
+          Attribute [28..29)
+            IdentifierName [28..29)
+              IdentifierToken [28..29) 'A'
+          CloseBracketToken [29..30) ']'
+          T:WhitespaceTrivia [30..31) ' '
+        Parameter [31..33)
+          IdentifierToken [31..32) 'y'
+          T:WhitespaceTrivia [32..33) ' '
+        EqualsGreaterThanToken [33..35) '=>'
+        T:WhitespaceTrivia [35..36) ' '
+        IdentifierName [36..37)
+          IdentifierToken [36..37) 'y'
+      CloseParenToken [37..38) ')'
+      T:WhitespaceTrivia [38..39) ' '
+    ColonToken [39..40) ':'
+    T:WhitespaceTrivia [40..41) ' '
+    IdentifierName [41..42)
+      IdentifierToken [41..42) 'z'

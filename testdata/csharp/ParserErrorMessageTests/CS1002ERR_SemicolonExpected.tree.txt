@@ -1,0 +1,73 @@
+CompilationUnit [0..181)
+  NamespaceDeclaration [0..181)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..179)
+      L:WhitespaceTrivia [15..19) '    '
+      AbstractKeyword [19..27) 'abstract'
+      T:WhitespaceTrivia [27..28) ' '
+      PublicKeyword [28..34) 'public'
+      T:WhitespaceTrivia [34..35) ' '
+      ClassKeyword [35..40) 'class'
+      T:WhitespaceTrivia [40..41) ' '
+      IdentifierToken [41..44) 'clx'
+      T:WhitespaceTrivia [44..45) ' '
+      T:EndOfLineTrivia [45..46) '\n'
+      L:WhitespaceTrivia [46..50) '    '
+      OpenBraceToken [50..51) '{'
+      T:EndOfLineTrivia [51..52) '\n'
+      FieldDeclaration [52..98)
+        VariableDeclaration [52..98)
+          PredefinedType [52..64)
+            L:WhitespaceTrivia [52..60) '        '
+            IntKeyword [60..63) 'int'
+            T:WhitespaceTrivia [63..64) ' '
+          VariableDeclarator [64..98)
+            IdentifierToken [64..65) 'i'
+            T:WhitespaceTrivia [65..69) '    '
+            T:SingleLineCommentTrivia [69..97) '// CS1002, missing semicolon'
+            T:EndOfLineTrivia [97..98) '\n'
+        SemicolonToken [98..98) missing
+      MethodDeclaration [98..173)
+        L:WhitespaceTrivia [98..106) '        '
+        PublicKeyword [106..112) 'public'
+        T:WhitespaceTrivia [112..113) ' '
+        StaticKeyword [113..119) 'static'
+        T:WhitespaceTrivia [119..120) ' '
+        PredefinedType [120..124)
+          IntKeyword [120..123) 'int'
+          T:WhitespaceTrivia [123..124) ' '
+        IdentifierToken [124..128) 'Main'
+        ParameterList [128..131)
+          OpenParenToken [128..129) '('
+          CloseParenToken [129..130) ')'
+          T:EndOfLineTrivia [130..131) '\n'
+        Block [131..173)
+          L:WhitespaceTrivia [131..139) '        '
+          OpenBraceToken [139..140) '{'
+          T:EndOfLineTrivia [140..141) '\n'
+          ReturnStatement [141..163)
+            L:WhitespaceTrivia [141..153) '            '
+            ReturnKeyword [153..159) 'return'
+            T:WhitespaceTrivia [159..160) ' '
+            NumericLiteralExpression [160..161)
+              NumericLiteralToken [160..161) '0'
+            SemicolonToken [161..162) ';'
+            T:EndOfLineTrivia [162..163) '\n'
+          L:WhitespaceTrivia [163..171) '        '
+          CloseBraceToken [171..172) '}'
+          T:EndOfLineTrivia [172..173) '\n'
+      L:WhitespaceTrivia [173..177) '    '
+      CloseBraceToken [177..178) '}'
+      T:EndOfLineTrivia [178..179) '\n'
+    CloseBraceToken [179..180) '}'
+    T:EndOfLineTrivia [180..181) '\n'
+  EndOfFileToken [181..181) ''
+Diagnostics:
+  CS1002 [65..65) ; expected

@@ -1,0 +1,1 @@
+[a : from x in y select x]

@@ -1,0 +1,36 @@
+ForStatement [0..48)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  AnonymousMethodExpression [5..18)
+    DelegateKeyword [5..13) 'delegate'
+    ParameterList [13..16)
+      OpenParenToken [13..14) '('
+      CloseParenToken [14..15) ')'
+      T:WhitespaceTrivia [15..16) ' '
+    Block [16..18)
+      OpenBraceToken [16..17) '{'
+      CloseBraceToken [17..18) '}'
+  SemicolonToken [18..19) ';'
+  AnonymousMethodExpression [19..32)
+    DelegateKeyword [19..27) 'delegate'
+    ParameterList [27..30)
+      OpenParenToken [27..28) '('
+      CloseParenToken [28..29) ')'
+      T:WhitespaceTrivia [29..30) ' '
+    Block [30..32)
+      OpenBraceToken [30..31) '{'
+      CloseBraceToken [31..32) '}'
+  SemicolonToken [32..33) ';'
+  AnonymousMethodExpression [33..46)
+    DelegateKeyword [33..41) 'delegate'
+    ParameterList [41..44)
+      OpenParenToken [41..42) '('
+      CloseParenToken [42..43) ')'
+      T:WhitespaceTrivia [43..44) ' '
+    Block [44..46)
+      OpenBraceToken [44..45) '{'
+      CloseBraceToken [45..46) '}'
+  CloseParenToken [46..47) ')'
+  EmptyStatement [47..48)
+    SemicolonToken [47..48) ';'

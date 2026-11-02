@@ -1,0 +1,1 @@
+switch (o) { case (int, int)[] q: break; }

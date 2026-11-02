@@ -1,0 +1,1 @@
+for (A b = c switch { A => x, _ => y };;);

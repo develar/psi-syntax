@@ -1,0 +1,9 @@
+CastExpression [0..8)
+  OpenParenToken [0..1) '('
+  PredefinedType [1..4)
+    IntKeyword [1..4) 'int'
+  CloseParenToken [4..5) ')'
+  RangeExpression [5..8)
+    DotDotToken [5..7) '..'
+    NumericLiteralExpression [7..8)
+      NumericLiteralToken [7..8) '0'

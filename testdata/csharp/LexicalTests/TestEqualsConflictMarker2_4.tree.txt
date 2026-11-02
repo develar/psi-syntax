@@ -1,0 +1,6 @@
+OpenBraceToken [0..1) '{'
+T:EndOfLineTrivia [1..3) '\r\n'
+L:ConflictMarkerTrivia [3..25) '======= trailing chars'
+EndOfFileToken [25..25) ''
+Diagnostics:
+  CS8300 [3..10) Merge conflict marker encountered

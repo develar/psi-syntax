@@ -1,0 +1,45 @@
+CompilationUnit [0..60)
+  ClassDeclaration [0..60)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    IndexerDeclaration [10..59)
+      PredefinedType [10..21)
+        L:WhitespaceTrivia [10..14) '    '
+        ObjectKeyword [14..20) 'object'
+        T:WhitespaceTrivia [20..21) ' '
+      ThisKeyword [21..25) 'this'
+      BracketedParameterList [25..33)
+        OpenBracketToken [25..26) '['
+        Parameter [26..31)
+          PredefinedType [26..30)
+            IntKeyword [26..29) 'int'
+            T:WhitespaceTrivia [29..30) ' '
+          IdentifierToken [30..31) 'i'
+        CloseBracketToken [31..32) ']'
+        T:WhitespaceTrivia [32..33) ' '
+      AccessorList [33..59)
+        OpenBraceToken [33..34) '{'
+        T:WhitespaceTrivia [34..35) ' '
+        GetAccessorDeclaration [35..57)
+          GetKeyword [35..38) 'get'
+          T:WhitespaceTrivia [38..39) ' '
+          Block [39..57)
+            OpenBraceToken [39..40) '{'
+            T:WhitespaceTrivia [40..41) ' '
+            ReturnStatement [41..55)
+              ReturnKeyword [41..47) 'return'
+              T:WhitespaceTrivia [47..48) ' '
+              IdentifierName [48..53)
+                IdentifierToken [48..53) 'field'
+              SemicolonToken [53..54) ';'
+              T:WhitespaceTrivia [54..55) ' '
+            CloseBraceToken [55..56) '}'
+            T:WhitespaceTrivia [56..57) ' '
+        CloseBraceToken [57..58) '}'
+        T:EndOfLineTrivia [58..59) '\n'
+    CloseBraceToken [59..60) '}'
+  EndOfFileToken [60..60) ''

@@ -1,0 +1,40 @@
+CompilationUnit [0..118)
+  ClassDeclaration [0..118)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:PragmaWarningDirectiveTrivia [1..30)
+      HashToken [1..2) '#'
+      PragmaKeyword [2..8) 'pragma'
+      T:WhitespaceTrivia [8..9) ' '
+      WarningKeyword [9..16) 'warning'
+      T:WhitespaceTrivia [16..17) ' '
+      DisableKeyword [17..24) 'disable'
+      T:WhitespaceTrivia [24..25) ' '
+      NumericLiteralExpression [25..29)
+        NumericLiteralToken [25..29) '1584'
+      EndOfDirectiveToken [29..29) ''
+      T:EndOfLineTrivia [29..30) '\n'
+    L:PragmaChecksumDirectiveTrivia [30..106)
+      HashToken [30..31) '#'
+      PragmaKeyword [31..37) 'pragma'
+      T:WhitespaceTrivia [37..38) ' '
+      ChecksumKeyword [38..46) 'checksum'
+      T:WhitespaceTrivia [46..47) ' '
+      StringLiteralToken [47..57) '"file.txt"'
+      T:WhitespaceTrivia [57..58) ' '
+      StringLiteralToken [58..98) '"{00000000-0000-0000-0000-000000000000}"'
+      T:WhitespaceTrivia [98..99) ' '
+      StringLiteralToken [99..105) '"2453"'
+      EndOfDirectiveToken [105..105) ''
+      T:EndOfLineTrivia [105..106) '\n'
+    ClassKeyword [106..111) 'class'
+    T:WhitespaceTrivia [111..112) ' '
+    IdentifierToken [112..113) 'C'
+    T:WhitespaceTrivia [113..114) ' '
+    OpenBraceToken [114..115) '{'
+    T:WhitespaceTrivia [115..116) ' '
+    CloseBraceToken [116..117) '}'
+    T:EndOfLineTrivia [117..118) '\n'
+  EndOfFileToken [118..118) ''
+Diagnostics:
+  CS8022 [2..8) Feature \'#pragma\' is not available in C# 1. Please use language version 2 or greater.
+  CS8022 [31..37) Feature \'#pragma\' is not available in C# 1. Please use language version 2 or greater.

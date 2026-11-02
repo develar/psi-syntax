@@ -1,0 +1,22 @@
+CompilationUnit [0..18)
+  ClassDeclaration [0..18)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    BaseList [8..15)
+      ColonToken [8..9) ':'
+      T:WhitespaceTrivia [9..10) ' '
+      SimpleBaseType [10..11)
+        IdentifierName [10..11)
+          IdentifierToken [10..11) 'b'
+      CommaToken [11..12) ','
+      T:WhitespaceTrivia [12..13) ' '
+      SimpleBaseType [13..15)
+        IdentifierName [13..15)
+          IdentifierToken [13..14) 'c'
+          T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:WhitespaceTrivia [16..17) ' '
+    CloseBraceToken [17..18) '}'
+  EndOfFileToken [18..18) ''

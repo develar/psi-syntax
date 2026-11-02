@@ -1,0 +1,1 @@
+using (C x new C());

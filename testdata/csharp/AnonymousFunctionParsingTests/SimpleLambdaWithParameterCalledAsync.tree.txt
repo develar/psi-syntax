@@ -1,0 +1,69 @@
+CompilationUnit [0..103)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..103)
+    L:EndOfLineTrivia [15..16) '\n'
+    PublicKeyword [16..22) 'public'
+    T:WhitespaceTrivia [22..23) ' '
+    ClassKeyword [23..28) 'class'
+    T:WhitespaceTrivia [28..29) ' '
+    IdentifierToken [29..30) 'C'
+    T:EndOfLineTrivia [30..31) '\n'
+    OpenBraceToken [31..32) '{'
+    T:EndOfLineTrivia [32..33) '\n'
+    MethodDeclaration [33..102)
+      PredefinedType [33..42)
+        L:WhitespaceTrivia [33..37) '    '
+        VoidKeyword [37..41) 'void'
+        T:WhitespaceTrivia [41..42) ' '
+      IdentifierToken [42..44) 'M1'
+      ParameterList [44..47)
+        OpenParenToken [44..45) '('
+        CloseParenToken [45..46) ')'
+        T:EndOfLineTrivia [46..47) '\n'
+      Block [47..102)
+        L:WhitespaceTrivia [47..51) '    '
+        OpenBraceToken [51..52) '{'
+        T:EndOfLineTrivia [52..53) '\n'
+        LocalDeclarationStatement [53..96)
+          VariableDeclaration [53..94)
+            GenericName [53..76)
+              L:WhitespaceTrivia [53..61) '        '
+              IdentifierToken [61..65) 'Func'
+              TypeArgumentList [65..76)
+                LessThanToken [65..66) '<'
+                PredefinedType [66..69)
+                  IntKeyword [66..69) 'int'
+                CommaToken [69..70) ','
+                T:WhitespaceTrivia [70..71) ' '
+                PredefinedType [71..74)
+                  IntKeyword [71..74) 'int'
+                GreaterThanToken [74..75) '>'
+                T:WhitespaceTrivia [75..76) ' '
+            VariableDeclarator [76..94)
+              IdentifierToken [76..77) 'v'
+              T:WhitespaceTrivia [77..78) ' '
+              EqualsValueClause [78..94)
+                EqualsToken [78..79) '='
+                T:WhitespaceTrivia [79..80) ' '
+                SimpleLambdaExpression [80..94)
+                  Parameter [80..86)
+                    IdentifierToken [80..85) 'async'
+                    T:WhitespaceTrivia [85..86) ' '
+                  EqualsGreaterThanToken [86..88) '=>'
+                  T:WhitespaceTrivia [88..89) ' '
+                  IdentifierName [89..94)
+                    IdentifierToken [89..94) 'async'
+          SemicolonToken [94..95) ';'
+          T:EndOfLineTrivia [95..96) '\n'
+        L:WhitespaceTrivia [96..100) '    '
+        CloseBraceToken [100..101) '}'
+        T:EndOfLineTrivia [101..102) '\n'
+    CloseBraceToken [102..103) '}'
+  EndOfFileToken [103..103) ''

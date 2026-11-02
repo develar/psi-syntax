@@ -1,0 +1,10 @@
+CompilationUnit [0..12)
+  StructDeclaration [0..12)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'a'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+  EndOfFileToken [12..12) ''

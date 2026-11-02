@@ -1,0 +1,45 @@
+CompilationUnit [0..59)
+  ClassDeclaration [0..59)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:IfDirectiveTrivia [1..11)
+      HashToken [1..2) '#'
+      IfKeyword [2..4) 'if'
+      T:WhitespaceTrivia [4..5) ' '
+      FalseLiteralExpression [5..10)
+        FalseKeyword [5..10) 'false'
+      EndOfDirectiveToken [10..10) ''
+      T:EndOfLineTrivia [10..11) '\n'
+    L:IfDirectiveTrivia [11..20)
+      HashToken [11..12) '#'
+      IfKeyword [12..14) 'if'
+      T:WhitespaceTrivia [14..15) ' '
+      TrueLiteralExpression [15..19)
+        TrueKeyword [15..19) 'true'
+      EndOfDirectiveToken [19..19) ''
+      T:EndOfLineTrivia [19..20) '\n'
+    L:ErrorDirectiveTrivia [20..33)
+      HashToken [20..21) '#'
+      ErrorKeyword [21..26) 'error'
+      T:WhitespaceTrivia [26..27) ' '
+      L:PreprocessingMessageTrivia [27..32) 'error'
+      EndOfDirectiveToken [32..32) ''
+      T:EndOfLineTrivia [32..33) '\n'
+    L:EndIfDirectiveTrivia [33..40)
+      HashToken [33..34) '#'
+      EndIfKeyword [34..39) 'endif'
+      EndOfDirectiveToken [39..39) ''
+      T:EndOfLineTrivia [39..40) '\n'
+    L:EndIfDirectiveTrivia [40..47)
+      HashToken [40..41) '#'
+      EndIfKeyword [41..46) 'endif'
+      EndOfDirectiveToken [46..46) ''
+      T:EndOfLineTrivia [46..47) '\n'
+    ClassKeyword [47..52) 'class'
+    T:WhitespaceTrivia [52..53) ' '
+    IdentifierToken [53..54) 'C'
+    T:WhitespaceTrivia [54..55) ' '
+    OpenBraceToken [55..56) '{'
+    T:WhitespaceTrivia [56..57) ' '
+    CloseBraceToken [57..58) '}'
+    T:EndOfLineTrivia [58..59) '\n'
+  EndOfFileToken [59..59) ''

@@ -1,0 +1,36 @@
+CompilationUnit [0..26)
+  GlobalStatement [0..26)
+    ExpressionStatement [0..26)
+      InvocationExpression [0..24)
+        IdentifierName [0..2)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'M'
+        ArgumentList [2..24)
+          OpenParenToken [2..3) '('
+          Argument [3..18)
+            OutKeyword [3..6) 'out'
+            T:WhitespaceTrivia [6..7) ' '
+            RefExpression [7..18)
+              RefKeyword [7..10) 'ref'
+              T:WhitespaceTrivia [10..11) ' '
+              IdentifierName [11..18)
+                IdentifierToken [11..17) 'scoped'
+                T:WhitespaceTrivia [17..18) ' '
+          CommaToken [18..18) missing
+          Argument [18..22)
+            PredefinedType [18..22)
+              IntKeyword [18..21) 'int'
+              T:WhitespaceTrivia [21..22) ' '
+          CommaToken [22..22) missing
+          Argument [22..23)
+            IdentifierName [22..23)
+              IdentifierToken [22..23) 'b'
+          CloseParenToken [23..24) ')'
+      SemicolonToken [24..25) ';'
+      T:EndOfLineTrivia [25..26) '\n'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1525 [7..17) Invalid expression term \'ref\'
+  CS1003 [18..21) Syntax error, \',\' expected
+  CS1525 [18..21) Invalid expression term \'int\'
+  CS1003 [22..23) Syntax error, \',\' expected

@@ -1,0 +1,1 @@
+delegate a b(c d);

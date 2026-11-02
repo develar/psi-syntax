@@ -1,0 +1,65 @@
+CompilationUnit [0..69)
+  ClassDeclaration [0..69)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..68)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..23) 'Goo'
+      ParameterList [23..26)
+        OpenParenToken [23..24) '('
+        CloseParenToken [24..25) ')'
+        T:EndOfLineTrivia [25..26) '\n'
+      Block [26..68)
+        L:WhitespaceTrivia [26..30) '    '
+        OpenBraceToken [30..31) '{'
+        T:EndOfLineTrivia [31..32) '\n'
+        TryStatement [32..48)
+          L:WhitespaceTrivia [32..40) '        '
+          TryKeyword [40..43) 'try'
+          T:WhitespaceTrivia [43..44) ' '
+          Block [44..48)
+            OpenBraceToken [44..45) '{'
+            T:WhitespaceTrivia [45..46) ' '
+            CloseBraceToken [46..47) '}'
+            T:WhitespaceTrivia [47..48) ' '
+          FinallyClause [48..48)
+            FinallyKeyword [48..48) missing
+            Block [48..48)
+              OpenBraceToken [48..48) missing
+              CloseBraceToken [48..48) missing
+        TryStatement [48..62)
+          AttributeList [48..52)
+            OpenBracketToken [48..49) '['
+            Attribute [49..50)
+              IdentifierName [49..50)
+                IdentifierToken [49..50) 'A'
+            CloseBracketToken [50..51) ']'
+            T:WhitespaceTrivia [51..52) ' '
+          TryKeyword [52..52) missing
+          Block [52..52)
+            OpenBraceToken [52..52) missing
+            CloseBraceToken [52..52) missing
+          CatchClause [52..62)
+            CatchKeyword [52..57) 'catch'
+            T:WhitespaceTrivia [57..58) ' '
+            Block [58..62)
+              OpenBraceToken [58..59) '{'
+              T:WhitespaceTrivia [59..60) ' '
+              CloseBraceToken [60..61) '}'
+              T:EndOfLineTrivia [61..62) '\n'
+        L:WhitespaceTrivia [62..66) '    '
+        CloseBraceToken [66..67) '}'
+        T:EndOfLineTrivia [67..68) '\n'
+    CloseBraceToken [68..69) '}'
+  EndOfFileToken [69..69) ''
+Diagnostics:
+  CS1524 [46..47) Expected catch or finally
+  CS1003 [52..57) Syntax error, \'try\' expected

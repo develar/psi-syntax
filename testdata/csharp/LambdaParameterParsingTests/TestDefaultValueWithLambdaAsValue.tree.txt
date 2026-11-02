@@ -1,0 +1,58 @@
+ParenthesizedLambdaExpression [0..56)
+  ParameterList [0..45)
+    OpenParenToken [0..1) '('
+    Parameter [1..8)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..8) 'arg'
+    CommaToken [8..9) ','
+    T:WhitespaceTrivia [9..10) ' '
+    Parameter [10..43)
+      GenericName [10..25)
+        IdentifierToken [10..14) 'Func'
+        TypeArgumentList [14..25)
+          LessThanToken [14..15) '<'
+          PredefinedType [15..18)
+            IntKeyword [15..18) 'int'
+          CommaToken [18..19) ','
+          T:WhitespaceTrivia [19..20) ' '
+          PredefinedType [20..23)
+            IntKeyword [20..23) 'int'
+          GreaterThanToken [23..24) '>'
+          T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..28) 'lam'
+      T:WhitespaceTrivia [28..29) ' '
+      EqualsValueClause [29..43)
+        EqualsToken [29..30) '='
+        T:WhitespaceTrivia [30..31) ' '
+        ParenthesizedLambdaExpression [31..43)
+          ParameterList [31..35)
+            OpenParenToken [31..32) '('
+            Parameter [32..33)
+              IdentifierToken [32..33) 'x'
+            CloseParenToken [33..34) ')'
+            T:WhitespaceTrivia [34..35) ' '
+          EqualsGreaterThanToken [35..37) '=>'
+          T:WhitespaceTrivia [37..38) ' '
+          MultiplyExpression [38..43)
+            NumericLiteralExpression [38..40)
+              NumericLiteralToken [38..39) '2'
+              T:WhitespaceTrivia [39..40) ' '
+            AsteriskToken [40..41) '*'
+            T:WhitespaceTrivia [41..42) ' '
+            IdentifierName [42..43)
+              IdentifierToken [42..43) 'x'
+    CloseParenToken [43..44) ')'
+    T:WhitespaceTrivia [44..45) ' '
+  EqualsGreaterThanToken [45..47) '=>'
+  T:WhitespaceTrivia [47..48) ' '
+  InvocationExpression [48..56)
+    IdentifierName [48..51)
+      IdentifierToken [48..51) 'lam'
+    ArgumentList [51..56)
+      OpenParenToken [51..52) '('
+      Argument [52..55)
+        IdentifierName [52..55)
+          IdentifierToken [52..55) 'arg'
+      CloseParenToken [55..56) ')'

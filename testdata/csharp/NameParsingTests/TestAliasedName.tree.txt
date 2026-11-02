@@ -1,0 +1,6 @@
+AliasQualifiedName [0..8)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  ColonColonToken [3..5) '::'
+  IdentifierName [5..8)
+    IdentifierToken [5..8) 'bar'

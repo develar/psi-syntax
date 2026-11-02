@@ -1,0 +1,75 @@
+L:SingleLineDocumentationCommentTrivia [0..53)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..53)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..51)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      NameMemberCref [15..50)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'A'
+        CrefParameterList [16..50)
+          OpenParenToken [16..17) '('
+          CrefParameter [17..28)
+            RefKeyword [17..20) 'ref'
+            ArrayType [20..28)
+              PointerType [20..26)
+                NullableType [20..25)
+                  PredefinedType [20..24)
+                    L:WhitespaceTrivia [20..21) ' '
+                    IntKeyword [21..24) 'int'
+                  QuestionToken [24..25) '?'
+                AsteriskToken [25..26) '*'
+              ArrayRankSpecifier [26..28)
+                OpenBracketToken [26..27) '['
+                OmittedArraySizeExpression [27..27)
+                  OmittedArraySizeExpressionToken [27..27) ''
+                CloseBracketToken [27..28) ']'
+          CommaToken [28..29) ','
+          CrefParameter [29..49)
+            L:WhitespaceTrivia [29..30) ' '
+            OutKeyword [30..33) 'out'
+            ArrayType [33..49)
+              NullableType [33..44)
+                QualifiedName [33..43)
+                  AliasQualifiedName [33..41)
+                    IdentifierName [33..35)
+                      L:WhitespaceTrivia [33..34) ' '
+                      IdentifierToken [34..35) 'B'
+                    ColonColonToken [35..37) '::'
+                    GenericName [37..41)
+                      IdentifierToken [37..38) 'C'
+                      TypeArgumentList [38..41)
+                        LessThanToken [38..39) '{'
+                        IdentifierName [39..40)
+                          IdentifierToken [39..40) 'D'
+                        GreaterThanToken [40..41) '}'
+                  DotToken [41..42) '.'
+                  IdentifierName [42..43)
+                    IdentifierToken [42..43) 'E'
+                QuestionToken [43..44) '?'
+              ArrayRankSpecifier [44..47)
+                OpenBracketToken [44..45) '['
+                OmittedArraySizeExpression [45..45)
+                  OmittedArraySizeExpressionToken [45..45) ''
+                CommaToken [45..46) ','
+                OmittedArraySizeExpression [46..46)
+                  OmittedArraySizeExpressionToken [46..46) ''
+                CloseBracketToken [46..47) ']'
+              ArrayRankSpecifier [47..49)
+                OpenBracketToken [47..48) '['
+                OmittedArraySizeExpression [48..48)
+                  OmittedArraySizeExpressionToken [48..48) ''
+                CloseBracketToken [48..49) ']'
+          CloseParenToken [49..50) ')'
+      DoubleQuoteToken [50..51) '"'
+    SlashGreaterThanToken [51..53) '/>'
+  EndOfDocumentationCommentToken [53..53) ''
+EndOfFileToken [53..53) ''

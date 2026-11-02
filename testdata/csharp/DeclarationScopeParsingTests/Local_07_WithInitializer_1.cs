@@ -1,0 +1,1 @@
+scoped scoped a = default;

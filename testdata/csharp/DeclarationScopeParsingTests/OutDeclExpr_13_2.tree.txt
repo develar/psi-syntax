@@ -1,0 +1,45 @@
+CompilationUnit [0..36)
+  GlobalStatement [0..19)
+    ExpressionStatement [0..19)
+      InvocationExpression [0..19)
+        IdentifierName [0..2)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'M'
+        ArgumentList [2..19)
+          OpenParenToken [2..3) '('
+          Argument [3..15)
+            OutKeyword [3..6) 'out'
+            T:WhitespaceTrivia [6..7) ' '
+            IdentifierName [7..15)
+              IdentifierToken [7..14) '@scoped'
+              T:WhitespaceTrivia [14..15) ' '
+          CommaToken [15..15) missing
+          Argument [15..19)
+            RefKeyword [15..18) 'ref'
+            T:WhitespaceTrivia [18..19) ' '
+            IdentifierName [19..19)
+              IdentifierToken [19..19) missing
+          CloseParenToken [19..19) missing
+      SemicolonToken [19..19) missing
+  GlobalStatement [19..36)
+    LocalDeclarationStatement [19..36)
+      ReadOnlyKeyword [19..27) 'readonly'
+      T:WhitespaceTrivia [27..28) ' '
+      VariableDeclaration [28..34)
+        PredefinedType [28..32)
+          IntKeyword [28..31) 'int'
+          T:WhitespaceTrivia [31..32) ' '
+        VariableDeclarator [32..34)
+          IdentifierToken [32..33) 'a'
+          T:SkippedTokensTrivia [33..34)
+            CloseParenToken [33..34) ')'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1003 [15..18) Syntax error, \',\' expected
+  CS1525 [19..27) Invalid expression term \'readonly\'
+  CS1026 [19..27) ) expected
+  CS1002 [19..27) ; expected
+  CS0106 [19..27) The modifier \'readonly\' is not valid for this item
+  CS1003 [33..34) Syntax error, \',\' expected

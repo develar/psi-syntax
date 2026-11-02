@@ -1,0 +1,21 @@
+PostIncrementExpression [0..16)
+  ParenthesizedLambdaExpression [0..14)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..2)
+        IdentifierName [1..2)
+          IdentifierToken [1..2) 'A'
+      CloseBracketToken [2..3) ']'
+      T:WhitespaceTrivia [3..4) ' '
+    ParameterList [4..7)
+      OpenParenToken [4..5) '('
+      CloseParenToken [5..6) ')'
+      T:WhitespaceTrivia [6..7) ' '
+    EqualsGreaterThanToken [7..9) '=>'
+    T:WhitespaceTrivia [9..10) ' '
+    Block [10..14)
+      OpenBraceToken [10..11) '{'
+      T:WhitespaceTrivia [11..12) ' '
+      CloseBraceToken [12..13) '}'
+      T:WhitespaceTrivia [13..14) ' '
+  PlusPlusToken [14..16) '++'

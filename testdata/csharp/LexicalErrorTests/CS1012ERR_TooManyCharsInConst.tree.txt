@@ -1,0 +1,75 @@
+CompilationUnit [0..137)
+  NamespaceDeclaration [0..137)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..135)
+      L:WhitespaceTrivia [15..19) '    '
+      PublicKeyword [19..25) 'public'
+      T:WhitespaceTrivia [25..26) ' '
+      ClassKeyword [26..31) 'class'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'b'
+      T:WhitespaceTrivia [33..34) ' '
+      BaseList [34..38)
+        ColonToken [34..35) ':'
+        T:WhitespaceTrivia [35..36) ' '
+        SimpleBaseType [36..38)
+          IdentifierName [36..38)
+            IdentifierToken [36..37) 'c'
+            T:EndOfLineTrivia [37..38) '\n'
+      L:WhitespaceTrivia [38..42) '    '
+      OpenBraceToken [42..43) '{'
+      T:EndOfLineTrivia [43..44) '\n'
+      FieldDeclaration [44..71)
+        VariableDeclaration [44..65)
+          PredefinedType [44..57)
+            L:WhitespaceTrivia [44..52) '        '
+            CharKeyword [52..56) 'char'
+            T:WhitespaceTrivia [56..57) ' '
+          VariableDeclarator [57..65)
+            IdentifierToken [57..58) 'a'
+            T:WhitespaceTrivia [58..59) ' '
+            EqualsValueClause [59..65)
+              EqualsToken [59..60) '='
+              T:WhitespaceTrivia [60..61) ' '
+              CharacterLiteralExpression [61..65)
+                CharacterLiteralToken [61..65) '\'xx\''
+        SemicolonToken [65..66) ';'
+        T:WhitespaceTrivia [66..70) '    '
+        T:EndOfLineTrivia [70..71) '\n'
+      MethodDeclaration [71..129)
+        L:WhitespaceTrivia [71..79) '        '
+        PublicKeyword [79..85) 'public'
+        T:WhitespaceTrivia [85..86) ' '
+        StaticKeyword [86..92) 'static'
+        T:WhitespaceTrivia [92..93) ' '
+        PredefinedType [93..98)
+          VoidKeyword [93..97) 'void'
+          T:WhitespaceTrivia [97..98) ' '
+        IdentifierToken [98..102) 'Main'
+        ParameterList [102..105)
+          OpenParenToken [102..103) '('
+          CloseParenToken [103..104) ')'
+          T:EndOfLineTrivia [104..105) '\n'
+        Block [105..129)
+          L:WhitespaceTrivia [105..113) '        '
+          OpenBraceToken [113..114) '{'
+          T:EndOfLineTrivia [114..115) '\n'
+          L:WhitespaceTrivia [115..123) '        '
+          CloseBraceToken [123..124) '}'
+          T:WhitespaceTrivia [124..128) '    '
+          T:EndOfLineTrivia [128..129) '\n'
+      L:WhitespaceTrivia [129..133) '    '
+      CloseBraceToken [133..134) '}'
+      T:EndOfLineTrivia [134..135) '\n'
+    CloseBraceToken [135..136) '}'
+    T:EndOfLineTrivia [136..137) '\n'
+  EndOfFileToken [137..137) ''
+Diagnostics:
+  CS1012 [61..61) Too many characters in character literal

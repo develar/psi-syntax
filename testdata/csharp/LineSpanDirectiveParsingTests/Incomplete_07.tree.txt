@@ -1,0 +1,26 @@
+CompilationUnit [0..16)
+  L:LineSpanDirectiveTrivia [0..16)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..13)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..8) '1'
+      CommaToken [8..9) ','
+      T:WhitespaceTrivia [9..10) ' '
+      NumericLiteralToken [10..11) '2'
+      CloseParenToken [11..12) ')'
+      T:WhitespaceTrivia [12..13) ' '
+    MinusToken [13..14) '-'
+    T:WhitespaceTrivia [14..15) ' '
+    LineDirectivePosition [15..16)
+      OpenParenToken [15..16) '('
+      NumericLiteralToken [16..16) missing
+      CommaToken [16..16) missing
+      NumericLiteralToken [16..16) missing
+      CloseParenToken [16..16) missing
+    StringLiteralToken [16..16) missing
+    EndOfDirectiveToken [16..16) ''
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS8938 [16..16) The #line directive value is missing or out of range

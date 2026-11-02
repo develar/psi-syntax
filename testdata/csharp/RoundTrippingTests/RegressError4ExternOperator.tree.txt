@@ -1,0 +1,68 @@
+CompilationUnit [0..118)
+  ClassDeclaration [0..118)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'A'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    OperatorDeclaration [17..63)
+      L:WhitespaceTrivia [17..21) '    '
+      PublicKeyword [21..27) 'public'
+      T:WhitespaceTrivia [27..28) ' '
+      StaticKeyword [28..34) 'static'
+      T:WhitespaceTrivia [34..35) ' '
+      ExternKeyword [35..41) 'extern'
+      T:WhitespaceTrivia [41..42) ' '
+      PredefinedType [42..46)
+        IntKeyword [42..45) 'int'
+        T:WhitespaceTrivia [45..46) ' '
+      OperatorKeyword [46..54) 'operator'
+      T:WhitespaceTrivia [54..55) ' '
+      ExclamationToken [55..56) '!'
+      ParameterList [56..61)
+        OpenParenToken [56..57) '('
+        Parameter [57..60)
+          IdentifierName [57..59)
+            IdentifierToken [57..58) 'A'
+            T:WhitespaceTrivia [58..59) ' '
+          IdentifierToken [59..60) 'a'
+        CloseParenToken [60..61) ')'
+      SemicolonToken [61..62) ';'
+      T:EndOfLineTrivia [62..63) '\n'
+    OperatorDeclaration [63..116)
+      L:WhitespaceTrivia [63..67) '    '
+      PublicKeyword [67..73) 'public'
+      T:WhitespaceTrivia [73..74) ' '
+      StaticKeyword [74..80) 'static'
+      T:WhitespaceTrivia [80..81) ' '
+      ExternKeyword [81..87) 'extern'
+      T:WhitespaceTrivia [87..88) ' '
+      PredefinedType [88..92)
+        IntKeyword [88..91) 'int'
+        T:WhitespaceTrivia [91..92) ' '
+      OperatorKeyword [92..100) 'operator'
+      T:WhitespaceTrivia [100..101) ' '
+      PlusToken [101..102) '+'
+      ParameterList [102..114)
+        OpenParenToken [102..103) '('
+        Parameter [103..106)
+          IdentifierName [103..105)
+            IdentifierToken [103..104) 'A'
+            T:WhitespaceTrivia [104..105) ' '
+          IdentifierToken [105..106) 'a'
+        CommaToken [106..107) ','
+        T:WhitespaceTrivia [107..108) ' '
+        Parameter [108..113)
+          PredefinedType [108..112)
+            IntKeyword [108..111) 'int'
+            T:WhitespaceTrivia [111..112) ' '
+          IdentifierToken [112..113) 'n'
+        CloseParenToken [113..114) ')'
+      SemicolonToken [114..115) ';'
+      T:EndOfLineTrivia [115..116) '\n'
+    CloseBraceToken [116..117) '}'
+    T:EndOfLineTrivia [117..118) '\n'
+  EndOfFileToken [118..118) ''

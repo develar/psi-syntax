@@ -1,0 +1,13 @@
+CompilationUnit [0..6)
+  L:ReferenceDirectiveTrivia [0..6)
+    HashToken [0..1) '#'
+    ReferenceKeyword [1..2) 'r'
+    T:WhitespaceTrivia [2..3) ' '
+    StringLiteralToken [3..3) missing
+    L:SkippedTokensTrivia [3..6)
+      IdentifierToken [3..6) 'Goo'
+    EndOfDirectiveToken [6..6) ''
+  EndOfFileToken [6..6) ''
+Diagnostics:
+  CS7011 [1..2) #r is only allowed in scripts
+  CS7010 [3..6) Quoted file name expected

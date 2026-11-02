@@ -1,0 +1,1 @@
+void F(scoped readonly int a) { }

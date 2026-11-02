@@ -1,0 +1,1 @@
+from T a in A select b

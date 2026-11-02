@@ -1,0 +1,8 @@
+PostIncrementExpression [0..5)
+  CollectionExpression [0..3)
+    OpenBracketToken [0..1) '['
+    ExpressionElement [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+  PlusPlusToken [3..5) '++'

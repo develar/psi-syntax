@@ -1,0 +1,36 @@
+CompilationUnit [0..29)
+  GlobalStatement [0..29)
+    ExpressionStatement [0..29)
+      InvocationExpression [0..27)
+        IdentifierName [0..2)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'M'
+        ArgumentList [2..27)
+          OpenParenToken [2..3) '('
+          Argument [3..21)
+            OutKeyword [3..6) 'out'
+            T:WhitespaceTrivia [6..7) ' '
+            DeclarationExpression [7..21)
+              IdentifierName [7..14)
+                IdentifierToken [7..13) 'scoped'
+                T:WhitespaceTrivia [13..14) ' '
+              SingleVariableDesignation [14..21)
+                IdentifierToken [14..20) 'scoped'
+                T:WhitespaceTrivia [20..21) ' '
+          CommaToken [21..21) missing
+          Argument [21..25)
+            PredefinedType [21..25)
+              IntKeyword [21..24) 'int'
+              T:WhitespaceTrivia [24..25) ' '
+          CommaToken [25..25) missing
+          Argument [25..26)
+            IdentifierName [25..26)
+              IdentifierToken [25..26) 'a'
+          CloseParenToken [26..27) ')'
+      SemicolonToken [27..28) ';'
+      T:EndOfLineTrivia [28..29) '\n'
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1003 [21..24) Syntax error, \',\' expected
+  CS1525 [21..24) Invalid expression term \'int\'
+  CS1003 [25..26) Syntax error, \',\' expected

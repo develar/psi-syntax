@@ -1,0 +1,17 @@
+ArrayCreationExpression [0..11)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..8)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'a'
+    ArrayRankSpecifier [5..8)
+      OpenBracketToken [5..6) '['
+      OmittedArraySizeExpression [6..6)
+        OmittedArraySizeExpressionToken [6..6) ''
+      CloseBracketToken [6..7) ']'
+      T:WhitespaceTrivia [7..8) ' '
+  ArrayInitializerExpression [8..11)
+    OpenBraceToken [8..9) '{'
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'b'
+    CloseBraceToken [10..11) '}'

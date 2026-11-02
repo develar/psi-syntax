@@ -1,0 +1,45 @@
+CompilationUnit [0..33)
+  GlobalStatement [0..10)
+    ExpressionStatement [0..10)
+      ParenthesizedExpression [0..10)
+        L:EndOfLineTrivia [0..1) '\n'
+        OpenParenToken [1..2) '('
+        IdentifierName [2..10)
+          IdentifierToken [2..9) '@scoped'
+          T:WhitespaceTrivia [9..10) ' '
+        CloseParenToken [10..10) missing
+      SemicolonToken [10..10) missing
+  GlobalStatement [10..33)
+    LocalDeclarationStatement [10..33)
+      VariableDeclaration [10..31)
+        RefType [10..18)
+          RefKeyword [10..13) 'ref'
+          T:WhitespaceTrivia [13..14) ' '
+          PredefinedType [14..18)
+            IntKeyword [14..17) 'int'
+            T:WhitespaceTrivia [17..18) ' '
+        VariableDeclarator [18..19)
+          IdentifierToken [18..19) 'b'
+        CommaToken [19..20) ','
+        T:WhitespaceTrivia [20..21) ' '
+        VariableDeclarator [21..31)
+          IdentifierToken [21..24) 'var'
+          T:WhitespaceTrivia [24..25) ' '
+          T:SkippedTokensTrivia [25..26)
+            IdentifierToken [25..26) 'c'
+          T:SkippedTokensTrivia [26..27)
+            CloseParenToken [26..27) ')'
+          T:WhitespaceTrivia [27..28) ' '
+          T:SkippedTokensTrivia [28..29)
+            EqualsToken [28..29) '='
+          T:WhitespaceTrivia [29..30) ' '
+          T:SkippedTokensTrivia [30..31)
+            IdentifierToken [30..31) 'M'
+      SemicolonToken [31..32) ';'
+      T:EndOfLineTrivia [32..33) '\n'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1026 [10..13) ) expected
+  CS1002 [10..13) ; expected
+  CS1044 [21..24) Cannot use more than one type in a for, using, fixed, or declaration statement
+  CS1003 [25..26) Syntax error, \',\' expected

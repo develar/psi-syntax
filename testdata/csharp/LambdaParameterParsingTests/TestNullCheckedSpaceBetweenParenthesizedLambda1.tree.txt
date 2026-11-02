@@ -1,0 +1,39 @@
+FieldDeclaration [0..41)
+  VariableDeclaration [0..40)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..40)
+      IdentifierToken [21..26) 'func0'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..40)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        ParenthesizedExpression [29..40)
+          OpenParenToken [29..30) '('
+          SuppressNullableWarningExpression [30..34)
+            SuppressNullableWarningExpression [30..33)
+              IdentifierName [30..31)
+                IdentifierToken [30..31) 'x'
+              ExclamationToken [31..32) '!'
+              T:WhitespaceTrivia [32..33) ' '
+            ExclamationToken [33..34) '!'
+          CloseParenToken [34..35) ')'
+          T:WhitespaceTrivia [35..36) ' '
+          T:SkippedTokensTrivia [36..38)
+            EqualsGreaterThanToken [36..38) '=>'
+          T:WhitespaceTrivia [38..39) ' '
+          T:SkippedTokensTrivia [39..40)
+            IdentifierToken [39..40) 'x'
+  SemicolonToken [40..41) ';'
+Diagnostics:
+  CS1003 [36..38) Syntax error, \',\' expected

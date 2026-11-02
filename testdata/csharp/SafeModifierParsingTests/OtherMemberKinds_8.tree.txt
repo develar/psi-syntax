@@ -1,0 +1,9 @@
+RecordDeclaration [0..21)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  RecordKeyword [12..18) 'record'
+  T:WhitespaceTrivia [18..19) ' '
+  IdentifierToken [19..20) 'R'
+  SemicolonToken [20..21) ';'

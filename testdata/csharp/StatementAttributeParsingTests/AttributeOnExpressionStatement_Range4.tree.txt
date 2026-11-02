@@ -1,0 +1,52 @@
+CompilationUnit [0..66)
+  ClassDeclaration [0..66)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..65)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..23) 'Goo'
+      ParameterList [23..38)
+        OpenParenToken [23..24) '('
+        Parameter [24..29)
+          PredefinedType [24..28)
+            IntKeyword [24..27) 'int'
+            T:WhitespaceTrivia [27..28) ' '
+          IdentifierToken [28..29) 'a'
+        CommaToken [29..30) ','
+        T:WhitespaceTrivia [30..31) ' '
+        Parameter [31..36)
+          PredefinedType [31..35)
+            IntKeyword [31..34) 'int'
+            T:WhitespaceTrivia [34..35) ' '
+          IdentifierToken [35..36) 'b'
+        CloseParenToken [36..37) ')'
+        T:EndOfLineTrivia [37..38) '\n'
+      Block [38..65)
+        L:WhitespaceTrivia [38..42) '    '
+        OpenBraceToken [42..43) '{'
+        T:EndOfLineTrivia [43..44) '\n'
+        ExpressionStatement [44..59)
+          RangeExpression [44..57)
+            CollectionExpression [44..55)
+              L:WhitespaceTrivia [44..52) '        '
+              OpenBracketToken [52..53) '['
+              ExpressionElement [53..54)
+                IdentifierName [53..54)
+                  IdentifierToken [53..54) 'A'
+              CloseBracketToken [54..55) ']'
+            DotDotToken [55..57) '..'
+          SemicolonToken [57..58) ';'
+          T:EndOfLineTrivia [58..59) '\n'
+        L:WhitespaceTrivia [59..63) '    '
+        CloseBraceToken [63..64) '}'
+        T:EndOfLineTrivia [64..65) '\n'
+    CloseBraceToken [65..66) '}'
+  EndOfFileToken [66..66) ''

@@ -1,0 +1,21 @@
+SwitchExpression [0..11)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  SwitchExpressionArm [10..10)
+    ConstantPattern [10..10)
+      IdentifierName [10..10)
+        IdentifierToken [10..10) missing
+    EqualsGreaterThanToken [10..10) missing
+    IdentifierName [10..10)
+      IdentifierToken [10..10) missing
+  CommaToken [10..11) ','
+  CloseBraceToken [11..11) missing
+Diagnostics:
+  CS8504 [10..11) Pattern missing
+  CS1003 [10..11) Syntax error, \'=>\' expected
+  CS1525 [10..11) Invalid expression term \',\'
+  CS1513 [11..11) } expected

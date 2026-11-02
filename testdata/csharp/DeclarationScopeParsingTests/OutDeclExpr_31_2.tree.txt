@@ -1,0 +1,29 @@
+CompilationUnit [0..16)
+  GlobalStatement [0..16)
+    ExpressionStatement [0..16)
+      InvocationExpression [0..14)
+        IdentifierName [0..2)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'M'
+        ArgumentList [2..14)
+          OpenParenToken [2..3) '('
+          Argument [3..10)
+            IdentifierName [3..10)
+              IdentifierToken [3..9) 'scoped'
+              T:WhitespaceTrivia [9..10) ' '
+          CommaToken [10..10) missing
+          Argument [10..12)
+            IdentifierName [10..12)
+              IdentifierToken [10..11) 'S'
+              T:WhitespaceTrivia [11..12) ' '
+          CommaToken [12..12) missing
+          Argument [12..13)
+            IdentifierName [12..13)
+              IdentifierToken [12..13) 'a'
+          CloseParenToken [13..14) ')'
+      SemicolonToken [14..15) ';'
+      T:EndOfLineTrivia [15..16) '\n'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1003 [10..11) Syntax error, \',\' expected
+  CS1003 [12..13) Syntax error, \',\' expected

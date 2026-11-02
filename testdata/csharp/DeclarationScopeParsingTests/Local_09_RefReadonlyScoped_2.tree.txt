@@ -1,0 +1,45 @@
+CompilationUnit [0..62)
+  GlobalStatement [0..28)
+    LocalDeclarationStatement [0..28)
+      VariableDeclaration [0..26)
+        RefType [0..21)
+          L:EndOfLineTrivia [0..1) '\n'
+          RefKeyword [1..4) 'ref'
+          T:WhitespaceTrivia [4..5) ' '
+          ReadOnlyKeyword [5..13) 'readonly'
+          T:WhitespaceTrivia [13..14) ' '
+          IdentifierName [14..21)
+            IdentifierToken [14..20) 'scoped'
+            T:WhitespaceTrivia [20..21) ' '
+        VariableDeclarator [21..26)
+          IdentifierToken [21..24) 'var'
+          T:WhitespaceTrivia [24..25) ' '
+          T:SkippedTokensTrivia [25..26)
+            IdentifierToken [25..26) 'b'
+      SemicolonToken [26..27) ';'
+      T:EndOfLineTrivia [27..28) '\n'
+  GlobalStatement [28..62)
+    LocalDeclarationStatement [28..62)
+      VariableDeclaration [28..60)
+        ScopedType [28..55)
+          ScopedKeyword [28..34) 'scoped'
+          T:WhitespaceTrivia [34..35) ' '
+          RefType [35..55)
+            RefKeyword [35..38) 'ref'
+            T:WhitespaceTrivia [38..39) ' '
+            ReadOnlyKeyword [39..47) 'readonly'
+            T:WhitespaceTrivia [47..48) ' '
+            IdentifierName [48..55)
+              IdentifierToken [48..54) 'scoped'
+              T:WhitespaceTrivia [54..55) ' '
+        VariableDeclarator [55..60)
+          IdentifierToken [55..58) 'var'
+          T:WhitespaceTrivia [58..59) ' '
+          T:SkippedTokensTrivia [59..60)
+            IdentifierToken [59..60) 'c'
+      SemicolonToken [60..61) ';'
+      T:EndOfLineTrivia [61..62) '\n'
+  EndOfFileToken [62..62) ''
+Diagnostics:
+  CS1003 [25..26) Syntax error, \',\' expected
+  CS1003 [59..60) Syntax error, \',\' expected

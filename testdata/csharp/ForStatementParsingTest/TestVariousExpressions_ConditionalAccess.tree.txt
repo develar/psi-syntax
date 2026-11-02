@@ -1,0 +1,33 @@
+ForStatement [0..21)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ConditionalAccessExpression [5..9)
+    IdentifierName [5..6)
+      IdentifierToken [5..6) 'a'
+    QuestionToken [6..7) '?'
+    MemberBindingExpression [7..9)
+      DotToken [7..8) '.'
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'b'
+  SemicolonToken [9..10) ';'
+  ConditionalAccessExpression [10..14)
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'a'
+    QuestionToken [11..12) '?'
+    MemberBindingExpression [12..14)
+      DotToken [12..13) '.'
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'b'
+  SemicolonToken [14..15) ';'
+  ConditionalAccessExpression [15..19)
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'a'
+    QuestionToken [16..17) '?'
+    MemberBindingExpression [17..19)
+      DotToken [17..18) '.'
+      IdentifierName [18..19)
+        IdentifierToken [18..19) 'b'
+  CloseParenToken [19..20) ')'
+  EmptyStatement [20..21)
+    SemicolonToken [20..21) ';'

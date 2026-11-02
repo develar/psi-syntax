@@ -1,0 +1,1 @@
+public record M<T(ImmutableArray<T Array);

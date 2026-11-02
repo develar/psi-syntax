@@ -1,0 +1,22 @@
+CompilationUnit [0..11)
+  L:SingleLineDocumentationCommentTrivia [0..11)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlEmptyElement [4..11)
+      LessThanToken [4..5) '<'
+      XmlName [5..8)
+        IdentifierToken [5..5) missing
+        T:SkippedTokensTrivia [5..6)
+          BadToken [5..6) '1'
+        T:SkippedTokensTrivia [6..7)
+          BadToken [6..7) '2'
+        T:SkippedTokensTrivia [7..8)
+          BadToken [7..8) '3'
+      L:WhitespaceTrivia [8..9) ' '
+      SlashGreaterThanToken [9..11) '/>'
+    EndOfDocumentationCommentToken [11..11) ''
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1570 [5..5) XML comment has badly formed XML -- \'An identifier was expected.\'
+  CS1570 [5..6) XML comment has badly formed XML -- \'The character(s) \'1\' cannot be used at this location.\'

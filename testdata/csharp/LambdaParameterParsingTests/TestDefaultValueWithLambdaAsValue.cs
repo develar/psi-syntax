@@ -1,0 +1,1 @@
+(int arg, Func<int, int> lam = (x) => 2 * x) => lam(arg)

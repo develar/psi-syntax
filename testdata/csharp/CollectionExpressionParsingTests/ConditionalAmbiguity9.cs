@@ -1,0 +1,1 @@
+a ? b?[delegate { var v = x ? [y] : z; }] : d

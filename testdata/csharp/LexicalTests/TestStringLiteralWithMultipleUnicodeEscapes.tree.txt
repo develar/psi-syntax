@@ -1,0 +1,2 @@
+StringLiteralToken [0..14) '"\\u1234\\u1234"'
+EndOfFileToken [14..14) ''

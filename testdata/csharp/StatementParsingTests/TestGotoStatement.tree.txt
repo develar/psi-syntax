@@ -1,0 +1,6 @@
+GotoStatement [0..11)
+  GotoKeyword [0..4) 'goto'
+  T:WhitespaceTrivia [4..5) ' '
+  IdentifierName [5..10)
+    IdentifierToken [5..10) 'label'
+  SemicolonToken [10..11) ';'

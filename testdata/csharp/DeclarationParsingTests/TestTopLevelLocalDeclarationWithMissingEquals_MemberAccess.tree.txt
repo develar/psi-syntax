@@ -1,0 +1,22 @@
+CompilationUnit [0..8)
+  GlobalStatement [0..8)
+    LocalDeclarationStatement [0..8)
+      VariableDeclaration [0..7)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) 'C'
+          T:WhitespaceTrivia [1..2) ' '
+        VariableDeclarator [2..7)
+          IdentifierToken [2..3) 'x'
+          T:WhitespaceTrivia [3..4) ' '
+          EqualsValueClause [4..7)
+            EqualsToken [4..4) missing
+            SimpleMemberAccessExpression [4..7)
+              IdentifierName [4..5)
+                IdentifierToken [4..5) 'X'
+              DotToken [5..6) '.'
+              IdentifierName [6..7)
+                IdentifierToken [6..7) 'Y'
+      SemicolonToken [7..8) ';'
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1003 [4..5) Syntax error, \'=\' expected

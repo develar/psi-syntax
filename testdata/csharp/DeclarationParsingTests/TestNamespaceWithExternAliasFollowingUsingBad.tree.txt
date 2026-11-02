@@ -1,0 +1,31 @@
+CompilationUnit [0..40)
+  NamespaceDeclaration [0..40)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'a'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    UsingDirective [14..39)
+      UsingKeyword [14..19) 'using'
+      T:WhitespaceTrivia [19..20) ' '
+      IdentifierName [20..21)
+        IdentifierToken [20..21) 'b'
+      SemicolonToken [21..22) ';'
+      T:WhitespaceTrivia [22..23) ' '
+      T:SkippedTokensTrivia [23..29)
+        ExternKeyword [23..29) 'extern'
+      T:WhitespaceTrivia [29..30) ' '
+      T:SkippedTokensTrivia [30..35)
+        AliasKeyword [30..35) 'alias'
+      T:WhitespaceTrivia [35..36) ' '
+      T:SkippedTokensTrivia [36..37)
+        IdentifierToken [36..37) 'c'
+      T:SkippedTokensTrivia [37..38)
+        SemicolonToken [37..38) ';'
+      T:WhitespaceTrivia [38..39) ' '
+    CloseBraceToken [39..40) '}'
+  EndOfFileToken [40..40) ''
+Diagnostics:
+  CS0439 [23..29) An extern alias declaration must precede all other elements defined in the namespace

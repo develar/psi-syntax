@@ -1,0 +1,44 @@
+CompilationUnit [0..50)
+  ClassDeclaration [0..50)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..37)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      T:WhitespaceTrivia [23..24) ' '
+      T:SkippedTokensTrivia [24..28)
+        IdentifierToken [24..28) 'Name'
+      ParameterList [28..35)
+        OpenParenToken [28..29) '('
+        Parameter [29..33)
+          IdentifierName [29..33)
+            IdentifierToken [29..33) 'Type'
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+      OpenBraceToken [35..35) missing
+      CloseBraceToken [35..35) missing
+      T:SkippedTokensTrivia [35..36)
+        ColonToken [35..36) ':'
+      T:WhitespaceTrivia [36..37) ' '
+    ConstructorDeclaration [37..49)
+      IdentifierToken [37..42) 'Type2'
+      ParameterList [42..45)
+        OpenParenToken [42..43) '('
+        CloseParenToken [43..44) ')'
+        T:WhitespaceTrivia [44..45) ' '
+      Block [45..49)
+        OpenBraceToken [45..46) '{'
+        T:WhitespaceTrivia [46..47) ' '
+        CloseBraceToken [47..48) '}'
+        T:EndOfLineTrivia [48..49) '\n'
+    CloseBraceToken [49..50) '}'
+  EndOfFileToken [50..50) ''
+Diagnostics:
+  CS9281 [24..28) Extension declarations may not have a name.
+  CS1514 [35..36) { expected
+  CS1513 [35..36) } expected
+  CS1519 [35..36) Invalid token \':\' in a member declaration

@@ -1,0 +1,1 @@
+using delegate*<void> ptr = MyMethod();

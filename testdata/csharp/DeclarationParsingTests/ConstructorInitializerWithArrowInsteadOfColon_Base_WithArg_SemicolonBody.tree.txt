@@ -1,0 +1,33 @@
+CompilationUnit [0..31)
+  ClassDeclaration [0..31)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ConstructorDeclaration [10..30)
+      L:WhitespaceTrivia [10..14) '    '
+      IdentifierToken [14..15) 'C'
+      ParameterList [15..18)
+        OpenParenToken [15..16) '('
+        CloseParenToken [16..17) ')'
+        T:WhitespaceTrivia [17..18) ' '
+      BaseConstructorInitializer [18..28)
+        ColonToken [18..18) missing
+        T:SkippedTokensTrivia [18..20)
+          EqualsGreaterThanToken [18..20) '=>'
+        T:WhitespaceTrivia [20..21) ' '
+        BaseKeyword [21..25) 'base'
+        ArgumentList [25..28)
+          OpenParenToken [25..26) '('
+          Argument [26..27)
+            NumericLiteralExpression [26..27)
+              NumericLiteralToken [26..27) '1'
+          CloseParenToken [27..28) ')'
+      SemicolonToken [28..29) ';'
+      T:EndOfLineTrivia [29..30) '\n'
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1003 [18..20) Syntax error, \':\' expected

@@ -1,0 +1,117 @@
+Block [0..181)
+  OpenBraceToken [0..1) '{'
+  T:EndOfLineTrivia [1..2) '\n'
+  LocalDeclarationStatement [2..64)
+    VariableDeclaration [2..64)
+      IdentifierName [2..10)
+        L:WhitespaceTrivia [2..6) '    '
+        IdentifierToken [6..9) 'var'
+        T:WhitespaceTrivia [9..10) ' '
+      VariableDeclarator [10..64)
+        IdentifierToken [10..11) 'y'
+        T:WhitespaceTrivia [11..12) ' '
+        EqualsValueClause [12..64)
+          EqualsToken [12..13) '='
+          T:WhitespaceTrivia [13..14) ' '
+          SwitchExpression [14..64)
+            IdentifierName [14..16)
+              IdentifierToken [14..15) 'x'
+              T:WhitespaceTrivia [15..16) ' '
+            SwitchKeyword [16..22) 'switch'
+            T:EndOfLineTrivia [22..23) '\n'
+            L:WhitespaceTrivia [23..27) '    '
+            OpenBraceToken [27..28) '{'
+            T:EndOfLineTrivia [28..29) '\n'
+            SwitchExpressionArm [29..62)
+              ConstantPattern [29..43)
+                NumericLiteralExpression [29..43)
+                  L:WhitespaceTrivia [29..37) '        '
+                  L:SkippedTokensTrivia [37..41)
+                    CaseKeyword [37..41) 'case'
+                  L:WhitespaceTrivia [41..42) ' '
+                  NumericLiteralToken [42..43) '0'
+              EqualsGreaterThanToken [43..43) missing
+              T:SkippedTokensTrivia [43..44)
+                ColonToken [43..44) ':'
+              T:EndOfLineTrivia [44..45) '\n'
+              InvocationExpression [45..62)
+                IdentifierName [45..60)
+                  L:WhitespaceTrivia [45..57) '            '
+                  IdentifierToken [57..60) 'Goo'
+                ArgumentList [60..62)
+                  OpenParenToken [60..61) '('
+                  CloseParenToken [61..62) ')'
+            CommaToken [62..62) missing
+            T:SkippedTokensTrivia [62..63)
+              SemicolonToken [62..63) ';'
+            T:EndOfLineTrivia [63..64) '\n'
+            CloseBraceToken [64..64) missing
+    SemicolonToken [64..64) missing
+  ReturnStatement [64..88)
+    L:WhitespaceTrivia [64..76) '            '
+    ReturnKeyword [76..82) 'return'
+    T:WhitespaceTrivia [82..83) ' '
+    IdentifierName [83..86)
+      IdentifierToken [83..86) 'Bar'
+    SemicolonToken [86..87) ';'
+    T:EndOfLineTrivia [87..88) '\n'
+  SwitchStatement [88..178)
+    SwitchKeyword [88..88) missing
+    OpenParenToken [88..88) missing
+    IdentifierName [88..88)
+      IdentifierToken [88..88) missing
+    CloseParenToken [88..88) missing
+    OpenBraceToken [88..88) missing
+    SwitchSection [88..173)
+      CaseSwitchLabel [88..104)
+        L:WhitespaceTrivia [88..96) '        '
+        CaseKeyword [96..100) 'case'
+        T:WhitespaceTrivia [100..101) ' '
+        NumericLiteralExpression [101..102)
+          NumericLiteralToken [101..102) '1'
+        ColonToken [102..103) ':'
+        T:EndOfLineTrivia [103..104) '\n'
+      Block [104..173)
+        L:WhitespaceTrivia [104..112) '        '
+        OpenBraceToken [112..113) '{'
+        T:EndOfLineTrivia [113..114) '\n'
+        ExpressionStatement [114..133)
+          InvocationExpression [114..131)
+            IdentifierName [114..129)
+              L:WhitespaceTrivia [114..126) '            '
+              IdentifierToken [126..129) 'Baz'
+            ArgumentList [129..131)
+              OpenParenToken [129..130) '('
+              CloseParenToken [130..131) ')'
+          SemicolonToken [131..132) ';'
+          T:EndOfLineTrivia [132..133) '\n'
+        ThrowStatement [133..163)
+          L:WhitespaceTrivia [133..145) '            '
+          ThrowKeyword [145..150) 'throw'
+          T:WhitespaceTrivia [150..151) ' '
+          ObjectCreationExpression [151..161)
+            NewKeyword [151..154) 'new'
+            T:WhitespaceTrivia [154..155) ' '
+            IdentifierName [155..159)
+              IdentifierToken [155..159) 'Quux'
+            ArgumentList [159..161)
+              OpenParenToken [159..160) '('
+              CloseParenToken [160..161) ')'
+          SemicolonToken [161..162) ';'
+          T:EndOfLineTrivia [162..163) '\n'
+        L:WhitespaceTrivia [163..171) '        '
+        CloseBraceToken [171..172) '}'
+        T:EndOfLineTrivia [172..173) '\n'
+    L:WhitespaceTrivia [173..177) '    '
+    CloseBraceToken [177..178) '}'
+  EmptyStatement [178..180)
+    SemicolonToken [178..179) ';'
+    T:EndOfLineTrivia [179..180) '\n'
+  CloseBraceToken [180..181) '}'
+Diagnostics:
+  CS9134 [37..41) A switch expression arm does not begin with a \'case\' keyword.
+  CS1003 [43..44) Syntax error, \'=>\' expected
+  CS1003 [62..63) Syntax error, \',\' expected
+  CS1513 [63..63) } expected
+  CS1002 [63..63) ; expected
+  CS1003 [87..87) Syntax error, \'switch\' expected

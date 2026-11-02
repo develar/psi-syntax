@@ -1,0 +1,44 @@
+ForEachStatement [0..44)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  IdentifierName [10..17)
+    IdentifierToken [10..16) 'scoped'
+    T:WhitespaceTrivia [16..17) ' '
+  IdentifierToken [17..20) 'var'
+  T:WhitespaceTrivia [20..21) ' '
+  InKeyword [21..21) missing
+  TupleExpression [21..28)
+    OpenParenToken [21..22) '('
+    Argument [22..23)
+      IdentifierName [22..23)
+        IdentifierToken [22..23) 'b'
+    CommaToken [23..24) ','
+    T:WhitespaceTrivia [24..25) ' '
+    Argument [25..26)
+      IdentifierName [25..26)
+        IdentifierToken [25..26) 'c'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  CloseParenToken [28..28) missing
+  ExpressionStatement [28..44)
+    IdentifierName [28..28)
+      IdentifierToken [28..28) missing
+    SemicolonToken [28..28) missing
+    T:SkippedTokensTrivia [28..30)
+      InKeyword [28..30) 'in'
+    T:WhitespaceTrivia [30..31) ' '
+    T:SkippedTokensTrivia [31..41)
+      IdentifierToken [31..41) 'collection'
+    T:SkippedTokensTrivia [41..42)
+      CloseParenToken [41..42) ')'
+    T:SkippedTokensTrivia [42..43)
+      SemicolonToken [42..43) ';'
+    T:EndOfLineTrivia [43..44) '\n'
+Diagnostics:
+  CS1073 [1..28) Unexpected token \'in\'
+  CS1515 [21..22) \'in\' expected
+  CS1026 [28..30) ) expected
+  CS1525 [28..30) Invalid expression term \'in\'
+  CS1002 [28..30) ; expected

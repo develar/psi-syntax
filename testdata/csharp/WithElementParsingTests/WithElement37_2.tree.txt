@@ -1,0 +1,17 @@
+CollectionExpression [0..10)
+  OpenBracketToken [0..1) '['
+  WithElement [1..7)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..7)
+      OpenParenToken [5..6) '('
+      CloseParenToken [6..7) ')'
+  CommaToken [7..7) missing
+  ExpressionElement [7..9)
+    PreIncrementExpression [7..9)
+      PlusPlusToken [7..9) '++'
+      IdentifierName [9..9)
+        IdentifierToken [9..9) missing
+  CloseBracketToken [9..10) ']'
+Diagnostics:
+  CS1003 [7..9) Syntax error, \',\' expected
+  CS1525 [9..10) Invalid expression term \']\'

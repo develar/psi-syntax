@@ -1,0 +1,26 @@
+IsExpression [0..18)
+  ParenthesizedLambdaExpression [0..14)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..2)
+        IdentifierName [1..2)
+          IdentifierToken [1..2) 'A'
+      CloseBracketToken [2..3) ']'
+      T:WhitespaceTrivia [3..4) ' '
+    ParameterList [4..7)
+      OpenParenToken [4..5) '('
+      CloseParenToken [5..6) ')'
+      T:WhitespaceTrivia [6..7) ' '
+    EqualsGreaterThanToken [7..9) '=>'
+    T:WhitespaceTrivia [9..10) ' '
+    Block [10..14)
+      OpenBraceToken [10..11) '{'
+      T:WhitespaceTrivia [11..12) ' '
+      CloseBraceToken [12..13) '}'
+      T:WhitespaceTrivia [13..14) ' '
+  IsKeyword [14..16) 'is'
+  T:WhitespaceTrivia [16..17) ' '
+  IdentifierName [17..18)
+    IdentifierToken [17..18) 'E'
+Diagnostics:
+  CS8848 [14..16) Operator \'is\' cannot be used here due to precedence. Use parentheses to disambiguate.

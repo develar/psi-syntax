@@ -1,0 +1,9 @@
+class C
+{
+    public static int X()
+        => 5 switch
+        {
+            case /* trailing
+*/
+        };
+}

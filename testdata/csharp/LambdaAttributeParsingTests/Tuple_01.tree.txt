@@ -1,0 +1,27 @@
+TupleExpression [0..18)
+  OpenParenToken [0..1) '('
+  Argument [1..14)
+    ParenthesizedLambdaExpression [1..14)
+      AttributeList [1..5)
+        OpenBracketToken [1..2) '['
+        Attribute [2..3)
+          IdentifierName [2..3)
+            IdentifierToken [2..3) 'A'
+        CloseBracketToken [3..4) ']'
+        T:WhitespaceTrivia [4..5) ' '
+      ParameterList [5..8)
+        OpenParenToken [5..6) '('
+        CloseParenToken [6..7) ')'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsGreaterThanToken [8..10) '=>'
+      T:WhitespaceTrivia [10..11) ' '
+      Block [11..14)
+        OpenBraceToken [11..12) '{'
+        T:WhitespaceTrivia [12..13) ' '
+        CloseBraceToken [13..14) '}'
+  CommaToken [14..15) ','
+  T:WhitespaceTrivia [15..16) ' '
+  Argument [16..17)
+    IdentifierName [16..17)
+      IdentifierToken [16..17) 'y'
+  CloseParenToken [17..18) ')'

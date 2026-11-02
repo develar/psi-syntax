@@ -1,0 +1,35 @@
+CompilationUnit [0..29)
+  ConversionOperatorDeclaration [0..29)
+    ImplicitKeyword [0..8) 'implicit'
+    T:WhitespaceTrivia [8..9) ' '
+    ExplicitInterfaceSpecifier [9..13)
+      QualifiedName [9..13)
+        IdentifierName [9..10)
+          IdentifierToken [9..10) 'N'
+        DotToken [10..11) '.'
+        IdentifierName [11..13)
+          IdentifierToken [11..12) 'I'
+          T:WhitespaceTrivia [12..13) ' '
+      DotToken [13..13) missing
+    OperatorKeyword [13..13) missing
+    PredefinedType [13..16)
+      IntKeyword [13..16) 'int'
+    ParameterList [16..24)
+      OpenParenToken [16..17) '('
+      Parameter [17..22)
+        PredefinedType [17..21)
+          IntKeyword [17..20) 'int'
+          T:WhitespaceTrivia [20..21) ' '
+        IdentifierToken [21..22) 'x'
+      CloseParenToken [22..23) ')'
+      T:WhitespaceTrivia [23..24) ' '
+    ArrowExpressionClause [24..28)
+      EqualsGreaterThanToken [24..26) '=>'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierName [27..28)
+        IdentifierToken [27..28) 'x'
+    SemicolonToken [28..29) ';'
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1003 [13..16) Syntax error, \'.\' expected
+  CS1003 [13..16) Syntax error, \'operator\' expected

@@ -1,0 +1,151 @@
+CompilationUnit [0..356)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  NamespaceDeclaration [14..356)
+    NamespaceKeyword [14..23) 'namespace'
+    T:WhitespaceTrivia [23..24) ' '
+    IdentifierName [24..28)
+      IdentifierToken [24..27) 'nms'
+      T:EndOfLineTrivia [27..28) '\n'
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    ClassDeclaration [30..354)
+      L:WhitespaceTrivia [30..34) '    '
+      PublicKeyword [34..40) 'public'
+      T:WhitespaceTrivia [40..41) ' '
+      ClassKeyword [41..46) 'class'
+      T:WhitespaceTrivia [46..47) ' '
+      IdentifierToken [47..51) 'mine'
+      T:EndOfLineTrivia [51..52) '\n'
+      L:WhitespaceTrivia [52..56) '    '
+      OpenBraceToken [56..57) '{'
+      T:EndOfLineTrivia [57..58) '\n'
+      FieldDeclaration [58..97)
+        L:WhitespaceTrivia [58..66) '        '
+        PrivateKeyword [66..73) 'private'
+        T:WhitespaceTrivia [73..74) ' '
+        StaticKeyword [74..80) 'static'
+        T:WhitespaceTrivia [80..81) ' '
+        VariableDeclaration [81..95)
+          PredefinedType [81..85)
+            IntKeyword [81..84) 'int'
+            T:WhitespaceTrivia [84..85) ' '
+          VariableDeclarator [85..95)
+            IdentifierToken [85..91) 'retval'
+            T:WhitespaceTrivia [91..92) ' '
+            EqualsValueClause [92..95)
+              EqualsToken [92..93) '='
+              T:WhitespaceTrivia [93..94) ' '
+              NumericLiteralExpression [94..95)
+                NumericLiteralToken [94..95) '5'
+        SemicolonToken [95..96) ';'
+        T:EndOfLineTrivia [96..97) '\n'
+      MethodDeclaration [97..347)
+        L:WhitespaceTrivia [97..105) '        '
+        PublicKeyword [105..111) 'public'
+        T:WhitespaceTrivia [111..112) ' '
+        StaticKeyword [112..118) 'static'
+        T:WhitespaceTrivia [118..119) ' '
+        PredefinedType [119..123)
+          IntKeyword [119..122) 'int'
+          T:WhitespaceTrivia [122..123) ' '
+        IdentifierToken [123..127) 'Main'
+        ParameterList [127..130)
+          OpenParenToken [127..128) '('
+          CloseParenToken [128..129) ')'
+          T:EndOfLineTrivia [129..130) '\n'
+        Block [130..347)
+          L:WhitespaceTrivia [130..138) '        '
+          OpenBraceToken [138..139) '{'
+          T:EndOfLineTrivia [139..140) '\n'
+          TryStatement [140..314)
+            L:WhitespaceTrivia [140..148) '        '
+            TryKeyword [148..151) 'try'
+            T:WhitespaceTrivia [151..152) ' '
+            Block [152..314)
+              OpenBraceToken [152..153) '{'
+              T:EndOfLineTrivia [153..154) '\n'
+              ExpressionStatement [154..218)
+                InvocationExpression [154..216)
+                  SimpleMemberAccessExpression [154..183)
+                    IdentifierName [154..173)
+                      L:WhitespaceTrivia [154..166) '            '
+                      IdentifierToken [166..173) 'Console'
+                    DotToken [173..174) '.'
+                    IdentifierName [174..183)
+                      IdentifierToken [174..183) 'WriteLine'
+                  ArgumentList [183..216)
+                    OpenParenToken [183..184) '('
+                    Argument [184..215)
+                      StringLiteralExpression [184..215)
+                        StringLiteralToken [184..215) '"In try block, ready to throw."'
+                    CloseParenToken [215..216) ')'
+                SemicolonToken [216..217) ';'
+                T:EndOfLineTrivia [217..218) '\n'
+              ExpressionStatement [218..238)
+                SizeOfExpression [218..238)
+                  L:WhitespaceTrivia [218..230) '            '
+                  SizeOfKeyword [230..236) 'sizeof'
+                  T:WhitespaceTrivia [236..237) ' '
+                  OpenParenToken [237..238) '('
+                  IdentifierName [238..238)
+                    IdentifierToken [238..238) missing
+                  CloseParenToken [238..238) missing
+                SemicolonToken [238..238) missing
+              ThrowStatement [238..298)
+                ThrowKeyword [238..243) 'throw'
+                T:WhitespaceTrivia [243..244) ' '
+                ObjectCreationExpression [244..297)
+                  NewKeyword [244..247) 'new'
+                  T:WhitespaceTrivia [247..248) ' '
+                  IdentifierName [248..268)
+                    IdentifierToken [248..268) 'RecoverableException'
+                  ArgumentList [268..297)
+                    OpenParenToken [268..269) '('
+                    Argument [269..296)
+                      StringLiteralExpression [269..296)
+                        StringLiteralToken [269..296) '"An exception has occurred"'
+                    CloseParenToken [296..297) ')'
+                SemicolonToken [297..297) missing
+                T:SkippedTokensTrivia [297..298)
+                  CloseParenToken [297..298) ')'
+              EmptyStatement [298..300)
+                SemicolonToken [298..299) ';'
+                T:EndOfLineTrivia [299..300) '\n'
+              L:WhitespaceTrivia [300..312) '            '
+              CloseBraceToken [312..313) '}'
+              T:EndOfLineTrivia [313..314) '\n'
+            FinallyClause [314..314)
+              FinallyKeyword [314..314) missing
+              Block [314..314)
+                OpenBraceToken [314..314) missing
+                CloseBraceToken [314..314) missing
+          ReturnStatement [314..337)
+            L:WhitespaceTrivia [314..322) '        '
+            ReturnKeyword [322..328) 'return'
+            T:WhitespaceTrivia [328..329) ' '
+            IdentifierName [329..335)
+              IdentifierToken [329..335) 'retval'
+            SemicolonToken [335..336) ';'
+            T:EndOfLineTrivia [336..337) '\n'
+          L:WhitespaceTrivia [337..345) '        '
+          CloseBraceToken [345..346) '}'
+          T:EndOfLineTrivia [346..347) '\n'
+      L:WhitespaceTrivia [347..351) '    '
+      CloseBraceToken [351..352) '}'
+      SemicolonToken [352..353) ';'
+      T:EndOfLineTrivia [353..354) '\n'
+    CloseBraceToken [354..355) '}'
+    T:EndOfLineTrivia [355..356) '\n'
+  EndOfFileToken [356..356) ''
+Diagnostics:
+  CS1031 [238..243) Type expected
+  CS1026 [238..243) ) expected
+  CS1002 [238..243) ; expected
+  CS1002 [297..298) ; expected
+  CS1513 [297..298) } expected

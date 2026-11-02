@@ -1,0 +1,1 @@
+void M() { (var x, var _) = e; }

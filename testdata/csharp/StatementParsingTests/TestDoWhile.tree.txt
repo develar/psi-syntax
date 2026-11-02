@@ -1,0 +1,15 @@
+DoStatement [0..17)
+  DoKeyword [0..2) 'do'
+  T:WhitespaceTrivia [2..3) ' '
+  Block [3..7)
+    OpenBraceToken [3..4) '{'
+    T:WhitespaceTrivia [4..5) ' '
+    CloseBraceToken [5..6) '}'
+    T:WhitespaceTrivia [6..7) ' '
+  WhileKeyword [7..12) 'while'
+  T:WhitespaceTrivia [12..13) ' '
+  OpenParenToken [13..14) '('
+  IdentifierName [14..15)
+    IdentifierToken [14..15) 'a'
+  CloseParenToken [15..16) ')'
+  SemicolonToken [16..17) ';'

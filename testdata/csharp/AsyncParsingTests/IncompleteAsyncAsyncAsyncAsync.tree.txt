@@ -1,0 +1,25 @@
+CompilationUnit [0..39)
+  ClassDeclaration [0..39)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..39)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      AsyncKeyword [21..26) 'async'
+      T:WhitespaceTrivia [26..27) ' '
+      AsyncKeyword [27..32) 'async'
+      T:WhitespaceTrivia [32..33) ' '
+      IdentifierName [33..39)
+        IdentifierToken [33..38) 'async'
+        T:EndOfLineTrivia [38..39) '\n'
+    CloseBraceToken [39..39) missing
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1519 [39..39) Invalid token \'\' in a member declaration
+  CS1513 [38..38) } expected

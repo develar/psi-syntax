@@ -1,0 +1,2 @@
+StringLiteralExpression [0..13)
+  MultiLineRawStringLiteralToken [0..13) '"""\nhello\n"""'

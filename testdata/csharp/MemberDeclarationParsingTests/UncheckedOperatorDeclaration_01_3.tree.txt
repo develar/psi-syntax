@@ -1,0 +1,27 @@
+OperatorDeclaration [0..33)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  T:SkippedTokensTrivia [11..20)
+    UncheckedKeyword [11..20) 'unchecked'
+  T:WhitespaceTrivia [20..21) ' '
+  ExclamationToken [21..22) '!'
+  ParameterList [22..28)
+    OpenParenToken [22..23) '('
+    Parameter [23..26)
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'C'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'x'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  ArrowExpressionClause [28..32)
+    EqualsGreaterThanToken [28..30) '=>'
+    T:WhitespaceTrivia [30..31) ' '
+    IdentifierName [31..32)
+      IdentifierToken [31..32) 'x'
+  SemicolonToken [32..33) ';'
+Diagnostics:
+  CS9027 [11..20) Unexpected keyword \'unchecked\'

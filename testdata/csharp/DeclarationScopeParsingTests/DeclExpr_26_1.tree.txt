@@ -1,0 +1,45 @@
+CompilationUnit [0..35)
+  GlobalStatement [0..9)
+    ExpressionStatement [0..9)
+      ParenthesizedExpression [0..9)
+        L:EndOfLineTrivia [0..1) '\n'
+        OpenParenToken [1..2) '('
+        IdentifierName [2..9)
+          IdentifierToken [2..8) 'scoped'
+          T:WhitespaceTrivia [8..9) ' '
+        CloseParenToken [9..9) missing
+      SemicolonToken [9..9) missing
+  GlobalStatement [9..35)
+    LocalDeclarationStatement [9..35)
+      VariableDeclaration [9..33)
+        ScopedType [9..20)
+          ScopedKeyword [9..15) 'scoped'
+          T:WhitespaceTrivia [15..16) ' '
+          IdentifierName [16..20)
+            IdentifierToken [16..19) 'var'
+            T:WhitespaceTrivia [19..20) ' '
+        VariableDeclarator [20..21)
+          IdentifierToken [20..21) 'b'
+        CommaToken [21..22) ','
+        T:WhitespaceTrivia [22..23) ' '
+        VariableDeclarator [23..33)
+          IdentifierToken [23..26) 'var'
+          T:WhitespaceTrivia [26..27) ' '
+          T:SkippedTokensTrivia [27..28)
+            IdentifierToken [27..28) 'c'
+          T:SkippedTokensTrivia [28..29)
+            CloseParenToken [28..29) ')'
+          T:WhitespaceTrivia [29..30) ' '
+          T:SkippedTokensTrivia [30..31)
+            EqualsToken [30..31) '='
+          T:WhitespaceTrivia [31..32) ' '
+          T:SkippedTokensTrivia [32..33)
+            IdentifierToken [32..33) 'M'
+      SemicolonToken [33..34) ';'
+      T:EndOfLineTrivia [34..35) '\n'
+  EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1026 [9..15) ) expected
+  CS1002 [9..15) ; expected
+  CS1044 [23..26) Cannot use more than one type in a for, using, fixed, or declaration statement
+  CS1003 [27..28) Syntax error, \',\' expected

@@ -1,0 +1,33 @@
+LocalDeclarationStatement [0..27)
+  VariableDeclaration [0..26)
+    RefType [0..6)
+      RefKeyword [0..3) 'ref'
+      T:WhitespaceTrivia [3..4) ' '
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'T'
+        T:WhitespaceTrivia [5..6) ' '
+    VariableDeclarator [6..15)
+      IdentifierToken [6..7) 'a'
+      T:WhitespaceTrivia [7..8) ' '
+      EqualsValueClause [8..15)
+        EqualsToken [8..9) '='
+        T:WhitespaceTrivia [9..10) ' '
+        RefExpression [10..15)
+          RefKeyword [10..13) 'ref'
+          T:WhitespaceTrivia [13..14) ' '
+          IdentifierName [14..15)
+            IdentifierToken [14..15) 'b'
+    CommaToken [15..16) ','
+    T:WhitespaceTrivia [16..17) ' '
+    VariableDeclarator [17..26)
+      IdentifierToken [17..18) 'c'
+      T:WhitespaceTrivia [18..19) ' '
+      EqualsValueClause [19..26)
+        EqualsToken [19..20) '='
+        T:WhitespaceTrivia [20..21) ' '
+        RefExpression [21..26)
+          RefKeyword [21..24) 'ref'
+          T:WhitespaceTrivia [24..25) ' '
+          IdentifierName [25..26)
+            IdentifierToken [25..26) 'd'
+  SemicolonToken [26..27) ';'

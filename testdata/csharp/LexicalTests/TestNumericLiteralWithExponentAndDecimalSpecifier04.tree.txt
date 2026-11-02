@@ -1,0 +1,4 @@
+NumericLiteralToken [0..5) '0.1EM'
+EndOfFileToken [5..5) ''
+Diagnostics:
+  CS0595 [0..0) Invalid real literal.

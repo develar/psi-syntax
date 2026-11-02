@@ -1,0 +1,65 @@
+CompilationUnit [0..127)
+  NamespaceDeclaration [0..127)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..125)
+      L:WhitespaceTrivia [15..19) '    '
+      AbstractKeyword [19..27) 'abstract'
+      T:WhitespaceTrivia [27..28) ' '
+      PublicKeyword [28..34) 'public'
+      T:WhitespaceTrivia [34..35) ' '
+      ClassKeyword [35..40) 'class'
+      T:WhitespaceTrivia [40..41) ' '
+      IdentifierToken [41..44) 'clx'
+      T:WhitespaceTrivia [44..45) ' '
+      T:EndOfLineTrivia [45..46) '\n'
+      L:WhitespaceTrivia [46..50) '    '
+      OpenBraceToken [50..51) '{'
+      T:EndOfLineTrivia [51..52) '\n'
+      FieldDeclaration [52..97)
+        VariableDeclaration [52..97)
+          PredefinedType [52..67)
+            L:WhitespaceTrivia [52..60) '        '
+            StringKeyword [60..66) 'string'
+            T:WhitespaceTrivia [66..67) ' '
+          VariableDeclarator [67..97)
+            IdentifierToken [67..68) 'a'
+            T:WhitespaceTrivia [68..69) ' '
+            EqualsValueClause [69..97)
+              EqualsToken [69..70) '='
+              T:WhitespaceTrivia [70..71) ' '
+              StringLiteralExpression [71..97)
+                StringLiteralToken [71..96) '"Hello World    // CS1010'
+                T:EndOfLineTrivia [96..97) '\n'
+        SemicolonToken [97..97) missing
+      FieldDeclaration [97..119)
+        VariableDeclaration [97..117)
+          PredefinedType [97..110)
+            L:WhitespaceTrivia [97..105) '        '
+            CharKeyword [105..109) 'char'
+            T:WhitespaceTrivia [109..110) ' '
+          VariableDeclarator [110..117)
+            IdentifierToken [110..111) 'b'
+            T:WhitespaceTrivia [111..112) ' '
+            EqualsValueClause [112..117)
+              EqualsToken [112..113) '='
+              T:WhitespaceTrivia [113..114) ' '
+              CharacterLiteralExpression [114..117)
+                CharacterLiteralToken [114..117) '\'a\''
+        SemicolonToken [117..118) ';'
+        T:EndOfLineTrivia [118..119) '\n'
+      L:WhitespaceTrivia [119..123) '    '
+      CloseBraceToken [123..124) '}'
+      T:EndOfLineTrivia [124..125) '\n'
+    CloseBraceToken [125..126) '}'
+    T:EndOfLineTrivia [126..127) '\n'
+  EndOfFileToken [127..127) ''
+Diagnostics:
+  CS1010 [71..71) Newline in constant
+  CS1002 [96..96) ; expected

@@ -1,0 +1,25 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    ExpressionStatement [0..21)
+      InvocationExpression [0..20)
+        SimpleMemberAccessExpression [0..18)
+          SuppressNullableWarningExpression [0..6)
+            ElementAccessExpression [0..5)
+              CollectionExpression [0..2)
+                OpenBracketToken [0..1) '['
+                CloseBracketToken [1..2) ']'
+              BracketedArgumentList [2..5)
+                OpenBracketToken [2..3) '['
+                Argument [3..4)
+                  NumericLiteralExpression [3..4)
+                    NumericLiteralToken [3..4) '0'
+                CloseBracketToken [4..5) ']'
+            ExclamationToken [5..6) '!'
+          DotToken [6..7) '.'
+          IdentifierName [7..18)
+            IdentifierToken [7..18) 'GetHashCode'
+        ArgumentList [18..20)
+          OpenParenToken [18..19) '('
+          CloseParenToken [19..20) ')'
+      SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

@@ -1,0 +1,1 @@
+class c<t> : x, where t : b { }

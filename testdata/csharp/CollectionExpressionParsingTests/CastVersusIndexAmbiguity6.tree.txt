@@ -1,0 +1,28 @@
+ElementAccessExpression [0..21)
+  ParenthesizedExpression [0..12)
+    OpenParenToken [0..1) '('
+    AddExpression [1..11)
+      IdentifierName [1..5)
+        IdentifierToken [1..4) 'Not'
+        T:WhitespaceTrivia [4..5) ' '
+      PlusToken [5..6) '+'
+      T:WhitespaceTrivia [6..7) ' '
+      IdentifierName [7..11)
+        IdentifierToken [7..11) 'Cast'
+    CloseParenToken [11..12) ')'
+  BracketedArgumentList [12..21)
+    OpenBracketToken [12..13) '['
+    Argument [13..14)
+      NumericLiteralExpression [13..14)
+        NumericLiteralToken [13..14) '1'
+    CommaToken [14..15) ','
+    T:WhitespaceTrivia [15..16) ' '
+    Argument [16..17)
+      NumericLiteralExpression [16..17)
+        NumericLiteralToken [16..17) '2'
+    CommaToken [17..18) ','
+    T:WhitespaceTrivia [18..19) ' '
+    Argument [19..20)
+      NumericLiteralExpression [19..20)
+        NumericLiteralToken [19..20) '3'
+    CloseBracketToken [20..21) ']'

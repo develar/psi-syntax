@@ -1,0 +1,62 @@
+CompilationUnit [0..150)
+  ClassDeclaration [0..150)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'A'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..148)
+      L:WhitespaceTrivia [11..15) '    '
+      StaticKeyword [15..21) 'static'
+      T:WhitespaceTrivia [21..22) ' '
+      PredefinedType [22..27)
+        VoidKeyword [22..26) 'void'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..31) 'Main'
+      ParameterList [31..39)
+        OpenParenToken [31..32) '('
+        Parameter [32..37)
+          PredefinedType [32..36)
+            IntKeyword [32..35) 'int'
+            T:WhitespaceTrivia [35..36) ' '
+          IdentifierToken [36..37) 'i'
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..148)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        L:PragmaWarningDirectiveTrivia [45..74)
+          HashToken [45..46) '#'
+          PragmaKeyword [46..52) 'pragma'
+          T:WhitespaceTrivia [52..53) ' '
+          WarningKeyword [53..60) 'warning'
+          T:WhitespaceTrivia [60..61) ' '
+          DisableKeyword [61..68) 'disable'
+          T:WhitespaceTrivia [68..69) ' '
+          NumericLiteralExpression [69..73)
+            NumericLiteralToken [69..73) '1633'
+          EndOfDirectiveToken [73..73) ''
+          T:EndOfLineTrivia [73..74) '\n'
+        L:PragmaWarningDirectiveTrivia [74..142)
+          HashToken [74..75) '#'
+          PragmaKeyword [75..81) 'pragma'
+          T:WhitespaceTrivia [81..82) ' '
+          WarningKeyword [82..82) missing
+          DisableKeyword [82..82) missing
+          L:SkippedTokensTrivia [82..141)
+            IdentifierToken [82..91) 'something'
+            T:WhitespaceTrivia [91..92) ' '
+            T:SingleLineCommentTrivia [92..141) '// warning CS1633: Unrecognized #pragma directive'
+          EndOfDirectiveToken [141..141) ''
+          T:EndOfLineTrivia [141..142) '\n'
+        L:WhitespaceTrivia [142..146) '    '
+        CloseBraceToken [146..147) '}'
+        T:EndOfLineTrivia [147..148) '\n'
+    CloseBraceToken [148..149) '}'
+    T:EndOfLineTrivia [149..150) '\n'
+  EndOfFileToken [150..150) ''
+Diagnostics:
+  CS1633 [82..91) Unrecognized #pragma directive

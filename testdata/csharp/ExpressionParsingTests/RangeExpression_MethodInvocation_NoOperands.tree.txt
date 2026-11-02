@@ -1,0 +1,13 @@
+RangeExpression [0..14)
+  DotDotToken [0..2) '..'
+  T:WhitespaceTrivia [2..3) ' '
+  T:SkippedTokensTrivia [3..4)
+    DotToken [3..4) '.'
+  T:SkippedTokensTrivia [4..12)
+    IdentifierToken [4..12) 'ToString'
+  T:SkippedTokensTrivia [12..13)
+    OpenParenToken [12..13) '('
+  T:SkippedTokensTrivia [13..14)
+    CloseParenToken [13..14) ')'
+Diagnostics:
+  CS1073 [0..2) Unexpected token \'.\'

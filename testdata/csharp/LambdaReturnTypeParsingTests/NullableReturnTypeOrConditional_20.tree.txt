@@ -1,0 +1,29 @@
+ParenthesizedLambdaExpression [0..28)
+  NullableType [0..17)
+    FunctionPointerType [0..15)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..15)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..14)
+          PredefinedType [10..14)
+            VoidKeyword [10..14) 'void'
+        GreaterThanToken [14..15) '>'
+    QuestionToken [15..16) '?'
+    T:WhitespaceTrivia [16..17) ' '
+  ParameterList [17..20)
+    OpenParenToken [17..18) '('
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  EqualsGreaterThanToken [20..22) '=>'
+  T:WhitespaceTrivia [22..23) ' '
+  IdentifierName [23..28)
+    IdentifierToken [23..24) 'x'
+    T:WhitespaceTrivia [24..25) ' '
+    T:SkippedTokensTrivia [25..26)
+      ColonToken [25..26) ':'
+    T:WhitespaceTrivia [26..27) ' '
+    T:SkippedTokensTrivia [27..28)
+      IdentifierToken [27..28) 'y'
+Diagnostics:
+  CS1073 [0..24) Unexpected token \':\'

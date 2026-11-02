@@ -1,0 +1,20 @@
+CompilationUnit [0..22)
+  UsingDirective [0..22)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    NameEquals [7..11)
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'X'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsToken [9..10) '='
+      T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..20)
+      IdentifierToken [11..11) missing
+      T:SkippedTokensTrivia [11..20)
+        MakeRefKeyword [11..20) '__makeref'
+    SemicolonToken [20..21) ';'
+    T:EndOfLineTrivia [21..22) '\n'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1031 [11..20) Type expected

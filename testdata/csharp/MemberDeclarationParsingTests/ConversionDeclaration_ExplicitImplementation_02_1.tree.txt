@@ -1,0 +1,31 @@
+ConversionOperatorDeclaration [0..29)
+  ExplicitKeyword [0..0) missing
+  ExplicitInterfaceSpecifier [0..4)
+    QualifiedName [0..3)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'N'
+      DotToken [1..2) '.'
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'I'
+    DotToken [3..4) '.'
+  OperatorKeyword [4..12) 'operator'
+  T:WhitespaceTrivia [12..13) ' '
+  PredefinedType [13..16)
+    IntKeyword [13..16) 'int'
+  ParameterList [16..24)
+    OpenParenToken [16..17) '('
+    Parameter [17..22)
+      PredefinedType [17..21)
+        IntKeyword [17..20) 'int'
+        T:WhitespaceTrivia [20..21) ' '
+      IdentifierToken [21..22) 'x'
+    CloseParenToken [22..23) ')'
+    T:WhitespaceTrivia [23..24) ' '
+  ArrowExpressionClause [24..28)
+    EqualsGreaterThanToken [24..26) '=>'
+    T:WhitespaceTrivia [26..27) ' '
+    IdentifierName [27..28)
+      IdentifierToken [27..28) 'x'
+  SemicolonToken [28..29) ';'
+Diagnostics:
+  CS1003 [0..1) Syntax error, \'explicit\' expected

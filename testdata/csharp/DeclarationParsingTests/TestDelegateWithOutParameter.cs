@@ -1,0 +1,1 @@
+delegate a b(out c d);

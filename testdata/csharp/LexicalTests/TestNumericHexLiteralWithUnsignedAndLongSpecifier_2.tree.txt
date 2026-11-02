@@ -1,0 +1,2 @@
+NumericLiteralToken [0..7) '0x123lu'
+EndOfFileToken [7..7) ''

@@ -1,0 +1,17 @@
+IdentifierName [0..21)
+  IdentifierToken [0..0) missing
+  T:SkippedTokensTrivia [0..7)
+    IdentifierToken [0..7) 'partial'
+  T:WhitespaceTrivia [7..8) ' '
+  T:SkippedTokensTrivia [8..12)
+    VoidKeyword [8..12) 'void'
+  T:WhitespaceTrivia [12..13) ' '
+  T:SkippedTokensTrivia [13..19)
+    IdentifierToken [13..19) 'Method'
+  T:SkippedTokensTrivia [19..20)
+    OpenParenToken [19..20) '('
+  T:SkippedTokensTrivia [20..21)
+    CloseParenToken [20..21) ')'
+Diagnostics:
+  CS1073 [0..0) Unexpected token \'partial\'
+  CS1525 [0..7) Invalid expression term \'partial\'

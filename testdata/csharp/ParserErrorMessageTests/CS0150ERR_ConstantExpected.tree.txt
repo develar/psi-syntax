@@ -1,0 +1,100 @@
+CompilationUnit [0..165)
+  UsingDirective [0..7)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..7)
+      IdentifierToken [7..7) missing
+    SemicolonToken [7..7) missing
+  FileScopedNamespaceDeclaration [7..165)
+    NamespaceKeyword [7..16) 'namespace'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..23)
+      IdentifierToken [17..23) 'System'
+    SemicolonToken [23..24) ';'
+    T:EndOfLineTrivia [24..25) '\n'
+    ClassDeclaration [25..165)
+      PublicKeyword [25..31) 'public'
+      T:WhitespaceTrivia [31..32) ' '
+      ClassKeyword [32..37) 'class'
+      T:WhitespaceTrivia [37..38) ' '
+      IdentifierToken [38..42) 'mine'
+      T:WhitespaceTrivia [42..43) ' '
+      OpenBraceToken [43..44) '{'
+      T:EndOfLineTrivia [44..45) '\n'
+      EnumDeclaration [45..89)
+        L:WhitespaceTrivia [45..49) '    '
+        PublicKeyword [49..55) 'public'
+        T:WhitespaceTrivia [55..56) ' '
+        EnumKeyword [56..60) 'enum'
+        T:WhitespaceTrivia [60..61) ' '
+        IdentifierToken [61..63) 'e1'
+        T:WhitespaceTrivia [63..64) ' '
+        OpenBraceToken [64..65) '{'
+        EnumMemberDeclaration [65..70)
+          IdentifierToken [65..68) 'one'
+          EqualsValueClause [68..70)
+            EqualsToken [68..69) '='
+            NumericLiteralExpression [69..70)
+              NumericLiteralToken [69..70) '1'
+        CommaToken [70..71) ','
+        T:WhitespaceTrivia [71..72) ' '
+        EnumMemberDeclaration [72..77)
+          IdentifierToken [72..75) 'two'
+          EqualsValueClause [75..77)
+            EqualsToken [75..76) '='
+            NumericLiteralExpression [76..77)
+              NumericLiteralToken [76..77) '2'
+        CommaToken [77..78) ','
+        T:WhitespaceTrivia [78..79) ' '
+        EnumMemberDeclaration [79..86)
+          IdentifierToken [79..84) 'three'
+          EqualsValueClause [84..86)
+            EqualsToken [84..85) '='
+            T:WhitespaceTrivia [85..86) ' '
+            IdentifierName [86..86)
+              IdentifierToken [86..86) missing
+        CloseBraceToken [86..87) '}'
+        SemicolonToken [87..88) ';'
+        T:EndOfLineTrivia [88..89) '\n'
+      MethodDeclaration [89..156)
+        L:WhitespaceTrivia [89..93) '    '
+        PublicKeyword [93..99) 'public'
+        T:WhitespaceTrivia [99..100) ' '
+        StaticKeyword [100..106) 'static'
+        T:WhitespaceTrivia [106..107) ' '
+        PredefinedType [107..111)
+          IntKeyword [107..110) 'int'
+          T:WhitespaceTrivia [110..111) ' '
+        IdentifierToken [111..115) 'Main'
+        ParameterList [115..118)
+          OpenParenToken [115..116) '('
+          CloseParenToken [116..117) ')'
+          T:EndOfLineTrivia [117..118) '\n'
+        Block [118..156)
+          L:WhitespaceTrivia [118..126) '        '
+          OpenBraceToken [126..127) '{'
+          T:EndOfLineTrivia [127..128) '\n'
+          ReturnStatement [128..146)
+            L:WhitespaceTrivia [128..136) '        '
+            ReturnKeyword [136..142) 'return'
+            T:WhitespaceTrivia [142..143) ' '
+            NumericLiteralExpression [143..144)
+              NumericLiteralToken [143..144) '1'
+            SemicolonToken [144..145) ';'
+            T:EndOfLineTrivia [145..146) '\n'
+          L:WhitespaceTrivia [146..154) '        '
+          CloseBraceToken [154..155) '}'
+          T:EndOfLineTrivia [155..156) '\n'
+      L:WhitespaceTrivia [156..160) '    '
+      CloseBraceToken [160..161) '}'
+      SemicolonToken [161..162) ';'
+      T:EndOfLineTrivia [162..163) '\n'
+      T:SkippedTokensTrivia [163..164)
+        CloseBraceToken [163..164) '}'
+      T:EndOfLineTrivia [164..165) '\n'
+  EndOfFileToken [165..165) ''
+Diagnostics:
+  CS1041 [7..16) Identifier expected; \'namespace\' is a keyword
+  CS0150 [86..87) A constant value is expected
+  CS1022 [163..164) Type or namespace definition, or end-of-file expected

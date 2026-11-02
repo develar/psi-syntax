@@ -1,0 +1,13 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..14)
+    ExpressionStatement [0..14)
+      ObjectCreationExpression [0..13)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        IdentifierName [4..11)
+          IdentifierToken [4..11) 'partial'
+        ArgumentList [11..13)
+          OpenParenToken [11..12) '('
+          CloseParenToken [12..13) ')'
+      SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

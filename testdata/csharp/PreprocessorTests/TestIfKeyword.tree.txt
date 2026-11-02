@@ -1,0 +1,72 @@
+CompilationUnit [0..99)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..8)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..7)
+      IdentifierToken [5..7) 'if'
+    EndOfDirectiveToken [7..7) ''
+    T:EndOfLineTrivia [7..8) '\n'
+  L:WarningDirectiveTrivia [8..20)
+    HashToken [8..9) '#'
+    WarningKeyword [9..16) 'warning'
+    T:WhitespaceTrivia [16..17) ' '
+    L:PreprocessingMessageTrivia [17..19) 'W1'
+    EndOfDirectiveToken [19..19) ''
+    T:EndOfLineTrivia [19..20) '\n'
+  L:ElifDirectiveTrivia [20..31)
+    HashToken [20..21) '#'
+    ElifKeyword [21..25) 'elif'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierName [26..30)
+      IdentifierToken [26..30) 'elif'
+    EndOfDirectiveToken [30..30) ''
+    T:EndOfLineTrivia [30..31) '\n'
+  L:WarningDirectiveTrivia [31..43)
+    HashToken [31..32) '#'
+    WarningKeyword [32..39) 'warning'
+    T:WhitespaceTrivia [39..40) ' '
+    L:PreprocessingMessageTrivia [40..42) 'W2'
+    EndOfDirectiveToken [42..42) ''
+    T:EndOfLineTrivia [42..43) '\n'
+  L:ElifDirectiveTrivia [43..55)
+    HashToken [43..44) '#'
+    ElifKeyword [44..48) 'elif'
+    T:WhitespaceTrivia [48..49) ' '
+    IdentifierName [49..54)
+      IdentifierToken [49..54) 'endif'
+    EndOfDirectiveToken [54..54) ''
+    T:EndOfLineTrivia [54..55) '\n'
+  L:WarningDirectiveTrivia [55..67)
+    HashToken [55..56) '#'
+    WarningKeyword [56..63) 'warning'
+    T:WhitespaceTrivia [63..64) ' '
+    L:PreprocessingMessageTrivia [64..66) 'W3'
+    EndOfDirectiveToken [66..66) ''
+    T:EndOfLineTrivia [66..67) '\n'
+  L:ElifDirectiveTrivia [67..80)
+    HashToken [67..68) '#'
+    ElifKeyword [68..72) 'elif'
+    T:WhitespaceTrivia [72..73) ' '
+    LogicalNotExpression [73..79)
+      ExclamationToken [73..74) '!'
+      IdentifierName [74..79)
+        IdentifierToken [74..79) 'error'
+    EndOfDirectiveToken [79..79) ''
+    T:EndOfLineTrivia [79..80) '\n'
+  L:WarningDirectiveTrivia [80..92)
+    HashToken [80..81) '#'
+    WarningKeyword [81..88) 'warning'
+    T:WhitespaceTrivia [88..89) ' '
+    L:PreprocessingMessageTrivia [89..91) 'W4'
+    EndOfDirectiveToken [91..91) ''
+    T:EndOfLineTrivia [91..92) '\n'
+  L:EndIfDirectiveTrivia [92..99)
+    HashToken [92..93) '#'
+    EndIfKeyword [93..98) 'endif'
+    EndOfDirectiveToken [98..98) ''
+    T:EndOfLineTrivia [98..99) '\n'
+  EndOfFileToken [99..99) ''
+Diagnostics:
+  CS1030 [89..91) #warning: \'W4\'

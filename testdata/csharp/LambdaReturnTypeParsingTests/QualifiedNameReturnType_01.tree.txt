@@ -1,0 +1,16 @@
+ParenthesizedLambdaExpression [0..14)
+  QualifiedName [0..4)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'A'
+    DotToken [1..2) '.'
+    IdentifierName [2..4)
+      IdentifierToken [2..3) 'B'
+      T:WhitespaceTrivia [3..4) ' '
+  ParameterList [4..7)
+    OpenParenToken [4..5) '('
+    CloseParenToken [5..6) ')'
+    T:WhitespaceTrivia [6..7) ' '
+  EqualsGreaterThanToken [7..9) '=>'
+  T:WhitespaceTrivia [9..10) ' '
+  NullLiteralExpression [10..14)
+    NullKeyword [10..14) 'null'

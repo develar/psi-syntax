@@ -1,0 +1,22 @@
+CompilationUnit [0..38)
+  L:RegionDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    RegionKeyword [1..7) 'region'
+    EndOfDirectiveToken [7..7) ''
+    T:EndOfLineTrivia [7..8) '\n'
+  L:RegionDirectiveTrivia [8..16)
+    HashToken [8..9) '#'
+    RegionKeyword [9..15) 'region'
+    EndOfDirectiveToken [15..15) ''
+    T:EndOfLineTrivia [15..16) '\n'
+  L:EndRegionDirectiveTrivia [16..27)
+    HashToken [16..17) '#'
+    EndRegionKeyword [17..26) 'endregion'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  L:EndRegionDirectiveTrivia [27..38)
+    HashToken [27..28) '#'
+    EndRegionKeyword [28..37) 'endregion'
+    EndOfDirectiveToken [37..37) ''
+    T:EndOfLineTrivia [37..38) '\n'
+  EndOfFileToken [38..38) ''

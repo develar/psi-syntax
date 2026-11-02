@@ -1,0 +1,12 @@
+LocalDeclarationStatement [0..18)
+  ExternKeyword [0..6) 'extern'
+  T:WhitespaceTrivia [6..7) ' '
+  VariableDeclaration [7..17)
+    PredefinedType [7..14)
+      ObjectKeyword [7..13) 'object'
+      T:WhitespaceTrivia [13..14) ' '
+    VariableDeclarator [14..17)
+      IdentifierToken [14..17) 'obj'
+  SemicolonToken [17..18) ';'
+Diagnostics:
+  CS0106 [0..6) The modifier \'extern\' is not valid for this item

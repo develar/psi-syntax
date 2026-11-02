@@ -1,0 +1,40 @@
+ForEachVariableStatement [0..37)
+  ForEachKeyword [0..7) 'foreach'
+  T:WhitespaceTrivia [7..8) ' '
+  OpenParenToken [8..9) '('
+  TupleExpression [9..29)
+    OpenParenToken [9..10) '('
+    Argument [10..15)
+      DeclarationExpression [10..15)
+        PredefinedType [10..14)
+          IntKeyword [10..13) 'int'
+          T:WhitespaceTrivia [13..14) ' '
+        SingleVariableDesignation [14..15)
+          IdentifierToken [14..15) 'x'
+    CommaToken [15..16) ','
+    T:WhitespaceTrivia [16..17) ' '
+    Argument [17..27)
+      DeclarationExpression [17..27)
+        IdentifierName [17..21)
+          IdentifierToken [17..20) 'var'
+          T:WhitespaceTrivia [20..21) ' '
+        ParenthesizedVariableDesignation [21..27)
+          OpenParenToken [21..22) '('
+          SingleVariableDesignation [22..23)
+            IdentifierToken [22..23) 'y'
+          CommaToken [23..24) ','
+          T:WhitespaceTrivia [24..25) ' '
+          SingleVariableDesignation [25..26)
+            IdentifierToken [25..26) 'z'
+          CloseParenToken [26..27) ')'
+    CloseParenToken [27..28) ')'
+    T:WhitespaceTrivia [28..29) ' '
+  InKeyword [29..31) 'in'
+  T:WhitespaceTrivia [31..32) ' '
+  IdentifierName [32..33)
+    IdentifierToken [32..33) 'e'
+  CloseParenToken [33..34) ')'
+  T:WhitespaceTrivia [34..35) ' '
+  Block [35..37)
+    OpenBraceToken [35..36) '{'
+    CloseBraceToken [36..37) '}'

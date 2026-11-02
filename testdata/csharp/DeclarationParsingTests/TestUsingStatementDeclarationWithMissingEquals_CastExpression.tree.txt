@@ -1,0 +1,35 @@
+UsingStatement [0..19)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..18)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'C'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..18)
+      IdentifierToken [9..10) 'x'
+      T:WhitespaceTrivia [10..11) ' '
+      BracketedArgumentList [11..18)
+        OpenBracketToken [11..11) missing
+        T:SkippedTokensTrivia [11..12)
+          OpenParenToken [11..12) '('
+        Argument [12..15)
+          PredefinedType [12..15)
+            IntKeyword [12..15) 'int'
+        CloseBracketToken [15..15) missing
+        T:SkippedTokensTrivia [15..16)
+          CloseParenToken [15..16) ')'
+        T:SkippedTokensTrivia [16..17)
+          NumericLiteralToken [16..17) '0'
+        T:SkippedTokensTrivia [17..18)
+          CloseParenToken [17..18) ')'
+  CloseParenToken [18..18) missing
+  EmptyStatement [18..19)
+    SemicolonToken [18..19) ';'
+Diagnostics:
+  CS1528 [11..15) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [11..12) Syntax error, \'[\' expected
+  CS1525 [12..15) Invalid expression term \'int\'
+  CS1003 [15..16) Syntax error, \']\' expected
+  CS1003 [16..17) Syntax error, \',\' expected
+  CS1026 [18..19) ) expected

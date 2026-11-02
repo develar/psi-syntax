@@ -1,0 +1,1 @@
+(scoped R a, scoped ref R b) => null

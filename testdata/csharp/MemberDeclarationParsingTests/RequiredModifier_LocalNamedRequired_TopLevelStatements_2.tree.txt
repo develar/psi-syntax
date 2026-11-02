@@ -1,0 +1,23 @@
+CompilationUnit [0..31)
+  GlobalStatement [0..15)
+    LocalDeclarationStatement [0..15)
+      VariableDeclaration [0..13)
+        PredefinedType [0..5)
+          BoolKeyword [0..4) 'bool'
+          T:WhitespaceTrivia [4..5) ' '
+        VariableDeclarator [5..13)
+          IdentifierToken [5..13) 'required'
+      SemicolonToken [13..14) ';'
+      T:EndOfLineTrivia [14..15) '\n'
+  GlobalStatement [15..31)
+    ExpressionStatement [15..31)
+      SimpleAssignmentExpression [15..30)
+        IdentifierName [15..24)
+          IdentifierToken [15..23) 'required'
+          T:WhitespaceTrivia [23..24) ' '
+        EqualsToken [24..25) '='
+        T:WhitespaceTrivia [25..26) ' '
+        TrueLiteralExpression [26..30)
+          TrueKeyword [26..30) 'true'
+      SemicolonToken [30..31) ';'
+  EndOfFileToken [31..31) ''

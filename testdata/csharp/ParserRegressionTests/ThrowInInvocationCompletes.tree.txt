@@ -1,0 +1,18 @@
+InvocationExpression [0..33)
+  IdentifierName [0..10)
+    IdentifierToken [0..10) 'SomeMethod'
+  ArgumentList [10..33)
+    OpenParenToken [10..11) '('
+    Argument [11..32)
+      ThrowExpression [11..32)
+        ThrowKeyword [11..16) 'throw'
+        T:WhitespaceTrivia [16..17) ' '
+        ObjectCreationExpression [17..32)
+          NewKeyword [17..20) 'new'
+          T:WhitespaceTrivia [20..21) ' '
+          IdentifierName [21..30)
+            IdentifierToken [21..30) 'Exception'
+          ArgumentList [30..32)
+            OpenParenToken [30..31) '('
+            CloseParenToken [31..32) ')'
+    CloseParenToken [32..33) ')'

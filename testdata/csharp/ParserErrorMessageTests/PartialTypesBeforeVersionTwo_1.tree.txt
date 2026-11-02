@@ -1,0 +1,14 @@
+CompilationUnit [0..21)
+  ClassDeclaration [0..21)
+    L:EndOfLineTrivia [0..1) '\n'
+    PartialKeyword [1..8) 'partial'
+    T:WhitespaceTrivia [8..9) ' '
+    ClassKeyword [9..14) 'class'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'C'
+    T:EndOfLineTrivia [16..17) '\n'
+    OpenBraceToken [17..18) '{'
+    T:EndOfLineTrivia [18..19) '\n'
+    CloseBraceToken [19..20) '}'
+    T:EndOfLineTrivia [20..21) '\n'
+  EndOfFileToken [21..21) ''

@@ -1,0 +1,1 @@
+static T F(int x) => { }

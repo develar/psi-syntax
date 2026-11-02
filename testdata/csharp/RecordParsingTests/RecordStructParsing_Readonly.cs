@@ -1,0 +1,1 @@
+readonly record struct S;

@@ -1,0 +1,8 @@
+CompilationUnit [0..11)
+  UsingDirective [0..11)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..10)
+      IdentifierToken [6..10) 'type'
+    SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''

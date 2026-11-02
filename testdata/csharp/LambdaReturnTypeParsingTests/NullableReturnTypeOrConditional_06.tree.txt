@@ -1,0 +1,23 @@
+ConditionalExpression [0..25)
+  SimpleMemberAccessExpression [0..12)
+    PredefinedType [0..3)
+      IntKeyword [0..3) 'int'
+    DotToken [3..4) '.'
+    IdentifierName [4..12)
+      IdentifierToken [4..12) 'MaxValue'
+  QuestionToken [12..13) '?'
+  T:WhitespaceTrivia [13..14) ' '
+  ParenthesizedLambdaExpression [14..22)
+    ParameterList [14..17)
+      OpenParenToken [14..15) '('
+      CloseParenToken [15..16) ')'
+      T:WhitespaceTrivia [16..17) ' '
+    EqualsGreaterThanToken [17..19) '=>'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierName [20..22)
+      IdentifierToken [20..21) 'x'
+      T:WhitespaceTrivia [21..22) ' '
+  ColonToken [22..23) ':'
+  T:WhitespaceTrivia [23..24) ' '
+  IdentifierName [24..25)
+    IdentifierToken [24..25) 'y'

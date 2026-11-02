@@ -1,0 +1,27 @@
+TupleExpression [0..13)
+  OpenParenToken [0..1) '('
+  Argument [1..9)
+    DeclarationExpression [1..9)
+      ArrayType [1..8)
+        PointerType [1..5)
+          PointerType [1..4)
+            PointerType [1..3)
+              IdentifierName [1..2)
+                IdentifierToken [1..2) 'B'
+              AsteriskToken [2..3) '*'
+            AsteriskToken [3..4) '*'
+          AsteriskToken [4..5) '*'
+        ArrayRankSpecifier [5..8)
+          OpenBracketToken [5..6) '['
+          OmittedArraySizeExpression [6..6)
+            OmittedArraySizeExpressionToken [6..6) ''
+          CloseBracketToken [6..7) ']'
+          T:WhitespaceTrivia [7..8) ' '
+      SingleVariableDesignation [8..9)
+        IdentifierToken [8..9) 'C'
+  CommaToken [9..10) ','
+  T:WhitespaceTrivia [10..11) ' '
+  Argument [11..12)
+    IdentifierName [11..12)
+      IdentifierToken [11..12) 'D'
+  CloseParenToken [12..13) ')'

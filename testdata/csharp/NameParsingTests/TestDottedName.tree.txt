@@ -1,0 +1,6 @@
+QualifiedName [0..7)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  DotToken [3..4) '.'
+  IdentifierName [4..7)
+    IdentifierToken [4..7) 'bar'

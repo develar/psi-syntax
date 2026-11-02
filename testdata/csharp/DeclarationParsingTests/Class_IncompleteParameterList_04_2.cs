@@ -1,0 +1,4 @@
+
+struct C
+(
+: Base;

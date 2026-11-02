@@ -1,0 +1,15 @@
+InterpolatedStringExpression [0..23)
+  InterpolatedVerbatimStringStartToken [0..3) '$@"'
+  InterpolatedStringText [3..6)
+    InterpolatedStringTextToken [3..6) 'aaa'
+  Interpolation [6..19)
+    OpenBraceToken [6..7) '{'
+    InterpolatedStringExpression [7..18)
+      InterpolatedVerbatimStringStartToken [7..10) '@$"'
+      InterpolatedStringText [10..17)
+        InterpolatedStringTextToken [10..17) 'bbb\nccc'
+      InterpolatedStringEndToken [17..18) '"'
+    CloseBraceToken [18..19) '}'
+  InterpolatedStringText [19..22)
+    InterpolatedStringTextToken [19..22) 'ddd'
+  InterpolatedStringEndToken [22..23) '"'

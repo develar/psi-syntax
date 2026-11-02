@@ -1,0 +1,7 @@
+CheckedStatement [0..11)
+  CheckedKeyword [0..7) 'checked'
+  T:WhitespaceTrivia [7..8) ' '
+  Block [8..11)
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    CloseBraceToken [10..11) '}'

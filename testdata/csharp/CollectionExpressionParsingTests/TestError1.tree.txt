@@ -1,0 +1,9 @@
+CollectionExpression [0..3)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..1)
+    IdentifierName [1..1)
+      IdentifierToken [1..1) missing
+  CommaToken [1..2) ','
+  CloseBracketToken [2..3) ']'
+Diagnostics:
+  CS1525 [1..2) Invalid expression term \',\'

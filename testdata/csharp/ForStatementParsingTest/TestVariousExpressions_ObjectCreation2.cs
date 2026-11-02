@@ -1,0 +1,1 @@
+for (new A() { };new A() { };new A() { });

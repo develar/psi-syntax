@@ -1,0 +1,15 @@
+CastExpression [0..15)
+  OpenParenToken [0..1) '('
+  NullableType [1..10)
+    ArrayType [1..9)
+      PredefinedType [1..7)
+        ObjectKeyword [1..7) 'object'
+      ArrayRankSpecifier [7..9)
+        OpenBracketToken [7..8) '['
+        OmittedArraySizeExpression [8..8)
+          OmittedArraySizeExpressionToken [8..8) ''
+        CloseBracketToken [8..9) ']'
+    QuestionToken [9..10) '?'
+  CloseParenToken [10..11) ')'
+  NullLiteralExpression [11..15)
+    NullKeyword [11..15) 'null'

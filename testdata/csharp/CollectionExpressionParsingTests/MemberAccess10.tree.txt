@@ -1,0 +1,46 @@
+CompilationUnit [0..79)
+  ClassDeclaration [0..79)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..78)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..32)
+        VoidKeyword [27..31) 'void'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..36) 'Main'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      Block [39..78)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        ExpressionStatement [45..72)
+          ConditionalAccessExpression [45..70)
+            CollectionExpression [45..55)
+              L:WhitespaceTrivia [45..53) '        '
+              OpenBracketToken [53..54) '['
+              CloseBracketToken [54..55) ']'
+            QuestionToken [55..56) '?'
+            InvocationExpression [56..70)
+              MemberBindingExpression [56..68)
+                DotToken [56..57) '.'
+                IdentifierName [57..68)
+                  IdentifierToken [57..68) 'GetHashCode'
+              ArgumentList [68..70)
+                OpenParenToken [68..69) '('
+                CloseParenToken [69..70) ')'
+          SemicolonToken [70..71) ';'
+          T:EndOfLineTrivia [71..72) '\n'
+        L:WhitespaceTrivia [72..76) '    '
+        CloseBraceToken [76..77) '}'
+        T:EndOfLineTrivia [77..78) '\n'
+    CloseBraceToken [78..79) '}'
+  EndOfFileToken [79..79) ''

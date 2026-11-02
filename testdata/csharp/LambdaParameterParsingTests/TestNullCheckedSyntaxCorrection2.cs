@@ -1,0 +1,1 @@
+Func<string, string> func2 = x != > x;

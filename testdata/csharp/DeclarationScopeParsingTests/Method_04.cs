@@ -1,0 +1,1 @@
+scoped R F() => default;

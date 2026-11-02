@@ -1,0 +1,27 @@
+ForStatement [0..42)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  TypeOfExpression [5..16)
+    TypeOfKeyword [5..11) 'typeof'
+    OpenParenToken [11..12) '('
+    PredefinedType [12..15)
+      IntKeyword [12..15) 'int'
+    CloseParenToken [15..16) ')'
+  SemicolonToken [16..17) ';'
+  TypeOfExpression [17..28)
+    TypeOfKeyword [17..23) 'typeof'
+    OpenParenToken [23..24) '('
+    PredefinedType [24..27)
+      IntKeyword [24..27) 'int'
+    CloseParenToken [27..28) ')'
+  SemicolonToken [28..29) ';'
+  TypeOfExpression [29..40)
+    TypeOfKeyword [29..35) 'typeof'
+    OpenParenToken [35..36) '('
+    PredefinedType [36..39)
+      IntKeyword [36..39) 'int'
+    CloseParenToken [39..40) ')'
+  CloseParenToken [40..41) ')'
+  EmptyStatement [41..42)
+    SemicolonToken [41..42) ';'

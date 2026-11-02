@@ -1,0 +1,15 @@
+CompilationUnit [0..4)
+  IncompleteMember [0..4)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..4)
+        IdentifierName [1..4)
+          IdentifierToken [1..2) 'a'
+          T:WhitespaceTrivia [2..3) ' '
+          T:SkippedTokensTrivia [3..4)
+            BadToken [3..4) '$'
+      CloseBracketToken [4..4) missing
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1056 [3..3) Unexpected character \'$\'
+  CS1003 [4..4) Syntax error, \']\' expected

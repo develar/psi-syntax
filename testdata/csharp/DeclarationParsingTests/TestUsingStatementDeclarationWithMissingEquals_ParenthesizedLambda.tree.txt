@@ -1,0 +1,38 @@
+UsingStatement [0..21)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..20)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'C'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..20)
+      IdentifierToken [9..10) 'x'
+      T:WhitespaceTrivia [10..11) ' '
+      BracketedArgumentList [11..20)
+        OpenBracketToken [11..11) missing
+        T:SkippedTokensTrivia [11..12)
+          OpenParenToken [11..12) '('
+        Argument [12..13)
+          IdentifierName [12..13)
+            IdentifierToken [12..13) 'a'
+        CloseBracketToken [13..13) missing
+        T:SkippedTokensTrivia [13..14)
+          CloseParenToken [13..14) ')'
+        T:WhitespaceTrivia [14..15) ' '
+        T:SkippedTokensTrivia [15..17)
+          EqualsGreaterThanToken [15..17) '=>'
+        T:WhitespaceTrivia [17..18) ' '
+        T:SkippedTokensTrivia [18..19)
+          IdentifierToken [18..19) 'b'
+        T:SkippedTokensTrivia [19..20)
+          CloseParenToken [19..20) ')'
+  CloseParenToken [20..20) missing
+  EmptyStatement [20..21)
+    SemicolonToken [20..21) ';'
+Diagnostics:
+  CS1528 [11..13) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [11..12) Syntax error, \'[\' expected
+  CS1003 [13..14) Syntax error, \']\' expected
+  CS1003 [15..17) Syntax error, \',\' expected
+  CS1026 [20..21) ) expected

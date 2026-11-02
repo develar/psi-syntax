@@ -1,0 +1,18 @@
+RefExpression [0..14)
+  RefKeyword [0..3) 'ref'
+  T:WhitespaceTrivia [3..4) ' '
+  SimpleLambdaExpression [4..14)
+    Parameter [4..8)
+      IdentifierToken [4..4) missing
+      T:SkippedTokensTrivia [4..7)
+        IntKeyword [4..7) 'int'
+      T:WhitespaceTrivia [7..8) ' '
+    EqualsGreaterThanToken [8..10) '=>'
+    T:WhitespaceTrivia [10..11) ' '
+    Block [11..14)
+      OpenBraceToken [11..12) '{'
+      T:WhitespaceTrivia [12..13) ' '
+      CloseBraceToken [13..14) '}'
+Diagnostics:
+  CS1525 [0..14) Invalid expression term \'ref\'
+  CS1041 [4..7) Identifier expected; \'int\' is a keyword

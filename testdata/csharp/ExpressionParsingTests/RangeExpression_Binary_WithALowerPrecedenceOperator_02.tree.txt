@@ -1,0 +1,14 @@
+UnsignedRightShiftExpression [0..11)
+  LeftShiftExpression [0..7)
+    NumericLiteralExpression [0..1)
+      NumericLiteralToken [0..1) '1'
+    LessThanLessThanToken [1..3) '<<'
+    RangeExpression [3..7)
+      NumericLiteralExpression [3..4)
+        NumericLiteralToken [3..4) '2'
+      DotDotToken [4..6) '..'
+      NumericLiteralExpression [6..7)
+        NumericLiteralToken [6..7) '3'
+  GreaterThanGreaterThanGreaterThanToken [7..10) '>>>'
+  NumericLiteralExpression [10..11)
+    NumericLiteralToken [10..11) '4'

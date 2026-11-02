@@ -1,0 +1,25 @@
+CompilationUnit [0..38)
+  NamespaceDeclaration [0..38)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..36)
+      L:WhitespaceTrivia [14..18) '    '
+      ClassKeyword [18..23) 'class'
+      T:EndOfLineTrivia [23..24) '\n'
+      IdentifierToken [24..24) missing
+      L:WhitespaceTrivia [24..28) '    '
+      OpenBraceToken [28..29) '{'
+      T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      CloseBraceToken [34..35) '}'
+      T:EndOfLineTrivia [35..36) '\n'
+    CloseBraceToken [36..37) '}'
+    T:EndOfLineTrivia [37..38) '\n'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1001 [23..23) Identifier expected

@@ -1,0 +1,26 @@
+ParenthesizedExpression [0..17)
+  OpenParenToken [0..1) '('
+  PredefinedType [1..5)
+    IntKeyword [1..4) 'int'
+    T:WhitespaceTrivia [4..5) ' '
+  CloseParenToken [5..5) missing
+  T:SkippedTokensTrivia [5..6)
+    IdentifierToken [5..6) 'x'
+  T:WhitespaceTrivia [6..7) ' '
+  T:SkippedTokensTrivia [7..9)
+    EqualsEqualsToken [7..9) '=='
+  T:WhitespaceTrivia [9..10) ' '
+  T:SkippedTokensTrivia [10..11)
+    NumericLiteralToken [10..11) '4'
+  T:SkippedTokensTrivia [11..12)
+    CloseParenToken [11..12) ')'
+  T:WhitespaceTrivia [12..13) ' '
+  T:SkippedTokensTrivia [13..15)
+    EqualsGreaterThanToken [13..15) '=>'
+  T:WhitespaceTrivia [15..16) ' '
+  T:SkippedTokensTrivia [16..17)
+    IdentifierToken [16..17) 'x'
+Diagnostics:
+  CS1073 [0..5) Unexpected token \'x\'
+  CS1525 [1..4) Invalid expression term \'int\'
+  CS1026 [5..6) ) expected

@@ -1,0 +1,79 @@
+CompilationUnit [0..138)
+  DelegateDeclaration [0..28)
+    L:EndOfLineTrivia [0..1) '\n'
+    DelegateKeyword [1..9) 'delegate'
+    T:WhitespaceTrivia [9..10) ' '
+    PredefinedType [10..14)
+      IntKeyword [10..13) 'int'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..24) 'MyDelegate'
+    ParameterList [24..26)
+      OpenParenToken [24..25) '('
+      CloseParenToken [25..26) ')'
+    SemicolonToken [26..27) ';'
+    T:EndOfLineTrivia [27..28) '\n'
+  ClassDeclaration [28..138)
+    ClassKeyword [28..33) 'class'
+    T:WhitespaceTrivia [33..34) ' '
+    IdentifierToken [34..38) 'Test'
+    T:EndOfLineTrivia [38..39) '\n'
+    OpenBraceToken [39..40) '{'
+    T:EndOfLineTrivia [40..41) '\n'
+    MethodDeclaration [41..136)
+      L:WhitespaceTrivia [41..45) '    '
+      PublicKeyword [45..51) 'public'
+      T:WhitespaceTrivia [51..52) ' '
+      StaticKeyword [52..58) 'static'
+      T:WhitespaceTrivia [58..59) ' '
+      PredefinedType [59..63)
+        IntKeyword [59..62) 'int'
+        T:WhitespaceTrivia [62..63) ' '
+      IdentifierToken [63..67) 'Main'
+      ParameterList [67..70)
+        OpenParenToken [67..68) '('
+        CloseParenToken [68..69) ')'
+        T:EndOfLineTrivia [69..70) '\n'
+      Block [70..136)
+        L:WhitespaceTrivia [70..74) '    '
+        OpenBraceToken [74..75) '{'
+        T:EndOfLineTrivia [75..76) '\n'
+        LocalDeclarationStatement [76..112)
+          VariableDeclaration [76..99)
+            PredefinedType [76..88)
+              L:WhitespaceTrivia [76..84) '        '
+              IntKeyword [84..87) 'int'
+              T:WhitespaceTrivia [87..88) ' '
+            VariableDeclarator [88..99)
+              IdentifierToken [88..89) 'i'
+              T:WhitespaceTrivia [89..90) ' '
+              EqualsValueClause [90..99)
+                EqualsToken [90..91) '='
+                T:WhitespaceTrivia [91..92) ' '
+                IdentifierName [92..99)
+                  IdentifierToken [92..92) missing
+                  T:SkippedTokensTrivia [92..93)
+                    BadToken [92..93) '@'
+                  T:SkippedTokensTrivia [93..99)
+                    BadToken [93..99) '\\u0303'
+          SemicolonToken [99..100) ';'
+          T:WhitespaceTrivia [100..102) '  '
+          T:SingleLineCommentTrivia [102..111) '// CS1646'
+          T:EndOfLineTrivia [111..112) '\n'
+        ReturnStatement [112..130)
+          L:WhitespaceTrivia [112..120) '        '
+          ReturnKeyword [120..126) 'return'
+          T:WhitespaceTrivia [126..127) ' '
+          NumericLiteralExpression [127..128)
+            NumericLiteralToken [127..128) '1'
+          SemicolonToken [128..129) ';'
+          T:EndOfLineTrivia [129..130) '\n'
+        L:WhitespaceTrivia [130..134) '    '
+        CloseBraceToken [134..135) '}'
+        T:EndOfLineTrivia [135..136) '\n'
+    CloseBraceToken [136..137) '}'
+    T:EndOfLineTrivia [137..138) '\n'
+  EndOfFileToken [138..138) ''
+Diagnostics:
+  CS1525 [92..93) Invalid expression term \'\'
+  CS1646 [92..92) Keyword, identifier, or string expected after verbatim specifier: @
+  CS1056 [93..93) Unexpected character \'\\u0303\'

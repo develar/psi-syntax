@@ -1,0 +1,11 @@
+ConstructorDeclaration [0..15)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierToken [9..10) 'M'
+  ParameterList [10..13)
+    OpenParenToken [10..11) '('
+    CloseParenToken [11..12) ')'
+    T:WhitespaceTrivia [12..13) ' '
+  Block [13..15)
+    OpenBraceToken [13..14) '{'
+    CloseBraceToken [14..15) '}'

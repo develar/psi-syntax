@@ -1,0 +1,46 @@
+CompilationUnit [0..42)
+  ClassDeclaration [0..42)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..41)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..41)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..39)
+          VariableDeclaration [21..37)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..37)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..37)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                ObjectCreationExpression [29..37)
+                  NewKeyword [29..32) 'new'
+                  T:WhitespaceTrivia [32..33) ' '
+                  IdentifierName [33..35)
+                    IdentifierToken [33..34) 'C'
+                    T:WhitespaceTrivia [34..35) ' '
+                  ObjectInitializerExpression [35..37)
+                    OpenBraceToken [35..36) '{'
+                    CloseBraceToken [36..37) '}'
+          SemicolonToken [37..38) ';'
+          T:WhitespaceTrivia [38..39) ' '
+        CloseBraceToken [39..40) '}'
+        T:WhitespaceTrivia [40..41) ' '
+    CloseBraceToken [41..42) '}'
+  EndOfFileToken [42..42) ''

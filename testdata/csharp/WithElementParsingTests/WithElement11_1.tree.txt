@@ -1,0 +1,13 @@
+CollectionExpression [0..11)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'a'
+  CommaToken [2..3) ','
+  T:WhitespaceTrivia [3..4) ' '
+  WithElement [4..10)
+    WithKeyword [4..8) 'with'
+    ArgumentList [8..10)
+      OpenParenToken [8..9) '('
+      CloseParenToken [9..10) ')'
+  CloseBracketToken [10..11) ']'

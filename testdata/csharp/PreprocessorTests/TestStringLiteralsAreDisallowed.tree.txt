@@ -1,0 +1,25 @@
+CompilationUnit [0..79)
+  L:PragmaWarningDirectiveTrivia [0..79)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    RestoreKeyword [16..23) 'restore'
+    T:WhitespaceTrivia [23..24) ' '
+    NumericLiteralExpression [24..24)
+      NumericLiteralToken [24..24) missing
+    L:SkippedTokensTrivia [24..79)
+      StringLiteralToken [24..32) '"CS0114"'
+      CommaToken [32..33) ','
+      T:WhitespaceTrivia [33..34) ' '
+      NumericLiteralToken [34..37) '162'
+      CommaToken [37..38) ','
+      T:WhitespaceTrivia [38..39) ' '
+      StringLiteralToken [39..47) '"CS0168"'
+      T:WhitespaceTrivia [47..48) ' '
+      T:SingleLineCommentTrivia [48..79) '// Mixed string & numeric codes'
+    EndOfDirectiveToken [79..79) ''
+  EndOfFileToken [79..79) ''
+Diagnostics:
+  CS1072 [24..32) Expected identifier or numeric literal.

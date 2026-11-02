@@ -1,0 +1,1 @@
+stackalloc int[1] { 42 }

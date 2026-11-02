@@ -1,0 +1,25 @@
+CastExpression [0..22)
+  OpenParenToken [0..1) '('
+  AliasQualifiedName [1..12)
+    IdentifierName [1..6)
+      IdentifierToken [1..6) 'alias'
+    ColonColonToken [6..8) '::'
+    IdentifierName [8..12)
+      IdentifierToken [8..12) 'type'
+  CloseParenToken [12..13) ')'
+  CollectionExpression [13..22)
+    OpenBracketToken [13..14) '['
+    ExpressionElement [14..15)
+      NumericLiteralExpression [14..15)
+        NumericLiteralToken [14..15) '1'
+    CommaToken [15..16) ','
+    T:WhitespaceTrivia [16..17) ' '
+    ExpressionElement [17..18)
+      NumericLiteralExpression [17..18)
+        NumericLiteralToken [17..18) '2'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    ExpressionElement [20..21)
+      NumericLiteralExpression [20..21)
+        NumericLiteralToken [20..21) '3'
+    CloseBracketToken [21..22) ']'

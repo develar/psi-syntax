@@ -1,0 +1,70 @@
+CompilationUnit [0..79)
+  ClassDeclaration [0..79)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..77)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..23) 'Goo'
+      ParameterList [23..26)
+        OpenParenToken [23..24) '('
+        CloseParenToken [24..25) ')'
+        T:WhitespaceTrivia [25..26) ' '
+      Block [26..77)
+        OpenBraceToken [26..27) '{'
+        T:EndOfLineTrivia [27..28) '\n'
+        LocalDeclarationStatement [28..71)
+          VariableDeclaration [28..69)
+            IdentifierName [28..40)
+              L:WhitespaceTrivia [28..36) '        '
+              IdentifierToken [36..39) 'var'
+              T:WhitespaceTrivia [39..40) ' '
+            VariableDeclarator [40..69)
+              IdentifierToken [40..41) 'x'
+              T:WhitespaceTrivia [41..42) ' '
+              EqualsValueClause [42..69)
+                EqualsToken [42..43) '='
+                T:WhitespaceTrivia [43..44) ' '
+                ImplicitStackAllocArrayCreationExpression [44..69)
+                  StackAllocKeyword [44..54) 'stackalloc'
+                  OpenBracketToken [54..55) '['
+                  T:SkippedTokensTrivia [55..56)
+                    CommaToken [55..56) ','
+                  T:SkippedTokensTrivia [56..57)
+                    NumericLiteralToken [56..57) '3'
+                  T:WhitespaceTrivia [57..58) ' '
+                  CloseBracketToken [58..58) missing
+                  ArrayInitializerExpression [58..69)
+                    OpenBraceToken [58..59) '{'
+                    T:WhitespaceTrivia [59..60) ' '
+                    NumericLiteralExpression [60..61)
+                      NumericLiteralToken [60..61) '1'
+                    CommaToken [61..62) ','
+                    T:WhitespaceTrivia [62..63) ' '
+                    NumericLiteralExpression [63..64)
+                      NumericLiteralToken [63..64) '2'
+                    CommaToken [64..65) ','
+                    T:WhitespaceTrivia [65..66) ' '
+                    NumericLiteralExpression [66..68)
+                      NumericLiteralToken [66..67) '3'
+                      T:WhitespaceTrivia [67..68) ' '
+                    CloseBraceToken [68..69) '}'
+          SemicolonToken [69..70) ';'
+          T:EndOfLineTrivia [70..71) '\n'
+        L:WhitespaceTrivia [71..75) '    '
+        CloseBraceToken [75..76) '}'
+        T:EndOfLineTrivia [76..77) '\n'
+    CloseBraceToken [77..78) '}'
+    T:EndOfLineTrivia [78..79) '\n'
+  EndOfFileToken [79..79) ''
+Diagnostics:
+  CS8381 [56..57) "Invalid rank specifier: expected \']\'
+  CS8381 [55..56) "Invalid rank specifier: expected \']\'
+  CS1003 [58..59) Syntax error, \']\' expected

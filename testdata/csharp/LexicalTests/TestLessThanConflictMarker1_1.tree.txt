@@ -1,0 +1,5 @@
+LessThanLessThanToken [0..2) '<<'
+LessThanLessThanToken [2..4) '<<'
+LessThanLessThanToken [4..6) '<<'
+LessThanToken [6..7) '<'
+EndOfFileToken [7..7) ''

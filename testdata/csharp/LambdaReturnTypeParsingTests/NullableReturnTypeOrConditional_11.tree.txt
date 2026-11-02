@@ -1,0 +1,20 @@
+ParenthesizedLambdaExpression [0..12)
+  NullableType [0..5)
+    ArrayType [0..3)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'T'
+      ArrayRankSpecifier [1..3)
+        OpenBracketToken [1..2) '['
+        OmittedArraySizeExpression [2..2)
+          OmittedArraySizeExpressionToken [2..2) ''
+        CloseBracketToken [2..3) ']'
+    QuestionToken [3..4) '?'
+    T:WhitespaceTrivia [4..5) ' '
+  ParameterList [5..8)
+    OpenParenToken [5..6) '('
+    CloseParenToken [6..7) ')'
+    T:WhitespaceTrivia [7..8) ' '
+  EqualsGreaterThanToken [8..10) '=>'
+  T:WhitespaceTrivia [10..11) ' '
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'x'

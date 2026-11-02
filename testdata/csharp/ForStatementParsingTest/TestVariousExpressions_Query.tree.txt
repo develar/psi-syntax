@@ -1,0 +1,69 @@
+ForEachStatement [0..69)
+  ForEachKeyword [0..0) missing
+  T:SkippedTokensTrivia [0..3)
+    ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  IdentifierName [5..10)
+    IdentifierToken [5..9) 'from'
+    T:WhitespaceTrivia [9..10) ' '
+  IdentifierToken [10..11) 'a'
+  T:WhitespaceTrivia [11..12) ' '
+  InKeyword [12..14) 'in'
+  T:WhitespaceTrivia [14..15) ' '
+  IdentifierName [15..17)
+    IdentifierToken [15..16) 'b'
+    T:WhitespaceTrivia [16..17) ' '
+  CloseParenToken [17..17) missing
+  LocalDeclarationStatement [17..69)
+    VariableDeclaration [17..25)
+      IdentifierName [17..24)
+        IdentifierToken [17..23) 'select'
+        T:WhitespaceTrivia [23..24) ' '
+      VariableDeclarator [24..25)
+        IdentifierToken [24..25) 'c'
+    SemicolonToken [25..26) ';'
+    T:SkippedTokensTrivia [26..30)
+      IdentifierToken [26..30) 'from'
+    T:WhitespaceTrivia [30..31) ' '
+    T:SkippedTokensTrivia [31..32)
+      IdentifierToken [31..32) 'a'
+    T:WhitespaceTrivia [32..33) ' '
+    T:SkippedTokensTrivia [33..35)
+      InKeyword [33..35) 'in'
+    T:WhitespaceTrivia [35..36) ' '
+    T:SkippedTokensTrivia [36..37)
+      IdentifierToken [36..37) 'b'
+    T:WhitespaceTrivia [37..38) ' '
+    T:SkippedTokensTrivia [38..44)
+      IdentifierToken [38..44) 'select'
+    T:WhitespaceTrivia [44..45) ' '
+    T:SkippedTokensTrivia [45..46)
+      IdentifierToken [45..46) 'c'
+    T:SkippedTokensTrivia [46..47)
+      SemicolonToken [46..47) ';'
+    T:SkippedTokensTrivia [47..51)
+      IdentifierToken [47..51) 'from'
+    T:WhitespaceTrivia [51..52) ' '
+    T:SkippedTokensTrivia [52..53)
+      IdentifierToken [52..53) 'a'
+    T:WhitespaceTrivia [53..54) ' '
+    T:SkippedTokensTrivia [54..56)
+      InKeyword [54..56) 'in'
+    T:WhitespaceTrivia [56..57) ' '
+    T:SkippedTokensTrivia [57..58)
+      IdentifierToken [57..58) 'b'
+    T:WhitespaceTrivia [58..59) ' '
+    T:SkippedTokensTrivia [59..65)
+      IdentifierToken [59..65) 'select'
+    T:WhitespaceTrivia [65..66) ' '
+    T:SkippedTokensTrivia [66..67)
+      IdentifierToken [66..67) 'c'
+    T:SkippedTokensTrivia [67..68)
+      CloseParenToken [67..68) ')'
+    T:SkippedTokensTrivia [68..69)
+      SemicolonToken [68..69) ';'
+Diagnostics:
+  CS1073 [0..26) Unexpected token \'from\'
+  CS1003 [0..3) Syntax error, \'foreach\' expected
+  CS1026 [17..23) ) expected

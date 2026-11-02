@@ -1,0 +1,16 @@
+CompilationUnit [0..32)
+  RecordStructDeclaration [0..32)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    FileKeyword [8..12) 'file'
+    T:WhitespaceTrivia [12..13) ' '
+    RecordKeyword [13..19) 'record'
+    T:WhitespaceTrivia [19..20) ' '
+    StructKeyword [20..26) 'struct'
+    T:WhitespaceTrivia [26..27) ' '
+    IdentifierToken [27..28) 'C'
+    T:WhitespaceTrivia [28..29) ' '
+    OpenBraceToken [29..30) '{'
+    T:WhitespaceTrivia [30..31) ' '
+    CloseBraceToken [31..32) '}'
+  EndOfFileToken [32..32) ''

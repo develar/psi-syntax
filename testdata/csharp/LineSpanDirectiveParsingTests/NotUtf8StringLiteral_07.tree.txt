@@ -1,0 +1,15 @@
+CompilationUnit [0..23)
+  L:LineDirectiveTrivia [0..23)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..7) '1'
+    T:WhitespaceTrivia [7..8) ' '
+    StringLiteralToken [8..21) '"""file.cs"""'
+    L:SkippedTokensTrivia [21..23)
+      IdentifierToken [21..23) 'U8'
+    EndOfDirectiveToken [23..23) ''
+  EndOfFileToken [23..23) ''
+Diagnostics:
+  CS8996 [8..8) Raw string literals are not allowed in preprocessor directives.
+  CS1025 [21..23) Single-line comment or end-of-line expected

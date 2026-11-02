@@ -1,0 +1,1 @@
+foreach(var a in b) { }

@@ -1,0 +1,1 @@
+delegate*<Goo, void>* ptr;

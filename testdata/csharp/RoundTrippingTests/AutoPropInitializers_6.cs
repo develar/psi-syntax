@@ -1,0 +1,1 @@
+interface I { int GetInt { get; } = 0; }

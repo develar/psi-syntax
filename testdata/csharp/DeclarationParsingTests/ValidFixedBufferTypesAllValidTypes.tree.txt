@@ -1,0 +1,269 @@
+CompilationUnit [0..458)
+  StructDeclaration [0..456)
+    L:EndOfLineTrivia [0..1) '\n'
+    UnsafeKeyword [1..7) 'unsafe'
+    T:WhitespaceTrivia [7..8) ' '
+    StructKeyword [8..14) 'struct'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 's'
+    T:EndOfLineTrivia [16..17) '\n'
+    OpenBraceToken [17..18) '{'
+    T:EndOfLineTrivia [18..19) '\n'
+    FieldDeclaration [19..54)
+      L:WhitespaceTrivia [19..23) '    '
+      PublicKeyword [23..29) 'public'
+      T:WhitespaceTrivia [29..30) ' '
+      FixedKeyword [30..35) 'fixed'
+      T:WhitespaceTrivia [35..36) ' '
+      VariableDeclaration [36..51)
+        PredefinedType [36..41)
+          BoolKeyword [36..40) 'bool'
+          T:WhitespaceTrivia [40..41) ' '
+        VariableDeclarator [41..51)
+          IdentifierToken [41..47) '_Type1'
+          BracketedArgumentList [47..51)
+            OpenBracketToken [47..48) '['
+            Argument [48..50)
+              NumericLiteralExpression [48..50)
+                NumericLiteralToken [48..50) '10'
+            CloseBracketToken [50..51) ']'
+      SemicolonToken [51..52) ';'
+      T:WhitespaceTrivia [52..53) ' '
+      T:EndOfLineTrivia [53..54) '\n'
+    FieldDeclaration [54..90)
+      L:WhitespaceTrivia [54..58) '    '
+      PublicKeyword [58..64) 'public'
+      T:WhitespaceTrivia [64..65) ' '
+      FixedKeyword [65..70) 'fixed'
+      T:WhitespaceTrivia [70..71) ' '
+      VariableDeclaration [71..87)
+        PredefinedType [71..76)
+          ByteKeyword [71..75) 'byte'
+          T:WhitespaceTrivia [75..76) ' '
+        VariableDeclarator [76..87)
+          IdentifierToken [76..83) '_Type12'
+          BracketedArgumentList [83..87)
+            OpenBracketToken [83..84) '['
+            Argument [84..86)
+              NumericLiteralExpression [84..86)
+                NumericLiteralToken [84..86) '10'
+            CloseBracketToken [86..87) ']'
+      SemicolonToken [87..88) ';'
+      T:WhitespaceTrivia [88..89) ' '
+      T:EndOfLineTrivia [89..90) '\n'
+    FieldDeclaration [90..124)
+      L:WhitespaceTrivia [90..94) '    '
+      PublicKeyword [94..100) 'public'
+      T:WhitespaceTrivia [100..101) ' '
+      FixedKeyword [101..106) 'fixed'
+      T:WhitespaceTrivia [106..107) ' '
+      VariableDeclaration [107..121)
+        PredefinedType [107..111)
+          IntKeyword [107..110) 'int'
+          T:WhitespaceTrivia [110..111) ' '
+        VariableDeclarator [111..121)
+          IdentifierToken [111..117) '_Type2'
+          BracketedArgumentList [117..121)
+            OpenBracketToken [117..118) '['
+            Argument [118..120)
+              NumericLiteralExpression [118..120)
+                NumericLiteralToken [118..120) '10'
+            CloseBracketToken [120..121) ']'
+      SemicolonToken [121..122) ';'
+      T:WhitespaceTrivia [122..123) ' '
+      T:EndOfLineTrivia [123..124) '\n'
+    FieldDeclaration [124..160)
+      L:WhitespaceTrivia [124..128) '    '
+      PublicKeyword [128..134) 'public'
+      T:WhitespaceTrivia [134..135) ' '
+      FixedKeyword [135..140) 'fixed'
+      T:WhitespaceTrivia [140..141) ' '
+      VariableDeclaration [141..157)
+        PredefinedType [141..147)
+          ShortKeyword [141..146) 'short'
+          T:WhitespaceTrivia [146..147) ' '
+        VariableDeclarator [147..157)
+          IdentifierToken [147..153) '_Type3'
+          BracketedArgumentList [153..157)
+            OpenBracketToken [153..154) '['
+            Argument [154..156)
+              NumericLiteralExpression [154..156)
+                NumericLiteralToken [154..156) '10'
+            CloseBracketToken [156..157) ']'
+      SemicolonToken [157..158) ';'
+      T:WhitespaceTrivia [158..159) ' '
+      T:EndOfLineTrivia [159..160) '\n'
+    FieldDeclaration [160..195)
+      L:WhitespaceTrivia [160..164) '    '
+      PublicKeyword [164..170) 'public'
+      T:WhitespaceTrivia [170..171) ' '
+      FixedKeyword [171..176) 'fixed'
+      T:WhitespaceTrivia [176..177) ' '
+      VariableDeclaration [177..192)
+        PredefinedType [177..182)
+          LongKeyword [177..181) 'long'
+          T:WhitespaceTrivia [181..182) ' '
+        VariableDeclarator [182..192)
+          IdentifierToken [182..188) '_Type4'
+          BracketedArgumentList [188..192)
+            OpenBracketToken [188..189) '['
+            Argument [189..191)
+              NumericLiteralExpression [189..191)
+                NumericLiteralToken [189..191) '10'
+            CloseBracketToken [191..192) ']'
+      SemicolonToken [192..193) ';'
+      T:WhitespaceTrivia [193..194) ' '
+      T:EndOfLineTrivia [194..195) '\n'
+    FieldDeclaration [195..230)
+      L:WhitespaceTrivia [195..199) '    '
+      PublicKeyword [199..205) 'public'
+      T:WhitespaceTrivia [205..206) ' '
+      FixedKeyword [206..211) 'fixed'
+      T:WhitespaceTrivia [211..212) ' '
+      VariableDeclaration [212..227)
+        PredefinedType [212..217)
+          CharKeyword [212..216) 'char'
+          T:WhitespaceTrivia [216..217) ' '
+        VariableDeclarator [217..227)
+          IdentifierToken [217..223) '_Type5'
+          BracketedArgumentList [223..227)
+            OpenBracketToken [223..224) '['
+            Argument [224..226)
+              NumericLiteralExpression [224..226)
+                NumericLiteralToken [224..226) '10'
+            CloseBracketToken [226..227) ']'
+      SemicolonToken [227..228) ';'
+      T:WhitespaceTrivia [228..229) ' '
+      T:EndOfLineTrivia [229..230) '\n'
+    FieldDeclaration [230..266)
+      L:WhitespaceTrivia [230..234) '    '
+      PublicKeyword [234..240) 'public'
+      T:WhitespaceTrivia [240..241) ' '
+      FixedKeyword [241..246) 'fixed'
+      T:WhitespaceTrivia [246..247) ' '
+      VariableDeclaration [247..263)
+        PredefinedType [247..253)
+          SByteKeyword [247..252) 'sbyte'
+          T:WhitespaceTrivia [252..253) ' '
+        VariableDeclarator [253..263)
+          IdentifierToken [253..259) '_Type6'
+          BracketedArgumentList [259..263)
+            OpenBracketToken [259..260) '['
+            Argument [260..262)
+              NumericLiteralExpression [260..262)
+                NumericLiteralToken [260..262) '10'
+            CloseBracketToken [262..263) ']'
+      SemicolonToken [263..264) ';'
+      T:WhitespaceTrivia [264..265) ' '
+      T:EndOfLineTrivia [265..266) '\n'
+    FieldDeclaration [266..303)
+      L:WhitespaceTrivia [266..270) '    '
+      PublicKeyword [270..276) 'public'
+      T:WhitespaceTrivia [276..277) ' '
+      FixedKeyword [277..282) 'fixed'
+      T:WhitespaceTrivia [282..283) ' '
+      VariableDeclaration [283..300)
+        PredefinedType [283..290)
+          UShortKeyword [283..289) 'ushort'
+          T:WhitespaceTrivia [289..290) ' '
+        VariableDeclarator [290..300)
+          IdentifierToken [290..296) '_Type7'
+          BracketedArgumentList [296..300)
+            OpenBracketToken [296..297) '['
+            Argument [297..299)
+              NumericLiteralExpression [297..299)
+                NumericLiteralToken [297..299) '10'
+            CloseBracketToken [299..300) ']'
+      SemicolonToken [300..301) ';'
+      T:WhitespaceTrivia [301..302) ' '
+      T:EndOfLineTrivia [302..303) '\n'
+    FieldDeclaration [303..338)
+      L:WhitespaceTrivia [303..307) '    '
+      PublicKeyword [307..313) 'public'
+      T:WhitespaceTrivia [313..314) ' '
+      FixedKeyword [314..319) 'fixed'
+      T:WhitespaceTrivia [319..320) ' '
+      VariableDeclaration [320..335)
+        PredefinedType [320..325)
+          UIntKeyword [320..324) 'uint'
+          T:WhitespaceTrivia [324..325) ' '
+        VariableDeclarator [325..335)
+          IdentifierToken [325..331) '_Type8'
+          BracketedArgumentList [331..335)
+            OpenBracketToken [331..332) '['
+            Argument [332..334)
+              NumericLiteralExpression [332..334)
+                NumericLiteralToken [332..334) '10'
+            CloseBracketToken [334..335) ']'
+      SemicolonToken [335..336) ';'
+      T:WhitespaceTrivia [336..337) ' '
+      T:EndOfLineTrivia [337..338) '\n'
+    FieldDeclaration [338..374)
+      L:WhitespaceTrivia [338..342) '    '
+      PublicKeyword [342..348) 'public'
+      T:WhitespaceTrivia [348..349) ' '
+      FixedKeyword [349..354) 'fixed'
+      T:WhitespaceTrivia [354..355) ' '
+      VariableDeclaration [355..371)
+        PredefinedType [355..361)
+          ULongKeyword [355..360) 'ulong'
+          T:WhitespaceTrivia [360..361) ' '
+        VariableDeclarator [361..371)
+          IdentifierToken [361..367) '_Type9'
+          BracketedArgumentList [367..371)
+            OpenBracketToken [367..368) '['
+            Argument [368..370)
+              NumericLiteralExpression [368..370)
+                NumericLiteralToken [368..370) '10'
+            CloseBracketToken [370..371) ']'
+      SemicolonToken [371..372) ';'
+      T:WhitespaceTrivia [372..373) ' '
+      T:EndOfLineTrivia [373..374) '\n'
+    FieldDeclaration [374..411)
+      L:WhitespaceTrivia [374..378) '    '
+      PublicKeyword [378..384) 'public'
+      T:WhitespaceTrivia [384..385) ' '
+      FixedKeyword [385..390) 'fixed'
+      T:WhitespaceTrivia [390..391) ' '
+      VariableDeclaration [391..408)
+        PredefinedType [391..397)
+          FloatKeyword [391..396) 'float'
+          T:WhitespaceTrivia [396..397) ' '
+        VariableDeclarator [397..408)
+          IdentifierToken [397..404) '_Type10'
+          BracketedArgumentList [404..408)
+            OpenBracketToken [404..405) '['
+            Argument [405..407)
+              NumericLiteralExpression [405..407)
+                NumericLiteralToken [405..407) '10'
+            CloseBracketToken [407..408) ']'
+      SemicolonToken [408..409) ';'
+      T:WhitespaceTrivia [409..410) ' '
+      T:EndOfLineTrivia [410..411) '\n'
+    FieldDeclaration [411..453)
+      L:WhitespaceTrivia [411..415) '    '
+      PublicKeyword [415..421) 'public'
+      T:WhitespaceTrivia [421..422) ' '
+      FixedKeyword [422..427) 'fixed'
+      T:WhitespaceTrivia [427..428) ' '
+      VariableDeclaration [428..446)
+        PredefinedType [428..435)
+          DoubleKeyword [428..434) 'double'
+          T:WhitespaceTrivia [434..435) ' '
+        VariableDeclarator [435..446)
+          IdentifierToken [435..442) '_Type11'
+          BracketedArgumentList [442..446)
+            OpenBracketToken [442..443) '['
+            Argument [443..445)
+              NumericLiteralExpression [443..445)
+                NumericLiteralToken [443..445) '10'
+            CloseBracketToken [445..446) ']'
+      SemicolonToken [446..447) ';'
+      T:WhitespaceTrivia [447..452) '     '
+      T:EndOfLineTrivia [452..453) '\n'
+    L:WhitespaceTrivia [453..454) ' '
+    CloseBraceToken [454..455) '}'
+    T:EndOfLineTrivia [455..456) '\n'
+  L:EndOfLineTrivia [456..457) '\n'
+  L:EndOfLineTrivia [457..458) '\n'
+  EndOfFileToken [458..458) ''

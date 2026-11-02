@@ -1,0 +1,37 @@
+IfStatement [0..28)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IsPatternExpression [4..23)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'o'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    DeclarationPattern [9..23)
+      ArrayType [9..22)
+        TupleType [9..19)
+          OpenParenToken [9..10) '('
+          TupleElement [10..13)
+            PredefinedType [10..13)
+              IntKeyword [10..13) 'int'
+          CommaToken [13..14) ','
+          T:WhitespaceTrivia [14..15) ' '
+          TupleElement [15..18)
+            PredefinedType [15..18)
+              IntKeyword [15..18) 'int'
+          CloseParenToken [18..19) ')'
+        ArrayRankSpecifier [19..22)
+          OpenBracketToken [19..20) '['
+          OmittedArraySizeExpression [20..20)
+            OmittedArraySizeExpressionToken [20..20) ''
+          CloseBracketToken [20..21) ']'
+          T:WhitespaceTrivia [21..22) ' '
+      SingleVariableDesignation [22..23)
+        IdentifierToken [22..23) 'q'
+  CloseParenToken [23..24) ')'
+  T:WhitespaceTrivia [24..25) ' '
+  Block [25..28)
+    OpenBraceToken [25..26) '{'
+    T:WhitespaceTrivia [26..27) ' '
+    CloseBraceToken [27..28) '}'

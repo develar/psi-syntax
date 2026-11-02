@@ -1,0 +1,26 @@
+CompilationUnit [0..39)
+  ClassDeclaration [0..39)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..38)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..34)
+        OpenParenToken [23..24) '('
+        Parameter [24..32)
+          RefKeyword [24..27) 'ref'
+          T:WhitespaceTrivia [27..28) ' '
+          IdentifierName [28..32)
+            IdentifierToken [28..32) 'Type'
+        CloseParenToken [32..33) ')'
+        T:WhitespaceTrivia [33..34) ' '
+      OpenBraceToken [34..35) '{'
+      T:WhitespaceTrivia [35..36) ' '
+      CloseBraceToken [36..37) '}'
+      T:EndOfLineTrivia [37..38) '\n'
+    CloseBraceToken [38..39) '}'
+  EndOfFileToken [39..39) ''

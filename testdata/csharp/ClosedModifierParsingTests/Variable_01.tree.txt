@@ -1,0 +1,38 @@
+CompilationUnit [0..48)
+  GlobalStatement [0..48)
+    LocalFunctionStatement [0..48)
+      PredefinedType [0..5)
+        VoidKeyword [0..4) 'void'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'M'
+      ParameterList [6..9)
+        OpenParenToken [6..7) '('
+        CloseParenToken [7..8) ')'
+        T:EndOfLineTrivia [8..9) '\n'
+      Block [9..48)
+        OpenBraceToken [9..10) '{'
+        T:EndOfLineTrivia [10..11) '\n'
+        LocalDeclarationStatement [11..28)
+          VariableDeclaration [11..26)
+            PredefinedType [11..20)
+              L:WhitespaceTrivia [11..15) '    '
+              BoolKeyword [15..19) 'bool'
+              T:WhitespaceTrivia [19..20) ' '
+            VariableDeclarator [20..26)
+              IdentifierToken [20..26) 'closed'
+          SemicolonToken [26..27) ';'
+          T:EndOfLineTrivia [27..28) '\n'
+        ExpressionStatement [28..47)
+          SimpleAssignmentExpression [28..45)
+            IdentifierName [28..39)
+              L:WhitespaceTrivia [28..32) '    '
+              IdentifierToken [32..38) 'closed'
+              T:WhitespaceTrivia [38..39) ' '
+            EqualsToken [39..40) '='
+            T:WhitespaceTrivia [40..41) ' '
+            TrueLiteralExpression [41..45)
+              TrueKeyword [41..45) 'true'
+          SemicolonToken [45..46) ';'
+          T:EndOfLineTrivia [46..47) '\n'
+        CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''

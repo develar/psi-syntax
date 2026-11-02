@@ -1,0 +1,54 @@
+CompilationUnit [0..133)
+  ClassDeclaration [0..133)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..10) 'Test'
+    T:WhitespaceTrivia [10..11) ' '
+    OpenBraceToken [11..12) '{'
+    T:EndOfLineTrivia [12..13) '\n'
+    MethodDeclaration [13..132)
+      L:WhitespaceTrivia [13..17) '    '
+      StaticKeyword [17..23) 'static'
+      T:WhitespaceTrivia [23..24) ' '
+      PredefinedType [24..28)
+        IntKeyword [24..27) 'int'
+        T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..32) 'Main'
+      ParameterList [32..36)
+        OpenParenToken [32..33) '('
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+        T:EndOfLineTrivia [35..36) '\n'
+      Block [36..132)
+        L:WhitespaceTrivia [36..40) '    '
+        OpenBraceToken [40..41) '{'
+        T:EndOfLineTrivia [41..42) '\n'
+        ReturnStatement [42..126)
+          L:PragmaChecksumDirectiveTrivia [42..115)
+            HashToken [42..43) '#'
+            PragmaKeyword [43..49) 'pragma'
+            T:WhitespaceTrivia [49..50) ' '
+            ChecksumKeyword [50..58) 'checksum'
+            T:WhitespaceTrivia [58..59) ' '
+            StringLiteralToken [59..68) '"test.cs"'
+            T:WhitespaceTrivia [68..69) ' '
+            StringLiteralToken [69..109) '"{406EA660-64CF-4C82-B6F0-42D48172A799}"'
+            T:WhitespaceTrivia [109..110) ' '
+            StringLiteralToken [110..113) '"A"'
+            T:WhitespaceTrivia [113..114) ' '
+            EndOfDirectiveToken [114..114) ''
+            T:EndOfLineTrivia [114..115) '\n'
+          L:WhitespaceTrivia [115..116) ' '
+          ReturnKeyword [116..122) 'return'
+          T:WhitespaceTrivia [122..123) ' '
+          NumericLiteralExpression [123..124)
+            NumericLiteralToken [123..124) '0'
+          SemicolonToken [124..125) ';'
+          T:EndOfLineTrivia [125..126) '\n'
+        L:WhitespaceTrivia [126..130) '    '
+        CloseBraceToken [130..131) '}'
+        T:WhitespaceTrivia [131..132) ' '
+    CloseBraceToken [132..133) '}'
+  EndOfFileToken [133..133) ''
+Diagnostics:
+  CS1695 [110..113) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."

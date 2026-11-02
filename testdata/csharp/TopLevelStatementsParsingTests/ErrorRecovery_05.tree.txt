@@ -1,0 +1,18 @@
+CompilationUnit [0..19)
+  UsingDirective [0..19)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..15)
+      IdentifierName [6..13)
+        IdentifierToken [6..12) 'aliasY'
+        T:WhitespaceTrivia [12..13) ' '
+      EqualsToken [13..14) '='
+      T:WhitespaceTrivia [14..15) ' '
+    QualifiedName [15..18)
+      IdentifierName [15..16)
+        IdentifierToken [15..16) 'X'
+      DotToken [16..17) '.'
+      IdentifierName [17..18)
+        IdentifierToken [17..18) 'Y'
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''

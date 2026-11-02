@@ -1,0 +1,39 @@
+CompilationUnit [0..38)
+  ClassDeclaration [0..38)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..17)
+      PredefinedType [10..14)
+        IntKeyword [10..13) 'int'
+        T:WhitespaceTrivia [13..14) ' '
+      IdentifierToken [14..15) 'm'
+      ParameterList [15..17)
+        OpenParenToken [15..16) '('
+        T:WhitespaceTrivia [16..17) ' '
+        CloseParenToken [17..17) missing
+      SemicolonToken [17..17) missing
+    MethodDeclaration [17..37)
+      PublicKeyword [17..23) 'public'
+      T:WhitespaceTrivia [23..24) ' '
+      PredefinedType [24..29)
+        VoidKeyword [24..28) 'void'
+        T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..30) 'm'
+      ParameterList [30..33)
+        OpenParenToken [30..31) '('
+        CloseParenToken [31..32) ')'
+        T:WhitespaceTrivia [32..33) ' '
+      Block [33..37)
+        OpenBraceToken [33..34) '{'
+        T:WhitespaceTrivia [34..35) ' '
+        CloseBraceToken [35..36) '}'
+        T:WhitespaceTrivia [36..37) ' '
+    CloseBraceToken [37..38) '}'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1026 [17..23) ) expected
+  CS1002 [17..23) ; expected

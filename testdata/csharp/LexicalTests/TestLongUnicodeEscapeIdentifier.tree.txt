@@ -1,0 +1,2 @@
+IdentifierToken [0..10) '\\U00001234'
+EndOfFileToken [10..10) ''

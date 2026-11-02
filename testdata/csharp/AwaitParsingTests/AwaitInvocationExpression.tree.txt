@@ -1,0 +1,28 @@
+ParenthesizedLambdaExpression [0..29)
+  L:EndOfLineTrivia [0..1) '\n'
+  AsyncKeyword [1..6) 'async'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  AwaitExpression [13..29)
+    AwaitKeyword [13..18) 'await'
+    T:WhitespaceTrivia [18..19) ' '
+    InvocationExpression [19..29)
+      SimpleMemberAccessExpression [19..25)
+        ThisExpression [19..23)
+          ThisKeyword [19..23) 'this'
+        DotToken [23..24) '.'
+        IdentifierName [24..25)
+          IdentifierToken [24..25) 'g'
+      ArgumentList [25..29)
+        OpenParenToken [25..26) '('
+        CloseParenToken [26..27) ')'
+        T:SkippedTokensTrivia [27..28)
+          SemicolonToken [27..28) ';'
+        T:EndOfLineTrivia [28..29) '\n'
+Diagnostics:
+  CS1073 [1..27) Unexpected token \';\'

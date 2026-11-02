@@ -1,0 +1,1 @@
+using unsafe static X = System.Console;

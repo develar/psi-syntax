@@ -1,0 +1,52 @@
+CompilationUnit [0..76)
+  StructDeclaration [0..76)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    IncompleteMember [17..28)
+      IdentifierName [17..28)
+        L:WhitespaceTrivia [17..21) '    '
+        IdentifierToken [21..27) 'scoped'
+        T:WhitespaceTrivia [27..28) ' '
+    FieldDeclaration [28..43)
+      PrivateKeyword [28..35) 'private'
+      T:WhitespaceTrivia [35..36) ' '
+      VariableDeclaration [36..41)
+        IdentifierName [36..39)
+          IdentifierToken [36..38) 'R1'
+          T:WhitespaceTrivia [38..39) ' '
+        VariableDeclarator [39..41)
+          IdentifierToken [39..41) 'F1'
+      SemicolonToken [41..42) ';'
+      T:EndOfLineTrivia [42..43) '\n'
+    IncompleteMember [43..54)
+      IdentifierName [43..54)
+        L:WhitespaceTrivia [43..47) '    '
+        IdentifierToken [47..53) 'scoped'
+        T:WhitespaceTrivia [53..54) ' '
+    FieldDeclaration [54..74)
+      PrivateKeyword [54..61) 'private'
+      T:WhitespaceTrivia [61..62) ' '
+      VariableDeclaration [62..72)
+        RefType [62..70)
+          RefKeyword [62..65) 'ref'
+          T:WhitespaceTrivia [65..66) ' '
+          PredefinedType [66..70)
+            IntKeyword [66..69) 'int'
+            T:WhitespaceTrivia [69..70) ' '
+        VariableDeclarator [70..72)
+          IdentifierToken [70..72) 'F3'
+      SemicolonToken [72..73) ';'
+      T:EndOfLineTrivia [73..74) '\n'
+    CloseBraceToken [74..75) '}'
+    T:EndOfLineTrivia [75..76) '\n'
+  EndOfFileToken [76..76) ''
+Diagnostics:
+  CS1585 [28..35) Member modifier \'private\' must precede the member type and name
+  CS1585 [54..61) Member modifier \'private\' must precede the member type and name

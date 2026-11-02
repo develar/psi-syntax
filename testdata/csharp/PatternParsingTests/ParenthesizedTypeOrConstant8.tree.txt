@@ -1,0 +1,41 @@
+SwitchExpression [0..54)
+  IdentifierName [0..5)
+    IdentifierToken [0..4) 'reqs'
+    T:WhitespaceTrivia [4..5) ' '
+  SwitchKeyword [5..11) 'switch'
+  T:EndOfLineTrivia [11..12) '\n'
+  OpenBraceToken [12..13) '{'
+  T:EndOfLineTrivia [13..14) '\n'
+  SwitchExpressionArm [14..51)
+    ConstantPattern [14..39)
+      ParenthesizedExpression [14..39)
+        L:WhitespaceTrivia [14..18) '    '
+        OpenParenToken [18..19) '('
+        SimpleMemberAccessExpression [19..37)
+          IdentifierName [19..29)
+            IdentifierToken [19..29) 'CustomEnum'
+          DotToken [29..30) '.'
+          IdentifierName [30..37)
+            IdentifierToken [30..37) 'EnumTwo'
+        CloseParenToken [37..38) ')'
+        T:WhitespaceTrivia [38..39) ' '
+    WhenClause [39..51)
+      WhenKeyword [39..43) 'when'
+      T:WhitespaceTrivia [43..44) ' '
+      SimpleLambdaExpression [44..51)
+        Parameter [44..44)
+          IdentifierToken [44..44) missing
+        EqualsGreaterThanToken [44..46) '=>'
+        T:WhitespaceTrivia [46..47) ' '
+        StringLiteralExpression [47..51)
+          StringLiteralToken [47..51) '"ok"'
+    EqualsGreaterThanToken [51..51) missing
+    IdentifierName [51..51)
+      IdentifierToken [51..51) missing
+  CommaToken [51..52) ','
+  T:EndOfLineTrivia [52..53) '\n'
+  CloseBraceToken [53..54) '}'
+Diagnostics:
+  CS1001 [44..46) Identifier expected
+  CS1003 [51..52) Syntax error, \'=>\' expected
+  CS1525 [51..52) Invalid expression term \',\'

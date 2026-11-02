@@ -1,0 +1,19 @@
+CompilationUnit [0..32)
+  ClassDeclaration [0..32)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    RecordDeclaration [10..31)
+      L:WhitespaceTrivia [10..14) '    '
+      ClosedKeyword [14..20) 'closed'
+      T:WhitespaceTrivia [20..21) ' '
+      RecordKeyword [21..27) 'record'
+      T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..29) 'X'
+      SemicolonToken [29..30) ';'
+      T:EndOfLineTrivia [30..31) '\n'
+    CloseBraceToken [31..32) '}'
+  EndOfFileToken [32..32) ''

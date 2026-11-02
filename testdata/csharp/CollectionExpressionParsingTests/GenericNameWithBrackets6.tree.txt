@@ -1,0 +1,18 @@
+ConditionalExpression [0..12)
+  LessThanExpression [0..5)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'A'
+      T:WhitespaceTrivia [1..2) ' '
+    LessThanToken [2..3) '<'
+    T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'B'
+  QuestionToken [5..6) '?'
+  CollectionExpression [6..9)
+    OpenBracketToken [6..7) '['
+    CloseBracketToken [7..8) ']'
+    T:WhitespaceTrivia [8..9) ' '
+  ColonToken [9..10) ':'
+  T:WhitespaceTrivia [10..11) ' '
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'D'

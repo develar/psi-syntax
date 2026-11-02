@@ -1,0 +1,9 @@
+ElementAccessExpression [0..4)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'a'
+  BracketedArgumentList [1..4)
+    OpenBracketToken [1..2) '['
+    Argument [2..3)
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'b'
+    CloseBracketToken [3..4) ']'

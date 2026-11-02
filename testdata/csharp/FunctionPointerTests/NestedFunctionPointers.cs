@@ -1,0 +1,1 @@
+delegate*<delegate* unmanaged[cdecl]<int*, void*>, delegate* managed<string*>> ptr;

@@ -1,0 +1,27 @@
+CompilationUnit [0..21)
+  ClassDeclaration [0..10)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    BaseList [8..10)
+      ColonToken [8..9) ':'
+      T:WhitespaceTrivia [9..10) ' '
+      SimpleBaseType [10..10)
+        IdentifierName [10..10)
+          IdentifierToken [10..10) missing
+    OpenBraceToken [10..10) missing
+    CloseBraceToken [10..10) missing
+  ClassDeclaration [10..21)
+    ClassKeyword [10..15) 'class'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierToken [16..17) 'b'
+    T:WhitespaceTrivia [17..18) ' '
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    CloseBraceToken [20..21) '}'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1031 [10..15) Type expected
+  CS1514 [10..15) { expected
+  CS1513 [10..15) } expected

@@ -1,0 +1,10 @@
+CompilationUnit [0..23)
+  L:PragmaWarningDirectiveTrivia [0..23)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    DisableKeyword [16..23) 'disable'
+    EndOfDirectiveToken [23..23) ''
+  EndOfFileToken [23..23) ''

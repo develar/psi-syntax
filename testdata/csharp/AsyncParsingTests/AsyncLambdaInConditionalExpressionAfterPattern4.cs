@@ -1,0 +1,1 @@
+x is A a ? async (b) => 0 : null

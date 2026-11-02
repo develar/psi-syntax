@@ -1,0 +1,21 @@
+CompilationUnit [0..26)
+  UsingDirective [0..26)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 't'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    FunctionPointerType [10..25)
+      DelegateKeyword [10..18) 'delegate'
+      AsteriskToken [18..19) '*'
+      FunctionPointerParameterList [19..25)
+        LessThanToken [19..20) '<'
+        FunctionPointerParameter [20..24)
+          PredefinedType [20..24)
+            VoidKeyword [20..24) 'void'
+        GreaterThanToken [24..25) '>'
+    SemicolonToken [25..26) ';'
+  EndOfFileToken [26..26) ''

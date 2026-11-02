@@ -1,0 +1,18 @@
+AsExpression [0..16)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  AsKeyword [2..4) 'as'
+  T:WhitespaceTrivia [4..5) ' '
+  ArrayType [5..16)
+    NullableType [5..14)
+      PredefinedType [5..12)
+        StringKeyword [5..11) 'string'
+        T:WhitespaceTrivia [11..12) ' '
+      QuestionToken [12..13) '?'
+      T:WhitespaceTrivia [13..14) ' '
+    ArrayRankSpecifier [14..16)
+      OpenBracketToken [14..15) '['
+      OmittedArraySizeExpression [15..15)
+        OmittedArraySizeExpressionToken [15..15) ''
+      CloseBracketToken [15..16) ']'

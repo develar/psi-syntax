@@ -1,0 +1,5 @@
+InterpolatedStringExpression [0..9)
+  InterpolatedVerbatimStringStartToken [0..3) '@$"'
+  InterpolatedStringText [3..8)
+    InterpolatedStringTextToken [3..8) 'hello'
+  InterpolatedStringEndToken [8..9) '"'

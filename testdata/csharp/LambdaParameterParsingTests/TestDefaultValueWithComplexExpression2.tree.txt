@@ -1,0 +1,53 @@
+ParenthesizedLambdaExpression [0..45)
+  ParameterList [0..39)
+    OpenParenToken [0..1) '('
+    Parameter [1..36)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..8) 'arg'
+      T:WhitespaceTrivia [8..9) ' '
+      EqualsValueClause [9..36)
+        EqualsToken [9..10) '='
+        T:WhitespaceTrivia [10..11) ' '
+        ConditionalExpression [11..36)
+          IdentifierName [11..13)
+            IdentifierToken [11..12) 'a'
+            T:WhitespaceTrivia [12..13) ' '
+          QuestionToken [13..14) '?'
+          T:WhitespaceTrivia [14..15) ' '
+          ConditionalExpression [15..25)
+            IdentifierName [15..17)
+              IdentifierToken [15..16) 'b'
+              T:WhitespaceTrivia [16..17) ' '
+            QuestionToken [17..18) '?'
+            T:WhitespaceTrivia [18..19) ' '
+            IdentifierName [19..21)
+              IdentifierToken [19..20) 'w'
+              T:WhitespaceTrivia [20..21) ' '
+            ColonToken [21..22) ':'
+            T:WhitespaceTrivia [22..23) ' '
+            IdentifierName [23..25)
+              IdentifierToken [23..24) 'x'
+              T:WhitespaceTrivia [24..25) ' '
+          ColonToken [25..26) ':'
+          T:WhitespaceTrivia [26..27) ' '
+          ConditionalExpression [27..36)
+            IdentifierName [27..29)
+              IdentifierToken [27..28) 'c'
+              T:WhitespaceTrivia [28..29) ' '
+            QuestionToken [29..30) '?'
+            T:WhitespaceTrivia [30..31) ' '
+            IdentifierName [31..33)
+              IdentifierToken [31..32) 'y'
+              T:WhitespaceTrivia [32..33) ' '
+            ColonToken [33..34) ':'
+            T:WhitespaceTrivia [34..35) ' '
+            IdentifierName [35..36)
+              IdentifierToken [35..36) 'z'
+    CloseParenToken [36..37) ')'
+    T:WhitespaceTrivia [37..39) '  '
+  EqualsGreaterThanToken [39..41) '=>'
+  T:WhitespaceTrivia [41..42) ' '
+  IdentifierName [42..45)
+    IdentifierToken [42..45) 'arg'

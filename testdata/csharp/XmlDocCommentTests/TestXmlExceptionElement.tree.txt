@@ -1,0 +1,2 @@
+IdentifierName [0..25)
+  IdentifierToken [0..25) 'InvalidOperationException'

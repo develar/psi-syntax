@@ -1,0 +1,13 @@
+CompilationUnit [0..11)
+  L:PragmaWarningDirectiveTrivia [0..11)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..8) missing
+    DisableKeyword [8..8) missing
+    L:SkippedTokensTrivia [8..11)
+      IdentifierToken [8..11) 'GOO'
+    EndOfDirectiveToken [11..11) ''
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1633 [8..11) Unrecognized #pragma directive

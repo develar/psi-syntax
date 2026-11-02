@@ -1,0 +1,46 @@
+ParenthesizedLambdaExpression [0..46)
+  ParameterList [0..24)
+    OpenParenToken [0..1) '('
+    Parameter [1..9)
+      PredefinedType [1..8)
+        StringKeyword [1..7) 'string'
+        T:WhitespaceTrivia [7..8) ' '
+      IdentifierToken [8..9) 'a'
+    CommaToken [9..10) ','
+    T:WhitespaceTrivia [10..11) ' '
+    Parameter [11..22)
+      PredefinedType [11..18)
+        DoubleKeyword [11..17) 'double'
+        T:WhitespaceTrivia [17..18) ' '
+      IdentifierToken [18..19) 'b'
+      T:WhitespaceTrivia [19..20) ' '
+      EqualsValueClause [20..22)
+        EqualsToken [20..21) '='
+        T:WhitespaceTrivia [21..22) ' '
+        IdentifierName [22..22)
+          IdentifierToken [22..22) missing
+    CloseParenToken [22..23) ')'
+    T:WhitespaceTrivia [23..24) ' '
+  EqualsGreaterThanToken [24..26) '=>'
+  T:WhitespaceTrivia [26..27) ' '
+  AddExpression [27..46)
+    InvocationExpression [27..43)
+      SimpleMemberAccessExpression [27..39)
+        PredefinedType [27..33)
+          DoubleKeyword [27..33) 'double'
+        DotToken [33..34) '.'
+        IdentifierName [34..39)
+          IdentifierToken [34..39) 'Parse'
+      ArgumentList [39..43)
+        OpenParenToken [39..40) '('
+        Argument [40..41)
+          IdentifierName [40..41)
+            IdentifierToken [40..41) 'a'
+        CloseParenToken [41..42) ')'
+        T:WhitespaceTrivia [42..43) ' '
+    PlusToken [43..44) '+'
+    T:WhitespaceTrivia [44..45) ' '
+    IdentifierName [45..46)
+      IdentifierToken [45..46) 'b'
+Diagnostics:
+  CS1525 [22..23) Invalid expression term \')\'

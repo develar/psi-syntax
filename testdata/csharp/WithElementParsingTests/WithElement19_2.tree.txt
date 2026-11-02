@@ -1,0 +1,21 @@
+CollectionExpression [0..22)
+  OpenBracketToken [0..1) '['
+  WithElement [1..21)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..21)
+      OpenParenToken [5..6) '('
+      Argument [6..20)
+        ParenthesizedLambdaExpression [6..20)
+          AsyncKeyword [6..11) 'async'
+          T:WhitespaceTrivia [11..12) ' '
+          ParameterList [12..15)
+            OpenParenToken [12..13) '('
+            CloseParenToken [13..14) ')'
+            T:WhitespaceTrivia [14..15) ' '
+          EqualsGreaterThanToken [15..17) '=>'
+          T:WhitespaceTrivia [17..18) ' '
+          Block [18..20)
+            OpenBraceToken [18..19) '{'
+            CloseBraceToken [19..20) '}'
+      CloseParenToken [20..21) ')'
+  CloseBracketToken [21..22) ']'

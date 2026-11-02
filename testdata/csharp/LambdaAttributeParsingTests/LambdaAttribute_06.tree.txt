@@ -1,0 +1,20 @@
+CollectionExpression [0..14)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'A'
+  CloseBracketToken [2..3) ']'
+  T:WhitespaceTrivia [3..4) ' '
+  T:SkippedTokensTrivia [4..7)
+    RefKeyword [4..7) 'ref'
+  T:WhitespaceTrivia [7..8) ' '
+  T:SkippedTokensTrivia [8..9)
+    IdentifierToken [8..9) 'x'
+  T:WhitespaceTrivia [9..10) ' '
+  T:SkippedTokensTrivia [10..12)
+    EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  T:SkippedTokensTrivia [13..14)
+    IdentifierToken [13..14) 'x'
+Diagnostics:
+  CS1073 [0..3) Unexpected token \'ref\'

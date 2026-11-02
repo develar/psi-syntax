@@ -1,0 +1,8 @@
+CompilationUnit [0..8)
+  L:WarningDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    WarningKeyword [1..8) 'warning'
+    EndOfDirectiveToken [8..8) ''
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1030 [8..8) #warning: \'\'

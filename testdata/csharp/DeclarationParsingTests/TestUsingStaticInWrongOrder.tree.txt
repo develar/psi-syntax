@@ -1,0 +1,13 @@
+CompilationUnit [0..15)
+  UsingDirective [0..15)
+    L:SkippedTokensTrivia [0..6)
+      StaticKeyword [0..6) 'static'
+    L:WhitespaceTrivia [6..7) ' '
+    UsingKeyword [7..12) 'using'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierName [13..14)
+      IdentifierToken [13..14) 'a'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS0116 [0..6) A namespace cannot directly contain members such as fields, methods or statements

@@ -1,0 +1,27 @@
+CompilationUnit [0..14)
+  L:MultiLineDocumentationCommentTrivia [0..14)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlEmptyElement [4..6)
+      LessThanToken [4..5) '<'
+      XmlName [5..6)
+        IdentifierToken [5..6) 'a'
+      SlashGreaterThanToken [6..6) missing
+    XmlText [6..8)
+      XmlTextLiteralToken [6..7) ' '
+      XmlTextLiteralNewLineToken [7..8) '\n'
+    XmlEmptyElement [8..10)
+      LessThanToken [8..9) '<'
+      XmlName [9..10)
+        IdentifierToken [9..10) 'b'
+      SlashGreaterThanToken [10..10) missing
+    XmlText [10..12)
+      XmlTextLiteralToken [10..11) ' '
+      XmlTextLiteralNewLineToken [11..12) '\n'
+    L:DocumentationCommentExteriorTrivia [12..14) '*/'
+    EndOfDocumentationCommentToken [14..14) ''
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1570 [6..6) XML comment has badly formed XML -- \'Expected \'>\' or \'/>\' to close tag \'a\'.\'
+  CS1570 [10..10) XML comment has badly formed XML -- \'Expected \'>\' or \'/>\' to close tag \'b\'.\'

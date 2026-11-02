@@ -1,0 +1,46 @@
+ForStatement [0..51)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..28)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..19)
+      IdentifierToken [9..15) 'offset'
+      T:WhitespaceTrivia [15..16) ' '
+      EqualsValueClause [16..19)
+        EqualsToken [16..17) '='
+        T:WhitespaceTrivia [17..18) ' '
+        NumericLiteralExpression [18..19)
+          NumericLiteralToken [18..19) '0'
+    CommaToken [19..20) ','
+    T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..23)
+      IdentifierToken [21..23) 'c1'
+    CommaToken [23..24) ','
+    T:WhitespaceTrivia [24..25) ' '
+    VariableDeclarator [25..27)
+      IdentifierToken [25..27) 'c2'
+    CommaToken [27..28) ','
+    VariableDeclarator [28..28)
+      IdentifierToken [28..28) missing
+  SemicolonToken [28..29) ';'
+  T:WhitespaceTrivia [29..30) ' '
+  LessThanExpression [30..45)
+    IdentifierName [30..37)
+      IdentifierToken [30..36) 'offset'
+      T:WhitespaceTrivia [36..37) ' '
+    LessThanToken [37..38) '<'
+    T:WhitespaceTrivia [38..39) ' '
+    IdentifierName [39..45)
+      IdentifierToken [39..45) 'length'
+  SemicolonToken [45..46) ';'
+  CloseParenToken [46..47) ')'
+  T:EndOfLineTrivia [47..48) '\n'
+  Block [48..51)
+    OpenBraceToken [48..49) '{'
+    T:EndOfLineTrivia [49..50) '\n'
+    CloseBraceToken [50..51) '}'
+Diagnostics:
+  CS1001 [28..29) Identifier expected

@@ -1,0 +1,51 @@
+CompilationUnit [0..59)
+  GlobalStatement [0..16)
+    ExpressionStatement [0..16)
+      ElementAccessExpression [0..16)
+        ThisExpression [0..5)
+          L:EndOfLineTrivia [0..1) '\n'
+          ThisKeyword [1..5) 'this'
+        BracketedArgumentList [5..16)
+          OpenBracketToken [5..6) '['
+          Argument [6..13)
+            PredefinedType [6..13)
+              DoubleKeyword [6..12) 'double'
+              T:WhitespaceTrivia [12..13) ' '
+          CommaToken [13..13) missing
+          Argument [13..14)
+            IdentifierName [13..14)
+              IdentifierToken [13..14) 'E'
+          CloseBracketToken [14..15) ']'
+          T:WhitespaceTrivia [15..16) ' '
+      SemicolonToken [16..16) missing
+  GlobalStatement [16..59)
+    Block [16..59)
+      OpenBraceToken [16..17) '{'
+      T:WhitespaceTrivia [17..18) ' '
+      ExpressionStatement [18..22)
+        IdentifierName [18..22)
+          IdentifierToken [18..21) 'get'
+          T:WhitespaceTrivia [21..22) ' '
+        SemicolonToken [22..22) missing
+      Block [22..57)
+        OpenBraceToken [22..23) '{'
+        T:WhitespaceTrivia [23..24) ' '
+        ReturnStatement [24..55)
+          ReturnKeyword [24..30) 'return'
+          T:WhitespaceTrivia [30..31) ' '
+          T:MultiLineCommentTrivia [31..41) '/*<bind>*/'
+          IdentifierName [41..53)
+            IdentifierToken [41..42) 'E'
+            T:MultiLineCommentTrivia [42..53) '/*</bind>*/'
+          SemicolonToken [53..54) ';'
+          T:WhitespaceTrivia [54..55) ' '
+        CloseBraceToken [55..56) '}'
+        T:WhitespaceTrivia [56..57) ' '
+      CloseBraceToken [57..58) '}'
+      T:EndOfLineTrivia [58..59) '\n'
+  EndOfFileToken [59..59) ''
+Diagnostics:
+  CS1525 [6..12) Invalid expression term \'double\'
+  CS1003 [13..14) Syntax error, \',\' expected
+  CS1002 [16..17) ; expected
+  CS1002 [22..23) ; expected

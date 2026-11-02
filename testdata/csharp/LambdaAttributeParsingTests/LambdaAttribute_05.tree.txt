@@ -1,0 +1,20 @@
+ParenthesizedLambdaExpression [0..16)
+  AttributeList [0..4)
+    OpenBracketToken [0..1) '['
+    Attribute [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+    T:WhitespaceTrivia [3..4) ' '
+  ParameterList [4..12)
+    OpenParenToken [4..5) '('
+    Parameter [5..10)
+      RefKeyword [5..8) 'ref'
+      T:WhitespaceTrivia [8..9) ' '
+      IdentifierToken [9..10) 'x'
+    CloseParenToken [10..11) ')'
+    T:WhitespaceTrivia [11..12) ' '
+  EqualsGreaterThanToken [12..14) '=>'
+  T:WhitespaceTrivia [14..15) ' '
+  IdentifierName [15..16)
+    IdentifierToken [15..16) 'x'

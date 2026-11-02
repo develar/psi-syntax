@@ -1,0 +1,16 @@
+PropertyDeclaration [0..29)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  PredefinedType [9..16)
+    StringKeyword [9..15) 'string'
+    T:WhitespaceTrivia [15..16) ' '
+  IdentifierToken [16..20) 'Prop'
+  T:WhitespaceTrivia [20..21) ' '
+  AccessorList [21..29)
+    OpenBraceToken [21..22) '{'
+    T:WhitespaceTrivia [22..23) ' '
+    GetAccessorDeclaration [23..28)
+      GetKeyword [23..26) 'get'
+      SemicolonToken [26..27) ';'
+      T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'

@@ -1,0 +1,1 @@
+[Attr1][Attr2] (A a, B b) LocalFunc() { }

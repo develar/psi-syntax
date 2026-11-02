@@ -1,0 +1,30 @@
+ForEachStatement [0..42)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  ScopedType [10..24)
+    ScopedKeyword [10..16) 'scoped'
+    T:WhitespaceTrivia [16..17) ' '
+    TupleType [17..24)
+      OpenParenToken [17..18) '('
+      TupleElement [18..19)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'b'
+      CommaToken [19..20) ','
+      T:WhitespaceTrivia [20..21) ' '
+      TupleElement [21..22)
+        IdentifierName [21..22)
+          IdentifierToken [21..22) 'c'
+      CloseParenToken [22..23) ')'
+      T:WhitespaceTrivia [23..24) ' '
+  IdentifierToken [24..25) 'd'
+  T:WhitespaceTrivia [25..26) ' '
+  InKeyword [26..28) 'in'
+  T:WhitespaceTrivia [28..29) ' '
+  IdentifierName [29..39)
+    IdentifierToken [29..39) 'collection'
+  CloseParenToken [39..40) ')'
+  EmptyStatement [40..42)
+    SemicolonToken [40..41) ';'
+    T:EndOfLineTrivia [41..42) '\n'

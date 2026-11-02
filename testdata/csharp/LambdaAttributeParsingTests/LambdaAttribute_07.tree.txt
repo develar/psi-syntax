@@ -1,0 +1,20 @@
+CollectionExpression [0..13)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'A'
+  CloseBracketToken [2..3) ']'
+  T:WhitespaceTrivia [3..4) ' '
+  T:SkippedTokensTrivia [4..6)
+    InKeyword [4..6) 'in'
+  T:WhitespaceTrivia [6..7) ' '
+  T:SkippedTokensTrivia [7..8)
+    IdentifierToken [7..8) 'x'
+  T:WhitespaceTrivia [8..9) ' '
+  T:SkippedTokensTrivia [9..11)
+    EqualsGreaterThanToken [9..11) '=>'
+  T:WhitespaceTrivia [11..12) ' '
+  T:SkippedTokensTrivia [12..13)
+    IdentifierToken [12..13) 'x'
+Diagnostics:
+  CS1073 [0..3) Unexpected token \'in\'

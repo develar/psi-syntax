@@ -1,0 +1,1 @@
+class c { void m() { var x = new C { a = b; c = d, e = f; g = h }; var y = 5; } }

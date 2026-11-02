@@ -1,0 +1,18 @@
+CompilationUnit [0..18)
+  MethodDeclaration [0..18)
+    L:EndOfLineTrivia [0..1) '\n'
+    NewKeyword [1..4) 'new'
+    T:WhitespaceTrivia [4..5) ' '
+    RefType [5..13)
+      RefKeyword [5..8) 'ref'
+      T:WhitespaceTrivia [8..9) ' '
+      PredefinedType [9..13)
+        IntKeyword [9..12) 'int'
+        T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'M'
+    ParameterList [14..16)
+      OpenParenToken [14..15) '('
+      CloseParenToken [15..16) ')'
+    SemicolonToken [16..17) ';'
+    T:EndOfLineTrivia [17..18) '\n'
+  EndOfFileToken [18..18) ''

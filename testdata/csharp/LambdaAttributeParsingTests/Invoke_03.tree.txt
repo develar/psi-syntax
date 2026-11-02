@@ -1,0 +1,22 @@
+InvocationExpression [0..14)
+  ParenthesizedExpression [0..12)
+    OpenParenToken [0..1) '('
+    SimpleLambdaExpression [1..11)
+      AttributeList [1..5)
+        OpenBracketToken [1..2) '['
+        Attribute [2..3)
+          IdentifierName [2..3)
+            IdentifierToken [2..3) 'A'
+        CloseBracketToken [3..4) ']'
+        T:WhitespaceTrivia [4..5) ' '
+      Parameter [5..7)
+        IdentifierToken [5..6) 'x'
+        T:WhitespaceTrivia [6..7) ' '
+      EqualsGreaterThanToken [7..9) '=>'
+      T:WhitespaceTrivia [9..10) ' '
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'x'
+    CloseParenToken [11..12) ')'
+  ArgumentList [12..14)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'

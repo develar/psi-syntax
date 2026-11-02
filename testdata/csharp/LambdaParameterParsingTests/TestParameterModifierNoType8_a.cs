@@ -1,0 +1,1 @@
+(a, scoped ref readonly b) => { }

@@ -1,0 +1,1 @@
+void F(scoped.nested x, ref scoped.nested y) { }

@@ -1,0 +1,1 @@
+delegate*<ref Goo, in Bar, out Baz, ref readonly void*> ptr;

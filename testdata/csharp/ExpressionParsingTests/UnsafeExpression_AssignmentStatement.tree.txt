@@ -1,0 +1,17 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..14)
+    ExpressionStatement [0..14)
+      SimpleAssignmentExpression [0..13)
+        UnsafeExpression [0..10)
+          UnsafeKeyword [0..6) 'unsafe'
+          OpenParenToken [6..7) '('
+          IdentifierName [7..8)
+            IdentifierToken [7..8) 'x'
+          CloseParenToken [8..9) ')'
+          T:WhitespaceTrivia [9..10) ' '
+        EqualsToken [10..11) '='
+        T:WhitespaceTrivia [11..12) ' '
+        IdentifierName [12..13)
+          IdentifierToken [12..13) 'y'
+      SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

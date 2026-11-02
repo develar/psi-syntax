@@ -1,0 +1,22 @@
+OperatorDeclaration [0..24)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  PercentEqualsToken [11..13) '%='
+  ParameterList [13..19)
+    OpenParenToken [13..14) '('
+    Parameter [14..17)
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'C'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'x'
+    CloseParenToken [17..18) ')'
+    T:WhitespaceTrivia [18..19) ' '
+  ArrowExpressionClause [19..23)
+    EqualsGreaterThanToken [19..21) '=>'
+    T:WhitespaceTrivia [21..22) ' '
+    IdentifierName [22..23)
+      IdentifierToken [22..23) 'x'
+  SemicolonToken [23..24) ';'

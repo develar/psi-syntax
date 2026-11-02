@@ -1,0 +1,4 @@
+
+private namespace test
+{
+}

@@ -1,0 +1,5 @@
+RangeExpression [0..5)
+  DotDotToken [0..2) '..'
+  T:WhitespaceTrivia [2..3) ' '
+  RangeExpression [3..5)
+    DotDotToken [3..5) '..'

@@ -1,0 +1,2 @@
+# define  true
+class A {}

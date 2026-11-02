@@ -1,0 +1,4 @@
+CharacterLiteralToken [0..6) '\'\\u12\''
+EndOfFileToken [6..6) ''
+Diagnostics:
+  CS1009 [1..5) Unrecognized escape sequence

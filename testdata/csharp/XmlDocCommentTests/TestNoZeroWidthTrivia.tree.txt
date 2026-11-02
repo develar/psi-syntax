@@ -1,0 +1,10 @@
+CompilationUnit [0..8)
+  L:MultiLineDocumentationCommentTrivia [0..8)
+    XmlText [0..6)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralNewLineToken [3..4) '\n'
+      XmlTextLiteralToken [4..5) 'x'
+      XmlTextLiteralNewLineToken [5..6) '\n'
+    L:DocumentationCommentExteriorTrivia [6..8) '*/'
+    EndOfDocumentationCommentToken [8..8) ''
+  EndOfFileToken [8..8) ''

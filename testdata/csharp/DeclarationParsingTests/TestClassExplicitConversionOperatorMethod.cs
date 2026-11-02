@@ -1,0 +1,1 @@
+class a { explicit operator b (c d) { } }

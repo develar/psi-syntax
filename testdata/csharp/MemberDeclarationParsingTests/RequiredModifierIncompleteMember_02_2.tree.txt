@@ -1,0 +1,7 @@
+IncompleteMember [0..15)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  PredefinedType [9..15)
+    StringKeyword [9..15) 'string'
+Diagnostics:
+  CS1519 [15..15) Invalid token \'\' in a member declaration

@@ -1,0 +1,8 @@
+FieldDeclaration [0..15)
+  VariableDeclaration [0..14)
+    IdentifierName [0..9)
+      IdentifierToken [0..8) 'required'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..14) 'Field'
+  SemicolonToken [14..15) ';'

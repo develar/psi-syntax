@@ -1,0 +1,4 @@
+namespace n
+{
+    class c
+}

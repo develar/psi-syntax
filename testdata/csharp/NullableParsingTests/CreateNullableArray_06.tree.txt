@@ -1,0 +1,11 @@
+ArrayCreationExpression [0..12)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..12)
+    PredefinedType [4..10)
+      ObjectKeyword [4..10) 'object'
+    ArrayRankSpecifier [10..12)
+      OpenBracketToken [10..11) '['
+      OmittedArraySizeExpression [11..11)
+        OmittedArraySizeExpressionToken [11..11) ''
+      CloseBracketToken [11..12) ']'

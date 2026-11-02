@@ -1,0 +1,2 @@
+IdentifierToken [0..6) 'a0b1c2'
+EndOfFileToken [6..6) ''

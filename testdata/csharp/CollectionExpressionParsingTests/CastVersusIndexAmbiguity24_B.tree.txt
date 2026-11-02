@@ -1,0 +1,12 @@
+ElementAccessExpression [0..6)
+  ParenthesizedExpression [0..3)
+    OpenParenToken [0..1) '('
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'A'
+    CloseParenToken [2..3) ')'
+  BracketedArgumentList [3..6)
+    OpenBracketToken [3..4) '['
+    Argument [4..5)
+      NumericLiteralExpression [4..5)
+        NumericLiteralToken [4..5) '1'
+    CloseBracketToken [5..6) ']'

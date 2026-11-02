@@ -1,0 +1,1 @@
+public file struct C { }

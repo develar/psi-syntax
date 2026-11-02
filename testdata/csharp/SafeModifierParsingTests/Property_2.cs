@@ -1,0 +1,1 @@
+public safe extern int P { get; }

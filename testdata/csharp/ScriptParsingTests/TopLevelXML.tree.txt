@@ -1,0 +1,46 @@
+CompilationUnit [0..36)
+  GlobalStatement [0..10)
+    ExpressionStatement [0..10)
+      LessThanExpression [0..10)
+        IdentifierName [0..0)
+          IdentifierToken [0..0) missing
+        L:EndOfLineTrivia [0..1) '\n'
+        LessThanToken [1..2) '<'
+        IdentifierName [2..10)
+          IdentifierToken [2..9) 'Expects'
+          T:WhitespaceTrivia [9..10) ' '
+      SemicolonToken [10..10) missing
+  GlobalStatement [10..36)
+    ExpressionStatement [10..36)
+      SimpleAssignmentExpression [10..36)
+        IdentifierName [10..16)
+          IdentifierToken [10..16) 'Status'
+        EqualsToken [16..17) '='
+        GreaterThanExpression [17..36)
+          LessThanExpression [17..34)
+            GreaterThanExpression [17..25)
+              IdentifierName [17..24)
+                IdentifierToken [17..24) 'success'
+              GreaterThanToken [24..25) '>'
+              IdentifierName [25..25)
+                IdentifierToken [25..25) missing
+            LessThanToken [25..26) '<'
+            DivideExpression [26..34)
+              IdentifierName [26..26)
+                IdentifierToken [26..26) missing
+              SlashToken [26..27) '/'
+              IdentifierName [27..34)
+                IdentifierToken [27..34) 'Expects'
+          GreaterThanToken [34..35) '>'
+          T:EndOfLineTrivia [35..36) '\n'
+          IdentifierName [36..36)
+            IdentifierToken [36..36) missing
+      SemicolonToken [36..36) missing
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1525 [1..2) Invalid expression term \'<\'
+  CS1002 [10..16) ; expected
+  CS1525 [25..26) Invalid expression term \'<\'
+  CS1525 [26..27) Invalid expression term \'/\'
+  CS1733 [35..35) Expected expression
+  CS1002 [35..35) ; expected

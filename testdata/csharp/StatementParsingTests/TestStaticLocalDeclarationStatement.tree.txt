@@ -1,0 +1,18 @@
+LocalDeclarationStatement [0..15)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  VariableDeclaration [7..14)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'T'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..10) 'a'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        IdentifierName [13..14)
+          IdentifierToken [13..14) 'b'
+  SemicolonToken [14..15) ';'
+Diagnostics:
+  CS0106 [0..6) The modifier \'static\' is not valid for this item

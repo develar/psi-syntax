@@ -1,0 +1,29 @@
+CompilationUnit [0..41)
+  ClassDeclaration [0..41)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..39)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      IdentifierName [21..27)
+        IdentifierToken [21..26) 'async'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..32) 'async'
+      ParameterList [32..35)
+        OpenParenToken [32..33) '('
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+      Block [35..39)
+        OpenBraceToken [35..36) '{'
+        T:WhitespaceTrivia [36..37) ' '
+        CloseBraceToken [37..38) '}'
+        T:EndOfLineTrivia [38..39) '\n'
+    CloseBraceToken [39..40) '}'
+    T:EndOfLineTrivia [40..41) '\n'
+  EndOfFileToken [41..41) ''

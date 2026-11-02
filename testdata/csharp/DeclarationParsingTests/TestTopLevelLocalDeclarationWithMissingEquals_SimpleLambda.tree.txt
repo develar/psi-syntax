@@ -1,0 +1,24 @@
+CompilationUnit [0..11)
+  GlobalStatement [0..11)
+    LocalDeclarationStatement [0..11)
+      VariableDeclaration [0..10)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) 'C'
+          T:WhitespaceTrivia [1..2) ' '
+        VariableDeclarator [2..10)
+          IdentifierToken [2..3) 'x'
+          T:WhitespaceTrivia [3..4) ' '
+          EqualsValueClause [4..10)
+            EqualsToken [4..4) missing
+            SimpleLambdaExpression [4..10)
+              Parameter [4..6)
+                IdentifierToken [4..5) 'a'
+                T:WhitespaceTrivia [5..6) ' '
+              EqualsGreaterThanToken [6..8) '=>'
+              T:WhitespaceTrivia [8..9) ' '
+              IdentifierName [9..10)
+                IdentifierToken [9..10) 'b'
+      SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1003 [4..5) Syntax error, \'=\' expected

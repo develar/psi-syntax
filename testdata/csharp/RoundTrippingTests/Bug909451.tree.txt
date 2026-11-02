@@ -1,0 +1,64 @@
+CompilationUnit [0..102)
+  ClassDeclaration [0..102)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..31) 'AnonymousTypeTest'
+    T:WhitespaceTrivia [31..32) ' '
+    BaseList [32..46)
+      ColonToken [32..33) ':'
+      T:WhitespaceTrivia [33..34) ' '
+      SimpleBaseType [34..46)
+        IdentifierName [34..46)
+          IdentifierToken [34..45) 'ParentClass'
+          T:EndOfLineTrivia [45..46) '\n'
+    OpenBraceToken [46..47) '{'
+    T:EndOfLineTrivia [47..48) '\n'
+    MethodDeclaration [48..100)
+      PublicKeyword [48..54) 'public'
+      T:WhitespaceTrivia [54..55) ' '
+      PredefinedType [55..60)
+        VoidKeyword [55..59) 'void'
+        T:WhitespaceTrivia [59..60) ' '
+      IdentifierToken [60..63) 'Run'
+      ParameterList [63..66)
+        OpenParenToken [63..64) '('
+        CloseParenToken [64..65) ')'
+        T:EndOfLineTrivia [65..66) '\n'
+      Block [66..100)
+        OpenBraceToken [66..67) '{'
+        T:EndOfLineTrivia [67..68) '\n'
+        LocalDeclarationStatement [68..98)
+          VariableDeclaration [68..96)
+            IdentifierName [68..72)
+              IdentifierToken [68..71) 'var'
+              T:WhitespaceTrivia [71..72) ' '
+            VariableDeclarator [72..96)
+              IdentifierToken [72..74) 'p1'
+              T:WhitespaceTrivia [74..75) ' '
+              EqualsValueClause [75..96)
+                EqualsToken [75..76) '='
+                T:WhitespaceTrivia [76..77) ' '
+                AnonymousObjectCreationExpression [77..96)
+                  NewKeyword [77..80) 'new'
+                  T:WhitespaceTrivia [80..81) ' '
+                  OpenBraceToken [81..82) '{'
+                  T:WhitespaceTrivia [82..83) ' '
+                  AnonymousObjectMemberDeclarator [83..95)
+                    SimpleMemberAccessExpression [83..95)
+                      BaseExpression [83..87)
+                        BaseKeyword [83..87) 'base'
+                      DotToken [87..88) '.'
+                      IdentifierName [88..95)
+                        IdentifierToken [88..94) 'Number'
+                        T:WhitespaceTrivia [94..95) ' '
+                  CloseBraceToken [95..96) '}'
+          SemicolonToken [96..97) ';'
+          T:EndOfLineTrivia [97..98) '\n'
+        CloseBraceToken [98..99) '}'
+        T:EndOfLineTrivia [99..100) '\n'
+    CloseBraceToken [100..101) '}'
+    T:EndOfLineTrivia [101..102) '\n'
+  EndOfFileToken [102..102) ''

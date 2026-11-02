@@ -1,0 +1,56 @@
+CompilationUnit [0..47)
+  StructDeclaration [0..47)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    FieldDeclaration [17..45)
+      L:WhitespaceTrivia [17..21) '    '
+      FixedKeyword [21..26) 'fixed'
+      T:WhitespaceTrivia [26..27) ' '
+      VariableDeclaration [27..43)
+        IdentifierName [27..34)
+          IdentifierToken [27..33) 'scoped'
+          T:WhitespaceTrivia [33..34) ' '
+        VariableDeclarator [34..43)
+          IdentifierToken [34..34) missing
+          BracketedArgumentList [34..43)
+            OpenBracketToken [34..34) missing
+            Argument [34..38)
+              PredefinedType [34..38)
+                IntKeyword [34..37) 'int'
+                T:WhitespaceTrivia [37..38) ' '
+            CommaToken [38..38) missing
+            Argument [38..43)
+              ElementAccessExpression [38..43)
+                IdentifierName [38..40)
+                  IdentifierToken [38..40) 'F3'
+                BracketedArgumentList [40..43)
+                  OpenBracketToken [40..41) '['
+                  Argument [41..42)
+                    NumericLiteralExpression [41..42)
+                      NumericLiteralToken [41..42) '2'
+                  CloseBracketToken [42..43) ']'
+            CommaToken [43..43) missing
+            Argument [43..43)
+              IdentifierName [43..43)
+                IdentifierToken [43..43) missing
+            CloseBracketToken [43..43) missing
+      SemicolonToken [43..44) ';'
+      T:EndOfLineTrivia [44..45) '\n'
+    CloseBraceToken [45..46) '}'
+    T:EndOfLineTrivia [46..47) '\n'
+  EndOfFileToken [47..47) ''
+Diagnostics:
+  CS1001 [34..37) Identifier expected
+  CS1003 [34..37) Syntax error, \'[\' expected
+  CS1525 [34..37) Invalid expression term \'int\'
+  CS1003 [38..40) Syntax error, \',\' expected
+  CS1003 [43..44) Syntax error, \',\' expected
+  CS0443 [43..43) Syntax error; value expected
+  CS1003 [43..44) Syntax error, \']\' expected

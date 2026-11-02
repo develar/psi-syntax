@@ -1,0 +1,19 @@
+IdentifierName [0..17)
+  IdentifierToken [0..0) missing
+  T:SkippedTokensTrivia [0..6)
+    StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  T:SkippedTokensTrivia [7..10)
+    IntKeyword [7..10) 'int'
+  T:WhitespaceTrivia [10..11) ' '
+  T:SkippedTokensTrivia [11..13)
+    EqualsGreaterThanToken [11..13) '=>'
+  T:WhitespaceTrivia [13..14) ' '
+  T:SkippedTokensTrivia [14..15)
+    OpenBraceToken [14..15) '{'
+  T:WhitespaceTrivia [15..16) ' '
+  T:SkippedTokensTrivia [16..17)
+    CloseBraceToken [16..17) '}'
+Diagnostics:
+  CS1525 [0..6) Invalid expression term \'static\'
+  CS1073 [0..0) Unexpected token \'static\'

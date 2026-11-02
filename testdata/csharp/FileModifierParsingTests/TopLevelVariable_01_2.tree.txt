@@ -1,0 +1,11 @@
+CompilationUnit [0..10)
+  GlobalStatement [0..10)
+    LocalDeclarationStatement [0..10)
+      VariableDeclaration [0..9)
+        IdentifierName [0..5)
+          IdentifierToken [0..4) 'file'
+          T:WhitespaceTrivia [4..5) ' '
+        VariableDeclarator [5..9)
+          IdentifierToken [5..9) 'file'
+      SemicolonToken [9..10) ';'
+  EndOfFileToken [10..10) ''

@@ -1,0 +1,58 @@
+CompilationUnit [0..62)
+  ClassDeclaration [0..62)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    PropertyDeclaration [11..42)
+      PredefinedType [11..19)
+        L:WhitespaceTrivia [11..15) '    '
+        IntKeyword [15..18) 'int'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'A'
+      T:WhitespaceTrivia [20..21) ' '
+      AccessorList [21..42)
+        OpenBraceToken [21..22) '{'
+        T:WhitespaceTrivia [22..23) ' '
+        GetAccessorDeclaration [23..42)
+          GetKeyword [23..26) 'get'
+          T:WhitespaceTrivia [26..27) ' '
+          Block [27..42)
+            OpenBraceToken [27..28) '{'
+            T:WhitespaceTrivia [28..29) ' '
+            ReturnStatement [29..42)
+              ReturnKeyword [29..35) 'return'
+              T:WhitespaceTrivia [35..36) ' '
+              SimpleMemberAccessExpression [36..42)
+                ThisExpression [36..40)
+                  ThisKeyword [36..40) 'this'
+                DotToken [40..41) '.'
+                T:EndOfLineTrivia [41..42) '\n'
+                IdentifierName [42..42)
+                  IdentifierToken [42..42) missing
+              SemicolonToken [42..42) missing
+            CloseBraceToken [42..42) missing
+        CloseBraceToken [42..42) missing
+    FieldDeclaration [42..60)
+      L:WhitespaceTrivia [42..46) '    '
+      PublicKeyword [46..52) 'public'
+      T:WhitespaceTrivia [52..53) ' '
+      VariableDeclaration [53..58)
+        PredefinedType [53..57)
+          IntKeyword [53..56) 'int'
+          T:WhitespaceTrivia [56..57) ' '
+        VariableDeclarator [57..58)
+          IdentifierToken [57..58) 'B'
+      SemicolonToken [58..59) ';'
+      T:EndOfLineTrivia [59..60) '\n'
+    CloseBraceToken [60..61) '}'
+    T:EndOfLineTrivia [61..62) '\n'
+  EndOfFileToken [62..62) ''
+Diagnostics:
+  CS1001 [41..41) Identifier expected
+  CS1002 [41..41) ; expected
+  CS1513 [41..41) } expected
+  CS1513 [41..41) } expected

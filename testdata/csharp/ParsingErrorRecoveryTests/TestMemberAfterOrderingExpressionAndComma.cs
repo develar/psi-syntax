@@ -1,0 +1,1 @@
+class c { void m() { var q = from x in y orderby e, public int Goo; }

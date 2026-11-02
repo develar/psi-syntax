@@ -1,0 +1,29 @@
+CompilationUnit [0..51)
+  ClassDeclaration [0..51)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    DelegateDeclaration [11..49)
+      L:WhitespaceTrivia [11..15) '    '
+      PublicKeyword [15..21) 'public'
+      T:WhitespaceTrivia [21..22) ' '
+      AsyncKeyword [22..27) 'async'
+      T:WhitespaceTrivia [27..28) ' '
+      DelegateKeyword [28..36) 'delegate'
+      T:WhitespaceTrivia [36..37) ' '
+      PredefinedType [37..42)
+        VoidKeyword [37..41) 'void'
+        T:WhitespaceTrivia [41..42) ' '
+      IdentifierToken [42..45) 'Goo'
+      ParameterList [45..47)
+        OpenParenToken [45..46) '('
+        CloseParenToken [46..47) ')'
+      SemicolonToken [47..48) ';'
+      T:EndOfLineTrivia [48..49) '\n'
+    CloseBraceToken [49..50) '}'
+    T:EndOfLineTrivia [50..51) '\n'
+  EndOfFileToken [51..51) ''

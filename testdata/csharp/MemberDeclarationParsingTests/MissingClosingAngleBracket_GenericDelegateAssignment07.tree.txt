@@ -1,0 +1,104 @@
+MethodDeclaration [0..103)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..12)
+    VoidKeyword [7..11) 'void'
+    T:WhitespaceTrivia [11..12) ' '
+  IdentifierToken [12..18) 'Method'
+  TypeParameterList [18..23)
+    LessThanToken [18..19) '<'
+    TypeParameter [19..20)
+      IdentifierToken [19..20) 'T'
+    CommaToken [20..21) ','
+    T:WhitespaceTrivia [21..22) ' '
+    TypeParameter [22..23)
+      IdentifierToken [22..23) 'U'
+    GreaterThanToken [23..23) missing
+  ParameterList [23..26)
+    OpenParenToken [23..24) '('
+    CloseParenToken [24..25) ')'
+    T:EndOfLineTrivia [25..26) '\n'
+  Block [26..103)
+    OpenBraceToken [26..27) '{'
+    T:EndOfLineTrivia [27..28) '\n'
+    ExpressionStatement [28..102)
+      SimpleAssignmentExpression [28..100)
+        DeclarationExpression [28..43)
+          IdentifierName [28..36)
+            L:WhitespaceTrivia [28..32) '    '
+            IdentifierToken [32..35) 'var'
+            T:WhitespaceTrivia [35..36) ' '
+          ParenthesizedVariableDesignation [36..43)
+            OpenParenToken [36..37) '('
+            SingleVariableDesignation [37..38)
+              IdentifierToken [37..38) 't'
+            CommaToken [38..39) ','
+            T:WhitespaceTrivia [39..40) ' '
+            SingleVariableDesignation [40..41)
+              IdentifierToken [40..41) 'u'
+            CloseParenToken [41..42) ')'
+            T:WhitespaceTrivia [42..43) ' '
+        EqualsToken [43..44) '='
+        T:WhitespaceTrivia [44..45) ' '
+        TupleExpression [45..100)
+          OpenParenToken [45..46) '('
+          Argument [46..72)
+            CastExpression [46..72)
+              OpenParenToken [46..47) '('
+              GenericName [47..59)
+                IdentifierToken [47..53) 'Action'
+                TypeArgumentList [53..59)
+                  LessThanToken [53..54) '<'
+                  IdentifierName [54..55)
+                    IdentifierToken [54..55) 'T'
+                  CommaToken [55..56) ','
+                  T:WhitespaceTrivia [56..57) ' '
+                  IdentifierName [57..58)
+                    IdentifierToken [57..58) 'U'
+                  GreaterThanToken [58..59) '>'
+              CloseParenToken [59..60) ')'
+              GenericName [60..72)
+                IdentifierToken [60..66) 'Method'
+                TypeArgumentList [66..72)
+                  LessThanToken [66..67) '<'
+                  IdentifierName [67..68)
+                    IdentifierToken [67..68) 'T'
+                  CommaToken [68..69) ','
+                  T:WhitespaceTrivia [69..70) ' '
+                  IdentifierName [70..71)
+                    IdentifierToken [70..71) 'U'
+                  GreaterThanToken [71..72) '>'
+          CommaToken [72..73) ','
+          T:WhitespaceTrivia [73..74) ' '
+          Argument [74..96)
+            LessThanExpression [74..96)
+              CastExpression [74..94)
+                OpenParenToken [74..75) '('
+                GenericName [75..87)
+                  IdentifierToken [75..81) 'Action'
+                  TypeArgumentList [81..87)
+                    LessThanToken [81..82) '<'
+                    IdentifierName [82..83)
+                      IdentifierToken [82..83) 'T'
+                    CommaToken [83..84) ','
+                    T:WhitespaceTrivia [84..85) ' '
+                    IdentifierName [85..86)
+                      IdentifierToken [85..86) 'U'
+                    GreaterThanToken [86..87) '>'
+                CloseParenToken [87..88) ')'
+                IdentifierName [88..94)
+                  IdentifierToken [88..94) 'Method'
+              LessThanToken [94..95) '<'
+              IdentifierName [95..96)
+                IdentifierToken [95..96) 'T'
+          CommaToken [96..97) ','
+          T:WhitespaceTrivia [97..98) ' '
+          Argument [98..99)
+            IdentifierName [98..99)
+              IdentifierToken [98..99) 'U'
+          CloseParenToken [99..100) ')'
+      SemicolonToken [100..101) ';'
+      T:EndOfLineTrivia [101..102) '\n'
+    CloseBraceToken [102..103) '}'
+Diagnostics:
+  CS1003 [23..24) Syntax error, \'>\' expected

@@ -1,0 +1,129 @@
+ParenthesizedLambdaExpression [0..273)
+  ParameterList [0..232)
+    OpenParenToken [0..1) '('
+    Parameter [1..8)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..8) 'arg'
+    CommaToken [8..9) ','
+    T:EndOfLineTrivia [9..10) '\n'
+    Parameter [10..230)
+      GenericName [10..55)
+        L:WhitespaceTrivia [10..38) '                            '
+        IdentifierToken [38..42) 'Func'
+        TypeArgumentList [42..55)
+          LessThanToken [42..43) '<'
+          PredefinedType [43..46)
+            IntKeyword [43..46) 'int'
+          CommaToken [46..47) ','
+          T:WhitespaceTrivia [47..48) ' '
+          IdentifierName [48..53)
+            IdentifierToken [48..53) 'Color'
+          GreaterThanToken [53..54) '>'
+          T:WhitespaceTrivia [54..55) ' '
+      IdentifierToken [55..64) 'colorFunc'
+      T:WhitespaceTrivia [64..65) ' '
+      EqualsValueClause [65..230)
+        EqualsToken [65..66) '='
+        T:WhitespaceTrivia [66..67) ' '
+        ParenthesizedLambdaExpression [67..230)
+          ParameterList [67..89)
+            OpenParenToken [67..68) '('
+            Parameter [68..87)
+              IdentifierName [68..74)
+                IdentifierToken [68..73) 'Color'
+                T:WhitespaceTrivia [73..74) ' '
+              IdentifierToken [74..75) 'c'
+              T:WhitespaceTrivia [75..76) ' '
+              EqualsValueClause [76..87)
+                EqualsToken [76..77) '='
+                T:WhitespaceTrivia [77..78) ' '
+                SimpleMemberAccessExpression [78..87)
+                  IdentifierName [78..83)
+                    IdentifierToken [78..83) 'Color'
+                  DotToken [83..84) '.'
+                  IdentifierName [84..87)
+                    IdentifierToken [84..87) 'Red'
+            CloseParenToken [87..88) ')'
+            T:WhitespaceTrivia [88..89) ' '
+          EqualsGreaterThanToken [89..91) '=>'
+          T:WhitespaceTrivia [91..92) ' '
+          SwitchExpression [92..230)
+            IdentifierName [92..94)
+              IdentifierToken [92..93) 'c'
+              T:WhitespaceTrivia [93..94) ' '
+            SwitchKeyword [94..100) 'switch'
+            T:WhitespaceTrivia [100..101) ' '
+            T:EndOfLineTrivia [101..102) '\n'
+            L:WhitespaceTrivia [102..177) '                                                                           '
+            OpenBraceToken [177..178) '{'
+            T:WhitespaceTrivia [178..179) ' '
+            SwitchExpressionArm [179..195)
+              ConstantPattern [179..181)
+                NumericLiteralExpression [179..181)
+                  NumericLiteralToken [179..180) '1'
+                  T:WhitespaceTrivia [180..181) ' '
+              EqualsGreaterThanToken [181..183) '=>'
+              T:WhitespaceTrivia [183..184) ' '
+              SimpleMemberAccessExpression [184..195)
+                IdentifierName [184..189)
+                  IdentifierToken [184..189) 'Color'
+                DotToken [189..190) '.'
+                IdentifierName [190..195)
+                  IdentifierToken [190..195) 'Green'
+            CommaToken [195..196) ','
+            T:WhitespaceTrivia [196..197) ' '
+            SwitchExpressionArm [197..211)
+              ConstantPattern [197..199)
+                NumericLiteralExpression [197..199)
+                  NumericLiteralToken [197..198) '2'
+                  T:WhitespaceTrivia [198..199) ' '
+              EqualsGreaterThanToken [199..201) '=>'
+              T:WhitespaceTrivia [201..202) ' '
+              SimpleMemberAccessExpression [202..211)
+                IdentifierName [202..207)
+                  IdentifierToken [202..207) 'Color'
+                DotToken [207..208) '.'
+                IdentifierName [208..211)
+                  IdentifierToken [208..211) 'Red'
+            CommaToken [211..212) ','
+            T:WhitespaceTrivia [212..213) ' '
+            SwitchExpressionArm [213..229)
+              ConstantPattern [213..215)
+                NumericLiteralExpression [213..215)
+                  NumericLiteralToken [213..214) '3'
+                  T:WhitespaceTrivia [214..215) ' '
+              EqualsGreaterThanToken [215..217) '=>'
+              T:WhitespaceTrivia [217..218) ' '
+              SimpleMemberAccessExpression [218..229)
+                IdentifierName [218..223)
+                  IdentifierToken [218..223) 'Color'
+                DotToken [223..224) '.'
+                IdentifierName [224..229)
+                  IdentifierToken [224..228) 'Blue'
+                  T:WhitespaceTrivia [228..229) ' '
+            CloseBraceToken [229..230) '}'
+    CloseParenToken [230..231) ')'
+    T:WhitespaceTrivia [231..232) ' '
+  EqualsGreaterThanToken [232..234) '=>'
+  T:EndOfLineTrivia [234..235) '\n'
+  Block [235..273)
+    L:WhitespaceTrivia [235..247) '            '
+    OpenBraceToken [247..248) '{'
+    T:WhitespaceTrivia [248..249) ' '
+    ReturnStatement [249..272)
+      ReturnKeyword [249..255) 'return'
+      T:WhitespaceTrivia [255..256) ' '
+      InvocationExpression [256..270)
+        IdentifierName [256..265)
+          IdentifierToken [256..265) 'colorFunc'
+        ArgumentList [265..270)
+          OpenParenToken [265..266) '('
+          Argument [266..269)
+            IdentifierName [266..269)
+              IdentifierToken [266..269) 'arg'
+          CloseParenToken [269..270) ')'
+      SemicolonToken [270..271) ';'
+      T:WhitespaceTrivia [271..272) ' '
+    CloseBraceToken [272..273) '}'

@@ -1,0 +1,26 @@
+SwitchStatement [0..31)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..30)
+    CasePatternSwitchLabel [13..28)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      DeclarationPattern [18..26)
+        IdentifierName [18..25)
+          IdentifierToken [18..24) 'nameof'
+          T:WhitespaceTrivia [24..25) ' '
+        SingleVariableDesignation [25..26)
+          IdentifierToken [25..26) 'n'
+      ColonToken [26..27) ':'
+      T:WhitespaceTrivia [27..28) ' '
+    EmptyStatement [28..30)
+      SemicolonToken [28..29) ';'
+      T:WhitespaceTrivia [29..30) ' '
+  CloseBraceToken [30..31) '}'

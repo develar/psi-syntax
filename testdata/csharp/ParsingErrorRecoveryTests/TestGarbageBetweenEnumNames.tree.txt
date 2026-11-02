@@ -1,0 +1,22 @@
+CompilationUnit [0..17)
+  EnumDeclaration [0..17)
+    EnumKeyword [0..4) 'enum'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'e'
+    T:WhitespaceTrivia [6..7) ' '
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    EnumMemberDeclaration [9..10)
+      IdentifierToken [9..10) 'n'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    T:SkippedTokensTrivia [12..13)
+      BadToken [12..13) '$'
+    T:WhitespaceTrivia [13..14) ' '
+    EnumMemberDeclaration [14..16)
+      IdentifierToken [14..15) 'n'
+      T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1056 [12..12) Unexpected character \'$\'

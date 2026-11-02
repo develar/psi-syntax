@@ -1,0 +1,30 @@
+CompilationUnit [0..35)
+  GlobalStatement [0..35)
+    ExpressionStatement [0..35)
+      InvocationExpression [0..33)
+        IdentifierName [0..2)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..2) 'M'
+        ArgumentList [2..33)
+          OpenParenToken [2..3) '('
+          Argument [3..32)
+            OutKeyword [3..6) 'out'
+            T:WhitespaceTrivia [6..7) ' '
+            DeclarationExpression [7..32)
+              ScopedType [7..31)
+                ScopedKeyword [7..13) 'scoped'
+                T:WhitespaceTrivia [13..14) ' '
+                RefType [14..31)
+                  RefKeyword [14..17) 'ref'
+                  T:WhitespaceTrivia [17..18) ' '
+                  ReadOnlyKeyword [18..26) 'readonly'
+                  T:WhitespaceTrivia [26..27) ' '
+                  IdentifierName [27..31)
+                    IdentifierToken [27..30) 'var'
+                    T:WhitespaceTrivia [30..31) ' '
+              SingleVariableDesignation [31..32)
+                IdentifierToken [31..32) 'c'
+          CloseParenToken [32..33) ')'
+      SemicolonToken [33..34) ';'
+      T:EndOfLineTrivia [34..35) '\n'
+  EndOfFileToken [35..35) ''

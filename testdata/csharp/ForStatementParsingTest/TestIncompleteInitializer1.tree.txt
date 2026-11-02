@@ -1,0 +1,64 @@
+ForStatement [0..42)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..41)
+    IdentifierName [5..12)
+      IdentifierToken [5..11) 'MyType'
+      T:WhitespaceTrivia [11..12) ' '
+    VariableDeclarator [12..41)
+      IdentifierToken [12..13) 'm'
+      T:WhitespaceTrivia [13..14) ' '
+      EqualsValueClause [14..41)
+        EqualsToken [14..15) '='
+        T:WhitespaceTrivia [15..16) ' '
+        ImplicitObjectCreationExpression [16..41)
+          NewKeyword [16..19) 'new'
+          ArgumentList [19..22)
+            OpenParenToken [19..20) '('
+            CloseParenToken [20..21) ')'
+            T:WhitespaceTrivia [21..22) ' '
+          ObjectInitializerExpression [22..41)
+            OpenBraceToken [22..23) '{'
+            T:WhitespaceTrivia [23..24) ' '
+            SimpleAssignmentExpression [24..29)
+              IdentifierName [24..26)
+                IdentifierToken [24..25) 'A'
+                T:WhitespaceTrivia [25..26) ' '
+              EqualsToken [26..27) '='
+              T:WhitespaceTrivia [27..28) ' '
+              NumericLiteralExpression [28..29)
+                NumericLiteralToken [28..29) '1'
+            CommaToken [29..30) ','
+            IdentifierName [30..30)
+              IdentifierToken [30..30) missing
+            SemicolonToken [30..31) ';'
+            T:WhitespaceTrivia [31..32) ' '
+            TrueLiteralExpression [32..36)
+              TrueKeyword [32..36) 'true'
+            SemicolonToken [36..37) ';'
+            T:WhitespaceTrivia [37..38) ' '
+            PostIncrementExpression [38..41)
+              IdentifierName [38..39)
+                IdentifierToken [38..39) 'm'
+              PlusPlusToken [39..41) '++'
+            CloseBraceToken [41..41) missing
+  SemicolonToken [41..41) missing
+  IdentifierName [41..41)
+    IdentifierToken [41..41) missing
+  SemicolonToken [41..41) missing
+  CloseParenToken [41..42) ')'
+  ExpressionStatement [42..42)
+    IdentifierName [42..42)
+      IdentifierToken [42..42) missing
+    SemicolonToken [42..42) missing
+Diagnostics:
+  CS1525 [30..31) Invalid expression term \';\'
+  CS1003 [30..31) Syntax error, \',\' expected
+  CS1003 [36..37) Syntax error, \',\' expected
+  CS1513 [41..42) } expected
+  CS1002 [41..42) ; expected
+  CS1525 [41..42) Invalid expression term \')\'
+  CS1002 [41..42) ; expected
+  CS1733 [42..42) Expected expression
+  CS1002 [42..42) ; expected

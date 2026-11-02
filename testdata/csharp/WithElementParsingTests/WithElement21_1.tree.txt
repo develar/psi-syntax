@@ -1,0 +1,17 @@
+CollectionExpression [0..16)
+  OpenBracketToken [0..1) '['
+  WithElement [1..15)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..15)
+      OpenParenToken [5..6) '('
+      Argument [6..14)
+        CollectionExpression [6..14)
+          OpenBracketToken [6..7) '['
+          WithElement [7..13)
+            WithKeyword [7..11) 'with'
+            ArgumentList [11..13)
+              OpenParenToken [11..12) '('
+              CloseParenToken [12..13) ')'
+          CloseBracketToken [13..14) ']'
+      CloseParenToken [14..15) ')'
+  CloseBracketToken [15..16) ']'

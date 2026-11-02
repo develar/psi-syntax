@@ -1,0 +1,32 @@
+CompilationUnit [0..50)
+  GlobalStatement [0..50)
+    Block [0..50)
+      OpenBraceToken [0..1) '{'
+      T:EndOfLineTrivia [1..2) '\n'
+      ExpressionStatement [2..10)
+        IdentifierName [2..10)
+          L:WhitespaceTrivia [2..6) '    '
+          IdentifierToken [6..9) 'get'
+          T:EndOfLineTrivia [9..10) '\n'
+        SemicolonToken [10..10) missing
+      Block [10..49)
+        L:WhitespaceTrivia [10..14) '    '
+        OpenBraceToken [14..15) '{'
+        T:EndOfLineTrivia [15..16) '\n'
+        ExpressionStatement [16..43)
+          InvocationExpression [16..41)
+            IdentifierName [16..39)
+              L:WhitespaceTrivia [16..24) '        '
+              IdentifierToken [24..39) 'ParseDefaultDir'
+            ArgumentList [39..41)
+              OpenParenToken [39..40) '('
+              CloseParenToken [40..41) ')'
+          SemicolonToken [41..42) ';'
+          T:EndOfLineTrivia [42..43) '\n'
+        L:WhitespaceTrivia [43..47) '    '
+        CloseBraceToken [47..48) '}'
+        T:EndOfLineTrivia [48..49) '\n'
+      CloseBraceToken [49..50) '}'
+  EndOfFileToken [50..50) ''
+Diagnostics:
+  CS1002 [9..9) ; expected

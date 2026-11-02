@@ -1,0 +1,8 @@
+MultiplyExpression [0..5)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'a'
+  AsteriskToken [1..2) '*'
+  RangeExpression [2..5)
+    DotDotToken [2..4) '..'
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'b'

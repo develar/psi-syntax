@@ -1,0 +1,6 @@
+StringLiteralExpression [0..12)
+  SingleLineRawStringLiteralToken [0..11) '"""hello"""'
+  T:SkippedTokensTrivia [11..12)
+    IdentifierToken [11..12) 'u'
+Diagnostics:
+  CS1073 [0..11) Unexpected token \'u\'

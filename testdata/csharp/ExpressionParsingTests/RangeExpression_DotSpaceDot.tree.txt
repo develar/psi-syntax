@@ -1,0 +1,12 @@
+SimpleMemberAccessExpression [0..5)
+  NumericLiteralExpression [0..1)
+    NumericLiteralToken [0..1) '1'
+  DotToken [1..2) '.'
+  T:WhitespaceTrivia [2..3) ' '
+  IdentifierName [3..5)
+    IdentifierToken [3..3) missing
+    T:SkippedTokensTrivia [3..5)
+      NumericLiteralToken [3..5) '.2'
+Diagnostics:
+  CS1073 [0..3) Unexpected token \'.2\'
+  CS1001 [3..5) Identifier expected

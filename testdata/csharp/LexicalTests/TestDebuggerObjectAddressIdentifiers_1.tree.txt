@@ -1,0 +1,5 @@
+BadToken [0..1) '@'
+NumericLiteralToken [1..4) '0x0'
+EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1646 [0..0) Keyword, identifier, or string expected after verbatim specifier: @

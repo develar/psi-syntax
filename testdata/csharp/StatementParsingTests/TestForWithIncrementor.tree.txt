@@ -1,0 +1,17 @@
+ForStatement [0..16)
+  ForKeyword [0..3) 'for'
+  OpenParenToken [3..4) '('
+  SemicolonToken [4..5) ';'
+  T:WhitespaceTrivia [5..6) ' '
+  SemicolonToken [6..7) ';'
+  T:WhitespaceTrivia [7..8) ' '
+  PostIncrementExpression [8..11)
+    IdentifierName [8..9)
+      IdentifierToken [8..9) 'a'
+    PlusPlusToken [9..11) '++'
+  CloseParenToken [11..12) ')'
+  T:WhitespaceTrivia [12..13) ' '
+  Block [13..16)
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    CloseBraceToken [15..16) '}'

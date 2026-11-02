@@ -1,0 +1,20 @@
+IsPatternExpression [0..23)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..23)
+    OpenBracketToken [5..6) '['
+    SlicePattern [6..22)
+      DotDotToken [6..8) '..'
+      T:WhitespaceTrivia [8..9) ' '
+      DeclarationPattern [9..22)
+        NullableType [9..17)
+          PredefinedType [9..15)
+            StringKeyword [9..15) 'string'
+          QuestionToken [15..16) '?'
+          T:WhitespaceTrivia [16..17) ' '
+        SingleVariableDesignation [17..22)
+          IdentifierToken [17..22) 'slice'
+    CloseBracketToken [22..23) ']'

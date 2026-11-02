@@ -1,0 +1,36 @@
+ForStatement [0..21)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ElementAccessExpression [5..9)
+    IdentifierName [5..6)
+      IdentifierToken [5..6) 'a'
+    BracketedArgumentList [6..9)
+      OpenBracketToken [6..7) '['
+      Argument [7..8)
+        NumericLiteralExpression [7..8)
+          NumericLiteralToken [7..8) '0'
+      CloseBracketToken [8..9) ']'
+  SemicolonToken [9..10) ';'
+  ElementAccessExpression [10..14)
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'a'
+    BracketedArgumentList [11..14)
+      OpenBracketToken [11..12) '['
+      Argument [12..13)
+        NumericLiteralExpression [12..13)
+          NumericLiteralToken [12..13) '0'
+      CloseBracketToken [13..14) ']'
+  SemicolonToken [14..15) ';'
+  ElementAccessExpression [15..19)
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'a'
+    BracketedArgumentList [16..19)
+      OpenBracketToken [16..17) '['
+      Argument [17..18)
+        NumericLiteralExpression [17..18)
+          NumericLiteralToken [17..18) '0'
+      CloseBracketToken [18..19) ']'
+  CloseParenToken [19..20) ')'
+  EmptyStatement [20..21)
+    SemicolonToken [20..21) ';'

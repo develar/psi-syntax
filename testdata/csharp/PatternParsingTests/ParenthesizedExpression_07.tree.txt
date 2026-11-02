@@ -1,0 +1,21 @@
+SwitchStatement [0..23)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..22)
+    CasePatternSwitchLabel [13..22)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      RecursivePattern [18..20)
+        PositionalPatternClause [18..20)
+          OpenParenToken [18..19) '('
+          CloseParenToken [19..20) ')'
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+  CloseBraceToken [22..23) '}'

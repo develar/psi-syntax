@@ -1,0 +1,11 @@
+CompilationUnit [0..20)
+  RecordStructDeclaration [0..20)
+    RefKeyword [0..3) 'ref'
+    T:WhitespaceTrivia [3..4) ' '
+    RecordKeyword [4..10) 'record'
+    T:WhitespaceTrivia [10..11) ' '
+    StructKeyword [11..17) 'struct'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..19) 'S'
+    SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''

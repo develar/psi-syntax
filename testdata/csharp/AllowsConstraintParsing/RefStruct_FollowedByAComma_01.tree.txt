@@ -1,0 +1,36 @@
+CompilationUnit [0..44)
+  ClassDeclaration [0..44)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    TypeParameterList [8..12)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..10)
+        IdentifierToken [9..10) 'T'
+      GreaterThanToken [10..11) '>'
+      T:WhitespaceTrivia [11..12) ' '
+    TypeParameterConstraintClause [12..42)
+      WhereKeyword [12..17) 'where'
+      T:WhitespaceTrivia [17..18) ' '
+      IdentifierName [18..20)
+        IdentifierToken [18..19) 'T'
+        T:WhitespaceTrivia [19..20) ' '
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+      AllowsConstraintClause [22..42)
+        AllowsKeyword [22..28) 'allows'
+        T:WhitespaceTrivia [28..29) ' '
+        RefStructConstraint [29..42)
+          RefKeyword [29..32) 'ref'
+          T:WhitespaceTrivia [32..33) ' '
+          StructKeyword [33..39) 'struct'
+          T:SkippedTokensTrivia [39..40)
+            CommaToken [39..40) ','
+          T:WhitespaceTrivia [40..41) ' '
+          T:EndOfLineTrivia [41..42) '\n'
+    OpenBraceToken [42..43) '{'
+    CloseBraceToken [43..44) '}'
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1073 [39..40) Unexpected token \',\'

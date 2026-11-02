@@ -1,0 +1,1 @@
+foreach(T a in b) { }

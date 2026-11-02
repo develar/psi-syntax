@@ -1,0 +1,23 @@
+ForStatement [0..20)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..16)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..10)
+      IdentifierToken [9..10) 'i'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    VariableDeclarator [12..13)
+      IdentifierToken [12..13) 'j'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    VariableDeclarator [15..16)
+      IdentifierToken [15..16) 'k'
+  SemicolonToken [16..17) ';'
+  SemicolonToken [17..18) ';'
+  CloseParenToken [18..19) ')'
+  EmptyStatement [19..20)
+    SemicolonToken [19..20) ';'

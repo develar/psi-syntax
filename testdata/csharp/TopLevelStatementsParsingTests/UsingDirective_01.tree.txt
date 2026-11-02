@@ -1,0 +1,10 @@
+CompilationUnit [0..18)
+  UsingDirective [0..18)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierName [13..17)
+      IdentifierToken [13..17) 'type'
+    SemicolonToken [17..18) ';'
+  EndOfFileToken [18..18) ''

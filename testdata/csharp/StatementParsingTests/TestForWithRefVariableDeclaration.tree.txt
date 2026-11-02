@@ -1,0 +1,42 @@
+ForStatement [0..37)
+  ForKeyword [0..3) 'for'
+  OpenParenToken [3..4) '('
+  VariableDeclaration [4..30)
+    RefType [4..10)
+      RefKeyword [4..7) 'ref'
+      T:WhitespaceTrivia [7..8) ' '
+      IdentifierName [8..10)
+        IdentifierToken [8..9) 'T'
+        T:WhitespaceTrivia [9..10) ' '
+    VariableDeclarator [10..19)
+      IdentifierToken [10..11) 'a'
+      T:WhitespaceTrivia [11..12) ' '
+      EqualsValueClause [12..19)
+        EqualsToken [12..13) '='
+        T:WhitespaceTrivia [13..14) ' '
+        RefExpression [14..19)
+          RefKeyword [14..17) 'ref'
+          T:WhitespaceTrivia [17..18) ' '
+          IdentifierName [18..19)
+            IdentifierToken [18..19) 'b'
+    CommaToken [19..20) ','
+    T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..30)
+      IdentifierToken [21..22) 'c'
+      T:WhitespaceTrivia [22..23) ' '
+      EqualsValueClause [23..30)
+        EqualsToken [23..24) '='
+        T:WhitespaceTrivia [24..25) ' '
+        RefExpression [25..30)
+          RefKeyword [25..28) 'ref'
+          T:WhitespaceTrivia [28..29) ' '
+          IdentifierName [29..30)
+            IdentifierToken [29..30) 'd'
+  SemicolonToken [30..31) ';'
+  SemicolonToken [31..32) ';'
+  CloseParenToken [32..33) ')'
+  T:WhitespaceTrivia [33..34) ' '
+  Block [34..37)
+    OpenBraceToken [34..35) '{'
+    T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'

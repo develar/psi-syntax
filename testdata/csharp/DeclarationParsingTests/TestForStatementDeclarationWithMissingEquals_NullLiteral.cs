@@ -1,0 +1,1 @@
+for (object value null;;);

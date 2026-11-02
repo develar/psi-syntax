@@ -1,0 +1,25 @@
+LocalDeclarationStatement [0..19)
+  VariableDeclaration [0..18)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    VariableDeclarator [2..18)
+      IdentifierToken [2..6) 'with'
+      T:WhitespaceTrivia [6..7) ' '
+      T:SkippedTokensTrivia [7..8)
+        OpenBraceToken [7..8) '{'
+      T:WhitespaceTrivia [8..9) ' '
+      T:SkippedTokensTrivia [9..10)
+        IdentifierToken [9..10) 'X'
+      T:WhitespaceTrivia [10..11) ' '
+      T:SkippedTokensTrivia [11..12)
+        EqualsToken [11..12) '='
+      T:WhitespaceTrivia [12..13) ' '
+      T:SkippedTokensTrivia [13..16)
+        StringLiteralToken [13..16) '"2"'
+      T:WhitespaceTrivia [16..17) ' '
+      T:SkippedTokensTrivia [17..18)
+        CloseBraceToken [17..18) '}'
+  SemicolonToken [18..19) ';'
+Diagnostics:
+  CS1003 [7..8) Syntax error, \',\' expected

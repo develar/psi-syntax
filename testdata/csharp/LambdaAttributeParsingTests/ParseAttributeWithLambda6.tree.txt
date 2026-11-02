@@ -1,0 +1,95 @@
+CompilationUnit [0..228)
+  ClassDeclaration [0..228)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..227)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..227)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        LocalDeclarationStatement [29..195)
+          VariableDeclaration [29..195)
+            IdentifierName [29..188)
+              L:WhitespaceTrivia [29..37) '        '
+              L:SingleLineCommentTrivia [37..129) '// We won\'t recognize this as a lambda because we\'ll bail out from default-parameter parsing'
+              L:EndOfLineTrivia [129..130) '\n'
+              L:WhitespaceTrivia [130..138) '        '
+              L:SingleLineCommentTrivia [138..175) '// when we see the `[` after the `=`.'
+              L:EndOfLineTrivia [175..176) '\n'
+              L:WhitespaceTrivia [176..184) '        '
+              IdentifierToken [184..187) 'var'
+              T:WhitespaceTrivia [187..188) ' '
+            VariableDeclarator [188..195)
+              IdentifierToken [188..189) 'v'
+              T:WhitespaceTrivia [189..190) ' '
+              EqualsValueClause [190..195)
+                EqualsToken [190..191) '='
+                T:WhitespaceTrivia [191..192) ' '
+                ParenthesizedExpression [192..195)
+                  OpenParenToken [192..193) '('
+                  IdentifierName [193..195)
+                    IdentifierToken [193..194) 'X'
+                    T:WhitespaceTrivia [194..195) ' '
+                  CloseParenToken [195..195) missing
+          SemicolonToken [195..195) missing
+        ExpressionStatement [195..216)
+          SimpleAssignmentExpression [195..211)
+            IdentifierName [195..197)
+              IdentifierToken [195..196) 'x'
+              T:WhitespaceTrivia [196..197) ' '
+            EqualsToken [197..198) '='
+            T:WhitespaceTrivia [198..199) ' '
+            ParenthesizedLambdaExpression [199..211)
+              AttributeList [199..203)
+                OpenBracketToken [199..200) '['
+                Attribute [200..201)
+                  IdentifierName [200..201)
+                    IdentifierToken [200..201) 'A'
+                CloseBracketToken [201..202) ']'
+                T:WhitespaceTrivia [202..203) ' '
+              ParameterList [203..206)
+                OpenParenToken [203..204) '('
+                CloseParenToken [204..205) ')'
+                T:WhitespaceTrivia [205..206) ' '
+              EqualsGreaterThanToken [206..208) '=>'
+              T:WhitespaceTrivia [208..209) ' '
+              Block [209..211)
+                OpenBraceToken [209..210) '{'
+                CloseBraceToken [210..211) '}'
+          SemicolonToken [211..211) missing
+          T:SkippedTokensTrivia [211..212)
+            CloseParenToken [211..212) ')'
+          T:WhitespaceTrivia [212..213) ' '
+          T:SkippedTokensTrivia [213..215)
+            EqualsGreaterThanToken [213..215) '=>'
+          T:WhitespaceTrivia [215..216) ' '
+        Block [216..219)
+          OpenBraceToken [216..217) '{'
+          T:WhitespaceTrivia [217..218) ' '
+          CloseBraceToken [218..219) '}'
+        EmptyStatement [219..221)
+          SemicolonToken [219..220) ';'
+          T:EndOfLineTrivia [220..221) '\n'
+        L:WhitespaceTrivia [221..225) '    '
+        CloseBraceToken [225..226) '}'
+        T:EndOfLineTrivia [226..227) '\n'
+    CloseBraceToken [227..228) '}'
+  EndOfFileToken [228..228) ''
+Diagnostics:
+  CS1026 [195..196) ) expected
+  CS1002 [195..196) ; expected
+  CS1002 [211..212) ; expected
+  CS1513 [211..212) } expected

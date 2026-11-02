@@ -1,0 +1,59 @@
+CompilationUnit [0..41)
+  StructDeclaration [0..41)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..38)
+      L:WhitespaceTrivia [11..15) '    '
+      FixedKeyword [15..20) 'fixed'
+      T:WhitespaceTrivia [20..21) ' '
+      VariableDeclaration [21..38)
+        PredefinedType [21..25)
+          IntKeyword [21..24) 'int'
+          T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..38)
+          IdentifierToken [25..30) 'value'
+          BracketedArgumentList [30..38)
+            OpenBracketToken [30..30) missing
+            Argument [30..36)
+              GreaterThanExpression [30..36)
+                LessThanExpression [30..32)
+                  IdentifierName [30..30)
+                    IdentifierToken [30..30) missing
+                  LessThanToken [30..31) '<'
+                  IdentifierName [31..32)
+                    IdentifierToken [31..32) 'T'
+                GreaterThanToken [32..33) '>'
+                ParenthesizedExpression [33..36)
+                  OpenParenToken [33..34) '('
+                  IdentifierName [34..34)
+                    IdentifierToken [34..34) missing
+                  CloseParenToken [34..35) ')'
+                  T:WhitespaceTrivia [35..36) ' '
+            CommaToken [36..36) missing
+            T:SkippedTokensTrivia [36..37)
+              OpenBraceToken [36..37) '{'
+            T:WhitespaceTrivia [37..38) ' '
+            Argument [38..38)
+              IdentifierName [38..38)
+                IdentifierToken [38..38) missing
+            CloseBracketToken [38..38) missing
+      SemicolonToken [38..38) missing
+    CloseBraceToken [38..39) '}'
+    T:EndOfLineTrivia [39..40) '\n'
+    T:SkippedTokensTrivia [40..41)
+      CloseBraceToken [40..41) '}'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1003 [30..31) Syntax error, \'[\' expected
+  CS1525 [30..31) Invalid expression term \'<\'
+  CS1525 [34..35) Invalid expression term \')\'
+  CS1003 [36..37) Syntax error, \',\' expected
+  CS1003 [36..37) Syntax error, \',\' expected
+  CS0443 [38..38) Syntax error; value expected
+  CS1003 [38..39) Syntax error, \']\' expected
+  CS1002 [38..39) ; expected
+  CS1022 [40..41) Type or namespace definition, or end-of-file expected

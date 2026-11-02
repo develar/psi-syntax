@@ -1,0 +1,46 @@
+LocalDeclarationStatement [0..39)
+  VariableDeclaration [0..38)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..38)
+      IdentifierToken [4..5) 'v'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..38)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        ConditionalExpression [8..38)
+          IsExpression [8..15)
+            IdentifierName [8..10)
+              IdentifierToken [8..9) 'x'
+              T:WhitespaceTrivia [9..10) ' '
+            IsKeyword [10..12) 'is'
+            T:WhitespaceTrivia [12..13) ' '
+            IdentifierName [13..15)
+              IdentifierToken [13..14) 'Y'
+              T:WhitespaceTrivia [14..15) ' '
+          QuestionToken [15..16) '?'
+          T:WhitespaceTrivia [16..17) ' '
+          EqualsExpression [17..33)
+            CollectionExpression [17..20)
+              OpenBracketToken [17..18) '['
+              CloseBracketToken [18..19) ']'
+              T:WhitespaceTrivia [19..20) ' '
+            EqualsEqualsToken [20..22) '=='
+            T:WhitespaceTrivia [22..23) ' '
+            InvocationExpression [23..33)
+              IdentifierName [23..30)
+                IdentifierToken [23..30) 'Complex'
+              ArgumentList [30..33)
+                OpenParenToken [30..31) '('
+                CloseParenToken [31..32) ')'
+                T:WhitespaceTrivia [32..33) ' '
+          ColonToken [33..34) ':'
+          T:WhitespaceTrivia [34..35) ' '
+          CollectionExpression [35..38)
+            OpenBracketToken [35..36) '['
+            ExpressionElement [36..37)
+              NumericLiteralExpression [36..37)
+                NumericLiteralToken [36..37) '1'
+            CloseBracketToken [37..38) ']'
+  SemicolonToken [38..39) ';'

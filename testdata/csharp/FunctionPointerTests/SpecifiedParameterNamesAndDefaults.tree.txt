@@ -1,0 +1,40 @@
+LocalDeclarationStatement [0..57)
+  VariableDeclaration [0..56)
+    FunctionPointerType [0..53)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..53)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..20)
+          PredefinedType [10..20)
+            IntKeyword [10..13) 'int'
+            T:WhitespaceTrivia [13..14) ' '
+            T:SkippedTokensTrivia [14..20)
+              IdentifierToken [14..20) 'param1'
+        CommaToken [20..21) ','
+        T:WhitespaceTrivia [21..22) ' '
+        FunctionPointerParameter [22..45)
+          PredefinedType [22..45)
+            StringKeyword [22..28) 'string'
+            T:WhitespaceTrivia [28..29) ' '
+            T:SkippedTokensTrivia [29..35)
+              IdentifierToken [29..35) 'param2'
+            T:WhitespaceTrivia [35..36) ' '
+            T:SkippedTokensTrivia [36..37)
+              EqualsToken [36..37) '='
+            T:WhitespaceTrivia [37..38) ' '
+            T:SkippedTokensTrivia [38..45)
+              DefaultKeyword [38..45) 'default'
+        CommaToken [45..46) ','
+        T:WhitespaceTrivia [46..47) ' '
+        FunctionPointerParameter [47..51)
+          PredefinedType [47..51)
+            VoidKeyword [47..51) 'void'
+        GreaterThanToken [51..52) '>'
+        T:WhitespaceTrivia [52..53) ' '
+    VariableDeclarator [53..56)
+      IdentifierToken [53..56) 'ptr'
+  SemicolonToken [56..57) ';'
+Diagnostics:
+  CS1003 [14..20) Syntax error, \',\' expected
+  CS1003 [29..35) Syntax error, \',\' expected

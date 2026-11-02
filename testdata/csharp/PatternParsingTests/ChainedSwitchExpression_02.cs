@@ -1,0 +1,1 @@
+a < b switch { 1 => 2 } < c switch { 2 => 3 }

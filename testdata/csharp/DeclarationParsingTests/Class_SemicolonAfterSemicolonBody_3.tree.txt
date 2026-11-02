@@ -1,0 +1,14 @@
+CompilationUnit [0..15)
+  InterfaceDeclaration [0..14)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'C'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  GlobalStatement [14..15)
+    EmptyStatement [14..15)
+      SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS8803 [14..15) Top-level statements must precede namespace and type declarations.

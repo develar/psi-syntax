@@ -1,0 +1,1 @@
+([A] scoped R a, [B] scoped ref R b) => null

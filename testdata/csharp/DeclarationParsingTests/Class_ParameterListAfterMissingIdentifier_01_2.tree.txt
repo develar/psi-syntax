@@ -1,0 +1,19 @@
+CompilationUnit [0..15)
+  StructDeclaration [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    T:EndOfLineTrivia [8..9) '\n'
+    IdentifierToken [9..9) missing
+    ParameterList [9..14)
+      OpenParenToken [9..10) '('
+      Parameter [10..13)
+        IdentifierName [10..12)
+          IdentifierToken [10..11) 'T'
+          T:WhitespaceTrivia [11..12) ' '
+        IdentifierToken [12..13) 'x'
+      CloseParenToken [13..14) ')'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1001 [7..7) Identifier expected

@@ -1,0 +1,10 @@
+CollectionExpression [0..8)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..7)
+    DotDotToken [1..3) '..'
+    T:WhitespaceTrivia [3..4) ' '
+    RangeExpression [4..7)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'e'
+      DotDotToken [5..7) '..'
+  CloseBracketToken [7..8) ']'

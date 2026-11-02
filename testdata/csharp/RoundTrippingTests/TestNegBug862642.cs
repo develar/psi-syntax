@@ -1,0 +1,5 @@
+
+alias myAlias;
+class myClass
+{
+}

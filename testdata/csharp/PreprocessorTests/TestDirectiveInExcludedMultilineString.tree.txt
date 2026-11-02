@@ -1,0 +1,25 @@
+CompilationUnit [0..62)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:DisabledTextTrivia [11..38) 'class A\n{\n   string X = @"\n'
+  L:DefineDirectiveTrivia [38..50)
+    HashToken [38..39) '#'
+    DefineKeyword [39..45) 'define'
+    T:WhitespaceTrivia [45..46) ' '
+    IdentifierToken [46..49) 'XYZ'
+    EndOfDirectiveToken [49..49) ''
+    T:EndOfLineTrivia [49..50) '\n'
+  L:DisabledTextTrivia [50..55) '";\n}\n'
+  L:EndIfDirectiveTrivia [55..62)
+    HashToken [55..56) '#'
+    EndIfKeyword [56..61) 'endif'
+    EndOfDirectiveToken [61..61) ''
+    T:EndOfLineTrivia [61..62) '\n'
+  EndOfFileToken [62..62) ''

@@ -1,0 +1,42 @@
+LocalDeclarationStatement [0..60)
+  VariableDeclaration [0..59)
+    FunctionPointerType [0..56)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..56)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..17)
+          RefKeyword [10..13) 'ref'
+          T:WhitespaceTrivia [13..14) ' '
+          IdentifierName [14..17)
+            IdentifierToken [14..17) 'Goo'
+        CommaToken [17..18) ','
+        T:WhitespaceTrivia [18..19) ' '
+        FunctionPointerParameter [19..25)
+          InKeyword [19..21) 'in'
+          T:WhitespaceTrivia [21..22) ' '
+          IdentifierName [22..25)
+            IdentifierToken [22..25) 'Bar'
+        CommaToken [25..26) ','
+        T:WhitespaceTrivia [26..27) ' '
+        FunctionPointerParameter [27..34)
+          OutKeyword [27..30) 'out'
+          T:WhitespaceTrivia [30..31) ' '
+          IdentifierName [31..34)
+            IdentifierToken [31..34) 'Baz'
+        CommaToken [34..35) ','
+        T:WhitespaceTrivia [35..36) ' '
+        FunctionPointerParameter [36..54)
+          RefKeyword [36..39) 'ref'
+          T:WhitespaceTrivia [39..40) ' '
+          ReadOnlyKeyword [40..48) 'readonly'
+          T:WhitespaceTrivia [48..49) ' '
+          PointerType [49..54)
+            PredefinedType [49..53)
+              VoidKeyword [49..53) 'void'
+            AsteriskToken [53..54) '*'
+        GreaterThanToken [54..55) '>'
+        T:WhitespaceTrivia [55..56) ' '
+    VariableDeclarator [56..59)
+      IdentifierToken [56..59) 'ptr'
+  SemicolonToken [59..60) ';'

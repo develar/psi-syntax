@@ -1,0 +1,32 @@
+CompilationUnit [0..41)
+  ClassDeclaration [0..41)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    ConversionOperatorDeclaration [10..40)
+      ExplicitKeyword [10..18) 'explicit'
+      T:WhitespaceTrivia [18..19) ' '
+      OperatorKeyword [19..27) 'operator'
+      T:WhitespaceTrivia [27..28) ' '
+      IdentifierName [28..30)
+        IdentifierToken [28..29) 'b'
+        T:WhitespaceTrivia [29..30) ' '
+      ParameterList [30..36)
+        OpenParenToken [30..31) '('
+        Parameter [31..34)
+          IdentifierName [31..33)
+            IdentifierToken [31..32) 'c'
+            T:WhitespaceTrivia [32..33) ' '
+          IdentifierToken [33..34) 'd'
+        CloseParenToken [34..35) ')'
+        T:WhitespaceTrivia [35..36) ' '
+      Block [36..40)
+        OpenBraceToken [36..37) '{'
+        T:WhitespaceTrivia [37..38) ' '
+        CloseBraceToken [38..39) '}'
+        T:WhitespaceTrivia [39..40) ' '
+    CloseBraceToken [40..41) '}'
+  EndOfFileToken [41..41) ''

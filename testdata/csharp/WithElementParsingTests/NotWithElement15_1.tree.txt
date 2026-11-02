@@ -1,0 +1,11 @@
+IdentifierName [0..8)
+  IdentifierToken [0..1) 'a'
+  T:WhitespaceTrivia [1..2) ' '
+  T:SkippedTokensTrivia [2..6)
+    IdentifierToken [2..6) 'with'
+  T:SkippedTokensTrivia [6..7)
+    OpenParenToken [6..7) '('
+  T:SkippedTokensTrivia [7..8)
+    CloseParenToken [7..8) ')'
+Diagnostics:
+  CS1073 [0..1) Unexpected token \'with\'

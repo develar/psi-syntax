@@ -1,0 +1,54 @@
+CompilationUnit [0..55)
+  IncompleteMember [0..11)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..2)
+        IdentifierName [1..2)
+          IdentifierToken [1..2) 'A'
+      CloseBracketToken [2..3) ']'
+      T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..11)
+      IdentifierToken [4..10) 'scoped'
+      T:WhitespaceTrivia [10..11) ' '
+  StructDeclaration [11..24)
+    StructKeyword [11..17) 'struct'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..19) 'A'
+    T:WhitespaceTrivia [19..20) ' '
+    OpenBraceToken [20..21) '{'
+    T:WhitespaceTrivia [21..22) ' '
+    CloseBraceToken [22..23) '}'
+    T:EndOfLineTrivia [23..24) '\n'
+  IncompleteMember [24..42)
+    AttributeList [24..31)
+      OpenBracketToken [24..25) '['
+      Attribute [25..26)
+        IdentifierName [25..26)
+          IdentifierToken [25..26) 'A'
+      CommaToken [26..27) ','
+      T:WhitespaceTrivia [27..28) ' '
+      Attribute [28..29)
+        IdentifierName [28..29)
+          IdentifierToken [28..29) 'B'
+      CloseBracketToken [29..30) ']'
+      T:WhitespaceTrivia [30..31) ' '
+    ScopedKeyword [31..37) 'scoped'
+    T:WhitespaceTrivia [37..38) ' '
+    RefType [38..42)
+      RefKeyword [38..41) 'ref'
+      T:WhitespaceTrivia [41..42) ' '
+      IdentifierName [42..42)
+        IdentifierToken [42..42) missing
+  StructDeclaration [42..55)
+    StructKeyword [42..48) 'struct'
+    T:WhitespaceTrivia [48..49) ' '
+    IdentifierToken [49..50) 'B'
+    T:WhitespaceTrivia [50..51) ' '
+    OpenBraceToken [51..52) '{'
+    T:WhitespaceTrivia [52..53) ' '
+    CloseBraceToken [53..54) '}'
+    T:EndOfLineTrivia [54..55) '\n'
+  EndOfFileToken [55..55) ''
+Diagnostics:
+  CS0116 [4..10) A namespace cannot directly contain members such as fields, methods or statements
+  CS1031 [42..48) Type expected

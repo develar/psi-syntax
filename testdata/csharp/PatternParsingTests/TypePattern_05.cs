@@ -1,0 +1,1 @@
+_ = e switch { T(int) => 1, };

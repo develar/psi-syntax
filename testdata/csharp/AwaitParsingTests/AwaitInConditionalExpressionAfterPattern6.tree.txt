@@ -1,0 +1,51 @@
+MethodDeclaration [0..52)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  PredefinedType [6..11)
+    VoidKeyword [6..10) 'void'
+    T:WhitespaceTrivia [10..11) ' '
+  IdentifierToken [11..12) 'M'
+  ParameterList [12..15)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'
+    T:EndOfLineTrivia [14..15) '\n'
+  Block [15..52)
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    LocalDeclarationStatement [17..51)
+      VariableDeclaration [17..49)
+        IdentifierName [17..25)
+          L:WhitespaceTrivia [17..21) '    '
+          IdentifierToken [21..24) 'var'
+          T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..49)
+          IdentifierToken [25..26) 'c'
+          T:WhitespaceTrivia [26..27) ' '
+          EqualsValueClause [27..49)
+            EqualsToken [27..28) '='
+            T:WhitespaceTrivia [28..29) ' '
+            ConditionalExpression [29..49)
+              IsExpression [29..36)
+                IdentifierName [29..31)
+                  IdentifierToken [29..30) 'x'
+                  T:WhitespaceTrivia [30..31) ' '
+                IsKeyword [31..33) 'is'
+                T:WhitespaceTrivia [33..34) ' '
+                IdentifierName [34..36)
+                  IdentifierToken [34..35) 'X'
+                  T:WhitespaceTrivia [35..36) ' '
+              QuestionToken [36..37) '?'
+              T:WhitespaceTrivia [37..38) ' '
+              AwaitExpression [38..46)
+                AwaitKeyword [38..43) 'await'
+                T:WhitespaceTrivia [43..44) ' '
+                IdentifierName [44..46)
+                  IdentifierToken [44..45) 'y'
+                  T:WhitespaceTrivia [45..46) ' '
+              ColonToken [46..47) ':'
+              T:WhitespaceTrivia [47..48) ' '
+              IdentifierName [48..49)
+                IdentifierToken [48..49) 'z'
+      SemicolonToken [49..50) ';'
+      T:EndOfLineTrivia [50..51) '\n'
+    CloseBraceToken [51..52) '}'

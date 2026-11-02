@@ -1,0 +1,2 @@
+IdentifierToken [0..3) 'abc'
+EndOfFileToken [3..3) ''

@@ -1,0 +1,26 @@
+CompilationUnit [0..31)
+  GlobalStatement [0..19)
+    LocalDeclarationStatement [0..19)
+      VariableDeclaration [0..19)
+        IdentifierName [0..8)
+          IdentifierToken [0..7) 'partial'
+          T:WhitespaceTrivia [7..8) ' '
+        VariableDeclarator [8..19)
+          IdentifierToken [8..14) 'closed'
+          T:WhitespaceTrivia [14..15) ' '
+          T:SkippedTokensTrivia [15..18)
+            RefKeyword [15..18) 'ref'
+          T:WhitespaceTrivia [18..19) ' '
+      SemicolonToken [19..19) missing
+  StructDeclaration [19..31)
+    StructKeyword [19..25) 'struct'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierToken [26..27) 'C'
+    T:WhitespaceTrivia [27..28) ' '
+    OpenBraceToken [28..29) '{'
+    T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1003 [15..18) Syntax error, \',\' expected
+  CS1002 [19..25) ; expected

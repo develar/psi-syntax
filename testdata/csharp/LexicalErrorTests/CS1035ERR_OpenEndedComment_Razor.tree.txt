@@ -1,0 +1,52 @@
+CompilationUnit [0..138)
+  ClassDeclaration [0..104)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..23) 'MainClass'
+    T:EndOfLineTrivia [23..24) '\n'
+    L:WhitespaceTrivia [24..28) '    '
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    MethodDeclaration [30..98)
+      L:WhitespaceTrivia [30..34) '    '
+      PublicKeyword [34..40) 'public'
+      T:WhitespaceTrivia [40..41) ' '
+      StaticKeyword [41..47) 'static'
+      T:WhitespaceTrivia [47..48) ' '
+      PredefinedType [48..52)
+        IntKeyword [48..51) 'int'
+        T:WhitespaceTrivia [51..52) ' '
+      IdentifierToken [52..56) 'Main'
+      T:WhitespaceTrivia [56..57) ' '
+      ParameterList [57..60)
+        OpenParenToken [57..58) '('
+        CloseParenToken [58..59) ')'
+        T:EndOfLineTrivia [59..60) '\n'
+      Block [60..98)
+        L:WhitespaceTrivia [60..68) '        '
+        OpenBraceToken [68..69) '{'
+        T:EndOfLineTrivia [69..70) '\n'
+        ReturnStatement [70..88)
+          L:WhitespaceTrivia [70..78) '        '
+          ReturnKeyword [78..84) 'return'
+          T:WhitespaceTrivia [84..85) ' '
+          NumericLiteralExpression [85..86)
+            NumericLiteralToken [85..86) '1'
+          SemicolonToken [86..87) ';'
+          T:EndOfLineTrivia [87..88) '\n'
+        L:WhitespaceTrivia [88..96) '        '
+        CloseBraceToken [96..97) '}'
+        T:EndOfLineTrivia [97..98) '\n'
+    L:WhitespaceTrivia [98..102) '    '
+    CloseBraceToken [102..103) '}'
+    T:EndOfLineTrivia [103..104) '\n'
+  L:SingleLineCommentTrivia [104..130) '//Comment lacks closing */'
+  L:EndOfLineTrivia [130..131) '\n'
+  L:MultiLineCommentTrivia [131..138) '@*    \n'
+  EndOfFileToken [138..138) ''
+Diagnostics:
+  CS1056 [131..132) Unexpected character \'@\'
+  CS1035 [131..131) End-of-file found, \'*/\' expected

@@ -1,0 +1,1 @@
+public IEnumerable<(string Value, string Description) this[string index] { get; }

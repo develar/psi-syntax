@@ -1,0 +1,11 @@
+CollectionExpression [0..6)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..5)
+    DotDotToken [1..3) '..'
+    T:SkippedTokensTrivia [3..4)
+      DotToken [3..4) '.'
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'e'
+  CloseBracketToken [5..6) ']'
+Diagnostics:
+  CS8635 [1..1) Unexpected character sequence \'...\'

@@ -1,0 +1,204 @@
+CompilationUnit [0..297)
+  GlobalStatement [0..297)
+    LocalFunctionStatement [0..297)
+      InternalKeyword [0..8) 'internal'
+      T:WhitespaceTrivia [8..9) ' '
+      PredefinedType [9..13)
+        IntKeyword [9..12) 'int'
+        T:WhitespaceTrivia [12..13) ' '
+      IdentifierToken [13..18) 'TYPES'
+      ParameterList [18..28)
+        OpenParenToken [18..19) '('
+        CloseParenToken [19..20) ')'
+        T:WhitespaceTrivia [20..28) '        '
+      Block [28..297)
+        OpenBraceToken [28..29) '{'
+        T:WhitespaceTrivia [29..42) '             '
+        BreakStatement [42..56)
+          BreakKeyword [42..47) 'break'
+          T:WhitespaceTrivia [47..49) '  '
+          IdentifierName [49..56)
+            IdentifierToken [49..55) 'retVal'
+            T:WhitespaceTrivia [55..56) ' '
+          SemicolonToken [56..56) missing
+        ExpressionStatement [56..68)
+          SimpleAssignmentExpression [56..66)
+            IdentifierName [56..56)
+              IdentifierToken [56..56) missing
+            EqualsToken [56..57) '='
+            T:WhitespaceTrivia [57..59) '  '
+            IdentifierName [59..66)
+              IdentifierToken [59..65) '@while'
+              T:WhitespaceTrivia [65..66) ' '
+          SemicolonToken [66..67) ';'
+          T:WhitespaceTrivia [67..68) ' '
+        ExpressionStatement [68..96)
+          RefTypeExpression [68..96)
+            RefTypeKeyword [68..77) '__reftype'
+            T:WhitespaceTrivia [77..90) '             '
+            OpenParenToken [90..90) missing
+            IdentifierName [90..96)
+              IdentifierToken [90..95) 'CLASS'
+              T:WhitespaceTrivia [95..96) ' '
+            CloseParenToken [96..96) missing
+          SemicolonToken [96..96) missing
+        ExpressionStatement [96..110)
+          SimpleAssignmentExpression [96..110)
+            IdentifierName [96..98)
+              IdentifierToken [96..97) 'c'
+              T:WhitespaceTrivia [97..98) ' '
+            EqualsToken [98..99) '='
+            T:WhitespaceTrivia [99..100) ' '
+            IdentifierName [100..110)
+              IdentifierToken [100..107) 'dynamic'
+              T:WhitespaceTrivia [107..110) '   '
+          SemicolonToken [110..110) missing
+        LocalFunctionStatement [110..129)
+          IdentifierName [110..122)
+            IdentifierToken [110..120) 'descending'
+            T:WhitespaceTrivia [120..122) '  '
+          IdentifierToken [122..127) 'CLASS'
+          ParameterList [127..129)
+            OpenParenToken [127..128) '('
+            T:WhitespaceTrivia [128..129) ' '
+            CloseParenToken [129..129) missing
+          SemicolonToken [129..129) missing
+        ExpressionStatement [129..133)
+          ModuloExpression [129..131)
+            IdentifierName [129..129)
+              IdentifierToken [129..129) missing
+            PercentToken [129..130) '%'
+            T:WhitespaceTrivia [130..131) ' '
+            IdentifierName [131..131)
+              IdentifierToken [131..131) missing
+          SemicolonToken [131..132) ';'
+          T:WhitespaceTrivia [132..133) ' '
+        LocalDeclarationStatement [133..151)
+          VariableDeclaration [133..151)
+            IdentifierName [133..148)
+              IdentifierToken [133..135) 'on'
+              T:WhitespaceTrivia [135..148) '             '
+            VariableDeclarator [148..151)
+              IdentifierToken [148..150) 'IF'
+              T:WhitespaceTrivia [150..151) ' '
+          SemicolonToken [151..151) missing
+        ExpressionStatement [151..165)
+          SimpleAssignmentExpression [151..165)
+            IdentifierName [151..154)
+              IdentifierToken [151..153) 'xx'
+              T:WhitespaceTrivia [153..154) ' '
+            EqualsToken [154..155) '='
+            T:WhitespaceTrivia [155..156) ' '
+            IdentifierName [156..165)
+              IdentifierToken [156..162) 'module'
+              T:WhitespaceTrivia [162..165) '   '
+          SemicolonToken [165..165) missing
+        ExpressionStatement [165..288)
+          OrAssignmentExpression [165..286)
+            IdentifierName [165..172)
+              IdentifierToken [165..170) '_4䓞'
+              T:WhitespaceTrivia [170..172) '  '
+            BarEqualsToken [172..174) '|='
+            T:WhitespaceTrivia [174..188) '              '
+            LessThanExpression [188..286)
+              IdentifierName [188..203)
+                IdentifierToken [188..200) '\\u14DB\\u0849'
+                T:WhitespaceTrivia [200..203) '   '
+              LessThanToken [203..204) '<'
+              LogicalNotExpression [204..286)
+                ExclamationToken [204..205) '!'
+                CollectionExpression [205..286)
+                  OpenBracketToken [205..206) '['
+                  ExpressionElement [206..286)
+                    ElementAccessExpression [206..286)
+                      IdentifierName [206..211)
+                        IdentifierToken [206..211) 'CDATA'
+                      BracketedArgumentList [211..286)
+                        OpenBracketToken [211..212) '['
+                        T:WhitespaceTrivia [212..214) '  '
+                        Argument [214..244)
+                          SimpleLambdaExpression [214..244)
+                            Parameter [214..216)
+                              IdentifierToken [214..215) 'c'
+                              T:WhitespaceTrivia [215..216) ' '
+                            EqualsGreaterThanToken [216..218) '=>'
+                            T:WhitespaceTrivia [218..220) '  '
+                            IdentifierName [220..244)
+                              IdentifierToken [220..228) '@default'
+                              T:WhitespaceTrivia [228..230) '  '
+                              T:SkippedTokensTrivia [230..231)
+                                BadToken [230..231) '$'
+                              T:WhitespaceTrivia [231..244) '             '
+                        CommaToken [244..244) missing
+                        Argument [244..251)
+                          IdentifierName [244..251)
+                            IdentifierToken [244..250) 'retVal'
+                            T:WhitespaceTrivia [250..251) ' '
+                        CommaToken [251..251) missing
+                        Argument [251..267)
+                          AddAssignmentExpression [251..267)
+                            IdentifierName [251..262)
+                              IdentifierToken [251..260) '@assembly'
+                              T:WhitespaceTrivia [260..262) '  '
+                            PlusEqualsToken [262..264) '+='
+                            T:WhitespaceTrivia [264..265) ' '
+                            IdentifierName [265..267)
+                              IdentifierToken [265..266) 'c'
+                              T:WhitespaceTrivia [266..267) ' '
+                        CommaToken [267..267) missing
+                        Argument [267..286)
+                          SubtractAssignmentExpression [267..286)
+                            BitwiseAndExpression [267..283)
+                              SimpleMemberAccessExpression [267..280)
+                                PredefinedType [267..272)
+                                  VoidKeyword [267..271) 'void'
+                                  T:WhitespaceTrivia [271..272) ' '
+                                DotToken [272..273) '.'
+                                IdentifierName [273..280)
+                                  IdentifierToken [273..279) 'Member'
+                                  T:WhitespaceTrivia [279..280) ' '
+                              AmpersandToken [280..281) '&'
+                              T:WhitespaceTrivia [281..283) '  '
+                              IdentifierName [283..283)
+                                IdentifierToken [283..283) missing
+                            MinusEqualsToken [283..285) '-='
+                            T:WhitespaceTrivia [285..286) ' '
+                            IdentifierName [286..286)
+                              IdentifierToken [286..286) missing
+                        CloseBracketToken [286..286) missing
+                  CloseBracketToken [286..286) missing
+          SemicolonToken [286..287) ';'
+          T:WhitespaceTrivia [287..288) ' '
+        ExpressionStatement [288..297)
+          IdentifierName [288..297)
+            IdentifierToken [288..295) '@typeof'
+            T:WhitespaceTrivia [295..296) ' '
+            T:EndOfLineTrivia [296..297) '\n'
+          SemicolonToken [297..297) missing
+        CloseBraceToken [297..297) missing
+  EndOfFileToken [297..297) ''
+Diagnostics:
+  CS0106 [0..8) The modifier \'internal\' is not valid for this item
+  CS1002 [56..57) ; expected
+  CS1525 [56..57) Invalid expression term \'=\'
+  CS1003 [90..95) Syntax error, \'(\' expected
+  CS1026 [96..97) ) expected
+  CS1002 [96..97) ; expected
+  CS1002 [110..120) ; expected
+  CS1026 [129..130) ) expected
+  CS1002 [129..130) ; expected
+  CS1525 [129..130) Invalid expression term \'%\'
+  CS1525 [131..132) Invalid expression term \';\'
+  CS1002 [151..153) ; expected
+  CS1002 [165..170) ; expected
+  CS1056 [230..230) Unexpected character \'$\'
+  CS1003 [244..250) Syntax error, \',\' expected
+  CS1003 [251..260) Syntax error, \',\' expected
+  CS1003 [267..271) Syntax error, \',\' expected
+  CS1525 [267..271) Invalid expression term \'void\'
+  CS1525 [283..285) Invalid expression term \'-=\'
+  CS1525 [286..287) Invalid expression term \';\'
+  CS1003 [286..287) Syntax error, \']\' expected
+  CS1003 [286..287) Syntax error, \']\' expected
+  CS1002 [295..295) ; expected
+  CS1513 [295..295) } expected

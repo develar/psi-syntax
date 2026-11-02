@@ -1,0 +1,15 @@
+MethodDeclaration [0..28)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  SafeKeyword [7..11) 'safe'
+  T:WhitespaceTrivia [11..12) ' '
+  ExternKeyword [12..18) 'extern'
+  T:WhitespaceTrivia [18..19) ' '
+  PredefinedType [19..24)
+    VoidKeyword [19..23) 'void'
+    T:WhitespaceTrivia [23..24) ' '
+  IdentifierToken [24..25) 'M'
+  ParameterList [25..27)
+    OpenParenToken [25..26) '('
+    CloseParenToken [26..27) ')'
+  SemicolonToken [27..28) ';'

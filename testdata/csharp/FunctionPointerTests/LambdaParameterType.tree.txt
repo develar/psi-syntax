@@ -1,0 +1,22 @@
+ParenthesizedLambdaExpression [0..26)
+  ParameterList [0..21)
+    OpenParenToken [0..1) '('
+    Parameter [1..19)
+      FunctionPointerType [1..17)
+        DelegateKeyword [1..9) 'delegate'
+        AsteriskToken [9..10) '*'
+        FunctionPointerParameterList [10..17)
+          LessThanToken [10..11) '<'
+          FunctionPointerParameter [11..15)
+            PredefinedType [11..15)
+              VoidKeyword [11..15) 'void'
+          GreaterThanToken [15..16) '>'
+          T:WhitespaceTrivia [16..17) ' '
+      IdentifierToken [17..19) 'p1'
+    CloseParenToken [19..20) ')'
+    T:WhitespaceTrivia [20..21) ' '
+  EqualsGreaterThanToken [21..23) '=>'
+  T:WhitespaceTrivia [23..24) ' '
+  Block [24..26)
+    OpenBraceToken [24..25) '{'
+    CloseBraceToken [25..26) '}'

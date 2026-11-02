@@ -1,0 +1,17 @@
+AddressOfExpression [0..6)
+  AmpersandToken [0..1) '&'
+  CollectionExpression [1..6)
+    OpenBracketToken [1..2) '['
+    ExpressionElement [2..4)
+      IdentifierName [2..4)
+        IdentifierToken [2..3) 'A'
+        T:SkippedTokensTrivia [3..4)
+          ColonToken [3..4) ':'
+    CommaToken [4..4) missing
+    ExpressionElement [4..5)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'B'
+    CloseBracketToken [5..6) ']'
+Diagnostics:
+  CS1003 [3..4) Syntax error, \',\' expected
+  CS1003 [4..5) Syntax error, \',\' expected

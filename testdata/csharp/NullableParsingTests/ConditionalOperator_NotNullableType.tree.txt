@@ -1,0 +1,19 @@
+ConditionalExpression [0..14)
+  IsExpression [0..7)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..7)
+      IdentifierToken [5..6) 'T'
+      T:WhitespaceTrivia [6..7) ' '
+  QuestionToken [7..8) '?'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..11)
+    IdentifierToken [9..10) 'y'
+    T:WhitespaceTrivia [10..11) ' '
+  ColonToken [11..12) ':'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..14)
+    IdentifierToken [13..14) 'z'

@@ -1,0 +1,52 @@
+CompilationUnit [0..81)
+  ClassDeclaration [0..81)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'A'
+    T:WhitespaceTrivia [7..8) ' '
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    OperatorDeclaration [11..79)
+      L:WhitespaceTrivia [11..13) '  '
+      PublicKeyword [13..19) 'public'
+      T:WhitespaceTrivia [19..20) ' '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..31)
+        IntKeyword [27..30) 'int'
+        T:WhitespaceTrivia [30..31) ' '
+      OperatorKeyword [31..39) 'operator'
+      T:WhitespaceTrivia [39..40) ' '
+      PlusToken [40..40) missing
+      T:SkippedTokensTrivia [40..42)
+        AmpersandAmpersandToken [40..42) '&&'
+      ParameterList [42..58)
+        OpenParenToken [42..43) '('
+        Parameter [43..46)
+          IdentifierName [43..45)
+            IdentifierToken [43..44) 'A'
+            T:WhitespaceTrivia [44..45) ' '
+          IdentifierToken [45..46) 'a'
+        CloseParenToken [46..47) ')'
+        T:WhitespaceTrivia [47..48) ' '
+        T:SingleLineCommentTrivia [48..57) '// CS1019'
+        T:EndOfLineTrivia [57..58) '\n'
+      Block [58..79)
+        L:WhitespaceTrivia [58..60) '  '
+        OpenBraceToken [60..61) '{'
+        T:WhitespaceTrivia [61..65) '    '
+        ReturnStatement [65..77)
+          ReturnKeyword [65..71) 'return'
+          T:WhitespaceTrivia [71..72) ' '
+          NumericLiteralExpression [72..73)
+            NumericLiteralToken [72..73) '0'
+          SemicolonToken [73..74) ';'
+          T:WhitespaceTrivia [74..77) '   '
+        CloseBraceToken [77..78) '}'
+        T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''
+Diagnostics:
+  CS1019 [40..42) Overloadable unary operator expected

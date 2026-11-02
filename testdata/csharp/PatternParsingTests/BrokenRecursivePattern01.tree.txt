@@ -1,0 +1,46 @@
+SwitchStatement [0..41)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..39)
+    CasePatternSwitchLabel [13..23)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      RecursivePattern [18..21)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'T'
+        PositionalPatternClause [19..21)
+          OpenParenToken [19..20) '('
+          T:WhitespaceTrivia [20..21) ' '
+          CloseParenToken [21..21) missing
+      ColonToken [21..22) ':'
+      T:WhitespaceTrivia [22..23) ' '
+    LocalDeclarationStatement [23..32)
+      VariableDeclaration [23..30)
+        IdentifierName [23..25)
+          IdentifierToken [23..24) 'Q'
+          T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..30)
+          IdentifierToken [25..26) 'x'
+          T:WhitespaceTrivia [26..27) ' '
+          EqualsValueClause [27..30)
+            EqualsToken [27..28) '='
+            T:WhitespaceTrivia [28..29) ' '
+            IdentifierName [29..30)
+              IdentifierToken [29..30) 'n'
+      SemicolonToken [30..31) ';'
+      T:WhitespaceTrivia [31..32) ' '
+    BreakStatement [32..39)
+      BreakKeyword [32..37) 'break'
+      SemicolonToken [37..38) ';'
+      T:WhitespaceTrivia [38..39) ' '
+  CloseBraceToken [39..40) '}'
+  T:WhitespaceTrivia [40..41) ' '
+Diagnostics:
+  CS1026 [21..22) ) expected

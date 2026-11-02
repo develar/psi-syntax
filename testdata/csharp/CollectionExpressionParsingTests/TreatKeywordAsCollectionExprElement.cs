@@ -1,0 +1,1 @@
+class C { public bool[] B => [true]; }

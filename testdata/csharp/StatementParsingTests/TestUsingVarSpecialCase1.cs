@@ -1,0 +1,1 @@
+using var x = f ? a : b;

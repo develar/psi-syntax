@@ -1,0 +1,33 @@
+CompilationUnit [0..37)
+  UsingDirective [0..37)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SkippedTokensTrivia [1..7)
+      IdentifierToken [1..7) 'System'
+    L:SkippedTokensTrivia [7..8)
+      DotToken [7..8) '.'
+    L:SkippedTokensTrivia [8..14)
+      IdentifierToken [8..14) 'String'
+    L:SkippedTokensTrivia [14..15)
+      OpenBracketToken [14..15) '['
+    L:SkippedTokensTrivia [15..16)
+      CloseBracketToken [15..16) ']'
+    L:EndOfLineTrivia [16..17) '\n'
+    UsingKeyword [17..22) 'using'
+    T:WhitespaceTrivia [22..23) ' '
+    NameEquals [23..32)
+      IdentifierName [23..30)
+        IdentifierToken [23..29) 'aliasY'
+        T:WhitespaceTrivia [29..30) ' '
+      EqualsToken [30..31) '='
+      T:WhitespaceTrivia [31..32) ' '
+    QualifiedName [32..35)
+      IdentifierName [32..33)
+        IdentifierToken [32..33) 'X'
+      DotToken [33..34) '.'
+      IdentifierName [34..35)
+        IdentifierToken [34..35) 'Y'
+    SemicolonToken [35..36) ';'
+    T:EndOfLineTrivia [36..37) '\n'
+  EndOfFileToken [37..37) ''
+Diagnostics:
+  CS0116 [15..16) A namespace cannot directly contain members such as fields, methods or statements

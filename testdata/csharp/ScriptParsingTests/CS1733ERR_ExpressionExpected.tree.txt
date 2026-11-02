@@ -1,0 +1,30 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    ExpressionStatement [0..27)
+      ConditionalExpression [0..27)
+        InvocationExpression [0..26)
+          SimpleMemberAccessExpression [0..17)
+            IdentifierName [0..7)
+              IdentifierToken [0..7) 'Console'
+            DotToken [7..8) '.'
+            IdentifierName [8..17)
+              IdentifierToken [8..17) 'WriteLine'
+          ArgumentList [17..26)
+            OpenParenToken [17..18) '('
+            Argument [18..25)
+              StringLiteralExpression [18..25)
+                StringLiteralToken [18..25) '"Hello"'
+            CloseParenToken [25..26) ')'
+        QuestionToken [26..27) '?'
+        IdentifierName [27..27)
+          IdentifierToken [27..27) missing
+        ColonToken [27..27) missing
+        IdentifierName [27..27)
+          IdentifierToken [27..27) missing
+      SemicolonToken [27..27) missing
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1733 [27..27) Expected expression
+  CS1003 [27..27) Syntax error, \':\' expected
+  CS1733 [27..27) Expected expression
+  CS1002 [27..27) ; expected

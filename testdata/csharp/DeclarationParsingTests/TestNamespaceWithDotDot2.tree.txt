@@ -1,0 +1,23 @@
+CompilationUnit [0..39)
+  NamespaceDeclaration [0..39)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    QualifiedName [10..36)
+      QualifiedName [10..33)
+        IdentifierName [10..12)
+          IdentifierToken [10..11) 'a'
+          T:EndOfLineTrivia [11..12) '\n'
+        L:WhitespaceTrivia [12..32) '                    '
+        DotToken [32..33) '.'
+        IdentifierName [33..33)
+          IdentifierToken [33..33) missing
+      DotToken [33..34) '.'
+      IdentifierName [34..36)
+        IdentifierToken [34..35) 'b'
+        T:WhitespaceTrivia [35..36) ' '
+    OpenBraceToken [36..37) '{'
+    T:WhitespaceTrivia [37..38) ' '
+    CloseBraceToken [38..39) '}'
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1001 [33..34) Identifier expected

@@ -1,0 +1,41 @@
+SwitchStatement [0..58)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'x'
+  CloseParenToken [9..10) ')'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchSection [13..57)
+    CasePatternSwitchLabel [13..29)
+      L:WhitespaceTrivia [13..17) '    '
+      CaseKeyword [17..21) 'case'
+      T:WhitespaceTrivia [21..22) ' '
+      ConstantPattern [22..24)
+        IdentifierName [22..24)
+          IdentifierToken [22..23) 'M'
+          T:WhitespaceTrivia [23..24) ' '
+      WhenClause [24..29)
+        WhenKeyword [24..28) 'when'
+        T:EndOfLineTrivia [28..29) '\n'
+        IdentifierName [29..29)
+          IdentifierToken [29..29) missing
+      ColonToken [29..29) missing
+    Block [29..57)
+      L:WhitespaceTrivia [29..33) '    '
+      OpenBraceToken [33..34) '{'
+      T:EndOfLineTrivia [34..35) '\n'
+      ReturnStatement [35..51)
+        L:WhitespaceTrivia [35..43) '        '
+        ReturnKeyword [43..49) 'return'
+        SemicolonToken [49..50) ';'
+        T:EndOfLineTrivia [50..51) '\n'
+      L:WhitespaceTrivia [51..55) '    '
+      CloseBraceToken [55..56) '}'
+      T:EndOfLineTrivia [56..57) '\n'
+  CloseBraceToken [57..58) '}'
+Diagnostics:
+  CS1525 [28..28) Invalid expression term \'{\'
+  CS1003 [28..28) Syntax error, \':\' expected

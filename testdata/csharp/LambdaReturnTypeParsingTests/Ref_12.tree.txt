@@ -1,0 +1,25 @@
+InvocationExpression [0..21)
+  IdentifierName [0..2)
+    IdentifierToken [0..2) 'd1'
+  ArgumentList [2..21)
+    OpenParenToken [2..3) '('
+    Argument [3..20)
+      ParenthesizedExpression [3..20)
+        OpenParenToken [3..4) '('
+        ParenthesizedLambdaExpression [4..19)
+          RefType [4..12)
+            RefKeyword [4..7) 'ref'
+            T:WhitespaceTrivia [7..8) ' '
+            PredefinedType [8..12)
+              IntKeyword [8..11) 'int'
+              T:WhitespaceTrivia [11..12) ' '
+          ParameterList [12..15)
+            OpenParenToken [12..13) '('
+            CloseParenToken [13..14) ')'
+            T:WhitespaceTrivia [14..15) ' '
+          EqualsGreaterThanToken [15..17) '=>'
+          T:WhitespaceTrivia [17..18) ' '
+          IdentifierName [18..19)
+            IdentifierToken [18..19) 'x'
+        CloseParenToken [19..20) ')'
+    CloseParenToken [20..21) ')'

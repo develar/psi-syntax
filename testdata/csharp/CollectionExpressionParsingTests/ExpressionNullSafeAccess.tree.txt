@@ -1,0 +1,32 @@
+CompilationUnit [0..16)
+  GlobalStatement [0..16)
+    ExpressionStatement [0..16)
+      SimpleAssignmentExpression [0..15)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) '_'
+          T:WhitespaceTrivia [1..2) ' '
+        EqualsToken [2..3) '='
+        T:WhitespaceTrivia [3..4) ' '
+        ConditionalAccessExpression [4..15)
+          CollectionExpression [4..10)
+            OpenBracketToken [4..5) '['
+            ExpressionElement [5..6)
+              IdentifierName [5..6)
+                IdentifierToken [5..6) 'A'
+            CommaToken [6..7) ','
+            T:WhitespaceTrivia [7..8) ' '
+            ExpressionElement [8..9)
+              IdentifierName [8..9)
+                IdentifierToken [8..9) 'B'
+            CloseBracketToken [9..10) ']'
+          QuestionToken [10..11) '?'
+          InvocationExpression [11..15)
+            MemberBindingExpression [11..13)
+              DotToken [11..12) '.'
+              IdentifierName [12..13)
+                IdentifierToken [12..13) 'C'
+            ArgumentList [13..15)
+              OpenParenToken [13..14) '('
+              CloseParenToken [14..15) ')'
+      SemicolonToken [15..16) ';'
+  EndOfFileToken [16..16) ''

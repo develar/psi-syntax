@@ -1,0 +1,45 @@
+ForEachVariableStatement [0..48)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  InvocationExpression [10..32)
+    IdentifierName [10..17)
+      IdentifierToken [10..16) 'scoped'
+      T:WhitespaceTrivia [16..17) ' '
+    ArgumentList [17..32)
+      OpenParenToken [17..18) '('
+      Argument [18..22)
+        PredefinedType [18..22)
+          IntKeyword [18..21) 'int'
+          T:WhitespaceTrivia [21..22) ' '
+      CommaToken [22..22) missing
+      Argument [22..23)
+        IdentifierName [22..23)
+          IdentifierToken [22..23) 'b'
+      CommaToken [23..24) ','
+      T:WhitespaceTrivia [24..25) ' '
+      Argument [25..29)
+        PredefinedType [25..29)
+          IntKeyword [25..28) 'int'
+          T:WhitespaceTrivia [28..29) ' '
+      CommaToken [29..29) missing
+      Argument [29..30)
+        IdentifierName [29..30)
+          IdentifierToken [29..30) 'c'
+      CloseParenToken [30..31) ')'
+      T:WhitespaceTrivia [31..32) ' '
+  InKeyword [32..34) 'in'
+  T:WhitespaceTrivia [34..35) ' '
+  IdentifierName [35..45)
+    IdentifierToken [35..45) 'collection'
+  CloseParenToken [45..46) ')'
+  EmptyStatement [46..48)
+    SemicolonToken [46..47) ';'
+    T:EndOfLineTrivia [47..48) '\n'
+Diagnostics:
+  CS1525 [18..21) Invalid expression term \'int\'
+  CS1003 [22..23) Syntax error, \',\' expected
+  CS1525 [25..28) Invalid expression term \'int\'
+  CS1003 [29..30) Syntax error, \',\' expected
+  CS0230 [32..34) Type and identifier are both required in a foreach statement

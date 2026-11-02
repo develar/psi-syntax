@@ -1,0 +1,45 @@
+CompilationUnit [0..43)
+  ClassDeclaration [0..43)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..42)
+      VariableDeclaration [10..40)
+        IdentifierName [10..14)
+          L:WhitespaceTrivia [10..12) '  '
+          IdentifierToken [12..13) 'C'
+          T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..40)
+          IdentifierToken [14..15) 'x'
+          T:WhitespaceTrivia [15..16) ' '
+          EqualsValueClause [16..40)
+            EqualsToken [16..16) missing
+            QueryExpression [16..40)
+              FromClause [16..32)
+                FromKeyword [16..20) 'from'
+                T:WhitespaceTrivia [20..21) ' '
+                PredefinedType [21..25)
+                  IntKeyword [21..24) 'int'
+                  T:WhitespaceTrivia [24..25) ' '
+                IdentifierToken [25..26) 'x'
+                T:WhitespaceTrivia [26..27) ' '
+                InKeyword [27..29) 'in'
+                T:WhitespaceTrivia [29..30) ' '
+                IdentifierName [30..32)
+                  IdentifierToken [30..31) 'y'
+                  T:WhitespaceTrivia [31..32) ' '
+              QueryBody [32..40)
+                SelectClause [32..40)
+                  SelectKeyword [32..38) 'select'
+                  T:WhitespaceTrivia [38..39) ' '
+                  IdentifierName [39..40)
+                    IdentifierToken [39..40) 'x'
+      SemicolonToken [40..41) ';'
+      T:EndOfLineTrivia [41..42) '\n'
+    CloseBraceToken [42..43) '}'
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1003 [16..20) Syntax error, \'=\' expected

@@ -1,0 +1,9 @@
+CompilationUnit [0..18)
+  L:ShebangDirectiveTrivia [0..18)
+    HashToken [0..1) '#'
+    ExclamationToken [1..2) '!'
+    L:PreprocessingMessageTrivia [2..18) '/usr/bin/env csi'
+    EndOfDirectiveToken [18..18) ''
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS9314 [1..2) \'#!\' directives can be only used in scripts or file-based programs

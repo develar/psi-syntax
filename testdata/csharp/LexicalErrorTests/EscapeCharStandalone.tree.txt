@@ -1,0 +1,16 @@
+CompilationUnit [0..2)
+  GlobalStatement [0..2)
+    LocalDeclarationStatement [0..2)
+      VariableDeclaration [0..2)
+        IdentifierName [0..2)
+          L:SkippedTokensTrivia [0..1)
+            BadToken [0..1) '\\'
+          IdentifierToken [1..2) 'e'
+        VariableDeclarator [2..2)
+          IdentifierToken [2..2) missing
+      SemicolonToken [2..2) missing
+  EndOfFileToken [2..2) ''
+Diagnostics:
+  CS1056 [0..0) Unexpected character \'\\\'
+  CS1001 [2..2) Identifier expected
+  CS1002 [2..2) ; expected

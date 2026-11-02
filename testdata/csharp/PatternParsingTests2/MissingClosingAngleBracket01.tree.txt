@@ -1,0 +1,14 @@
+LessThanExpression [0..13)
+  IsExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'e'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..9)
+      IdentifierToken [5..9) 'List'
+  LessThanToken [9..10) '<'
+  PredefinedType [10..13)
+    IntKeyword [10..13) 'int'
+Diagnostics:
+  CS1525 [10..13) Invalid expression term \'int\'

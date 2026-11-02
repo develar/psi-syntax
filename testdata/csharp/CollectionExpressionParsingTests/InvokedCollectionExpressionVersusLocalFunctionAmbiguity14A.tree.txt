@@ -1,0 +1,42 @@
+CompilationUnit [0..41)
+  GlobalStatement [0..41)
+    LocalFunctionStatement [0..41)
+      AttributeList [0..7)
+        OpenBracketToken [0..1) '['
+        Attribute [1..6)
+          IdentifierName [1..6)
+            IdentifierToken [1..6) 'Attr1'
+        CloseBracketToken [6..7) ']'
+      AttributeList [7..15)
+        OpenBracketToken [7..8) '['
+        Attribute [8..13)
+          IdentifierName [8..13)
+            IdentifierToken [8..13) 'Attr2'
+        CloseBracketToken [13..14) ']'
+        T:WhitespaceTrivia [14..15) ' '
+      TupleType [15..26)
+        OpenParenToken [15..16) '('
+        TupleElement [16..19)
+          IdentifierName [16..18)
+            IdentifierToken [16..17) 'A'
+            T:WhitespaceTrivia [17..18) ' '
+          IdentifierToken [18..19) 'a'
+        CommaToken [19..20) ','
+        T:WhitespaceTrivia [20..21) ' '
+        TupleElement [21..24)
+          IdentifierName [21..23)
+            IdentifierToken [21..22) 'B'
+            T:WhitespaceTrivia [22..23) ' '
+          IdentifierToken [23..24) 'b'
+        CloseParenToken [24..25) ')'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..35) 'LocalFunc'
+      ParameterList [35..38)
+        OpenParenToken [35..36) '('
+        CloseParenToken [36..37) ')'
+        T:WhitespaceTrivia [37..38) ' '
+      Block [38..41)
+        OpenBraceToken [38..39) '{'
+        T:WhitespaceTrivia [39..40) ' '
+        CloseBraceToken [40..41) '}'
+  EndOfFileToken [41..41) ''

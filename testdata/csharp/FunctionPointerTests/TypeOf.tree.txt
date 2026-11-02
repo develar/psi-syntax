@@ -1,0 +1,32 @@
+TypeOfExpression [0..59)
+  TypeOfKeyword [0..6) 'typeof'
+  OpenParenToken [6..7) '('
+  FunctionPointerType [7..58)
+    DelegateKeyword [7..15) 'delegate'
+    AsteriskToken [15..16) '*'
+    T:WhitespaceTrivia [16..17) ' '
+    FunctionPointerCallingConvention [17..33)
+      UnmanagedKeyword [17..26) 'unmanaged'
+      FunctionPointerUnmanagedCallingConventionList [26..33)
+        OpenBracketToken [26..27) '['
+        FunctionPointerUnmanagedCallingConvention [27..32)
+          IdentifierToken [27..32) 'cdecl'
+        CloseBracketToken [32..33) ']'
+    FunctionPointerParameterList [33..58)
+      LessThanToken [33..34) '<'
+      FunctionPointerParameter [34..41)
+        RefKeyword [34..37) 'ref'
+        T:WhitespaceTrivia [37..38) ' '
+        PredefinedType [38..41)
+          IntKeyword [38..41) 'int'
+      CommaToken [41..42) ','
+      T:WhitespaceTrivia [42..43) ' '
+      FunctionPointerParameter [43..57)
+        ReadOnlyKeyword [43..51) 'readonly'
+        T:WhitespaceTrivia [51..52) ' '
+        RefKeyword [52..55) 'ref'
+        T:WhitespaceTrivia [55..56) ' '
+        IdentifierName [56..57)
+          IdentifierToken [56..57) 'D'
+      GreaterThanToken [57..58) '>'
+  CloseParenToken [58..59) ')'

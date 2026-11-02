@@ -1,0 +1,1 @@
+abstract file class C { }

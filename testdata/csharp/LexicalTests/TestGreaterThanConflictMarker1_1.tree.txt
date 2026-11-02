@@ -1,0 +1,8 @@
+GreaterThanToken [0..1) '>'
+GreaterThanToken [1..2) '>'
+GreaterThanToken [2..3) '>'
+GreaterThanToken [3..4) '>'
+GreaterThanToken [4..5) '>'
+GreaterThanToken [5..6) '>'
+GreaterThanToken [6..7) '>'
+EndOfFileToken [7..7) ''

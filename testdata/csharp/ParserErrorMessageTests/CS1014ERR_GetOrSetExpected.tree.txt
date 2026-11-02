@@ -1,0 +1,121 @@
+CompilationUnit [0..223)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..223)
+    L:EndOfLineTrivia [14..15) '\n'
+    PublicKeyword [15..21) 'public'
+    T:WhitespaceTrivia [21..22) ' '
+    SealedKeyword [22..28) 'sealed'
+    T:WhitespaceTrivia [28..29) ' '
+    ClassKeyword [29..34) 'class'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierToken [35..44) 'Container'
+    T:EndOfLineTrivia [44..45) '\n'
+    OpenBraceToken [45..46) '{'
+    T:EndOfLineTrivia [46..47) '\n'
+    PropertyDeclaration [47..85)
+      L:WhitespaceTrivia [47..51) '    '
+      PublicKeyword [51..57) 'public'
+      T:WhitespaceTrivia [57..58) ' '
+      PredefinedType [58..65)
+        StringKeyword [58..64) 'string'
+        T:WhitespaceTrivia [64..65) ' '
+      IdentifierToken [65..70) 'Prop1'
+      T:WhitespaceTrivia [70..71) ' '
+      AccessorList [71..85)
+        OpenBraceToken [71..72) '{'
+        T:WhitespaceTrivia [72..73) ' '
+        UnknownAccessorDeclaration [73..83)
+          ProtectedKeyword [73..82) 'protected'
+          T:WhitespaceTrivia [82..83) ' '
+          IdentifierToken [83..83) missing
+        CloseBraceToken [83..84) '}'
+        T:EndOfLineTrivia [84..85) '\n'
+    PropertyDeclaration [85..144)
+      L:WhitespaceTrivia [85..89) '    '
+      PublicKeyword [89..95) 'public'
+      T:WhitespaceTrivia [95..96) ' '
+      PredefinedType [96..103)
+        StringKeyword [96..102) 'string'
+        T:WhitespaceTrivia [102..103) ' '
+      IdentifierToken [103..108) 'Prop2'
+      T:WhitespaceTrivia [108..109) ' '
+      AccessorList [109..144)
+        OpenBraceToken [109..110) '{'
+        T:WhitespaceTrivia [110..111) ' '
+        GetAccessorDeclaration [111..132)
+          GetKeyword [111..114) 'get'
+          T:WhitespaceTrivia [114..115) ' '
+          Block [115..132)
+            OpenBraceToken [115..116) '{'
+            T:WhitespaceTrivia [116..117) ' '
+            ReturnStatement [117..130)
+              ReturnKeyword [117..123) 'return'
+              T:WhitespaceTrivia [123..124) ' '
+              NullLiteralExpression [124..128)
+                NullKeyword [124..128) 'null'
+              SemicolonToken [128..129) ';'
+              T:WhitespaceTrivia [129..130) ' '
+            CloseBraceToken [130..131) '}'
+            T:WhitespaceTrivia [131..132) ' '
+        UnknownAccessorDeclaration [132..142)
+          ProtectedKeyword [132..141) 'protected'
+          T:WhitespaceTrivia [141..142) ' '
+          IdentifierToken [142..142) missing
+        CloseBraceToken [142..143) '}'
+        T:EndOfLineTrivia [143..144) '\n'
+    PropertyDeclaration [144..221)
+      L:WhitespaceTrivia [144..148) '    '
+      PublicKeyword [148..154) 'public'
+      T:WhitespaceTrivia [154..155) ' '
+      PredefinedType [155..162)
+        StringKeyword [155..161) 'string'
+        T:WhitespaceTrivia [161..162) ' '
+      IdentifierToken [162..167) 'Prop3'
+      T:WhitespaceTrivia [167..168) ' '
+      AccessorList [168..221)
+        OpenBraceToken [168..169) '{'
+        T:WhitespaceTrivia [169..170) ' '
+        GetAccessorDeclaration [170..191)
+          GetKeyword [170..173) 'get'
+          T:WhitespaceTrivia [173..174) ' '
+          Block [174..191)
+            OpenBraceToken [174..175) '{'
+            T:WhitespaceTrivia [175..176) ' '
+            ReturnStatement [176..189)
+              ReturnKeyword [176..182) 'return'
+              T:WhitespaceTrivia [182..183) ' '
+              NullLiteralExpression [183..187)
+                NullKeyword [183..187) 'null'
+              SemicolonToken [187..188) ';'
+              T:WhitespaceTrivia [188..189) ' '
+            CloseBraceToken [189..190) '}'
+            T:WhitespaceTrivia [190..191) ' '
+        SetAccessorDeclaration [191..209)
+          ProtectedKeyword [191..200) 'protected'
+          T:WhitespaceTrivia [200..201) ' '
+          SetKeyword [201..204) 'set'
+          T:WhitespaceTrivia [204..205) ' '
+          Block [205..209)
+            OpenBraceToken [205..206) '{'
+            T:WhitespaceTrivia [206..207) ' '
+            CloseBraceToken [207..208) '}'
+            T:WhitespaceTrivia [208..209) ' '
+        UnknownAccessorDeclaration [209..219)
+          ProtectedKeyword [209..218) 'protected'
+          T:WhitespaceTrivia [218..219) ' '
+          IdentifierToken [219..219) missing
+        CloseBraceToken [219..220) '}'
+        T:EndOfLineTrivia [220..221) '\n'
+    CloseBraceToken [221..222) '}'
+    T:EndOfLineTrivia [222..223) '\n'
+  EndOfFileToken [223..223) ''
+Diagnostics:
+  CS1014 [83..84) A get or set accessor expected
+  CS1014 [142..143) A get or set accessor expected
+  CS1014 [219..220) A get or set accessor expected

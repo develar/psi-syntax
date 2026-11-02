@@ -1,0 +1,1 @@
+from elem in aRay select new Result { A = on = true }

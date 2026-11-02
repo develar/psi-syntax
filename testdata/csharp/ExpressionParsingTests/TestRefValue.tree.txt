@@ -1,0 +1,10 @@
+RefValueExpression [0..16)
+  RefValueKeyword [0..10) '__refvalue'
+  OpenParenToken [10..11) '('
+  IdentifierName [11..12)
+    IdentifierToken [11..12) 'a'
+  CommaToken [12..13) ','
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierName [14..15)
+    IdentifierToken [14..15) 'b'
+  CloseParenToken [15..16) ')'

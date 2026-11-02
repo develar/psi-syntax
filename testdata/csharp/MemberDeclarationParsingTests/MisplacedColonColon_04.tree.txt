@@ -1,0 +1,23 @@
+MethodDeclaration [0..17)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  ExplicitInterfaceSpecifier [4..7)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'I'
+    DotToken [5..5) missing
+    T:SkippedTokensTrivia [5..7)
+      ColonColonToken [5..7) '::'
+  IdentifierToken [7..9) 'M1'
+  ParameterList [9..12)
+    OpenParenToken [9..10) '('
+    CloseParenToken [10..11) ')'
+    T:WhitespaceTrivia [11..12) ' '
+  ArrowExpressionClause [12..16)
+    EqualsGreaterThanToken [12..14) '=>'
+    T:WhitespaceTrivia [14..15) ' '
+    NumericLiteralExpression [15..16)
+      NumericLiteralToken [15..16) '0'
+  SemicolonToken [16..17) ';'
+Diagnostics:
+  CS0687 [5..7) The namespace alias qualifier \'::\' always resolves to a type or namespace so is illegal here. Consider using \'.\' instead.

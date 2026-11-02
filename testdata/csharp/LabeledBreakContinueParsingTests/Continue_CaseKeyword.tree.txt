@@ -1,0 +1,11 @@
+ContinueStatement [0..14)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  SemicolonToken [9..9) missing
+  T:SkippedTokensTrivia [9..13)
+    CaseKeyword [9..13) 'case'
+  T:SkippedTokensTrivia [13..14)
+    SemicolonToken [13..14) ';'
+Diagnostics:
+  CS1073 [0..9) Unexpected token \'case\'
+  CS1002 [9..13) ; expected

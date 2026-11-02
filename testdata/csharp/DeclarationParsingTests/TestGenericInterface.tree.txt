@@ -1,0 +1,15 @@
+CompilationUnit [0..18)
+  InterfaceDeclaration [0..18)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'A'
+    TypeParameterList [11..15)
+      LessThanToken [11..12) '<'
+      TypeParameter [12..13)
+        IdentifierToken [12..13) 'B'
+      GreaterThanToken [13..14) '>'
+      T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:WhitespaceTrivia [16..17) ' '
+    CloseBraceToken [17..18) '}'
+  EndOfFileToken [18..18) ''

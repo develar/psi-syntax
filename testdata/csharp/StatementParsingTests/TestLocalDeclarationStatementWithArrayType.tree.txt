@@ -1,0 +1,33 @@
+LocalDeclarationStatement [0..13)
+  VariableDeclaration [0..12)
+    ArrayType [0..11)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'T'
+      ArrayRankSpecifier [1..3)
+        OpenBracketToken [1..2) '['
+        OmittedArraySizeExpression [2..2)
+          OmittedArraySizeExpressionToken [2..2) ''
+        CloseBracketToken [2..3) ']'
+      ArrayRankSpecifier [3..6)
+        OpenBracketToken [3..4) '['
+        OmittedArraySizeExpression [4..4)
+          OmittedArraySizeExpressionToken [4..4) ''
+        CommaToken [4..5) ','
+        OmittedArraySizeExpression [5..5)
+          OmittedArraySizeExpressionToken [5..5) ''
+        CloseBracketToken [5..6) ']'
+      ArrayRankSpecifier [6..11)
+        OpenBracketToken [6..7) '['
+        OmittedArraySizeExpression [7..7)
+          OmittedArraySizeExpressionToken [7..7) ''
+        CommaToken [7..8) ','
+        OmittedArraySizeExpression [8..8)
+          OmittedArraySizeExpressionToken [8..8) ''
+        CommaToken [8..9) ','
+        OmittedArraySizeExpression [9..9)
+          OmittedArraySizeExpressionToken [9..9) ''
+        CloseBracketToken [9..10) ']'
+        T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..12)
+      IdentifierToken [11..12) 'a'
+  SemicolonToken [12..13) ';'

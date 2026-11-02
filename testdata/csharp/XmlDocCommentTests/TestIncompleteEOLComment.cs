@@ -1,0 +1,2 @@
+/// <!-- incomplete
+class C { }

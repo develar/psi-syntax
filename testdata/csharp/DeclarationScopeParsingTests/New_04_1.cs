@@ -1,0 +1,2 @@
+
+new scoped int M();

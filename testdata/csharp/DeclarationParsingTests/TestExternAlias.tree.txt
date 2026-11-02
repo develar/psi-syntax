@@ -1,0 +1,9 @@
+CompilationUnit [0..15)
+  ExternAliasDirective [0..15)
+    ExternKeyword [0..6) 'extern'
+    T:WhitespaceTrivia [6..7) ' '
+    AliasKeyword [7..12) 'alias'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'a'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

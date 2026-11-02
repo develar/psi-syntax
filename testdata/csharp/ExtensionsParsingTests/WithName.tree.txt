@@ -1,0 +1,29 @@
+CompilationUnit [0..40)
+  ClassDeclaration [0..40)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..39)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      T:WhitespaceTrivia [23..24) ' '
+      T:SkippedTokensTrivia [24..28)
+        IdentifierToken [24..28) 'Name'
+      ParameterList [28..35)
+        OpenParenToken [28..29) '('
+        Parameter [29..33)
+          IdentifierName [29..33)
+            IdentifierToken [29..33) 'Type'
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+      OpenBraceToken [35..36) '{'
+      T:WhitespaceTrivia [36..37) ' '
+      CloseBraceToken [37..38) '}'
+      T:EndOfLineTrivia [38..39) '\n'
+    CloseBraceToken [39..40) '}'
+  EndOfFileToken [40..40) ''
+Diagnostics:
+  CS9281 [24..28) Extension declarations may not have a name.

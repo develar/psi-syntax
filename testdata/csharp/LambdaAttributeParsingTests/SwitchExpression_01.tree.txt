@@ -1,0 +1,27 @@
+SwitchExpression [0..24)
+  ParenthesizedLambdaExpression [0..14)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..2)
+        IdentifierName [1..2)
+          IdentifierToken [1..2) 'A'
+      CloseBracketToken [2..3) ']'
+      T:WhitespaceTrivia [3..4) ' '
+    ParameterList [4..7)
+      OpenParenToken [4..5) '('
+      CloseParenToken [5..6) ')'
+      T:WhitespaceTrivia [6..7) ' '
+    EqualsGreaterThanToken [7..9) '=>'
+    T:WhitespaceTrivia [9..10) ' '
+    Block [10..14)
+      OpenBraceToken [10..11) '{'
+      T:WhitespaceTrivia [11..12) ' '
+      CloseBraceToken [12..13) '}'
+      T:WhitespaceTrivia [13..14) ' '
+  SwitchKeyword [14..20) 'switch'
+  T:WhitespaceTrivia [20..21) ' '
+  OpenBraceToken [21..22) '{'
+  T:WhitespaceTrivia [22..23) ' '
+  CloseBraceToken [23..24) '}'
+Diagnostics:
+  CS8848 [14..20) Operator \'switch\' cannot be used here due to precedence. Use parentheses to disambiguate.

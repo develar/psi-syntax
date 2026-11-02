@@ -1,0 +1,148 @@
+CompilationUnit [0..245)
+  ClassDeclaration [0..245)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..243)
+      L:WhitespaceTrivia [17..21) '    '
+      StaticKeyword [21..27) 'static'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..33)
+        VoidKeyword [28..32) 'void'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..37) 'Main'
+      ParameterList [37..40)
+        OpenParenToken [37..38) '('
+        CloseParenToken [38..39) ')'
+        T:EndOfLineTrivia [39..40) '\n'
+      Block [40..243)
+        L:WhitespaceTrivia [40..44) '    '
+        OpenBraceToken [44..45) '{'
+        T:EndOfLineTrivia [45..46) '\n'
+        LocalDeclarationStatement [46..64)
+          VariableDeclaration [46..62)
+            PredefinedType [46..61)
+              L:WhitespaceTrivia [46..54) '        '
+              StringKeyword [54..60) 'string'
+              T:WhitespaceTrivia [60..61) ' '
+            VariableDeclarator [61..62)
+              IdentifierToken [61..62) 's'
+          SemicolonToken [62..63) ';'
+          T:EndOfLineTrivia [63..64) '\n'
+        ExpressionStatement [64..82)
+          SimpleAssignmentExpression [64..80)
+            IdentifierName [64..74)
+              L:WhitespaceTrivia [64..72) '        '
+              IdentifierToken [72..73) 's'
+              T:WhitespaceTrivia [73..74) ' '
+            EqualsToken [74..75) '='
+            T:WhitespaceTrivia [75..76) ' '
+            StringLiteralExpression [76..80)
+              StringLiteralToken [76..80) '"\\u"'
+          SemicolonToken [80..81) ';'
+          T:EndOfLineTrivia [81..82) '\n'
+        ExpressionStatement [82..101)
+          SimpleAssignmentExpression [82..99)
+            IdentifierName [82..92)
+              L:WhitespaceTrivia [82..90) '        '
+              IdentifierToken [90..91) 's'
+              T:WhitespaceTrivia [91..92) ' '
+            EqualsToken [92..93) '='
+            T:WhitespaceTrivia [93..94) ' '
+            StringLiteralExpression [94..99)
+              StringLiteralToken [94..99) '"\\u0"'
+          SemicolonToken [99..100) ';'
+          T:EndOfLineTrivia [100..101) '\n'
+        ExpressionStatement [101..121)
+          SimpleAssignmentExpression [101..119)
+            IdentifierName [101..111)
+              L:WhitespaceTrivia [101..109) '        '
+              IdentifierToken [109..110) 's'
+              T:WhitespaceTrivia [110..111) ' '
+            EqualsToken [111..112) '='
+            T:WhitespaceTrivia [112..113) ' '
+            StringLiteralExpression [113..119)
+              StringLiteralToken [113..119) '"\\u00"'
+          SemicolonToken [119..120) ';'
+          T:EndOfLineTrivia [120..121) '\n'
+        ExpressionStatement [121..142)
+          SimpleAssignmentExpression [121..140)
+            IdentifierName [121..131)
+              L:WhitespaceTrivia [121..129) '        '
+              IdentifierToken [129..130) 's'
+              T:WhitespaceTrivia [130..131) ' '
+            EqualsToken [131..132) '='
+            T:WhitespaceTrivia [132..133) ' '
+            StringLiteralExpression [133..140)
+              StringLiteralToken [133..140) '"\\u000"'
+          SemicolonToken [140..141) ';'
+          T:EndOfLineTrivia [141..142) '\n'
+        ExpressionStatement [142..171)
+          SimpleAssignmentExpression [142..169)
+            IdentifierName [142..161)
+              L:WhitespaceTrivia [142..150) '        '
+              L:EndOfLineTrivia [150..151) '\n'
+              L:WhitespaceTrivia [151..159) '        '
+              IdentifierToken [159..160) 's'
+              T:WhitespaceTrivia [160..161) ' '
+            EqualsToken [161..162) '='
+            T:WhitespaceTrivia [162..163) ' '
+            StringLiteralExpression [163..169)
+              StringLiteralToken [163..169) '"a\\uz"'
+          SemicolonToken [169..170) ';'
+          T:EndOfLineTrivia [170..171) '\n'
+        ExpressionStatement [171..192)
+          SimpleAssignmentExpression [171..190)
+            IdentifierName [171..181)
+              L:WhitespaceTrivia [171..179) '        '
+              IdentifierToken [179..180) 's'
+              T:WhitespaceTrivia [180..181) ' '
+            EqualsToken [181..182) '='
+            T:WhitespaceTrivia [182..183) ' '
+            StringLiteralExpression [183..190)
+              StringLiteralToken [183..190) '"a\\u0z"'
+          SemicolonToken [190..191) ';'
+          T:EndOfLineTrivia [191..192) '\n'
+        ExpressionStatement [192..214)
+          SimpleAssignmentExpression [192..212)
+            IdentifierName [192..202)
+              L:WhitespaceTrivia [192..200) '        '
+              IdentifierToken [200..201) 's'
+              T:WhitespaceTrivia [201..202) ' '
+            EqualsToken [202..203) '='
+            T:WhitespaceTrivia [203..204) ' '
+            StringLiteralExpression [204..212)
+              StringLiteralToken [204..212) '"a\\u00z"'
+          SemicolonToken [212..213) ';'
+          T:EndOfLineTrivia [213..214) '\n'
+        ExpressionStatement [214..237)
+          SimpleAssignmentExpression [214..235)
+            IdentifierName [214..224)
+              L:WhitespaceTrivia [214..222) '        '
+              IdentifierToken [222..223) 's'
+              T:WhitespaceTrivia [223..224) ' '
+            EqualsToken [224..225) '='
+            T:WhitespaceTrivia [225..226) ' '
+            StringLiteralExpression [226..235)
+              StringLiteralToken [226..235) '"a\\u000z"'
+          SemicolonToken [235..236) ';'
+          T:EndOfLineTrivia [236..237) '\n'
+        L:WhitespaceTrivia [237..241) '    '
+        CloseBraceToken [241..242) '}'
+        T:EndOfLineTrivia [242..243) '\n'
+    CloseBraceToken [243..244) '}'
+    T:EndOfLineTrivia [244..245) '\n'
+  EndOfFileToken [245..245) ''
+Diagnostics:
+  CS1009 [77..79) Unrecognized escape sequence
+  CS1009 [95..98) Unrecognized escape sequence
+  CS1009 [114..118) Unrecognized escape sequence
+  CS1009 [134..139) Unrecognized escape sequence
+  CS1009 [165..167) Unrecognized escape sequence
+  CS1009 [185..188) Unrecognized escape sequence
+  CS1009 [206..210) Unrecognized escape sequence
+  CS1009 [228..233) Unrecognized escape sequence

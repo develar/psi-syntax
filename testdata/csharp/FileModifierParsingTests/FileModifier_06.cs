@@ -1,0 +1,1 @@
+partial file record struct C { }

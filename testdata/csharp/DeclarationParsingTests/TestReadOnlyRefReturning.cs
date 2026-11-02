@@ -1,0 +1,1 @@
+struct a { readonly ref readonly int M() { } }

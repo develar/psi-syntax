@@ -1,0 +1,1 @@
+explicit I<T>.operator int(int x) => x;

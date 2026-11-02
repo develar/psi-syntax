@@ -1,0 +1,92 @@
+CompilationUnit [0..111)
+  DelegateDeclaration [0..29)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..16)
+      ObjectKeyword [9..15) 'object'
+      T:WhitespaceTrivia [15..16) ' '
+    IdentifierToken [16..17) 'D'
+    ParameterList [17..27)
+      OpenParenToken [17..18) '('
+      Parameter [18..26)
+        PredefinedType [18..25)
+          ObjectKeyword [18..24) 'object'
+          T:WhitespaceTrivia [24..25) ' '
+        IdentifierToken [25..26) 'o'
+      CloseParenToken [26..27) ')'
+    SemicolonToken [27..28) ';'
+    T:EndOfLineTrivia [28..29) '\n'
+  ClassDeclaration [29..111)
+    ClassKeyword [29..34) 'class'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierToken [35..36) 'C'
+    T:EndOfLineTrivia [36..37) '\n'
+    OpenBraceToken [37..38) '{'
+    T:EndOfLineTrivia [38..39) '\n'
+    MethodDeclaration [39..110)
+      L:WhitespaceTrivia [39..43) '    '
+      StaticKeyword [43..49) 'static'
+      T:WhitespaceTrivia [49..50) ' '
+      PredefinedType [50..55)
+        VoidKeyword [50..54) 'void'
+        T:WhitespaceTrivia [54..55) ' '
+      IdentifierToken [55..56) 'M'
+      ParameterList [56..59)
+        OpenParenToken [56..57) '('
+        CloseParenToken [57..58) ')'
+        T:EndOfLineTrivia [58..59) '\n'
+      Block [59..110)
+        L:WhitespaceTrivia [59..63) '    '
+        OpenBraceToken [63..64) '{'
+        T:EndOfLineTrivia [64..65) '\n'
+        LocalDeclarationStatement [65..85)
+          VariableDeclaration [65..85)
+            IdentifierName [65..75)
+              L:WhitespaceTrivia [65..73) '        '
+              IdentifierToken [73..74) 'D'
+              T:WhitespaceTrivia [74..75) ' '
+            VariableDeclarator [75..85)
+              IdentifierToken [75..76) 'd'
+              T:WhitespaceTrivia [76..77) ' '
+              EqualsValueClause [77..85)
+                EqualsToken [77..78) '='
+                T:WhitespaceTrivia [78..79) ' '
+                ParenthesizedLambdaExpression [79..85)
+                  ParameterList [79..80)
+                    OpenParenToken [79..80) '('
+                    CloseParenToken [80..80) missing
+                  EqualsGreaterThanToken [80..80) missing
+                  ThisExpression [80..85)
+                    ThisKeyword [80..84) 'this'
+                    T:WhitespaceTrivia [84..85) ' '
+          SemicolonToken [85..85) missing
+        LocalDeclarationStatement [85..98)
+          VariableDeclaration [85..98)
+            PredefinedType [85..92)
+              ObjectKeyword [85..91) 'object'
+              T:WhitespaceTrivia [91..92) ' '
+            VariableDeclarator [92..98)
+              IdentifierToken [92..93) 'o'
+              T:SkippedTokensTrivia [93..94)
+                CloseParenToken [93..94) ')'
+              T:WhitespaceTrivia [94..95) ' '
+              T:SkippedTokensTrivia [95..97)
+                EqualsGreaterThanToken [95..97) '=>'
+              T:WhitespaceTrivia [97..98) ' '
+          SemicolonToken [98..98) missing
+        ExpressionStatement [98..104)
+          NullLiteralExpression [98..102)
+            NullKeyword [98..102) 'null'
+          SemicolonToken [102..103) ';'
+          T:EndOfLineTrivia [103..104) '\n'
+        L:WhitespaceTrivia [104..108) '    '
+        CloseBraceToken [108..109) '}'
+        T:EndOfLineTrivia [109..110) '\n'
+    CloseBraceToken [110..111) '}'
+  EndOfFileToken [111..111) ''
+Diagnostics:
+  CS1026 [80..84) ) expected
+  CS1003 [80..84) Syntax error, \'=>\' expected
+  CS1002 [85..91) ; expected
+  CS1003 [93..94) Syntax error, \',\' expected
+  CS1002 [98..102) ; expected

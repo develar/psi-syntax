@@ -1,0 +1,1 @@
+_ = e switch { List<X> => 1, List<Y> => 2, };

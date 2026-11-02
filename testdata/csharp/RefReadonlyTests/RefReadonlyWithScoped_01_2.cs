@@ -1,0 +1,1 @@
+void M(scoped ref readonly int p);

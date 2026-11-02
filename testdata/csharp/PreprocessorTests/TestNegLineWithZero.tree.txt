@@ -1,0 +1,25 @@
+CompilationUnit [0..36)
+  ClassDeclaration [0..36)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    L:WhitespaceTrivia [21..25) '    '
+    L:LineDirectiveTrivia [25..34)
+      HashToken [25..26) '#'
+      T:WhitespaceTrivia [26..27) ' '
+      LineKeyword [27..31) 'line'
+      T:WhitespaceTrivia [31..32) ' '
+      NumericLiteralToken [32..33) '0'
+      EndOfDirectiveToken [33..33) ''
+      T:EndOfLineTrivia [33..34) '\n'
+    CloseBraceToken [34..35) '}'
+    T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1576 [32..33) The line number specified for #line directive is missing or invalid

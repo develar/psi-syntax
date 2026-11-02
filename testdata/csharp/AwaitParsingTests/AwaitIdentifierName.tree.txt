@@ -1,0 +1,20 @@
+ParenthesizedLambdaExpression [0..24)
+  L:EndOfLineTrivia [0..1) '\n'
+  AsyncKeyword [1..6) 'async'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  AwaitExpression [13..24)
+    AwaitKeyword [13..18) 'await'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..24)
+      IdentifierToken [19..22) 'goo'
+      T:SkippedTokensTrivia [22..23)
+        SemicolonToken [22..23) ';'
+      T:EndOfLineTrivia [23..24) '\n'
+Diagnostics:
+  CS1073 [1..22) Unexpected token \';\'

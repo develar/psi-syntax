@@ -1,0 +1,56 @@
+CompilationUnit [0..53)
+  ClassDeclaration [0..53)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..52)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..52)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        TryStatement [21..50)
+          TryKeyword [21..24) 'try'
+          T:WhitespaceTrivia [24..25) ' '
+          Block [25..29)
+            OpenBraceToken [25..26) '{'
+            T:WhitespaceTrivia [26..27) ' '
+            CloseBraceToken [27..28) '}'
+            T:WhitespaceTrivia [28..29) ' '
+          CatchClause [29..38)
+            CatchKeyword [29..34) 'catch'
+            T:WhitespaceTrivia [34..35) ' '
+            CatchDeclaration [35..38)
+              OpenParenToken [35..36) '('
+              IdentifierName [36..38)
+                IdentifierToken [36..37) 't'
+                T:WhitespaceTrivia [37..38) ' '
+              CloseParenToken [38..38) missing
+            Block [38..38)
+              OpenBraceToken [38..38) missing
+              CloseBraceToken [38..38) missing
+          FinallyClause [38..50)
+            FinallyKeyword [38..45) 'finally'
+            T:WhitespaceTrivia [45..46) ' '
+            Block [46..50)
+              OpenBraceToken [46..47) '{'
+              T:WhitespaceTrivia [47..48) ' '
+              CloseBraceToken [48..49) '}'
+              T:WhitespaceTrivia [49..50) ' '
+        CloseBraceToken [50..51) '}'
+        T:WhitespaceTrivia [51..52) ' '
+    CloseBraceToken [52..53) '}'
+  EndOfFileToken [53..53) ''
+Diagnostics:
+  CS1026 [38..45) ) expected
+  CS1514 [38..45) { expected
+  CS1513 [38..45) } expected

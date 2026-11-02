@@ -1,0 +1,23 @@
+CompilationUnit [0..34)
+  GlobalStatement [0..34)
+    LocalFunctionStatement [0..34)
+      PredefinedType [0..5)
+        VoidKeyword [0..4) 'void'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..8) 'Goo'
+      ParameterList [8..31)
+        OpenParenToken [8..9) '('
+        Parameter [9..29)
+          ScopedKeyword [9..15) 'scoped'
+          T:WhitespaceTrivia [15..16) ' '
+          IdentifierName [16..23)
+            IdentifierToken [16..22) 'scoped'
+            T:WhitespaceTrivia [22..23) ' '
+          IdentifierToken [23..29) 'scoped'
+        CloseParenToken [29..30) ')'
+        T:WhitespaceTrivia [30..31) ' '
+      Block [31..34)
+        OpenBraceToken [31..32) '{'
+        T:WhitespaceTrivia [32..33) ' '
+        CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''

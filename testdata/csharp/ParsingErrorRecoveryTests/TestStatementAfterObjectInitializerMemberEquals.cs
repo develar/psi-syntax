@@ -1,0 +1,1 @@
+class c { void m() { var x = new C { a = while (x) {} } }

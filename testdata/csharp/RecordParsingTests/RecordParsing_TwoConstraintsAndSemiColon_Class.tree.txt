@@ -1,0 +1,40 @@
+CompilationUnit [0..59)
+  ClassDeclaration [0..59)
+    AbstractKeyword [0..8) 'abstract'
+    T:WhitespaceTrivia [8..9) ' '
+    ClassKeyword [9..14) 'class'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'C'
+    TypeParameterList [16..25)
+      LessThanToken [16..17) '<'
+      TypeParameter [17..19)
+        IdentifierToken [17..19) 'T1'
+      CommaToken [19..20) ','
+      T:WhitespaceTrivia [20..21) ' '
+      TypeParameter [21..23)
+        IdentifierToken [21..23) 'T2'
+      GreaterThanToken [23..24) '>'
+      T:WhitespaceTrivia [24..25) ' '
+    TypeParameterConstraintClause [25..42)
+      WhereKeyword [25..30) 'where'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierName [31..34)
+        IdentifierToken [31..33) 'T1'
+        T:WhitespaceTrivia [33..34) ' '
+      ColonToken [34..35) ':'
+      T:WhitespaceTrivia [35..36) ' '
+      ClassConstraint [36..42)
+        ClassKeyword [36..41) 'class'
+        T:WhitespaceTrivia [41..42) ' '
+    TypeParameterConstraintClause [42..58)
+      WhereKeyword [42..47) 'where'
+      T:WhitespaceTrivia [47..48) ' '
+      IdentifierName [48..51)
+        IdentifierToken [48..50) 'T2'
+        T:WhitespaceTrivia [50..51) ' '
+      ColonToken [51..52) ':'
+      T:WhitespaceTrivia [52..53) ' '
+      ClassConstraint [53..58)
+        ClassKeyword [53..58) 'class'
+    SemicolonToken [58..59) ';'
+  EndOfFileToken [59..59) ''

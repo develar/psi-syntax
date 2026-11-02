@@ -1,0 +1,1 @@
+[A(ref int () => default)] class C { }

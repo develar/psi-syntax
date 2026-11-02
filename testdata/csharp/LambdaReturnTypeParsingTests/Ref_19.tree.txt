@@ -1,0 +1,26 @@
+ConditionalExpression [0..27)
+  IdentifierName [0..3)
+    IdentifierToken [0..2) 'd1'
+    T:WhitespaceTrivia [2..3) ' '
+  QuestionToken [3..4) '?'
+  T:WhitespaceTrivia [4..5) ' '
+  NullLiteralExpression [5..10)
+    NullKeyword [5..9) 'null'
+    T:WhitespaceTrivia [9..10) ' '
+  ColonToken [10..11) ':'
+  T:WhitespaceTrivia [11..12) ' '
+  ParenthesizedLambdaExpression [12..27)
+    RefType [12..20)
+      RefKeyword [12..15) 'ref'
+      T:WhitespaceTrivia [15..16) ' '
+      PredefinedType [16..20)
+        IntKeyword [16..19) 'int'
+        T:WhitespaceTrivia [19..20) ' '
+    ParameterList [20..23)
+      OpenParenToken [20..21) '('
+      CloseParenToken [21..22) ')'
+      T:WhitespaceTrivia [22..23) ' '
+    EqualsGreaterThanToken [23..25) '=>'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierName [26..27)
+      IdentifierToken [26..27) 'x'

@@ -1,0 +1,59 @@
+CompilationUnit [0..78)
+  GlobalStatement [0..8)
+    LocalDeclarationStatement [0..8)
+      VariableDeclaration [0..8)
+        IdentifierName [0..8)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..7) 'scoped'
+          T:WhitespaceTrivia [7..8) ' '
+        VariableDeclarator [8..8)
+          IdentifierToken [8..8) missing
+      SemicolonToken [8..8) missing
+  StructDeclaration [8..21)
+    StructKeyword [8..14) 'struct'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'A'
+    T:WhitespaceTrivia [16..17) ' '
+    OpenBraceToken [17..18) '{'
+    T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'
+    T:EndOfLineTrivia [20..21) '\n'
+  IncompleteMember [21..32)
+    ScopedKeyword [21..27) 'scoped'
+    T:WhitespaceTrivia [27..28) ' '
+    RefType [28..32)
+      RefKeyword [28..31) 'ref'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierName [32..32)
+        IdentifierToken [32..32) missing
+  StructDeclaration [32..45)
+    StructKeyword [32..38) 'struct'
+    T:WhitespaceTrivia [38..39) ' '
+    IdentifierToken [39..40) 'B'
+    T:WhitespaceTrivia [40..41) ' '
+    OpenBraceToken [41..42) '{'
+    T:WhitespaceTrivia [42..43) ' '
+    CloseBraceToken [43..44) '}'
+    T:EndOfLineTrivia [44..45) '\n'
+  IncompleteMember [45..52)
+    ScopedKeyword [45..51) 'scoped'
+    T:WhitespaceTrivia [51..52) ' '
+  StructDeclaration [52..78)
+    ReadOnlyKeyword [52..60) 'readonly'
+    T:WhitespaceTrivia [60..61) ' '
+    RefKeyword [61..64) 'ref'
+    T:WhitespaceTrivia [64..65) ' '
+    StructKeyword [65..71) 'struct'
+    T:WhitespaceTrivia [71..72) ' '
+    IdentifierToken [72..73) 'C'
+    T:WhitespaceTrivia [73..74) ' '
+    OpenBraceToken [74..75) '{'
+    T:WhitespaceTrivia [75..76) ' '
+    CloseBraceToken [76..77) '}'
+    T:EndOfLineTrivia [77..78) '\n'
+  EndOfFileToken [78..78) ''
+Diagnostics:
+  CS1001 [8..14) Identifier expected
+  CS1002 [8..14) ; expected
+  CS1031 [32..38) Type expected
+  CS0116 [45..51) A namespace cannot directly contain members such as fields, methods or statements

@@ -1,0 +1,11 @@
+ContinueStatement [0..11)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  SemicolonToken [9..9) missing
+  T:SkippedTokensTrivia [9..10)
+    NumericLiteralToken [9..10) '0'
+  T:SkippedTokensTrivia [10..11)
+    SemicolonToken [10..11) ';'
+Diagnostics:
+  CS1073 [0..9) Unexpected token \'0\'
+  CS1002 [9..10) ; expected

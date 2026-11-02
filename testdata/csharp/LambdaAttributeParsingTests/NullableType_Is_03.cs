@@ -1,0 +1,1 @@
+_ = x is string ? [] y => y : z

@@ -1,0 +1,42 @@
+ForEachVariableStatement [0..52)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  RefExpression [10..21)
+    RefKeyword [10..13) 'ref'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierName [14..21)
+      IdentifierToken [14..20) 'scoped'
+      T:WhitespaceTrivia [20..21) ' '
+  InKeyword [21..21) missing
+  IdentifierName [21..21)
+    IdentifierToken [21..21) missing
+  CloseParenToken [21..21) missing
+  LocalDeclarationStatement [21..52)
+    ReadOnlyKeyword [21..29) 'readonly'
+    T:WhitespaceTrivia [29..30) ' '
+    VariableDeclaration [30..50)
+      PredefinedType [30..34)
+        IntKeyword [30..33) 'int'
+        T:WhitespaceTrivia [33..34) ' '
+      VariableDeclarator [34..50)
+        IdentifierToken [34..35) 'c'
+        T:WhitespaceTrivia [35..36) ' '
+        T:SkippedTokensTrivia [36..38)
+          InKeyword [36..38) 'in'
+        T:WhitespaceTrivia [38..39) ' '
+        T:SkippedTokensTrivia [39..49)
+          IdentifierToken [39..49) 'collection'
+        T:SkippedTokensTrivia [49..50)
+          CloseParenToken [49..50) ')'
+    SemicolonToken [50..51) ';'
+    T:EndOfLineTrivia [51..52) '\n'
+Diagnostics:
+  CS1525 [10..20) Invalid expression term \'ref\'
+  CS1515 [21..29) \'in\' expected
+  CS0230 [21..29) Type and identifier are both required in a foreach statement
+  CS1525 [21..29) Invalid expression term \'readonly\'
+  CS1026 [21..29) ) expected
+  CS0106 [21..29) The modifier \'readonly\' is not valid for this item
+  CS1003 [36..38) Syntax error, \',\' expected

@@ -1,0 +1,2 @@
+RangeExpression [0..2)
+  DotDotToken [0..2) '..'

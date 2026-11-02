@@ -1,0 +1,1 @@
+interface C(int X, int Y) : B;

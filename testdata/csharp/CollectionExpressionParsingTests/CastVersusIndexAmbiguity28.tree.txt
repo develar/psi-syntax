@@ -1,0 +1,13 @@
+CastExpression [0..7)
+  OpenParenToken [0..1) '('
+  GenericName [1..4)
+    IdentifierToken [1..2) 'A'
+    TypeArgumentList [2..4)
+      LessThanToken [2..3) '<'
+      OmittedTypeArgument [3..3)
+        OmittedTypeArgumentToken [3..3) ''
+      GreaterThanToken [3..4) '>'
+  CloseParenToken [4..5) ')'
+  CollectionExpression [5..7)
+    OpenBracketToken [5..6) '['
+    CloseBracketToken [6..7) ']'

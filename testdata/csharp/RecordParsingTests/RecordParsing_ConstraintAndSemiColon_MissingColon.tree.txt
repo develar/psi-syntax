@@ -1,0 +1,24 @@
+CompilationUnit [0..28)
+  RecordDeclaration [0..28)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'R'
+    TypeParameterList [8..12)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..10)
+        IdentifierToken [9..10) 'T'
+      GreaterThanToken [10..11) '>'
+      T:WhitespaceTrivia [11..12) ' '
+    TypeParameterConstraintClause [12..27)
+      WhereKeyword [12..17) 'where'
+      T:WhitespaceTrivia [17..18) ' '
+      IdentifierName [18..22)
+        IdentifierToken [18..19) 'T'
+        T:WhitespaceTrivia [19..22) '   '
+      ColonToken [22..22) missing
+      ClassConstraint [22..27)
+        ClassKeyword [22..27) 'class'
+    SemicolonToken [27..28) ';'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS1003 [22..27) Syntax error, \':\' expected

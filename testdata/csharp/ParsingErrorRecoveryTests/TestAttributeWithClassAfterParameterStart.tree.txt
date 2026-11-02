@@ -1,0 +1,23 @@
+CompilationUnit [0..15)
+  ClassDeclaration [0..15)
+    AttributeList [0..4)
+      OpenBracketToken [0..1) '['
+      Attribute [1..4)
+        IdentifierName [1..2)
+          IdentifierToken [1..2) 'a'
+        AttributeArgumentList [2..4)
+          OpenParenToken [2..3) '('
+          T:WhitespaceTrivia [3..4) ' '
+          CloseParenToken [4..4) missing
+      CloseBracketToken [4..4) missing
+    ClassKeyword [4..9) 'class'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'c'
+    T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1026 [4..9) ) expected
+  CS1003 [4..9) Syntax error, \']\' expected

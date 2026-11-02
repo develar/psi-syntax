@@ -1,0 +1,16 @@
+CompilationUnit [0..28)
+  ExternAliasDirective [0..16)
+    ExternKeyword [0..6) 'extern'
+    T:WhitespaceTrivia [6..7) ' '
+    AliasKeyword [7..12) 'alias'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'X'
+    SemicolonToken [14..15) ';'
+    T:EndOfLineTrivia [15..16) '\n'
+  FileScopedNamespaceDeclaration [16..28)
+    NamespaceKeyword [16..25) 'namespace'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierName [26..27)
+      IdentifierToken [26..27) 'A'
+    SemicolonToken [27..28) ';'
+  EndOfFileToken [28..28) ''

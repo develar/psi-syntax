@@ -1,0 +1,1 @@
+safe public static explicit operator int(C c);

@@ -1,0 +1,96 @@
+CompilationUnit [0..192)
+  ClassDeclaration [0..89)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..10) 'goo'
+    T:WhitespaceTrivia [10..11) ' '
+    OpenBraceToken [11..12) '{'
+    T:EndOfLineTrivia [12..13) '\n'
+    ConversionOperatorDeclaration [13..87)
+      L:WhitespaceTrivia [13..17) '    '
+      PublicKeyword [17..23) 'public'
+      T:WhitespaceTrivia [23..24) ' '
+      StaticKeyword [24..30) 'static'
+      T:WhitespaceTrivia [30..31) ' '
+      L:SkippedTokensTrivia [31..34)
+        IntKeyword [31..34) 'int'
+      L:WhitespaceTrivia [34..35) ' '
+      ImplicitKeyword [35..43) 'implicit'
+      T:WhitespaceTrivia [43..44) ' '
+      OperatorKeyword [44..52) 'operator'
+      T:WhitespaceTrivia [52..53) ' '
+      IdentifierName [53..53)
+        IdentifierToken [53..53) missing
+      ParameterList [53..61)
+        OpenParenToken [53..54) '('
+        Parameter [54..59)
+          IdentifierName [54..58)
+            IdentifierToken [54..57) 'goo'
+            T:WhitespaceTrivia [57..58) ' '
+          IdentifierToken [58..59) 'f'
+        CloseParenToken [59..60) ')'
+        T:WhitespaceTrivia [60..61) ' '
+      Block [61..87)
+        OpenBraceToken [61..62) '{'
+        T:WhitespaceTrivia [62..63) ' '
+        ReturnStatement [63..73)
+          ReturnKeyword [63..69) 'return'
+          T:WhitespaceTrivia [69..70) ' '
+          NumericLiteralExpression [70..71)
+            NumericLiteralToken [70..71) '6'
+          SemicolonToken [71..72) ';'
+          T:WhitespaceTrivia [72..73) ' '
+        CloseBraceToken [73..74) '}'
+        T:WhitespaceTrivia [74..78) '    '
+        T:SingleLineCommentTrivia [78..86) '// Error'
+        T:EndOfLineTrivia [86..87) '\n'
+    CloseBraceToken [87..88) '}'
+    T:EndOfLineTrivia [88..89) '\n'
+  ClassDeclaration [89..192)
+    PublicKeyword [89..95) 'public'
+    T:WhitespaceTrivia [95..96) ' '
+    ClassKeyword [96..101) 'class'
+    T:WhitespaceTrivia [101..102) ' '
+    IdentifierToken [102..111) 'MainClass'
+    T:EndOfLineTrivia [111..112) '\n'
+    L:WhitespaceTrivia [112..116) '    '
+    OpenBraceToken [116..117) '{'
+    T:EndOfLineTrivia [117..118) '\n'
+    MethodDeclaration [118..186)
+      L:WhitespaceTrivia [118..122) '    '
+      PublicKeyword [122..128) 'public'
+      T:WhitespaceTrivia [128..129) ' '
+      StaticKeyword [129..135) 'static'
+      T:WhitespaceTrivia [135..136) ' '
+      PredefinedType [136..140)
+        IntKeyword [136..139) 'int'
+        T:WhitespaceTrivia [139..140) ' '
+      IdentifierToken [140..144) 'Main'
+      T:WhitespaceTrivia [144..145) ' '
+      ParameterList [145..148)
+        OpenParenToken [145..146) '('
+        CloseParenToken [146..147) ')'
+        T:EndOfLineTrivia [147..148) '\n'
+      Block [148..186)
+        L:WhitespaceTrivia [148..156) '        '
+        OpenBraceToken [156..157) '{'
+        T:EndOfLineTrivia [157..158) '\n'
+        ReturnStatement [158..176)
+          L:WhitespaceTrivia [158..166) '        '
+          ReturnKeyword [166..172) 'return'
+          T:WhitespaceTrivia [172..173) ' '
+          NumericLiteralExpression [173..174)
+            NumericLiteralToken [173..174) '1'
+          SemicolonToken [174..175) ';'
+          T:EndOfLineTrivia [175..176) '\n'
+        L:WhitespaceTrivia [176..184) '        '
+        CloseBraceToken [184..185) '}'
+        T:EndOfLineTrivia [185..186) '\n'
+    L:WhitespaceTrivia [186..190) '    '
+    CloseBraceToken [190..191) '}'
+    T:EndOfLineTrivia [191..192) '\n'
+  EndOfFileToken [192..192) ''
+Diagnostics:
+  CS1553 [31..34) Declaration is not valid; use \'implicit operator <dest-type> (...\' instead
+  CS1001 [53..54) Identifier expected

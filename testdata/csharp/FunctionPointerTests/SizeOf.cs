@@ -1,0 +1,1 @@
+sizeof(delegate*<void>)

@@ -1,0 +1,59 @@
+MethodDeclaration [0..87)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..66)
+    IdentifierToken [7..18) 'IEnumerable'
+    TypeArgumentList [18..66)
+      LessThanToken [18..19) '<'
+      TupleType [19..53)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+      CommaToken [53..54) ','
+      T:WhitespaceTrivia [54..55) ' '
+      TupleType [55..66)
+        OpenParenToken [55..56) '('
+        TupleElement [56..59)
+          ArrayType [56..59)
+            IdentifierName [56..57)
+              IdentifierToken [56..57) 'X'
+            ArrayRankSpecifier [57..59)
+              OpenBracketToken [57..58) '['
+              OmittedArraySizeExpression [58..58)
+                OmittedArraySizeExpressionToken [58..58) ''
+              CloseBracketToken [58..59) ']'
+        CommaToken [59..60) ','
+        T:WhitespaceTrivia [60..61) ' '
+        TupleElement [61..64)
+          QualifiedName [61..64)
+            IdentifierName [61..62)
+              IdentifierToken [61..62) 'Y'
+            DotToken [62..63) '.'
+            IdentifierName [63..64)
+              IdentifierToken [63..64) 'Z'
+        CloseParenToken [64..65) ')'
+        T:WhitespaceTrivia [65..66) ' '
+      GreaterThanToken [66..66) missing
+  IdentifierToken [66..78) 'GetAllValues'
+  ParameterList [78..86)
+    OpenParenToken [78..79) '('
+    Parameter [79..85)
+      IdentifierName [79..84)
+        IdentifierToken [79..83) 'Type'
+        T:WhitespaceTrivia [83..84) ' '
+      IdentifierToken [84..85) 't'
+    CloseParenToken [85..86) ')'
+  SemicolonToken [86..87) ';'
+Diagnostics:
+  CS1003 [66..78) Syntax error, \'>\' expected

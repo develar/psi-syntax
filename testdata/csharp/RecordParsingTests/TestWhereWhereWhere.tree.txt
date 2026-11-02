@@ -1,0 +1,47 @@
+CompilationUnit [0..57)
+  ClassDeclaration [0..57)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..16) 'Goo'
+    TypeParameterList [16..20)
+      LessThanToken [16..17) '<'
+      TypeParameter [17..18)
+        IdentifierToken [17..18) 'T'
+      GreaterThanToken [18..19) '>'
+      T:WhitespaceTrivia [19..20) ' '
+    BaseList [20..54)
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+      SimpleBaseType [22..36)
+        QualifiedName [22..36)
+          IdentifierName [22..28)
+            IdentifierToken [22..28) 'System'
+          DotToken [28..29) '.'
+          IdentifierName [29..36)
+            IdentifierToken [29..35) 'Object'
+            T:WhitespaceTrivia [35..36) ' '
+      CommaToken [36..36) missing
+      SimpleBaseType [36..42)
+        IdentifierName [36..42)
+          IdentifierToken [36..41) 'where'
+          T:WhitespaceTrivia [41..42) ' '
+      CommaToken [42..42) missing
+      SimpleBaseType [42..48)
+        IdentifierName [42..48)
+          IdentifierToken [42..47) 'where'
+          T:WhitespaceTrivia [47..48) ' '
+      CommaToken [48..48) missing
+      SimpleBaseType [48..54)
+        IdentifierName [48..54)
+          IdentifierToken [48..53) 'where'
+          T:WhitespaceTrivia [53..54) ' '
+    OpenBraceToken [54..55) '{'
+    T:WhitespaceTrivia [55..56) ' '
+    CloseBraceToken [56..57) '}'
+  EndOfFileToken [57..57) ''
+Diagnostics:
+  CS1003 [36..41) Syntax error, \',\' expected
+  CS1003 [42..47) Syntax error, \',\' expected
+  CS1003 [48..53) Syntax error, \',\' expected

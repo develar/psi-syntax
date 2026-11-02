@@ -1,0 +1,162 @@
+CompilationUnit [0..256)
+  ClassDeclaration [0..256)
+    L:EndOfLineTrivia [0..1) '\n'
+    PartialKeyword [1..8) 'partial'
+    T:WhitespaceTrivia [8..9) ' '
+    ClassKeyword [9..14) 'class'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..29) 'PartialPartial'
+    T:EndOfLineTrivia [29..30) '\n'
+    OpenBraceToken [30..31) '{'
+    T:EndOfLineTrivia [31..32) '\n'
+    FieldDeclaration [32..47)
+      VariableDeclaration [32..45)
+        PredefinedType [32..40)
+          L:WhitespaceTrivia [32..36) '    '
+          IntKeyword [36..39) 'int'
+          T:WhitespaceTrivia [39..40) ' '
+        VariableDeclarator [40..45)
+          IdentifierToken [40..41) 'i'
+          T:WhitespaceTrivia [41..42) ' '
+          EqualsValueClause [42..45)
+            EqualsToken [42..43) '='
+            T:WhitespaceTrivia [43..44) ' '
+            NumericLiteralExpression [44..45)
+              NumericLiteralToken [44..45) '1'
+      SemicolonToken [45..46) ';'
+      T:EndOfLineTrivia [46..47) '\n'
+    FieldDeclaration [47..59)
+      VariableDeclaration [47..59)
+        IdentifierName [47..59)
+          L:WhitespaceTrivia [47..51) '    '
+          IdentifierToken [51..58) 'partial'
+          T:WhitespaceTrivia [58..59) ' '
+        VariableDeclarator [59..59)
+          IdentifierToken [59..59) missing
+      SemicolonToken [59..59) missing
+    MethodDeclaration [59..78)
+      PartialKeyword [59..66) 'partial'
+      T:WhitespaceTrivia [66..67) ' '
+      PredefinedType [67..72)
+        VoidKeyword [67..71) 'void'
+        T:WhitespaceTrivia [71..72) ' '
+      IdentifierToken [72..74) 'PM'
+      ParameterList [74..76)
+        OpenParenToken [74..75) '('
+        CloseParenToken [75..76) ')'
+      SemicolonToken [76..77) ';'
+      T:EndOfLineTrivia [77..78) '\n'
+    FieldDeclaration [78..90)
+      VariableDeclaration [78..90)
+        IdentifierName [78..90)
+          L:WhitespaceTrivia [78..82) '    '
+          IdentifierToken [82..89) 'partial'
+          T:WhitespaceTrivia [89..90) ' '
+        VariableDeclarator [90..90)
+          IdentifierToken [90..90) missing
+      SemicolonToken [90..90) missing
+    MethodDeclaration [90..135)
+      PartialKeyword [90..97) 'partial'
+      T:WhitespaceTrivia [97..98) ' '
+      PredefinedType [98..103)
+        VoidKeyword [98..102) 'void'
+        T:WhitespaceTrivia [102..103) ' '
+      IdentifierToken [103..105) 'PM'
+      ParameterList [105..108)
+        OpenParenToken [105..106) '('
+        CloseParenToken [106..107) ')'
+        T:EndOfLineTrivia [107..108) '\n'
+      Block [108..135)
+        L:WhitespaceTrivia [108..112) '    '
+        OpenBraceToken [112..113) '{'
+        T:EndOfLineTrivia [113..114) '\n'
+        ExpressionStatement [114..129)
+          SimpleAssignmentExpression [114..127)
+            IdentifierName [114..124)
+              L:WhitespaceTrivia [114..122) '        '
+              IdentifierToken [122..123) 'i'
+              T:WhitespaceTrivia [123..124) ' '
+            EqualsToken [124..125) '='
+            T:WhitespaceTrivia [125..126) ' '
+            NumericLiteralExpression [126..127)
+              NumericLiteralToken [126..127) '0'
+          SemicolonToken [127..128) ';'
+          T:EndOfLineTrivia [128..129) '\n'
+        L:WhitespaceTrivia [129..133) '    '
+        CloseBraceToken [133..134) '}'
+        T:EndOfLineTrivia [134..135) '\n'
+    MethodDeclaration [135..254)
+      L:WhitespaceTrivia [135..139) '    '
+      StaticKeyword [139..145) 'static'
+      T:WhitespaceTrivia [145..146) ' '
+      PredefinedType [146..150)
+        IntKeyword [146..149) 'int'
+        T:WhitespaceTrivia [149..150) ' '
+      IdentifierToken [150..154) 'Main'
+      ParameterList [154..157)
+        OpenParenToken [154..155) '('
+        CloseParenToken [155..156) ')'
+        T:EndOfLineTrivia [156..157) '\n'
+      Block [157..254)
+        L:WhitespaceTrivia [157..161) '    '
+        OpenBraceToken [161..162) '{'
+        T:EndOfLineTrivia [162..163) '\n'
+        LocalDeclarationStatement [163..212)
+          VariableDeclaration [163..210)
+            IdentifierName [163..186)
+              L:WhitespaceTrivia [163..171) '        '
+              IdentifierToken [171..185) 'PartialPartial'
+              T:WhitespaceTrivia [185..186) ' '
+            VariableDeclarator [186..210)
+              IdentifierToken [186..187) 't'
+              T:WhitespaceTrivia [187..188) ' '
+              EqualsValueClause [188..210)
+                EqualsToken [188..189) '='
+                T:WhitespaceTrivia [189..190) ' '
+                ObjectCreationExpression [190..210)
+                  NewKeyword [190..193) 'new'
+                  T:WhitespaceTrivia [193..194) ' '
+                  IdentifierName [194..208)
+                    IdentifierToken [194..208) 'PartialPartial'
+                  ArgumentList [208..210)
+                    OpenParenToken [208..209) '('
+                    CloseParenToken [209..210) ')'
+          SemicolonToken [210..211) ';'
+          T:EndOfLineTrivia [211..212) '\n'
+        ExpressionStatement [212..228)
+          InvocationExpression [212..226)
+            SimpleMemberAccessExpression [212..224)
+              IdentifierName [212..221)
+                L:WhitespaceTrivia [212..220) '        '
+                IdentifierToken [220..221) 't'
+              DotToken [221..222) '.'
+              IdentifierName [222..224)
+                IdentifierToken [222..224) 'PM'
+            ArgumentList [224..226)
+              OpenParenToken [224..225) '('
+              CloseParenToken [225..226) ')'
+          SemicolonToken [226..227) ';'
+          T:EndOfLineTrivia [227..228) '\n'
+        ReturnStatement [228..248)
+          L:WhitespaceTrivia [228..236) '        '
+          ReturnKeyword [236..242) 'return'
+          T:WhitespaceTrivia [242..243) ' '
+          SimpleMemberAccessExpression [243..246)
+            IdentifierName [243..244)
+              IdentifierToken [243..244) 't'
+            DotToken [244..245) '.'
+            IdentifierName [245..246)
+              IdentifierToken [245..246) 'i'
+          SemicolonToken [246..247) ';'
+          T:EndOfLineTrivia [247..248) '\n'
+        L:WhitespaceTrivia [248..252) '    '
+        CloseBraceToken [252..253) '}'
+        T:EndOfLineTrivia [253..254) '\n'
+    CloseBraceToken [254..255) '}'
+    T:EndOfLineTrivia [255..256) '\n'
+  EndOfFileToken [256..256) ''
+Diagnostics:
+  CS1525 [59..66) Invalid expression term \'partial\'
+  CS1002 [59..66) ; expected
+  CS1525 [90..97) Invalid expression term \'partial\'
+  CS1002 [90..97) ; expected

@@ -1,0 +1,2 @@
+bool file;
+file = true;

@@ -1,0 +1,21 @@
+CompilationUnit [0..12)
+  IncompleteMember [0..11)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..11)
+      IdentifierToken [4..10) 'closed'
+      T:EndOfLineTrivia [10..11) '\n'
+  GlobalStatement [11..12)
+    ExpressionStatement [11..12)
+      ParenthesizedExpression [11..12)
+        OpenParenToken [11..12) '('
+        IdentifierName [12..12)
+          IdentifierToken [12..12) missing
+        CloseParenToken [12..12) missing
+      SemicolonToken [12..12) missing
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS0116 [4..10) A namespace cannot directly contain members such as fields, methods or statements
+  CS1733 [12..12) Expected expression
+  CS1026 [12..12) ) expected
+  CS1002 [12..12) ; expected

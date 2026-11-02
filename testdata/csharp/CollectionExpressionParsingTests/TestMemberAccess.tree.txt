@@ -1,0 +1,11 @@
+CollectionExpression [0..7)
+  OpenBracketToken [0..1) '['
+  SpreadElement [1..6)
+    DotDotToken [1..3) '..'
+    SimpleMemberAccessExpression [3..6)
+      IdentifierName [3..4)
+        IdentifierToken [3..4) 'x'
+      DotToken [4..5) '.'
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'y'
+  CloseBracketToken [6..7) ']'

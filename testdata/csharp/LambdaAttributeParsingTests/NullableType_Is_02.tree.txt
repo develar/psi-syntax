@@ -1,0 +1,24 @@
+ConditionalExpression [0..19)
+  IsExpression [0..12)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    PredefinedType [5..12)
+      StringKeyword [5..11) 'string'
+      T:WhitespaceTrivia [11..12) ' '
+  QuestionToken [12..13) '?'
+  T:WhitespaceTrivia [13..14) ' '
+  CollectionExpression [14..18)
+    OpenBracketToken [14..15) '['
+    ExpressionElement [15..16)
+      IdentifierName [15..16)
+        IdentifierToken [15..16) 'A'
+    CloseBracketToken [16..17) ']'
+    T:WhitespaceTrivia [17..18) ' '
+  ColonToken [18..18) missing
+  IdentifierName [18..19)
+    IdentifierToken [18..19) 'y'
+Diagnostics:
+  CS1003 [18..19) Syntax error, \':\' expected

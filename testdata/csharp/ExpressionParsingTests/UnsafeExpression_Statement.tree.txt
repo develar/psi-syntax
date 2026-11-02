@@ -1,0 +1,11 @@
+CompilationUnit [0..10)
+  GlobalStatement [0..10)
+    ExpressionStatement [0..10)
+      UnsafeExpression [0..9)
+        UnsafeKeyword [0..6) 'unsafe'
+        OpenParenToken [6..7) '('
+        IdentifierName [7..8)
+          IdentifierToken [7..8) 'x'
+        CloseParenToken [8..9) ')'
+      SemicolonToken [9..10) ';'
+  EndOfFileToken [10..10) ''

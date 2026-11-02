@@ -1,0 +1,1 @@
+(ColonColon::ImmutableArray<int>)[1, 2, 3]

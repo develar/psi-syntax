@@ -1,0 +1,4 @@
+
+parial class Test
+{
+}

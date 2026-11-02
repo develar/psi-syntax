@@ -1,0 +1,238 @@
+CompilationUnit [0..448)
+  ClassDeclaration [0..448)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..446)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..21) 'M'
+      ParameterList [21..24)
+        OpenParenToken [21..22) '('
+        CloseParenToken [22..23) ')'
+        T:EndOfLineTrivia [23..24) '\n'
+      Block [24..446)
+        L:WhitespaceTrivia [24..28) '    '
+        OpenBraceToken [28..29) '{'
+        T:EndOfLineTrivia [29..30) '\n'
+        ExpressionStatement [30..151)
+          SimpleAssignmentExpression [30..149)
+            TupleExpression [30..146)
+              L:WhitespaceTrivia [30..38) '        '
+              L:SingleLineCommentTrivia [38..119) '// syntax error: pointer types only permitted as an array element type in a tuple'
+              L:EndOfLineTrivia [119..120) '\n'
+              L:WhitespaceTrivia [120..128) '        '
+              OpenParenToken [128..129) '('
+              Argument [129..136)
+                MultiplyExpression [129..136)
+                  PredefinedType [129..132)
+                    IntKeyword [129..132) 'int'
+                  AsteriskToken [132..133) '*'
+                  T:WhitespaceTrivia [133..134) ' '
+                  IdentifierName [134..136)
+                    IdentifierToken [134..136) 'x1'
+              CommaToken [136..137) ','
+              T:WhitespaceTrivia [137..138) ' '
+              Argument [138..144)
+                DeclarationExpression [138..144)
+                  PredefinedType [138..142)
+                    IntKeyword [138..141) 'int'
+                    T:WhitespaceTrivia [141..142) ' '
+                  SingleVariableDesignation [142..144)
+                    IdentifierToken [142..144) 'y1'
+              CloseParenToken [144..145) ')'
+              T:WhitespaceTrivia [145..146) ' '
+            EqualsToken [146..147) '='
+            T:WhitespaceTrivia [147..148) ' '
+            IdentifierName [148..149)
+              IdentifierToken [148..149) 'e'
+          SemicolonToken [149..150) ';'
+          T:EndOfLineTrivia [150..151) '\n'
+        ExpressionStatement [151..255)
+          SimpleAssignmentExpression [151..253)
+            TupleExpression [151..250)
+              L:EndOfLineTrivia [151..152) '\n'
+              L:WhitespaceTrivia [152..160) '        '
+              L:SingleLineCommentTrivia [160..221) '// These are OK, because an array is a valid type in a tuple.'
+              L:EndOfLineTrivia [221..222) '\n'
+              L:WhitespaceTrivia [222..230) '        '
+              OpenParenToken [230..231) '('
+              Argument [231..240)
+                DeclarationExpression [231..240)
+                  ArrayType [231..238)
+                    PointerType [231..235)
+                      PredefinedType [231..234)
+                        IntKeyword [231..234) 'int'
+                      AsteriskToken [234..235) '*'
+                    ArrayRankSpecifier [235..238)
+                      OpenBracketToken [235..236) '['
+                      OmittedArraySizeExpression [236..236)
+                        OmittedArraySizeExpressionToken [236..236) ''
+                      CloseBracketToken [236..237) ']'
+                      T:WhitespaceTrivia [237..238) ' '
+                  SingleVariableDesignation [238..240)
+                    IdentifierToken [238..240) 'x2'
+              CommaToken [240..241) ','
+              T:WhitespaceTrivia [241..242) ' '
+              Argument [242..248)
+                DeclarationExpression [242..248)
+                  PredefinedType [242..246)
+                    IntKeyword [242..245) 'int'
+                    T:WhitespaceTrivia [245..246) ' '
+                  SingleVariableDesignation [246..248)
+                    IdentifierToken [246..248) 'y2'
+              CloseParenToken [248..249) ')'
+              T:WhitespaceTrivia [249..250) ' '
+            EqualsToken [250..251) '='
+            T:WhitespaceTrivia [251..252) ' '
+            IdentifierName [252..253)
+              IdentifierToken [252..253) 'e'
+          SemicolonToken [253..254) ';'
+          T:EndOfLineTrivia [254..255) '\n'
+        ExpressionStatement [255..288)
+          SimpleAssignmentExpression [255..286)
+            TupleExpression [255..283)
+              L:WhitespaceTrivia [255..263) '        '
+              OpenParenToken [263..264) '('
+              Argument [264..273)
+                DeclarationExpression [264..273)
+                  ArrayType [264..271)
+                    PointerType [264..268)
+                      IdentifierName [264..267)
+                        IdentifierToken [264..267) 'var'
+                      AsteriskToken [267..268) '*'
+                    ArrayRankSpecifier [268..271)
+                      OpenBracketToken [268..269) '['
+                      OmittedArraySizeExpression [269..269)
+                        OmittedArraySizeExpressionToken [269..269) ''
+                      CloseBracketToken [269..270) ']'
+                      T:WhitespaceTrivia [270..271) ' '
+                  SingleVariableDesignation [271..273)
+                    IdentifierToken [271..273) 'x3'
+              CommaToken [273..274) ','
+              T:WhitespaceTrivia [274..275) ' '
+              Argument [275..281)
+                DeclarationExpression [275..281)
+                  PredefinedType [275..279)
+                    IntKeyword [275..278) 'int'
+                    T:WhitespaceTrivia [278..279) ' '
+                  SingleVariableDesignation [279..281)
+                    IdentifierToken [279..281) 'y3'
+              CloseParenToken [281..282) ')'
+              T:WhitespaceTrivia [282..283) ' '
+            EqualsToken [283..284) '='
+            T:WhitespaceTrivia [284..285) ' '
+            IdentifierName [285..286)
+              IdentifierToken [285..286) 'e'
+          SemicolonToken [286..287) ';'
+          T:EndOfLineTrivia [287..288) '\n'
+        ExpressionStatement [288..376)
+          SimpleAssignmentExpression [288..374)
+            TupleExpression [288..371)
+              L:EndOfLineTrivia [288..289) '\n'
+              L:WhitespaceTrivia [289..297) '        '
+              L:SingleLineCommentTrivia [297..344) '// Multiplication in a tuple element is also OK'
+              L:EndOfLineTrivia [344..345) '\n'
+              L:WhitespaceTrivia [345..353) '        '
+              OpenParenToken [353..354) '('
+              Argument [354..361)
+                MultiplyExpression [354..361)
+                  IdentifierName [354..357)
+                    IdentifierToken [354..357) 'var'
+                  AsteriskToken [357..358) '*'
+                  T:WhitespaceTrivia [358..359) ' '
+                  IdentifierName [359..361)
+                    IdentifierToken [359..361) 'x4'
+              CommaToken [361..362) ','
+              T:WhitespaceTrivia [362..363) ' '
+              Argument [363..369)
+                DeclarationExpression [363..369)
+                  PredefinedType [363..367)
+                    IntKeyword [363..366) 'int'
+                    T:WhitespaceTrivia [366..367) ' '
+                  SingleVariableDesignation [367..369)
+                    IdentifierToken [367..369) 'y4'
+              CloseParenToken [369..370) ')'
+              T:WhitespaceTrivia [370..371) ' '
+            EqualsToken [371..372) '='
+            T:WhitespaceTrivia [372..373) ' '
+            IdentifierName [373..374)
+              IdentifierToken [373..374) 'e'
+          SemicolonToken [374..375) ';'
+          T:EndOfLineTrivia [375..376) '\n'
+        ExpressionStatement [376..408)
+          SimpleAssignmentExpression [376..406)
+            TupleExpression [376..403)
+              L:WhitespaceTrivia [376..384) '        '
+              OpenParenToken [384..385) '('
+              Argument [385..392)
+                MultiplyExpression [385..392)
+                  IdentifierName [385..388)
+                    IdentifierToken [385..388) 'var'
+                  AsteriskToken [388..389) '*'
+                  T:WhitespaceTrivia [389..390) ' '
+                  IdentifierName [390..392)
+                    IdentifierToken [390..392) 'x5'
+              CommaToken [392..393) ','
+              T:WhitespaceTrivia [393..394) ' '
+              Argument [394..401)
+                MultiplyExpression [394..401)
+                  IdentifierName [394..397)
+                    IdentifierToken [394..397) 'var'
+                  AsteriskToken [397..398) '*'
+                  T:WhitespaceTrivia [398..399) ' '
+                  IdentifierName [399..401)
+                    IdentifierToken [399..401) 'y5'
+              CloseParenToken [401..402) ')'
+              T:WhitespaceTrivia [402..403) ' '
+            EqualsToken [403..404) '='
+            T:WhitespaceTrivia [404..405) ' '
+            IdentifierName [405..406)
+              IdentifierToken [405..406) 'e'
+          SemicolonToken [406..407) ';'
+          T:EndOfLineTrivia [407..408) '\n'
+        ExpressionStatement [408..440)
+          SimpleAssignmentExpression [408..438)
+            IdentifierName [408..418)
+              L:WhitespaceTrivia [408..416) '        '
+              IdentifierToken [416..417) 'e'
+              T:WhitespaceTrivia [417..418) ' '
+            EqualsToken [418..419) '='
+            T:WhitespaceTrivia [419..420) ' '
+            TupleExpression [420..438)
+              OpenParenToken [420..421) '('
+              Argument [421..428)
+                MultiplyExpression [421..428)
+                  IdentifierName [421..424)
+                    IdentifierToken [421..424) 'var'
+                  AsteriskToken [424..425) '*'
+                  T:WhitespaceTrivia [425..426) ' '
+                  IdentifierName [426..428)
+                    IdentifierToken [426..428) 'x6'
+              CommaToken [428..429) ','
+              T:WhitespaceTrivia [429..430) ' '
+              Argument [430..437)
+                MultiplyExpression [430..437)
+                  IdentifierName [430..433)
+                    IdentifierToken [430..433) 'var'
+                  AsteriskToken [433..434) '*'
+                  T:WhitespaceTrivia [434..435) ' '
+                  IdentifierName [435..437)
+                    IdentifierToken [435..437) 'y6'
+              CloseParenToken [437..438) ')'
+          SemicolonToken [438..439) ';'
+          T:EndOfLineTrivia [439..440) '\n'
+        L:WhitespaceTrivia [440..444) '    '
+        CloseBraceToken [444..445) '}'
+        T:EndOfLineTrivia [445..446) '\n'
+    CloseBraceToken [446..447) '}'
+    T:EndOfLineTrivia [447..448) '\n'
+  EndOfFileToken [448..448) ''
+Diagnostics:
+  CS1525 [129..132) Invalid expression term \'int\'

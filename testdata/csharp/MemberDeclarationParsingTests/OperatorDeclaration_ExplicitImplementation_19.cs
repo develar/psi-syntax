@@ -1,0 +1,1 @@
+public int I<T>.operator +(int x) => x;

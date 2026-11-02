@@ -1,0 +1,23 @@
+CompilationUnit [0..19)
+  AttributeList [0..19)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..11)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+    Attribute [11..11)
+      IdentifierName [11..11)
+        IdentifierToken [11..11) missing
+    CloseBracketToken [11..11) missing
+    T:SkippedTokensTrivia [11..16)
+      UsingKeyword [11..16) 'using'
+    T:WhitespaceTrivia [16..17) ' '
+    T:SkippedTokensTrivia [17..18)
+      IdentifierToken [17..18) 'n'
+    T:SkippedTokensTrivia [18..19)
+      SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1001 [11..16) Identifier expected
+  CS1003 [11..16) Syntax error, \']\' expected
+  CS1529 [11..19) A using clause must precede all other elements defined in the namespace except extern alias declarations

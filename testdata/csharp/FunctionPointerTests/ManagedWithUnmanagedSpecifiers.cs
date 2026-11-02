@@ -1,0 +1,1 @@
+delegate* managed[Cdecl]<void> ptr;

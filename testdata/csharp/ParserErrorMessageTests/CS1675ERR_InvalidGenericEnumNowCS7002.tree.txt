@@ -1,0 +1,60 @@
+CompilationUnit [0..99)
+  EnumDeclaration [0..25)
+    L:EndOfLineTrivia [0..1) '\n'
+    EnumKeyword [1..5) 'enum'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'E'
+    T:SkippedTokensTrivia [7..8)
+      LessThanToken [7..8) '<'
+    T:SkippedTokensTrivia [8..9)
+      IdentifierToken [8..9) 'T'
+    T:SkippedTokensTrivia [9..10)
+      GreaterThanToken [9..10) '>'
+    T:WhitespaceTrivia [10..11) ' '
+    T:SingleLineCommentTrivia [11..20) '// CS1675'
+    T:EndOfLineTrivia [20..21) '\n'
+    OpenBraceToken [21..22) '{'
+    T:EndOfLineTrivia [22..23) '\n'
+    CloseBraceToken [23..24) '}'
+    T:EndOfLineTrivia [24..25) '\n'
+  ClassDeclaration [25..99)
+    ClassKeyword [25..30) 'class'
+    T:WhitespaceTrivia [30..31) ' '
+    IdentifierToken [31..35) 'Test'
+    T:EndOfLineTrivia [35..36) '\n'
+    OpenBraceToken [36..37) '{'
+    T:EndOfLineTrivia [37..38) '\n'
+    MethodDeclaration [38..97)
+      L:WhitespaceTrivia [38..42) '    '
+      PublicKeyword [42..48) 'public'
+      T:WhitespaceTrivia [48..49) ' '
+      StaticKeyword [49..55) 'static'
+      T:WhitespaceTrivia [55..56) ' '
+      PredefinedType [56..60)
+        IntKeyword [56..59) 'int'
+        T:WhitespaceTrivia [59..60) ' '
+      IdentifierToken [60..64) 'Main'
+      ParameterList [64..67)
+        OpenParenToken [64..65) '('
+        CloseParenToken [65..66) ')'
+        T:EndOfLineTrivia [66..67) '\n'
+      Block [67..97)
+        L:WhitespaceTrivia [67..71) '    '
+        OpenBraceToken [71..72) '{'
+        T:EndOfLineTrivia [72..73) '\n'
+        ReturnStatement [73..91)
+          L:WhitespaceTrivia [73..81) '        '
+          ReturnKeyword [81..87) 'return'
+          T:WhitespaceTrivia [87..88) ' '
+          NumericLiteralExpression [88..89)
+            NumericLiteralToken [88..89) '1'
+          SemicolonToken [89..90) ';'
+          T:EndOfLineTrivia [90..91) '\n'
+        L:WhitespaceTrivia [91..95) '    '
+        CloseBraceToken [95..96) '}'
+        T:EndOfLineTrivia [96..97) '\n'
+    CloseBraceToken [97..98) '}'
+    T:EndOfLineTrivia [98..99) '\n'
+  EndOfFileToken [99..99) ''
+Diagnostics:
+  CS7002 [6..7) Unexpected use of a generic name

@@ -1,0 +1,2 @@
+int?[] ///  a   = new int? .  @string ] { 1,  typeof  $  3, 4, 5 } static ; @partial /*[] bug*/ // YES []            int[] var = { 1,  else , 3 </  4 |  5 };/*,;*/            int i = (int)a @in [ __refvalue ] [ /*[]*/             @readonly  = i + i - abstract   @typevar  * i /  @this  % i & ,  i | i ^ unchecked  i; in /*+ - * / % & | ^*/            bool b = true & false +  | true ^ false readonly ;/*& | ^*/             @unsafe  = !b;/*!*/            i = ~i;/*~i*/            b = i < (i - 
+  1 @for ) && (i + 1) > i;/*< && >*/

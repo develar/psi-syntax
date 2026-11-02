@@ -1,0 +1,30 @@
+CompilationUnit [0..38)
+  FileScopedNamespaceDeclaration [0..38)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'N'
+    SemicolonToken [11..12) ';'
+    T:EndOfLineTrivia [12..13) '\n'
+    DelegateDeclaration [13..38)
+      L:EndOfLineTrivia [13..14) '\n'
+      DelegateKeyword [14..22) 'delegate'
+      T:WhitespaceTrivia [22..23) ' '
+      TupleType [23..34)
+        OpenParenToken [23..24) '('
+        TupleElement [24..27)
+          PredefinedType [24..27)
+            IntKeyword [24..27) 'int'
+        CommaToken [27..28) ','
+        T:WhitespaceTrivia [28..29) ' '
+        TupleElement [29..32)
+          PredefinedType [29..32)
+            IntKeyword [29..32) 'int'
+        CloseParenToken [32..33) ')'
+        T:WhitespaceTrivia [33..34) ' '
+      IdentifierToken [34..35) 'I'
+      ParameterList [35..37)
+        OpenParenToken [35..36) '('
+        CloseParenToken [36..37) ')'
+      SemicolonToken [37..38) ';'
+  EndOfFileToken [38..38) ''

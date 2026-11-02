@@ -1,0 +1,8 @@
+ContinueStatement [0..16)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..16)
+    IdentifierToken [9..16) 'myLabel'
+  SemicolonToken [16..16) missing
+Diagnostics:
+  CS1002 [16..16) ; expected

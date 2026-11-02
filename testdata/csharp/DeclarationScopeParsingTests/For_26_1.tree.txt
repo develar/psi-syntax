@@ -1,0 +1,25 @@
+ForStatement [0..30)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForKeyword [1..4) 'for'
+  T:WhitespaceTrivia [4..5) ' '
+  OpenParenToken [5..6) '('
+  VariableDeclaration [6..25)
+    ScopedType [6..20)
+      ScopedKeyword [6..12) 'scoped'
+      T:WhitespaceTrivia [12..13) ' '
+      IdentifierName [13..20)
+        IdentifierToken [13..19) 'scoped'
+        T:WhitespaceTrivia [19..20) ' '
+    VariableDeclarator [20..25)
+      IdentifierToken [20..23) 'var'
+      T:WhitespaceTrivia [23..24) ' '
+      T:SkippedTokensTrivia [24..25)
+        IdentifierToken [24..25) 'b'
+  SemicolonToken [25..26) ';'
+  SemicolonToken [26..27) ';'
+  CloseParenToken [27..28) ')'
+  EmptyStatement [28..30)
+    SemicolonToken [28..29) ';'
+    T:EndOfLineTrivia [29..30) '\n'
+Diagnostics:
+  CS1003 [24..25) Syntax error, \',\' expected

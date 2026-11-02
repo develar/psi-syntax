@@ -1,0 +1,31 @@
+CollectionExpression [0..15)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..13)
+    ParenthesizedExpression [1..13)
+      OpenParenToken [1..2) '('
+      ConditionalAccessExpression [2..9)
+        IdentifierName [2..4)
+          IdentifierToken [2..3) 'a'
+          T:WhitespaceTrivia [3..4) ' '
+        QuestionToken [4..5) '?'
+        T:WhitespaceTrivia [5..6) ' '
+        ElementBindingExpression [6..9)
+          BracketedArgumentList [6..9)
+            OpenBracketToken [6..7) '['
+            Argument [7..8)
+              IdentifierName [7..8)
+                IdentifierToken [7..8) 'b'
+            CloseBracketToken [8..9) ']'
+      CloseParenToken [9..10) ')'
+      T:WhitespaceTrivia [10..11) ' '
+      T:SkippedTokensTrivia [11..12)
+        ColonToken [11..12) ':'
+      T:WhitespaceTrivia [12..13) ' '
+  CommaToken [13..13) missing
+  ExpressionElement [13..14)
+    IdentifierName [13..14)
+      IdentifierToken [13..14) 'c'
+  CloseBracketToken [14..15) ']'
+Diagnostics:
+  CS1003 [11..12) Syntax error, \',\' expected
+  CS1003 [13..14) Syntax error, \',\' expected

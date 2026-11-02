@@ -1,0 +1,4 @@
+IdentifierToken [0..5) '\\u123'
+EndOfFileToken [5..5) ''
+Diagnostics:
+  CS1009 [0..5) Unrecognized escape sequence

@@ -1,0 +1,53 @@
+CompilationUnit [0..85)
+  ClassDeclaration [0..85)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..83)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      PredefinedType [21..26)
+        VoidKeyword [21..25) 'void'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..27) 'M'
+      ParameterList [27..30)
+        OpenParenToken [27..28) '('
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      Block [30..83)
+        L:WhitespaceTrivia [30..34) '    '
+        OpenBraceToken [34..35) '{'
+        T:EndOfLineTrivia [35..36) '\n'
+        LocalDeclarationStatement [36..77)
+          VariableDeclaration [36..75)
+            QualifiedName [36..64)
+              IdentifierName [36..48)
+                L:WhitespaceTrivia [36..44) '        '
+                IdentifierToken [44..48) 'Task'
+              DotToken [48..49) '.'
+              T:EndOfLineTrivia [49..50) '\n'
+              IdentifierName [50..64)
+                L:WhitespaceTrivia [50..58) '        '
+                IdentifierToken [58..63) 'await'
+                T:WhitespaceTrivia [63..64) ' '
+            VariableDeclarator [64..68)
+              IdentifierToken [64..68) 'Task'
+            CommaToken [68..69) ','
+            T:WhitespaceTrivia [69..70) ' '
+            VariableDeclarator [70..75)
+              IdentifierToken [70..75) 'Task2'
+          SemicolonToken [75..76) ';'
+          T:EndOfLineTrivia [76..77) '\n'
+        L:WhitespaceTrivia [77..81) '    '
+        CloseBraceToken [81..82) '}'
+        T:EndOfLineTrivia [82..83) '\n'
+    CloseBraceToken [83..84) '}'
+    T:EndOfLineTrivia [84..85) '\n'
+  EndOfFileToken [85..85) ''
+Diagnostics:
+  CS4003 [58..63) \'await\' cannot be used as an identifier within an async method or lambda expression

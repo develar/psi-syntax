@@ -1,0 +1,27 @@
+CompilationUnit [0..26)
+  ClassDeclaration [0..26)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    FieldDeclaration [10..25)
+      FixedKeyword [10..15) 'fixed'
+      T:WhitespaceTrivia [15..16) ' '
+      VariableDeclaration [16..23)
+        IdentifierName [16..18)
+          IdentifierToken [16..17) 'b'
+          T:WhitespaceTrivia [17..18) ' '
+        VariableDeclarator [18..23)
+          IdentifierToken [18..19) 'c'
+          BracketedArgumentList [19..23)
+            OpenBracketToken [19..20) '['
+            Argument [20..22)
+              NumericLiteralExpression [20..22)
+                NumericLiteralToken [20..22) '10'
+            CloseBracketToken [22..23) ']'
+      SemicolonToken [23..24) ';'
+      T:WhitespaceTrivia [24..25) ' '
+    CloseBraceToken [25..26) '}'
+  EndOfFileToken [26..26) ''

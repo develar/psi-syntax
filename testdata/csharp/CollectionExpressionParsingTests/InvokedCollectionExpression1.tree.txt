@@ -1,0 +1,15 @@
+InvocationExpression [0..8)
+  CollectionExpression [0..6)
+    OpenBracketToken [0..1) '['
+    ExpressionElement [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CommaToken [2..3) ','
+    T:WhitespaceTrivia [3..4) ' '
+    ExpressionElement [4..5)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'B'
+    CloseBracketToken [5..6) ']'
+  ArgumentList [6..8)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'

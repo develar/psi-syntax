@@ -1,0 +1,2 @@
+bool scoped;
+scoped = true;

@@ -1,0 +1,4 @@
+L:MultiLineCommentTrivia [0..31) '@* \n comment \n on many lines\n*@'
+EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1056 [0..1) Unexpected character \'@\'

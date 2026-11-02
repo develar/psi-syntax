@@ -1,0 +1,10 @@
+PostIncrementExpression [0..6)
+  ConditionalAccessExpression [0..4)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'a'
+    QuestionToken [1..2) '?'
+    MemberBindingExpression [2..4)
+      DotToken [2..3) '.'
+      IdentifierName [3..4)
+        IdentifierToken [3..4) 'b'
+  PlusPlusToken [4..6) '++'

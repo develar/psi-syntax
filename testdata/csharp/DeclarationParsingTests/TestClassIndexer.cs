@@ -1,0 +1,1 @@
+class a { b this[c d] { get; set; } }

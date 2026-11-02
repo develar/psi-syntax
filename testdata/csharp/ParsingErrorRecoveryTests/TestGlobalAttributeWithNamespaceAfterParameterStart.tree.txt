@@ -1,0 +1,28 @@
+CompilationUnit [0..29)
+  AttributeList [0..14)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..11)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+    Attribute [11..14)
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'a'
+      AttributeArgumentList [12..14)
+        OpenParenToken [12..13) '('
+        T:WhitespaceTrivia [13..14) ' '
+        CloseParenToken [14..14) missing
+    CloseBracketToken [14..14) missing
+  NamespaceDeclaration [14..29)
+    NamespaceKeyword [14..23) 'namespace'
+    T:WhitespaceTrivia [23..24) ' '
+    IdentifierName [24..26)
+      IdentifierToken [24..25) 'n'
+      T:WhitespaceTrivia [25..26) ' '
+    OpenBraceToken [26..27) '{'
+    T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1026 [14..23) ) expected
+  CS1003 [14..23) Syntax error, \']\' expected

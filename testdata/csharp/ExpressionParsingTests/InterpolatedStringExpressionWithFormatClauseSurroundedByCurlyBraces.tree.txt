@@ -1,0 +1,15 @@
+InterpolatedStringExpression [0..13)
+  InterpolatedStringStartToken [0..2) '$"'
+  InterpolatedStringText [2..4)
+    InterpolatedStringTextToken [2..4) '{{'
+  Interpolation [4..10)
+    OpenBraceToken [4..5) '{'
+    NumericLiteralExpression [5..7)
+      NumericLiteralToken [5..7) '12'
+    InterpolationFormatClause [7..9)
+      ColonToken [7..8) ':'
+      InterpolatedStringTextToken [8..9) 'X'
+    CloseBraceToken [9..10) '}'
+  InterpolatedStringText [10..12)
+    InterpolatedStringTextToken [10..12) '}}'
+  InterpolatedStringEndToken [12..13) '"'

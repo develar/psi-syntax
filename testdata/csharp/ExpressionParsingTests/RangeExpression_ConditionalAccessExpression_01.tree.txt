@@ -1,0 +1,14 @@
+ConditionalExpression [0..5)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'c'
+  QuestionToken [1..2) '?'
+  RangeExpression [2..5)
+    DotDotToken [2..4) '..'
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'b'
+  ColonToken [5..5) missing
+  IdentifierName [5..5)
+    IdentifierToken [5..5) missing
+Diagnostics:
+  CS1003 [5..5) Syntax error, \':\' expected
+  CS1733 [5..5) Expected expression

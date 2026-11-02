@@ -1,0 +1,63 @@
+CompilationUnit [0..531)
+  GlobalStatement [0..531)
+    LocalDeclarationStatement [0..531)
+      VariableDeclaration [0..519)
+        ArrayType [0..7)
+          NullableType [0..4)
+            PredefinedType [0..3)
+              IntKeyword [0..3) 'int'
+            QuestionToken [3..4) '?'
+          ArrayRankSpecifier [4..7)
+            OpenBracketToken [4..5) '['
+            OmittedArraySizeExpression [5..5)
+              OmittedArraySizeExpressionToken [5..5) ''
+            CloseBracketToken [5..6) ']'
+            T:WhitespaceTrivia [6..7) ' '
+        VariableDeclarator [7..519)
+          IdentifierToken [7..7) missing
+          T:SingleLineDocumentationCommentTrivia [7..494)
+            XmlText [7..145)
+              L:DocumentationCommentExteriorTrivia [7..10) '///'
+              XmlTextLiteralToken [10..145) '  a \u{000B}  = new int? .  @string ] { 1,  typeof  $  3, 4, 5 } static ; @partial /*[] bug*/ // YES []            int[] var = { 1,  else , 3 '
+            XmlText [145..494)
+              XmlTextLiteralToken [145..493) '</  4 |  5 };/*,;*/            int i = (int)a @in [ __refvalue ] [ /*[]*/             @readonly  = i + i - abstract   @typevar  * i /  @this  % i & ,  i | i ^ unchecked  i; in /*+ - * / % & | ^*/            bool b = true & false +  | true ^ false readonly ;/*& | ^*/             @unsafe  = !b;/*!*/            i = ~i;/*~i*/            b = i < (i - '
+              XmlTextLiteralNewLineToken [493..494) '\n'
+            EndOfDocumentationCommentToken [494..494) ''
+          T:WhitespaceTrivia [494..496) '  '
+          T:SkippedTokensTrivia [496..497)
+            NumericLiteralToken [496..497) '1'
+          T:WhitespaceTrivia [497..498) ' '
+          T:SkippedTokensTrivia [498..502)
+            IdentifierToken [498..502) '@for'
+          T:WhitespaceTrivia [502..503) ' '
+          T:SkippedTokensTrivia [503..504)
+            CloseParenToken [503..504) ')'
+          T:WhitespaceTrivia [504..505) ' '
+          T:SkippedTokensTrivia [505..507)
+            AmpersandAmpersandToken [505..507) '&&'
+          T:WhitespaceTrivia [507..508) ' '
+          T:SkippedTokensTrivia [508..509)
+            OpenParenToken [508..509) '('
+          T:SkippedTokensTrivia [509..510)
+            IdentifierToken [509..510) 'i'
+          T:WhitespaceTrivia [510..511) ' '
+          T:SkippedTokensTrivia [511..512)
+            PlusToken [511..512) '+'
+          T:WhitespaceTrivia [512..513) ' '
+          T:SkippedTokensTrivia [513..514)
+            NumericLiteralToken [513..514) '1'
+          T:SkippedTokensTrivia [514..515)
+            CloseParenToken [514..515) ')'
+          T:WhitespaceTrivia [515..516) ' '
+          T:SkippedTokensTrivia [516..517)
+            GreaterThanToken [516..517) '>'
+          T:WhitespaceTrivia [517..518) ' '
+          T:SkippedTokensTrivia [518..519)
+            IdentifierToken [518..519) 'i'
+      SemicolonToken [519..520) ';'
+      T:MultiLineCommentTrivia [520..530) '/*< && >*/'
+      T:EndOfLineTrivia [530..531) '\n'
+  EndOfFileToken [531..531) ''
+Diagnostics:
+  CS1001 [496..497) Identifier expected
+  CS1003 [496..497) Syntax error, \',\' expected

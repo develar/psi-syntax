@@ -1,0 +1,21 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..10)
+    ExpressionStatement [0..10)
+      InvocationExpression [0..10)
+        IdentifierName [0..7)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..7) 'Script'
+        ArgumentList [7..10)
+          OpenParenToken [7..8) '('
+          CloseParenToken [8..9) ')'
+          T:WhitespaceTrivia [9..10) ' '
+      SemicolonToken [10..10) missing
+  GlobalStatement [10..14)
+    Block [10..14)
+      OpenBraceToken [10..11) '{'
+      T:WhitespaceTrivia [11..12) ' '
+      CloseBraceToken [12..13) '}'
+      T:EndOfLineTrivia [13..14) '\n'
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1002 [10..11) ; expected

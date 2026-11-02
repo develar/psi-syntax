@@ -1,0 +1,23 @@
+CompilationUnit [0..11)
+  GlobalStatement [0..11)
+    LocalDeclarationStatement [0..11)
+      VariableDeclaration [0..11)
+        IdentifierName [0..4)
+          IdentifierToken [0..3) 'var'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..11)
+          IdentifierToken [4..5) 'x'
+          T:WhitespaceTrivia [5..6) ' '
+          EqualsValueClause [6..11)
+            EqualsToken [6..7) '='
+            T:WhitespaceTrivia [7..8) ' '
+            IdentifierName [8..11)
+              IdentifierToken [8..8) missing
+              T:SkippedTokensTrivia [8..11)
+                RazorContentToken [8..11) '@:;'
+      SemicolonToken [11..11) missing
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1525 [8..11) Invalid expression term \'\'
+  CS1646 [9..10) Keyword, identifier, or string expected after verbatim specifier: @
+  CS1002 [11..11) ; expected

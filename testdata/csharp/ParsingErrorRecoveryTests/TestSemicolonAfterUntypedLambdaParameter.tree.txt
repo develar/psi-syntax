@@ -1,0 +1,51 @@
+CompilationUnit [0..38)
+  ClassDeclaration [0..38)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..37)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..37)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..35)
+          VariableDeclaration [21..33)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..33)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..33)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                TupleExpression [29..33)
+                  OpenParenToken [29..30) '('
+                  Argument [30..31)
+                    IdentifierName [30..31)
+                      IdentifierToken [30..31) 'y'
+                  CommaToken [31..32) ','
+                  T:WhitespaceTrivia [32..33) ' '
+                  Argument [33..33)
+                    IdentifierName [33..33)
+                      IdentifierToken [33..33) missing
+                  CloseParenToken [33..33) missing
+          SemicolonToken [33..34) ';'
+          T:WhitespaceTrivia [34..35) ' '
+        CloseBraceToken [35..36) '}'
+        T:WhitespaceTrivia [36..37) ' '
+    CloseBraceToken [37..38) '}'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1525 [33..34) Invalid expression term \';\'
+  CS1026 [33..34) ) expected

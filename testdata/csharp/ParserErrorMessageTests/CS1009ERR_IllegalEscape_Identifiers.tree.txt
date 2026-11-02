@@ -1,0 +1,163 @@
+CompilationUnit [0..216)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..216)
+    ClassKeyword [14..19) 'class'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..27) 'Program'
+    T:EndOfLineTrivia [27..28) '\n'
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    MethodDeclaration [30..214)
+      L:WhitespaceTrivia [30..34) '    '
+      StaticKeyword [34..40) 'static'
+      T:WhitespaceTrivia [40..41) ' '
+      PredefinedType [41..46)
+        VoidKeyword [41..45) 'void'
+        T:WhitespaceTrivia [45..46) ' '
+      IdentifierToken [46..50) 'Main'
+      ParameterList [50..53)
+        OpenParenToken [50..51) '('
+        CloseParenToken [51..52) ')'
+        T:EndOfLineTrivia [52..53) '\n'
+      Block [53..214)
+        L:WhitespaceTrivia [53..57) '    '
+        OpenBraceToken [57..58) '{'
+        T:EndOfLineTrivia [58..59) '\n'
+        LocalDeclarationStatement [59..75)
+          VariableDeclaration [59..73)
+            PredefinedType [59..71)
+              L:WhitespaceTrivia [59..67) '        '
+              IntKeyword [67..70) 'int'
+              T:WhitespaceTrivia [70..71) ' '
+            VariableDeclarator [71..73)
+              IdentifierToken [71..73) '\\u'
+          SemicolonToken [73..74) ';'
+          T:EndOfLineTrivia [74..75) '\n'
+        LocalDeclarationStatement [75..92)
+          VariableDeclaration [75..90)
+            PredefinedType [75..87)
+              L:WhitespaceTrivia [75..83) '        '
+              IntKeyword [83..86) 'int'
+              T:WhitespaceTrivia [86..87) ' '
+            VariableDeclarator [87..90)
+              IdentifierToken [87..87) missing
+              T:SkippedTokensTrivia [87..90)
+                BadToken [87..90) '\\u0'
+          SemicolonToken [90..91) ';'
+          T:EndOfLineTrivia [91..92) '\n'
+        LocalDeclarationStatement [92..110)
+          VariableDeclaration [92..108)
+            PredefinedType [92..104)
+              L:WhitespaceTrivia [92..100) '        '
+              IntKeyword [100..103) 'int'
+              T:WhitespaceTrivia [103..104) ' '
+            VariableDeclarator [104..108)
+              IdentifierToken [104..104) missing
+              T:SkippedTokensTrivia [104..108)
+                BadToken [104..108) '\\u00'
+          SemicolonToken [108..109) ';'
+          T:EndOfLineTrivia [109..110) '\n'
+        LocalDeclarationStatement [110..129)
+          VariableDeclaration [110..127)
+            PredefinedType [110..122)
+              L:WhitespaceTrivia [110..118) '        '
+              IntKeyword [118..121) 'int'
+              T:WhitespaceTrivia [121..122) ' '
+            VariableDeclarator [122..127)
+              IdentifierToken [122..122) missing
+              T:SkippedTokensTrivia [122..127)
+                BadToken [122..127) '\\u000'
+          SemicolonToken [127..128) ';'
+          T:EndOfLineTrivia [128..129) '\n'
+        LocalDeclarationStatement [129..148)
+          VariableDeclaration [129..146)
+            PredefinedType [129..142)
+              L:EndOfLineTrivia [129..130) '\n'
+              L:WhitespaceTrivia [130..138) '        '
+              IntKeyword [138..141) 'int'
+              T:WhitespaceTrivia [141..142) ' '
+            VariableDeclarator [142..146)
+              IdentifierToken [142..146) 'a\\uz'
+          SemicolonToken [146..147) ';'
+          T:EndOfLineTrivia [147..148) '\n'
+        LocalDeclarationStatement [148..164)
+          VariableDeclaration [148..164)
+            PredefinedType [148..160)
+              L:WhitespaceTrivia [148..156) '        '
+              IntKeyword [156..159) 'int'
+              T:WhitespaceTrivia [159..160) ' '
+            VariableDeclarator [160..164)
+              IdentifierToken [160..161) 'a'
+              T:SkippedTokensTrivia [161..164)
+                BadToken [161..164) '\\u0'
+          SemicolonToken [164..164) missing
+        ExpressionStatement [164..167)
+          IdentifierName [164..165)
+            IdentifierToken [164..165) 'z'
+          SemicolonToken [165..166) ';'
+          T:EndOfLineTrivia [166..167) '\n'
+        LocalDeclarationStatement [167..184)
+          VariableDeclaration [167..184)
+            PredefinedType [167..179)
+              L:WhitespaceTrivia [167..175) '        '
+              IntKeyword [175..178) 'int'
+              T:WhitespaceTrivia [178..179) ' '
+            VariableDeclarator [179..184)
+              IdentifierToken [179..180) 'a'
+              T:SkippedTokensTrivia [180..184)
+                BadToken [180..184) '\\u00'
+          SemicolonToken [184..184) missing
+        ExpressionStatement [184..187)
+          IdentifierName [184..185)
+            IdentifierToken [184..185) 'z'
+          SemicolonToken [185..186) ';'
+          T:EndOfLineTrivia [186..187) '\n'
+        LocalDeclarationStatement [187..205)
+          VariableDeclaration [187..205)
+            PredefinedType [187..199)
+              L:WhitespaceTrivia [187..195) '        '
+              IntKeyword [195..198) 'int'
+              T:WhitespaceTrivia [198..199) ' '
+            VariableDeclarator [199..205)
+              IdentifierToken [199..200) 'a'
+              T:SkippedTokensTrivia [200..205)
+                BadToken [200..205) '\\u000'
+          SemicolonToken [205..205) missing
+        ExpressionStatement [205..208)
+          IdentifierName [205..206)
+            IdentifierToken [205..206) 'z'
+          SemicolonToken [206..207) ';'
+          T:EndOfLineTrivia [207..208) '\n'
+        L:WhitespaceTrivia [208..212) '    '
+        CloseBraceToken [212..213) '}'
+        T:EndOfLineTrivia [213..214) '\n'
+    CloseBraceToken [214..215) '}'
+    T:EndOfLineTrivia [215..216) '\n'
+  EndOfFileToken [216..216) ''
+Diagnostics:
+  CS1009 [71..73) Unrecognized escape sequence
+  CS1001 [87..90) Identifier expected
+  CS1009 [87..90) Unrecognized escape sequence
+  CS1056 [87..87) Unexpected character \'\\u0\'
+  CS1001 [104..108) Identifier expected
+  CS1009 [104..108) Unrecognized escape sequence
+  CS1056 [104..104) Unexpected character \'\\u00\'
+  CS1001 [122..127) Identifier expected
+  CS1009 [122..127) Unrecognized escape sequence
+  CS1056 [122..122) Unexpected character \'\\u000\'
+  CS1009 [143..145) Unrecognized escape sequence
+  CS1009 [161..164) Unrecognized escape sequence
+  CS1056 [161..161) Unexpected character \'\\u0\'
+  CS1002 [164..165) ; expected
+  CS1009 [180..184) Unrecognized escape sequence
+  CS1056 [180..180) Unexpected character \'\\u00\'
+  CS1002 [184..185) ; expected
+  CS1009 [200..205) Unrecognized escape sequence
+  CS1056 [200..200) Unexpected character \'\\u000\'
+  CS1002 [205..206) ; expected

@@ -1,0 +1,4 @@
+NumericLiteralToken [0..5) '1_000'
+EndOfFileToken [5..5) ''
+Diagnostics:
+  CS8059 [0..0) Feature \'digit separators\' is not available in C# 6. Please use language version 7.0 or greater.

@@ -1,0 +1,65 @@
+CompilationUnit [0..231)
+  ClassDeclaration [0..231)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..17) 'Test'
+    T:EndOfLineTrivia [17..18) '\n'
+    L:WhitespaceTrivia [18..43) '                         '
+    OpenBraceToken [43..44) '{'
+    T:EndOfLineTrivia [44..45) '\n'
+    MethodDeclaration [45..205)
+      L:WhitespaceTrivia [45..74) '                             '
+      PublicKeyword [74..80) 'public'
+      T:WhitespaceTrivia [80..81) ' '
+      PredefinedType [81..86)
+        VoidKeyword [81..85) 'void'
+        T:WhitespaceTrivia [85..86) ' '
+      IdentifierToken [86..89) 'Goo'
+      ParameterList [89..92)
+        OpenParenToken [89..90) '('
+        CloseParenToken [90..91) ')'
+        T:EndOfLineTrivia [91..92) '\n'
+      Block [92..205)
+        L:WhitespaceTrivia [92..121) '                             '
+        OpenBraceToken [121..122) '{'
+        T:EndOfLineTrivia [122..123) '\n'
+        LocalDeclarationStatement [123..174)
+          VariableDeclaration [123..174)
+            IdentifierName [123..160)
+              L:WhitespaceTrivia [123..156) '                                 '
+              IdentifierToken [156..159) 'var'
+              T:WhitespaceTrivia [159..160) ' '
+            VariableDeclarator [160..174)
+              IdentifierToken [160..161) 'x'
+              T:WhitespaceTrivia [161..162) ' '
+              EqualsValueClause [162..174)
+                EqualsToken [162..163) '='
+                T:WhitespaceTrivia [163..164) ' '
+                ParenthesizedExpression [164..174)
+                  OpenParenToken [164..165) '('
+                  TupleExpression [165..174)
+                    OpenParenToken [165..166) '('
+                    Argument [166..167)
+                      IdentifierName [166..167)
+                        IdentifierToken [166..167) 'x'
+                    CommaToken [167..168) ','
+                    T:WhitespaceTrivia [168..169) ' '
+                    Argument [169..174)
+                      ThisExpression [169..174)
+                        ThisKeyword [169..173) 'this'
+                        T:EndOfLineTrivia [173..174) '\n'
+                    CloseParenToken [174..174) missing
+                  CloseParenToken [174..174) missing
+          SemicolonToken [174..174) missing
+        L:WhitespaceTrivia [174..203) '                             '
+        CloseBraceToken [203..204) '}'
+        T:EndOfLineTrivia [204..205) '\n'
+    L:WhitespaceTrivia [205..230) '                         '
+    CloseBraceToken [230..231) '}'
+  EndOfFileToken [231..231) ''
+Diagnostics:
+  CS1026 [173..173) ) expected
+  CS1026 [173..173) ) expected
+  CS1002 [173..173) ; expected

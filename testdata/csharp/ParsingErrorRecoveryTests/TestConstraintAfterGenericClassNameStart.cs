@@ -1,0 +1,1 @@
+class c< where t : x { }

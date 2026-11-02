@@ -1,0 +1,16 @@
+InvocationExpression [0..4)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..4)
+    OpenParenToken [1..2) '('
+    Argument [2..3)
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'a'
+    CommaToken [3..4) ','
+    Argument [4..4)
+      IdentifierName [4..4)
+        IdentifierToken [4..4) missing
+    CloseParenToken [4..4) missing
+Diagnostics:
+  CS1733 [4..4) Expected expression
+  CS1026 [4..4) ) expected

@@ -1,0 +1,36 @@
+ExpressionStatement [0..43)
+  GreaterThanExpression [0..42)
+    LessThanExpression [0..37)
+      MultiplyExpression [0..32)
+        AnonymousMethodExpression [0..8)
+          DelegateKeyword [0..8) 'delegate'
+          Block [8..8)
+            OpenBraceToken [8..8) missing
+            CloseBraceToken [8..8) missing
+        AsteriskToken [8..9) '*'
+        T:WhitespaceTrivia [9..10) ' '
+        ElementAccessExpression [10..32)
+          SimpleMemberAccessExpression [10..24)
+            IdentifierName [10..19)
+              IdentifierToken [10..19) 'unmanaged'
+            DotToken [19..20) '.'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Name'
+          BracketedArgumentList [24..32)
+            OpenBracketToken [24..25) '['
+            Argument [25..31)
+              IdentifierName [25..31)
+                IdentifierToken [25..31) 'Dotted'
+            CloseBracketToken [31..32) ']'
+      LessThanToken [32..33) '<'
+      PredefinedType [33..37)
+        VoidKeyword [33..37) 'void'
+    GreaterThanToken [37..38) '>'
+    T:WhitespaceTrivia [38..39) ' '
+    IdentifierName [39..42)
+      IdentifierToken [39..42) 'ptr'
+  SemicolonToken [42..43) ';'
+Diagnostics:
+  CS1514 [8..9) { expected
+  CS8848 [8..9) Operator \'*\' cannot be used here due to precedence. Use parentheses to disambiguate.
+  CS1525 [33..37) Invalid expression term \'void\'

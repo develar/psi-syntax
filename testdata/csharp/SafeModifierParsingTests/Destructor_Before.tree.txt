@@ -1,0 +1,21 @@
+IncompleteMember [0..13)
+  IdentifierName [0..13)
+    IdentifierToken [0..4) 'safe'
+    T:WhitespaceTrivia [4..5) ' '
+    T:SkippedTokensTrivia [5..6)
+      TildeToken [5..6) '~'
+    T:SkippedTokensTrivia [6..7)
+      IdentifierToken [6..7) 'C'
+    T:SkippedTokensTrivia [7..8)
+      OpenParenToken [7..8) '('
+    T:SkippedTokensTrivia [8..9)
+      CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+    T:SkippedTokensTrivia [10..11)
+      OpenBraceToken [10..11) '{'
+    T:WhitespaceTrivia [11..12) ' '
+    T:SkippedTokensTrivia [12..13)
+      CloseBraceToken [12..13) '}'
+Diagnostics:
+  CS1519 [5..6) Invalid token \'~\' in a member declaration
+  CS1073 [0..4) Unexpected token \'~\'

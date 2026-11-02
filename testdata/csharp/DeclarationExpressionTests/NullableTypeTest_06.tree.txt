@@ -1,0 +1,43 @@
+LocalDeclarationStatement [0..50)
+  VariableDeclaration [0..49)
+    RefType [0..11)
+      RefKeyword [0..3) 'ref'
+      T:WhitespaceTrivia [3..4) ' '
+      PredefinedType [4..11)
+        ObjectKeyword [4..10) 'object'
+        T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..49)
+      IdentifierToken [11..12) 'x'
+      T:WhitespaceTrivia [12..13) ' '
+      EqualsValueClause [13..49)
+        EqualsToken [13..14) '='
+        T:WhitespaceTrivia [14..15) ' '
+        RefExpression [15..49)
+          RefKeyword [15..18) 'ref'
+          T:WhitespaceTrivia [18..19) ' '
+          ConditionalExpression [19..49)
+            IsExpression [19..32)
+              IdentifierName [19..22)
+                IdentifierToken [19..21) 'o1'
+                T:WhitespaceTrivia [21..22) ' '
+              IsKeyword [22..24) 'is'
+              T:WhitespaceTrivia [24..25) ' '
+              PredefinedType [25..32)
+                StringKeyword [25..31) 'string'
+                T:WhitespaceTrivia [31..32) ' '
+            QuestionToken [32..33) '?'
+            T:WhitespaceTrivia [33..34) ' '
+            RefExpression [34..41)
+              RefKeyword [34..37) 'ref'
+              T:WhitespaceTrivia [37..38) ' '
+              IdentifierName [38..41)
+                IdentifierToken [38..40) 'o2'
+                T:WhitespaceTrivia [40..41) ' '
+            ColonToken [41..42) ':'
+            T:WhitespaceTrivia [42..43) ' '
+            RefExpression [43..49)
+              RefKeyword [43..46) 'ref'
+              T:WhitespaceTrivia [46..47) ' '
+              IdentifierName [47..49)
+                IdentifierToken [47..49) 'o3'
+  SemicolonToken [49..50) ';'

@@ -1,0 +1,1 @@
+ptr as delegate* unmanaged[stdcall]<int, void>

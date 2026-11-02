@@ -1,0 +1,51 @@
+FieldDeclaration [0..54)
+  VariableDeclaration [0..53)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..11)
+          StringKeyword [5..11) 'string'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..53)
+      IdentifierToken [21..26) 'func0'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..53)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        ParenthesizedExpression [29..53)
+          OpenParenToken [29..30) '('
+          PredefinedType [30..37)
+            StringKeyword [30..36) 'string'
+            T:WhitespaceTrivia [36..37) ' '
+          CloseParenToken [37..37) missing
+          T:SkippedTokensTrivia [37..38)
+            IdentifierToken [37..38) 'x'
+          T:SkippedTokensTrivia [38..39)
+            ExclamationToken [38..39) '!'
+          T:SkippedTokensTrivia [39..40)
+            ExclamationToken [39..40) '!'
+          T:WhitespaceTrivia [40..41) ' '
+          T:SkippedTokensTrivia [41..42)
+            EqualsToken [41..42) '='
+          T:WhitespaceTrivia [42..43) ' '
+          T:SkippedTokensTrivia [43..47)
+            NullKeyword [43..47) 'null'
+          T:SkippedTokensTrivia [47..48)
+            CloseParenToken [47..48) ')'
+          T:WhitespaceTrivia [48..49) ' '
+          T:SkippedTokensTrivia [49..51)
+            EqualsGreaterThanToken [49..51) '=>'
+          T:WhitespaceTrivia [51..52) ' '
+          T:SkippedTokensTrivia [52..53)
+            IdentifierToken [52..53) 'x'
+  SemicolonToken [53..54) ';'
+Diagnostics:
+  CS1525 [30..36) Invalid expression term \'string\'
+  CS1026 [37..38) ) expected
+  CS1003 [37..38) Syntax error, \',\' expected

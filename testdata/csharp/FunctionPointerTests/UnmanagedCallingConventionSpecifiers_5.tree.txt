@@ -1,0 +1,33 @@
+LocalDeclarationStatement [0..68)
+  VariableDeclaration [0..67)
+    FunctionPointerType [0..64)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      T:WhitespaceTrivia [9..10) ' '
+      FunctionPointerCallingConvention [10..45)
+        UnmanagedKeyword [10..19) 'unmanaged'
+        FunctionPointerUnmanagedCallingConventionList [19..45)
+          OpenBracketToken [19..20) '['
+          FunctionPointerUnmanagedCallingConvention [20..44)
+            IdentifierToken [20..44) 'invalidcallingconvention'
+          CloseBracketToken [44..45) ']'
+      FunctionPointerParameterList [45..64)
+        LessThanToken [45..46) '<'
+        FunctionPointerParameter [46..52)
+          PredefinedType [46..52)
+            StringKeyword [46..52) 'string'
+        CommaToken [52..53) ','
+        T:WhitespaceTrivia [53..54) ' '
+        FunctionPointerParameter [54..57)
+          IdentifierName [54..57)
+            IdentifierToken [54..57) 'Goo'
+        CommaToken [57..58) ','
+        T:WhitespaceTrivia [58..59) ' '
+        FunctionPointerParameter [59..62)
+          PredefinedType [59..62)
+            IntKeyword [59..62) 'int'
+        GreaterThanToken [62..63) '>'
+        T:WhitespaceTrivia [63..64) ' '
+    VariableDeclarator [64..67)
+      IdentifierToken [64..67) 'ptr'
+  SemicolonToken [67..68) ';'

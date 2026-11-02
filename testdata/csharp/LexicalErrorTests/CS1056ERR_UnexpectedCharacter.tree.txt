@@ -1,0 +1,86 @@
+CompilationUnit [0..127)
+  UsingDirective [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..13)
+      IdentifierToken [7..13) 'System'
+    SemicolonToken [13..14) ';'
+    T:EndOfLineTrivia [14..15) '\n'
+  ClassDeclaration [15..127)
+    ClassKeyword [15..20) 'class'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..25) 'Test'
+    T:EndOfLineTrivia [25..26) '\n'
+    OpenBraceToken [26..27) '{'
+    T:EndOfLineTrivia [27..28) '\n'
+    MethodDeclaration [28..125)
+      L:WhitespaceTrivia [28..29) '\t'
+      PublicKeyword [29..35) 'public'
+      T:WhitespaceTrivia [35..36) ' '
+      StaticKeyword [36..42) 'static'
+      T:WhitespaceTrivia [42..43) ' '
+      PredefinedType [43..48)
+        VoidKeyword [43..47) 'void'
+        T:WhitespaceTrivia [47..48) ' '
+      IdentifierToken [48..52) 'Main'
+      ParameterList [52..55)
+        OpenParenToken [52..53) '('
+        CloseParenToken [53..54) ')'
+        T:EndOfLineTrivia [54..55) '\n'
+      Block [55..125)
+        L:WhitespaceTrivia [55..56) '\t'
+        OpenBraceToken [56..57) '{'
+        T:EndOfLineTrivia [57..58) '\n'
+        LocalDeclarationStatement [58..71)
+          VariableDeclaration [58..71)
+            PredefinedType [58..64)
+              L:WhitespaceTrivia [58..60) '\t\t'
+              IntKeyword [60..63) 'int'
+              T:WhitespaceTrivia [63..64) ' '
+            VariableDeclarator [64..71)
+              IdentifierToken [64..64) missing
+              T:SkippedTokensTrivia [64..65)
+                BadToken [64..65) '\\'
+              T:SkippedTokensTrivia [65..71)
+                BadToken [65..71) '\\u070F'
+          SemicolonToken [71..71) missing
+        ExpressionStatement [71..88)
+          SimpleAssignmentExpression [71..86)
+            IdentifierName [71..83)
+              IdentifierToken [71..82) 'identifier1'
+              T:WhitespaceTrivia [82..83) ' '
+            EqualsToken [83..84) '='
+            T:WhitespaceTrivia [84..85) ' '
+            NumericLiteralExpression [85..86)
+              NumericLiteralToken [85..86) '1'
+          SemicolonToken [86..87) ';'
+          T:EndOfLineTrivia [87..88) '\n'
+        ExpressionStatement [88..122)
+          InvocationExpression [88..120)
+            SimpleMemberAccessExpression [88..107)
+              IdentifierName [88..97)
+                L:WhitespaceTrivia [88..90) '\t\t'
+                IdentifierToken [90..97) 'Console'
+              DotToken [97..98) '.'
+              IdentifierName [98..107)
+                IdentifierToken [98..107) 'WriteLine'
+            ArgumentList [107..120)
+              OpenParenToken [107..108) '('
+              Argument [108..119)
+                IdentifierName [108..119)
+                  IdentifierToken [108..119) 'identifier1'
+              CloseParenToken [119..120) ')'
+          SemicolonToken [120..121) ';'
+          T:EndOfLineTrivia [121..122) '\n'
+        L:WhitespaceTrivia [122..123) '\t'
+        CloseBraceToken [123..124) '}'
+        T:EndOfLineTrivia [124..125) '\n'
+    CloseBraceToken [125..126) '}'
+    T:EndOfLineTrivia [126..127) '\n'
+  EndOfFileToken [127..127) ''
+Diagnostics:
+  CS1001 [64..65) Identifier expected
+  CS1056 [64..64) Unexpected character \'\\\'
+  CS1056 [65..65) Unexpected character \'\\u070F\'
+  CS1002 [71..82) ; expected

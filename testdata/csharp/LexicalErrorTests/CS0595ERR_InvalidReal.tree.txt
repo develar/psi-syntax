@@ -1,0 +1,98 @@
+CompilationUnit [0..123)
+  ClassDeclaration [0..123)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'C'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    FieldDeclaration [17..37)
+      VariableDeclaration [17..35)
+        PredefinedType [17..28)
+          L:WhitespaceTrivia [17..21) '    '
+          DoubleKeyword [21..27) 'double'
+          T:WhitespaceTrivia [27..28) ' '
+        VariableDeclarator [28..35)
+          IdentifierToken [28..30) 'd1'
+          T:WhitespaceTrivia [30..31) ' '
+          EqualsValueClause [31..35)
+            EqualsToken [31..32) '='
+            T:WhitespaceTrivia [32..33) ' '
+            NumericLiteralExpression [33..35)
+              NumericLiteralToken [33..35) '0e'
+      SemicolonToken [35..36) ';'
+      T:EndOfLineTrivia [36..37) '\n'
+    FieldDeclaration [37..58)
+      VariableDeclaration [37..56)
+        PredefinedType [37..48)
+          L:WhitespaceTrivia [37..41) '    '
+          DoubleKeyword [41..47) 'double'
+          T:WhitespaceTrivia [47..48) ' '
+        VariableDeclarator [48..56)
+          IdentifierToken [48..50) 'd2'
+          T:WhitespaceTrivia [50..51) ' '
+          EqualsValueClause [51..56)
+            EqualsToken [51..52) '='
+            T:WhitespaceTrivia [52..53) ' '
+            NumericLiteralExpression [53..56)
+              NumericLiteralToken [53..56) '.0e'
+      SemicolonToken [56..57) ';'
+      T:EndOfLineTrivia [57..58) '\n'
+    FieldDeclaration [58..80)
+      VariableDeclaration [58..78)
+        PredefinedType [58..69)
+          L:WhitespaceTrivia [58..62) '    '
+          DoubleKeyword [62..68) 'double'
+          T:WhitespaceTrivia [68..69) ' '
+        VariableDeclarator [69..78)
+          IdentifierToken [69..71) 'd3'
+          T:WhitespaceTrivia [71..72) ' '
+          EqualsValueClause [72..78)
+            EqualsToken [72..73) '='
+            T:WhitespaceTrivia [73..74) ' '
+            NumericLiteralExpression [74..78)
+              NumericLiteralToken [74..78) '0.0e'
+      SemicolonToken [78..79) ';'
+      T:EndOfLineTrivia [79..80) '\n'
+    FieldDeclaration [80..101)
+      VariableDeclaration [80..99)
+        PredefinedType [80..91)
+          L:WhitespaceTrivia [80..84) '    '
+          DoubleKeyword [84..90) 'double'
+          T:WhitespaceTrivia [90..91) ' '
+        VariableDeclarator [91..99)
+          IdentifierToken [91..93) 'd4'
+          T:WhitespaceTrivia [93..94) ' '
+          EqualsValueClause [94..99)
+            EqualsToken [94..95) '='
+            T:WhitespaceTrivia [95..96) ' '
+            NumericLiteralExpression [96..99)
+              NumericLiteralToken [96..99) '0e+'
+      SemicolonToken [99..100) ';'
+      T:EndOfLineTrivia [100..101) '\n'
+    FieldDeclaration [101..122)
+      VariableDeclaration [101..120)
+        PredefinedType [101..112)
+          L:WhitespaceTrivia [101..105) '    '
+          DoubleKeyword [105..111) 'double'
+          T:WhitespaceTrivia [111..112) ' '
+        VariableDeclarator [112..120)
+          IdentifierToken [112..114) 'd5'
+          T:WhitespaceTrivia [114..115) ' '
+          EqualsValueClause [115..120)
+            EqualsToken [115..116) '='
+            T:WhitespaceTrivia [116..117) ' '
+            NumericLiteralExpression [117..120)
+              NumericLiteralToken [117..120) '0e-'
+      SemicolonToken [120..121) ';'
+      T:EndOfLineTrivia [121..122) '\n'
+    CloseBraceToken [122..123) '}'
+  EndOfFileToken [123..123) ''
+Diagnostics:
+  CS0595 [33..33) Invalid real literal.
+  CS0595 [53..53) Invalid real literal.
+  CS0595 [74..74) Invalid real literal.
+  CS0595 [96..96) Invalid real literal.
+  CS0595 [117..117) Invalid real literal.

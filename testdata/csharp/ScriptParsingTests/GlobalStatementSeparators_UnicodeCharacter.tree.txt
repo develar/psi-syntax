@@ -1,0 +1,16 @@
+CompilationUnit [0..79)
+  GlobalStatement [0..79)
+    LocalDeclarationStatement [0..79)
+      VariableDeclaration [0..79)
+        PredefinedType [0..5)
+          L:EndOfLineTrivia [0..1) '\n'
+          IntKeyword [1..4) 'int'
+          T:WhitespaceTrivia [4..5) ' '
+        VariableDeclarator [5..79)
+          IdentifierToken [5..77) 'नुसौप्रख्यातनिदेशकपुरानी'
+          T:WhitespaceTrivia [77..78) ' '
+          T:EndOfLineTrivia [78..79) '\n'
+      SemicolonToken [79..79) missing
+  EndOfFileToken [79..79) ''
+Diagnostics:
+  CS1002 [77..77) ; expected

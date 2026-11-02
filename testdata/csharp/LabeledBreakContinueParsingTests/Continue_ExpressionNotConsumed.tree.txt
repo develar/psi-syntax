@@ -1,0 +1,17 @@
+ContinueStatement [0..15)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..11)
+    IdentifierToken [9..10) 'a'
+    T:WhitespaceTrivia [10..11) ' '
+  SemicolonToken [11..11) missing
+  T:SkippedTokensTrivia [11..12)
+    PlusToken [11..12) '+'
+  T:WhitespaceTrivia [12..13) ' '
+  T:SkippedTokensTrivia [13..14)
+    IdentifierToken [13..14) 'b'
+  T:SkippedTokensTrivia [14..15)
+    SemicolonToken [14..15) ';'
+Diagnostics:
+  CS1073 [0..11) Unexpected token \'+\'
+  CS1002 [11..12) ; expected

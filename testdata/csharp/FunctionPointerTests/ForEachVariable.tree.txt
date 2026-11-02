@@ -1,0 +1,25 @@
+ForEachStatement [0..40)
+  ForEachKeyword [0..7) 'foreach'
+  T:WhitespaceTrivia [7..8) ' '
+  OpenParenToken [8..9) '('
+  FunctionPointerType [9..25)
+    DelegateKeyword [9..17) 'delegate'
+    AsteriskToken [17..18) '*'
+    FunctionPointerParameterList [18..25)
+      LessThanToken [18..19) '<'
+      FunctionPointerParameter [19..23)
+        PredefinedType [19..23)
+          VoidKeyword [19..23) 'void'
+      GreaterThanToken [23..24) '>'
+      T:WhitespaceTrivia [24..25) ' '
+  IdentifierToken [25..28) 'ptr'
+  T:WhitespaceTrivia [28..29) ' '
+  InKeyword [29..31) 'in'
+  T:WhitespaceTrivia [31..32) ' '
+  IdentifierName [32..36)
+    IdentifierToken [32..36) 'ptrs'
+  CloseParenToken [36..37) ')'
+  T:WhitespaceTrivia [37..38) ' '
+  Block [38..40)
+    OpenBraceToken [38..39) '{'
+    CloseBraceToken [39..40) '}'

@@ -1,0 +1,21 @@
+ForStatement [0..18)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  RangeExpression [5..8)
+    DotDotToken [5..7) '..'
+    IdentifierName [7..8)
+      IdentifierToken [7..8) 'a'
+  SemicolonToken [8..9) ';'
+  RangeExpression [9..12)
+    DotDotToken [9..11) '..'
+    IdentifierName [11..12)
+      IdentifierToken [11..12) 'a'
+  SemicolonToken [12..13) ';'
+  RangeExpression [13..16)
+    DotDotToken [13..15) '..'
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'a'
+  CloseParenToken [16..17) ')'
+  EmptyStatement [17..18)
+    SemicolonToken [17..18) ';'

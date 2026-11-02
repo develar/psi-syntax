@@ -1,0 +1,1 @@
+foreach (_ in e) {}

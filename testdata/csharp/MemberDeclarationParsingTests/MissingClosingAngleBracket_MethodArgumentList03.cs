@@ -1,0 +1,1 @@
+public ImmutableArray<int M(ImmutableArray<int a, ImmutableArray<int b);

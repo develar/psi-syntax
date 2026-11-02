@@ -1,0 +1,24 @@
+ForStatement [0..17)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..13)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..13)
+      IdentifierToken [9..10) 'x'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..13)
+        EqualsToken [11..11) missing
+        UnaryMinusExpression [11..13)
+          MinusToken [11..12) '-'
+          IdentifierName [12..13)
+            IdentifierToken [12..13) 'y'
+  SemicolonToken [13..14) ';'
+  SemicolonToken [14..15) ';'
+  CloseParenToken [15..16) ')'
+  EmptyStatement [16..17)
+    SemicolonToken [16..17) ';'
+Diagnostics:
+  CS1003 [11..12) Syntax error, \'=\' expected

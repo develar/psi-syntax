@@ -1,0 +1,52 @@
+CompilationUnit [0..41)
+  GlobalStatement [0..6)
+    ExpressionStatement [0..6)
+      ParenthesizedExpression [0..6)
+        L:EndOfLineTrivia [0..1) '\n'
+        OpenParenToken [1..2) '('
+        RefExpression [2..6)
+          RefKeyword [2..5) 'ref'
+          T:WhitespaceTrivia [5..6) ' '
+          IdentifierName [6..6)
+            IdentifierToken [6..6) missing
+        CloseParenToken [6..6) missing
+      SemicolonToken [6..6) missing
+  GlobalStatement [6..41)
+    LocalDeclarationStatement [6..41)
+      ReadOnlyKeyword [6..14) 'readonly'
+      T:WhitespaceTrivia [14..15) ' '
+      VariableDeclaration [15..39)
+        ScopedType [15..26)
+          ScopedKeyword [15..21) 'scoped'
+          T:WhitespaceTrivia [21..22) ' '
+          PredefinedType [22..26)
+            IntKeyword [22..25) 'int'
+            T:WhitespaceTrivia [25..26) ' '
+        VariableDeclarator [26..27)
+          IdentifierToken [26..27) 'c'
+        CommaToken [27..28) ','
+        T:WhitespaceTrivia [28..29) ' '
+        VariableDeclarator [29..39)
+          IdentifierToken [29..32) 'var'
+          T:WhitespaceTrivia [32..33) ' '
+          T:SkippedTokensTrivia [33..34)
+            IdentifierToken [33..34) 'd'
+          T:SkippedTokensTrivia [34..35)
+            CloseParenToken [34..35) ')'
+          T:WhitespaceTrivia [35..36) ' '
+          T:SkippedTokensTrivia [36..37)
+            EqualsToken [36..37) '='
+          T:WhitespaceTrivia [37..38) ' '
+          T:SkippedTokensTrivia [38..39)
+            IdentifierToken [38..39) 'M'
+      SemicolonToken [39..40) ';'
+      T:EndOfLineTrivia [40..41) '\n'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1525 [2..6) Invalid expression term \'ref\'
+  CS1525 [6..14) Invalid expression term \'readonly\'
+  CS1026 [6..14) ) expected
+  CS1002 [6..14) ; expected
+  CS0106 [6..14) The modifier \'readonly\' is not valid for this item
+  CS1044 [29..32) Cannot use more than one type in a for, using, fixed, or declaration statement
+  CS1003 [33..34) Syntax error, \',\' expected

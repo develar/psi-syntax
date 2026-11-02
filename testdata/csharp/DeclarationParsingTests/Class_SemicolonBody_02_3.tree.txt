@@ -1,0 +1,13 @@
+CompilationUnit [0..16)
+  InterfaceDeclaration [0..16)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'C'
+    TypeParameterList [12..15)
+      LessThanToken [12..13) '<'
+      TypeParameter [13..14)
+        IdentifierToken [13..14) 'T'
+      GreaterThanToken [14..15) '>'
+    SemicolonToken [15..16) ';'
+  EndOfFileToken [16..16) ''

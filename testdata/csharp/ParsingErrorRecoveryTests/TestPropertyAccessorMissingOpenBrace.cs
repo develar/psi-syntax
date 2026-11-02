@@ -1,0 +1,1 @@
+class c { int p { get return 0; } } }

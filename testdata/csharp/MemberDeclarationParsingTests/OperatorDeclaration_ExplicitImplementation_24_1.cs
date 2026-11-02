@@ -1,0 +1,1 @@
+int N.I.implicit (int x) => x;

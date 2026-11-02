@@ -1,0 +1,69 @@
+SwitchStatement [0..121)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..13)
+    IdentifierToken [8..13) 'array'
+  CloseParenToken [13..14) ')'
+  T:WhitespaceTrivia [14..15) ' '
+  OpenBraceToken [15..16) '{'
+  T:EndOfLineTrivia [16..17) '\n'
+  SwitchSection [17..120)
+    CasePatternSwitchLabel [17..63)
+      CaseKeyword [17..21) 'case'
+      T:WhitespaceTrivia [21..22) ' '
+      DeclarationPattern [22..61)
+        ArrayType [22..55)
+          GenericName [22..52)
+            IdentifierToken [22..34) 'KeyValuePair'
+            TypeArgumentList [34..52)
+              LessThanToken [34..35) '<'
+              PredefinedType [35..41)
+                StringKeyword [35..41) 'string'
+              CommaToken [41..42) ','
+              T:WhitespaceTrivia [42..43) ' '
+              IdentifierName [43..51)
+                IdentifierToken [43..51) 'DateTime'
+              GreaterThanToken [51..52) '>'
+          ArrayRankSpecifier [52..55)
+            OpenBracketToken [52..53) '['
+            OmittedArraySizeExpression [53..53)
+              OmittedArraySizeExpressionToken [53..53) ''
+            CloseBracketToken [53..54) ']'
+            T:WhitespaceTrivia [54..55) ' '
+        SingleVariableDesignation [55..61)
+          IdentifierToken [55..61) 'pairs1'
+      ColonToken [61..62) ':'
+      T:EndOfLineTrivia [62..63) '\n'
+    CasePatternSwitchLabel [63..109)
+      CaseKeyword [63..67) 'case'
+      T:WhitespaceTrivia [67..68) ' '
+      DeclarationPattern [68..107)
+        ArrayType [68..101)
+          GenericName [68..98)
+            IdentifierToken [68..80) 'KeyValuePair'
+            TypeArgumentList [80..98)
+              LessThanToken [80..81) '<'
+              IdentifierName [81..87)
+                IdentifierToken [81..87) 'String'
+              CommaToken [87..88) ','
+              T:WhitespaceTrivia [88..89) ' '
+              IdentifierName [89..97)
+                IdentifierToken [89..97) 'DateTime'
+              GreaterThanToken [97..98) '>'
+          ArrayRankSpecifier [98..101)
+            OpenBracketToken [98..99) '['
+            OmittedArraySizeExpression [99..99)
+              OmittedArraySizeExpressionToken [99..99) ''
+            CloseBracketToken [99..100) ']'
+            T:WhitespaceTrivia [100..101) ' '
+        SingleVariableDesignation [101..107)
+          IdentifierToken [101..107) 'pairs2'
+      ColonToken [107..108) ':'
+      T:EndOfLineTrivia [108..109) '\n'
+    BreakStatement [109..120)
+      L:WhitespaceTrivia [109..113) '    '
+      BreakKeyword [113..118) 'break'
+      SemicolonToken [118..119) ';'
+      T:EndOfLineTrivia [119..120) '\n'
+  CloseBraceToken [120..121) '}'

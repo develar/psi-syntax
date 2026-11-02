@@ -1,0 +1,29 @@
+CompilationUnit [0..22)
+  L:MultiLineDocumentationCommentTrivia [0..22)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..12)
+      XmlElementStartTag [4..7)
+        LessThanToken [4..5) '<'
+        XmlName [5..6)
+          IdentifierToken [5..6) 'a'
+        GreaterThanToken [6..7) '>'
+      XmlText [7..8)
+        XmlTextLiteralToken [7..8) ' '
+      XmlElementEndTag [8..12)
+        LessThanSlashToken [8..10) '</'
+        XmlName [10..11)
+          IdentifierToken [10..11) 'a'
+        GreaterThanToken [11..12) '>'
+    XmlText [12..13)
+      XmlTextLiteralToken [12..13) ' '
+    XmlText [13..20)
+      XmlTextLiteralToken [13..18) '</a> '
+      XmlTextLiteralNewLineToken [18..19) '\n'
+      XmlTextLiteralNewLineToken [19..20) '\n'
+    L:DocumentationCommentExteriorTrivia [20..22) '*/'
+    EndOfDocumentationCommentToken [22..22) ''
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1570 [13..14) XML comment has badly formed XML -- \'End tag was not expected at this location.\'

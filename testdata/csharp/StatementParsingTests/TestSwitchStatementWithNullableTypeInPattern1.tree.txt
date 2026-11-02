@@ -1,0 +1,28 @@
+SwitchStatement [0..47)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..46)
+    CasePatternSwitchLabel [15..31)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      TypePattern [24..29)
+        NullableType [24..29)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+          QuestionToken [28..29) '?'
+      ColonToken [29..30) ':'
+      T:EndOfLineTrivia [30..31) '\n'
+    BreakStatement [31..46)
+      L:WhitespaceTrivia [31..39) '        '
+      BreakKeyword [39..44) 'break'
+      SemicolonToken [44..45) ';'
+      T:EndOfLineTrivia [45..46) '\n'
+  CloseBraceToken [46..47) '}'

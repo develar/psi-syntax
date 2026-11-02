@@ -1,0 +1,31 @@
+CompilationUnit [0..42)
+  ClassDeclaration [0..42)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..41)
+      IdentifierName [10..21)
+        L:WhitespaceTrivia [10..14) '    '
+        IdentifierToken [14..20) 'scoped'
+        T:WhitespaceTrivia [20..21) ' '
+      IdentifierToken [21..30) 'extension'
+      ParameterList [30..37)
+        OpenParenToken [30..31) '('
+        Parameter [31..35)
+          IdentifierName [31..35)
+            IdentifierToken [31..35) 'Type'
+          IdentifierToken [35..35) missing
+        CloseParenToken [35..36) ')'
+        T:WhitespaceTrivia [36..37) ' '
+      Block [37..41)
+        OpenBraceToken [37..38) '{'
+        T:WhitespaceTrivia [38..39) ' '
+        CloseBraceToken [39..40) '}'
+        T:EndOfLineTrivia [40..41) '\n'
+    CloseBraceToken [41..42) '}'
+  EndOfFileToken [42..42) ''
+Diagnostics:
+  CS1001 [35..36) Identifier expected

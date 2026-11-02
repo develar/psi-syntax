@@ -1,0 +1,23 @@
+CompilationUnit [0..99)
+  ClassDeclaration [0..88)
+    L:RegionDirectiveTrivia [0..76)
+      HashToken [0..1) '#'
+      RegionKeyword [1..7) 'region'
+      T:WhitespaceTrivia [7..8) ' '
+      L:PreprocessingMessageTrivia [8..75) 'Region Process Information after the Grid """""""""""""""""""""""""'
+      EndOfDirectiveToken [75..75) ''
+      T:EndOfLineTrivia [75..76) '\n'
+    ClassKeyword [76..81) 'class'
+    T:WhitespaceTrivia [81..82) ' '
+    IdentifierToken [82..83) 'C'
+    T:EndOfLineTrivia [83..84) '\n'
+    OpenBraceToken [84..85) '{'
+    T:EndOfLineTrivia [85..86) '\n'
+    CloseBraceToken [86..87) '}'
+    T:EndOfLineTrivia [87..88) '\n'
+  L:EndRegionDirectiveTrivia [88..99)
+    HashToken [88..89) '#'
+    EndRegionKeyword [89..98) 'endregion'
+    EndOfDirectiveToken [98..98) ''
+    T:EndOfLineTrivia [98..99) '\n'
+  EndOfFileToken [99..99) ''

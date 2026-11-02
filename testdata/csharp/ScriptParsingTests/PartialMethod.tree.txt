@@ -1,0 +1,45 @@
+CompilationUnit [0..66)
+  IndexerDeclaration [0..66)
+    L:EndOfLineTrivia [0..1) '\n'
+    NewKeyword [1..4) 'new'
+    T:WhitespaceTrivia [4..5) ' '
+    PublicKeyword [5..11) 'public'
+    T:WhitespaceTrivia [11..12) ' '
+    PredefinedType [12..17)
+      BoolKeyword [12..16) 'bool'
+      T:WhitespaceTrivia [16..17) ' '
+    ThisKeyword [17..21) 'this'
+    BracketedParameterList [21..34)
+      OpenBracketToken [21..22) '['
+      Parameter [22..31)
+        PredefinedType [22..26)
+          IntKeyword [22..25) 'int'
+          T:WhitespaceTrivia [25..26) ' '
+        IdentifierToken [26..31) 'index'
+      CloseBracketToken [31..32) ']'
+      T:WhitespaceTrivia [32..33) ' '
+      T:EndOfLineTrivia [33..34) '\n'
+    AccessorList [34..66)
+      L:WhitespaceTrivia [34..35) ' '
+      OpenBraceToken [35..36) '{'
+      T:EndOfLineTrivia [36..37) '\n'
+      GetAccessorDeclaration [37..63)
+        L:WhitespaceTrivia [37..42) '     '
+        GetKeyword [42..45) 'get'
+        T:WhitespaceTrivia [45..46) ' '
+        Block [46..63)
+          OpenBraceToken [46..47) '{'
+          T:WhitespaceTrivia [47..48) ' '
+          ReturnStatement [48..61)
+            ReturnKeyword [48..54) 'return'
+            T:WhitespaceTrivia [54..55) ' '
+            TrueLiteralExpression [55..59)
+              TrueKeyword [55..59) 'true'
+            SemicolonToken [59..60) ';'
+            T:WhitespaceTrivia [60..61) ' '
+          CloseBraceToken [61..62) '}'
+          T:EndOfLineTrivia [62..63) '\n'
+      L:WhitespaceTrivia [63..64) ' '
+      CloseBraceToken [64..65) '}'
+      T:EndOfLineTrivia [65..66) '\n'
+  EndOfFileToken [66..66) ''

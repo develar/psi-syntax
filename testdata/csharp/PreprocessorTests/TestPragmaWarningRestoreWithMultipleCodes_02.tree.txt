@@ -1,0 +1,17 @@
+CompilationUnit [0..40)
+  L:PragmaWarningDirectiveTrivia [0..40)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    RestoreKeyword [16..23) 'restore'
+    T:WhitespaceTrivia [23..24) ' '
+    IdentifierName [24..30)
+      IdentifierToken [24..30) 'CS0114'
+    CommaToken [30..31) ','
+    T:WhitespaceTrivia [31..32) ' '
+    IdentifierName [32..40)
+      IdentifierToken [32..40) 'nullable'
+    EndOfDirectiveToken [40..40) ''
+  EndOfFileToken [40..40) ''

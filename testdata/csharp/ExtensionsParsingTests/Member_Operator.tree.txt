@@ -1,0 +1,63 @@
+CompilationUnit [0..118)
+  ClassDeclaration [0..118)
+    StaticKeyword [0..6) 'static'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'C'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    ExtensionBlockDeclaration [17..117)
+      L:WhitespaceTrivia [17..21) '    '
+      ExtensionKeyword [21..30) 'extension'
+      ParameterList [30..39)
+        OpenParenToken [30..31) '('
+        Parameter [31..37)
+          PredefinedType [31..37)
+            ObjectKeyword [31..37) 'object'
+        CloseParenToken [37..38) ')'
+        T:EndOfLineTrivia [38..39) '\n'
+      L:WhitespaceTrivia [39..43) '    '
+      OpenBraceToken [43..44) '{'
+      T:EndOfLineTrivia [44..45) '\n'
+      OperatorDeclaration [45..111)
+        L:WhitespaceTrivia [45..53) '        '
+        PublicKeyword [53..59) 'public'
+        T:WhitespaceTrivia [59..60) ' '
+        StaticKeyword [60..66) 'static'
+        T:WhitespaceTrivia [66..67) ' '
+        PredefinedType [67..74)
+          ObjectKeyword [67..73) 'object'
+          T:WhitespaceTrivia [73..74) ' '
+        OperatorKeyword [74..82) 'operator'
+        T:WhitespaceTrivia [82..83) ' '
+        PlusToken [83..84) '+'
+        ParameterList [84..105)
+          OpenParenToken [84..85) '('
+          Parameter [85..93)
+            PredefinedType [85..92)
+              ObjectKeyword [85..91) 'object'
+              T:WhitespaceTrivia [91..92) ' '
+            IdentifierToken [92..93) 'a'
+          CommaToken [93..94) ','
+          T:WhitespaceTrivia [94..95) ' '
+          Parameter [95..103)
+            PredefinedType [95..102)
+              ObjectKeyword [95..101) 'object'
+              T:WhitespaceTrivia [101..102) ' '
+            IdentifierToken [102..103) 'b'
+          CloseParenToken [103..104) ')'
+          T:WhitespaceTrivia [104..105) ' '
+        ArrowExpressionClause [105..109)
+          EqualsGreaterThanToken [105..107) '=>'
+          T:WhitespaceTrivia [107..108) ' '
+          IdentifierName [108..109)
+            IdentifierToken [108..109) 'a'
+        SemicolonToken [109..110) ';'
+        T:EndOfLineTrivia [110..111) '\n'
+      L:WhitespaceTrivia [111..115) '    '
+      CloseBraceToken [115..116) '}'
+      T:EndOfLineTrivia [116..117) '\n'
+    CloseBraceToken [117..118) '}'
+  EndOfFileToken [118..118) ''

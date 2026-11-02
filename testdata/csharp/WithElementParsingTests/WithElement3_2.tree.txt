@@ -1,0 +1,18 @@
+CollectionExpression [0..9)
+  OpenBracketToken [0..1) '['
+  WithElement [1..8)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..8)
+      OpenParenToken [5..6) '('
+      Argument [6..6)
+        IdentifierName [6..6)
+          IdentifierToken [6..6) missing
+      CommaToken [6..7) ','
+      Argument [7..7)
+        IdentifierName [7..7)
+          IdentifierToken [7..7) missing
+      CloseParenToken [7..8) ')'
+  CloseBracketToken [8..9) ']'
+Diagnostics:
+  CS0839 [6..7) Argument missing
+  CS1525 [7..8) Invalid expression term \')\'

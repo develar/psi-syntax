@@ -1,0 +1,22 @@
+ConversionOperatorDeclaration [0..46)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  StaticKeyword [12..18) 'static'
+  T:WhitespaceTrivia [18..19) ' '
+  ExplicitKeyword [19..27) 'explicit'
+  T:WhitespaceTrivia [27..28) ' '
+  OperatorKeyword [28..36) 'operator'
+  T:WhitespaceTrivia [36..37) ' '
+  PredefinedType [37..40)
+    IntKeyword [37..40) 'int'
+  ParameterList [40..45)
+    OpenParenToken [40..41) '('
+    Parameter [41..44)
+      IdentifierName [41..43)
+        IdentifierToken [41..42) 'C'
+        T:WhitespaceTrivia [42..43) ' '
+      IdentifierToken [43..44) 'c'
+    CloseParenToken [44..45) ')'
+  SemicolonToken [45..46) ';'

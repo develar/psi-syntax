@@ -1,0 +1,22 @@
+LocalDeclarationStatement [0..23)
+  VariableDeclaration [0..22)
+    PredefinedType [0..4)
+      IntKeyword [0..3) 'int'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..22)
+      IdentifierToken [4..5) 'x'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..22)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        WithExpression [8..22)
+          IdentifierName [8..14)
+            IdentifierToken [8..13) 'await'
+            T:WhitespaceTrivia [13..14) ' '
+          WithKeyword [14..18) 'with'
+          T:WhitespaceTrivia [18..19) ' '
+          WithInitializerExpression [19..22)
+            OpenBraceToken [19..20) '{'
+            T:WhitespaceTrivia [20..21) ' '
+            CloseBraceToken [21..22) '}'
+  SemicolonToken [22..23) ';'

@@ -1,0 +1,15 @@
+TryStatement [0..19)
+  TryKeyword [0..3) 'try'
+  T:WhitespaceTrivia [3..4) ' '
+  Block [4..8)
+    OpenBraceToken [4..5) '{'
+    T:WhitespaceTrivia [5..6) ' '
+    CloseBraceToken [6..7) '}'
+    T:WhitespaceTrivia [7..8) ' '
+  FinallyClause [8..19)
+    FinallyKeyword [8..15) 'finally'
+    T:WhitespaceTrivia [15..16) ' '
+    Block [16..19)
+      OpenBraceToken [16..17) '{'
+      T:WhitespaceTrivia [17..18) ' '
+      CloseBraceToken [18..19) '}'

@@ -1,0 +1,30 @@
+ConversionOperatorDeclaration [0..38)
+  ImplicitKeyword [0..8) 'implicit'
+  T:WhitespaceTrivia [8..9) ' '
+  ExplicitInterfaceSpecifier [9..13)
+    QualifiedName [9..12)
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'N'
+      DotToken [10..11) '.'
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'I'
+    DotToken [12..13) '.'
+  OperatorKeyword [13..21) 'operator'
+  T:WhitespaceTrivia [21..22) ' '
+  PredefinedType [22..25)
+    IntKeyword [22..25) 'int'
+  ParameterList [25..33)
+    OpenParenToken [25..26) '('
+    Parameter [26..31)
+      PredefinedType [26..30)
+        IntKeyword [26..29) 'int'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'x'
+    CloseParenToken [31..32) ')'
+    T:WhitespaceTrivia [32..33) ' '
+  ArrowExpressionClause [33..37)
+    EqualsGreaterThanToken [33..35) '=>'
+    T:WhitespaceTrivia [35..36) ' '
+    IdentifierName [36..37)
+      IdentifierToken [36..37) 'x'
+  SemicolonToken [37..38) ';'

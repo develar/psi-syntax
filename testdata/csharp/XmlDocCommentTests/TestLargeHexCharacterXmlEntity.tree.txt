@@ -1,0 +1,8 @@
+CompilationUnit [0..13)
+  L:SingleLineDocumentationCommentTrivia [0..13)
+    XmlText [0..13)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+      XmlEntityLiteralToken [4..13) '&#x1d11e;'
+    EndOfDocumentationCommentToken [13..13) ''
+  EndOfFileToken [13..13) ''

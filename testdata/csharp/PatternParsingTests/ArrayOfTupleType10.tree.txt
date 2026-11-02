@@ -1,0 +1,45 @@
+IfStatement [0..34)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  IsExpression [4..29)
+    IdentifierName [4..6)
+      IdentifierToken [4..5) 'o'
+      T:WhitespaceTrivia [5..6) ' '
+    IsKeyword [6..8) 'is'
+    T:WhitespaceTrivia [8..9) ' '
+    ArrayType [9..29)
+      TupleType [9..27)
+        OpenParenToken [9..10) '('
+        TupleElement [10..17)
+          QualifiedName [10..16)
+            IdentifierName [10..11)
+              IdentifierToken [10..11) 'S'
+            DotToken [11..12) '.'
+            IdentifierName [12..16)
+              IdentifierToken [12..15) 'Int'
+              T:WhitespaceTrivia [15..16) ' '
+          IdentifierToken [16..17) 'a'
+        CommaToken [17..18) ','
+        T:WhitespaceTrivia [18..19) ' '
+        TupleElement [19..26)
+          QualifiedName [19..25)
+            IdentifierName [19..20)
+              IdentifierToken [19..20) 'S'
+            DotToken [20..21) '.'
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'Int'
+              T:WhitespaceTrivia [24..25) ' '
+          IdentifierToken [25..26) 'b'
+        CloseParenToken [26..27) ')'
+      ArrayRankSpecifier [27..29)
+        OpenBracketToken [27..28) '['
+        OmittedArraySizeExpression [28..28)
+          OmittedArraySizeExpressionToken [28..28) ''
+        CloseBracketToken [28..29) ']'
+  CloseParenToken [29..30) ')'
+  T:WhitespaceTrivia [30..31) ' '
+  Block [31..34)
+    OpenBraceToken [31..32) '{'
+    T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'

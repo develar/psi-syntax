@@ -1,0 +1,6 @@
+ReturnStatement [0..9)
+  ReturnKeyword [0..6) 'return'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierName [7..8)
+    IdentifierToken [7..8) 'a'
+  SemicolonToken [8..9) ';'

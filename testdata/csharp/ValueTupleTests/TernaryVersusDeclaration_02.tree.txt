@@ -1,0 +1,34 @@
+ReturnStatement [0..56)
+  ReturnKeyword [0..6) 'return'
+  T:WhitespaceTrivia [6..7) ' '
+  TupleExpression [7..55)
+    OpenParenToken [7..8) '('
+    Argument [8..51)
+      ConditionalExpression [8..51)
+        IdentifierName [8..16)
+          IdentifierToken [8..15) 'isValid'
+          T:WhitespaceTrivia [15..16) ' '
+        QuestionToken [16..17) '?'
+        T:WhitespaceTrivia [17..18) ' '
+        SimpleMemberAccessExpression [18..33)
+          IdentifierName [18..24)
+            IdentifierToken [18..24) 'Errors'
+          DotToken [24..25) '.'
+          IdentifierName [25..33)
+            IdentifierToken [25..32) 'IsValid'
+            T:WhitespaceTrivia [32..33) ' '
+        ColonToken [33..34) ':'
+        T:WhitespaceTrivia [34..35) ' '
+        SimpleMemberAccessExpression [35..51)
+          IdentifierName [35..41)
+            IdentifierToken [35..41) 'Errors'
+          DotToken [41..42) '.'
+          IdentifierName [42..51)
+            IdentifierToken [42..51) 'HasErrors'
+    CommaToken [51..52) ','
+    T:WhitespaceTrivia [52..53) ' '
+    Argument [53..54)
+      IdentifierName [53..54)
+        IdentifierToken [53..54) 'i'
+    CloseParenToken [54..55) ')'
+  SemicolonToken [55..56) ';'

@@ -1,0 +1,24 @@
+PropertyDeclaration [0..29)
+  PredefinedType [0..7)
+    StringKeyword [0..6) 'string'
+    T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..15) 'Property'
+  T:WhitespaceTrivia [15..16) ' '
+  AccessorList [16..29)
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    InitAccessorDeclaration [18..29)
+      InitKeyword [18..22) 'init'
+      T:WhitespaceTrivia [22..23) ' '
+      Block [23..29)
+        OpenBraceToken [23..23) missing
+        ExpressionStatement [23..28)
+          IdentifierName [23..26)
+            IdentifierToken [23..26) 'set'
+          SemicolonToken [26..27) ';'
+          T:WhitespaceTrivia [27..28) ' '
+        CloseBraceToken [28..29) '}'
+    CloseBraceToken [29..29) missing
+Diagnostics:
+  CS8180 [23..26) { or ; or => expected
+  CS1513 [29..29) } expected

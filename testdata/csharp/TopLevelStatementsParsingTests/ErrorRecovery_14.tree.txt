@@ -1,0 +1,36 @@
+CompilationUnit [0..41)
+  UsingDirective [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    GlobalKeyword [1..7) 'global'
+    T:WhitespaceTrivia [7..8) ' '
+    UsingKeyword [8..13) 'using'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierName [14..17)
+      IdentifierToken [14..17) 'Goo'
+    SemicolonToken [17..18) ';'
+    T:EndOfLineTrivia [18..19) '\n'
+  GlobalStatement [19..28)
+    LocalDeclarationStatement [19..28)
+      VariableDeclaration [19..28)
+        IdentifierName [19..21)
+          IdentifierToken [19..20) 'p'
+          T:EndOfLineTrivia [20..21) '\n'
+        VariableDeclarator [21..28)
+          IdentifierToken [21..27) 'global'
+          T:WhitespaceTrivia [27..28) ' '
+      SemicolonToken [28..28) missing
+  GlobalStatement [28..41)
+    LocalDeclarationStatement [28..41)
+      UsingKeyword [28..33) 'using'
+      T:WhitespaceTrivia [33..34) ' '
+      VariableDeclaration [34..39)
+        IdentifierName [34..38)
+          IdentifierToken [34..37) 'Bar'
+          T:WhitespaceTrivia [37..38) ' '
+        VariableDeclarator [38..39)
+          IdentifierToken [38..39) 'x'
+      SemicolonToken [39..40) ';'
+      T:EndOfLineTrivia [40..41) '\n'
+  EndOfFileToken [41..41) ''
+Diagnostics:
+  CS1002 [28..33) ; expected

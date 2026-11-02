@@ -1,0 +1,22 @@
+MethodDeclaration [0..40)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..39)
+    OpenParenToken [6..7) '('
+    Parameter [7..38)
+      RefKeyword [7..10) 'ref'
+      T:WhitespaceTrivia [10..11) ' '
+      ReadOnlyKeyword [11..19) 'readonly'
+      T:WhitespaceTrivia [19..20) ' '
+      RefKeyword [20..23) 'ref'
+      T:WhitespaceTrivia [23..24) ' '
+      ReadOnlyKeyword [24..32) 'readonly'
+      T:WhitespaceTrivia [32..33) ' '
+      PredefinedType [33..37)
+        IntKeyword [33..36) 'int'
+        T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..38) 'p'
+    CloseParenToken [38..39) ')'
+  SemicolonToken [39..40) ';'

@@ -1,0 +1,28 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    LocalFunctionStatement [0..27)
+      PredefinedType [0..6)
+        L:EndOfLineTrivia [0..1) '\n'
+        VoidKeyword [1..5) 'void'
+        T:WhitespaceTrivia [5..6) ' '
+      IdentifierToken [6..9) 'goo'
+      ParameterList [9..12)
+        OpenParenToken [9..10) '('
+        CloseParenToken [10..11) ')'
+        T:WhitespaceTrivia [11..12) ' '
+      Block [12..27)
+        OpenBraceToken [12..13) '{'
+        T:WhitespaceTrivia [13..14) ' '
+        CloseBraceToken [14..15) '}'
+        T:EndOfLineTrivia [15..16) '\n'
+        T:SkippedTokensTrivia [16..21)
+          UsingKeyword [16..21) 'using'
+        T:WhitespaceTrivia [21..22) ' '
+        T:SkippedTokensTrivia [22..25)
+          IdentifierToken [22..25) 'Goo'
+        T:SkippedTokensTrivia [25..26)
+          SemicolonToken [25..26) ';'
+        T:EndOfLineTrivia [26..27) '\n'
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1529 [16..26) A using clause must precede all other elements defined in the namespace except extern alias declarations

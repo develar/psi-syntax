@@ -1,0 +1,14 @@
+CompilationUnit [0..37)
+  L:NullableDirectiveTrivia [0..37)
+    HashToken [0..1) '#'
+    NullableKeyword [1..9) 'nullable'
+    T:WhitespaceTrivia [9..10) ' '
+    DisableKeyword [10..17) 'disable'
+    T:WhitespaceTrivia [17..18) ' '
+    WarningsKeyword [18..26) 'warnings'
+    T:WhitespaceTrivia [26..27) ' '
+    T:SingleLineCommentTrivia [27..37) '// comment'
+    EndOfDirectiveToken [37..37) ''
+  EndOfFileToken [37..37) ''
+Diagnostics:
+  CS8025 [1..9) Feature \'nullable reference types\' is not available in C# 4. Please use language version 8.0 or greater.

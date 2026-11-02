@@ -1,0 +1,1 @@
+/// <![CDATA[ incompleteclass C { }

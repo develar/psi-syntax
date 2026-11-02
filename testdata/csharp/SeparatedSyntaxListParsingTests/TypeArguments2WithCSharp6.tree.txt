@@ -1,0 +1,204 @@
+CompilationUnit [0..160)
+  ClassDeclaration [0..144)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..22)
+      L:WhitespaceTrivia [11..15) '    '
+      NewKeyword [15..18) 'new'
+      T:WhitespaceTrivia [18..19) ' '
+      GenericName [19..22)
+        IdentifierToken [19..20) 'C'
+        TypeArgumentList [20..22)
+          LessThanToken [20..21) '<'
+          OmittedTypeArgument [21..21)
+            OmittedTypeArgumentToken [21..21) ''
+          GreaterThanToken [21..22) '>'
+    IncompleteMember [22..26)
+      TupleType [22..26)
+        OpenParenToken [22..23) '('
+        TupleElement [23..23)
+          IdentifierName [23..23)
+            IdentifierToken [23..23) missing
+        CommaToken [23..23) missing
+        TupleElement [23..23)
+          IdentifierName [23..23)
+            IdentifierToken [23..23) missing
+        CloseParenToken [23..24) ')'
+        T:SkippedTokensTrivia [24..25)
+          SemicolonToken [24..25) ';'
+        T:EndOfLineTrivia [25..26) '\n'
+    IncompleteMember [26..39)
+      L:WhitespaceTrivia [26..30) '    '
+      NewKeyword [30..33) 'new'
+      T:WhitespaceTrivia [33..34) ' '
+      GenericName [34..39)
+        IdentifierToken [34..35) 'C'
+        TypeArgumentList [35..39)
+          LessThanToken [35..36) '<'
+          OmittedTypeArgument [36..36)
+            OmittedTypeArgumentToken [36..36) ''
+          CommaToken [36..37) ','
+          T:WhitespaceTrivia [37..38) ' '
+          OmittedTypeArgument [38..38)
+            OmittedTypeArgumentToken [38..38) ''
+          GreaterThanToken [38..39) '>'
+    IncompleteMember [39..43)
+      TupleType [39..43)
+        OpenParenToken [39..40) '('
+        TupleElement [40..40)
+          IdentifierName [40..40)
+            IdentifierToken [40..40) missing
+        CommaToken [40..40) missing
+        TupleElement [40..40)
+          IdentifierName [40..40)
+            IdentifierToken [40..40) missing
+        CloseParenToken [40..41) ')'
+        T:SkippedTokensTrivia [41..42)
+          SemicolonToken [41..42) ';'
+        T:EndOfLineTrivia [42..43) '\n'
+    FieldDeclaration [43..58)
+      VariableDeclaration [43..56)
+        GenericName [43..54)
+          L:WhitespaceTrivia [43..47) '    '
+          IdentifierToken [47..48) 'C'
+          TypeArgumentList [48..54)
+            LessThanToken [48..49) '<'
+            GenericName [49..52)
+              IdentifierToken [49..50) 'C'
+              TypeArgumentList [50..52)
+                LessThanToken [50..51) '<'
+                OmittedTypeArgument [51..51)
+                  OmittedTypeArgumentToken [51..51) ''
+                GreaterThanToken [51..52) '>'
+            GreaterThanToken [52..53) '>'
+            T:WhitespaceTrivia [53..54) ' '
+        VariableDeclarator [54..56)
+          IdentifierToken [54..56) 'a1'
+      SemicolonToken [56..57) ';'
+      T:EndOfLineTrivia [57..58) '\n'
+    FieldDeclaration [58..73)
+      VariableDeclaration [58..71)
+        GenericName [58..69)
+          L:WhitespaceTrivia [58..62) '    '
+          IdentifierToken [62..63) 'C'
+          TypeArgumentList [63..69)
+            LessThanToken [63..64) '<'
+            GenericName [64..67)
+              IdentifierToken [64..65) 'A'
+              TypeArgumentList [65..67)
+                LessThanToken [65..66) '<'
+                OmittedTypeArgument [66..66)
+                  OmittedTypeArgumentToken [66..66) ''
+                GreaterThanToken [66..67) '>'
+            GreaterThanToken [67..68) '>'
+            T:WhitespaceTrivia [68..69) ' '
+        VariableDeclarator [69..71)
+          IdentifierToken [69..71) 'a1'
+      SemicolonToken [71..72) ';'
+      T:EndOfLineTrivia [72..73) '\n'
+    FieldDeclaration [73..112)
+      VariableDeclaration [73..110)
+        PredefinedType [73..84)
+          L:WhitespaceTrivia [73..77) '    '
+          ObjectKeyword [77..83) 'object'
+          T:WhitespaceTrivia [83..84) ' '
+        VariableDeclarator [84..110)
+          IdentifierToken [84..86) 'a1'
+          T:WhitespaceTrivia [86..87) ' '
+          EqualsValueClause [87..110)
+            EqualsToken [87..88) '='
+            T:WhitespaceTrivia [88..89) ' '
+            TypeOfExpression [89..110)
+              TypeOfKeyword [89..95) 'typeof'
+              OpenParenToken [95..96) '('
+              GenericName [96..109)
+                IdentifierToken [96..97) 'C'
+                TypeArgumentList [97..109)
+                  LessThanToken [97..98) '<'
+                  GenericName [98..103)
+                    IdentifierToken [98..99) 'C'
+                    TypeArgumentList [99..103)
+                      LessThanToken [99..100) '<'
+                      OmittedTypeArgument [100..100)
+                        OmittedTypeArgumentToken [100..100) ''
+                      CommaToken [100..101) ','
+                      T:WhitespaceTrivia [101..102) ' '
+                      OmittedTypeArgument [102..102)
+                        OmittedTypeArgumentToken [102..102) ''
+                      GreaterThanToken [102..103) '>'
+                  CommaToken [103..104) ','
+                  T:WhitespaceTrivia [104..105) ' '
+                  PredefinedType [105..108)
+                    IntKeyword [105..108) 'int'
+                  GreaterThanToken [108..109) '>'
+              CloseParenToken [109..110) ')'
+      SemicolonToken [110..111) ';'
+      T:EndOfLineTrivia [111..112) '\n'
+    FieldDeclaration [112..142)
+      VariableDeclaration [112..140)
+        PredefinedType [112..123)
+          L:WhitespaceTrivia [112..116) '    '
+          ObjectKeyword [116..122) 'object'
+          T:WhitespaceTrivia [122..123) ' '
+        VariableDeclarator [123..140)
+          IdentifierToken [123..125) 'a2'
+          T:WhitespaceTrivia [125..126) ' '
+          EqualsValueClause [126..140)
+            EqualsToken [126..127) '='
+            T:WhitespaceTrivia [127..128) ' '
+            InvocationExpression [128..140)
+              GenericName [128..134)
+                IdentifierToken [128..132) 'Swap'
+                TypeArgumentList [132..134)
+                  LessThanToken [132..133) '<'
+                  OmittedTypeArgument [133..133)
+                    OmittedTypeArgumentToken [133..133) ''
+                  GreaterThanToken [133..134) '>'
+              ArgumentList [134..140)
+                OpenParenToken [134..135) '('
+                Argument [135..136)
+                  NumericLiteralExpression [135..136)
+                    NumericLiteralToken [135..136) '1'
+                CommaToken [136..137) ','
+                T:WhitespaceTrivia [137..138) ' '
+                Argument [138..139)
+                  NumericLiteralExpression [138..139)
+                    NumericLiteralToken [138..139) '1'
+                CloseParenToken [139..140) ')'
+      SemicolonToken [140..141) ';'
+      T:EndOfLineTrivia [141..142) '\n'
+    CloseBraceToken [142..143) '}'
+    T:EndOfLineTrivia [143..144) '\n'
+  ClassDeclaration [144..160)
+    L:EndOfLineTrivia [144..145) '\n'
+    ClassKeyword [145..150) 'class'
+    T:WhitespaceTrivia [150..151) ' '
+    IdentifierToken [151..152) 'M'
+    TypeParameterList [152..156)
+      LessThanToken [152..153) '<'
+      TypeParameter [153..153)
+        IdentifierToken [153..153) missing
+      CommaToken [153..154) ','
+      TypeParameter [154..154)
+        IdentifierToken [154..154) missing
+      GreaterThanToken [154..155) '>'
+      T:WhitespaceTrivia [155..156) ' '
+    OpenBraceToken [156..157) '{'
+    T:WhitespaceTrivia [157..158) ' '
+    CloseBraceToken [158..159) '}'
+    T:EndOfLineTrivia [159..160) '\n'
+  EndOfFileToken [160..160) ''
+Diagnostics:
+  CS1519 [22..23) Invalid token \'(\' in a member declaration
+  CS8124 [23..24) Tuple must contain at least two elements.
+  CS1519 [24..25) Invalid token \';\' in a member declaration
+  CS1519 [39..40) Invalid token \'(\' in a member declaration
+  CS8124 [40..41) Tuple must contain at least two elements.
+  CS1519 [41..42) Invalid token \';\' in a member declaration
+  CS1001 [153..154) Identifier expected
+  CS1001 [154..155) Identifier expected

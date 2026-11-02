@@ -1,0 +1,15 @@
+LocalDeclarationStatement [0..18)
+  VariableDeclaration [0..17)
+    PredefinedType [0..7)
+      ObjectKeyword [0..6) 'object'
+      T:WhitespaceTrivia [6..7) ' '
+    VariableDeclarator [7..17)
+      IdentifierToken [7..12) 'value'
+      T:WhitespaceTrivia [12..13) ' '
+      EqualsValueClause [13..17)
+        EqualsToken [13..13) missing
+        NullLiteralExpression [13..17)
+          NullKeyword [13..17) 'null'
+  SemicolonToken [17..18) ';'
+Diagnostics:
+  CS1003 [13..17) Syntax error, \'=\' expected

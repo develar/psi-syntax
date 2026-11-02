@@ -1,0 +1,10 @@
+CompilationUnit [0..12)
+  L:ErrorDirectiveTrivia [0..12)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..12) '"goo"'
+    EndOfDirectiveToken [12..12) ''
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1029 [7..12) #error: \'"goo"\'

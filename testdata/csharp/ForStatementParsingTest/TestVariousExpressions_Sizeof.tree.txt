@@ -1,0 +1,27 @@
+ForStatement [0..36)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  SizeOfExpression [5..14)
+    SizeOfKeyword [5..11) 'sizeof'
+    OpenParenToken [11..12) '('
+    IdentifierName [12..13)
+      IdentifierToken [12..13) 'a'
+    CloseParenToken [13..14) ')'
+  SemicolonToken [14..15) ';'
+  SizeOfExpression [15..24)
+    SizeOfKeyword [15..21) 'sizeof'
+    OpenParenToken [21..22) '('
+    IdentifierName [22..23)
+      IdentifierToken [22..23) 'a'
+    CloseParenToken [23..24) ')'
+  SemicolonToken [24..25) ';'
+  SizeOfExpression [25..34)
+    SizeOfKeyword [25..31) 'sizeof'
+    OpenParenToken [31..32) '('
+    IdentifierName [32..33)
+      IdentifierToken [32..33) 'a'
+    CloseParenToken [33..34) ')'
+  CloseParenToken [34..35) ')'
+  EmptyStatement [35..36)
+    SemicolonToken [35..36) ';'

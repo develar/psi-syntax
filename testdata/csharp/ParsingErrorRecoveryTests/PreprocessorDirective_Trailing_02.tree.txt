@@ -1,0 +1,33 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..24)
+    IfStatement [0..24)
+      IfKeyword [0..2) 'if'
+      T:WhitespaceTrivia [2..3) ' '
+      OpenParenToken [3..4) '('
+      T:SkippedTokensTrivia [4..14)
+        BadToken [4..14) '#if false\n'
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'x'
+        T:EndOfLineTrivia [15..16) '\n'
+      CloseParenToken [16..16) missing
+      ExpressionStatement [16..24)
+        IdentifierName [16..24)
+          L:BadDirectiveTrivia [16..22)
+            HashToken [16..17) '#'
+            ElseKeyword [17..21) 'else'
+            EndOfDirectiveToken [21..21) ''
+            T:EndOfLineTrivia [21..22) '\n'
+          IdentifierToken [22..23) 'y'
+          T:EndOfLineTrivia [23..24) '\n'
+        SemicolonToken [24..24) missing
+  L:BadDirectiveTrivia [24..30)
+    HashToken [24..25) '#'
+    EndIfKeyword [25..30) 'endif'
+    EndOfDirectiveToken [30..30) ''
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1040 [4..5) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1026 [15..15) ) expected
+  CS1028 [16..21) Unexpected preprocessor directive
+  CS1002 [23..23) ; expected
+  CS1028 [24..30) Unexpected preprocessor directive

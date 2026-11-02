@@ -1,0 +1,75 @@
+CompilationUnit [0..86)
+  ClassDeclaration [0..86)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'A'
+    T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    MethodDeclaration [18..84)
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      PredefinedType [25..30)
+        VoidKeyword [25..29) 'void'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'M'
+      TypeParameterList [31..37)
+        LessThanToken [31..32) '<'
+        TypeParameter [32..33)
+          IdentifierToken [32..33) 'T'
+        CommaToken [33..34) ','
+        T:WhitespaceTrivia [34..35) ' '
+        TypeParameter [35..36)
+          IdentifierToken [35..36) 'V'
+        GreaterThanToken [36..37) '>'
+      ParameterList [37..48)
+        OpenParenToken [37..38) '('
+        Parameter [38..41)
+          IdentifierName [38..40)
+            IdentifierToken [38..39) 'T'
+            T:WhitespaceTrivia [39..40) ' '
+          IdentifierToken [40..41) 't'
+        CommaToken [41..42) ','
+        T:WhitespaceTrivia [42..43) ' '
+        Parameter [43..46)
+          IdentifierName [43..45)
+            IdentifierToken [43..44) 'V'
+            T:WhitespaceTrivia [44..45) ' '
+          IdentifierToken [45..46) 'v'
+        CloseParenToken [46..47) ')'
+        T:EndOfLineTrivia [47..48) '\n'
+      TypeParameterConstraintClause [48..64)
+        WhereKeyword [48..53) 'where'
+        T:WhitespaceTrivia [53..54) ' '
+        IdentifierName [54..56)
+          IdentifierToken [54..55) 'T'
+          T:WhitespaceTrivia [55..56) ' '
+        ColonToken [56..57) ':'
+        T:WhitespaceTrivia [57..58) ' '
+        ConstructorConstraint [58..64)
+          NewKeyword [58..61) 'new'
+          OpenParenToken [61..62) '('
+          CloseParenToken [62..63) ')'
+          T:EndOfLineTrivia [63..64) '\n'
+      TypeParameterConstraintClause [64..80)
+        WhereKeyword [64..69) 'where'
+        T:WhitespaceTrivia [69..70) ' '
+        IdentifierName [70..72)
+          IdentifierToken [70..71) 'V'
+          T:WhitespaceTrivia [71..72) ' '
+        ColonToken [72..73) ':'
+        T:WhitespaceTrivia [73..74) ' '
+        ClassConstraint [74..80)
+          ClassKeyword [74..79) 'class'
+          T:WhitespaceTrivia [79..80) ' '
+      Block [80..84)
+        OpenBraceToken [80..81) '{'
+        T:WhitespaceTrivia [81..82) ' '
+        CloseBraceToken [82..83) '}'
+        T:EndOfLineTrivia [83..84) '\n'
+    CloseBraceToken [84..85) '}'
+    T:EndOfLineTrivia [85..86) '\n'
+  EndOfFileToken [86..86) ''

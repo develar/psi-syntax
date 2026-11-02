@@ -1,0 +1,1 @@
+delegate* unmanaged<void> ptr;

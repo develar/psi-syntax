@@ -1,0 +1,21 @@
+FieldDeclaration [0..26)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  VariableDeclaration [7..12)
+    PredefinedType [7..11)
+      IntKeyword [7..10) 'int'
+      T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..12)
+      IdentifierToken [11..12) 'x'
+  SemicolonToken [12..13) ';'
+  T:WhitespaceTrivia [13..14) ' '
+  T:SkippedTokensTrivia [14..20)
+    PublicKeyword [14..20) 'public'
+  T:WhitespaceTrivia [20..21) ' '
+  T:SkippedTokensTrivia [21..24)
+    IntKeyword [21..24) 'int'
+  T:WhitespaceTrivia [24..25) ' '
+  T:SkippedTokensTrivia [25..26)
+    IdentifierToken [25..26) 'y'
+Diagnostics:
+  CS1073 [0..13) Unexpected token \'public\'

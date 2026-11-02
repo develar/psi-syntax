@@ -1,0 +1,1 @@
+safe public interface I { }

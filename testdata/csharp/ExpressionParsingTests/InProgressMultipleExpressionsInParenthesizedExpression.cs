@@ -1,0 +1,1 @@
+var v = (Boo Quux());

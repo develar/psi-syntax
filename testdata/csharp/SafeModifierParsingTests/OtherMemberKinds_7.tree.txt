@@ -1,0 +1,12 @@
+StructDeclaration [0..24)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  StructKeyword [12..18) 'struct'
+  T:WhitespaceTrivia [18..19) ' '
+  IdentifierToken [19..20) 'S'
+  T:WhitespaceTrivia [20..21) ' '
+  OpenBraceToken [21..22) '{'
+  T:WhitespaceTrivia [22..23) ' '
+  CloseBraceToken [23..24) '}'

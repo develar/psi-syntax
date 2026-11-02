@@ -1,0 +1,20 @@
+CompilationUnit [0..19)
+  GlobalStatement [0..19)
+    LocalDeclarationStatement [0..19)
+      L:EndOfLineTrivia [0..1) '\n'
+      UnsafeKeyword [1..7) 'unsafe'
+      T:WhitespaceTrivia [7..8) ' '
+      VariableDeclaration [8..17)
+        PointerType [8..14)
+          IdentifierName [8..12)
+            IdentifierToken [8..11) 'Idf'
+            T:WhitespaceTrivia [11..12) ' '
+          AsteriskToken [12..13) '*'
+          T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..17)
+          IdentifierToken [14..17) 'Idf'
+      SemicolonToken [17..18) ';'
+      T:EndOfLineTrivia [18..19) '\n'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS0106 [1..7) The modifier \'unsafe\' is not valid for this item

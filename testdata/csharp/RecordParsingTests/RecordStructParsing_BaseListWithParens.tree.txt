@@ -1,0 +1,22 @@
+CompilationUnit [0..26)
+  RecordStructDeclaration [0..26)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'S'
+    T:WhitespaceTrivia [15..16) ' '
+    BaseList [16..25)
+      ColonToken [16..17) ':'
+      T:WhitespaceTrivia [17..18) ' '
+      PrimaryConstructorBaseType [18..25)
+        IdentifierName [18..22)
+          IdentifierToken [18..22) 'Base'
+        ArgumentList [22..25)
+          OpenParenToken [22..23) '('
+          Argument [23..24)
+            NumericLiteralExpression [23..24)
+              NumericLiteralToken [23..24) '1'
+          CloseParenToken [24..25) ')'
+    SemicolonToken [25..26) ';'
+  EndOfFileToken [26..26) ''

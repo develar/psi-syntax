@@ -1,0 +1,4 @@
+IdentifierToken [0..8) '@@@class'
+EndOfFileToken [8..8) ''
+Diagnostics:
+  CS9008 [0..3) Sequence of \'@\' characters is not allowed. A verbatim string or identifier can only have one \'@\' character and a raw string cannot have any.

@@ -1,0 +1,1 @@
+class a { fixed b c[10]; }

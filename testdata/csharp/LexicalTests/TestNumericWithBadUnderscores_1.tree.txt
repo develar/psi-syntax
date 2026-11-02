@@ -1,0 +1,2 @@
+IdentifierToken [0..5) '_1000'
+EndOfFileToken [5..5) ''

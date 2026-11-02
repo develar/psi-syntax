@@ -1,0 +1,38 @@
+SwitchStatement [0..84)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchSection [13..83)
+    CasePatternSwitchLabel [13..64)
+      L:WhitespaceTrivia [13..17) '    '
+      CaseKeyword [17..21) 'case'
+      T:WhitespaceTrivia [21..22) ' '
+      ConstantPattern [22..53)
+        SimpleMemberAccessExpression [22..53)
+          IdentifierName [22..27)
+            IdentifierToken [22..27) 'Int32'
+          DotToken [27..28) '.'
+          T:EndOfLineTrivia [28..29) '\n'
+          IdentifierName [29..53)
+            L:WhitespaceTrivia [29..44) '               '
+            IdentifierToken [44..52) 'MaxValue'
+            T:WhitespaceTrivia [52..53) ' '
+      WhenClause [53..62)
+        WhenKeyword [53..57) 'when'
+        T:WhitespaceTrivia [57..58) ' '
+        TrueLiteralExpression [58..62)
+          TrueKeyword [58..62) 'true'
+      ColonToken [62..63) ':'
+      T:EndOfLineTrivia [63..64) '\n'
+    BreakStatement [64..83)
+      L:WhitespaceTrivia [64..76) '            '
+      BreakKeyword [76..81) 'break'
+      SemicolonToken [81..82) ';'
+      T:EndOfLineTrivia [82..83) '\n'
+  CloseBraceToken [83..84) '}'

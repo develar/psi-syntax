@@ -1,0 +1,5 @@
+IncompleteMember [0..8)
+  IdentifierName [0..8)
+    IdentifierToken [0..8) 'required'
+Diagnostics:
+  CS1519 [8..8) Invalid token \'\' in a member declaration

@@ -1,0 +1,84 @@
+ExpressionStatement [0..76)
+  SimpleAssignmentExpression [0..75)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    SwitchExpression [4..75)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      SwitchKeyword [6..12) 'switch'
+      T:WhitespaceTrivia [12..13) ' '
+      OpenBraceToken [13..14) '{'
+      T:EndOfLineTrivia [14..15) '\n'
+      SwitchExpressionArm [15..32)
+        RelationalPattern [15..28)
+          L:WhitespaceTrivia [15..19) '    '
+          LessThanToken [19..20) '<'
+          T:WhitespaceTrivia [20..21) ' '
+          LeftShiftExpression [21..28)
+            NumericLiteralExpression [21..23)
+              NumericLiteralToken [21..22) '0'
+              T:WhitespaceTrivia [22..23) ' '
+            LessThanLessThanToken [23..25) '<<'
+            T:WhitespaceTrivia [25..26) ' '
+            NumericLiteralExpression [26..28)
+              NumericLiteralToken [26..27) '0'
+              T:WhitespaceTrivia [27..28) ' '
+        EqualsGreaterThanToken [28..30) '=>'
+        T:WhitespaceTrivia [30..31) ' '
+        NumericLiteralExpression [31..32)
+          NumericLiteralToken [31..32) '0'
+      CommaToken [32..33) ','
+      T:EndOfLineTrivia [33..34) '\n'
+      SwitchExpressionArm [34..52)
+        ConstantPattern [34..48)
+          LeftShiftExpression [34..48)
+            NumericLiteralExpression [34..43)
+              L:WhitespaceTrivia [34..38) '    '
+              L:SkippedTokensTrivia [38..40)
+                EqualsEqualsToken [38..40) '=='
+              L:WhitespaceTrivia [40..41) ' '
+              NumericLiteralToken [41..42) '4'
+              T:WhitespaceTrivia [42..43) ' '
+            LessThanLessThanToken [43..45) '<<'
+            T:WhitespaceTrivia [45..46) ' '
+            NumericLiteralExpression [46..48)
+              NumericLiteralToken [46..47) '4'
+              T:WhitespaceTrivia [47..48) ' '
+        EqualsGreaterThanToken [48..50) '=>'
+        T:WhitespaceTrivia [50..51) ' '
+        NumericLiteralExpression [51..52)
+          NumericLiteralToken [51..52) '4'
+      CommaToken [52..53) ','
+      T:EndOfLineTrivia [53..54) '\n'
+      SwitchExpressionArm [54..72)
+        NotPattern [54..68)
+          NotKeyword [54..54) missing
+          T:WhitespaceTrivia [54..58) '    '
+          T:SkippedTokensTrivia [58..60)
+            ExclamationEqualsToken [58..60) '!='
+          T:WhitespaceTrivia [60..61) ' '
+          ConstantPattern [61..68)
+            LeftShiftExpression [61..68)
+              NumericLiteralExpression [61..63)
+                NumericLiteralToken [61..62) '5'
+                T:WhitespaceTrivia [62..63) ' '
+              LessThanLessThanToken [63..65) '<<'
+              T:WhitespaceTrivia [65..66) ' '
+              NumericLiteralExpression [66..68)
+                NumericLiteralToken [66..67) '5'
+                T:WhitespaceTrivia [67..68) ' '
+        EqualsGreaterThanToken [68..70) '=>'
+        T:WhitespaceTrivia [70..71) ' '
+        NumericLiteralExpression [71..72)
+          NumericLiteralToken [71..72) '5'
+      CommaToken [72..73) ','
+      T:EndOfLineTrivia [73..74) '\n'
+      CloseBraceToken [74..75) '}'
+  SemicolonToken [75..76) ';'
+Diagnostics:
+  CS9344 [38..40) The \'==\' operator is not supported in a pattern.
+  CS9345 [58..60) The \'!=\' operator is not supported in a pattern. Use \'not\' to represent a negated pattern.

@@ -1,0 +1,11 @@
+WithExpression [0..8)
+  NumericLiteralExpression [0..2)
+    NumericLiteralToken [0..1) '0'
+    T:WhitespaceTrivia [1..2) ' '
+  WithKeyword [2..6) 'with'
+  T:WhitespaceTrivia [6..7) ' '
+  WithInitializerExpression [7..8)
+    OpenBraceToken [7..8) '{'
+    CloseBraceToken [8..8) missing
+Diagnostics:
+  CS1513 [8..8) } expected

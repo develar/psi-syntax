@@ -1,0 +1,82 @@
+CompilationUnit [0..139)
+  ClassDeclaration [0..139)
+    AttributeList [0..42)
+      L:EndOfLineTrivia [0..1) '\n'
+      OpenBracketToken [1..2) '['
+      Attribute [2..40)
+        IdentifierName [2..16)
+          IdentifierToken [2..16) 'AttributeUsage'
+        AttributeArgumentList [16..40)
+          OpenParenToken [16..17) '('
+          AttributeArgument [17..39)
+            SimpleMemberAccessExpression [17..39)
+              IdentifierName [17..33)
+                IdentifierToken [17..33) 'AttributeTargets'
+              DotToken [33..34) '.'
+              IdentifierName [34..39)
+                IdentifierToken [34..39) 'Class'
+          CloseParenToken [39..40) ')'
+      CloseBracketToken [40..41) ']'
+      T:EndOfLineTrivia [41..42) '\n'
+    PublicKeyword [42..48) 'public'
+    T:WhitespaceTrivia [48..49) ' '
+    ClassKeyword [49..54) 'class'
+    T:WhitespaceTrivia [54..55) ' '
+    IdentifierToken [55..68) 'HelpAttribute'
+    T:WhitespaceTrivia [68..69) ' '
+    BaseList [69..81)
+      ColonToken [69..70) ':'
+      T:WhitespaceTrivia [70..71) ' '
+      SimpleBaseType [71..81)
+        IdentifierName [71..81)
+          IdentifierToken [71..80) 'Attribute'
+          T:EndOfLineTrivia [80..81) '\n'
+    OpenBraceToken [81..82) '{'
+    T:EndOfLineTrivia [82..83) '\n'
+    FieldDeclaration [83..95)
+      VariableDeclaration [83..93)
+        PredefinedType [83..88)
+          ByteKeyword [83..87) 'byte'
+          T:WhitespaceTrivia [87..88) ' '
+        VariableDeclarator [88..93)
+          IdentifierToken [88..89) 'b'
+          T:WhitespaceTrivia [89..90) ' '
+          EqualsValueClause [90..93)
+            EqualsToken [90..91) '='
+            T:WhitespaceTrivia [91..92) ' '
+            NumericLiteralExpression [92..93)
+              NumericLiteralToken [92..93) '0'
+      SemicolonToken [93..94) ';'
+      T:EndOfLineTrivia [94..95) '\n'
+    ConstructorDeclaration [95..137)
+      PublicKeyword [95..101) 'public'
+      T:WhitespaceTrivia [101..102) ' '
+      IdentifierToken [102..115) 'HelpAttribute'
+      ParameterList [115..125)
+        OpenParenToken [115..116) '('
+        Parameter [116..123)
+          PredefinedType [116..121)
+            ByteKeyword [116..120) 'byte'
+            T:WhitespaceTrivia [120..121) ' '
+          IdentifierToken [121..123) 'b1'
+        CloseParenToken [123..124) ')'
+        T:WhitespaceTrivia [124..125) ' '
+      Block [125..137)
+        OpenBraceToken [125..126) '{'
+        T:EndOfLineTrivia [126..127) '\n'
+        ExpressionStatement [127..135)
+          SimpleAssignmentExpression [127..133)
+            IdentifierName [127..129)
+              IdentifierToken [127..128) 'b'
+              T:WhitespaceTrivia [128..129) ' '
+            EqualsToken [129..130) '='
+            T:WhitespaceTrivia [130..131) ' '
+            IdentifierName [131..133)
+              IdentifierToken [131..133) 'b1'
+          SemicolonToken [133..134) ';'
+          T:EndOfLineTrivia [134..135) '\n'
+        CloseBraceToken [135..136) '}'
+        T:EndOfLineTrivia [136..137) '\n'
+    CloseBraceToken [137..138) '}'
+    T:EndOfLineTrivia [138..139) '\n'
+  EndOfFileToken [139..139) ''

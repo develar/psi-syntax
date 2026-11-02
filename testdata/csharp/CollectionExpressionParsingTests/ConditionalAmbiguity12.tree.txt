@@ -1,0 +1,54 @@
+ConditionalExpression [0..29)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  QuestionToken [2..3) '?'
+  T:WhitespaceTrivia [3..4) ' '
+  ConditionalAccessExpression [4..10)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'b'
+    QuestionToken [5..6) '?'
+    ElementBindingExpression [6..10)
+      BracketedArgumentList [6..10)
+        OpenBracketToken [6..7) '['
+        Argument [7..8)
+          IdentifierName [7..8)
+            IdentifierToken [7..8) 'c'
+        CloseBracketToken [8..9) ']'
+        T:WhitespaceTrivia [9..10) ' '
+  ColonToken [10..11) ':'
+  T:WhitespaceTrivia [11..12) ' '
+  ConditionalExpression [12..29)
+    IdentifierName [12..14)
+      IdentifierToken [12..13) 'd'
+      T:WhitespaceTrivia [13..14) ' '
+    QuestionToken [14..15) '?'
+    T:WhitespaceTrivia [15..16) ' '
+    ConditionalExpression [16..29)
+      IdentifierName [16..18)
+        IdentifierToken [16..17) 'e'
+        T:WhitespaceTrivia [17..18) ' '
+      QuestionToken [18..19) '?'
+      T:WhitespaceTrivia [19..20) ' '
+      ConditionalAccessExpression [20..26)
+        IdentifierName [20..21)
+          IdentifierToken [20..21) 'f'
+        QuestionToken [21..22) '?'
+        ElementBindingExpression [22..26)
+          BracketedArgumentList [22..26)
+            OpenBracketToken [22..23) '['
+            Argument [23..24)
+              IdentifierName [23..24)
+                IdentifierToken [23..24) 'g'
+            CloseBracketToken [24..25) ']'
+            T:WhitespaceTrivia [25..26) ' '
+      ColonToken [26..27) ':'
+      T:WhitespaceTrivia [27..28) ' '
+      IdentifierName [28..29)
+        IdentifierToken [28..29) 'h'
+    ColonToken [29..29) missing
+    IdentifierName [29..29)
+      IdentifierToken [29..29) missing
+Diagnostics:
+  CS1003 [29..29) Syntax error, \':\' expected
+  CS1733 [29..29) Expected expression

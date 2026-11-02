@@ -1,0 +1,42 @@
+CompilationUnit [0..36)
+  ClassDeclaration [0..36)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..35)
+      AttributeList [10..22)
+        OpenBracketToken [10..11) '['
+        Attribute [11..20)
+          IdentifierName [11..15)
+            IdentifierToken [11..15) 'Attr'
+          AttributeArgumentList [15..20)
+            OpenParenToken [15..16) '('
+            AttributeArgument [16..19)
+              RefExpression [16..19)
+                RefKeyword [16..19) 'ref'
+                IdentifierName [19..19)
+                  IdentifierToken [19..19) missing
+            CloseParenToken [19..20) ')'
+        CloseBracketToken [20..21) ']'
+        T:WhitespaceTrivia [21..22) ' '
+      PredefinedType [22..27)
+        VoidKeyword [22..26) 'void'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..28) 'M'
+      ParameterList [28..31)
+        OpenParenToken [28..29) '('
+        CloseParenToken [29..30) ')'
+        T:WhitespaceTrivia [30..31) ' '
+      Block [31..35)
+        OpenBraceToken [31..32) '{'
+        T:WhitespaceTrivia [32..33) ' '
+        CloseBraceToken [33..34) '}'
+        T:WhitespaceTrivia [34..35) ' '
+    CloseBraceToken [35..36) '}'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1525 [16..19) Invalid expression term \'ref\'
+  CS1525 [19..20) Invalid expression term \')\'

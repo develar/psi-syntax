@@ -1,0 +1,10 @@
+ExpressionStatement [0..7)
+  IdentifierName [0..0)
+    IdentifierToken [0..0) missing
+  SemicolonToken [0..0) missing
+  T:SkippedTokensTrivia [0..7)
+    PrivateKeyword [0..7) 'private'
+Diagnostics:
+  CS1073 [0..0) Unexpected token \'private\'
+  CS1525 [0..7) Invalid expression term \'private\'
+  CS1002 [0..7) ; expected

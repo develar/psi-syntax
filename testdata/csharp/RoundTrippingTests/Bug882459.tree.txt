@@ -1,0 +1,62 @@
+CompilationUnit [0..148)
+  ClassDeclaration [0..148)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    PartialKeyword [8..15) 'partial'
+    T:WhitespaceTrivia [15..16) ' '
+    ClassKeyword [16..21) 'class'
+    T:WhitespaceTrivia [21..22) ' '
+    IdentifierToken [22..26) 'Base'
+    T:EndOfLineTrivia [26..27) '\n'
+    OpenBraceToken [27..28) '{'
+    T:EndOfLineTrivia [28..29) '\n'
+    FieldDeclaration [29..146)
+      VariableDeclaration [29..133)
+        IdentifierName [29..56)
+          L:WhitespaceTrivia [29..33) '    '
+          IdentifierToken [33..55) 'ViolateClassConstraint'
+          T:WhitespaceTrivia [55..56) ' '
+        VariableDeclarator [56..133)
+          IdentifierToken [56..61) 'Fld01'
+          T:WhitespaceTrivia [61..62) ' '
+          EqualsValueClause [62..133)
+            EqualsToken [62..63) '='
+            T:WhitespaceTrivia [63..64) ' '
+            InvocationExpression [64..133)
+              SimpleMemberAccessExpression [64..103)
+                ObjectCreationExpression [64..74)
+                  NewKeyword [64..67) 'new'
+                  T:WhitespaceTrivia [67..68) ' '
+                  IdentifierName [68..72)
+                    IdentifierToken [68..72) 'Base'
+                  ArgumentList [72..74)
+                    OpenParenToken [72..73) '('
+                    CloseParenToken [73..74) ')'
+                DotToken [74..75) '.'
+                GenericName [75..103)
+                  IdentifierToken [75..79) 'Meth'
+                  TypeArgumentList [79..103)
+                    LessThanToken [79..80) '<'
+                    IdentifierName [80..102)
+                      IdentifierToken [80..102) 'ViolateClassConstraint'
+                    GreaterThanToken [102..103) '>'
+              ArgumentList [103..133)
+                OpenParenToken [103..104) '('
+                Argument [104..132)
+                  ObjectCreationExpression [104..132)
+                    NewKeyword [104..107) 'new'
+                    T:WhitespaceTrivia [107..108) ' '
+                    IdentifierName [108..130)
+                      IdentifierToken [108..130) 'ViolateClassConstraint'
+                    ArgumentList [130..132)
+                      OpenParenToken [130..131) '('
+                      CloseParenToken [131..132) ')'
+                CloseParenToken [132..133) ')'
+      SemicolonToken [133..134) ';'
+      T:WhitespaceTrivia [134..135) ' '
+      T:SingleLineCommentTrivia [135..145) '//E:CS0315'
+      T:EndOfLineTrivia [145..146) '\n'
+    CloseBraceToken [146..147) '}'
+    T:EndOfLineTrivia [147..148) '\n'
+  EndOfFileToken [148..148) ''

@@ -1,0 +1,1 @@
+ref object x = o1 is string ? ref o2 : ref o3;

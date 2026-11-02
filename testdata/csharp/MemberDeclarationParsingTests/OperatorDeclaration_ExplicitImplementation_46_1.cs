@@ -1,0 +1,1 @@
+N.I.operator +(int x) => x;

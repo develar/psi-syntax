@@ -1,0 +1,13 @@
+CompilationUnit [0..14)
+  L:LineDirectiveTrivia [0..14)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..10) '1000'
+    T:WhitespaceTrivia [10..11) ' '
+    L:SkippedTokensTrivia [11..14)
+      IdentifierToken [11..14) 'XYZ'
+    EndOfDirectiveToken [14..14) ''
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1578 [11..14) Quoted file name, single-line comment or end-of-line expected

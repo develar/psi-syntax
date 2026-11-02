@@ -1,0 +1,27 @@
+ForStatement [0..18)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  SimpleAssignmentExpression [5..8)
+    IdentifierName [5..6)
+      IdentifierToken [5..6) 'a'
+    EqualsToken [6..7) '='
+    NumericLiteralExpression [7..8)
+      NumericLiteralToken [7..8) '1'
+  SemicolonToken [8..9) ';'
+  SimpleAssignmentExpression [9..12)
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'a'
+    EqualsToken [10..11) '='
+    NumericLiteralExpression [11..12)
+      NumericLiteralToken [11..12) '1'
+  SemicolonToken [12..13) ';'
+  SimpleAssignmentExpression [13..16)
+    IdentifierName [13..14)
+      IdentifierToken [13..14) 'a'
+    EqualsToken [14..15) '='
+    NumericLiteralExpression [15..16)
+      NumericLiteralToken [15..16) '1'
+  CloseParenToken [16..17) ')'
+  EmptyStatement [17..18)
+    SemicolonToken [17..18) ';'

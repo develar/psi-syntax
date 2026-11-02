@@ -1,0 +1,47 @@
+CompilationUnit [0..44)
+  UsingDirective [0..18)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'V'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    ArrayType [10..16)
+      PredefinedType [10..14)
+        VoidKeyword [10..14) 'void'
+      ArrayRankSpecifier [14..16)
+        OpenBracketToken [14..15) '['
+        OmittedArraySizeExpression [15..15)
+          OmittedArraySizeExpressionToken [15..15) ''
+        CloseBracketToken [15..16) ']'
+    SemicolonToken [16..17) ';'
+    T:EndOfLineTrivia [17..18) '\n'
+  ClassDeclaration [18..44)
+    L:EndOfLineTrivia [18..19) '\n'
+    ClassKeyword [19..24) 'class'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierToken [25..26) 'C'
+    T:EndOfLineTrivia [26..27) '\n'
+    OpenBraceToken [27..28) '{'
+    T:EndOfLineTrivia [28..29) '\n'
+    MethodDeclaration [29..43)
+      IdentifierName [29..35)
+        L:WhitespaceTrivia [29..33) '    '
+        IdentifierToken [33..34) 'V'
+        T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..36) 'M'
+      ParameterList [36..39)
+        OpenParenToken [36..37) '('
+        CloseParenToken [37..38) ')'
+        T:WhitespaceTrivia [38..39) ' '
+      Block [39..43)
+        OpenBraceToken [39..40) '{'
+        T:WhitespaceTrivia [40..41) ' '
+        CloseBraceToken [41..42) '}'
+        T:EndOfLineTrivia [42..43) '\n'
+    CloseBraceToken [43..44) '}'
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1547 [10..14) Keyword \'void\' cannot be used in this context

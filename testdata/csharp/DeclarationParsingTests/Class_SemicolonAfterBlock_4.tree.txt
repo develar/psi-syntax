@@ -1,0 +1,12 @@
+CompilationUnit [0..12)
+  EnumDeclaration [0..12)
+    L:EndOfLineTrivia [0..1) '\n'
+    EnumKeyword [1..5) 'enum'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    CloseBraceToken [10..11) '}'
+    SemicolonToken [11..12) ';'
+  EndOfFileToken [12..12) ''

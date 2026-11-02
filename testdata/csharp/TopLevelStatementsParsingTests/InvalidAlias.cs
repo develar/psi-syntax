@@ -1,0 +1,1 @@
+extern alias Alias(*#$@^%*&); class D : Alias(*#$@^%*&).C {}

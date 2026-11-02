@@ -1,0 +1,1 @@
+struct S {  ref fixed int F1[1]; ref readonly fixed int F2[2]; }

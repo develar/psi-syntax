@@ -1,0 +1,35 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..45)
+      L:WhitespaceTrivia [10..14) '    '
+      FileKeyword [14..18) 'file'
+      T:WhitespaceTrivia [18..19) ' '
+      FunctionPointerType [19..40)
+        DelegateKeyword [19..27) 'delegate'
+        AsteriskToken [27..28) '*'
+        FunctionPointerParameterList [28..40)
+          LessThanToken [28..29) '<'
+          FunctionPointerParameter [29..32)
+            PredefinedType [29..32)
+              IntKeyword [29..32) 'int'
+          CommaToken [32..33) ','
+          T:WhitespaceTrivia [33..34) ' '
+          FunctionPointerParameter [34..38)
+            PredefinedType [34..38)
+              VoidKeyword [34..38) 'void'
+          GreaterThanToken [38..39) '>'
+          T:WhitespaceTrivia [39..40) ' '
+      IdentifierToken [40..41) 'M'
+      ParameterList [41..43)
+        OpenParenToken [41..42) '('
+        CloseParenToken [42..43) ')'
+      SemicolonToken [43..44) ';'
+      T:EndOfLineTrivia [44..45) '\n'
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''

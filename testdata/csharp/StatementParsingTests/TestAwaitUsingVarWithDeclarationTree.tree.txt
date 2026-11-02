@@ -1,0 +1,18 @@
+LocalDeclarationStatement [0..20)
+  AwaitKeyword [0..5) 'await'
+  T:WhitespaceTrivia [5..6) ' '
+  UsingKeyword [6..11) 'using'
+  T:WhitespaceTrivia [11..12) ' '
+  VariableDeclaration [12..19)
+    IdentifierName [12..14)
+      IdentifierToken [12..13) 'T'
+      T:WhitespaceTrivia [13..14) ' '
+    VariableDeclarator [14..19)
+      IdentifierToken [14..15) 'a'
+      T:WhitespaceTrivia [15..16) ' '
+      EqualsValueClause [16..19)
+        EqualsToken [16..17) '='
+        T:WhitespaceTrivia [17..18) ' '
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'b'
+  SemicolonToken [19..20) ';'

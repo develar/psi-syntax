@@ -1,0 +1,20 @@
+UsingStatement [0..29)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..27)
+    PredefinedType [7..14)
+      StringKeyword [7..13) 'string'
+      T:WhitespaceTrivia [13..14) ' '
+    VariableDeclarator [14..27)
+      IdentifierToken [14..19) 'value'
+      T:WhitespaceTrivia [19..20) ' '
+      EqualsValueClause [20..27)
+        EqualsToken [20..20) missing
+        StringLiteralExpression [20..27)
+          StringLiteralToken [20..27) '"hello"'
+  CloseParenToken [27..28) ')'
+  EmptyStatement [28..29)
+    SemicolonToken [28..29) ';'
+Diagnostics:
+  CS1003 [20..27) Syntax error, \'=\' expected

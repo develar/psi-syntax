@@ -1,0 +1,1 @@
+class c { int this[x y public void m() { } }

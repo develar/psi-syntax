@@ -1,0 +1,12 @@
+GenericName [0..11)
+  IdentifierToken [0..3) 'goo'
+  TypeArgumentList [3..11)
+    LessThanToken [3..4) '<'
+    IdentifierName [4..10)
+      L:SkippedTokensTrivia [4..6)
+        InKeyword [4..6) 'in'
+      L:WhitespaceTrivia [6..7) ' '
+      IdentifierToken [7..10) 'bar'
+    GreaterThanToken [10..11) '>'
+Diagnostics:
+  CS1960 [4..6) Invalid variance modifier. Only interface and delegate type parameters can be specified as variant.

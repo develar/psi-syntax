@@ -1,0 +1,17 @@
+IsPatternExpression [0..11)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..11)
+    OpenBracketToken [5..6) '['
+    ListPattern [6..8)
+      OpenBracketToken [6..7) '['
+      CloseBracketToken [7..8) ']'
+    CommaToken [8..8) missing
+    SlicePattern [8..10)
+      DotDotToken [8..10) '..'
+    CloseBracketToken [10..11) ']'
+Diagnostics:
+  CS1003 [8..9) Syntax error, \',\' expected

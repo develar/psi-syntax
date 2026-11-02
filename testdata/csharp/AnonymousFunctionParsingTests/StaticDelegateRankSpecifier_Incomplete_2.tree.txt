@@ -1,0 +1,26 @@
+ExpressionStatement [0..29)
+  SimpleAssignmentExpression [0..28)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..28)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..28)
+        PredefinedType [8..11)
+          IntKeyword [8..11) 'int'
+        ArrayRankSpecifier [11..28)
+          OpenBracketToken [11..12) '['
+          AnonymousMethodExpression [12..27)
+            StaticKeyword [12..18) 'static'
+            T:WhitespaceTrivia [18..19) ' '
+            DelegateKeyword [19..27) 'delegate'
+            Block [27..27)
+              OpenBraceToken [27..27) missing
+              CloseBraceToken [27..27) missing
+          CloseBracketToken [27..28) ']'
+  SemicolonToken [28..29) ';'
+Diagnostics:
+  CS1514 [27..28) { expected

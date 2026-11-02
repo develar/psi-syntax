@@ -1,0 +1,39 @@
+CompilationUnit [0..32)
+  ClassDeclaration [0..32)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..31)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..31)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        ExpressionStatement [21..29)
+          PreIncrementExpression [21..27)
+            PlusPlusToken [21..23) '++'
+            ElementAccessExpression [23..27)
+              IdentifierName [23..24)
+                IdentifierToken [23..24) 'a'
+              BracketedArgumentList [24..27)
+                OpenBracketToken [24..25) '['
+                T:SkippedTokensTrivia [25..26)
+                  BadToken [25..26) '$'
+                CloseBracketToken [26..27) ']'
+          SemicolonToken [27..28) ';'
+          T:WhitespaceTrivia [28..29) ' '
+        CloseBraceToken [29..30) '}'
+        T:WhitespaceTrivia [30..31) ' '
+    CloseBraceToken [31..32) '}'
+  EndOfFileToken [32..32) ''
+Diagnostics:
+  CS1056 [25..25) Unexpected character \'$\'

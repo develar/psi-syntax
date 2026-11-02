@@ -1,0 +1,1 @@
+switch (e) { case T(X: 3, Y: 4){L: 5} p: ; }

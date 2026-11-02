@@ -1,0 +1,31 @@
+CompilationUnit [0..39)
+  ClassDeclaration [0..39)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ConversionOperatorDeclaration [11..39)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      ImplicitKeyword [21..29) 'implicit'
+      T:WhitespaceTrivia [29..30) ' '
+      OperatorKeyword [30..38) 'operator'
+      T:EndOfLineTrivia [38..39) '\n'
+      IdentifierName [39..39)
+        IdentifierToken [39..39) missing
+      ParameterList [39..39)
+        OpenParenToken [39..39) missing
+        CloseParenToken [39..39) missing
+      SemicolonToken [39..39) missing
+    CloseBraceToken [39..39) missing
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1031 [38..38) Type expected
+  CS1003 [38..38) Syntax error, \'(\' expected
+  CS1026 [38..38) ) expected
+  CS1002 [38..38) ; expected
+  CS1513 [38..38) } expected

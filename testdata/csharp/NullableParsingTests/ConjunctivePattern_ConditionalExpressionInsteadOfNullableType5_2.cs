@@ -1,0 +1,1 @@
+x is Type ? dict[key] : default

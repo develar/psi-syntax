@@ -1,0 +1,2 @@
+
+ref scoped var c;

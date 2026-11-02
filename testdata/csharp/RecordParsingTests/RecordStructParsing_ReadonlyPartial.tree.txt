@@ -1,0 +1,13 @@
+CompilationUnit [0..33)
+  RecordStructDeclaration [0..33)
+    ReadOnlyKeyword [0..8) 'readonly'
+    T:WhitespaceTrivia [8..9) ' '
+    PartialKeyword [9..16) 'partial'
+    T:WhitespaceTrivia [16..17) ' '
+    RecordKeyword [17..23) 'record'
+    T:WhitespaceTrivia [23..24) ' '
+    StructKeyword [24..30) 'struct'
+    T:WhitespaceTrivia [30..31) ' '
+    IdentifierToken [31..32) 'S'
+    SemicolonToken [32..33) ';'
+  EndOfFileToken [33..33) ''

@@ -1,0 +1,54 @@
+SwitchStatement [0..50)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'o'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..49)
+    CasePatternSwitchLabel [13..42)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      DeclarationPattern [18..40)
+        ArrayType [18..39)
+          TupleType [18..36)
+            OpenParenToken [18..19) '('
+            TupleElement [19..26)
+              QualifiedName [19..25)
+                IdentifierName [19..20)
+                  IdentifierToken [19..20) 'S'
+                DotToken [20..21) '.'
+                IdentifierName [21..25)
+                  IdentifierToken [21..24) 'Int'
+                  T:WhitespaceTrivia [24..25) ' '
+              IdentifierToken [25..26) 'a'
+            CommaToken [26..27) ','
+            T:WhitespaceTrivia [27..28) ' '
+            TupleElement [28..35)
+              QualifiedName [28..34)
+                IdentifierName [28..29)
+                  IdentifierToken [28..29) 'S'
+                DotToken [29..30) '.'
+                IdentifierName [30..34)
+                  IdentifierToken [30..33) 'Int'
+                  T:WhitespaceTrivia [33..34) ' '
+              IdentifierToken [34..35) 'b'
+            CloseParenToken [35..36) ')'
+          ArrayRankSpecifier [36..39)
+            OpenBracketToken [36..37) '['
+            OmittedArraySizeExpression [37..37)
+              OmittedArraySizeExpressionToken [37..37) ''
+            CloseBracketToken [37..38) ']'
+            T:WhitespaceTrivia [38..39) ' '
+        SingleVariableDesignation [39..40)
+          IdentifierToken [39..40) 'q'
+      ColonToken [40..41) ':'
+      T:WhitespaceTrivia [41..42) ' '
+    BreakStatement [42..49)
+      BreakKeyword [42..47) 'break'
+      SemicolonToken [47..48) ';'
+      T:WhitespaceTrivia [48..49) ' '
+  CloseBraceToken [49..50) '}'

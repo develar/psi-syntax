@@ -1,0 +1,11 @@
+ContinueStatement [0..13)
+  ContinueKeyword [0..8) 'continue'
+  T:WhitespaceTrivia [8..9) ' '
+  SemicolonToken [9..9) missing
+  T:SkippedTokensTrivia [9..12)
+    IntKeyword [9..12) 'int'
+  T:SkippedTokensTrivia [12..13)
+    SemicolonToken [12..13) ';'
+Diagnostics:
+  CS1073 [0..9) Unexpected token \'int\'
+  CS1002 [9..12) ; expected

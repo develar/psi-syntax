@@ -1,0 +1,20 @@
+CompilationUnit [0..18)
+  L:IfDirectiveTrivia [0..11)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    ParenthesizedExpression [4..10)
+      OpenParenToken [4..5) '('
+      FalseLiteralExpression [5..10)
+        FalseKeyword [5..10) 'false'
+      CloseParenToken [10..10) missing
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:EndIfDirectiveTrivia [11..18)
+    HashToken [11..12) '#'
+    EndIfKeyword [12..17) 'endif'
+    EndOfDirectiveToken [17..17) ''
+    T:EndOfLineTrivia [17..18) '\n'
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1026 [10..10) ) expected

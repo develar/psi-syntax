@@ -1,0 +1,17 @@
+CompilationUnit [0..81)
+  L:SingleLineDocumentationCommentTrivia [0..81)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlCDataSection [4..81)
+      XmlCDataStartToken [4..13) '<![CDATA['
+      XmlTextLiteralToken [13..28) ' this is a test'
+      XmlTextLiteralNewLineToken [28..29) '\n'
+      L:DocumentationCommentExteriorTrivia [29..32) '///'
+      XmlTextLiteralToken [32..59) ' of &some; cdata /// */ /**'
+      XmlTextLiteralNewLineToken [59..60) '\n'
+      L:DocumentationCommentExteriorTrivia [60..63) '///'
+      XmlTextLiteralToken [63..78) ' "\']]<>/></text'
+      XmlCDataEndToken [78..81) ']]>'
+    EndOfDocumentationCommentToken [81..81) ''
+  EndOfFileToken [81..81) ''

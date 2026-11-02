@@ -1,0 +1,15 @@
+CompilationUnit [0..15)
+  InterfaceDeclaration [0..15)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:EndOfLineTrivia [10..11) '\n'
+    IdentifierToken [11..12) 'C'
+    TypeParameterList [12..14)
+      LessThanToken [12..13) '<'
+      TypeParameter [13..13)
+        IdentifierToken [13..13) missing
+      GreaterThanToken [13..14) '>'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''
+Diagnostics:
+  CS1001 [13..14) Identifier expected

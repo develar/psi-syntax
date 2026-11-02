@@ -1,0 +1,60 @@
+CompilationUnit [0..51)
+  StructDeclaration [0..51)
+    L:EndOfLineTrivia [0..1) '\n'
+    RefKeyword [1..4) 'ref'
+    T:WhitespaceTrivia [4..5) ' '
+    StructKeyword [5..11) 'struct'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..14) 'R2'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    FieldDeclaration [17..49)
+      L:WhitespaceTrivia [17..21) '    '
+      FixedKeyword [21..26) 'fixed'
+      T:WhitespaceTrivia [26..27) ' '
+      VariableDeclaration [27..47)
+        IdentifierName [27..34)
+          IdentifierToken [27..33) 'scoped'
+          T:WhitespaceTrivia [33..34) ' '
+        VariableDeclarator [34..47)
+          IdentifierToken [34..34) missing
+          BracketedArgumentList [34..47)
+            OpenBracketToken [34..34) missing
+            Argument [34..42)
+              RefExpression [34..42)
+                RefKeyword [34..37) 'ref'
+                T:WhitespaceTrivia [37..38) ' '
+                PredefinedType [38..42)
+                  IntKeyword [38..41) 'int'
+                  T:WhitespaceTrivia [41..42) ' '
+            CommaToken [42..42) missing
+            Argument [42..47)
+              ElementAccessExpression [42..47)
+                IdentifierName [42..44)
+                  IdentifierToken [42..44) 'F3'
+                BracketedArgumentList [44..47)
+                  OpenBracketToken [44..45) '['
+                  Argument [45..46)
+                    NumericLiteralExpression [45..46)
+                      NumericLiteralToken [45..46) '2'
+                  CloseBracketToken [46..47) ']'
+            CommaToken [47..47) missing
+            Argument [47..47)
+              IdentifierName [47..47)
+                IdentifierToken [47..47) missing
+            CloseBracketToken [47..47) missing
+      SemicolonToken [47..48) ';'
+      T:EndOfLineTrivia [48..49) '\n'
+    CloseBraceToken [49..50) '}'
+    T:EndOfLineTrivia [50..51) '\n'
+  EndOfFileToken [51..51) ''
+Diagnostics:
+  CS1001 [34..37) Identifier expected
+  CS1003 [34..37) Syntax error, \'[\' expected
+  CS1525 [34..41) Invalid expression term \'ref\'
+  CS1525 [38..41) Invalid expression term \'int\'
+  CS1003 [42..44) Syntax error, \',\' expected
+  CS1003 [47..48) Syntax error, \',\' expected
+  CS0443 [47..47) Syntax error; value expected
+  CS1003 [47..48) Syntax error, \']\' expected

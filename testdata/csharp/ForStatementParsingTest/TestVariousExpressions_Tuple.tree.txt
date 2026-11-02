@@ -1,0 +1,42 @@
+ForStatement [0..27)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  TupleExpression [5..11)
+    OpenParenToken [5..6) '('
+    Argument [6..7)
+      IdentifierName [6..7)
+        IdentifierToken [6..7) 'a'
+    CommaToken [7..8) ','
+    T:WhitespaceTrivia [8..9) ' '
+    Argument [9..10)
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'b'
+    CloseParenToken [10..11) ')'
+  SemicolonToken [11..12) ';'
+  TupleExpression [12..18)
+    OpenParenToken [12..13) '('
+    Argument [13..14)
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'a'
+    CommaToken [14..15) ','
+    T:WhitespaceTrivia [15..16) ' '
+    Argument [16..17)
+      IdentifierName [16..17)
+        IdentifierToken [16..17) 'b'
+    CloseParenToken [17..18) ')'
+  SemicolonToken [18..19) ';'
+  TupleExpression [19..25)
+    OpenParenToken [19..20) '('
+    Argument [20..21)
+      IdentifierName [20..21)
+        IdentifierToken [20..21) 'a'
+    CommaToken [21..22) ','
+    T:WhitespaceTrivia [22..23) ' '
+    Argument [23..24)
+      IdentifierName [23..24)
+        IdentifierToken [23..24) 'b'
+    CloseParenToken [24..25) ')'
+  CloseParenToken [25..26) ')'
+  EmptyStatement [26..27)
+    SemicolonToken [26..27) ';'

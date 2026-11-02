@@ -1,0 +1,2 @@
+
+using (scoped S a);

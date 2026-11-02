@@ -1,0 +1,18 @@
+IsPatternExpression [0..11)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..11)
+    PositionalPatternClause [5..11)
+      OpenParenToken [5..6) '('
+      Subpattern [6..7)
+        DiscardPattern [6..7)
+          UnderscoreToken [6..7) '_'
+      CommaToken [7..8) ','
+      T:WhitespaceTrivia [8..9) ' '
+      Subpattern [9..10)
+        DiscardPattern [9..10)
+          UnderscoreToken [9..10) '_'
+      CloseParenToken [10..11) ')'

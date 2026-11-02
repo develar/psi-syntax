@@ -1,0 +1,1 @@
+switch (e) { case global::E.A: break; }

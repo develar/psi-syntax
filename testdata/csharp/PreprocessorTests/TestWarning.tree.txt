@@ -1,0 +1,10 @@
+CompilationUnit [0..29)
+  L:WarningDirectiveTrivia [0..29)
+    HashToken [0..1) '#'
+    WarningKeyword [1..8) 'warning'
+    T:WhitespaceTrivia [8..9) ' '
+    L:PreprocessingMessageTrivia [9..29) 'Your monkey is alive'
+    EndOfDirectiveToken [29..29) ''
+  EndOfFileToken [29..29) ''
+Diagnostics:
+  CS1030 [9..29) #warning: \'Your monkey is alive\'

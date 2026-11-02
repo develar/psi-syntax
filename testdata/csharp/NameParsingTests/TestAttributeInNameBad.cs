@@ -1,0 +1,1 @@
+goo<[My]bar>

@@ -1,0 +1,2 @@
+IdentifierToken [0..8) 'a\\u1234b'
+EndOfFileToken [8..8) ''

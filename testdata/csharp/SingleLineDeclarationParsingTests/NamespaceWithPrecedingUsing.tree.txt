@@ -1,0 +1,15 @@
+CompilationUnit [0..21)
+  UsingDirective [0..9)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..7)
+      IdentifierToken [6..7) 'X'
+    SemicolonToken [7..8) ';'
+    T:EndOfLineTrivia [8..9) '\n'
+  FileScopedNamespaceDeclaration [9..21)
+    NamespaceKeyword [9..18) 'namespace'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..20)
+      IdentifierToken [19..20) 'A'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

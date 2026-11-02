@@ -1,0 +1,30 @@
+CompilationUnit [0..24)
+  NamespaceDeclaration [0..24)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+    T:WhitespaceTrivia [15..16) ' '
+    T:SkippedTokensTrivia [16..17)
+      CommaToken [16..17) ','
+    T:SkippedTokensTrivia [17..18)
+      CommaToken [17..18) ','
+    T:SkippedTokensTrivia [18..19)
+      CommaToken [18..19) ','
+    T:SkippedTokensTrivia [19..20)
+      CommaToken [19..20) ','
+    T:SkippedTokensTrivia [20..21)
+      CommaToken [20..21) ','
+    T:SkippedTokensTrivia [21..22)
+      CommaToken [21..22) ','
+    T:SkippedTokensTrivia [22..23)
+      CommaToken [22..23) ','
+    T:SkippedTokensTrivia [23..24)
+      CommaToken [23..24) ','
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1022 [16..17) Type or namespace definition, or end-of-file expected

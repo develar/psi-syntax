@@ -1,0 +1,48 @@
+CompilationUnit [0..59)
+  UsingDirective [0..18)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..11)
+      IdentifierName [6..9)
+        IdentifierToken [6..8) 'VP'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsToken [9..10) '='
+      T:WhitespaceTrivia [10..11) ' '
+    PointerType [11..16)
+      PredefinedType [11..15)
+        VoidKeyword [11..15) 'void'
+      AsteriskToken [15..16) '*'
+    SemicolonToken [16..17) ';'
+    T:EndOfLineTrivia [17..18) '\n'
+  ClassDeclaration [18..59)
+    L:EndOfLineTrivia [18..19) '\n'
+    ClassKeyword [19..24) 'class'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierToken [25..26) 'C'
+    T:EndOfLineTrivia [26..27) '\n'
+    OpenBraceToken [27..28) '{'
+    T:EndOfLineTrivia [28..29) '\n'
+    MethodDeclaration [29..58)
+      L:WhitespaceTrivia [29..33) '    '
+      UnsafeKeyword [33..39) 'unsafe'
+      T:WhitespaceTrivia [39..40) ' '
+      PredefinedType [40..45)
+        VoidKeyword [40..44) 'void'
+        T:WhitespaceTrivia [44..45) ' '
+      IdentifierToken [45..46) 'M'
+      ParameterList [46..54)
+        OpenParenToken [46..47) '('
+        Parameter [47..52)
+          IdentifierName [47..50)
+            IdentifierToken [47..49) 'VP'
+            T:WhitespaceTrivia [49..50) ' '
+          IdentifierToken [50..52) 'vp'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      Block [54..58)
+        OpenBraceToken [54..55) '{'
+        T:WhitespaceTrivia [55..56) ' '
+        CloseBraceToken [56..57) '}'
+        T:EndOfLineTrivia [57..58) '\n'
+    CloseBraceToken [58..59) '}'
+  EndOfFileToken [59..59) ''

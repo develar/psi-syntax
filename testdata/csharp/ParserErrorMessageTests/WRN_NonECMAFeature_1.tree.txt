@@ -1,0 +1,14 @@
+CompilationUnit [0..19)
+  AttributeList [0..19)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..8)
+      ModuleKeyword [1..7) 'module'
+      ColonToken [7..8) ':'
+    Attribute [8..18)
+      IdentifierName [8..16)
+        IdentifierToken [8..16) 'Obsolete'
+      AttributeArgumentList [16..18)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+    CloseBracketToken [18..19) ']'
+  EndOfFileToken [19..19) ''

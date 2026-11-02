@@ -1,0 +1,1 @@
+class a { b c = x, d = y, e = z; }

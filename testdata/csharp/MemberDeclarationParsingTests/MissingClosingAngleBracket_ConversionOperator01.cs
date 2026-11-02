@@ -1,0 +1,1 @@
+public static implicit operator IEnumerable<(string Value, string Description)(X source);

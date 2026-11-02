@@ -1,0 +1,16 @@
+MethodDeclaration [0..25)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierName [7..12)
+    IdentifierToken [7..11) 'safe'
+    T:WhitespaceTrivia [11..12) ' '
+  IdentifierToken [12..17) 'async'
+  ParameterList [17..24)
+    OpenParenToken [17..18) '('
+    Parameter [18..23)
+      PredefinedType [18..22)
+        IntKeyword [18..21) 'int'
+        T:WhitespaceTrivia [21..22) ' '
+      IdentifierToken [22..23) 'i'
+    CloseParenToken [23..24) ')'
+  SemicolonToken [24..25) ';'

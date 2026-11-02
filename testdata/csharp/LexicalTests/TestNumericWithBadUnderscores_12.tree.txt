@@ -1,0 +1,4 @@
+NumericLiteralToken [0..5) '1E+_2'
+EndOfFileToken [5..5) ''
+Diagnostics:
+  CS1013 [0..5) Invalid number

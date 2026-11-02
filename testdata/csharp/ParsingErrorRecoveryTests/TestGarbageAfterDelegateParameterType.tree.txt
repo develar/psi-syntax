@@ -1,0 +1,23 @@
+CompilationUnit [0..21)
+  DelegateDeclaration [0..21)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..14)
+      VoidKeyword [9..13) 'void'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'd'
+    ParameterList [15..20)
+      OpenParenToken [15..16) '('
+      Parameter [16..19)
+        IdentifierName [16..18)
+          IdentifierToken [16..17) 't'
+          T:WhitespaceTrivia [17..18) ' '
+        IdentifierToken [18..18) missing
+        T:SkippedTokensTrivia [18..19)
+          BadToken [18..19) '$'
+      CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1001 [18..19) Identifier expected
+  CS1056 [18..18) Unexpected character \'$\'

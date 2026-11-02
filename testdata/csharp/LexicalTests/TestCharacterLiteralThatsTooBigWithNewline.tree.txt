@@ -1,0 +1,9 @@
+CharacterLiteralToken [0..3) '\'ab'
+T:EndOfLineTrivia [3..4) '\r'
+CharacterLiteralToken [4..5) '\''
+EndOfFileToken [5..5) ''
+Diagnostics:
+  CS1010 [0..0) Newline in constant
+  CS1012 [0..0) Too many characters in character literal
+  CS1010 [4..4) Newline in constant
+  CS1011 [4..4) Empty character literal

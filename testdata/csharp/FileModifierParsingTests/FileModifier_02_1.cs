@@ -1,0 +1,1 @@
+file partial class C { }

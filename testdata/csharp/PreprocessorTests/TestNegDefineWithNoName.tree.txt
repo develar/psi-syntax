@@ -1,0 +1,9 @@
+CompilationUnit [0..7)
+  L:DefineDirectiveTrivia [0..7)
+    HashToken [0..1) '#'
+    DefineKeyword [1..7) 'define'
+    IdentifierToken [7..7) missing
+    EndOfDirectiveToken [7..7) ''
+  EndOfFileToken [7..7) ''
+Diagnostics:
+  CS1001 [7..7) Identifier expected

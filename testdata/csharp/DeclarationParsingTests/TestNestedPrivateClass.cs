@@ -1,0 +1,1 @@
+class a { private class b { } }

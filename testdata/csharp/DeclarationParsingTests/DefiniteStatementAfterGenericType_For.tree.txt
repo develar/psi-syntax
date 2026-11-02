@@ -1,0 +1,55 @@
+MethodDeclaration [0..35)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..35)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..26)
+      VariableDeclaration [11..26)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:EndOfLineTrivia [25..26) '\n'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    ForStatement [26..35)
+      L:WhitespaceTrivia [26..30) '    '
+      ForKeyword [30..33) 'for'
+      T:EndOfLineTrivia [33..34) '\n'
+      OpenParenToken [34..34) missing
+      T:SkippedTokensTrivia [34..35)
+        CloseBraceToken [34..35) '}'
+      SemicolonToken [35..35) missing
+      IdentifierName [35..35)
+        IdentifierToken [35..35) missing
+      SemicolonToken [35..35) missing
+      CloseParenToken [35..35) missing
+      ExpressionStatement [35..35)
+        IdentifierName [35..35)
+          IdentifierToken [35..35) missing
+        SemicolonToken [35..35) missing
+    CloseBraceToken [35..35) missing
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected
+  CS1003 [33..33) Syntax error, \'(\' expected
+  CS1001 [33..33) Identifier expected
+  CS1002 [35..35) ; expected
+  CS1733 [35..35) Expected expression
+  CS1002 [35..35) ; expected
+  CS1026 [35..35) ) expected
+  CS1733 [35..35) Expected expression
+  CS1002 [35..35) ; expected
+  CS1513 [35..35) } expected

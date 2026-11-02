@@ -1,0 +1,1 @@
+class c { void m() { do { } while(e[; } }

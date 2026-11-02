@@ -1,0 +1,11 @@
+SimpleLambdaExpression [0..10)
+  Parameter [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsGreaterThanToken [2..4) '=>'
+  T:WhitespaceTrivia [4..5) ' '
+  RefExpression [5..10)
+    RefKeyword [5..8) 'ref'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'b'

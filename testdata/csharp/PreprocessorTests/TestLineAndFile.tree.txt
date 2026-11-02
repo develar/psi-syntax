@@ -1,0 +1,10 @@
+CompilationUnit [0..21)
+  L:LineDirectiveTrivia [0..21)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..10) '1000'
+    T:WhitespaceTrivia [10..11) ' '
+    StringLiteralToken [11..21) '"bogus.cs"'
+    EndOfDirectiveToken [21..21) ''
+  EndOfFileToken [21..21) ''

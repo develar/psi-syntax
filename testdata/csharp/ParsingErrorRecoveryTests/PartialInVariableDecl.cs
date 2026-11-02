@@ -1,0 +1,1 @@
+class C1 { void M1() { int x = 1, partial class y = 2; } }

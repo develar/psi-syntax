@@ -1,0 +1,18 @@
+ParenthesizedExpression [0..17)
+  OpenParenToken [0..1) '('
+  ParenthesizedLambdaExpression [1..16)
+    RefType [1..9)
+      RefKeyword [1..4) 'ref'
+      T:WhitespaceTrivia [4..5) ' '
+      PredefinedType [5..9)
+        IntKeyword [5..8) 'int'
+        T:WhitespaceTrivia [8..9) ' '
+    ParameterList [9..12)
+      OpenParenToken [9..10) '('
+      CloseParenToken [10..11) ')'
+      T:WhitespaceTrivia [11..12) ' '
+    EqualsGreaterThanToken [12..14) '=>'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'x'
+  CloseParenToken [16..17) ')'

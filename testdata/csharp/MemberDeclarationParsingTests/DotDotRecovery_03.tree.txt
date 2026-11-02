@@ -1,0 +1,34 @@
+MethodDeclaration [0..25)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  ExplicitInterfaceSpecifier [4..11)
+    QualifiedName [4..10)
+      QualifiedName [4..9)
+        IdentifierName [4..6)
+          IdentifierToken [4..6) 'N1'
+        DotToken [6..7) '.'
+        IdentifierName [7..9)
+          IdentifierToken [7..9) 'N2'
+      DotToken [9..10) '.'
+      IdentifierName [10..10)
+        IdentifierToken [10..10) missing
+    DotToken [10..11) '.'
+  IdentifierToken [11..12) 'M'
+  ParameterList [12..20)
+    OpenParenToken [12..13) '('
+    Parameter [13..18)
+      PredefinedType [13..17)
+        IntKeyword [13..16) 'int'
+        T:WhitespaceTrivia [16..17) ' '
+      IdentifierToken [17..18) 'x'
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  ArrowExpressionClause [20..24)
+    EqualsGreaterThanToken [20..22) '=>'
+    T:WhitespaceTrivia [22..23) ' '
+    IdentifierName [23..24)
+      IdentifierToken [23..24) 'x'
+  SemicolonToken [24..25) ';'
+Diagnostics:
+  CS1001 [10..11) Identifier expected

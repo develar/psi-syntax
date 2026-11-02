@@ -1,0 +1,22 @@
+IsPatternExpression [0..18)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  DeclarationPattern [5..18)
+    ArrayType [5..17)
+      NullableType [5..14)
+        PredefinedType [5..12)
+          StringKeyword [5..11) 'string'
+          T:WhitespaceTrivia [11..12) ' '
+        QuestionToken [12..13) '?'
+        T:WhitespaceTrivia [13..14) ' '
+      ArrayRankSpecifier [14..17)
+        OpenBracketToken [14..15) '['
+        OmittedArraySizeExpression [15..15)
+          OmittedArraySizeExpressionToken [15..15) ''
+        CloseBracketToken [15..16) ']'
+        T:WhitespaceTrivia [16..17) ' '
+    SingleVariableDesignation [17..18)
+      IdentifierToken [17..18) 'y'

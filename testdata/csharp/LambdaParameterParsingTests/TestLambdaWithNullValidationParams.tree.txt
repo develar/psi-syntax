@@ -1,0 +1,54 @@
+FieldDeclaration [0..48)
+  VariableDeclaration [0..47)
+    GenericName [0..21)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..21)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..8)
+          IntKeyword [5..8) 'int'
+        CommaToken [8..9) ','
+        T:WhitespaceTrivia [9..10) ' '
+        PredefinedType [10..13)
+          IntKeyword [10..13) 'int'
+        CommaToken [13..14) ','
+        T:WhitespaceTrivia [14..15) ' '
+        PredefinedType [15..19)
+          BoolKeyword [15..19) 'bool'
+        GreaterThanToken [19..20) '>'
+        T:WhitespaceTrivia [20..21) ' '
+    VariableDeclarator [21..47)
+      IdentifierToken [21..26) 'func1'
+      T:WhitespaceTrivia [26..27) ' '
+      EqualsValueClause [27..47)
+        EqualsToken [27..28) '='
+        T:WhitespaceTrivia [28..29) ' '
+        TupleExpression [29..47)
+          OpenParenToken [29..30) '('
+          Argument [30..33)
+            SuppressNullableWarningExpression [30..33)
+              SuppressNullableWarningExpression [30..32)
+                IdentifierName [30..31)
+                  IdentifierToken [30..31) 'x'
+                ExclamationToken [31..32) '!'
+              ExclamationToken [32..33) '!'
+          CommaToken [33..34) ','
+          T:WhitespaceTrivia [34..35) ' '
+          Argument [35..36)
+            IdentifierName [35..36)
+              IdentifierToken [35..36) 'y'
+          CloseParenToken [36..37) ')'
+          T:WhitespaceTrivia [37..38) ' '
+          T:SkippedTokensTrivia [38..40)
+            EqualsGreaterThanToken [38..40) '=>'
+          T:WhitespaceTrivia [40..41) ' '
+          T:SkippedTokensTrivia [41..42)
+            IdentifierToken [41..42) 'x'
+          T:WhitespaceTrivia [42..43) ' '
+          T:SkippedTokensTrivia [43..45)
+            EqualsEqualsToken [43..45) '=='
+          T:WhitespaceTrivia [45..46) ' '
+          T:SkippedTokensTrivia [46..47)
+            IdentifierToken [46..47) 'y'
+  SemicolonToken [47..48) ';'
+Diagnostics:
+  CS1003 [38..40) Syntax error, \',\' expected

@@ -1,0 +1,14 @@
+L:IfDirectiveTrivia [0..10)
+  HashToken [0..1) '#'
+  IfKeyword [1..3) 'if'
+  T:WhitespaceTrivia [3..4) ' '
+  FalseLiteralExpression [4..9)
+    FalseKeyword [4..9) 'false'
+  EndOfDirectiveToken [9..9) ''
+  T:EndOfLineTrivia [9..10) '\n'
+L:DisabledTextTrivia [10..13) '@:\n'
+L:EndIfDirectiveTrivia [13..19)
+  HashToken [13..14) '#'
+  EndIfKeyword [14..19) 'endif'
+  EndOfDirectiveToken [19..19) ''
+EndOfFileToken [19..19) ''

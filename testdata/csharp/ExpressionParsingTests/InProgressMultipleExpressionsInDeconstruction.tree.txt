@@ -1,0 +1,60 @@
+CompilationUnit [0..24)
+  GlobalStatement [0..9)
+    ExpressionStatement [0..9)
+      TupleExpression [0..9)
+        OpenParenToken [0..1) '('
+        Argument [1..2)
+          IdentifierName [1..2)
+            IdentifierToken [1..2) 'a'
+        CommaToken [2..3) ','
+        T:WhitespaceTrivia [3..4) ' '
+        Argument [4..5)
+          IdentifierName [4..5)
+            IdentifierToken [4..5) 'b'
+        CommaToken [5..6) ','
+        T:WhitespaceTrivia [6..7) ' '
+        Argument [7..9)
+          NumericLiteralExpression [7..9)
+            NumericLiteralToken [7..8) '0'
+            T:WhitespaceTrivia [8..9) ' '
+        CloseParenToken [9..9) missing
+      SemicolonToken [9..9) missing
+  GlobalStatement [9..12)
+    ExpressionStatement [9..12)
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '0'
+      SemicolonToken [10..10) missing
+      T:SkippedTokensTrivia [10..11)
+        CloseParenToken [10..11) ')'
+      T:WhitespaceTrivia [11..12) ' '
+  GlobalStatement [12..24)
+    ExpressionStatement [12..24)
+      SimpleAssignmentExpression [12..23)
+        IdentifierName [12..12)
+          IdentifierToken [12..12) missing
+        EqualsToken [12..13) '='
+        T:WhitespaceTrivia [13..14) ' '
+        TupleExpression [14..23)
+          OpenParenToken [14..15) '('
+          Argument [15..16)
+            IdentifierName [15..16)
+              IdentifierToken [15..16) 'a'
+          CommaToken [16..17) ','
+          T:WhitespaceTrivia [17..18) ' '
+          Argument [18..19)
+            IdentifierName [18..19)
+              IdentifierToken [18..19) 'b'
+          CommaToken [19..20) ','
+          T:WhitespaceTrivia [20..21) ' '
+          Argument [21..22)
+            IdentifierName [21..22)
+              IdentifierToken [21..22) 'c'
+          CloseParenToken [22..23) ')'
+      SemicolonToken [23..24) ';'
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1026 [9..10) ) expected
+  CS1002 [9..10) ; expected
+  CS1002 [10..11) ; expected
+  CS1022 [10..11) Type or namespace definition, or end-of-file expected
+  CS1525 [12..13) Invalid expression term \'=\'

@@ -1,0 +1,69 @@
+CompilationUnit [0..110)
+  RecordDeclaration [0..30)
+    L:EndOfLineTrivia [0..1) '\n'
+    RecordKeyword [1..7) 'record'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..10) 'R1'
+    ParameterList [10..13)
+      OpenParenToken [10..11) '('
+      CloseParenToken [11..12) ')'
+      T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    T:SkippedTokensTrivia [15..21)
+      ReturnKeyword [15..21) 'return'
+    T:WhitespaceTrivia [21..22) ' '
+    T:SkippedTokensTrivia [22..26)
+      NullKeyword [22..26) 'null'
+    T:SkippedTokensTrivia [26..27)
+      SemicolonToken [26..27) ';'
+    T:WhitespaceTrivia [27..28) ' '
+    CloseBraceToken [28..29) '}'
+    T:EndOfLineTrivia [29..30) '\n'
+  RecordDeclaration [30..110)
+    AbstractKeyword [30..38) 'abstract'
+    T:WhitespaceTrivia [38..39) ' '
+    RecordKeyword [39..45) 'record'
+    T:WhitespaceTrivia [45..46) ' '
+    IdentifierToken [46..47) 'D'
+    T:EndOfLineTrivia [47..48) '\n'
+    OpenBraceToken [48..49) '{'
+    T:EndOfLineTrivia [49..50) '\n'
+    RecordDeclaration [50..83)
+      L:WhitespaceTrivia [50..54) '    '
+      RecordKeyword [54..60) 'record'
+      T:WhitespaceTrivia [60..61) ' '
+      IdentifierToken [61..63) 'R2'
+      ParameterList [63..66)
+        OpenParenToken [63..64) '('
+        CloseParenToken [64..65) ')'
+        T:WhitespaceTrivia [65..66) ' '
+      OpenBraceToken [66..67) '{'
+      T:WhitespaceTrivia [67..68) ' '
+      T:SkippedTokensTrivia [68..74)
+        ReturnKeyword [68..74) 'return'
+      T:WhitespaceTrivia [74..75) ' '
+      T:SkippedTokensTrivia [75..79)
+        NullKeyword [75..79) 'null'
+      T:SkippedTokensTrivia [79..80)
+        SemicolonToken [79..80) ';'
+      T:WhitespaceTrivia [80..81) ' '
+      CloseBraceToken [81..82) '}'
+      T:EndOfLineTrivia [82..83) '\n'
+    RecordDeclaration [83..109)
+      L:WhitespaceTrivia [83..87) '    '
+      AbstractKeyword [87..95) 'abstract'
+      T:WhitespaceTrivia [95..96) ' '
+      RecordKeyword [96..102) 'record'
+      T:WhitespaceTrivia [102..103) ' '
+      IdentifierToken [103..105) 'R3'
+      ParameterList [105..107)
+        OpenParenToken [105..106) '('
+        CloseParenToken [106..107) ')'
+      SemicolonToken [107..108) ';'
+      T:EndOfLineTrivia [108..109) '\n'
+    CloseBraceToken [109..110) '}'
+  EndOfFileToken [110..110) ''
+Diagnostics:
+  CS1519 [15..21) Invalid token \'return\' in a member declaration
+  CS1519 [68..74) Invalid token \'return\' in a member declaration

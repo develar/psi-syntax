@@ -1,0 +1,46 @@
+SwitchStatement [0..56)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..55)
+    CasePatternSwitchLabel [15..28)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      ListPattern [24..26)
+        OpenBracketToken [24..25) '['
+        ListPattern [25..26)
+          OpenBracketToken [25..26) '['
+          CloseBracketToken [26..26) missing
+        CloseBracketToken [26..26) missing
+      ColonToken [26..27) ':'
+      T:EndOfLineTrivia [27..28) '\n'
+    CasePatternSwitchLabel [28..41)
+      L:WhitespaceTrivia [28..32) '    '
+      CaseKeyword [32..36) 'case'
+      T:WhitespaceTrivia [36..37) ' '
+      ListPattern [37..39)
+        OpenBracketToken [37..38) '['
+        ListPattern [38..39)
+          OpenBracketToken [38..39) '['
+          CloseBracketToken [39..39) missing
+        CloseBracketToken [39..39) missing
+      ColonToken [39..40) ':'
+      T:EndOfLineTrivia [40..41) '\n'
+    BreakStatement [41..55)
+      L:WhitespaceTrivia [41..48) '       '
+      BreakKeyword [48..53) 'break'
+      SemicolonToken [53..54) ';'
+      T:EndOfLineTrivia [54..55) '\n'
+  CloseBraceToken [55..56) '}'
+Diagnostics:
+  CS1003 [26..27) Syntax error, \']\' expected
+  CS1003 [26..27) Syntax error, \']\' expected
+  CS1003 [39..40) Syntax error, \']\' expected
+  CS1003 [39..40) Syntax error, \']\' expected

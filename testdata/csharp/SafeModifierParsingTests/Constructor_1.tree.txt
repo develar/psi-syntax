@@ -1,0 +1,10 @@
+ConstructorDeclaration [0..16)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  IdentifierToken [12..13) 'C'
+  ParameterList [13..15)
+    OpenParenToken [13..14) '('
+    CloseParenToken [14..15) ')'
+  SemicolonToken [15..16) ';'

@@ -1,0 +1,1 @@
+new S { ref t }

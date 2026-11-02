@@ -1,0 +1,32 @@
+CompilationUnit [0..79)
+  ClassDeclaration [0..79)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..17) 'clx'
+    T:EndOfLineTrivia [17..18) '\n'
+    OpenBraceToken [18..19) '{'
+    T:EndOfLineTrivia [19..20) '\n'
+    EnumDeclaration [20..77)
+      L:WhitespaceTrivia [20..28) '        '
+      EnumKeyword [28..32) 'enum'
+      T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..40) 'splitch'
+      T:EndOfLineTrivia [40..41) '\n'
+      L:WhitespaceTrivia [41..49) '        '
+      OpenBraceToken [49..50) '{'
+      T:EndOfLineTrivia [50..51) '\n'
+      T:WhitespaceTrivia [51..63) '            '
+      T:SkippedTokensTrivia [63..66)
+        CharacterLiteralToken [63..66) '\'a\''
+      T:EndOfLineTrivia [66..67) '\n'
+      L:WhitespaceTrivia [67..75) '        '
+      CloseBraceToken [75..76) '}'
+      T:EndOfLineTrivia [76..77) '\n'
+    CloseBraceToken [77..78) '}'
+    T:EndOfLineTrivia [78..79) '\n'
+  EndOfFileToken [79..79) ''
+Diagnostics:
+  CS1001 [50..50) Identifier expected

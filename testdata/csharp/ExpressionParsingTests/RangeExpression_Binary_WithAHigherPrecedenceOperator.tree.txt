@@ -1,0 +1,14 @@
+SubtractExpression [0..8)
+  AddExpression [0..6)
+    NumericLiteralExpression [0..1)
+      NumericLiteralToken [0..1) '1'
+    PlusToken [1..2) '+'
+    RangeExpression [2..6)
+      NumericLiteralExpression [2..3)
+        NumericLiteralToken [2..3) '2'
+      DotDotToken [3..5) '..'
+      NumericLiteralExpression [5..6)
+        NumericLiteralToken [5..6) '3'
+  MinusToken [6..7) '-'
+  NumericLiteralExpression [7..8)
+    NumericLiteralToken [7..8) '4'

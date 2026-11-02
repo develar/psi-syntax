@@ -1,0 +1,199 @@
+CompilationUnit [0..289)
+  GlobalStatement [0..19)
+    ExpressionStatement [0..19)
+      SimpleAssignmentExpression [0..17)
+        IdentifierName [0..8)
+          IdentifierToken [0..7) 'partial'
+          T:WhitespaceTrivia [7..8) ' '
+        EqualsToken [8..9) '='
+        T:WhitespaceTrivia [9..10) ' '
+        IdentifierName [10..17)
+          IdentifierToken [10..17) 'partial'
+      SemicolonToken [17..18) ';'
+      T:EndOfLineTrivia [18..19) '\n'
+  GlobalStatement [19..37)
+    LocalDeclarationStatement [19..37)
+      VariableDeclaration [19..35)
+        IdentifierName [19..28)
+          L:EndOfLineTrivia [19..20) '\n'
+          IdentifierToken [20..27) 'partial'
+          T:WhitespaceTrivia [27..28) ' '
+        VariableDeclarator [28..35)
+          IdentifierToken [28..35) 'partial'
+      SemicolonToken [35..36) ';'
+      T:EndOfLineTrivia [36..37) '\n'
+  GlobalStatement [37..64)
+    LocalDeclarationStatement [37..64)
+      VariableDeclaration [37..62)
+        IdentifierName [37..45)
+          IdentifierToken [37..44) 'partial'
+          T:WhitespaceTrivia [44..45) ' '
+        VariableDeclarator [45..62)
+          IdentifierToken [45..52) 'partial'
+          T:WhitespaceTrivia [52..53) ' '
+          EqualsValueClause [53..62)
+            EqualsToken [53..54) '='
+            T:WhitespaceTrivia [54..55) ' '
+            IdentifierName [55..62)
+              IdentifierToken [55..62) 'partial'
+      SemicolonToken [62..63) ';'
+      T:EndOfLineTrivia [63..64) '\n'
+  PropertyDeclaration [64..86)
+    IdentifierName [64..73)
+      L:EndOfLineTrivia [64..65) '\n'
+      IdentifierToken [65..72) 'partial'
+      T:WhitespaceTrivia [72..73) ' '
+    IdentifierToken [73..76) 'Goo'
+    T:WhitespaceTrivia [76..77) ' '
+    AccessorList [77..86)
+      OpenBraceToken [77..78) '{'
+      T:WhitespaceTrivia [78..79) ' '
+      GetAccessorDeclaration [79..84)
+        GetKeyword [79..82) 'get'
+        SemicolonToken [82..83) ';'
+        T:WhitespaceTrivia [83..84) ' '
+      CloseBraceToken [84..85) '}'
+      T:EndOfLineTrivia [85..86) '\n'
+  PropertyDeclaration [86..116)
+    PartialKeyword [86..93) 'partial'
+    T:WhitespaceTrivia [93..94) ' '
+    IdentifierName [94..102)
+      IdentifierToken [94..101) 'partial'
+      T:WhitespaceTrivia [101..102) ' '
+    IdentifierToken [102..105) 'Goo'
+    T:WhitespaceTrivia [105..106) ' '
+    AccessorList [106..116)
+      OpenBraceToken [106..107) '{'
+      T:WhitespaceTrivia [107..108) ' '
+      GetAccessorDeclaration [108..113)
+        GetKeyword [108..111) 'get'
+        SemicolonToken [111..112) ';'
+        T:WhitespaceTrivia [112..113) ' '
+      CloseBraceToken [113..114) '}'
+      T:WhitespaceTrivia [114..115) ' '
+      T:EndOfLineTrivia [115..116) '\n'
+  PropertyDeclaration [116..148)
+    PartialKeyword [116..123) 'partial'
+    T:WhitespaceTrivia [123..124) ' '
+    ArrayType [124..134)
+      IdentifierName [124..131)
+        IdentifierToken [124..131) 'partial'
+      ArrayRankSpecifier [131..134)
+        OpenBracketToken [131..132) '['
+        OmittedArraySizeExpression [132..132)
+          OmittedArraySizeExpressionToken [132..132) ''
+        CloseBracketToken [132..133) ']'
+        T:WhitespaceTrivia [133..134) ' '
+    IdentifierToken [134..137) 'Goo'
+    T:WhitespaceTrivia [137..138) ' '
+    AccessorList [138..148)
+      OpenBraceToken [138..139) '{'
+      T:WhitespaceTrivia [139..140) ' '
+      GetAccessorDeclaration [140..145)
+        GetKeyword [140..143) 'get'
+        SemicolonToken [143..144) ';'
+        T:WhitespaceTrivia [144..145) ' '
+      CloseBraceToken [145..146) '}'
+      T:WhitespaceTrivia [146..147) ' '
+      T:EndOfLineTrivia [147..148) '\n'
+  PropertyDeclaration [148..183)
+    PartialKeyword [148..155) 'partial'
+    T:WhitespaceTrivia [155..156) ' '
+    GenericName [156..169)
+      IdentifierToken [156..163) 'partial'
+      TypeArgumentList [163..169)
+        LessThanToken [163..164) '<'
+        PredefinedType [164..167)
+          IntKeyword [164..167) 'int'
+        GreaterThanToken [167..168) '>'
+        T:WhitespaceTrivia [168..169) ' '
+    IdentifierToken [169..172) 'Goo'
+    T:WhitespaceTrivia [172..173) ' '
+    AccessorList [173..183)
+      OpenBraceToken [173..174) '{'
+      T:WhitespaceTrivia [174..175) ' '
+      GetAccessorDeclaration [175..180)
+        GetKeyword [175..178) 'get'
+        SemicolonToken [178..179) ';'
+        T:WhitespaceTrivia [179..180) ' '
+      CloseBraceToken [180..181) '}'
+      T:WhitespaceTrivia [181..182) ' '
+      T:EndOfLineTrivia [182..183) '\n'
+  GlobalStatement [183..203)
+    LocalFunctionStatement [183..203)
+      IdentifierName [183..192)
+        L:EndOfLineTrivia [183..184) '\n'
+        IdentifierToken [184..191) 'partial'
+        T:WhitespaceTrivia [191..192) ' '
+      IdentifierToken [192..195) 'Goo'
+      ParameterList [195..198)
+        OpenParenToken [195..196) '('
+        CloseParenToken [196..197) ')'
+        T:WhitespaceTrivia [197..198) ' '
+      Block [198..203)
+        OpenBraceToken [198..199) '{'
+        T:WhitespaceTrivia [199..200) ' '
+        CloseBraceToken [200..201) '}'
+        T:WhitespaceTrivia [201..202) ' '
+        T:EndOfLineTrivia [202..203) '\n'
+  MethodDeclaration [203..230)
+    PartialKeyword [203..210) 'partial'
+    T:WhitespaceTrivia [210..211) ' '
+    IdentifierName [211..219)
+      IdentifierToken [211..218) 'partial'
+      T:WhitespaceTrivia [218..219) ' '
+    IdentifierToken [219..222) 'Goo'
+    ParameterList [222..225)
+      OpenParenToken [222..223) '('
+      CloseParenToken [223..224) ')'
+      T:WhitespaceTrivia [224..225) ' '
+    Block [225..230)
+      OpenBraceToken [225..226) '{'
+      T:WhitespaceTrivia [226..227) ' '
+      CloseBraceToken [227..228) '}'
+      T:WhitespaceTrivia [228..229) ' '
+      T:EndOfLineTrivia [229..230) '\n'
+  MethodDeclaration [230..259)
+    PartialKeyword [230..237) 'partial'
+    T:WhitespaceTrivia [237..238) ' '
+    ArrayType [238..248)
+      IdentifierName [238..245)
+        IdentifierToken [238..245) 'partial'
+      ArrayRankSpecifier [245..248)
+        OpenBracketToken [245..246) '['
+        OmittedArraySizeExpression [246..246)
+          OmittedArraySizeExpressionToken [246..246) ''
+        CloseBracketToken [246..247) ']'
+        T:WhitespaceTrivia [247..248) ' '
+    IdentifierToken [248..251) 'Goo'
+    ParameterList [251..254)
+      OpenParenToken [251..252) '('
+      CloseParenToken [252..253) ')'
+      T:WhitespaceTrivia [253..254) ' '
+    Block [254..259)
+      OpenBraceToken [254..255) '{'
+      T:WhitespaceTrivia [255..256) ' '
+      CloseBraceToken [256..257) '}'
+      T:WhitespaceTrivia [257..258) ' '
+      T:EndOfLineTrivia [258..259) '\n'
+  MethodDeclaration [259..289)
+    PartialKeyword [259..266) 'partial'
+    T:WhitespaceTrivia [266..267) ' '
+    GenericName [267..280)
+      IdentifierToken [267..274) 'partial'
+      TypeArgumentList [274..280)
+        LessThanToken [274..275) '<'
+        PredefinedType [275..278)
+          IntKeyword [275..278) 'int'
+        GreaterThanToken [278..279) '>'
+        T:WhitespaceTrivia [279..280) ' '
+    IdentifierToken [280..283) 'Goo'
+    ParameterList [283..286)
+      OpenParenToken [283..284) '('
+      CloseParenToken [284..285) ')'
+      T:WhitespaceTrivia [285..286) ' '
+    Block [286..289)
+      OpenBraceToken [286..287) '{'
+      T:WhitespaceTrivia [287..288) ' '
+      CloseBraceToken [288..289) '}'
+  EndOfFileToken [289..289) ''

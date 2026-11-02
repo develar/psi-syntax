@@ -1,0 +1,42 @@
+CompilationUnit [0..28)
+  ClassDeclaration [0..28)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..27)
+      VariableDeclaration [10..25)
+        IdentifierName [10..14)
+          L:WhitespaceTrivia [10..12) '  '
+          IdentifierToken [12..13) 'C'
+          T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..25)
+          IdentifierToken [14..15) 'x'
+          T:WhitespaceTrivia [15..16) ' '
+          BracketedArgumentList [16..25)
+            OpenBracketToken [16..17) '['
+            Argument [17..18)
+              NumericLiteralExpression [17..18)
+                NumericLiteralToken [17..18) '1'
+            CommaToken [18..19) ','
+            T:WhitespaceTrivia [19..20) ' '
+            Argument [20..21)
+              NumericLiteralExpression [20..21)
+                NumericLiteralToken [20..21) '2'
+            CommaToken [21..22) ','
+            T:WhitespaceTrivia [22..23) ' '
+            Argument [23..24)
+              NumericLiteralExpression [23..24)
+                NumericLiteralToken [23..24) '3'
+            CloseBracketToken [24..25) ']'
+      SemicolonToken [25..26) ';'
+      T:EndOfLineTrivia [26..27) '\n'
+    CloseBraceToken [27..28) '}'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS0650 [16..25) Bad array declarator: To declare a managed array the rank specifier precedes the variable\'s identifier. To declare a fixed size buffer field, use the fixed keyword before the field type.
+  CS0270 [17..18) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)
+  CS0270 [20..21) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)
+  CS0270 [23..24) Array size cannot be specified in a variable declaration (try initializing with a \'new\' expression)

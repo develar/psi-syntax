@@ -1,0 +1,1 @@
+_ = e is A or B or C;

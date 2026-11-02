@@ -1,0 +1,68 @@
+CompilationUnit [0..58)
+  ClassDeclaration [0..58)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..57)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..57)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..42)
+          VariableDeclaration [21..42)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..42)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..42)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                AnonymousObjectCreationExpression [29..42)
+                  NewKeyword [29..32) 'new'
+                  T:WhitespaceTrivia [32..33) ' '
+                  OpenBraceToken [33..34) '{'
+                  T:WhitespaceTrivia [34..35) ' '
+                  AnonymousObjectMemberDeclarator [35..40)
+                    NameEquals [35..39)
+                      IdentifierName [35..37)
+                        IdentifierToken [35..36) 'a'
+                        T:WhitespaceTrivia [36..37) ' '
+                      EqualsToken [37..38) '='
+                      T:WhitespaceTrivia [38..39) ' '
+                    IdentifierName [39..40)
+                      IdentifierToken [39..40) 'b'
+                  CommaToken [40..41) ','
+                  T:WhitespaceTrivia [41..42) ' '
+                  CloseBraceToken [42..42) missing
+          SemicolonToken [42..42) missing
+        WhileStatement [42..55)
+          WhileKeyword [42..47) 'while'
+          T:WhitespaceTrivia [47..48) ' '
+          OpenParenToken [48..49) '('
+          IdentifierName [49..50)
+            IdentifierToken [49..50) 'x'
+          CloseParenToken [50..51) ')'
+          T:WhitespaceTrivia [51..52) ' '
+          Block [52..55)
+            OpenBraceToken [52..53) '{'
+            CloseBraceToken [53..54) '}'
+            T:WhitespaceTrivia [54..55) ' '
+        CloseBraceToken [55..56) '}'
+        T:WhitespaceTrivia [56..57) ' '
+    CloseBraceToken [57..58) '}'
+  EndOfFileToken [58..58) ''
+Diagnostics:
+  CS1513 [42..47) } expected
+  CS1002 [42..47) ; expected

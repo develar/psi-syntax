@@ -1,0 +1,38 @@
+LocalDeclarationStatement [0..33)
+  VariableDeclaration [0..32)
+    FunctionPointerType [0..16)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..16)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..14)
+          PredefinedType [10..14)
+            VoidKeyword [10..14) 'void'
+        GreaterThanToken [14..15) '>'
+        T:WhitespaceTrivia [15..16) ' '
+    VariableDeclarator [16..32)
+      IdentifierToken [16..19) 'ptr'
+      T:WhitespaceTrivia [19..20) ' '
+      EqualsValueClause [20..32)
+        EqualsToken [20..21) '='
+        T:WhitespaceTrivia [21..22) ' '
+        AddressOfExpression [22..32)
+          AmpersandToken [22..23) '&'
+          ParenthesizedExpression [23..32)
+            OpenParenToken [23..24) '('
+            IdentifierName [24..24)
+              IdentifierToken [24..24) missing
+            CloseParenToken [24..25) ')'
+            T:WhitespaceTrivia [25..26) ' '
+            T:SkippedTokensTrivia [26..28)
+              EqualsGreaterThanToken [26..28) '=>'
+            T:WhitespaceTrivia [28..29) ' '
+            T:SkippedTokensTrivia [29..30)
+              OpenBraceToken [29..30) '{'
+            T:WhitespaceTrivia [30..31) ' '
+            T:SkippedTokensTrivia [31..32)
+              CloseBraceToken [31..32) '}'
+  SemicolonToken [32..33) ';'
+Diagnostics:
+  CS1525 [24..25) Invalid expression term \')\'
+  CS1003 [26..28) Syntax error, \',\' expected

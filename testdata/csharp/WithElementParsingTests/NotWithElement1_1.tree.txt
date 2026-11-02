@@ -1,0 +1,6 @@
+CollectionExpression [0..6)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..5)
+    IdentifierName [1..5)
+      IdentifierToken [1..5) 'with'
+  CloseBracketToken [5..6) ']'

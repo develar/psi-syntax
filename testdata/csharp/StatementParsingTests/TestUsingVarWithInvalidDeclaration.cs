@@ -1,0 +1,1 @@
+using public readonly var a = b;

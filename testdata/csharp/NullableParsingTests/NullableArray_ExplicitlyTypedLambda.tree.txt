@@ -1,0 +1,29 @@
+InvocationExpression [0..21)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..21)
+    OpenParenToken [1..2) '('
+    Argument [2..20)
+      ParenthesizedLambdaExpression [2..20)
+        ParameterList [2..16)
+          OpenParenToken [2..3) '('
+          Parameter [3..14)
+            NullableType [3..13)
+              ArrayType [3..11)
+                PredefinedType [3..9)
+                  ObjectKeyword [3..9) 'object'
+                ArrayRankSpecifier [9..11)
+                  OpenBracketToken [9..10) '['
+                  OmittedArraySizeExpression [10..10)
+                    OmittedArraySizeExpressionToken [10..10) ''
+                  CloseBracketToken [10..11) ']'
+              QuestionToken [11..12) '?'
+              T:WhitespaceTrivia [12..13) ' '
+            IdentifierToken [13..14) 'a'
+          CloseParenToken [14..15) ')'
+          T:WhitespaceTrivia [15..16) ' '
+        EqualsGreaterThanToken [16..18) '=>'
+        T:WhitespaceTrivia [18..19) ' '
+        IdentifierName [19..20)
+          IdentifierToken [19..20) 'a'
+    CloseParenToken [20..21) ')'

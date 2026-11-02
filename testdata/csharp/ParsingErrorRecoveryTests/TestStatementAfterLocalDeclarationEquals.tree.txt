@@ -1,0 +1,58 @@
+CompilationUnit [0..44)
+  ClassDeclaration [0..44)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..43)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..43)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..29)
+          VariableDeclaration [21..29)
+            PredefinedType [21..25)
+              IntKeyword [21..24) 'int'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..29)
+              IdentifierToken [25..26) 'a'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..29)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                IdentifierName [29..29)
+                  IdentifierToken [29..29) missing
+          SemicolonToken [29..29) missing
+        IfStatement [29..41)
+          IfKeyword [29..31) 'if'
+          T:WhitespaceTrivia [31..32) ' '
+          OpenParenToken [32..33) '('
+          IdentifierName [33..34)
+            IdentifierToken [33..34) 'x'
+          CloseParenToken [34..35) ')'
+          T:WhitespaceTrivia [35..36) ' '
+          ExpressionStatement [36..41)
+            InvocationExpression [36..39)
+              IdentifierName [36..37)
+                IdentifierToken [36..37) 'y'
+              ArgumentList [37..39)
+                OpenParenToken [37..38) '('
+                CloseParenToken [38..39) ')'
+            SemicolonToken [39..40) ';'
+            T:WhitespaceTrivia [40..41) ' '
+        CloseBraceToken [41..42) '}'
+        T:WhitespaceTrivia [42..43) ' '
+    CloseBraceToken [43..44) '}'
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1525 [29..31) Invalid expression term \'if\'
+  CS1002 [29..31) ; expected

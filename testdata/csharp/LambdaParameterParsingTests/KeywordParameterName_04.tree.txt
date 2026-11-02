@@ -1,0 +1,14 @@
+SimpleLambdaExpression [0..15)
+  Parameter [0..9)
+    IdentifierToken [0..0) missing
+    T:SkippedTokensTrivia [0..8)
+      DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+  EqualsGreaterThanToken [9..11) '=>'
+  T:WhitespaceTrivia [11..12) ' '
+  Block [12..15)
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+Diagnostics:
+  CS1041 [0..8) Identifier expected; \'delegate\' is a keyword

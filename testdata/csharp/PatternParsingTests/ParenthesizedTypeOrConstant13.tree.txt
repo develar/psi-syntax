@@ -1,0 +1,59 @@
+SwitchExpression [0..84)
+  IdentifierName [0..5)
+    IdentifierToken [0..4) 'reqs'
+    T:WhitespaceTrivia [4..5) ' '
+  SwitchKeyword [5..11) 'switch'
+  T:EndOfLineTrivia [11..12) '\n'
+  OpenBraceToken [12..13) '{'
+  T:EndOfLineTrivia [13..14) '\n'
+  SwitchExpressionArm [14..81)
+    RecursivePattern [14..69)
+      PositionalPatternClause [14..69)
+        L:WhitespaceTrivia [14..18) '    '
+        OpenParenToken [18..19) '('
+        Subpattern [19..42)
+          DeclarationPattern [19..42)
+            QualifiedName [19..38)
+              IdentifierName [19..29)
+                IdentifierToken [19..29) 'CustomEnum'
+              DotToken [29..30) '.'
+              IdentifierName [30..38)
+                IdentifierToken [30..37) 'EnumTwo'
+                T:WhitespaceTrivia [37..38) ' '
+            SingleVariableDesignation [38..42)
+              IdentifierToken [38..42) 'when'
+        CommaToken [42..43) ','
+        T:WhitespaceTrivia [43..44) ' '
+        Subpattern [44..67)
+          DeclarationPattern [44..67)
+            QualifiedName [44..63)
+              IdentifierName [44..54)
+                IdentifierToken [44..54) 'CustomEnum'
+              DotToken [54..55) '.'
+              IdentifierName [55..63)
+                IdentifierToken [55..62) 'EnumTwo'
+                T:WhitespaceTrivia [62..63) ' '
+            SingleVariableDesignation [63..67)
+              IdentifierToken [63..67) 'when'
+        CloseParenToken [67..68) ')'
+        T:WhitespaceTrivia [68..69) ' '
+    WhenClause [69..81)
+      WhenKeyword [69..73) 'when'
+      T:WhitespaceTrivia [73..74) ' '
+      SimpleLambdaExpression [74..81)
+        Parameter [74..74)
+          IdentifierToken [74..74) missing
+        EqualsGreaterThanToken [74..76) '=>'
+        T:WhitespaceTrivia [76..77) ' '
+        StringLiteralExpression [77..81)
+          StringLiteralToken [77..81) '"ok"'
+    EqualsGreaterThanToken [81..81) missing
+    IdentifierName [81..81)
+      IdentifierToken [81..81) missing
+  CommaToken [81..82) ','
+  T:EndOfLineTrivia [82..83) '\n'
+  CloseBraceToken [83..84) '}'
+Diagnostics:
+  CS1001 [74..76) Identifier expected
+  CS1003 [81..82) Syntax error, \'=>\' expected
+  CS1525 [81..82) Invalid expression term \',\'

@@ -1,0 +1,10 @@
+SimpleLambdaExpression [0..12)
+  Parameter [0..6)
+    IdentifierToken [0..5) 'async'
+    T:WhitespaceTrivia [5..6) ' '
+  EqualsGreaterThanToken [6..8) '=>'
+  T:WhitespaceTrivia [8..9) ' '
+  Block [9..12)
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'

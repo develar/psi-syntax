@@ -1,0 +1,1 @@
+/// <see cref="implicit operator A"/>

@@ -1,0 +1,11 @@
+CompilationUnit [0..11)
+  GlobalStatement [0..11)
+    LocalDeclarationStatement [0..11)
+      VariableDeclaration [0..10)
+        PredefinedType [0..4)
+          IntKeyword [0..3) 'int'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..10)
+          IdentifierToken [4..10) 'closed'
+      SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''

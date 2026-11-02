@@ -1,0 +1,11 @@
+CoalesceAssignmentExpression [0..9)
+  ParenthesizedExpression [0..4)
+    OpenParenToken [0..1) '('
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'a'
+    CloseParenToken [2..3) ')'
+    T:WhitespaceTrivia [3..4) ' '
+  QuestionQuestionEqualsToken [4..7) '??='
+  T:WhitespaceTrivia [7..8) ' '
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'b'

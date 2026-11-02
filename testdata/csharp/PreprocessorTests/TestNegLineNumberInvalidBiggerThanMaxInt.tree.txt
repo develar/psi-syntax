@@ -1,0 +1,13 @@
+CompilationUnit [0..22)
+  L:LineDirectiveTrivia [0..22)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..16) '2147483649'
+    T:WhitespaceTrivia [16..17) ' '
+    StringLiteralToken [17..22) '"XYZ"'
+    EndOfDirectiveToken [22..22) ''
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1021 [6..6) Integral constant is too large
+  CS1576 [6..16) The line number specified for #line directive is missing or invalid

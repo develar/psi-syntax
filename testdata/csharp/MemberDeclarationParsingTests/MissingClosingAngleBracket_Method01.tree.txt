@@ -1,0 +1,147 @@
+MethodDeclaration [0..231)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..54)
+    IdentifierToken [7..18) 'IEnumerable'
+    TypeArgumentList [18..54)
+      LessThanToken [18..19) '<'
+      TupleType [19..54)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+        T:WhitespaceTrivia [53..54) ' '
+      GreaterThanToken [54..54) missing
+  IdentifierToken [54..66) 'GetAllValues'
+  ParameterList [66..75)
+    OpenParenToken [66..67) '('
+    Parameter [67..73)
+      IdentifierName [67..72)
+        IdentifierToken [67..71) 'Type'
+        T:WhitespaceTrivia [71..72) ' '
+      IdentifierToken [72..73) 't'
+    CloseParenToken [73..74) ')'
+    T:EndOfLineTrivia [74..75) '\n'
+  Block [75..231)
+    OpenBraceToken [75..76) '{'
+    T:EndOfLineTrivia [76..77) '\n'
+    IfStatement [77..144)
+      L:WhitespaceTrivia [77..81) '    '
+      IfKeyword [81..83) 'if'
+      T:WhitespaceTrivia [83..84) ' '
+      OpenParenToken [84..85) '('
+      LogicalNotExpression [85..94)
+        ExclamationToken [85..86) '!'
+        SimpleMemberAccessExpression [86..94)
+          IdentifierName [86..87)
+            IdentifierToken [86..87) 't'
+          DotToken [87..88) '.'
+          IdentifierName [88..94)
+            IdentifierToken [88..94) 'IsEnum'
+      CloseParenToken [94..95) ')'
+      T:EndOfLineTrivia [95..96) '\n'
+      ThrowStatement [96..144)
+        L:WhitespaceTrivia [96..104) '        '
+        ThrowKeyword [104..109) 'throw'
+        T:WhitespaceTrivia [109..110) ' '
+        ObjectCreationExpression [110..142)
+          NewKeyword [110..113) 'new'
+          T:WhitespaceTrivia [113..114) ' '
+          IdentifierName [114..131)
+            IdentifierToken [114..131) 'ArgumentException'
+          ArgumentList [131..142)
+            OpenParenToken [131..132) '('
+            Argument [132..141)
+              StringLiteralExpression [132..141)
+                StringLiteralToken [132..141) '"no good"'
+            CloseParenToken [141..142) ')'
+        SemicolonToken [142..143) ';'
+        T:EndOfLineTrivia [143..144) '\n'
+    ReturnStatement [144..230)
+      L:EndOfLineTrivia [144..145) '\n'
+      L:WhitespaceTrivia [145..149) '    '
+      ReturnKeyword [149..155) 'return'
+      T:WhitespaceTrivia [155..156) ' '
+      InvocationExpression [156..228)
+        SimpleMemberAccessExpression [156..193)
+          InvocationExpression [156..186)
+            SimpleMemberAccessExpression [156..184)
+              InvocationExpression [156..173)
+                SimpleMemberAccessExpression [156..170)
+                  IdentifierName [156..160)
+                    IdentifierToken [156..160) 'Enum'
+                  DotToken [160..161) '.'
+                  IdentifierName [161..170)
+                    IdentifierToken [161..170) 'GetValues'
+                ArgumentList [170..173)
+                  OpenParenToken [170..171) '('
+                  Argument [171..172)
+                    IdentifierName [171..172)
+                      IdentifierToken [171..172) 't'
+                  CloseParenToken [172..173) ')'
+              DotToken [173..174) '.'
+              GenericName [174..184)
+                IdentifierToken [174..178) 'Cast'
+                TypeArgumentList [178..184)
+                  LessThanToken [178..179) '<'
+                  IdentifierName [179..183)
+                    IdentifierToken [179..183) 'Enum'
+                  GreaterThanToken [183..184) '>'
+            ArgumentList [184..186)
+              OpenParenToken [184..185) '('
+              CloseParenToken [185..186) ')'
+          DotToken [186..187) '.'
+          IdentifierName [187..193)
+            IdentifierToken [187..193) 'Select'
+        ArgumentList [193..228)
+          OpenParenToken [193..194) '('
+          Argument [194..227)
+            SimpleLambdaExpression [194..227)
+              Parameter [194..196)
+                IdentifierToken [194..195) 'e'
+                T:WhitespaceTrivia [195..196) ' '
+              EqualsGreaterThanToken [196..198) '=>'
+              T:WhitespaceTrivia [198..199) ' '
+              TupleExpression [199..227)
+                OpenParenToken [199..200) '('
+                Argument [200..212)
+                  InvocationExpression [200..212)
+                    SimpleMemberAccessExpression [200..210)
+                      IdentifierName [200..201)
+                        IdentifierToken [200..201) 'e'
+                      DotToken [201..202) '.'
+                      IdentifierName [202..210)
+                        IdentifierToken [202..210) 'ToString'
+                    ArgumentList [210..212)
+                      OpenParenToken [210..211) '('
+                      CloseParenToken [211..212) ')'
+                CommaToken [212..213) ','
+                T:WhitespaceTrivia [213..214) ' '
+                Argument [214..226)
+                  InvocationExpression [214..226)
+                    SimpleMemberAccessExpression [214..224)
+                      IdentifierName [214..215)
+                        IdentifierToken [214..215) 'e'
+                      DotToken [215..216) '.'
+                      IdentifierName [216..224)
+                        IdentifierToken [216..224) 'ToString'
+                    ArgumentList [224..226)
+                      OpenParenToken [224..225) '('
+                      CloseParenToken [225..226) ')'
+                CloseParenToken [226..227) ')'
+          CloseParenToken [227..228) ')'
+      SemicolonToken [228..229) ';'
+      T:EndOfLineTrivia [229..230) '\n'
+    CloseBraceToken [230..231) '}'
+Diagnostics:
+  CS1003 [54..66) Syntax error, \'>\' expected

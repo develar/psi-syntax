@@ -1,0 +1,34 @@
+ConditionalExpression [0..32)
+  IsPatternExpression [0..9)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    DeclarationPattern [5..9)
+      IdentifierName [5..7)
+        IdentifierToken [5..6) 'A'
+        T:WhitespaceTrivia [6..7) ' '
+      SingleVariableDesignation [7..9)
+        IdentifierToken [7..8) 'a'
+        T:WhitespaceTrivia [8..9) ' '
+  QuestionToken [9..10) '?'
+  T:WhitespaceTrivia [10..11) ' '
+  ParenthesizedLambdaExpression [11..26)
+    AsyncKeyword [11..16) 'async'
+    T:WhitespaceTrivia [16..17) ' '
+    ParameterList [17..21)
+      OpenParenToken [17..18) '('
+      Parameter [18..19)
+        IdentifierToken [18..19) 'b'
+      CloseParenToken [19..20) ')'
+      T:WhitespaceTrivia [20..21) ' '
+    EqualsGreaterThanToken [21..23) '=>'
+    T:WhitespaceTrivia [23..24) ' '
+    NumericLiteralExpression [24..26)
+      NumericLiteralToken [24..25) '0'
+      T:WhitespaceTrivia [25..26) ' '
+  ColonToken [26..27) ':'
+  T:WhitespaceTrivia [27..28) ' '
+  NullLiteralExpression [28..32)
+    NullKeyword [28..32) 'null'

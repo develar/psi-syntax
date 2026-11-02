@@ -1,0 +1,1 @@
+Func<int, int, int> func1 = (int x!!, int y!!) => x;

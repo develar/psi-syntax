@@ -1,0 +1,36 @@
+InvocationExpression [0..30)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'M'
+  ArgumentList [1..30)
+    OpenParenToken [1..2) '('
+    Argument [2..7)
+      RefKeyword [2..5) 'ref'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..7)
+        IdentifierToken [6..7) 'x'
+    CommaToken [7..8) ','
+    T:WhitespaceTrivia [8..9) ' '
+    Argument [9..13)
+      InKeyword [9..11) 'in'
+      T:WhitespaceTrivia [11..12) ' '
+      IdentifierName [12..13)
+        IdentifierToken [12..13) 'y'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    Argument [15..28)
+      RefKeyword [15..18) 'ref'
+      T:WhitespaceTrivia [18..19) ' '
+      IdentifierName [19..28)
+        IdentifierToken [19..19) missing
+        T:SkippedTokensTrivia [19..27)
+          ReadOnlyKeyword [19..27) 'readonly'
+        T:WhitespaceTrivia [27..28) ' '
+    CommaToken [28..28) missing
+    Argument [28..29)
+      IdentifierName [28..29)
+        IdentifierToken [28..29) 'z'
+    CloseParenToken [29..30) ')'
+Diagnostics:
+  CS1525 [19..27) Invalid expression term \'readonly\'
+  CS1003 [19..27) Syntax error, \',\' expected
+  CS1003 [28..29) Syntax error, \',\' expected

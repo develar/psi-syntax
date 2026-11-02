@@ -1,0 +1,33 @@
+IncompleteMember [0..34)
+  IdentifierName [0..34)
+    IdentifierToken [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    T:SkippedTokensTrivia [8..12)
+      VoidKeyword [8..12) 'void'
+    T:WhitespaceTrivia [12..13) ' '
+    T:SkippedTokensTrivia [13..21)
+      OperatorKeyword [13..21) 'operator'
+    T:WhitespaceTrivia [21..22) ' '
+    T:SkippedTokensTrivia [22..23)
+      GreaterThanToken [22..23) '>'
+    T:SkippedTokensTrivia [23..24)
+      GreaterThanToken [23..24) '>'
+    T:SkippedTokensTrivia [24..26)
+      GreaterThanEqualsToken [24..26) '>='
+    T:SkippedTokensTrivia [26..27)
+      OpenParenToken [26..27) '('
+    T:SkippedTokensTrivia [27..28)
+      IdentifierToken [27..28) 'C'
+    T:WhitespaceTrivia [28..29) ' '
+    T:SkippedTokensTrivia [29..30)
+      IdentifierToken [29..30) 'x'
+    T:SkippedTokensTrivia [30..31)
+      CloseParenToken [30..31) ')'
+    T:WhitespaceTrivia [31..32) ' '
+    T:SkippedTokensTrivia [32..33)
+      OpenBraceToken [32..33) '{'
+    T:SkippedTokensTrivia [33..34)
+      CloseBraceToken [33..34) '}'
+Diagnostics:
+  CS1519 [8..12) Invalid token \'void\' in a member declaration
+  CS1073 [0..7) Unexpected token \'void\'

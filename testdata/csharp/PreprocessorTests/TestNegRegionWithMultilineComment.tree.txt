@@ -1,0 +1,50 @@
+CompilationUnit [0..85)
+  ClassDeclaration [0..85)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    FieldDeclaration [14..52)
+      VariableDeclaration [14..52)
+        IdentifierName [14..52)
+          L:RegionDirectiveTrivia [14..36)
+            HashToken [14..15) '#'
+            RegionKeyword [15..21) 'region'
+            T:WhitespaceTrivia [21..22) ' '
+            L:PreprocessingMessageTrivia [22..35) '/* This is a '
+            EndOfDirectiveToken [35..35) ''
+            T:EndOfLineTrivia [35..36) '\n'
+          L:WhitespaceTrivia [36..40) '    '
+          IdentifierToken [40..50) 'multilines'
+          T:WhitespaceTrivia [50..51) ' '
+          T:EndOfLineTrivia [51..52) '\n'
+        VariableDeclarator [52..52)
+          IdentifierToken [52..52) missing
+      SemicolonToken [52..52) missing
+    IncompleteMember [52..71)
+      PointerType [52..71)
+        IdentifierName [52..68)
+          L:WhitespaceTrivia [52..60) '        '
+          IdentifierToken [60..67) 'comment'
+          T:WhitespaceTrivia [67..68) ' '
+        AsteriskToken [68..69) '*'
+        T:SkippedTokensTrivia [69..70)
+          SlashToken [69..70) '/'
+        T:EndOfLineTrivia [70..71) '\n'
+    L:EndRegionDirectiveTrivia [71..83)
+      HashToken [71..72) '#'
+      EndRegionKeyword [72..81) 'endregion'
+      T:WhitespaceTrivia [81..82) ' '
+      EndOfDirectiveToken [82..82) ''
+      T:EndOfLineTrivia [82..83) '\n'
+    CloseBraceToken [83..84) '}'
+    T:EndOfLineTrivia [84..85) '\n'
+  EndOfFileToken [85..85) ''
+Diagnostics:
+  CS1001 [50..50) Identifier expected
+  CS1002 [50..50) ; expected
+  CS1519 [69..70) Invalid token \'/\' in a member declaration
+  CS1519 [69..70) Invalid token \'/\' in a member declaration

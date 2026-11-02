@@ -1,0 +1,23 @@
+InterpolatedStringExpression [0..12)
+  L:WhitespaceTrivia [0..1) ' '
+  InterpolatedStringStartToken [1..3) '$"'
+  Interpolation [3..10)
+    OpenBraceToken [3..4) '{'
+    CollectionExpression [4..9)
+      OpenBracketToken [4..5) '['
+      ExpressionElement [5..7)
+        IdentifierName [5..7)
+          IdentifierToken [5..6) 'A'
+          T:SkippedTokensTrivia [6..7)
+            ColonToken [6..7) ':'
+      CommaToken [7..7) missing
+      ExpressionElement [7..8)
+        IdentifierName [7..8)
+          IdentifierToken [7..8) 'B'
+      CloseBracketToken [8..9) ']'
+    CloseBraceToken [9..10) '}'
+  InterpolatedStringEndToken [10..11) '"'
+  T:WhitespaceTrivia [11..12) ' '
+Diagnostics:
+  CS1003 [6..7) Syntax error, \',\' expected
+  CS1003 [7..8) Syntax error, \',\' expected

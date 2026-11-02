@@ -1,0 +1,62 @@
+CompilationUnit [0..70)
+  ClassDeclaration [0..70)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..70)
+      PublicKeyword [11..17) 'public'
+      T:WhitespaceTrivia [17..18) ' '
+      StaticKeyword [18..24) 'static'
+      T:WhitespaceTrivia [24..25) ' '
+      PredefinedType [25..29)
+        IntKeyword [25..28) 'int'
+        T:WhitespaceTrivia [28..29) ' '
+      IdentifierToken [29..33) 'Main'
+      ParameterList [33..36)
+        OpenParenToken [33..34) '('
+        CloseParenToken [34..35) ')'
+        T:EndOfLineTrivia [35..36) '\n'
+      Block [36..70)
+        OpenBraceToken [36..37) '{'
+        T:EndOfLineTrivia [37..38) '\n'
+        SwitchStatement [38..70)
+          SwitchKeyword [38..44) 'switch'
+          OpenParenToken [44..45) '('
+          IdentifierName [45..48)
+            IdentifierToken [45..48) 'str'
+          CloseParenToken [48..49) ')'
+          T:EndOfLineTrivia [49..50) '\n'
+          OpenBraceToken [50..51) '{'
+          T:WhitespaceTrivia [51..52) ' '
+          T:EndOfLineTrivia [52..53) '\n'
+          SwitchSection [53..70)
+            DefaultSwitchLabel [53..62)
+              DefaultKeyword [53..60) 'default'
+              ColonToken [60..61) ':'
+              T:EndOfLineTrivia [61..62) '\n'
+            ExpressionStatement [62..70)
+              LessThanExpression [62..67)
+                IdentifierName [62..66)
+                  IdentifierToken [62..66) 'List'
+                LessThanToken [66..67) '<'
+                IdentifierName [67..67)
+                  IdentifierToken [67..67) missing
+              SemicolonToken [67..67) missing
+              T:SkippedTokensTrivia [67..69)
+                InKeyword [67..69) 'in'
+              T:EndOfLineTrivia [69..70) '\n'
+          CloseBraceToken [70..70) missing
+        CloseBraceToken [70..70) missing
+    CloseBraceToken [70..70) missing
+  EndOfFileToken [70..70) ''
+Diagnostics:
+  CS1525 [67..69) Invalid expression term \'in\'
+  CS1002 [67..69) ; expected
+  CS1513 [67..69) } expected
+  CS1513 [69..69) } expected
+  CS1513 [69..69) } expected
+  CS1513 [69..69) } expected

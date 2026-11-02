@@ -1,0 +1,2 @@
+NumericLiteralToken [0..10) '0x7FFFFFFF'
+EndOfFileToken [10..10) ''

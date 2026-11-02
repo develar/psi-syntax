@@ -1,0 +1,9 @@
+CompilationUnit [0..17)
+  RecordDeclaration [0..17)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    RecordKeyword [8..14) 'record'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'S'
+    SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''

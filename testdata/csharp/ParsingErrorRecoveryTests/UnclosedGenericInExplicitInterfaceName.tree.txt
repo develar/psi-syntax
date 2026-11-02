@@ -1,0 +1,78 @@
+CompilationUnit [0..81)
+  InterfaceDeclaration [0..36)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'I'
+    TypeParameterList [12..16)
+      LessThanToken [12..13) '<'
+      TypeParameter [13..14)
+        IdentifierToken [13..14) 'T'
+      GreaterThanToken [14..15) '>'
+      T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    MethodDeclaration [18..34)
+      PredefinedType [18..27)
+        L:WhitespaceTrivia [18..22) '    '
+        VoidKeyword [22..26) 'void'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..30) 'Goo'
+      ParameterList [30..32)
+        OpenParenToken [30..31) '('
+        CloseParenToken [31..32) ')'
+      SemicolonToken [32..33) ';'
+      T:EndOfLineTrivia [33..34) '\n'
+    CloseBraceToken [34..35) '}'
+    T:EndOfLineTrivia [35..36) '\n'
+  ClassDeclaration [36..81)
+    L:WhitespaceTrivia [36..37) ' '
+    L:EndOfLineTrivia [37..38) '\n'
+    ClassKeyword [38..43) 'class'
+    T:WhitespaceTrivia [43..44) ' '
+    IdentifierToken [44..45) 'C'
+    T:WhitespaceTrivia [45..46) ' '
+    BaseList [46..55)
+      ColonToken [46..47) ':'
+      T:WhitespaceTrivia [47..48) ' '
+      SimpleBaseType [48..55)
+        GenericName [48..55)
+          IdentifierToken [48..49) 'I'
+          TypeArgumentList [49..55)
+            LessThanToken [49..50) '<'
+            PredefinedType [50..53)
+              IntKeyword [50..53) 'int'
+            GreaterThanToken [53..54) '>'
+            T:EndOfLineTrivia [54..55) '\n'
+    OpenBraceToken [55..56) '{'
+    T:EndOfLineTrivia [56..57) '\n'
+    MethodDeclaration [57..79)
+      PredefinedType [57..66)
+        L:WhitespaceTrivia [57..61) '    '
+        VoidKeyword [61..65) 'void'
+        T:WhitespaceTrivia [65..66) ' '
+      ExplicitInterfaceSpecifier [66..69)
+        GenericName [66..68)
+          IdentifierToken [66..67) 'I'
+          TypeArgumentList [67..68)
+            LessThanToken [67..68) '<'
+            IdentifierName [68..68)
+              IdentifierToken [68..68) missing
+            GreaterThanToken [68..68) missing
+        DotToken [68..69) '.'
+      IdentifierToken [69..72) 'Goo'
+      ParameterList [72..75)
+        OpenParenToken [72..73) '('
+        CloseParenToken [73..74) ')'
+        T:WhitespaceTrivia [74..75) ' '
+      Block [75..79)
+        OpenBraceToken [75..76) '{'
+        T:WhitespaceTrivia [76..77) ' '
+        CloseBraceToken [77..78) '}'
+        T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''
+Diagnostics:
+  CS1031 [68..69) Type expected
+  CS1003 [68..69) Syntax error, \'>\' expected

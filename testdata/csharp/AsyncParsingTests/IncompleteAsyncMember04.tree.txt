@@ -1,0 +1,28 @@
+CompilationUnit [0..32)
+  ClassDeclaration [0..32)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    OperatorDeclaration [11..31)
+      IdentifierName [11..21)
+        L:WhitespaceTrivia [11..15) '    '
+        IdentifierToken [15..20) 'async'
+        T:WhitespaceTrivia [20..21) ' '
+      OperatorKeyword [21..29) 'operator'
+      PlusToken [29..30) '+'
+      T:EndOfLineTrivia [30..31) '\n'
+      ParameterList [31..31)
+        OpenParenToken [31..31) missing
+        CloseParenToken [31..31) missing
+      SemicolonToken [31..31) missing
+    CloseBraceToken [31..32) '}'
+  EndOfFileToken [32..32) ''
+Diagnostics:
+  CS1534 [29..30) Overloaded binary operator \'+\' takes two parameters
+  CS1003 [30..30) Syntax error, \'(\' expected
+  CS1026 [30..30) ) expected
+  CS1002 [30..30) ; expected

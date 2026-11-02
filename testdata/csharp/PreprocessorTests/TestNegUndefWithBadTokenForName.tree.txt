@@ -1,0 +1,12 @@
+CompilationUnit [0..8)
+  L:UndefDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    UndefKeyword [1..6) 'undef'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..7) missing
+    L:SkippedTokensTrivia [7..8)
+      OpenParenToken [7..8) '('
+    EndOfDirectiveToken [8..8) ''
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1001 [7..8) Identifier expected

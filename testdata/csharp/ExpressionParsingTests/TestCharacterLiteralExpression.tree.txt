@@ -1,0 +1,2 @@
+CharacterLiteralExpression [0..3)
+  CharacterLiteralToken [0..3) '\'c\''

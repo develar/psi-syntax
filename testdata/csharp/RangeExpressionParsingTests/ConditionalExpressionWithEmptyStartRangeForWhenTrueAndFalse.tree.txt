@@ -1,0 +1,17 @@
+ConditionalExpression [0..13)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  QuestionToken [2..3) '?'
+  T:WhitespaceTrivia [3..4) ' '
+  RangeExpression [4..8)
+    DotDotToken [4..6) '..'
+    IdentifierName [6..8)
+      IdentifierToken [6..7) 'b'
+      T:WhitespaceTrivia [7..8) ' '
+  ColonToken [8..9) ':'
+  T:WhitespaceTrivia [9..10) ' '
+  RangeExpression [10..13)
+    DotDotToken [10..12) '..'
+    IdentifierName [12..13)
+      IdentifierToken [12..13) 'c'

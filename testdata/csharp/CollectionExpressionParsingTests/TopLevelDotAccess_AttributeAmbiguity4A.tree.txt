@@ -1,0 +1,43 @@
+CompilationUnit [0..16)
+  GlobalStatement [0..1)
+    ExpressionStatement [0..1)
+      CollectionExpression [0..1)
+        OpenBracketToken [0..1) '['
+        CloseBracketToken [1..1) missing
+      SemicolonToken [1..1) missing
+  GlobalStatement [1..9)
+    ReturnStatement [1..9)
+      ReturnKeyword [1..7) 'return'
+      IdentifierName [7..7)
+        IdentifierToken [7..7) missing
+      SemicolonToken [7..7) missing
+      T:SkippedTokensTrivia [7..8)
+        ColonToken [7..8) ':'
+      T:WhitespaceTrivia [8..9) ' '
+  GlobalStatement [9..16)
+    LocalDeclarationStatement [9..16)
+      VariableDeclaration [9..15)
+        IdentifierName [9..10)
+          IdentifierToken [9..10) 'A'
+        VariableDeclarator [10..15)
+          IdentifierToken [10..10) missing
+          T:SkippedTokensTrivia [10..11)
+            CloseBracketToken [10..11) ']'
+          T:SkippedTokensTrivia [11..12)
+            DotToken [11..12) '.'
+          T:SkippedTokensTrivia [12..13)
+            IdentifierToken [12..13) 'C'
+          T:SkippedTokensTrivia [13..14)
+            OpenParenToken [13..14) '('
+          T:SkippedTokensTrivia [14..15)
+            CloseParenToken [14..15) ')'
+      SemicolonToken [15..16) ';'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1003 [1..7) Syntax error, \']\' expected
+  CS1002 [1..7) ; expected
+  CS1525 [7..8) Invalid expression term \':\'
+  CS1002 [7..8) ; expected
+  CS1022 [7..8) Type or namespace definition, or end-of-file expected
+  CS1001 [10..11) Identifier expected
+  CS1003 [10..11) Syntax error, \',\' expected

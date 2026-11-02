@@ -1,0 +1,45 @@
+CompilationUnit [0..42)
+  OperatorDeclaration [0..42)
+    PredefinedType [0..4)
+      IntKeyword [0..3) 'int'
+      T:WhitespaceTrivia [3..4) ' '
+    ExplicitInterfaceSpecifier [4..8)
+      QualifiedName [4..7)
+        IdentifierName [4..5)
+          IdentifierToken [4..5) 'N'
+        DotToken [5..6) '.'
+        IdentifierName [6..7)
+          IdentifierToken [6..7) 'I'
+      DotToken [7..8) '.'
+    OperatorKeyword [8..16) 'operator'
+    T:WhitespaceTrivia [16..17) ' '
+    PlusToken [17..18) '+'
+    ParameterList [18..33)
+      OpenParenToken [18..19) '('
+      Parameter [19..24)
+        PredefinedType [19..23)
+          IntKeyword [19..22) 'int'
+          T:WhitespaceTrivia [22..23) ' '
+        IdentifierToken [23..24) 'x'
+      CommaToken [24..25) ','
+      T:WhitespaceTrivia [25..26) ' '
+      Parameter [26..31)
+        PredefinedType [26..30)
+          IntKeyword [26..29) 'int'
+          T:WhitespaceTrivia [29..30) ' '
+        IdentifierToken [30..31) 'y'
+      CloseParenToken [31..32) ')'
+      T:WhitespaceTrivia [32..33) ' '
+    ArrowExpressionClause [33..41)
+      EqualsGreaterThanToken [33..35) '=>'
+      T:WhitespaceTrivia [35..36) ' '
+      AddExpression [36..41)
+        IdentifierName [36..38)
+          IdentifierToken [36..37) 'x'
+          T:WhitespaceTrivia [37..38) ' '
+        PlusToken [38..39) '+'
+        T:WhitespaceTrivia [39..40) ' '
+        IdentifierName [40..41)
+          IdentifierToken [40..41) 'y'
+    SemicolonToken [41..42) ';'
+  EndOfFileToken [42..42) ''

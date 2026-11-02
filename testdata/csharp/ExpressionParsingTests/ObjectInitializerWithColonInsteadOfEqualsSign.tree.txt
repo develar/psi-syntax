@@ -1,0 +1,22 @@
+ObjectCreationExpression [0..19)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..11)
+    IdentifierToken [4..10) 'Class1'
+    T:WhitespaceTrivia [10..11) ' '
+  ObjectInitializerExpression [11..19)
+    OpenBraceToken [11..12) '{'
+    T:WhitespaceTrivia [12..13) ' '
+    SimpleAssignmentExpression [13..18)
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'X'
+      EqualsToken [14..14) missing
+      T:SkippedTokensTrivia [14..15)
+        ColonToken [14..15) ':'
+      T:WhitespaceTrivia [15..16) ' '
+      NumericLiteralExpression [16..18)
+        NumericLiteralToken [16..17) '0'
+        T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'
+Diagnostics:
+  CS1003 [14..15) Syntax error, \'=\' expected

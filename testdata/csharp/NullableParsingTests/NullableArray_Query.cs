@@ -1,0 +1,1 @@
+from A[]? a in b select a

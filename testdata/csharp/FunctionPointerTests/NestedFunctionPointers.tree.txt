@@ -1,0 +1,56 @@
+LocalDeclarationStatement [0..83)
+  VariableDeclaration [0..82)
+    FunctionPointerType [0..79)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..79)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..49)
+          FunctionPointerType [10..49)
+            DelegateKeyword [10..18) 'delegate'
+            AsteriskToken [18..19) '*'
+            T:WhitespaceTrivia [19..20) ' '
+            FunctionPointerCallingConvention [20..36)
+              UnmanagedKeyword [20..29) 'unmanaged'
+              FunctionPointerUnmanagedCallingConventionList [29..36)
+                OpenBracketToken [29..30) '['
+                FunctionPointerUnmanagedCallingConvention [30..35)
+                  IdentifierToken [30..35) 'cdecl'
+                CloseBracketToken [35..36) ']'
+            FunctionPointerParameterList [36..49)
+              LessThanToken [36..37) '<'
+              FunctionPointerParameter [37..41)
+                PointerType [37..41)
+                  PredefinedType [37..40)
+                    IntKeyword [37..40) 'int'
+                  AsteriskToken [40..41) '*'
+              CommaToken [41..42) ','
+              T:WhitespaceTrivia [42..43) ' '
+              FunctionPointerParameter [43..48)
+                PointerType [43..48)
+                  PredefinedType [43..47)
+                    VoidKeyword [43..47) 'void'
+                  AsteriskToken [47..48) '*'
+              GreaterThanToken [48..49) '>'
+        CommaToken [49..50) ','
+        T:WhitespaceTrivia [50..51) ' '
+        FunctionPointerParameter [51..77)
+          FunctionPointerType [51..77)
+            DelegateKeyword [51..59) 'delegate'
+            AsteriskToken [59..60) '*'
+            T:WhitespaceTrivia [60..61) ' '
+            FunctionPointerCallingConvention [61..68)
+              ManagedKeyword [61..68) 'managed'
+            FunctionPointerParameterList [68..77)
+              LessThanToken [68..69) '<'
+              FunctionPointerParameter [69..76)
+                PointerType [69..76)
+                  PredefinedType [69..75)
+                    StringKeyword [69..75) 'string'
+                  AsteriskToken [75..76) '*'
+              GreaterThanToken [76..77) '>'
+        GreaterThanToken [77..78) '>'
+        T:WhitespaceTrivia [78..79) ' '
+    VariableDeclarator [79..82)
+      IdentifierToken [79..82) 'ptr'
+  SemicolonToken [82..83) ';'

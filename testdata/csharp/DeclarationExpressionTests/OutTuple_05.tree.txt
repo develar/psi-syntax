@@ -1,0 +1,30 @@
+ExpressionStatement [0..22)
+  InvocationExpression [0..21)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'M'
+    ArgumentList [1..21)
+      OpenParenToken [1..2) '('
+      Argument [2..20)
+        OutKeyword [2..5) 'out'
+        T:WhitespaceTrivia [5..6) ' '
+        TupleExpression [6..20)
+          OpenParenToken [6..7) '('
+          Argument [7..12)
+            DeclarationExpression [7..12)
+              IdentifierName [7..11)
+                IdentifierToken [7..10) 'var'
+                T:WhitespaceTrivia [10..11) ' '
+              SingleVariableDesignation [11..12)
+                IdentifierToken [11..12) 'x'
+          CommaToken [12..13) ','
+          T:WhitespaceTrivia [13..14) ' '
+          Argument [14..19)
+            DeclarationExpression [14..19)
+              IdentifierName [14..18)
+                IdentifierToken [14..17) 'var'
+                T:WhitespaceTrivia [17..18) ' '
+              SingleVariableDesignation [18..19)
+                IdentifierToken [18..19) 'y'
+          CloseParenToken [19..20) ')'
+      CloseParenToken [20..21) ')'
+  SemicolonToken [21..22) ';'

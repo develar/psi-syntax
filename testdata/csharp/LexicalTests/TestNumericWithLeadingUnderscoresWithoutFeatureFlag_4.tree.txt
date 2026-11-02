@@ -1,0 +1,5 @@
+NumericLiteralToken [0..26) '0x_123_456_789_ABC_DEF_123'
+EndOfFileToken [26..26) ''
+Diagnostics:
+  CS8059 [0..0) Feature \'leading digit separator\' is not available in C# 6. Please use language version 7.2 or greater.
+  CS1021 [0..0) Integral constant is too large

@@ -1,0 +1,2 @@
+StringLiteralExpression [0..8)
+  StringLiteralToken [0..8) '@"hello"'

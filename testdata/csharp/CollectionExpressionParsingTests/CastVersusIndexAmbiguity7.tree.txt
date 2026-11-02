@@ -1,0 +1,28 @@
+CastExpression [0..21)
+  OpenParenToken [0..1) '('
+  NullableType [1..11)
+    GenericName [1..10)
+      IdentifierToken [1..5) 'List'
+      TypeArgumentList [5..10)
+        LessThanToken [5..6) '<'
+        PredefinedType [6..9)
+          IntKeyword [6..9) 'int'
+        GreaterThanToken [9..10) '>'
+    QuestionToken [10..11) '?'
+  CloseParenToken [11..12) ')'
+  CollectionExpression [12..21)
+    OpenBracketToken [12..13) '['
+    ExpressionElement [13..14)
+      NumericLiteralExpression [13..14)
+        NumericLiteralToken [13..14) '1'
+    CommaToken [14..15) ','
+    T:WhitespaceTrivia [15..16) ' '
+    ExpressionElement [16..17)
+      NumericLiteralExpression [16..17)
+        NumericLiteralToken [16..17) '2'
+    CommaToken [17..18) ','
+    T:WhitespaceTrivia [18..19) ' '
+    ExpressionElement [19..20)
+      NumericLiteralExpression [19..20)
+        NumericLiteralToken [19..20) '3'
+    CloseBracketToken [20..21) ']'

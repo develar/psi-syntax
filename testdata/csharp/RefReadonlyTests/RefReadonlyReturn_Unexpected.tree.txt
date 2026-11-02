@@ -1,0 +1,186 @@
+CompilationUnit [0..347)
+  ClassDeclaration [0..347)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:EndOfLineTrivia [1..2) '\n'
+    ClassKeyword [2..7) 'class'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..15) 'Program'
+    T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    MethodDeclaration [18..53)
+      L:WhitespaceTrivia [18..22) '    '
+      StaticKeyword [22..28) 'static'
+      T:WhitespaceTrivia [28..29) ' '
+      PredefinedType [29..34)
+        VoidKeyword [29..33) 'void'
+        T:WhitespaceTrivia [33..34) ' '
+      IdentifierToken [34..38) 'Main'
+      ParameterList [38..41)
+        OpenParenToken [38..39) '('
+        CloseParenToken [39..40) ')'
+        T:EndOfLineTrivia [40..41) '\n'
+      Block [41..53)
+        L:WhitespaceTrivia [41..45) '    '
+        OpenBraceToken [45..46) '{'
+        T:EndOfLineTrivia [46..47) '\n'
+        L:WhitespaceTrivia [47..51) '    '
+        CloseBraceToken [51..52) '}'
+        T:EndOfLineTrivia [52..53) '\n'
+    FieldDeclaration [53..82)
+      VariableDeclaration [53..80)
+        RefType [53..75)
+          L:EndOfLineTrivia [53..54) '\n'
+          L:WhitespaceTrivia [54..58) '    '
+          RefKeyword [58..61) 'ref'
+          T:WhitespaceTrivia [61..62) ' '
+          ReadOnlyKeyword [62..70) 'readonly'
+          T:WhitespaceTrivia [70..71) ' '
+          PredefinedType [71..75)
+            IntKeyword [71..74) 'int'
+            T:WhitespaceTrivia [74..75) ' '
+        VariableDeclarator [75..80)
+          IdentifierToken [75..80) 'Field'
+      SemicolonToken [80..81) ';'
+      T:EndOfLineTrivia [81..82) '\n'
+    IncompleteMember [82..134)
+      L:EndOfLineTrivia [82..83) '\n'
+      L:WhitespaceTrivia [83..87) '    '
+      PublicKeyword [87..93) 'public'
+      T:WhitespaceTrivia [93..94) ' '
+      StaticKeyword [94..100) 'static'
+      T:WhitespaceTrivia [100..101) ' '
+      RefType [101..134)
+        RefKeyword [101..104) 'ref'
+        T:WhitespaceTrivia [104..105) ' '
+        ReadOnlyKeyword [105..113) 'readonly'
+        T:WhitespaceTrivia [113..114) ' '
+        IdentifierName [114..134)
+          IdentifierToken [114..121) 'Program'
+          T:WhitespaceTrivia [121..123) '  '
+          T:SkippedTokensTrivia [123..131)
+            OperatorKeyword [123..131) 'operator'
+          T:WhitespaceTrivia [131..133) '  '
+          T:SkippedTokensTrivia [133..134)
+            PlusToken [133..134) '+'
+    PropertyDeclaration [134..189)
+      TupleType [134..157)
+        OpenParenToken [134..135) '('
+        TupleElement [135..144)
+          IdentifierName [135..143)
+            IdentifierToken [135..142) 'Program'
+            T:WhitespaceTrivia [142..143) ' '
+          IdentifierToken [143..144) 'x'
+        CommaToken [144..145) ','
+        T:WhitespaceTrivia [145..146) ' '
+        TupleElement [146..155)
+          IdentifierName [146..154)
+            IdentifierToken [146..153) 'Program'
+            T:WhitespaceTrivia [153..154) ' '
+          IdentifierToken [154..155) 'y'
+        CloseParenToken [155..156) ')'
+        T:EndOfLineTrivia [156..157) '\n'
+      IdentifierToken [157..157) missing
+      AccessorList [157..189)
+        L:WhitespaceTrivia [157..161) '    '
+        OpenBraceToken [161..162) '{'
+        T:EndOfLineTrivia [162..163) '\n'
+        T:WhitespaceTrivia [163..171) '        '
+        T:SkippedTokensTrivia [171..176)
+          ThrowKeyword [171..176) 'throw'
+        T:WhitespaceTrivia [176..177) ' '
+        T:SkippedTokensTrivia [177..181)
+          NullKeyword [177..181) 'null'
+        UnknownAccessorDeclaration [181..183)
+          IdentifierToken [181..181) missing
+          SemicolonToken [181..182) ';'
+          T:EndOfLineTrivia [182..183) '\n'
+        L:WhitespaceTrivia [183..187) '    '
+        CloseBraceToken [187..188) '}'
+        T:EndOfLineTrivia [188..189) '\n'
+    MethodDeclaration [189..288)
+      L:EndOfLineTrivia [189..190) '\n'
+      L:WhitespaceTrivia [190..194) '    '
+      L:SingleLineCommentTrivia [194..213) '// this parses fine'
+      L:EndOfLineTrivia [213..214) '\n'
+      L:WhitespaceTrivia [214..218) '    '
+      StaticKeyword [218..224) 'static'
+      T:WhitespaceTrivia [224..225) ' '
+      AsyncKeyword [225..230) 'async'
+      T:WhitespaceTrivia [230..231) ' '
+      RefType [231..249)
+        RefKeyword [231..234) 'ref'
+        T:WhitespaceTrivia [234..235) ' '
+        ReadOnlyKeyword [235..243) 'readonly'
+        T:WhitespaceTrivia [243..244) ' '
+        IdentifierName [244..249)
+          IdentifierToken [244..248) 'Task'
+          T:WhitespaceTrivia [248..249) ' '
+      IdentifierToken [249..250) 'M'
+      TypeParameterList [250..253)
+        LessThanToken [250..251) '<'
+        TypeParameter [251..252)
+          IdentifierToken [251..252) 'T'
+        GreaterThanToken [252..253) '>'
+      ParameterList [253..256)
+        OpenParenToken [253..254) '('
+        CloseParenToken [254..255) ')'
+        T:EndOfLineTrivia [255..256) '\n'
+      Block [256..288)
+        L:WhitespaceTrivia [256..260) '    '
+        OpenBraceToken [260..261) '{'
+        T:EndOfLineTrivia [261..262) '\n'
+        ThrowStatement [262..282)
+          L:WhitespaceTrivia [262..270) '        '
+          ThrowKeyword [270..275) 'throw'
+          T:WhitespaceTrivia [275..276) ' '
+          NullLiteralExpression [276..280)
+            NullKeyword [276..280) 'null'
+          SemicolonToken [280..281) ';'
+          T:EndOfLineTrivia [281..282) '\n'
+        L:WhitespaceTrivia [282..286) '    '
+        CloseBraceToken [286..287) '}'
+        T:EndOfLineTrivia [287..288) '\n'
+    IncompleteMember [288..313)
+      L:EndOfLineTrivia [288..289) '\n'
+      L:WhitespaceTrivia [289..293) '    '
+      PublicKeyword [293..299) 'public'
+      T:WhitespaceTrivia [299..300) ' '
+      RefType [300..313)
+        RefKeyword [300..303) 'ref'
+        T:WhitespaceTrivia [303..304) ' '
+        ReadOnlyKeyword [304..312) 'readonly'
+        T:WhitespaceTrivia [312..313) ' '
+        IdentifierName [313..313)
+          IdentifierToken [313..313) missing
+    PropertyDeclaration [313..344)
+      VirtualKeyword [313..320) 'virtual'
+      T:WhitespaceTrivia [320..321) ' '
+      PointerType [321..326)
+        PredefinedType [321..324)
+          IntKeyword [321..324) 'int'
+        AsteriskToken [324..325) '*'
+        T:WhitespaceTrivia [325..326) ' '
+      IdentifierToken [326..328) 'P1'
+      T:WhitespaceTrivia [328..329) ' '
+      ArrowExpressionClause [329..342)
+        EqualsGreaterThanToken [329..331) '=>'
+        T:WhitespaceTrivia [331..332) ' '
+        ThrowExpression [332..342)
+          ThrowKeyword [332..337) 'throw'
+          T:WhitespaceTrivia [337..338) ' '
+          NullLiteralExpression [338..342)
+            NullKeyword [338..342) 'null'
+      SemicolonToken [342..343) ';'
+      T:EndOfLineTrivia [343..344) '\n'
+    L:EndOfLineTrivia [344..345) '\n'
+    CloseBraceToken [345..346) '}'
+    T:EndOfLineTrivia [346..347) '\n'
+  EndOfFileToken [347..347) ''
+Diagnostics:
+  CS1519 [123..131) Invalid token \'operator\' in a member declaration
+  CS1519 [123..131) Invalid token \'operator\' in a member declaration
+  CS1001 [156..156) Identifier expected
+  CS1014 [171..176) A get or set accessor expected
+  CS1014 [181..182) A get or set accessor expected
+  CS1031 [313..320) Type expected

@@ -1,0 +1,36 @@
+IsPatternExpression [0..28)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..28)
+    OpenBracketToken [5..6) '['
+    SlicePattern [6..22)
+      DotDotToken [6..8) '..'
+      T:WhitespaceTrivia [8..9) ' '
+      DeclarationPattern [9..22)
+        NullableType [9..16)
+          ArrayType [9..14)
+            PredefinedType [9..12)
+              IntKeyword [9..12) 'int'
+            ArrayRankSpecifier [12..14)
+              OpenBracketToken [12..13) '['
+              OmittedArraySizeExpression [13..13)
+                OmittedArraySizeExpressionToken [13..13) ''
+              CloseBracketToken [13..14) ']'
+          QuestionToken [14..15) '?'
+          T:WhitespaceTrivia [15..16) ' '
+        SingleVariableDesignation [16..22)
+          IdentifierToken [16..21) 'slice'
+          T:WhitespaceTrivia [21..22) ' '
+    CommaToken [22..22) missing
+    DeclarationPattern [22..27)
+      PredefinedType [22..26)
+        IntKeyword [22..25) 'int'
+        T:WhitespaceTrivia [25..26) ' '
+      SingleVariableDesignation [26..27)
+        IdentifierToken [26..27) 'i'
+    CloseBracketToken [27..28) ']'
+Diagnostics:
+  CS1003 [22..25) Syntax error, \',\' expected

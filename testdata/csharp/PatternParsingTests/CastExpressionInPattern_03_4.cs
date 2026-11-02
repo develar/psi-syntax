@@ -1,0 +1,1 @@
+_ = e is (int)and or or;

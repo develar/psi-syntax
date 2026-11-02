@@ -1,0 +1,36 @@
+CompilationUnit [0..40)
+  ConversionOperatorDeclaration [0..40)
+    ImplicitKeyword [0..8) 'implicit'
+    T:WhitespaceTrivia [8..9) ' '
+    ExplicitInterfaceSpecifier [9..15)
+      AliasQualifiedName [9..13)
+        IdentifierName [9..10)
+          IdentifierToken [9..10) 'N'
+        ColonColonToken [10..12) '::'
+        IdentifierName [12..13)
+          IdentifierToken [12..13) 'I'
+      DotToken [13..13) missing
+      T:SkippedTokensTrivia [13..15)
+        ColonColonToken [13..15) '::'
+    OperatorKeyword [15..23) 'operator'
+    T:WhitespaceTrivia [23..24) ' '
+    PredefinedType [24..27)
+      IntKeyword [24..27) 'int'
+    ParameterList [27..35)
+      OpenParenToken [27..28) '('
+      Parameter [28..33)
+        PredefinedType [28..32)
+          IntKeyword [28..31) 'int'
+          T:WhitespaceTrivia [31..32) ' '
+        IdentifierToken [32..33) 'x'
+      CloseParenToken [33..34) ')'
+      T:WhitespaceTrivia [34..35) ' '
+    ArrowExpressionClause [35..39)
+      EqualsGreaterThanToken [35..37) '=>'
+      T:WhitespaceTrivia [37..38) ' '
+      IdentifierName [38..39)
+        IdentifierToken [38..39) 'x'
+    SemicolonToken [39..40) ';'
+  EndOfFileToken [40..40) ''
+Diagnostics:
+  CS7000 [13..15) Unexpected use of an aliased name

@@ -1,0 +1,39 @@
+StructDeclaration [0..38)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  PropertyDeclaration [11..37)
+    PredefinedType [11..15)
+      IntKeyword [11..14) 'int'
+      T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..16) 'P'
+    T:WhitespaceTrivia [16..17) ' '
+    AccessorList [17..26)
+      OpenBraceToken [17..18) '{'
+      T:WhitespaceTrivia [18..19) ' '
+      GetAccessorDeclaration [19..24)
+        GetKeyword [19..22) 'get'
+        SemicolonToken [22..23) ';'
+        T:WhitespaceTrivia [23..24) ' '
+      CloseBraceToken [24..25) '}'
+      T:WhitespaceTrivia [25..26) ' '
+    EqualsValueClause [26..35)
+      EqualsToken [26..27) '='
+      T:WhitespaceTrivia [27..28) ' '
+      RefExpression [28..35)
+        RefKeyword [28..31) 'ref'
+        T:WhitespaceTrivia [31..32) ' '
+        InvocationExpression [32..35)
+          IdentifierName [32..33)
+            IdentifierToken [32..33) 'F'
+          ArgumentList [33..35)
+            OpenParenToken [33..34) '('
+            CloseParenToken [34..35) ')'
+    SemicolonToken [35..36) ';'
+    T:WhitespaceTrivia [36..37) ' '
+  CloseBraceToken [37..38) '}'
+Diagnostics:
+  CS1525 [28..35) Invalid expression term \'ref\'

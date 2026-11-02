@@ -1,0 +1,23 @@
+CompilationUnit [0..10)
+  GlobalStatement [0..10)
+    IfStatement [0..10)
+      IfKeyword [0..2) 'if'
+      T:WhitespaceTrivia [2..3) ' '
+      OpenParenToken [3..4) '('
+      T:WhitespaceTrivia [4..5) ' '
+      T:SkippedTokensTrivia [5..10)
+        BadToken [5..10) '# if)'
+      IdentifierName [10..10)
+        IdentifierToken [10..10) missing
+      CloseParenToken [10..10) missing
+      ExpressionStatement [10..10)
+        IdentifierName [10..10)
+          IdentifierToken [10..10) missing
+        SemicolonToken [10..10) missing
+  EndOfFileToken [10..10) ''
+Diagnostics:
+  CS1040 [5..6) Preprocessor directives must appear as the first non-whitespace character on a line
+  CS1733 [10..10) Expected expression
+  CS1026 [10..10) ) expected
+  CS1733 [10..10) Expected expression
+  CS1002 [10..10) ; expected

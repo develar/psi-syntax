@@ -1,0 +1,10 @@
+IncompleteMember [0..15)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  IdentifierName [9..15)
+    IdentifierToken [9..14) 'Field'
+    T:SkippedTokensTrivia [14..15)
+      SemicolonToken [14..15) ';'
+Diagnostics:
+  CS1519 [14..15) Invalid token \';\' in a member declaration
+  CS1073 [0..14) Unexpected token \';\'

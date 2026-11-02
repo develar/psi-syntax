@@ -1,0 +1,57 @@
+LocalDeclarationStatement [0..45)
+  VariableDeclaration [0..44)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..44)
+      IdentifierToken [4..5) 'v'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..44)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        ConditionalExpression [8..44)
+          IsExpression [8..15)
+            IdentifierName [8..10)
+              IdentifierToken [8..9) 'x'
+              T:WhitespaceTrivia [9..10) ' '
+            IsKeyword [10..12) 'is'
+            T:WhitespaceTrivia [12..13) ' '
+            IdentifierName [13..15)
+              IdentifierToken [13..14) 'Y'
+              T:WhitespaceTrivia [14..15) ' '
+          QuestionToken [15..16) '?'
+          T:WhitespaceTrivia [16..17) ' '
+          ParenthesizedLambdaExpression [17..30)
+            AttributeList [17..22)
+              OpenBracketToken [17..18) '['
+              Attribute [18..21)
+                IdentifierName [18..21)
+                  IdentifierToken [18..21) 'Goo'
+              CloseBracketToken [21..22) ']'
+            ParameterList [22..25)
+              OpenParenToken [22..23) '('
+              CloseParenToken [23..24) ')'
+              T:WhitespaceTrivia [24..25) ' '
+            EqualsGreaterThanToken [25..27) '=>'
+            T:WhitespaceTrivia [27..28) ' '
+            IdentifierName [28..30)
+              IdentifierToken [28..29) 'B'
+              T:WhitespaceTrivia [29..30) ' '
+          ColonToken [30..31) ':'
+          T:WhitespaceTrivia [31..32) ' '
+          ParenthesizedLambdaExpression [32..44)
+            AttributeList [32..37)
+              OpenBracketToken [32..33) '['
+              Attribute [33..36)
+                IdentifierName [33..36)
+                  IdentifierToken [33..36) 'Goo'
+              CloseBracketToken [36..37) ']'
+            ParameterList [37..40)
+              OpenParenToken [37..38) '('
+              CloseParenToken [38..39) ')'
+              T:WhitespaceTrivia [39..40) ' '
+            EqualsGreaterThanToken [40..42) '=>'
+            T:WhitespaceTrivia [42..43) ' '
+            IdentifierName [43..44)
+              IdentifierToken [43..44) 'C'
+  SemicolonToken [44..45) ';'

@@ -1,0 +1,1 @@
+public event EHandler E { safe add { } remove { } }

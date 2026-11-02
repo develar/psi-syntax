@@ -1,0 +1,10 @@
+CompilationUnit [0..2)
+  L:ReferenceDirectiveTrivia [0..2)
+    HashToken [0..1) '#'
+    ReferenceKeyword [1..2) 'r'
+    StringLiteralToken [2..2) missing
+    EndOfDirectiveToken [2..2) ''
+  EndOfFileToken [2..2) ''
+Diagnostics:
+  CS7011 [1..2) #r is only allowed in scripts
+  CS7010 [2..2) Quoted file name expected

@@ -1,0 +1,11 @@
+CompilationUnit [0..14)
+  L:ErrorDirectiveTrivia [0..14)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..14) 'version'
+    EndOfDirectiveToken [14..14) ''
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1029 [7..14) #error: \'version\'
+  CS8304 [7..14) Compiler version: \'5.9.0-1.26357.3 (35d9211b841e7613c1d2f8f5af6d628ace696c4c)\'. Language version: 9.0. Compiler path: \'Microsoft.CodeAnalysis.CSharp.dll\'.

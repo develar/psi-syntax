@@ -1,0 +1,5 @@
+BadToken [0..2) '@@'
+T:WhitespaceTrivia [2..4) '  '
+EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1646 [0..0) Keyword, identifier, or string expected after verbatim specifier: @

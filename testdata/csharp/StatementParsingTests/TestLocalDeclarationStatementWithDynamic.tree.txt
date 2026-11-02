@@ -1,0 +1,8 @@
+LocalDeclarationStatement [0..10)
+  VariableDeclaration [0..9)
+    IdentifierName [0..8)
+      IdentifierToken [0..7) 'dynamic'
+      T:WhitespaceTrivia [7..8) ' '
+    VariableDeclarator [8..9)
+      IdentifierToken [8..9) 'a'
+  SemicolonToken [9..10) ';'

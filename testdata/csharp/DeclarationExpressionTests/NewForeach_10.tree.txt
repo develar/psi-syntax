@@ -1,0 +1,22 @@
+ForEachVariableStatement [0..21)
+  ForEachKeyword [0..7) 'foreach'
+  T:WhitespaceTrivia [7..8) ' '
+  OpenParenToken [8..9) '('
+  SimpleMemberAccessExpression [9..13)
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'a'
+    DotToken [10..11) '.'
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'b'
+      T:WhitespaceTrivia [12..13) ' '
+  InKeyword [13..15) 'in'
+  T:WhitespaceTrivia [15..16) ' '
+  IdentifierName [16..17)
+    IdentifierToken [16..17) 'e'
+  CloseParenToken [17..18) ')'
+  T:WhitespaceTrivia [18..19) ' '
+  Block [19..21)
+    OpenBraceToken [19..20) '{'
+    CloseBraceToken [20..21) '}'
+Diagnostics:
+  CS0230 [13..15) Type and identifier are both required in a foreach statement

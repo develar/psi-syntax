@@ -1,0 +1,21 @@
+WithExpression [0..18)
+  IsPatternExpression [0..11)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    DeclarationPattern [5..11)
+      PredefinedType [5..9)
+        IntKeyword [5..8) 'int'
+        T:WhitespaceTrivia [8..9) ' '
+      SingleVariableDesignation [9..11)
+        IdentifierToken [9..10) 'y'
+        T:WhitespaceTrivia [10..11) ' '
+  WithKeyword [11..15) 'with'
+  T:WhitespaceTrivia [15..16) ' '
+  WithInitializerExpression [16..18)
+    OpenBraceToken [16..17) '{'
+    CloseBraceToken [17..18) '}'
+Diagnostics:
+  CS1073 [11..15) Unexpected token \'with\'

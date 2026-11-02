@@ -1,0 +1,1 @@
+new S { F = ref { F2 = t } }

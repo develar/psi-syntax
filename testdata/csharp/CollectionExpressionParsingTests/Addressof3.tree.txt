@@ -1,0 +1,20 @@
+AddressOfExpression [0..10)
+  AmpersandToken [0..1) '&'
+  ElementAccessExpression [1..10)
+    CollectionExpression [1..7)
+      OpenBracketToken [1..2) '['
+      ExpressionElement [2..3)
+        IdentifierName [2..3)
+          IdentifierToken [2..3) 'A'
+      CommaToken [3..4) ','
+      T:WhitespaceTrivia [4..5) ' '
+      ExpressionElement [5..6)
+        IdentifierName [5..6)
+          IdentifierToken [5..6) 'B'
+      CloseBracketToken [6..7) ']'
+    BracketedArgumentList [7..10)
+      OpenBracketToken [7..8) '['
+      Argument [8..9)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'C'
+      CloseBracketToken [9..10) ']'

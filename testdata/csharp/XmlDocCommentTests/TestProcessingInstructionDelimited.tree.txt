@@ -1,0 +1,26 @@
+CompilationUnit [0..104)
+  L:MultiLineDocumentationCommentTrivia [0..104)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlProcessingInstruction [4..99)
+      XmlProcessingInstructionStartToken [4..6) '<?'
+      XmlName [6..22)
+        XmlPrefix [6..13)
+          IdentifierToken [6..12) 'prefix'
+          ColonToken [12..13) ':'
+        IdentifierToken [13..22) 'localname'
+      XmlTextLiteralToken [22..42) ' this is a test <!--'
+      XmlTextLiteralNewLineToken [42..43) '\n'
+      L:DocumentationCommentExteriorTrivia [43..46) '  *'
+      XmlTextLiteralToken [46..75) ' of &a; ProcessingInstruction'
+      XmlTextLiteralNewLineToken [75..76) '\n'
+      L:DocumentationCommentExteriorTrivia [76..79) '  *'
+      XmlTextLiteralToken [79..97) ' "\']]>/></text>]]>'
+      XmlProcessingInstructionEndToken [97..99) '?>'
+    XmlText [99..100)
+      XmlTextLiteralNewLineToken [99..100) '\n'
+    L:DocumentationCommentExteriorTrivia [100..102) '  '
+    L:DocumentationCommentExteriorTrivia [102..104) '*/'
+    EndOfDocumentationCommentToken [104..104) ''
+  EndOfFileToken [104..104) ''

@@ -1,0 +1,49 @@
+CompilationUnit [0..33)
+  GlobalStatement [0..19)
+    LocalDeclarationStatement [0..19)
+      VariableDeclaration [0..19)
+        GenericName [0..15)
+          IdentifierToken [0..6) 'Action'
+          TypeArgumentList [6..15)
+            LessThanToken [6..7) '<'
+            PredefinedType [7..13)
+              ObjectKeyword [7..13) 'object'
+            GreaterThanToken [13..14) '>'
+            T:WhitespaceTrivia [14..15) ' '
+        VariableDeclarator [15..19)
+          IdentifierToken [15..16) 'a'
+          T:WhitespaceTrivia [16..17) ' '
+          EqualsValueClause [17..19)
+            EqualsToken [17..18) '='
+            T:WhitespaceTrivia [18..19) ' '
+            IdentifierName [19..19)
+              IdentifierToken [19..19) missing
+      SemicolonToken [19..19) missing
+  PropertyDeclaration [19..29)
+    PublicKeyword [19..25) 'public'
+    T:WhitespaceTrivia [25..26) ' '
+    IdentifierName [26..26)
+      IdentifierToken [26..26) missing
+    IdentifierToken [26..26) missing
+    ArrowExpressionClause [26..29)
+      EqualsGreaterThanToken [26..28) '=>'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierName [29..29)
+        IdentifierToken [29..29) missing
+    SemicolonToken [29..29) missing
+  GlobalStatement [29..32)
+    Block [29..32)
+      OpenBraceToken [29..30) '{'
+      T:WhitespaceTrivia [30..31) ' '
+      CloseBraceToken [31..32) '}'
+  GlobalStatement [32..33)
+    EmptyStatement [32..33)
+      SemicolonToken [32..33) ';'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1525 [19..25) Invalid expression term \'public\'
+  CS1002 [19..25) ; expected
+  CS1031 [26..28) Type expected
+  CS1001 [26..28) Identifier expected
+  CS1525 [29..30) Invalid expression term \'{\'
+  CS1002 [29..30) ; expected

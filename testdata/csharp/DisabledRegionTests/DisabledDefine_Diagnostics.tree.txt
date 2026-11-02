@@ -1,0 +1,33 @@
+CompilationUnit [0..38)
+  ClassDeclaration [0..38)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:IfDirectiveTrivia [1..11)
+      HashToken [1..2) '#'
+      IfKeyword [2..4) 'if'
+      T:WhitespaceTrivia [4..5) ' '
+      FalseLiteralExpression [5..10)
+        FalseKeyword [5..10) 'false'
+      EndOfDirectiveToken [10..10) ''
+      T:EndOfLineTrivia [10..11) '\n'
+    L:DefineDirectiveTrivia [11..19)
+      HashToken [11..12) '#'
+      DefineKeyword [12..18) 'define'
+      IdentifierToken [18..18) missing
+      EndOfDirectiveToken [18..18) ''
+      T:EndOfLineTrivia [18..19) '\n'
+    L:EndIfDirectiveTrivia [19..26)
+      HashToken [19..20) '#'
+      EndIfKeyword [20..25) 'endif'
+      EndOfDirectiveToken [25..25) ''
+      T:EndOfLineTrivia [25..26) '\n'
+    ClassKeyword [26..31) 'class'
+    T:WhitespaceTrivia [31..32) ' '
+    IdentifierToken [32..33) 'C'
+    T:WhitespaceTrivia [33..34) ' '
+    OpenBraceToken [34..35) '{'
+    T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'
+    T:EndOfLineTrivia [37..38) '\n'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1001 [18..18) Identifier expected

@@ -1,0 +1,1 @@
+(ref int a, out int b, int c = 0) => { b = a + c; }

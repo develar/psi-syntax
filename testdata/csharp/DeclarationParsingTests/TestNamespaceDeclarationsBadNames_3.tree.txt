@@ -1,0 +1,19 @@
+CompilationUnit [0..18)
+  NamespaceDeclaration [0..18)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    GenericName [10..15)
+      IdentifierToken [10..11) 'A'
+      TypeArgumentList [11..15)
+        LessThanToken [11..12) '<'
+        OmittedTypeArgument [12..12)
+          OmittedTypeArgumentToken [12..12) ''
+        CommaToken [12..13) ','
+        OmittedTypeArgument [13..13)
+          OmittedTypeArgumentToken [13..13) ''
+        GreaterThanToken [13..14) '>'
+        T:WhitespaceTrivia [14..15) ' '
+    OpenBraceToken [15..16) '{'
+    T:WhitespaceTrivia [16..17) ' '
+    CloseBraceToken [17..18) '}'
+  EndOfFileToken [18..18) ''

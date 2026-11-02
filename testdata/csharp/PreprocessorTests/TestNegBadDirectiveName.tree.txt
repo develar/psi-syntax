@@ -1,0 +1,8 @@
+CompilationUnit [0..4)
+  L:BadDirectiveTrivia [0..4)
+    HashToken [0..1) '#'
+    IdentifierToken [1..4) 'goo'
+    EndOfDirectiveToken [4..4) ''
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1024 [1..4) Preprocessor directive expected

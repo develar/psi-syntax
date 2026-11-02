@@ -1,0 +1,33 @@
+ExpressionStatement [0..29)
+  SimpleAssignmentExpression [0..29)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..29)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..17)
+        IdentifierName [8..14)
+          IdentifierToken [8..14) 'Action'
+        ArrayRankSpecifier [14..17)
+          OpenBracketToken [14..15) '['
+          OmittedArraySizeExpression [15..15)
+            OmittedArraySizeExpressionToken [15..15) ''
+          CloseBracketToken [15..16) ']'
+          T:WhitespaceTrivia [16..17) ' '
+      ArrayInitializerExpression [17..29)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        T:SkippedTokensTrivia [19..25)
+          StaticKeyword [19..25) 'static'
+        T:WhitespaceTrivia [25..26) ' '
+        IdentifierName [26..28)
+          IdentifierToken [26..27) 'x'
+          T:WhitespaceTrivia [27..28) ' '
+        CloseBraceToken [28..29) '}'
+  SemicolonToken [29..29) missing
+Diagnostics:
+  CS1041 [19..25) Identifier expected; \'static\' is a keyword
+  CS1002 [29..29) ; expected

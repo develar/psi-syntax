@@ -1,0 +1,22 @@
+CompilationUnit [0..27)
+  L:IfDirectiveTrivia [0..9)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    TrueLiteralExpression [4..8)
+      TrueKeyword [4..8) 'true'
+    EndOfDirectiveToken [8..8) ''
+    T:EndOfLineTrivia [8..9) '\n'
+  L:BadDirectiveTrivia [9..20)
+    HashToken [9..10) '#'
+    EndRegionKeyword [10..19) 'endregion'
+    EndOfDirectiveToken [19..19) ''
+    T:EndOfLineTrivia [19..20) '\n'
+  L:EndIfDirectiveTrivia [20..27)
+    HashToken [20..21) '#'
+    EndIfKeyword [21..26) 'endif'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1027 [9..19) #endif directive expected

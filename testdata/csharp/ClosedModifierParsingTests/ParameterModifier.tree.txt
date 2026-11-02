@@ -1,0 +1,39 @@
+CompilationUnit [0..40)
+  ClassDeclaration [0..40)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..39)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..35)
+        OpenParenToken [20..21) '('
+        Parameter [21..28)
+          IdentifierName [21..28)
+            IdentifierToken [21..27) 'closed'
+            T:WhitespaceTrivia [27..28) ' '
+          IdentifierToken [28..28) missing
+        CommaToken [28..28) missing
+        Parameter [28..33)
+          PredefinedType [28..32)
+            IntKeyword [28..31) 'int'
+            T:WhitespaceTrivia [31..32) ' '
+          IdentifierToken [32..33) 'x'
+        CloseParenToken [33..34) ')'
+        T:WhitespaceTrivia [34..35) ' '
+      Block [35..39)
+        OpenBraceToken [35..36) '{'
+        T:WhitespaceTrivia [36..37) ' '
+        CloseBraceToken [37..38) '}'
+        T:EndOfLineTrivia [38..39) '\n'
+    CloseBraceToken [39..40) '}'
+  EndOfFileToken [40..40) ''
+Diagnostics:
+  CS1001 [28..31) Identifier expected
+  CS1003 [28..31) Syntax error, \',\' expected

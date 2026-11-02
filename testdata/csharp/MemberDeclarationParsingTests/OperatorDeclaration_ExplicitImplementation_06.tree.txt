@@ -1,0 +1,49 @@
+OperatorDeclaration [0..51)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..11)
+    IntKeyword [7..10) 'int'
+    T:WhitespaceTrivia [10..11) ' '
+  ExplicitInterfaceSpecifier [11..17)
+    AliasQualifiedName [11..15)
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'N'
+      ColonColonToken [12..14) '::'
+      IdentifierName [14..15)
+        IdentifierToken [14..15) 'I'
+    DotToken [15..15) missing
+    T:SkippedTokensTrivia [15..17)
+      ColonColonToken [15..17) '::'
+  OperatorKeyword [17..25) 'operator'
+  T:WhitespaceTrivia [25..26) ' '
+  PlusToken [26..27) '+'
+  ParameterList [27..42)
+    OpenParenToken [27..28) '('
+    Parameter [28..33)
+      PredefinedType [28..32)
+        IntKeyword [28..31) 'int'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'x'
+    CommaToken [33..34) ','
+    T:WhitespaceTrivia [34..35) ' '
+    Parameter [35..40)
+      PredefinedType [35..39)
+        IntKeyword [35..38) 'int'
+        T:WhitespaceTrivia [38..39) ' '
+      IdentifierToken [39..40) 'y'
+    CloseParenToken [40..41) ')'
+    T:WhitespaceTrivia [41..42) ' '
+  ArrowExpressionClause [42..50)
+    EqualsGreaterThanToken [42..44) '=>'
+    T:WhitespaceTrivia [44..45) ' '
+    AddExpression [45..50)
+      IdentifierName [45..47)
+        IdentifierToken [45..46) 'x'
+        T:WhitespaceTrivia [46..47) ' '
+      PlusToken [47..48) '+'
+      T:WhitespaceTrivia [48..49) ' '
+      IdentifierName [49..50)
+        IdentifierToken [49..50) 'y'
+  SemicolonToken [50..51) ';'
+Diagnostics:
+  CS7000 [15..17) Unexpected use of an aliased name

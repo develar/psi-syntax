@@ -1,0 +1,70 @@
+CompilationUnit [0..86)
+  UnionDeclaration [0..86)
+    AttributeList [0..8)
+      OpenBracketToken [0..1) '['
+      Attribute [1..6)
+        IdentifierName [1..6)
+          IdentifierToken [1..6) 'Attr1'
+      CloseBracketToken [6..7) ']'
+      T:EndOfLineTrivia [7..8) '\n'
+    PublicKeyword [8..14) 'public'
+    T:WhitespaceTrivia [14..15) ' '
+    UnionKeyword [15..20) 'union'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierToken [21..23) 'U1'
+    TypeParameterList [23..27)
+      LessThanToken [23..24) '<'
+      TypeParameter [24..26)
+        IdentifierToken [24..26) 'T1'
+      GreaterThanToken [26..27) '>'
+    ParameterList [27..32)
+      OpenParenToken [27..28) '('
+      Parameter [28..30)
+        IdentifierName [28..30)
+          IdentifierToken [28..30) 'E1'
+      CloseParenToken [30..31) ')'
+      T:WhitespaceTrivia [31..32) ' '
+    BaseList [32..41)
+      ColonToken [32..33) ':'
+      T:WhitespaceTrivia [33..34) ' '
+      SimpleBaseType [34..36)
+        IdentifierName [34..36)
+          IdentifierToken [34..36) 'I1'
+      CommaToken [36..37) ','
+      T:WhitespaceTrivia [37..38) ' '
+      SimpleBaseType [38..41)
+        IdentifierName [38..41)
+          IdentifierToken [38..40) 'I2'
+          T:WhitespaceTrivia [40..41) ' '
+    TypeParameterConstraintClause [41..58)
+      WhereKeyword [41..46) 'where'
+      T:WhitespaceTrivia [46..47) ' '
+      IdentifierName [47..50)
+        IdentifierToken [47..49) 'T1'
+        T:WhitespaceTrivia [49..50) ' '
+      ColonToken [50..51) ':'
+      T:WhitespaceTrivia [51..52) ' '
+      ClassConstraint [52..58)
+        ClassKeyword [52..57) 'class'
+        T:EndOfLineTrivia [57..58) '\n'
+    OpenBraceToken [58..59) '{'
+    T:EndOfLineTrivia [59..60) '\n'
+    MethodDeclaration [60..85)
+      L:WhitespaceTrivia [60..64) '    '
+      PublicKeyword [64..70) 'public'
+      T:WhitespaceTrivia [70..71) ' '
+      PredefinedType [71..76)
+        VoidKeyword [71..75) 'void'
+        T:WhitespaceTrivia [75..76) ' '
+      IdentifierToken [76..78) 'M1'
+      ParameterList [78..81)
+        OpenParenToken [78..79) '('
+        CloseParenToken [79..80) ')'
+        T:WhitespaceTrivia [80..81) ' '
+      Block [81..85)
+        OpenBraceToken [81..82) '{'
+        T:WhitespaceTrivia [82..83) ' '
+        CloseBraceToken [83..84) '}'
+        T:EndOfLineTrivia [84..85) '\n'
+    CloseBraceToken [85..86) '}'
+  EndOfFileToken [86..86) ''

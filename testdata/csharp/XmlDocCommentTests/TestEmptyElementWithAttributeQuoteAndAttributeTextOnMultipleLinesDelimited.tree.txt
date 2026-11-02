@@ -1,0 +1,41 @@
+CompilationUnit [0..53)
+  L:MultiLineDocumentationCommentTrivia [0..53)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlEmptyElement [4..48)
+      LessThanToken [4..5) '<'
+      XmlName [5..8)
+        IdentifierToken [5..8) 'goo'
+      XmlTextAttribute [8..41)
+        XmlName [8..15)
+          L:WhitespaceTrivia [8..9) ' '
+          L:EndOfLineTrivia [9..10) '\n'
+          L:DocumentationCommentExteriorTrivia [10..13) '  *'
+          L:WhitespaceTrivia [13..14) ' '
+          IdentifierToken [14..15) 'a'
+        L:EndOfLineTrivia [15..16) '\n'
+        L:DocumentationCommentExteriorTrivia [16..19) '  *'
+        L:WhitespaceTrivia [19..20) ' '
+        EqualsToken [20..21) '='
+        L:EndOfLineTrivia [21..22) '\n'
+        L:DocumentationCommentExteriorTrivia [22..25) '  *'
+        L:WhitespaceTrivia [25..26) ' '
+        SingleQuoteToken [26..27) '\''
+        XmlTextLiteralNewLineToken [27..28) '\n'
+        L:DocumentationCommentExteriorTrivia [28..31) '  *'
+        XmlTextLiteralToken [31..35) ' xyz'
+        XmlTextLiteralNewLineToken [35..36) '\n'
+        L:DocumentationCommentExteriorTrivia [36..39) '  *'
+        XmlTextLiteralToken [39..40) ' '
+        SingleQuoteToken [40..41) '\''
+      L:EndOfLineTrivia [41..42) '\n'
+      L:DocumentationCommentExteriorTrivia [42..45) '  *'
+      L:WhitespaceTrivia [45..46) ' '
+      SlashGreaterThanToken [46..48) '/>'
+    XmlText [48..49)
+      XmlTextLiteralNewLineToken [48..49) '\n'
+    L:DocumentationCommentExteriorTrivia [49..51) '  '
+    L:DocumentationCommentExteriorTrivia [51..53) '*/'
+    EndOfDocumentationCommentToken [53..53) ''
+  EndOfFileToken [53..53) ''

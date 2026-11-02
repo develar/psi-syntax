@@ -1,0 +1,47 @@
+MethodDeclaration [0..34)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..34)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ExpressionStatement [11..26)
+      GreaterThanExpression [11..26)
+        LessThanExpression [11..24)
+          IdentifierName [11..19)
+            L:WhitespaceTrivia [11..15) '    '
+            IdentifierToken [15..19) 'List'
+          LessThanToken [19..20) '<'
+          IdentifierName [20..24)
+            IdentifierToken [20..24) 'Type'
+        GreaterThanToken [24..25) '>'
+        T:WhitespaceTrivia [25..26) ' '
+        IdentifierName [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    LocalDeclarationStatement [26..34)
+      StaticKeyword [26..32) 'static'
+      T:EndOfLineTrivia [32..33) '\n'
+      VariableDeclaration [33..34)
+        IdentifierName [33..33)
+          IdentifierToken [33..33) missing
+        VariableDeclarator [33..34)
+          IdentifierToken [33..33) missing
+          T:SkippedTokensTrivia [33..34)
+            CloseBraceToken [33..34) '}'
+      SemicolonToken [34..34) missing
+    CloseBraceToken [34..34) missing
+Diagnostics:
+  CS1525 [26..32) Invalid expression term \'static\'
+  CS1002 [26..32) ; expected
+  CS0106 [26..32) The modifier \'static\' is not valid for this item
+  CS1031 [32..32) Type expected
+  CS1001 [32..32) Identifier expected
+  CS1003 [32..32) Syntax error, \',\' expected
+  CS1002 [34..34) ; expected
+  CS1513 [34..34) } expected

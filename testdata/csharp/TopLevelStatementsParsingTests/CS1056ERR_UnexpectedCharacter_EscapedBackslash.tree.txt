@@ -1,0 +1,49 @@
+CompilationUnit [0..52)
+  UsingDirective [0..13)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..7)
+      IdentifierToken [6..7) 'S'
+    SemicolonToken [7..7) missing
+    T:SkippedTokensTrivia [7..13)
+      BadToken [7..13) '\\u005C'
+  GlobalStatement [13..29)
+    ExpressionStatement [13..29)
+      SimpleAssignmentExpression [13..27)
+        IdentifierName [13..19)
+          IdentifierToken [13..18) 'u0065'
+          T:WhitespaceTrivia [18..19) ' '
+        EqualsToken [19..20) '='
+        T:WhitespaceTrivia [20..21) ' '
+        IdentifierName [21..27)
+          IdentifierToken [21..27) 'System'
+      SemicolonToken [27..28) ';'
+      T:EndOfLineTrivia [28..29) '\n'
+  ClassDeclaration [29..52)
+    ClassKeyword [29..34) 'class'
+    T:WhitespaceTrivia [34..35) ' '
+    IdentifierToken [35..36) 'A'
+    T:EndOfLineTrivia [36..37) '\n'
+    OpenBraceToken [37..38) '{'
+    T:EndOfLineTrivia [38..39) '\n'
+    FieldDeclaration [39..50)
+      VariableDeclaration [39..48)
+        PredefinedType [39..43)
+          IntKeyword [39..42) 'int'
+          T:WhitespaceTrivia [42..43) ' '
+        VariableDeclarator [43..48)
+          IdentifierToken [43..44) 'x'
+          T:WhitespaceTrivia [44..45) ' '
+          EqualsValueClause [45..48)
+            EqualsToken [45..46) '='
+            T:WhitespaceTrivia [46..47) ' '
+            NumericLiteralExpression [47..48)
+              NumericLiteralToken [47..48) '0'
+      SemicolonToken [48..49) ';'
+      T:EndOfLineTrivia [49..50) '\n'
+    CloseBraceToken [50..51) '}'
+    T:EndOfLineTrivia [51..52) '\n'
+  EndOfFileToken [52..52) ''
+Diagnostics:
+  CS1002 [7..13) ; expected
+  CS1056 [7..7) Unexpected character \'\\u005C\'

@@ -1,0 +1,1 @@
+x is X.Y ? from item in collection select item : null

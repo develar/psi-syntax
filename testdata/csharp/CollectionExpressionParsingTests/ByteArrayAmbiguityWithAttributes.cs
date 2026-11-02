@@ -1,0 +1,1 @@
+class C { public ReadOnlySpan<byte> B => [0, 1, 2, 3, 4, 5, 6, 7]; }

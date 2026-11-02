@@ -1,0 +1,22 @@
+RecordDeclaration [0..42)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  RecordKeyword [7..13) 'record'
+  T:WhitespaceTrivia [13..14) ' '
+  IdentifierToken [14..15) 'M'
+  ParameterList [15..41)
+    OpenParenToken [15..16) '('
+    Parameter [16..40)
+      GenericName [16..35)
+        IdentifierToken [16..30) 'ImmutableArray'
+        TypeArgumentList [30..35)
+          LessThanToken [30..31) '<'
+          PredefinedType [31..35)
+            IntKeyword [31..34) 'int'
+            T:WhitespaceTrivia [34..35) ' '
+          GreaterThanToken [35..35) missing
+      IdentifierToken [35..40) 'Array'
+    CloseParenToken [40..41) ')'
+  SemicolonToken [41..42) ';'
+Diagnostics:
+  CS1003 [35..40) Syntax error, \'>\' expected

@@ -1,0 +1,10 @@
+CompilationUnit [0..10)
+  L:ErrorDirectiveTrivia [0..10)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..10) '"""'
+    EndOfDirectiveToken [10..10) ''
+  EndOfFileToken [10..10) ''
+Diagnostics:
+  CS1029 [7..10) #error: \'"""\'

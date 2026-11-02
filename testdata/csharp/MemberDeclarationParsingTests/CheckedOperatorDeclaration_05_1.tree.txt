@@ -1,0 +1,24 @@
+ConversionOperatorDeclaration [0..38)
+  ImplicitKeyword [0..8) 'implicit'
+  T:WhitespaceTrivia [8..9) ' '
+  OperatorKeyword [9..17) 'operator'
+  T:WhitespaceTrivia [17..18) ' '
+  CheckedKeyword [18..25) 'checked'
+  T:WhitespaceTrivia [25..26) ' '
+  IdentifierName [26..27)
+    IdentifierToken [26..27) 'D'
+  ParameterList [27..33)
+    OpenParenToken [27..28) '('
+    Parameter [28..31)
+      IdentifierName [28..30)
+        IdentifierToken [28..29) 'C'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'x'
+    CloseParenToken [31..32) ')'
+    T:WhitespaceTrivia [32..33) ' '
+  ArrowExpressionClause [33..37)
+    EqualsGreaterThanToken [33..35) '=>'
+    T:WhitespaceTrivia [35..36) ' '
+    IdentifierName [36..37)
+      IdentifierToken [36..37) 'x'
+  SemicolonToken [37..38) ';'

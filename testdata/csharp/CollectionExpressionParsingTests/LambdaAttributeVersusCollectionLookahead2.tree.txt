@@ -1,0 +1,43 @@
+ConditionalExpression [0..21)
+  InvocationExpression [0..13)
+    ElementAccessExpression [0..7)
+      CollectionExpression [0..3)
+        OpenBracketToken [0..1) '['
+        ExpressionElement [1..2)
+          IdentifierName [1..2)
+            IdentifierToken [1..2) 'A'
+        CloseBracketToken [2..3) ']'
+      BracketedArgumentList [3..7)
+        OpenBracketToken [3..4) '['
+        Argument [4..5)
+          IdentifierName [4..5)
+            IdentifierToken [4..5) 'B'
+        CloseBracketToken [5..6) ']'
+        T:WhitespaceTrivia [6..7) ' '
+    ArgumentList [7..13)
+      OpenParenToken [7..8) '('
+      Argument [8..9)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'C'
+      CommaToken [9..10) ','
+      T:WhitespaceTrivia [10..11) ' '
+      Argument [11..12)
+        IdentifierName [11..12)
+          IdentifierToken [11..12) 'D'
+      CloseParenToken [12..13) ')'
+  QuestionToken [13..14) '?'
+  T:WhitespaceTrivia [14..15) ' '
+  SimpleLambdaExpression [15..21)
+    Parameter [15..17)
+      IdentifierToken [15..16) 'e'
+      T:WhitespaceTrivia [16..17) ' '
+    EqualsGreaterThanToken [17..19) '=>'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierName [20..21)
+      IdentifierToken [20..21) 'f'
+  ColonToken [21..21) missing
+  IdentifierName [21..21)
+    IdentifierToken [21..21) missing
+Diagnostics:
+  CS1003 [21..21) Syntax error, \':\' expected
+  CS1733 [21..21) Expected expression

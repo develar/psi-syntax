@@ -1,0 +1,5 @@
+CompilationUnit [0..20)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:MultiLineCommentTrivia [1..19) '/* \n#define XYZ\n*/'
+  L:EndOfLineTrivia [19..20) '\n'
+  EndOfFileToken [20..20) ''

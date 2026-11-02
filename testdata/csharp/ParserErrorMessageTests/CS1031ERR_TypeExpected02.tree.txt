@@ -1,0 +1,100 @@
+CompilationUnit [0..201)
+  NamespaceDeclaration [0..201)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'x'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..199)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      ClassKeyword [25..30) 'class'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..32) 'a'
+      T:EndOfLineTrivia [32..33) '\n'
+      L:WhitespaceTrivia [33..37) '    '
+      OpenBraceToken [37..38) '{'
+      T:EndOfLineTrivia [38..39) '\n'
+      MethodDeclaration [39..193)
+        L:WhitespaceTrivia [39..47) '        '
+        PublicKeyword [47..53) 'public'
+        T:WhitespaceTrivia [53..54) ' '
+        StaticKeyword [54..60) 'static'
+        T:WhitespaceTrivia [60..61) ' '
+        PredefinedType [61..66)
+          VoidKeyword [61..65) 'void'
+          T:WhitespaceTrivia [65..66) ' '
+        IdentifierToken [66..70) 'Main'
+        ParameterList [70..73)
+          OpenParenToken [70..71) '('
+          CloseParenToken [71..72) ')'
+          T:EndOfLineTrivia [72..73) '\n'
+        Block [73..193)
+          L:WhitespaceTrivia [73..81) '        '
+          OpenBraceToken [81..82) '{'
+          T:EndOfLineTrivia [82..83) '\n'
+          ExpressionStatement [83..103)
+            SimpleAssignmentExpression [83..103)
+              IdentifierName [83..97)
+                L:WhitespaceTrivia [83..95) '            '
+                IdentifierToken [95..96) 'e'
+                T:WhitespaceTrivia [96..97) ' '
+              EqualsToken [97..98) '='
+              T:WhitespaceTrivia [98..99) ' '
+              ObjectCreationExpression [99..103)
+                NewKeyword [99..102) 'new'
+                T:WhitespaceTrivia [102..103) ' '
+                IdentifierName [103..103)
+                  IdentifierToken [103..103) missing
+                ArgumentList [103..103)
+                  OpenParenToken [103..103) missing
+                  CloseParenToken [103..103) missing
+            SemicolonToken [103..103) missing
+          ExpressionStatement [103..133)
+            BaseExpression [103..107)
+              BaseKeyword [103..107) 'base'
+            SemicolonToken [107..108) ';'
+            T:WhitespaceTrivia [108..111) '   '
+            T:SingleLineCommentTrivia [111..132) '// CS1031, not a type'
+            T:EndOfLineTrivia [132..133) '\n'
+          ExpressionStatement [133..153)
+            SimpleAssignmentExpression [133..153)
+              IdentifierName [133..147)
+                L:WhitespaceTrivia [133..145) '            '
+                IdentifierToken [145..146) 'e'
+                T:WhitespaceTrivia [146..147) ' '
+              EqualsToken [147..148) '='
+              T:WhitespaceTrivia [148..149) ' '
+              ObjectCreationExpression [149..153)
+                NewKeyword [149..152) 'new'
+                T:WhitespaceTrivia [152..153) ' '
+                IdentifierName [153..153)
+                  IdentifierToken [153..153) missing
+                ArgumentList [153..153)
+                  OpenParenToken [153..153) missing
+                  CloseParenToken [153..153) missing
+            SemicolonToken [153..153) missing
+          ExpressionStatement [153..183)
+            ThisExpression [153..157)
+              ThisKeyword [153..157) 'this'
+            SemicolonToken [157..158) ';'
+            T:WhitespaceTrivia [158..161) '   '
+            T:SingleLineCommentTrivia [161..182) '// CS1031, not a type'
+            T:EndOfLineTrivia [182..183) '\n'
+          L:WhitespaceTrivia [183..191) '        '
+          CloseBraceToken [191..192) '}'
+          T:EndOfLineTrivia [192..193) '\n'
+      L:WhitespaceTrivia [193..197) '    '
+      CloseBraceToken [197..198) '}'
+      T:EndOfLineTrivia [198..199) '\n'
+    CloseBraceToken [199..200) '}'
+    T:EndOfLineTrivia [200..201) '\n'
+  EndOfFileToken [201..201) ''
+Diagnostics:
+  CS1526 [103..107) A new expression requires an argument list or (), [], or {} after type
+  CS1002 [103..107) ; expected
+  CS1526 [153..157) A new expression requires an argument list or (), [], or {} after type
+  CS1002 [153..157) ; expected

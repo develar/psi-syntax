@@ -1,0 +1,1 @@
+from s in a where s is string where s.Length > 1 select s

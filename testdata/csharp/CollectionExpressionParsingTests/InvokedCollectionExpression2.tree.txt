@@ -1,0 +1,17 @@
+PreIncrementExpression [0..10)
+  PlusPlusToken [0..2) '++'
+  InvocationExpression [2..10)
+    CollectionExpression [2..8)
+      OpenBracketToken [2..3) '['
+      ExpressionElement [3..4)
+        IdentifierName [3..4)
+          IdentifierToken [3..4) 'A'
+      CommaToken [4..5) ','
+      T:WhitespaceTrivia [5..6) ' '
+      ExpressionElement [6..7)
+        IdentifierName [6..7)
+          IdentifierToken [6..7) 'B'
+      CloseBracketToken [7..8) ']'
+    ArgumentList [8..10)
+      OpenParenToken [8..9) '('
+      CloseParenToken [9..10) ')'

@@ -1,0 +1,27 @@
+ForStatement [0..39)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  CheckedExpression [5..15)
+    CheckedKeyword [5..12) 'checked'
+    OpenParenToken [12..13) '('
+    NumericLiteralExpression [13..14)
+      NumericLiteralToken [13..14) '0'
+    CloseParenToken [14..15) ')'
+  SemicolonToken [15..16) ';'
+  CheckedExpression [16..26)
+    CheckedKeyword [16..23) 'checked'
+    OpenParenToken [23..24) '('
+    NumericLiteralExpression [24..25)
+      NumericLiteralToken [24..25) '0'
+    CloseParenToken [25..26) ')'
+  SemicolonToken [26..27) ';'
+  CheckedExpression [27..37)
+    CheckedKeyword [27..34) 'checked'
+    OpenParenToken [34..35) '('
+    NumericLiteralExpression [35..36)
+      NumericLiteralToken [35..36) '0'
+    CloseParenToken [36..37) ')'
+  CloseParenToken [37..38) ')'
+  EmptyStatement [38..39)
+    SemicolonToken [38..39) ';'

@@ -1,0 +1,34 @@
+SwitchExpression [0..27)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..17)
+    ConstantPattern [11..13)
+      NumericLiteralExpression [11..13)
+        NumericLiteralToken [11..12) '1'
+        T:WhitespaceTrivia [12..13) ' '
+    EqualsGreaterThanToken [13..15) '=>'
+    T:WhitespaceTrivia [15..16) ' '
+    NumericLiteralExpression [16..17)
+      NumericLiteralToken [16..17) '1'
+  CommaToken [17..17) missing
+  T:SkippedTokensTrivia [17..18)
+    SemicolonToken [17..18) ';'
+  T:WhitespaceTrivia [18..19) ' '
+  SwitchExpressionArm [19..26)
+    ConstantPattern [19..21)
+      NumericLiteralExpression [19..21)
+        NumericLiteralToken [19..20) '2'
+        T:WhitespaceTrivia [20..21) ' '
+    EqualsGreaterThanToken [21..23) '=>'
+    T:WhitespaceTrivia [23..24) ' '
+    NumericLiteralExpression [24..26)
+      NumericLiteralToken [24..25) '2'
+      T:WhitespaceTrivia [25..26) ' '
+  CloseBraceToken [26..27) '}'
+Diagnostics:
+  CS1003 [17..18) Syntax error, \',\' expected

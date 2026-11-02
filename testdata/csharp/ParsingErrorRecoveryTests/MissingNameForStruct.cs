@@ -1,0 +1,6 @@
+namespace n
+{
+    struct : I
+    {
+    }
+}

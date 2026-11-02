@@ -1,0 +1,24 @@
+ForStatement [0..30)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ThrowExpression [5..12)
+    ThrowKeyword [5..10) 'throw'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..12)
+      IdentifierToken [11..12) 'a'
+  SemicolonToken [12..13) ';'
+  ThrowExpression [13..20)
+    ThrowKeyword [13..18) 'throw'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..20)
+      IdentifierToken [19..20) 'a'
+  SemicolonToken [20..21) ';'
+  ThrowExpression [21..28)
+    ThrowKeyword [21..26) 'throw'
+    T:WhitespaceTrivia [26..27) ' '
+    IdentifierName [27..28)
+      IdentifierToken [27..28) 'a'
+  CloseParenToken [28..29) ')'
+  EmptyStatement [29..30)
+    SemicolonToken [29..30) ';'

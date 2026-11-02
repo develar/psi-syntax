@@ -1,0 +1,1 @@
+safe public delegate void D();

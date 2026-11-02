@@ -1,0 +1,19 @@
+OperatorDeclaration [0..23)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  GreaterThanGreaterThanGreaterThanEqualsToken [11..15) '>>>='
+  ParameterList [15..18)
+    OpenParenToken [15..16) '('
+    CloseParenToken [16..17) ')'
+    T:WhitespaceTrivia [17..18) ' '
+  ArrowExpressionClause [18..22)
+    EqualsGreaterThanToken [18..20) '=>'
+    T:WhitespaceTrivia [20..21) ' '
+    IdentifierName [21..22)
+      IdentifierToken [21..22) 'x'
+  SemicolonToken [22..23) ';'
+Diagnostics:
+  CS9313 [11..15) Overloaded compound assignment operator \'>>>=\' takes one parameter

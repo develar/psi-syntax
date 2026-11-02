@@ -1,0 +1,35 @@
+FieldDeclaration [0..29)
+  VariableDeclaration [0..28)
+    GenericName [0..10)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..10)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..8)
+          IntKeyword [5..8) 'int'
+        GreaterThanToken [8..9) '>'
+        T:WhitespaceTrivia [9..10) ' '
+    VariableDeclarator [10..28)
+      IdentifierToken [10..15) 'func1'
+      T:WhitespaceTrivia [15..16) ' '
+      EqualsValueClause [16..28)
+        EqualsToken [16..17) '='
+        T:WhitespaceTrivia [17..18) ' '
+        ParenthesizedExpression [18..28)
+          OpenParenToken [18..19) '('
+          LogicalNotExpression [19..21)
+            ExclamationToken [19..20) '!'
+            LogicalNotExpression [20..21)
+              ExclamationToken [20..21) '!'
+              IdentifierName [21..21)
+                IdentifierToken [21..21) missing
+          CloseParenToken [21..22) ')'
+          T:WhitespaceTrivia [22..23) ' '
+          T:SkippedTokensTrivia [23..25)
+            EqualsGreaterThanToken [23..25) '=>'
+          T:WhitespaceTrivia [25..26) ' '
+          T:SkippedTokensTrivia [26..28)
+            NumericLiteralToken [26..28) '42'
+  SemicolonToken [28..29) ';'
+Diagnostics:
+  CS1525 [21..22) Invalid expression term \')\'
+  CS1003 [23..25) Syntax error, \',\' expected

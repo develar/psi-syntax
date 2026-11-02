@@ -1,0 +1,130 @@
+CompilationUnit [0..140)
+  EnumDeclaration [0..140)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    EnumKeyword [7..11) 'enum'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..22) 'BundleType'
+    T:EndOfLineTrivia [22..23) '\n'
+    OpenBraceToken [23..24) '{'
+    T:EndOfLineTrivia [24..25) '\n'
+    EnumMemberDeclaration [25..139)
+      AttributeList [25..82)
+        L:WhitespaceTrivia [25..29) '    '
+        OpenBracketToken [29..30) '['
+        Attribute [30..41)
+          IdentifierName [30..31)
+            IdentifierToken [30..31) 'A'
+          AttributeArgumentList [31..41)
+            OpenParenToken [31..32) '('
+            AttributeArgument [32..35)
+              StringLiteralExpression [32..35)
+                StringLiteralToken [32..35) '"B"'
+            CommaToken [35..36) ','
+            T:WhitespaceTrivia [36..37) ' '
+            AttributeArgument [37..40)
+              StringLiteralExpression [37..40)
+                StringLiteralToken [37..40) '"C"'
+            CloseParenToken [40..41) ')'
+        CommaToken [41..42) ','
+        T:WhitespaceTrivia [42..43) ' '
+        Attribute [43..60)
+          IdentifierName [43..54)
+            IdentifierToken [43..54) 'Description'
+          AttributeArgumentList [54..60)
+            OpenParenToken [54..55) '('
+            AttributeArgument [55..60)
+              StringLiteralExpression [55..60)
+                StringLiteralToken [55..59) '"Goo'
+                T:EndOfLineTrivia [59..60) '\n'
+            CloseParenToken [60..60) missing
+        CommaToken [60..60) missing
+        Attribute [60..68)
+          IdentifierName [60..68)
+            L:WhitespaceTrivia [60..64) '    '
+            IdentifierToken [64..67) 'bar'
+            T:WhitespaceTrivia [67..68) ' '
+        CommaToken [68..68) missing
+        Attribute [68..75)
+          IdentifierName [68..75)
+            IdentifierToken [68..71) 'baz'
+            T:SkippedTokensTrivia [71..74)
+              StringLiteralToken [71..74) '")]'
+            T:EndOfLineTrivia [74..75) '\n'
+        CommaToken [75..75) missing
+        Attribute [75..80)
+          IdentifierName [75..80)
+            L:WhitespaceTrivia [75..79) '    '
+            IdentifierToken [79..80) 'A'
+        CommaToken [80..81) ','
+        T:EndOfLineTrivia [81..82) '\n'
+        CloseBracketToken [82..82) missing
+      AttributeList [82..139)
+        L:WhitespaceTrivia [82..86) '    '
+        OpenBracketToken [86..87) '['
+        Attribute [87..98)
+          IdentifierName [87..88)
+            IdentifierToken [87..88) 'A'
+          AttributeArgumentList [88..98)
+            OpenParenToken [88..89) '('
+            AttributeArgument [89..92)
+              StringLiteralExpression [89..92)
+                StringLiteralToken [89..92) '"B"'
+            CommaToken [92..93) ','
+            T:WhitespaceTrivia [93..94) ' '
+            AttributeArgument [94..97)
+              StringLiteralExpression [94..97)
+                StringLiteralToken [94..97) '"C"'
+            CloseParenToken [97..98) ')'
+        CommaToken [98..99) ','
+        T:WhitespaceTrivia [99..100) ' '
+        Attribute [100..117)
+          IdentifierName [100..111)
+            IdentifierToken [100..111) 'Description'
+          AttributeArgumentList [111..117)
+            OpenParenToken [111..112) '('
+            AttributeArgument [112..117)
+              StringLiteralExpression [112..117)
+                StringLiteralToken [112..116) '"Goo'
+                T:EndOfLineTrivia [116..117) '\n'
+            CloseParenToken [117..117) missing
+        CommaToken [117..117) missing
+        Attribute [117..125)
+          IdentifierName [117..125)
+            L:WhitespaceTrivia [117..121) '    '
+            IdentifierToken [121..124) 'bar'
+            T:WhitespaceTrivia [124..125) ' '
+        CommaToken [125..125) missing
+        Attribute [125..132)
+          IdentifierName [125..132)
+            IdentifierToken [125..128) 'baz'
+            T:SkippedTokensTrivia [128..131)
+              StringLiteralToken [128..131) '")]'
+            T:EndOfLineTrivia [131..132) '\n'
+        CommaToken [132..132) missing
+        Attribute [132..137)
+          IdentifierName [132..137)
+            L:WhitespaceTrivia [132..136) '    '
+            IdentifierToken [136..137) 'B'
+        CommaToken [137..138) ','
+        T:EndOfLineTrivia [138..139) '\n'
+        CloseBracketToken [139..139) missing
+      IdentifierToken [139..139) missing
+    CloseBraceToken [139..140) '}'
+  EndOfFileToken [140..140) ''
+Diagnostics:
+  CS1010 [55..55) Newline in constant
+  CS1026 [59..59) ) expected
+  CS1003 [59..59) Syntax error, \',\' expected
+  CS1003 [68..71) Syntax error, \',\' expected
+  CS1010 [71..71) Newline in constant
+  CS1003 [74..74) Syntax error, \',\' expected
+  CS1003 [81..81) Syntax error, \']\' expected
+  CS1010 [112..112) Newline in constant
+  CS1026 [116..116) ) expected
+  CS1003 [116..116) Syntax error, \',\' expected
+  CS1003 [125..128) Syntax error, \',\' expected
+  CS1010 [128..128) Newline in constant
+  CS1003 [131..131) Syntax error, \',\' expected
+  CS1003 [138..138) Syntax error, \']\' expected
+  CS1001 [138..138) Identifier expected

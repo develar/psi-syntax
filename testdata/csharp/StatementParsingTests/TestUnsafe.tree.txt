@@ -1,0 +1,7 @@
+UnsafeStatement [0..10)
+  UnsafeKeyword [0..6) 'unsafe'
+  T:WhitespaceTrivia [6..7) ' '
+  Block [7..10)
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    CloseBraceToken [9..10) '}'

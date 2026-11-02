@@ -1,0 +1,40 @@
+SwitchExpression [0..70)
+  ParenthesizedExpression [0..12)
+    OpenParenToken [0..1) '('
+    CastExpression [1..10)
+      OpenParenToken [1..2) '('
+      PredefinedType [2..5)
+        IntKeyword [2..5) 'int'
+      CloseParenToken [5..6) ')'
+      IdentifierName [6..10)
+        IdentifierToken [6..10) 'reqs'
+    CloseParenToken [10..11) ')'
+    T:WhitespaceTrivia [11..12) ' '
+  SwitchKeyword [12..18) 'switch'
+  T:EndOfLineTrivia [18..19) '\n'
+  L:WhitespaceTrivia [19..26) '       '
+  OpenBraceToken [26..27) '{'
+  T:EndOfLineTrivia [27..28) '\n'
+  SwitchExpressionArm [28..60)
+    ConstantPattern [28..43)
+      ParenthesizedExpression [28..43)
+        L:WhitespaceTrivia [28..39) '           '
+        OpenParenToken [39..40) '('
+        NumericLiteralExpression [40..41)
+          NumericLiteralToken [40..41) '1'
+        CloseParenToken [41..42) ')'
+        T:WhitespaceTrivia [42..43) ' '
+    WhenClause [43..53)
+      WhenKeyword [43..47) 'when'
+      T:WhitespaceTrivia [47..48) ' '
+      IdentifierName [48..53)
+        IdentifierToken [48..52) 'flag'
+        T:WhitespaceTrivia [52..53) ' '
+    EqualsGreaterThanToken [53..55) '=>'
+    T:WhitespaceTrivia [55..56) ' '
+    StringLiteralExpression [56..60)
+      StringLiteralToken [56..60) '"ok"'
+  CommaToken [60..61) ','
+  T:EndOfLineTrivia [61..62) '\n'
+  L:WhitespaceTrivia [62..69) '       '
+  CloseBraceToken [69..70) '}'

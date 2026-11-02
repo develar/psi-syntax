@@ -1,0 +1,50 @@
+SwitchStatement [0..46)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'o'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..45)
+    CasePatternSwitchLabel [13..38)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      DeclarationPattern [18..36)
+        ArrayType [18..35)
+          TupleType [18..32)
+            OpenParenToken [18..19) '('
+            TupleElement [19..24)
+              QualifiedName [19..24)
+                IdentifierName [19..20)
+                  IdentifierToken [19..20) 'S'
+                DotToken [20..21) '.'
+                IdentifierName [21..24)
+                  IdentifierToken [21..24) 'Int'
+            CommaToken [24..25) ','
+            T:WhitespaceTrivia [25..26) ' '
+            TupleElement [26..31)
+              QualifiedName [26..31)
+                IdentifierName [26..27)
+                  IdentifierToken [26..27) 'S'
+                DotToken [27..28) '.'
+                IdentifierName [28..31)
+                  IdentifierToken [28..31) 'Int'
+            CloseParenToken [31..32) ')'
+          ArrayRankSpecifier [32..35)
+            OpenBracketToken [32..33) '['
+            OmittedArraySizeExpression [33..33)
+              OmittedArraySizeExpressionToken [33..33) ''
+            CloseBracketToken [33..34) ']'
+            T:WhitespaceTrivia [34..35) ' '
+        SingleVariableDesignation [35..36)
+          IdentifierToken [35..36) 'q'
+      ColonToken [36..37) ':'
+      T:WhitespaceTrivia [37..38) ' '
+    BreakStatement [38..45)
+      BreakKeyword [38..43) 'break'
+      SemicolonToken [43..44) ';'
+      T:WhitespaceTrivia [44..45) ' '
+  CloseBraceToken [45..46) '}'

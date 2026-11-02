@@ -1,0 +1,24 @@
+ObjectCreationExpression [0..20)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'S'
+    T:WhitespaceTrivia [5..6) ' '
+  CollectionInitializerExpression [6..20)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    AddAssignmentExpression [8..19)
+      IdentifierName [8..10)
+        IdentifierToken [8..9) 'F'
+        T:WhitespaceTrivia [9..10) ' '
+      PlusEqualsToken [10..12) '+='
+      T:WhitespaceTrivia [12..13) ' '
+      RefExpression [13..19)
+        RefKeyword [13..16) 'ref'
+        T:WhitespaceTrivia [16..17) ' '
+        IdentifierName [17..19)
+          IdentifierToken [17..18) 't'
+          T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'
+Diagnostics:
+  CS1525 [13..18) Invalid expression term \'ref\'

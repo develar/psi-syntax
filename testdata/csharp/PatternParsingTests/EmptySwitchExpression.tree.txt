@@ -1,0 +1,8 @@
+SwitchExpression [0..11)
+  NumericLiteralExpression [0..2)
+    NumericLiteralToken [0..1) '1'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  CloseBraceToken [10..11) '}'

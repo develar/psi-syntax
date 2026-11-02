@@ -1,0 +1,21 @@
+ObjectCreationExpression [0..17)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'a'
+    T:WhitespaceTrivia [5..6) ' '
+  CollectionInitializerExpression [6..17)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierName [8..9)
+      IdentifierToken [8..9) 'b'
+    CommaToken [9..10) ','
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..12)
+      IdentifierToken [11..12) 'c'
+    CommaToken [12..13) ','
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierName [14..16)
+      IdentifierToken [14..15) 'd'
+      T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'

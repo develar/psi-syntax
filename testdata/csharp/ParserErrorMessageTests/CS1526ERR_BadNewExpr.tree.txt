@@ -1,0 +1,76 @@
+CompilationUnit [0..132)
+  ClassDeclaration [0..132)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..23) 'MainClass'
+    T:EndOfLineTrivia [23..24) '\n'
+    L:WhitespaceTrivia [24..28) '    '
+    OpenBraceToken [28..29) '{'
+    T:EndOfLineTrivia [29..30) '\n'
+    MethodDeclaration [30..126)
+      L:WhitespaceTrivia [30..34) '    '
+      PublicKeyword [34..40) 'public'
+      T:WhitespaceTrivia [40..41) ' '
+      StaticKeyword [41..47) 'static'
+      T:WhitespaceTrivia [47..48) ' '
+      PredefinedType [48..52)
+        IntKeyword [48..51) 'int'
+        T:WhitespaceTrivia [51..52) ' '
+      IdentifierToken [52..56) 'Main'
+      T:WhitespaceTrivia [56..57) ' '
+      ParameterList [57..60)
+        OpenParenToken [57..58) '('
+        CloseParenToken [58..59) ')'
+        T:EndOfLineTrivia [59..60) '\n'
+      Block [60..126)
+        L:WhitespaceTrivia [60..68) '        '
+        OpenBraceToken [68..69) '{'
+        T:EndOfLineTrivia [69..70) '\n'
+        LocalDeclarationStatement [70..98)
+          VariableDeclaration [70..96)
+            ArrayType [70..84)
+              PredefinedType [70..82)
+                L:WhitespaceTrivia [70..78) '        '
+                IntKeyword [78..81) 'int'
+                T:WhitespaceTrivia [81..82) ' '
+              ArrayRankSpecifier [82..84)
+                OpenBracketToken [82..83) '['
+                OmittedArraySizeExpression [83..83)
+                  OmittedArraySizeExpressionToken [83..83) ''
+                CloseBracketToken [83..84) ']'
+            VariableDeclarator [84..96)
+              IdentifierToken [84..86) 'pi'
+              T:WhitespaceTrivia [86..87) ' '
+              EqualsValueClause [87..96)
+                EqualsToken [87..88) '='
+                T:WhitespaceTrivia [88..89) ' '
+                ObjectCreationExpression [89..96)
+                  NewKeyword [89..92) 'new'
+                  T:WhitespaceTrivia [92..93) ' '
+                  PredefinedType [93..96)
+                    IntKeyword [93..96) 'int'
+                  ArgumentList [96..96)
+                    OpenParenToken [96..96) missing
+                    CloseParenToken [96..96) missing
+          SemicolonToken [96..97) ';'
+          T:EndOfLineTrivia [97..98) '\n'
+        ReturnStatement [98..116)
+          L:WhitespaceTrivia [98..106) '        '
+          ReturnKeyword [106..112) 'return'
+          T:WhitespaceTrivia [112..113) ' '
+          NumericLiteralExpression [113..114)
+            NumericLiteralToken [113..114) '1'
+          SemicolonToken [114..115) ';'
+          T:EndOfLineTrivia [115..116) '\n'
+        L:WhitespaceTrivia [116..124) '        '
+        CloseBraceToken [124..125) '}'
+        T:EndOfLineTrivia [125..126) '\n'
+    L:WhitespaceTrivia [126..130) '    '
+    CloseBraceToken [130..131) '}'
+    T:EndOfLineTrivia [131..132) '\n'
+  EndOfFileToken [132..132) ''
+Diagnostics:
+  CS1526 [96..97) A new expression requires an argument list or (), [], or {} after type

@@ -1,0 +1,35 @@
+L:SingleLineDocumentationCommentTrivia [0..34)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..34)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..32)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      NameMemberCref [15..31)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'A'
+        CrefParameterList [16..31)
+          OpenParenToken [16..17) '('
+          CrefParameter [17..30)
+            InKeyword [17..19) 'in'
+            T:WhitespaceTrivia [19..20) ' '
+            T:SkippedTokensTrivia [20..28)
+              ReadOnlyKeyword [20..28) 'readonly'
+            IdentifierName [28..30)
+              L:WhitespaceTrivia [28..29) ' '
+              IdentifierToken [29..30) 'B'
+          CloseParenToken [30..31) ')'
+      DoubleQuoteToken [31..32) '"'
+    SlashGreaterThanToken [32..34) '/>'
+  EndOfDocumentationCommentToken [34..34) ''
+EndOfFileToken [34..34) ''
+Diagnostics:
+  CS1584 [15..31) XML comment has syntactically incorrect cref attribute \'A(in readonly B)\'
+  CS1658 [20..28) \'readonly\' modifier must be specified after \'ref\'.. See also error CS9190.

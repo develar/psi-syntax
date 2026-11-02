@@ -1,0 +1,18 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..2)
+    Block [0..2)
+      OpenBraceToken [0..1) '{'
+      T:WhitespaceTrivia [1..2) ' '
+      CloseBraceToken [2..2) missing
+  NamespaceDeclaration [2..17)
+    NamespaceKeyword [2..11) 'namespace'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierName [12..14)
+      IdentifierToken [12..13) 'n'
+      T:WhitespaceTrivia [13..14) ' '
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1513 [2..11) } expected

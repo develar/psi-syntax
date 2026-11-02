@@ -1,0 +1,69 @@
+CompilationUnit [0..73)
+  EnumDeclaration [0..73)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    EnumKeyword [7..11) 'enum'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..12) missing
+    BaseList [12..19)
+      ColonToken [12..13) ':'
+      T:WhitespaceTrivia [13..14) ' '
+      SimpleBaseType [14..19)
+        PredefinedType [14..19)
+          UIntKeyword [14..18) 'uint'
+          T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    EnumMemberDeclaration [21..26)
+      L:WhitespaceTrivia [21..25) '    '
+      IdentifierToken [25..26) 'A'
+    CommaToken [26..27) ','
+    T:EndOfLineTrivia [27..28) '\n'
+    EnumMemberDeclaration [28..33)
+      L:WhitespaceTrivia [28..32) '    '
+      IdentifierToken [32..33) 'B'
+    CommaToken [33..34) ','
+    T:EndOfLineTrivia [34..35) '\n'
+    EnumMemberDeclaration [35..44)
+      L:WhitespaceTrivia [35..39) '    '
+      IdentifierToken [39..40) 'C'
+      T:WhitespaceTrivia [40..41) ' '
+      EqualsValueClause [41..44)
+        EqualsToken [41..42) '='
+        T:WhitespaceTrivia [42..43) ' '
+        NumericLiteralExpression [43..44)
+          NumericLiteralToken [43..44) '1'
+    CommaToken [44..45) ','
+    T:EndOfLineTrivia [45..46) '\n'
+    EnumMemberDeclaration [46..59)
+      L:WhitespaceTrivia [46..50) '    '
+      IdentifierToken [50..51) 'D'
+      T:WhitespaceTrivia [51..52) ' '
+      EqualsValueClause [52..59)
+        EqualsToken [52..53) '='
+        T:WhitespaceTrivia [53..54) ' '
+        AddExpression [54..59)
+          IdentifierName [54..56)
+            IdentifierToken [54..55) 'C'
+            T:WhitespaceTrivia [55..56) ' '
+          PlusToken [56..57) '+'
+          T:WhitespaceTrivia [57..58) ' '
+          NumericLiteralExpression [58..59)
+            NumericLiteralToken [58..59) '2'
+    CommaToken [59..60) ','
+    T:EndOfLineTrivia [60..61) '\n'
+    EnumMemberDeclaration [61..70)
+      L:WhitespaceTrivia [61..65) '    '
+      IdentifierToken [65..66) 'E'
+      T:WhitespaceTrivia [66..67) ' '
+      EqualsValueClause [67..70)
+        EqualsToken [67..68) '='
+        T:WhitespaceTrivia [68..69) ' '
+        NumericLiteralExpression [69..70)
+          NumericLiteralToken [69..70) '0'
+    CommaToken [70..71) ','
+    T:EndOfLineTrivia [71..72) '\n'
+    CloseBraceToken [72..73) '}'
+  EndOfFileToken [73..73) ''
+Diagnostics:
+  CS1001 [12..13) Identifier expected

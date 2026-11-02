@@ -1,0 +1,31 @@
+InvocationExpression [0..20)
+  GenericName [0..18)
+    IdentifierToken [0..1) 'F'
+    TypeArgumentList [1..18)
+      LessThanToken [1..2) '<'
+      NullableType [2..6)
+        ArrayType [2..5)
+          IdentifierName [2..3)
+            IdentifierToken [2..3) 'A'
+          ArrayRankSpecifier [3..5)
+            OpenBracketToken [3..4) '['
+            OmittedArraySizeExpression [4..4)
+              OmittedArraySizeExpressionToken [4..4) ''
+            CloseBracketToken [4..5) ']'
+        QuestionToken [5..6) '?'
+      CommaToken [6..7) ','
+      T:WhitespaceTrivia [7..8) ' '
+      NullableType [8..17)
+        ArrayType [8..16)
+          PredefinedType [8..14)
+            ObjectKeyword [8..14) 'object'
+          ArrayRankSpecifier [14..16)
+            OpenBracketToken [14..15) '['
+            OmittedArraySizeExpression [15..15)
+              OmittedArraySizeExpressionToken [15..15) ''
+            CloseBracketToken [15..16) ']'
+        QuestionToken [16..17) '?'
+      GreaterThanToken [17..18) '>'
+  ArgumentList [18..20)
+    OpenParenToken [18..19) '('
+    CloseParenToken [19..20) ')'

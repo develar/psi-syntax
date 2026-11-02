@@ -1,0 +1,7 @@
+CompilationUnit [0..7)
+  GlobalStatement [0..7)
+    ExpressionStatement [0..7)
+      IdentifierName [0..6)
+        IdentifierToken [0..6) 'closed'
+      SemicolonToken [6..7) ';'
+  EndOfFileToken [7..7) ''

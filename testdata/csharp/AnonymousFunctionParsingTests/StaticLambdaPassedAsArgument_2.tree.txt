@@ -1,0 +1,19 @@
+ExpressionStatement [0..18)
+  InvocationExpression [0..17)
+    IdentifierName [0..2)
+      IdentifierToken [0..2) 'M1'
+    ArgumentList [2..17)
+      OpenParenToken [2..3) '('
+      Argument [3..16)
+        SimpleLambdaExpression [3..16)
+          StaticKeyword [3..9) 'static'
+          T:WhitespaceTrivia [9..10) ' '
+          Parameter [10..12)
+            IdentifierToken [10..11) 'x'
+            T:WhitespaceTrivia [11..12) ' '
+          EqualsGreaterThanToken [12..14) '=>'
+          T:WhitespaceTrivia [14..15) ' '
+          IdentifierName [15..16)
+            IdentifierToken [15..16) 'x'
+      CloseParenToken [16..17) ')'
+  SemicolonToken [17..18) ';'

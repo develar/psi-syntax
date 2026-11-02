@@ -1,0 +1,8 @@
+CastExpression [0..5)
+  OpenParenToken [0..1) '('
+  IdentifierName [1..2)
+    IdentifierToken [1..2) 'A'
+  CloseParenToken [2..3) ')'
+  CollectionExpression [3..5)
+    OpenBracketToken [3..4) '['
+    CloseBracketToken [4..5) ']'

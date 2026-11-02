@@ -1,0 +1,17 @@
+LocalDeclarationStatement [0..13)
+  VariableDeclaration [0..12)
+    TupleType [0..11)
+      OpenParenToken [0..1) '('
+      TupleElement [1..4)
+        PredefinedType [1..4)
+          IntKeyword [1..4) 'int'
+      CommaToken [4..5) ','
+      T:WhitespaceTrivia [5..6) ' '
+      TupleElement [6..9)
+        PredefinedType [6..9)
+          IntKeyword [6..9) 'int'
+      CloseParenToken [9..10) ')'
+      T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..12)
+      IdentifierToken [11..12) 'a'
+  SemicolonToken [12..13) ';'

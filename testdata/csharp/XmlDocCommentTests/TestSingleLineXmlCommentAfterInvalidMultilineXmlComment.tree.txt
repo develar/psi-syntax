@@ -1,0 +1,65 @@
+CompilationUnit [0..54)
+  L:MultiLineDocumentationCommentTrivia [0..28)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..26)
+      XmlElementStartTag [4..17)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'bar'
+        XmlTextAttribute [8..16)
+          XmlName [8..10)
+            L:WhitespaceTrivia [8..9) ' '
+            IdentifierToken [9..10) 'a'
+          EqualsToken [10..11) '='
+          SingleQuoteToken [11..12) '\''
+          XmlTextLiteralToken [12..15) 'val'
+          SingleQuoteToken [15..16) '\''
+        GreaterThanToken [16..17) '>'
+      XmlText [17..26)
+        XmlTextLiteralToken [17..18) ' '
+        XmlTextLiteralNewLineToken [18..19) '\n'
+        L:DocumentationCommentExteriorTrivia [19..20) '*'
+        XmlTextLiteralToken [20..25) ' text'
+        XmlTextLiteralNewLineToken [25..26) '\n'
+      XmlElementEndTag [26..26)
+        LessThanSlashToken [26..26) missing
+        XmlName [26..26)
+          IdentifierToken [26..26) missing
+        GreaterThanToken [26..26) missing
+    L:DocumentationCommentExteriorTrivia [26..28) '*/'
+    EndOfDocumentationCommentToken [28..28) ''
+  L:EndOfLineTrivia [28..29) '\n'
+  L:EndOfLineTrivia [29..30) '\n'
+  L:SingleLineDocumentationCommentTrivia [30..54)
+    XmlText [30..34)
+      L:DocumentationCommentExteriorTrivia [30..33) '///'
+      XmlTextLiteralToken [33..34) ' '
+    XmlElement [34..53)
+      XmlElementStartTag [34..46)
+        LessThanToken [34..35) '<'
+        XmlName [35..38)
+          IdentifierToken [35..38) 'goo'
+        XmlTextAttribute [38..45)
+          XmlName [38..40)
+            L:WhitespaceTrivia [38..39) ' '
+            IdentifierToken [39..40) 'a'
+          EqualsToken [40..41) '='
+          DoubleQuoteToken [41..42) '"'
+          XmlTextLiteralToken [42..44) 'as'
+          DoubleQuoteToken [44..45) '"'
+        GreaterThanToken [45..46) '>'
+      XmlText [46..47)
+        XmlTextLiteralToken [46..47) ' '
+      XmlElementEndTag [47..53)
+        LessThanSlashToken [47..49) '</'
+        XmlName [49..52)
+          IdentifierToken [49..52) 'goo'
+        GreaterThanToken [52..53) '>'
+    XmlText [53..54)
+      XmlTextLiteralNewLineToken [53..54) '\n'
+    EndOfDocumentationCommentToken [54..54) ''
+  EndOfFileToken [54..54) ''
+Diagnostics:
+  CS1570 [26..26) XML comment has badly formed XML -- \'Expected an end tag for element \'bar\'.\'

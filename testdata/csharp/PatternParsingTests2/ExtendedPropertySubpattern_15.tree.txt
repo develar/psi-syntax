@@ -1,0 +1,31 @@
+IsPatternExpression [0..19)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'e'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  RecursivePattern [5..19)
+    PropertyPatternClause [5..19)
+      OpenBraceToken [5..6) '{'
+      T:WhitespaceTrivia [6..7) ' '
+      Subpattern [7..18)
+        ExpressionColon [7..16)
+          ParenthesizedExpression [7..14)
+            OpenParenToken [7..8) '('
+            ConditionalExpression [8..13)
+              IdentifierName [8..9)
+                IdentifierToken [8..9) 'c'
+              QuestionToken [9..10) '?'
+              IdentifierName [10..11)
+                IdentifierToken [10..11) 'a'
+              ColonToken [11..12) ':'
+              IdentifierName [12..13)
+                IdentifierToken [12..13) 'b'
+            CloseParenToken [13..14) ')'
+          ColonToken [14..15) ':'
+          T:WhitespaceTrivia [15..16) ' '
+        ConstantPattern [16..18)
+          IdentifierName [16..18)
+            IdentifierToken [16..17) 'p'
+            T:WhitespaceTrivia [17..18) ' '
+      CloseBraceToken [18..19) '}'

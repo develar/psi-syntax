@@ -1,0 +1,1 @@
+interface async { async this[async i] { get; } }

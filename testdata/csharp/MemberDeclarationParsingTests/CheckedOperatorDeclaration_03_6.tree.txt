@@ -1,0 +1,31 @@
+OperatorDeclaration [0..36)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  CheckedKeyword [11..18) 'checked'
+  T:WhitespaceTrivia [18..19) ' '
+  AmpersandToken [19..20) '&'
+  ParameterList [20..31)
+    OpenParenToken [20..21) '('
+    Parameter [21..24)
+      IdentifierName [21..23)
+        IdentifierToken [21..22) 'C'
+        T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..24) 'x'
+    CommaToken [24..25) ','
+    T:WhitespaceTrivia [25..26) ' '
+    Parameter [26..29)
+      IdentifierName [26..28)
+        IdentifierToken [26..27) 'C'
+        T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..29) 'y'
+    CloseParenToken [29..30) ')'
+    T:WhitespaceTrivia [30..31) ' '
+  ArrowExpressionClause [31..35)
+    EqualsGreaterThanToken [31..33) '=>'
+    T:WhitespaceTrivia [33..34) ' '
+    IdentifierName [34..35)
+      IdentifierToken [34..35) 'x'
+  SemicolonToken [35..36) ';'

@@ -1,0 +1,3 @@
+
+#undef XXX
+class A { }

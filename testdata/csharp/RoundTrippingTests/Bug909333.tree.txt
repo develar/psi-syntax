@@ -1,0 +1,74 @@
+CompilationUnit [0..143)
+  ExternAliasDirective [0..24)
+    L:EndOfLineTrivia [0..1) '\n'
+    ExternKeyword [1..7) 'extern'
+    T:WhitespaceTrivia [7..8) ' '
+    AliasKeyword [8..13) 'alias'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..22) 'libAlias'
+    SemicolonToken [22..23) ';'
+    T:EndOfLineTrivia [23..24) '\n'
+  ClassDeclaration [24..143)
+    ClassKeyword [24..29) 'class'
+    T:WhitespaceTrivia [29..30) ' '
+    IdentifierToken [30..37) 'myClass'
+    T:EndOfLineTrivia [37..38) '\n'
+    OpenBraceToken [38..39) '{'
+    T:EndOfLineTrivia [39..40) '\n'
+    MethodDeclaration [40..141)
+      StaticKeyword [40..46) 'static'
+      T:WhitespaceTrivia [46..47) ' '
+      PredefinedType [47..51)
+        IntKeyword [47..50) 'int'
+        T:WhitespaceTrivia [50..51) ' '
+      IdentifierToken [51..55) 'Main'
+      ParameterList [55..58)
+        OpenParenToken [55..56) '('
+        CloseParenToken [56..57) ')'
+        T:EndOfLineTrivia [57..58) '\n'
+      Block [58..141)
+        OpenBraceToken [58..59) '{'
+        T:EndOfLineTrivia [59..60) '\n'
+        LocalDeclarationStatement [60..129)
+          VariableDeclaration [60..111)
+            AliasQualifiedName [60..81)
+              IdentifierName [60..68)
+                IdentifierToken [60..68) 'libAlias'
+              ColonColonToken [68..70) '::'
+              IdentifierName [70..81)
+                IdentifierToken [70..80) 'otherClass'
+                T:WhitespaceTrivia [80..81) ' '
+            VariableDeclarator [81..111)
+              IdentifierToken [81..83) 'oc'
+              T:WhitespaceTrivia [83..84) ' '
+              EqualsValueClause [84..111)
+                EqualsToken [84..85) '='
+                T:WhitespaceTrivia [85..86) ' '
+                ObjectCreationExpression [86..111)
+                  NewKeyword [86..89) 'new'
+                  T:WhitespaceTrivia [89..90) ' '
+                  QualifiedName [90..109)
+                    IdentifierName [90..98)
+                      IdentifierToken [90..98) 'libAlias'
+                    DotToken [98..99) '.'
+                    IdentifierName [99..109)
+                      IdentifierToken [99..109) 'otherClass'
+                  ArgumentList [109..111)
+                    OpenParenToken [109..110) '('
+                    CloseParenToken [110..111) ')'
+          SemicolonToken [111..112) ';'
+          T:WhitespaceTrivia [112..113) ' '
+          T:SingleLineCommentTrivia [113..128) '// \'::\' and \'.\''
+          T:EndOfLineTrivia [128..129) '\n'
+        ReturnStatement [129..139)
+          ReturnKeyword [129..135) 'return'
+          T:WhitespaceTrivia [135..136) ' '
+          NumericLiteralExpression [136..137)
+            NumericLiteralToken [136..137) '0'
+          SemicolonToken [137..138) ';'
+          T:EndOfLineTrivia [138..139) '\n'
+        CloseBraceToken [139..140) '}'
+        T:EndOfLineTrivia [140..141) '\n'
+    CloseBraceToken [141..142) '}'
+    T:EndOfLineTrivia [142..143) '\n'
+  EndOfFileToken [143..143) ''

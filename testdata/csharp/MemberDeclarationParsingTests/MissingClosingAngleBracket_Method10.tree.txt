@@ -1,0 +1,46 @@
+MethodDeclaration [0..82)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..61)
+    IdentifierToken [7..18) 'IEnumerable'
+    TypeArgumentList [18..61)
+      LessThanToken [18..19) '<'
+      TupleType [19..53)
+        OpenParenToken [19..20) '('
+        TupleElement [20..32)
+          PredefinedType [20..27)
+            StringKeyword [20..26) 'string'
+            T:WhitespaceTrivia [26..27) ' '
+          IdentifierToken [27..32) 'Value'
+        CommaToken [32..33) ','
+        T:WhitespaceTrivia [33..34) ' '
+        TupleElement [34..52)
+          PredefinedType [34..41)
+            StringKeyword [34..40) 'string'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..52) 'Description'
+        CloseParenToken [52..53) ')'
+      CommaToken [53..54) ','
+      T:WhitespaceTrivia [54..55) ' '
+      ArrayType [55..61)
+        PredefinedType [55..58)
+          IntKeyword [55..58) 'int'
+        ArrayRankSpecifier [58..61)
+          OpenBracketToken [58..59) '['
+          OmittedArraySizeExpression [59..59)
+            OmittedArraySizeExpressionToken [59..59) ''
+          CloseBracketToken [59..60) ']'
+          T:WhitespaceTrivia [60..61) ' '
+      GreaterThanToken [61..61) missing
+  IdentifierToken [61..73) 'GetAllValues'
+  ParameterList [73..81)
+    OpenParenToken [73..74) '('
+    Parameter [74..80)
+      IdentifierName [74..79)
+        IdentifierToken [74..78) 'Type'
+        T:WhitespaceTrivia [78..79) ' '
+      IdentifierToken [79..80) 't'
+    CloseParenToken [80..81) ')'
+  SemicolonToken [81..82) ';'
+Diagnostics:
+  CS1003 [61..73) Syntax error, \'>\' expected

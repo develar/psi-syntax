@@ -1,0 +1,29 @@
+IfStatement [0..40)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  TrueLiteralExpression [4..8)
+    TrueKeyword [4..8) 'true'
+  CloseParenToken [8..9) ')'
+  T:EndOfLineTrivia [9..10) '\n'
+  ExpressionStatement [10..40)
+    InvocationExpression [10..40)
+      SimpleMemberAccessExpression [10..34)
+        SimpleMemberAccessExpression [10..24)
+          IdentifierName [10..16)
+            IdentifierToken [10..16) 'System'
+          DotToken [16..17) '.'
+          IdentifierName [17..24)
+            IdentifierToken [17..24) 'Console'
+        DotToken [24..25) '.'
+        IdentifierName [25..34)
+          IdentifierToken [25..34) 'WriteLine'
+      ArgumentList [34..40)
+        OpenParenToken [34..35) '('
+        Argument [35..39)
+          TrueLiteralExpression [35..39)
+            TrueKeyword [35..39) 'true'
+        CloseParenToken [39..40) ')'
+    SemicolonToken [40..40) missing
+Diagnostics:
+  CS1002 [40..40) ; expected

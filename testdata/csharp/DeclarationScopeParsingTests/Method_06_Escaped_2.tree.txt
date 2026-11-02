@@ -1,0 +1,40 @@
+CompilationUnit [0..50)
+  GlobalStatement [0..30)
+    LocalFunctionStatement [0..30)
+      RefType [0..13)
+        L:EndOfLineTrivia [0..1) '\n'
+        RefKeyword [1..4) 'ref'
+        T:WhitespaceTrivia [4..5) ' '
+        IdentifierName [5..13)
+          IdentifierToken [5..12) '@scoped'
+          T:WhitespaceTrivia [12..13) ' '
+      IdentifierToken [13..15) 'F2'
+      ParameterList [15..18)
+        OpenParenToken [15..16) '('
+        CloseParenToken [16..17) ')'
+        T:WhitespaceTrivia [17..18) ' '
+      ArrowExpressionClause [18..28)
+        EqualsGreaterThanToken [18..20) '=>'
+        T:WhitespaceTrivia [20..21) ' '
+        DefaultLiteralExpression [21..28)
+          DefaultKeyword [21..28) 'default'
+      SemicolonToken [28..29) ';'
+      T:EndOfLineTrivia [29..30) '\n'
+  GlobalStatement [30..50)
+    LocalFunctionStatement [30..50)
+      RefType [30..42)
+        RefKeyword [30..33) 'ref'
+        T:WhitespaceTrivia [33..34) ' '
+        IdentifierName [34..42)
+          IdentifierToken [34..41) '@scoped'
+          T:WhitespaceTrivia [41..42) ' '
+      IdentifierToken [42..44) 'F4'
+      ParameterList [44..47)
+        OpenParenToken [44..45) '('
+        CloseParenToken [45..46) ')'
+        T:WhitespaceTrivia [46..47) ' '
+      Block [47..50)
+        OpenBraceToken [47..48) '{'
+        T:WhitespaceTrivia [48..49) ' '
+        CloseBraceToken [49..50) '}'
+  EndOfFileToken [50..50) ''

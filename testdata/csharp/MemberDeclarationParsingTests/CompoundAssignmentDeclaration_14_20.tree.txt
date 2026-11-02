@@ -1,0 +1,46 @@
+OperatorDeclaration [0..25)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'C'
+    T:WhitespaceTrivia [1..2) ' '
+  OperatorKeyword [2..10) 'operator'
+  T:WhitespaceTrivia [10..11) ' '
+  BarToken [11..12) '|'
+  T:WhitespaceTrivia [12..13) ' '
+  ParameterList [13..24)
+    OpenParenToken [13..13) missing
+    T:SkippedTokensTrivia [13..14)
+      EqualsToken [13..14) '='
+    Parameter [14..23)
+      TupleType [14..20)
+        OpenParenToken [14..15) '('
+        TupleElement [15..18)
+          IdentifierName [15..17)
+            IdentifierToken [15..16) 'C'
+            T:WhitespaceTrivia [16..17) ' '
+          IdentifierToken [17..18) 'x'
+        CommaToken [18..18) missing
+        TupleElement [18..18)
+          IdentifierName [18..18)
+            IdentifierToken [18..18) missing
+        CloseParenToken [18..19) ')'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..20) missing
+      T:SkippedTokensTrivia [20..22)
+        EqualsGreaterThanToken [20..22) '=>'
+      T:WhitespaceTrivia [22..23) ' '
+    CommaToken [23..23) missing
+    Parameter [23..24)
+      IdentifierName [23..24)
+        IdentifierToken [23..24) 'x'
+      IdentifierToken [24..24) missing
+    CloseParenToken [24..24) missing
+  SemicolonToken [24..25) ';'
+Diagnostics:
+  CS1003 [13..14) Syntax error, \'(\' expected
+  CS1001 [13..14) Identifier expected
+  CS8124 [18..19) Tuple must contain at least two elements.
+  CS1001 [20..22) Identifier expected
+  CS1003 [20..22) Syntax error, \',\' expected
+  CS1003 [23..24) Syntax error, \',\' expected
+  CS1001 [24..25) Identifier expected
+  CS1026 [24..25) ) expected

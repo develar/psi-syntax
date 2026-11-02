@@ -1,0 +1,44 @@
+ParenthesizedLambdaExpression [0..45)
+  ParameterList [0..41)
+    OpenParenToken [0..1) '('
+    Parameter [1..39)
+      AttributeList [1..29)
+        OpenBracketToken [1..2) '['
+        Attribute [2..27)
+          IdentifierName [2..13)
+            IdentifierToken [2..13) 'MyAttribute'
+          AttributeArgumentList [13..27)
+            OpenParenToken [13..14) '('
+            AttributeArgument [14..15)
+              NumericLiteralExpression [14..15)
+                NumericLiteralToken [14..15) '3'
+            CommaToken [15..16) ','
+            T:WhitespaceTrivia [16..17) ' '
+            AttributeArgument [17..26)
+              NameEquals [17..22)
+                IdentifierName [17..21)
+                  IdentifierToken [17..21) 'arg1'
+                EqualsToken [21..22) '='
+              TrueLiteralExpression [22..26)
+                TrueKeyword [22..26) 'true'
+            CloseParenToken [26..27) ')'
+        CloseBracketToken [27..28) ']'
+        T:WhitespaceTrivia [28..29) ' '
+      PredefinedType [29..33)
+        IntKeyword [29..32) 'int'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..34) 'x'
+      T:WhitespaceTrivia [34..35) ' '
+      EqualsValueClause [35..39)
+        EqualsToken [35..36) '='
+        T:WhitespaceTrivia [36..37) ' '
+        UnaryMinusExpression [37..39)
+          MinusToken [37..38) '-'
+          NumericLiteralExpression [38..39)
+            NumericLiteralToken [38..39) '1'
+    CloseParenToken [39..40) ')'
+    T:WhitespaceTrivia [40..41) ' '
+  EqualsGreaterThanToken [41..43) '=>'
+  T:WhitespaceTrivia [43..44) ' '
+  IdentifierName [44..45)
+    IdentifierToken [44..45) 'x'

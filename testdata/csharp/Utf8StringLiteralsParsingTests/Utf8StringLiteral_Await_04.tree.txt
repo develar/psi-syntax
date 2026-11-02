@@ -1,0 +1,5 @@
+AwaitExpression [0..21)
+  AwaitKeyword [0..5) 'await'
+  T:WhitespaceTrivia [5..6) ' '
+  Utf8StringLiteralExpression [6..21)
+    Utf8MultiLineRawStringLiteralToken [6..21) '"""\nhello\n"""u8'

@@ -1,0 +1,44 @@
+CompilationUnit [0..77)
+  ClassDeclaration [0..77)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..76)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..76)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        LocalFunctionStatement [29..70)
+          L:WhitespaceTrivia [29..37) '        '
+          SafeKeyword [37..41) 'safe'
+          T:WhitespaceTrivia [41..42) ' '
+          StaticKeyword [42..48) 'static'
+          T:WhitespaceTrivia [48..49) ' '
+          ExternKeyword [49..55) 'extern'
+          T:WhitespaceTrivia [55..56) ' '
+          PredefinedType [56..61)
+            VoidKeyword [56..60) 'void'
+            T:WhitespaceTrivia [60..61) ' '
+          IdentifierToken [61..66) 'Local'
+          ParameterList [66..68)
+            OpenParenToken [66..67) '('
+            CloseParenToken [67..68) ')'
+          SemicolonToken [68..69) ';'
+          T:EndOfLineTrivia [69..70) '\n'
+        L:WhitespaceTrivia [70..74) '    '
+        CloseBraceToken [74..75) '}'
+        T:EndOfLineTrivia [75..76) '\n'
+    CloseBraceToken [76..77) '}'
+  EndOfFileToken [77..77) ''

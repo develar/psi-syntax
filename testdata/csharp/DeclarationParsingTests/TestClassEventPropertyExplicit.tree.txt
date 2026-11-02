@@ -1,0 +1,43 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    EventDeclaration [10..45)
+      EventKeyword [10..15) 'event'
+      T:WhitespaceTrivia [15..16) ' '
+      IdentifierName [16..18)
+        IdentifierToken [16..17) 'b'
+        T:WhitespaceTrivia [17..18) ' '
+      ExplicitInterfaceSpecifier [18..20)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'I'
+        DotToken [19..20) '.'
+      IdentifierToken [20..21) 'c'
+      T:WhitespaceTrivia [21..22) ' '
+      AccessorList [22..45)
+        OpenBraceToken [22..23) '{'
+        T:WhitespaceTrivia [23..24) ' '
+        AddAccessorDeclaration [24..32)
+          AddKeyword [24..27) 'add'
+          T:WhitespaceTrivia [27..28) ' '
+          Block [28..32)
+            OpenBraceToken [28..29) '{'
+            T:WhitespaceTrivia [29..30) ' '
+            CloseBraceToken [30..31) '}'
+            T:WhitespaceTrivia [31..32) ' '
+        RemoveAccessorDeclaration [32..43)
+          RemoveKeyword [32..38) 'remove'
+          T:WhitespaceTrivia [38..39) ' '
+          Block [39..43)
+            OpenBraceToken [39..40) '{'
+            T:WhitespaceTrivia [40..41) ' '
+            CloseBraceToken [41..42) '}'
+            T:WhitespaceTrivia [42..43) ' '
+        CloseBraceToken [43..44) '}'
+        T:WhitespaceTrivia [44..45) ' '
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''

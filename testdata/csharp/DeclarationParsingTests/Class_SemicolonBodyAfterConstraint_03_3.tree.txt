@@ -1,0 +1,26 @@
+CompilationUnit [0..32)
+  InterfaceDeclaration [0..32)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'C'
+    TypeParameterList [12..17)
+      LessThanToken [12..13) '<'
+      TypeParameter [13..15)
+        IdentifierToken [13..15) 'T1'
+      GreaterThanToken [15..16) '>'
+      T:WhitespaceTrivia [16..17) ' '
+    TypeParameterConstraintClause [17..31)
+      WhereKeyword [17..22) 'where'
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierName [23..26)
+        IdentifierToken [23..25) 'T1'
+        T:WhitespaceTrivia [25..26) ' '
+      ColonToken [26..27) ':'
+      T:WhitespaceTrivia [27..28) ' '
+      TypeConstraint [28..31)
+        IdentifierName [28..31)
+          IdentifierToken [28..30) 'U1'
+          T:WhitespaceTrivia [30..31) ' '
+    SemicolonToken [31..32) ';'
+  EndOfFileToken [32..32) ''

@@ -1,0 +1,1 @@
+from m in methods let and = 1 select m

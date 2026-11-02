@@ -1,0 +1,1 @@
+(readonly ref a) => { }

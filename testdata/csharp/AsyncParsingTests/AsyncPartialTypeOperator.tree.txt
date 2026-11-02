@@ -1,0 +1,36 @@
+CompilationUnit [0..42)
+  ClassDeclaration [0..42)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    IncompleteMember [11..29)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      IdentifierName [21..29)
+        IdentifierToken [21..28) 'partial'
+        T:WhitespaceTrivia [28..29) ' '
+    OperatorDeclaration [29..42)
+      PredefinedType [29..33)
+        IntKeyword [29..32) 'int'
+        T:WhitespaceTrivia [32..33) ' '
+      OperatorKeyword [33..41) 'operator'
+      T:EndOfLineTrivia [41..42) '\n'
+      PlusToken [42..42) missing
+      ParameterList [42..42)
+        OpenParenToken [42..42) missing
+        CloseParenToken [42..42) missing
+      SemicolonToken [42..42) missing
+    CloseBraceToken [42..42) missing
+  EndOfFileToken [42..42) ''
+Diagnostics:
+  CS1519 [29..32) Invalid token \'int\' in a member declaration
+  CS1037 [42..42) Overloadable operator expected
+  CS1003 [42..42) Syntax error, \'(\' expected
+  CS1026 [42..42) ) expected
+  CS1002 [42..42) ; expected
+  CS1513 [42..42) } expected

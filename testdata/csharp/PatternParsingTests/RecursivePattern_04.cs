@@ -1,0 +1,1 @@
+var x = o is { Prop : 3 } x;

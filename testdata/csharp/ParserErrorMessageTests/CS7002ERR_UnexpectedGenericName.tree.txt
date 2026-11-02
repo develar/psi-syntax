@@ -1,0 +1,87 @@
+CompilationUnit [0..115)
+  EnumDeclaration [0..35)
+    EnumKeyword [0..4) 'enum'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'E'
+    T:SkippedTokensTrivia [6..7)
+      LessThanToken [6..7) '<'
+    T:SkippedTokensTrivia [7..8)
+      IdentifierToken [7..8) 'T'
+    T:SkippedTokensTrivia [8..9)
+      GreaterThanToken [8..9) '>'
+    T:WhitespaceTrivia [9..10) ' '
+    OpenBraceToken [10..11) '{'
+    T:WhitespaceTrivia [11..15) '    '
+    EnumMemberDeclaration [15..18)
+      IdentifierToken [15..18) 'One'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    EnumMemberDeclaration [20..23)
+      IdentifierToken [20..23) 'Two'
+    CommaToken [23..24) ','
+    T:WhitespaceTrivia [24..25) ' '
+    EnumMemberDeclaration [25..33)
+      IdentifierToken [25..30) 'Three'
+      T:WhitespaceTrivia [30..33) '   '
+    CloseBraceToken [33..34) '}'
+    T:EndOfLineTrivia [34..35) '\n'
+  ClassDeclaration [35..115)
+    L:EndOfLineTrivia [35..36) '\n'
+    PublicKeyword [36..42) 'public'
+    T:WhitespaceTrivia [42..43) ' '
+    ClassKeyword [43..48) 'class'
+    T:WhitespaceTrivia [48..49) ' '
+    IdentifierToken [49..53) 'Test'
+    T:EndOfLineTrivia [53..54) '\n'
+    OpenBraceToken [54..55) '{'
+    T:EndOfLineTrivia [55..56) '\n'
+    IndexerDeclaration [56..113)
+      L:WhitespaceTrivia [56..60) '    '
+      PublicKeyword [60..66) 'public'
+      T:WhitespaceTrivia [66..67) ' '
+      PredefinedType [67..71)
+        IntKeyword [67..70) 'int'
+        T:WhitespaceTrivia [70..71) ' '
+      ThisKeyword [71..75) 'this'
+      T:SkippedTokensTrivia [75..76)
+        LessThanToken [75..76) '<'
+      T:SkippedTokensTrivia [76..77)
+        IdentifierToken [76..77) 'V'
+      T:SkippedTokensTrivia [77..78)
+        GreaterThanToken [77..78) '>'
+      BracketedParameterList [78..85)
+        OpenBracketToken [78..79) '['
+        Parameter [79..82)
+          IdentifierName [79..81)
+            IdentifierToken [79..80) 'V'
+            T:WhitespaceTrivia [80..81) ' '
+          IdentifierToken [81..82) 'v'
+        CloseBracketToken [82..83) ']'
+        T:WhitespaceTrivia [83..85) '  '
+      AccessorList [85..113)
+        OpenBraceToken [85..86) '{'
+        T:WhitespaceTrivia [86..90) '    '
+        GetAccessorDeclaration [90..110)
+          GetKeyword [90..93) 'get'
+          T:WhitespaceTrivia [93..94) ' '
+          Block [94..110)
+            OpenBraceToken [94..95) '{'
+            T:WhitespaceTrivia [95..96) ' '
+            ReturnStatement [96..106)
+              ReturnKeyword [96..102) 'return'
+              T:WhitespaceTrivia [102..103) ' '
+              NumericLiteralExpression [103..104)
+                NumericLiteralToken [103..104) '0'
+              SemicolonToken [104..105) ';'
+              T:WhitespaceTrivia [105..106) ' '
+            CloseBraceToken [106..107) '}'
+            T:WhitespaceTrivia [107..110) '   '
+        CloseBraceToken [110..111) '}'
+        T:WhitespaceTrivia [111..112) ' '
+        T:EndOfLineTrivia [112..113) '\n'
+    CloseBraceToken [113..114) '}'
+    T:EndOfLineTrivia [114..115) '\n'
+  EndOfFileToken [115..115) ''
+Diagnostics:
+  CS7002 [5..6) Unexpected use of a generic name
+  CS7002 [71..75) Unexpected use of a generic name

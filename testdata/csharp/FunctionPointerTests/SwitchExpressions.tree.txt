@@ -1,0 +1,70 @@
+SwitchExpression [0..82)
+  IdentifierName [0..3)
+    L:EndOfLineTrivia [0..1) '\n'
+    IdentifierToken [1..2) 'o'
+    T:WhitespaceTrivia [2..3) ' '
+  SwitchKeyword [3..9) 'switch'
+  T:EndOfLineTrivia [9..10) '\n'
+  OpenBraceToken [10..11) '{'
+  T:EndOfLineTrivia [11..12) '\n'
+  SwitchExpressionArm [12..38)
+    DeclarationPattern [12..34)
+      FunctionPointerType [12..32)
+        L:WhitespaceTrivia [12..16) '    '
+        DelegateKeyword [16..24) 'delegate'
+        AsteriskToken [24..25) '*'
+        FunctionPointerParameterList [25..32)
+          LessThanToken [25..26) '<'
+          FunctionPointerParameter [26..30)
+            PredefinedType [26..30)
+              VoidKeyword [26..30) 'void'
+          GreaterThanToken [30..31) '>'
+          T:WhitespaceTrivia [31..32) ' '
+      DiscardDesignation [32..34)
+        UnderscoreToken [32..33) '_'
+        T:WhitespaceTrivia [33..34) ' '
+    EqualsGreaterThanToken [34..36) '=>'
+    T:WhitespaceTrivia [36..37) ' '
+    NumericLiteralExpression [37..38)
+      NumericLiteralToken [37..38) '1'
+  CommaToken [38..39) ','
+  T:EndOfLineTrivia [39..40) '\n'
+  SwitchExpressionArm [40..79)
+    RecursivePattern [40..75)
+      FunctionPointerType [40..60)
+        L:WhitespaceTrivia [40..44) '    '
+        DelegateKeyword [44..52) 'delegate'
+        AsteriskToken [52..53) '*'
+        FunctionPointerParameterList [53..60)
+          LessThanToken [53..54) '<'
+          FunctionPointerParameter [54..58)
+            PredefinedType [54..58)
+              VoidKeyword [54..58) 'void'
+          GreaterThanToken [58..59) '>'
+          T:WhitespaceTrivia [59..60) ' '
+      PositionalPatternClause [60..71)
+        OpenParenToken [60..61) '('
+        Subpattern [61..66)
+          VarPattern [61..66)
+            VarKeyword [61..64) 'var'
+            T:WhitespaceTrivia [64..65) ' '
+            SingleVariableDesignation [65..66)
+              IdentifierToken [65..66) 'a'
+        CommaToken [66..67) ','
+        T:WhitespaceTrivia [67..68) ' '
+        Subpattern [68..69)
+          ConstantPattern [68..69)
+            NumericLiteralExpression [68..69)
+              NumericLiteralToken [68..69) '2'
+        CloseParenToken [69..70) ')'
+        T:WhitespaceTrivia [70..71) ' '
+      SingleVariableDesignation [71..75)
+        IdentifierToken [71..74) 'ptr'
+        T:WhitespaceTrivia [74..75) ' '
+    EqualsGreaterThanToken [75..77) '=>'
+    T:WhitespaceTrivia [77..78) ' '
+    NumericLiteralExpression [78..79)
+      NumericLiteralToken [78..79) '2'
+  CommaToken [79..80) ','
+  T:EndOfLineTrivia [80..81) '\n'
+  CloseBraceToken [81..82) '}'

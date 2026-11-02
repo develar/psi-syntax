@@ -1,0 +1,13 @@
+CompilationUnit [0..17)
+  L:BadDirectiveTrivia [0..17)
+    HashToken [0..1) '#'
+    ElifKeyword [1..5) 'elif'
+    T:WhitespaceTrivia [5..6) ' '
+    L:DisabledTextTrivia [6..16) '! defined '
+    L:SkippedTokensTrivia [16..17)
+      IdentifierToken [16..17) 'X'
+    EndOfDirectiveToken [17..17) ''
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1028 [0..17) Unexpected preprocessor directive
+  CS1025 [16..17) Single-line comment or end-of-line expected

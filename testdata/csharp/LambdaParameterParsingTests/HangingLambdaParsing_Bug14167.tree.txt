@@ -1,0 +1,31 @@
+TupleExpression [0..21)
+  OpenParenToken [0..1) '('
+  Argument [1..6)
+    DeclarationExpression [1..6)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      SingleVariableDesignation [5..6)
+        IdentifierToken [5..6) 'a'
+  CommaToken [6..7) ','
+  T:WhitespaceTrivia [7..8) ' '
+  Argument [8..12)
+    PredefinedType [8..12)
+      IntKeyword [8..11) 'int'
+      T:WhitespaceTrivia [11..12) ' '
+  CloseParenToken [12..12) missing
+  T:SkippedTokensTrivia [12..13)
+    IdentifierToken [12..13) 'b'
+  T:WhitespaceTrivia [13..14) ' '
+  T:SkippedTokensTrivia [14..18)
+    IdentifierToken [14..18) 'Main'
+  T:SkippedTokensTrivia [18..19)
+    OpenParenToken [18..19) '('
+  T:SkippedTokensTrivia [19..20)
+    CloseParenToken [19..20) ')'
+  T:SkippedTokensTrivia [20..21)
+    SemicolonToken [20..21) ';'
+Diagnostics:
+  CS1073 [0..12) Unexpected token \'b\'
+  CS1525 [8..11) Invalid expression term \'int\'
+  CS1026 [12..13) ) expected

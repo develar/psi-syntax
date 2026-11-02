@@ -1,0 +1,1 @@
+class c { fixed int x[$ 10]; }

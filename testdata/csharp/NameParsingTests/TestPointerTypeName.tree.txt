@@ -1,0 +1,4 @@
+PointerType [0..4)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  AsteriskToken [3..4) '*'

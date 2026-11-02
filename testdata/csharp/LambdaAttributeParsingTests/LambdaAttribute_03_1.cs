@@ -1,0 +1,1 @@
+[A][B] (object x) => x

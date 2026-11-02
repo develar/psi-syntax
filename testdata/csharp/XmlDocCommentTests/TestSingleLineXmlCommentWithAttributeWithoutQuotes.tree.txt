@@ -1,0 +1,36 @@
+CompilationUnit [0..28)
+  ClassDeclaration [0..28)
+    L:SingleLineDocumentationCommentTrivia [0..19)
+      XmlElement [0..18)
+        XmlElementStartTag [0..12)
+          L:DocumentationCommentExteriorTrivia [0..3) '///'
+          LessThanToken [3..4) '<'
+          XmlName [4..7)
+            IdentifierToken [4..7) 'goo'
+          XmlTextAttribute [7..11)
+            XmlName [7..9)
+              L:WhitespaceTrivia [7..8) ' '
+              IdentifierToken [8..9) 'a'
+            EqualsToken [9..10) '='
+            DoubleQuoteToken [10..10) missing
+            DoubleQuoteToken [10..10) missing
+            T:SkippedTokensTrivia [10..11)
+              BadToken [10..11) '4'
+          GreaterThanToken [11..12) '>'
+        XmlElementEndTag [12..18)
+          LessThanSlashToken [12..14) '</'
+          XmlName [14..17)
+            IdentifierToken [14..17) 'goo'
+          GreaterThanToken [17..18) '>'
+      XmlText [18..19)
+        XmlTextLiteralNewLineToken [18..19) '\n'
+      EndOfDocumentationCommentToken [19..19) ''
+    ClassKeyword [19..24) 'class'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierToken [25..26) 'C'
+    OpenBraceToken [26..27) '{'
+    CloseBraceToken [27..28) '}'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS1570 [10..10) XML comment has badly formed XML -- \'A string literal was expected, but no opening quotation mark was found.\'
+  CS1570 [10..11) XML comment has badly formed XML -- \'The character(s) \'4\' cannot be used at this location.\'

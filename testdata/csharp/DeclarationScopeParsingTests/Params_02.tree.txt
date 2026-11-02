@@ -1,0 +1,24 @@
+MethodDeclaration [0..36)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'F'
+  ParameterList [6..35)
+    OpenParenToken [6..7) '('
+    Parameter [7..34)
+      ParamsKeyword [7..13) 'params'
+      T:WhitespaceTrivia [13..14) ' '
+      ScopedKeyword [14..20) 'scoped'
+      T:WhitespaceTrivia [20..21) ' '
+      ArrayType [21..30)
+        PredefinedType [21..27)
+          ObjectKeyword [21..27) 'object'
+        ArrayRankSpecifier [27..30)
+          OpenBracketToken [27..28) '['
+          OmittedArraySizeExpression [28..28)
+            OmittedArraySizeExpressionToken [28..28) ''
+          CloseBracketToken [28..29) ']'
+          T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..34) 'args'
+    CloseParenToken [34..35) ')'
+  SemicolonToken [35..36) ';'

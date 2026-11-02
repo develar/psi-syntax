@@ -1,0 +1,27 @@
+AnonymousObjectCreationExpression [0..21)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenBraceToken [4..5) '{'
+  T:WhitespaceTrivia [5..6) ' '
+  AnonymousObjectMemberDeclarator [6..20)
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'X'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    IsExpression [10..20)
+      IdentifierName [10..12)
+        IdentifierToken [10..11) 'e'
+        T:WhitespaceTrivia [11..12) ' '
+      IsKeyword [12..14) 'is'
+      T:WhitespaceTrivia [14..15) ' '
+      GenericName [15..20)
+        IdentifierToken [15..16) 'A'
+        TypeArgumentList [16..20)
+          LessThanToken [16..17) '<'
+          IdentifierName [17..18)
+            IdentifierToken [17..18) 'B'
+          GreaterThanToken [18..19) '>'
+          T:WhitespaceTrivia [19..20) ' '
+  CloseBraceToken [20..21) '}'

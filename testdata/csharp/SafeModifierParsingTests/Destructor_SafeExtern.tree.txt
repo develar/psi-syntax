@@ -1,0 +1,11 @@
+DestructorDeclaration [0..17)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  ExternKeyword [5..11) 'extern'
+  T:WhitespaceTrivia [11..12) ' '
+  TildeToken [12..13) '~'
+  IdentifierToken [13..14) 'C'
+  ParameterList [14..16)
+    OpenParenToken [14..15) '('
+    CloseParenToken [15..16) ')'
+  SemicolonToken [16..17) ';'

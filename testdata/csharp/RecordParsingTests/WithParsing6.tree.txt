@@ -1,0 +1,21 @@
+SwitchExpression [0..23)
+  WithExpression [0..13)
+    InvocationExpression [0..4)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'M'
+      ArgumentList [1..4)
+        OpenParenToken [1..2) '('
+        CloseParenToken [2..3) ')'
+        T:WhitespaceTrivia [3..4) ' '
+    WithKeyword [4..8) 'with'
+    T:WhitespaceTrivia [8..9) ' '
+    WithInitializerExpression [9..13)
+      OpenBraceToken [9..10) '{'
+      T:WhitespaceTrivia [10..11) ' '
+      CloseBraceToken [11..12) '}'
+      T:WhitespaceTrivia [12..13) ' '
+  SwitchKeyword [13..19) 'switch'
+  T:WhitespaceTrivia [19..20) ' '
+  OpenBraceToken [20..21) '{'
+  T:WhitespaceTrivia [21..22) ' '
+  CloseBraceToken [22..23) '}'

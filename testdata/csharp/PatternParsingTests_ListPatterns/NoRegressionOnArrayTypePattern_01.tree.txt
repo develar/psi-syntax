@@ -1,0 +1,14 @@
+IsExpression [0..13)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ArrayType [5..13)
+    PredefinedType [5..11)
+      StringKeyword [5..11) 'string'
+    ArrayRankSpecifier [11..13)
+      OpenBracketToken [11..12) '['
+      OmittedArraySizeExpression [12..12)
+        OmittedArraySizeExpressionToken [12..12) ''
+      CloseBracketToken [12..13) ']'

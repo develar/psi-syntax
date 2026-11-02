@@ -1,0 +1,1 @@
+extern safe public void M();

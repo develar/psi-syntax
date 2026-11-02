@@ -1,0 +1,8 @@
+YieldReturnStatement [0..15)
+  YieldKeyword [0..5) 'yield'
+  T:WhitespaceTrivia [5..6) ' '
+  ReturnKeyword [6..12) 'return'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..14)
+    IdentifierToken [13..14) 'a'
+  SemicolonToken [14..15) ';'

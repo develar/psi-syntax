@@ -1,0 +1,35 @@
+SwitchExpression [0..37)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..23)
+    ListPattern [13..19)
+      L:WhitespaceTrivia [13..17) '    '
+      OpenBracketToken [17..18) '['
+      T:WhitespaceTrivia [18..19) ' '
+      CloseBracketToken [19..19) missing
+    EqualsGreaterThanToken [19..21) '=>'
+    T:WhitespaceTrivia [21..22) ' '
+    NumericLiteralExpression [22..23)
+      NumericLiteralToken [22..23) '1'
+  CommaToken [23..24) ','
+  T:EndOfLineTrivia [24..25) '\n'
+  SwitchExpressionArm [25..36)
+    ListPattern [25..31)
+      L:WhitespaceTrivia [25..29) '    '
+      OpenBracketToken [29..30) '['
+      T:WhitespaceTrivia [30..31) ' '
+      CloseBracketToken [31..31) missing
+    EqualsGreaterThanToken [31..33) '=>'
+    T:WhitespaceTrivia [33..34) ' '
+    NumericLiteralExpression [34..36)
+      NumericLiteralToken [34..35) '2'
+      T:EndOfLineTrivia [35..36) '\n'
+  CloseBraceToken [36..37) '}'
+Diagnostics:
+  CS1003 [19..21) Syntax error, \']\' expected
+  CS1003 [31..33) Syntax error, \']\' expected

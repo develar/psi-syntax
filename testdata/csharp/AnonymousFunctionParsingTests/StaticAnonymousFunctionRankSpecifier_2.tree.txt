@@ -1,0 +1,34 @@
+ExpressionStatement [0..40)
+  SimpleAssignmentExpression [0..39)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..39)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..39)
+        PredefinedType [8..11)
+          IntKeyword [8..11) 'int'
+        ArrayRankSpecifier [11..39)
+          OpenBracketToken [11..12) '['
+          AnonymousMethodExpression [12..38)
+            StaticKeyword [12..18) 'static'
+            T:WhitespaceTrivia [18..19) ' '
+            DelegateKeyword [19..27) 'delegate'
+            ParameterList [27..35)
+              OpenParenToken [27..28) '('
+              Parameter [28..33)
+                PredefinedType [28..32)
+                  IntKeyword [28..31) 'int'
+                  T:WhitespaceTrivia [31..32) ' '
+                IdentifierToken [32..33) 'x'
+              CloseParenToken [33..34) ')'
+              T:WhitespaceTrivia [34..35) ' '
+            Block [35..38)
+              OpenBraceToken [35..36) '{'
+              T:WhitespaceTrivia [36..37) ' '
+              CloseBraceToken [37..38) '}'
+          CloseBracketToken [38..39) ']'
+  SemicolonToken [39..40) ';'

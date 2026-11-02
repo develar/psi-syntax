@@ -1,0 +1,1 @@
+T a = va, b = vb, c = vc;

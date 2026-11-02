@@ -1,0 +1,43 @@
+CompilationUnit [0..48)
+  StructDeclaration [0..48)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'S'
+    TypeParameterList [15..19)
+      LessThanToken [15..16) '<'
+      TypeParameter [16..16)
+        IdentifierToken [16..16) missing
+      GreaterThanToken [16..17) '>'
+      T:WhitespaceTrivia [17..18) ' '
+      T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..46)
+      L:WhitespaceTrivia [21..25) '    '
+      PublicKeyword [25..31) 'public'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..37)
+        VoidKeyword [32..36) 'void'
+        T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..38) 'M'
+      TypeParameterList [38..40)
+        LessThanToken [38..39) '<'
+        TypeParameter [39..39)
+          IdentifierToken [39..39) missing
+        GreaterThanToken [39..40) '>'
+      ParameterList [40..43)
+        OpenParenToken [40..41) '('
+        CloseParenToken [41..42) ')'
+        T:WhitespaceTrivia [42..43) ' '
+      Block [43..46)
+        OpenBraceToken [43..44) '{'
+        CloseBraceToken [44..45) '}'
+        T:EndOfLineTrivia [45..46) '\n'
+    CloseBraceToken [46..47) '}'
+    T:EndOfLineTrivia [47..48) '\n'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1001 [16..17) Identifier expected
+  CS1001 [39..40) Identifier expected

@@ -1,0 +1,19 @@
+CompilationUnit [0..26)
+  L:RegionDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    RegionKeyword [1..7) 'region'
+    EndOfDirectiveToken [7..7) ''
+    T:EndOfLineTrivia [7..8) '\n'
+  L:BadDirectiveTrivia [8..15)
+    HashToken [8..9) '#'
+    EndIfKeyword [9..14) 'endif'
+    EndOfDirectiveToken [14..14) ''
+    T:EndOfLineTrivia [14..15) '\n'
+  L:EndRegionDirectiveTrivia [15..26)
+    HashToken [15..16) '#'
+    EndRegionKeyword [16..25) 'endregion'
+    EndOfDirectiveToken [25..25) ''
+    T:EndOfLineTrivia [25..26) '\n'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1038 [8..14) #endregion directive expected

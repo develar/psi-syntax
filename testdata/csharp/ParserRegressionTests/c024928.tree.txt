@@ -1,0 +1,14 @@
+CompilationUnit [0..1567)
+  L:SingleLineDocumentationCommentTrivia [0..1565)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlText [4..1565)
+      XmlTextLiteralToken [4..1398) '</summary>        /// <returns></returns>        internal int OPERATOR()        { //             int?[ *   @method   !  new int explicit  , [  5 --  {  \\uDD48\\uEF5C , 2,  @ascending , @foreach   \\uD17B\\u21A8  .  5  ;  { /*[] bug*/ // YES []            int ::  (  <=  var  />  { @readonly  1 <!--  2 __makeref  ?  3 @descending , 4 @float , 5 } disable ;/*,;*/            int -=   _\\uAEC4   -  ( operator int <<= a =>  += ] @abstract ; property /*[]*/            i = i double  + i -  @async   -  i \'   &  i  )  i &  @using   #   @byte   ,   \\u7EE1\\u8B45 ;/*+ - * / % & | ^*/            bool b %=  = true  }   fixed  | class   join  ^ ?>   true ;/*& | ^*/            b  ^=  ! @null ;/*!*/             @stackalloc  = @in   ==  @default ;/*~i*/            b  \\  i base  <  / i -  await ) && @into  ( new i pragma  + 1 @for ) > i _\\uE02B\\u7325 ; else /*< && >*/             continue   @double  = _Ƚ揞   in   ^  1 internal   ::  0;/*? :*/   // YES :            i++ ~ /*++*/             _\\u560C\\uF27E\\uB73F -- @sizeof ;/*--*/            b @public  = /=   enum  && params  false  >>  true;/*&& ||*/            i @explicit   #   @byte   >>=   await ;/*<<*/             @sbyte  = @operator  i >> 5;/*>>*/            int  @from  = i;            b  >>   @protected  == )  j && assembly  i @const  != j "   |=  i <=  @explicit  &&  @await  >=  @typeof ;/*= == && != <= >=*/            i @long   >>=  (int '
+      XmlCDataEndToken [1398..1401) ']]>'
+      XmlTextLiteralToken [1401..1564) '  &=  ( /*+=*/            i _Ƚ揞  -= i explicit  -> /*-=*/            i  {  i -= /**=*/            if ]  ( <<= i @assembly   )  0 .                  @select ++; '
+      XmlTextLiteralNewLineToken [1564..1565) '\n'
+    EndOfDocumentationCommentToken [1565..1565) ''
+  L:WhitespaceTrivia [1565..1566) ' '
+  L:EndOfLineTrivia [1566..1567) '\n'
+  EndOfFileToken [1567..1567) ''

@@ -1,0 +1,11 @@
+CompilationUnit [0..8)
+  L:IfDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    TrueLiteralExpression [4..8)
+      TrueKeyword [4..8) 'true'
+    EndOfDirectiveToken [8..8) ''
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1027 [8..8) #endif directive expected

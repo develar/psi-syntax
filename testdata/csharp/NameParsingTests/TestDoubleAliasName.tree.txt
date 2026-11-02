@@ -1,0 +1,14 @@
+QualifiedName [0..13)
+  AliasQualifiedName [0..8)
+    IdentifierName [0..3)
+      IdentifierToken [0..3) 'goo'
+    ColonColonToken [3..5) '::'
+    IdentifierName [5..8)
+      IdentifierToken [5..8) 'bar'
+  DotToken [8..8) missing
+  T:SkippedTokensTrivia [8..10)
+    ColonColonToken [8..10) '::'
+  IdentifierName [10..13)
+    IdentifierToken [10..13) 'baz'
+Diagnostics:
+  CS7000 [8..10) Unexpected use of an aliased name

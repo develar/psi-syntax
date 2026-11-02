@@ -1,0 +1,2 @@
+NumericLiteralExpression [0..1)
+  NumericLiteralToken [0..1) '0'

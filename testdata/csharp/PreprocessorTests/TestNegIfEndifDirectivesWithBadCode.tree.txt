@@ -1,0 +1,31 @@
+CompilationUnit [0..25)
+  GlobalStatement [0..25)
+    LocalDeclarationStatement [0..25)
+      VariableDeclaration [0..25)
+        IdentifierName [0..25)
+          L:IfDirectiveTrivia [0..9)
+            HashToken [0..1) '#'
+            IfKeyword [1..3) 'if'
+            T:WhitespaceTrivia [3..4) ' '
+            TrueLiteralExpression [4..8)
+              TrueKeyword [4..8) 'true'
+            EndOfDirectiveToken [8..8) ''
+            T:EndOfLineTrivia [8..9) '\n'
+          L:ElseDirectiveTrivia [9..15)
+            HashToken [9..10) '#'
+            ElseKeyword [10..14) 'else'
+            EndOfDirectiveToken [14..14) ''
+            T:EndOfLineTrivia [14..15) '\n'
+          L:EndIfDirectiveTrivia [15..22)
+            HashToken [15..16) '#'
+            EndIfKeyword [16..21) 'endif'
+            EndOfDirectiveToken [21..21) ''
+            T:EndOfLineTrivia [21..22) '\n'
+          IdentifierToken [22..25) 'aeu'
+        VariableDeclarator [25..25)
+          IdentifierToken [25..25) missing
+      SemicolonToken [25..25) missing
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected

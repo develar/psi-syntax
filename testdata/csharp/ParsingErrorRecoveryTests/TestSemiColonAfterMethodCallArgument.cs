@@ -1,0 +1,1 @@
+class c { void m() { m(a; } }

@@ -1,0 +1,106 @@
+CompilationUnit [0..201)
+  ClassDeclaration [0..201)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..199)
+      L:WhitespaceTrivia [17..21) '    '
+      StaticKeyword [21..27) 'static'
+      T:WhitespaceTrivia [27..28) ' '
+      PredefinedType [28..33)
+        VoidKeyword [28..32) 'void'
+        T:WhitespaceTrivia [32..33) ' '
+      IdentifierToken [33..37) 'Main'
+      ParameterList [37..53)
+        OpenParenToken [37..38) '('
+        Parameter [38..51)
+          ArrayType [38..47)
+            PredefinedType [38..44)
+              StringKeyword [38..44) 'string'
+            ArrayRankSpecifier [44..47)
+              OpenBracketToken [44..45) '['
+              OmittedArraySizeExpression [45..45)
+                OmittedArraySizeExpressionToken [45..45) ''
+              CloseBracketToken [45..46) ']'
+              T:WhitespaceTrivia [46..47) ' '
+          IdentifierToken [47..51) 'args'
+        CloseParenToken [51..52) ')'
+        T:EndOfLineTrivia [52..53) '\n'
+      Block [53..199)
+        L:WhitespaceTrivia [53..57) '    '
+        OpenBraceToken [57..58) '{'
+        T:EndOfLineTrivia [58..59) '\n'
+        LocalDeclarationStatement [59..89)
+          VariableDeclaration [59..87)
+            PredefinedType [59..74)
+              L:WhitespaceTrivia [59..67) '        '
+              StringKeyword [67..73) 'string'
+              T:WhitespaceTrivia [73..74) ' '
+            VariableDeclarator [74..87)
+              IdentifierToken [74..80) 'target'
+              T:WhitespaceTrivia [80..81) ' '
+              EqualsValueClause [81..87)
+                EqualsToken [81..82) '='
+                T:WhitespaceTrivia [82..83) ' '
+                StringLiteralExpression [83..87)
+                  StringLiteralToken [83..87) '"t1"'
+          SemicolonToken [87..88) ';'
+          T:EndOfLineTrivia [88..89) '\n'
+        SwitchStatement [89..123)
+          L:WhitespaceTrivia [89..97) '        '
+          SwitchKeyword [97..103) 'switch'
+          T:WhitespaceTrivia [103..104) ' '
+          OpenParenToken [104..105) '('
+          IdentifierName [105..111)
+            IdentifierToken [105..111) 'target'
+          CloseParenToken [111..112) ')'
+          T:EndOfLineTrivia [112..113) '\n'
+          L:WhitespaceTrivia [113..121) '        '
+          OpenBraceToken [121..122) '{'
+          T:EndOfLineTrivia [122..123) '\n'
+          CloseBraceToken [123..123) missing
+        LabeledStatement [123..193)
+          L:WhitespaceTrivia [123..131) '        '
+          IdentifierToken [131..137) 'label1'
+          ColonToken [137..138) ':'
+          T:EndOfLineTrivia [138..139) '\n'
+          SwitchStatement [139..193)
+            SwitchKeyword [139..139) missing
+            OpenParenToken [139..139) missing
+            IdentifierName [139..139)
+              IdentifierToken [139..139) missing
+            CloseParenToken [139..139) missing
+            OpenBraceToken [139..139) missing
+            SwitchSection [139..183)
+              CaseSwitchLabel [139..158)
+                L:WhitespaceTrivia [139..147) '        '
+                CaseKeyword [147..151) 'case'
+                T:WhitespaceTrivia [151..152) ' '
+                StringLiteralExpression [152..156)
+                  StringLiteralToken [152..156) '"t1"'
+                ColonToken [156..157) ':'
+                T:EndOfLineTrivia [157..158) '\n'
+              GotoStatement [158..183)
+                L:WhitespaceTrivia [158..170) '            '
+                GotoKeyword [170..174) 'goto'
+                T:WhitespaceTrivia [174..175) ' '
+                IdentifierName [175..181)
+                  IdentifierToken [175..181) 'label1'
+                SemicolonToken [181..182) ';'
+                T:EndOfLineTrivia [182..183) '\n'
+            L:WhitespaceTrivia [183..191) '        '
+            CloseBraceToken [191..192) '}'
+            T:EndOfLineTrivia [192..193) '\n'
+        L:WhitespaceTrivia [193..197) '    '
+        CloseBraceToken [197..198) '}'
+        T:EndOfLineTrivia [198..199) '\n'
+    CloseBraceToken [199..200) '}'
+    T:EndOfLineTrivia [200..201) '\n'
+  EndOfFileToken [201..201) ''
+Diagnostics:
+  CS1513 [122..122) } expected
+  CS1003 [138..138) Syntax error, \'switch\' expected

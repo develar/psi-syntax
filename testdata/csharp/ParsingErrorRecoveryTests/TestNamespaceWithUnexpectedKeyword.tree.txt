@@ -1,0 +1,17 @@
+CompilationUnit [0..19)
+  NamespaceDeclaration [0..19)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    IncompleteMember [14..18)
+      PredefinedType [14..18)
+        IntKeyword [14..17) 'int'
+        T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS0116 [14..17) A namespace cannot directly contain members such as fields, methods or statements

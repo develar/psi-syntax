@@ -1,0 +1,30 @@
+CompilationUnit [0..28)
+  OperatorDeclaration [0..28)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'C'
+      T:WhitespaceTrivia [1..2) ' '
+    OperatorKeyword [2..10) 'operator'
+    T:WhitespaceTrivia [10..11) ' '
+    PlusToken [11..12) '+'
+    ParameterList [12..27)
+      OpenParenToken [12..13) '('
+      Parameter [13..18)
+        IdentifierName [13..15)
+          IdentifierToken [13..14) 'C'
+          T:WhitespaceTrivia [14..15) ' '
+        IdentifierToken [15..18) 'lhs'
+      CommaToken [18..19) ','
+      T:WhitespaceTrivia [19..20) ' '
+      Parameter [20..25)
+        IdentifierName [20..22)
+          IdentifierToken [20..21) 'C'
+          T:WhitespaceTrivia [21..22) ' '
+        IdentifierToken [22..25) 'rhs'
+      CloseParenToken [25..26) ')'
+      T:WhitespaceTrivia [26..27) ' '
+    Block [27..28)
+      OpenBraceToken [27..28) '{'
+      CloseBraceToken [28..28) missing
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS1513 [28..28) } expected

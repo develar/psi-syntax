@@ -1,0 +1,22 @@
+CompilationUnit [0..19)
+  UsingDirective [0..14)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..14)
+      IdentifierToken [7..13) 'scoped'
+      T:WhitespaceTrivia [13..14) ' '
+    SemicolonToken [14..14) missing
+  GlobalStatement [14..19)
+    LocalDeclarationStatement [14..19)
+      VariableDeclaration [14..17)
+        PredefinedType [14..17)
+          IntKeyword [14..17) 'int'
+        VariableDeclarator [17..17)
+          IdentifierToken [17..17) missing
+      SemicolonToken [17..18) ';'
+      T:EndOfLineTrivia [18..19) '\n'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1002 [14..17) ; expected
+  CS1001 [17..18) Identifier expected

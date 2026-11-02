@@ -1,0 +1,15 @@
+CompilationUnit [0..23)
+  DelegateDeclaration [0..23)
+    FileKeyword [0..4) 'file'
+    T:WhitespaceTrivia [4..5) ' '
+    DelegateKeyword [5..13) 'delegate'
+    T:WhitespaceTrivia [13..14) ' '
+    PredefinedType [14..19)
+      VoidKeyword [14..18) 'void'
+      T:WhitespaceTrivia [18..19) ' '
+    IdentifierToken [19..20) 'D'
+    ParameterList [20..22)
+      OpenParenToken [20..21) '('
+      CloseParenToken [21..22) ')'
+    SemicolonToken [22..23) ';'
+  EndOfFileToken [23..23) ''

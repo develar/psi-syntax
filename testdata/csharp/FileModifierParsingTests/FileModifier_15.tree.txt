@@ -1,0 +1,23 @@
+CompilationUnit [0..37)
+  NamespaceDeclaration [0..37)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..13)
+      IdentifierToken [10..12) 'NS'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..36)
+      L:WhitespaceTrivia [15..19) '    '
+      FileKeyword [19..23) 'file'
+      T:WhitespaceTrivia [23..24) ' '
+      ClassKeyword [24..29) 'class'
+      T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'C'
+      T:WhitespaceTrivia [31..32) ' '
+      OpenBraceToken [32..33) '{'
+      T:WhitespaceTrivia [33..34) ' '
+      CloseBraceToken [34..35) '}'
+      T:EndOfLineTrivia [35..36) '\n'
+    CloseBraceToken [36..37) '}'
+  EndOfFileToken [37..37) ''

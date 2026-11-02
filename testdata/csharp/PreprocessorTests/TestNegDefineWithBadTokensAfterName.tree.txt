@@ -1,0 +1,12 @@
+CompilationUnit [0..12)
+  L:DefineDirectiveTrivia [0..12)
+    HashToken [0..1) '#'
+    DefineKeyword [1..7) 'define'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..11) 'GOO'
+    L:SkippedTokensTrivia [11..12)
+      OpenParenToken [11..12) '('
+    EndOfDirectiveToken [12..12) ''
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1025 [11..12) Single-line comment or end-of-line expected

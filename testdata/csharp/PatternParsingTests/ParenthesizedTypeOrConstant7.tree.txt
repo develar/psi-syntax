@@ -1,0 +1,32 @@
+IsPatternExpression [0..23)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  OrPattern [5..23)
+    ConstantPattern [5..11)
+      ParenthesizedExpression [5..11)
+        OpenParenToken [5..6) '('
+        SimpleMemberAccessExpression [6..9)
+          IdentifierName [6..7)
+            IdentifierToken [6..7) 'A'
+          DotToken [7..8) '.'
+          IdentifierName [8..9)
+            IdentifierToken [8..9) 'B'
+        CloseParenToken [9..10) ')'
+        T:WhitespaceTrivia [10..11) ' '
+    OrKeyword [11..13) 'or'
+    T:WhitespaceTrivia [13..14) ' '
+    ConstantPattern [14..23)
+      CastExpression [14..23)
+        OpenParenToken [14..15) '('
+        QualifiedName [15..18)
+          IdentifierName [15..16)
+            IdentifierToken [15..16) 'A'
+          DotToken [16..17) '.'
+          IdentifierName [17..18)
+            IdentifierToken [17..18) 'B'
+        CloseParenToken [18..19) ')'
+        IdentifierName [19..23)
+          IdentifierToken [19..23) 'when'

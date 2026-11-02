@@ -1,0 +1,1 @@
+switch (e) { case B*** C: break; }

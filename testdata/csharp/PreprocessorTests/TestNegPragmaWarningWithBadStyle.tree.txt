@@ -1,0 +1,14 @@
+CompilationUnit [0..19)
+  L:PragmaWarningDirectiveTrivia [0..19)
+    HashToken [0..1) '#'
+    PragmaKeyword [1..7) 'pragma'
+    T:WhitespaceTrivia [7..8) ' '
+    WarningKeyword [8..15) 'warning'
+    T:WhitespaceTrivia [15..16) ' '
+    DisableKeyword [16..16) missing
+    L:SkippedTokensTrivia [16..19)
+      IdentifierToken [16..19) 'GOO'
+    EndOfDirectiveToken [19..19) ''
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1634 [16..19) Expected \'disable\' or \'restore\'

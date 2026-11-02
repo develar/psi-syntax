@@ -1,0 +1,1 @@
+class a { internal protected class b { } }

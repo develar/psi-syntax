@@ -1,0 +1,3 @@
+lock (Boo Quux())
+{
+}

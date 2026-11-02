@@ -1,0 +1,57 @@
+ForStatement [0..47)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..35)
+    IdentifierName [5..12)
+      IdentifierToken [5..11) 'MyType'
+      T:WhitespaceTrivia [11..12) ' '
+    VariableDeclarator [12..35)
+      IdentifierToken [12..13) 'm'
+      T:WhitespaceTrivia [13..14) ' '
+      EqualsValueClause [14..35)
+        EqualsToken [14..15) '='
+        T:WhitespaceTrivia [15..16) ' '
+        WithExpression [16..35)
+          IdentifierName [16..18)
+            IdentifierToken [16..17) 'x'
+            T:WhitespaceTrivia [17..18) ' '
+          WithKeyword [18..22) 'with'
+          T:WhitespaceTrivia [22..23) ' '
+          WithInitializerExpression [23..35)
+            OpenBraceToken [23..24) '{'
+            T:WhitespaceTrivia [24..25) ' '
+            SimpleAssignmentExpression [25..30)
+              IdentifierName [25..27)
+                IdentifierToken [25..26) 'A'
+                T:WhitespaceTrivia [26..27) ' '
+              EqualsToken [27..28) '='
+              T:WhitespaceTrivia [28..29) ' '
+              NumericLiteralExpression [29..30)
+                NumericLiteralToken [29..30) '1'
+            CommaToken [30..31) ','
+            T:WhitespaceTrivia [31..32) ' '
+            IdentifierName [32..33)
+              IdentifierToken [32..33) 'B'
+            CommaToken [33..34) ','
+            T:WhitespaceTrivia [34..35) ' '
+            CloseBraceToken [35..35) missing
+  SemicolonToken [35..36) ';'
+  T:WhitespaceTrivia [36..37) ' '
+  TrueLiteralExpression [37..41)
+    TrueKeyword [37..41) 'true'
+  SemicolonToken [41..42) ';'
+  T:WhitespaceTrivia [42..43) ' '
+  PostIncrementExpression [43..46)
+    IdentifierName [43..44)
+      IdentifierToken [43..44) 'm'
+    PlusPlusToken [44..46) '++'
+  CloseParenToken [46..47) ')'
+  ExpressionStatement [47..47)
+    IdentifierName [47..47)
+      IdentifierToken [47..47) missing
+    SemicolonToken [47..47) missing
+Diagnostics:
+  CS1513 [35..36) } expected
+  CS1733 [47..47) Expected expression
+  CS1002 [47..47) ; expected

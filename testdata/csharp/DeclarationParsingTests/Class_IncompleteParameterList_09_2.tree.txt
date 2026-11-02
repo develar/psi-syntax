@@ -1,0 +1,42 @@
+CompilationUnit [0..35)
+  StructDeclaration [0..35)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    TypeParameterList [9..13)
+      LessThanToken [9..10) '<'
+      TypeParameter [10..11)
+        IdentifierToken [10..11) 'T'
+      GreaterThanToken [11..12) '>'
+      T:EndOfLineTrivia [12..13) '\n'
+    ParameterList [13..19)
+      OpenParenToken [13..14) '('
+      Parameter [14..17)
+        IdentifierName [14..16)
+          IdentifierToken [14..15) 'T'
+          T:WhitespaceTrivia [15..16) ' '
+        IdentifierToken [16..17) 'x'
+      CommaToken [17..18) ','
+      T:EndOfLineTrivia [18..19) '\n'
+      Parameter [19..19)
+        IdentifierName [19..19)
+          IdentifierToken [19..19) missing
+        IdentifierToken [19..19) missing
+      CloseParenToken [19..19) missing
+    TypeParameterConstraintClause [19..34)
+      WhereKeyword [19..24) 'where'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierName [25..27)
+        IdentifierToken [25..26) 'T'
+        T:WhitespaceTrivia [26..27) ' '
+      ColonToken [27..28) ':'
+      T:WhitespaceTrivia [28..29) ' '
+      ClassConstraint [29..34)
+        ClassKeyword [29..34) 'class'
+    SemicolonToken [34..35) ';'
+  EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1031 [18..18) Type expected
+  CS1001 [18..18) Identifier expected
+  CS1026 [18..18) ) expected

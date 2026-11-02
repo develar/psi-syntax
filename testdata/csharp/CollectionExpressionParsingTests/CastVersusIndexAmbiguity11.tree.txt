@@ -1,0 +1,25 @@
+ElementAccessExpression [0..14)
+  ParenthesizedExpression [0..5)
+    OpenParenToken [0..1) '('
+    ParenthesizedExpression [1..4)
+      OpenParenToken [1..2) '('
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'A'
+      CloseParenToken [3..4) ')'
+    CloseParenToken [4..5) ')'
+  BracketedArgumentList [5..14)
+    OpenBracketToken [5..6) '['
+    Argument [6..7)
+      NumericLiteralExpression [6..7)
+        NumericLiteralToken [6..7) '1'
+    CommaToken [7..8) ','
+    T:WhitespaceTrivia [8..9) ' '
+    Argument [9..10)
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '2'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    Argument [12..13)
+      NumericLiteralExpression [12..13)
+        NumericLiteralToken [12..13) '3'
+    CloseBracketToken [13..14) ']'

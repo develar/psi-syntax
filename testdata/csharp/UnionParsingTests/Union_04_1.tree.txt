@@ -1,0 +1,19 @@
+CompilationUnit [0..21)
+  MethodDeclaration [0..21)
+    PartialKeyword [0..7) 'partial'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierName [8..14)
+      IdentifierToken [8..13) 'union'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..16) 'U1'
+    ParameterList [16..20)
+      OpenParenToken [16..17) '('
+      Parameter [17..19)
+        IdentifierName [17..19)
+          IdentifierToken [17..19) 'E1'
+        IdentifierToken [19..19) missing
+      CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1001 [19..20) Identifier expected

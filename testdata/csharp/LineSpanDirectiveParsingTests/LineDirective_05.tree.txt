@@ -1,0 +1,23 @@
+CompilationUnit [0..25)
+  L:LineSpanDirectiveTrivia [0..25)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    LineDirectivePosition [5..10)
+      OpenParenToken [5..6) '('
+      NumericLiteralToken [6..7) '1'
+      CommaToken [7..8) ','
+      NumericLiteralToken [8..9) '2'
+      CloseParenToken [9..10) ')'
+    MinusToken [10..11) '-'
+    LineDirectivePosition [11..16)
+      OpenParenToken [11..12) '('
+      NumericLiteralToken [12..13) '3'
+      CommaToken [13..14) ','
+      NumericLiteralToken [14..15) '4'
+      CloseParenToken [15..16) ')'
+    StringLiteralToken [16..25) '"file.cs"'
+    EndOfDirectiveToken [25..25) ''
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS9028 [5..10) The #line span directive requires space before the first parenthesis, before the character offset, and before the file name
+  CS9028 [16..25) The #line span directive requires space before the first parenthesis, before the character offset, and before the file name

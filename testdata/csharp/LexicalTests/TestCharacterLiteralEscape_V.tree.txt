@@ -1,0 +1,2 @@
+CharacterLiteralToken [0..4) '\'\\v\''
+EndOfFileToken [4..4) ''

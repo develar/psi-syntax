@@ -1,0 +1,27 @@
+L:SingleLineDocumentationCommentTrivia [0..30)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..30)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..28)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      OperatorMemberCref [15..27)
+        OperatorKeyword [15..23) 'operator'
+        L:WhitespaceTrivia [23..24) ' '
+        BarToken [24..25) '|'
+        T:WhitespaceTrivia [25..26) ' '
+        T:SkippedTokensTrivia [26..27)
+          EqualsToken [26..27) '='
+      DoubleQuoteToken [27..28) '"'
+    SlashGreaterThanToken [28..30) '/>'
+  EndOfDocumentationCommentToken [30..30) ''
+EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1584 [15..25) XML comment has syntactically incorrect cref attribute \'operator | =\'

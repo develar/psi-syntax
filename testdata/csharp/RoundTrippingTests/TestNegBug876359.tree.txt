@@ -1,0 +1,34 @@
+CompilationUnit [0..24)
+  ClassDeclaration [0..24)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..22)
+      L:WhitespaceTrivia [11..13) '  '
+      FixedKeyword [13..18) 'fixed'
+      T:WhitespaceTrivia [18..19) ' '
+      VariableDeclaration [19..20)
+        IdentifierName [19..20)
+          IdentifierToken [19..20) 'x'
+        VariableDeclarator [20..20)
+          IdentifierToken [20..20) missing
+          BracketedArgumentList [20..20)
+            OpenBracketToken [20..20) missing
+            Argument [20..20)
+              OmittedArraySizeExpression [20..20)
+                OmittedArraySizeExpressionToken [20..20) ''
+            CloseBracketToken [20..20) missing
+      SemicolonToken [20..21) ';'
+      T:EndOfLineTrivia [21..22) '\n'
+    CloseBraceToken [22..23) '}'
+    T:EndOfLineTrivia [23..24) '\n'
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1001 [20..21) Identifier expected
+  CS1003 [20..21) Syntax error, \'[\' expected
+  CS1003 [20..21) Syntax error, \']\' expected
+  CS0443 [20..21) Syntax error; value expected

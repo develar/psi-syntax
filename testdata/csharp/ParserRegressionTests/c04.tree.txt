@@ -1,0 +1,13 @@
+CompilationUnit [0..396)
+  L:SingleLineDocumentationCommentTrivia [0..375)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlText [4..375)
+      XmlTextLiteralToken [4..374) '</summary>        /// <returns></returns>        internal  do  OPERATOR || )        {            int?[] a = new int? \\u14DB\\u0849 [5] { 1, 2, 3, 4,  @using  } /= /*[] bug*/ // YES []            int[] var = { 1, 2, 3, 4, 5 } $ /*,;*/            int i =  ; int)a[1];/*[]*/            i = i  <<=   @__arglist  - i @sbyte  *  @extern  / i % i ++   %  i  ||   @checked  ^ i; '
+      XmlTextLiteralNewLineToken [374..375) '\n'
+    EndOfDocumentationCommentToken [375..375) ''
+  L:WhitespaceTrivia [375..376) ' '
+  L:MultiLineCommentTrivia [376..395) '/*+ - * / % & | ^*/'
+  L:EndOfLineTrivia [395..396) '\n'
+  EndOfFileToken [396..396) ''

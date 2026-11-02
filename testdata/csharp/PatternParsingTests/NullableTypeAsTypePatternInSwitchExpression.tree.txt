@@ -1,0 +1,29 @@
+ExpressionStatement [0..25)
+  SimpleAssignmentExpression [0..24)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    SwitchExpression [4..24)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      SwitchKeyword [6..12) 'switch'
+      T:WhitespaceTrivia [12..13) ' '
+      OpenBraceToken [13..14) '{'
+      T:WhitespaceTrivia [14..15) ' '
+      SwitchExpressionArm [15..23)
+        TypePattern [15..18)
+          NullableType [15..18)
+            IdentifierName [15..16)
+              IdentifierToken [15..16) 'a'
+            QuestionToken [16..17) '?'
+            T:WhitespaceTrivia [17..18) ' '
+        EqualsGreaterThanToken [18..20) '=>'
+        T:WhitespaceTrivia [20..21) ' '
+        NumericLiteralExpression [21..23)
+          NumericLiteralToken [21..22) '1'
+          T:WhitespaceTrivia [22..23) ' '
+      CloseBraceToken [23..24) '}'
+  SemicolonToken [24..25) ';'

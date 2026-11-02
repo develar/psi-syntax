@@ -1,0 +1,14 @@
+CompilationUnit [0..21)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:DisabledTextTrivia [11..21) 'int 1 = 0;'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1027 [21..21) #endif directive expected

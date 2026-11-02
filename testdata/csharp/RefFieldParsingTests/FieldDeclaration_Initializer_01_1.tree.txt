@@ -1,0 +1,33 @@
+StructDeclaration [0..34)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  FieldDeclaration [11..33)
+    VariableDeclaration [11..31)
+      RefType [11..19)
+        RefKeyword [11..14) 'ref'
+        T:WhitespaceTrivia [14..15) ' '
+        PredefinedType [15..19)
+          IntKeyword [15..18) 'int'
+          T:WhitespaceTrivia [18..19) ' '
+      VariableDeclarator [19..31)
+        IdentifierToken [19..21) '_f'
+        T:WhitespaceTrivia [21..22) ' '
+        EqualsValueClause [22..31)
+          EqualsToken [22..23) '='
+          T:WhitespaceTrivia [23..24) ' '
+          RefExpression [24..31)
+            RefKeyword [24..27) 'ref'
+            T:WhitespaceTrivia [27..28) ' '
+            InvocationExpression [28..31)
+              IdentifierName [28..29)
+                IdentifierToken [28..29) 'F'
+              ArgumentList [29..31)
+                OpenParenToken [29..30) '('
+                CloseParenToken [30..31) ')'
+    SemicolonToken [31..32) ';'
+    T:WhitespaceTrivia [32..33) ' '
+  CloseBraceToken [33..34) '}'

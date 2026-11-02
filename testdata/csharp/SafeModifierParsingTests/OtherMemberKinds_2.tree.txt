@@ -1,0 +1,28 @@
+IndexerDeclaration [0..43)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  ExternKeyword [12..18) 'extern'
+  T:WhitespaceTrivia [18..19) ' '
+  PredefinedType [19..23)
+    IntKeyword [19..22) 'int'
+    T:WhitespaceTrivia [22..23) ' '
+  ThisKeyword [23..27) 'this'
+  BracketedParameterList [27..35)
+    OpenBracketToken [27..28) '['
+    Parameter [28..33)
+      PredefinedType [28..32)
+        IntKeyword [28..31) 'int'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'i'
+    CloseBracketToken [33..34) ']'
+    T:WhitespaceTrivia [34..35) ' '
+  AccessorList [35..43)
+    OpenBraceToken [35..36) '{'
+    T:WhitespaceTrivia [36..37) ' '
+    GetAccessorDeclaration [37..42)
+      GetKeyword [37..40) 'get'
+      SemicolonToken [40..41) ';'
+      T:WhitespaceTrivia [41..42) ' '
+    CloseBraceToken [42..43) '}'

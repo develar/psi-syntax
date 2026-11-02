@@ -1,0 +1,38 @@
+ExpressionStatement [0..33)
+  SimpleAssignmentExpression [0..32)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    SwitchExpression [4..32)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      SwitchKeyword [6..12) 'switch'
+      T:WhitespaceTrivia [12..13) ' '
+      OpenBraceToken [13..14) '{'
+      T:WhitespaceTrivia [14..15) ' '
+      SwitchExpressionArm [15..29)
+        RecursivePattern [15..25)
+          IdentifierName [15..16)
+            IdentifierToken [15..16) 'T'
+          PositionalPatternClause [16..25)
+            OpenParenToken [16..17) '('
+            Subpattern [17..23)
+              DeclarationPattern [17..23)
+                IdentifierName [17..19)
+                  IdentifierToken [17..18) 'X'
+                  T:WhitespaceTrivia [18..19) ' '
+                SingleVariableDesignation [19..23)
+                  IdentifierToken [19..23) 'when'
+            CloseParenToken [23..24) ')'
+            T:WhitespaceTrivia [24..25) ' '
+        EqualsGreaterThanToken [25..27) '=>'
+        T:WhitespaceTrivia [27..28) ' '
+        NumericLiteralExpression [28..29)
+          NumericLiteralToken [28..29) '1'
+      CommaToken [29..30) ','
+      T:WhitespaceTrivia [30..31) ' '
+      CloseBraceToken [31..32) '}'
+  SemicolonToken [32..33) ';'

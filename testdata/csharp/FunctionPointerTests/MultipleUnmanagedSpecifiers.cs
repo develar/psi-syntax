@@ -1,0 +1,1 @@
+delegate* unmanaged[Cdecl, Thiscall, Stdcall, Fastcall, Vectorcall, SuppressGCTransition]<void> ptr;

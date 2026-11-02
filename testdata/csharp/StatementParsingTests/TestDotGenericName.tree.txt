@@ -1,0 +1,17 @@
+ExpressionStatement [0..9)
+  InvocationExpression [0..8)
+    SimpleMemberAccessExpression [0..6)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'a'
+      DotToken [1..2) '.'
+      GenericName [2..6)
+        IdentifierToken [2..3) 'b'
+        TypeArgumentList [3..6)
+          LessThanToken [3..4) '<'
+          IdentifierName [4..5)
+            IdentifierToken [4..5) 'c'
+          GreaterThanToken [5..6) '>'
+    ArgumentList [6..8)
+      OpenParenToken [6..7) '('
+      CloseParenToken [7..8) ')'
+  SemicolonToken [8..9) ';'

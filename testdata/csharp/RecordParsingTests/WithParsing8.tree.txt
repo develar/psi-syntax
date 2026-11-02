@@ -1,0 +1,24 @@
+WithExpression [0..23)
+  InvocationExpression [0..4)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'M'
+    ArgumentList [1..4)
+      OpenParenToken [1..2) '('
+      CloseParenToken [2..3) ')'
+      T:WhitespaceTrivia [3..4) ' '
+  WithKeyword [4..8) 'with'
+  T:WhitespaceTrivia [8..9) ' '
+  WithInitializerExpression [9..23)
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+    T:SkippedTokensTrivia [12..13)
+      DotToken [12..13) '.'
+    T:SkippedTokensTrivia [13..21)
+      IdentifierToken [13..21) 'ToString'
+    T:SkippedTokensTrivia [21..22)
+      OpenParenToken [21..22) '('
+    T:SkippedTokensTrivia [22..23)
+      CloseParenToken [22..23) ')'
+Diagnostics:
+  CS1073 [0..12) Unexpected token \'.\'

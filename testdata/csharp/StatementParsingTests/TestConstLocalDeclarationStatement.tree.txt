@@ -1,0 +1,16 @@
+LocalDeclarationStatement [0..14)
+  ConstKeyword [0..5) 'const'
+  T:WhitespaceTrivia [5..6) ' '
+  VariableDeclaration [6..13)
+    IdentifierName [6..8)
+      IdentifierToken [6..7) 'T'
+      T:WhitespaceTrivia [7..8) ' '
+    VariableDeclarator [8..13)
+      IdentifierToken [8..9) 'a'
+      T:WhitespaceTrivia [9..10) ' '
+      EqualsValueClause [10..13)
+        EqualsToken [10..11) '='
+        T:WhitespaceTrivia [11..12) ' '
+        IdentifierName [12..13)
+          IdentifierToken [12..13) 'b'
+  SemicolonToken [13..14) ';'

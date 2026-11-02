@@ -1,0 +1,75 @@
+CompilationUnit [0..172)
+  ClassDeclaration [0..172)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..170)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..21) 'M'
+      ParameterList [21..24)
+        OpenParenToken [21..22) '('
+        CloseParenToken [22..23) ')'
+        T:EndOfLineTrivia [23..24) '\n'
+      Block [24..170)
+        L:WhitespaceTrivia [24..28) '    '
+        OpenBraceToken [28..29) '{'
+        T:EndOfLineTrivia [29..30) '\n'
+        SwitchStatement [30..164)
+          L:WhitespaceTrivia [30..38) '        '
+          L:SingleLineCommentTrivia [38..56) '//const int a = 1;'
+          L:EndOfLineTrivia [56..57) '\n'
+          L:WhitespaceTrivia [57..65) '        '
+          L:SingleLineCommentTrivia [65..83) '//const int i = 2;'
+          L:EndOfLineTrivia [83..84) '\n'
+          L:WhitespaceTrivia [84..92) '        '
+          SwitchKeyword [92..98) 'switch'
+          T:WhitespaceTrivia [98..99) ' '
+          OpenParenToken [99..100) '('
+          FalseLiteralExpression [100..105)
+            FalseKeyword [100..105) 'false'
+          CloseParenToken [105..106) ')'
+          T:EndOfLineTrivia [106..107) '\n'
+          L:WhitespaceTrivia [107..115) '        '
+          OpenBraceToken [115..116) '{'
+          T:EndOfLineTrivia [116..117) '\n'
+          SwitchSection [117..154)
+            CaseSwitchLabel [117..147)
+              L:WhitespaceTrivia [117..129) '            '
+              CaseKeyword [129..133) 'case'
+              T:WhitespaceTrivia [133..134) ' '
+              LessThanExpression [134..145)
+                IdentifierName [134..136)
+                  IdentifierToken [134..135) 'a'
+                  T:WhitespaceTrivia [135..136) ' '
+                LessThanToken [136..137) '<'
+                T:WhitespaceTrivia [137..138) ' '
+                UnsignedRightShiftExpression [138..145)
+                  IdentifierName [138..140)
+                    IdentifierToken [138..139) 'i'
+                    T:WhitespaceTrivia [139..140) ' '
+                  GreaterThanGreaterThanGreaterThanToken [140..143) '>>>'
+                  T:WhitespaceTrivia [143..144) ' '
+                  NumericLiteralExpression [144..145)
+                    NumericLiteralToken [144..145) '2'
+              ColonToken [145..146) ':'
+              T:WhitespaceTrivia [146..147) ' '
+            BreakStatement [147..154)
+              BreakKeyword [147..152) 'break'
+              SemicolonToken [152..153) ';'
+              T:EndOfLineTrivia [153..154) '\n'
+          L:WhitespaceTrivia [154..162) '        '
+          CloseBraceToken [162..163) '}'
+          T:EndOfLineTrivia [163..164) '\n'
+        L:WhitespaceTrivia [164..168) '    '
+        CloseBraceToken [168..169) '}'
+        T:EndOfLineTrivia [169..170) '\n'
+    CloseBraceToken [170..171) '}'
+    T:EndOfLineTrivia [171..172) '\n'
+  EndOfFileToken [172..172) ''

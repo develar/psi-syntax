@@ -1,0 +1,33 @@
+ElementAccessExpression [0..20)
+  ParenthesizedExpression [0..11)
+    OpenParenToken [0..1) '('
+    ConditionalExpression [1..10)
+      IdentifierName [1..3)
+        IdentifierToken [1..2) 'a'
+        T:WhitespaceTrivia [2..3) ' '
+      QuestionToken [3..4) '?'
+      T:WhitespaceTrivia [4..5) ' '
+      IdentifierName [5..7)
+        IdentifierToken [5..6) 'b'
+        T:WhitespaceTrivia [6..7) ' '
+      ColonToken [7..8) ':'
+      T:WhitespaceTrivia [8..9) ' '
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'c'
+    CloseParenToken [10..11) ')'
+  BracketedArgumentList [11..20)
+    OpenBracketToken [11..12) '['
+    Argument [12..13)
+      NumericLiteralExpression [12..13)
+        NumericLiteralToken [12..13) '1'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    Argument [15..16)
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '2'
+    CommaToken [16..17) ','
+    T:WhitespaceTrivia [17..18) ' '
+    Argument [18..19)
+      NumericLiteralExpression [18..19)
+        NumericLiteralToken [18..19) '3'
+    CloseBracketToken [19..20) ']'

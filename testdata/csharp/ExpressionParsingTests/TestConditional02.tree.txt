@@ -1,0 +1,21 @@
+ConditionalExpression [0..13)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  QuestionToken [2..3) '?'
+  T:WhitespaceTrivia [3..4) ' '
+  SimpleAssignmentExpression [4..8)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'b'
+    EqualsToken [5..6) '='
+    IdentifierName [6..8)
+      IdentifierToken [6..7) 'c'
+      T:WhitespaceTrivia [7..8) ' '
+  ColonToken [8..9) ':'
+  T:WhitespaceTrivia [9..10) ' '
+  SimpleAssignmentExpression [10..13)
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'd'
+    EqualsToken [11..12) '='
+    IdentifierName [12..13)
+      IdentifierToken [12..13) 'e'

@@ -1,0 +1,29 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..12)
+    ExpressionStatement [0..12)
+      ObjectCreationExpression [0..12)
+        L:EndOfLineTrivia [0..1) '\n'
+        NewKeyword [1..4) 'new'
+        T:WhitespaceTrivia [4..5) ' '
+        IdentifierName [5..12)
+          IdentifierToken [5..11) 'scoped'
+          T:WhitespaceTrivia [11..12) ' '
+        ArgumentList [12..12)
+          OpenParenToken [12..12) missing
+          CloseParenToken [12..12) missing
+      SemicolonToken [12..12) missing
+  GlobalStatement [12..21)
+    LocalFunctionStatement [12..21)
+      PredefinedType [12..16)
+        IntKeyword [12..15) 'int'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'M'
+      ParameterList [17..19)
+        OpenParenToken [17..18) '('
+        CloseParenToken [18..19) ')'
+      SemicolonToken [19..20) ';'
+      T:EndOfLineTrivia [20..21) '\n'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1526 [12..15) A new expression requires an argument list or (), [], or {} after type
+  CS1002 [12..15) ; expected

@@ -1,0 +1,18 @@
+ArrayCreationExpression [0..11)
+  NewKeyword [0..3) 'new'
+  ArrayType [3..11)
+    TupleType [3..8)
+      OpenParenToken [3..4) '('
+      TupleElement [4..5)
+        IdentifierName [4..5)
+          IdentifierToken [4..5) 'x'
+      CommaToken [5..6) ','
+      TupleElement [6..7)
+        IdentifierName [6..7)
+          IdentifierToken [6..7) 'y'
+      CloseParenToken [7..8) ')'
+    ArrayRankSpecifier [8..11)
+      OpenBracketToken [8..9) '['
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '0'
+      CloseBracketToken [10..11) ']'

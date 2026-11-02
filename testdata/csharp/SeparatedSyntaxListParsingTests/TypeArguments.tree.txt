@@ -1,0 +1,168 @@
+CompilationUnit [0..125)
+  ClassDeclaration [0..125)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..23)
+      VariableDeclaration [11..21)
+        GenericName [11..19)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..16) 'A'
+          TypeArgumentList [16..19)
+            LessThanToken [16..17) '<'
+            OmittedTypeArgument [17..17)
+              OmittedTypeArgumentToken [17..17) ''
+            GreaterThanToken [17..18) '>'
+            T:WhitespaceTrivia [18..19) ' '
+        VariableDeclarator [19..21)
+          IdentifierToken [19..21) 'a1'
+      SemicolonToken [21..22) ';'
+      T:EndOfLineTrivia [22..23) '\n'
+    FieldDeclaration [23..36)
+      VariableDeclaration [23..34)
+        GenericName [23..32)
+          L:WhitespaceTrivia [23..27) '    '
+          IdentifierToken [27..28) 'A'
+          TypeArgumentList [28..32)
+            LessThanToken [28..29) '<'
+            IdentifierName [29..30)
+              IdentifierToken [29..30) 'T'
+            GreaterThanToken [30..31) '>'
+            T:WhitespaceTrivia [31..32) ' '
+        VariableDeclarator [32..34)
+          IdentifierToken [32..34) 'a2'
+      SemicolonToken [34..35) ';'
+      T:EndOfLineTrivia [35..36) '\n'
+    FieldDeclaration [36..49)
+      VariableDeclaration [36..47)
+        GenericName [36..45)
+          L:WhitespaceTrivia [36..40) '    '
+          IdentifierToken [40..41) 'A'
+          TypeArgumentList [41..45)
+            LessThanToken [41..42) '<'
+            OmittedTypeArgument [42..42)
+              OmittedTypeArgumentToken [42..42) ''
+            CommaToken [42..43) ','
+            OmittedTypeArgument [43..43)
+              OmittedTypeArgumentToken [43..43) ''
+            GreaterThanToken [43..44) '>'
+            T:WhitespaceTrivia [44..45) ' '
+        VariableDeclarator [45..47)
+          IdentifierToken [45..47) 'a3'
+      SemicolonToken [47..48) ';'
+      T:EndOfLineTrivia [48..49) '\n'
+    FieldDeclaration [49..64)
+      VariableDeclaration [49..62)
+        GenericName [49..60)
+          L:WhitespaceTrivia [49..53) '    '
+          IdentifierToken [53..54) 'A'
+          TypeArgumentList [54..60)
+            LessThanToken [54..55) '<'
+            IdentifierName [55..57)
+              IdentifierToken [55..56) 'T'
+              T:WhitespaceTrivia [56..57) ' '
+            CommaToken [57..57) missing
+            IdentifierName [57..58)
+              IdentifierToken [57..58) 'U'
+            GreaterThanToken [58..59) '>'
+            T:WhitespaceTrivia [59..60) ' '
+        VariableDeclarator [60..62)
+          IdentifierToken [60..62) 'a4'
+      SemicolonToken [62..63) ';'
+      T:EndOfLineTrivia [63..64) '\n'
+    FieldDeclaration [64..78)
+      VariableDeclaration [64..76)
+        GenericName [64..74)
+          L:WhitespaceTrivia [64..68) '    '
+          IdentifierToken [68..69) 'A'
+          TypeArgumentList [69..74)
+            LessThanToken [69..70) '<'
+            OmittedTypeArgument [70..70)
+              OmittedTypeArgumentToken [70..70) ''
+            CommaToken [70..71) ','
+            OmittedTypeArgument [71..71)
+              OmittedTypeArgumentToken [71..71) ''
+            CommaToken [71..72) ','
+            OmittedTypeArgument [72..72)
+              OmittedTypeArgumentToken [72..72) ''
+            GreaterThanToken [72..73) '>'
+            T:WhitespaceTrivia [73..74) ' '
+        VariableDeclarator [74..76)
+          IdentifierToken [74..76) 'a5'
+      SemicolonToken [76..77) ';'
+      T:EndOfLineTrivia [77..78) '\n'
+    FieldDeclaration [78..92)
+      VariableDeclaration [78..90)
+        GenericName [78..88)
+          L:WhitespaceTrivia [78..82) '    '
+          IdentifierToken [82..83) 'A'
+          TypeArgumentList [83..88)
+            LessThanToken [83..84) '<'
+            IdentifierName [84..85)
+              IdentifierToken [84..85) 'T'
+            CommaToken [85..86) ','
+            IdentifierName [86..86)
+              IdentifierToken [86..86) missing
+            GreaterThanToken [86..87) '>'
+            T:WhitespaceTrivia [87..88) ' '
+        VariableDeclarator [88..90)
+          IdentifierToken [88..90) 'a6'
+      SemicolonToken [90..91) ';'
+      T:EndOfLineTrivia [91..92) '\n'
+    FieldDeclaration [92..106)
+      VariableDeclaration [92..104)
+        GenericName [92..102)
+          L:WhitespaceTrivia [92..96) '    '
+          IdentifierToken [96..97) 'A'
+          TypeArgumentList [97..102)
+            LessThanToken [97..98) '<'
+            IdentifierName [98..98)
+              IdentifierToken [98..98) missing
+            CommaToken [98..99) ','
+            IdentifierName [99..100)
+              IdentifierToken [99..100) 'T'
+            GreaterThanToken [100..101) '>'
+            T:WhitespaceTrivia [101..102) ' '
+        VariableDeclarator [102..104)
+          IdentifierToken [102..104) 'a7'
+      SemicolonToken [104..105) ';'
+      T:EndOfLineTrivia [105..106) '\n'
+    FieldDeclaration [106..123)
+      VariableDeclaration [106..121)
+        GenericName [106..119)
+          L:WhitespaceTrivia [106..110) '    '
+          IdentifierToken [110..111) 'A'
+          TypeArgumentList [111..119)
+            LessThanToken [111..112) '<'
+            IdentifierName [112..114)
+              IdentifierToken [112..113) 'T'
+              T:WhitespaceTrivia [113..114) ' '
+            CommaToken [114..114) missing
+            IdentifierName [114..115)
+              IdentifierToken [114..115) 'U'
+            CommaToken [115..116) ','
+            IdentifierName [116..116)
+              IdentifierToken [116..116) missing
+            CommaToken [116..117) ','
+            IdentifierName [117..117)
+              IdentifierToken [117..117) missing
+            GreaterThanToken [117..118) '>'
+            T:WhitespaceTrivia [118..119) ' '
+        VariableDeclarator [119..121)
+          IdentifierToken [119..121) 'a8'
+      SemicolonToken [121..122) ';'
+      T:EndOfLineTrivia [122..123) '\n'
+    CloseBraceToken [123..124) '}'
+    T:EndOfLineTrivia [124..125) '\n'
+  EndOfFileToken [125..125) ''
+Diagnostics:
+  CS1003 [57..58) Syntax error, \',\' expected
+  CS1031 [86..87) Type expected
+  CS1031 [98..99) Type expected
+  CS1003 [114..115) Syntax error, \',\' expected
+  CS1031 [116..117) Type expected
+  CS1031 [117..118) Type expected

@@ -1,0 +1,14 @@
+SimpleLambdaExpression [0..10)
+  Parameter [0..4)
+    IdentifierToken [0..0) missing
+    T:SkippedTokensTrivia [0..3)
+      RefKeyword [0..3) 'ref'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  Block [7..10)
+    OpenBraceToken [7..8) '{'
+    T:WhitespaceTrivia [8..9) ' '
+    CloseBraceToken [9..10) '}'
+Diagnostics:
+  CS1041 [0..3) Identifier expected; \'ref\' is a keyword

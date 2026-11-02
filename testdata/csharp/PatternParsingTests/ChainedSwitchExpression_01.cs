@@ -1,0 +1,1 @@
+1 switch { 1 => 2 } switch { 2 => 3 }

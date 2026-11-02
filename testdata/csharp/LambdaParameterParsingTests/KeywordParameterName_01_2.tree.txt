@@ -1,0 +1,12 @@
+SimpleLambdaExpression [0..6)
+  Parameter [0..4)
+    IdentifierToken [0..0) missing
+    T:SkippedTokensTrivia [0..3)
+      IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  IdentifierName [6..6)
+    IdentifierToken [6..6) missing
+Diagnostics:
+  CS1041 [0..3) Identifier expected; \'int\' is a keyword
+  CS1733 [6..6) Expected expression

@@ -1,0 +1,66 @@
+CompilationUnit [0..94)
+  ExternAliasDirective [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    ExternKeyword [1..7) 'extern'
+    T:WhitespaceTrivia [7..8) ' '
+    AliasKeyword [8..13) 'alias'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..17) 'Goo'
+    SemicolonToken [17..18) ';'
+    T:EndOfLineTrivia [18..19) '\n'
+  GlobalStatement [19..39)
+    LocalFunctionStatement [19..39)
+      ExternKeyword [19..25) 'extern'
+      T:WhitespaceTrivia [25..26) ' '
+      IdentifierName [26..32)
+        IdentifierToken [26..31) 'alias'
+        T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..35) 'Goo'
+      ParameterList [35..37)
+        OpenParenToken [35..36) '('
+        CloseParenToken [36..37) ')'
+      SemicolonToken [37..38) ';'
+      T:EndOfLineTrivia [38..39) '\n'
+  PropertyDeclaration [39..65)
+    ExternKeyword [39..45) 'extern'
+    T:WhitespaceTrivia [45..46) ' '
+    IdentifierName [46..52)
+      IdentifierToken [46..51) 'alias'
+      T:WhitespaceTrivia [51..52) ' '
+    IdentifierToken [52..55) 'Goo'
+    T:WhitespaceTrivia [55..56) ' '
+    AccessorList [56..65)
+      OpenBraceToken [56..57) '{'
+      T:WhitespaceTrivia [57..58) ' '
+      GetAccessorDeclaration [58..63)
+        GetKeyword [58..61) 'get'
+        SemicolonToken [61..62) ';'
+        T:WhitespaceTrivia [62..63) ' '
+      CloseBraceToken [63..64) '}'
+      T:EndOfLineTrivia [64..65) '\n'
+  PropertyDeclaration [65..94)
+    ExternKeyword [65..71) 'extern'
+    T:WhitespaceTrivia [71..72) ' '
+    IdentifierName [72..78)
+      IdentifierToken [72..77) 'alias'
+      T:WhitespaceTrivia [77..78) ' '
+    IdentifierToken [78..81) 'Goo'
+    T:SkippedTokensTrivia [81..82)
+      LessThanToken [81..82) '<'
+    T:SkippedTokensTrivia [82..83)
+      IdentifierToken [82..83) 'T'
+    T:SkippedTokensTrivia [83..84)
+      GreaterThanToken [83..84) '>'
+    T:WhitespaceTrivia [84..85) ' '
+    AccessorList [85..94)
+      OpenBraceToken [85..86) '{'
+      T:WhitespaceTrivia [86..87) ' '
+      GetAccessorDeclaration [87..92)
+        GetKeyword [87..90) 'get'
+        SemicolonToken [90..91) ';'
+        T:WhitespaceTrivia [91..92) ' '
+      CloseBraceToken [92..93) '}'
+      T:EndOfLineTrivia [93..94) '\n'
+  EndOfFileToken [94..94) ''
+Diagnostics:
+  CS7002 [78..81) Unexpected use of a generic name

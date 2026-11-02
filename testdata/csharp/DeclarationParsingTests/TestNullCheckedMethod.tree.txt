@@ -1,0 +1,39 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..46)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..45)
+      L:WhitespaceTrivia [11..15) '    '
+      PublicKeyword [15..21) 'public'
+      T:WhitespaceTrivia [21..22) ' '
+      PredefinedType [22..27)
+        VoidKeyword [22..26) 'void'
+        T:WhitespaceTrivia [26..27) ' '
+      IdentifierToken [27..28) 'M'
+      ParameterList [28..41)
+        OpenParenToken [28..29) '('
+        Parameter [29..39)
+          PredefinedType [29..36)
+            StringKeyword [29..35) 'string'
+            T:WhitespaceTrivia [35..36) ' '
+          IdentifierToken [36..37) 'x'
+          T:SkippedTokensTrivia [37..38)
+            ExclamationToken [37..38) '!'
+          T:SkippedTokensTrivia [38..39)
+            ExclamationToken [38..39) '!'
+        CloseParenToken [39..40) ')'
+        T:WhitespaceTrivia [40..41) ' '
+      Block [41..45)
+        OpenBraceToken [41..42) '{'
+        T:WhitespaceTrivia [42..43) ' '
+        CloseBraceToken [43..44) '}'
+        T:EndOfLineTrivia [44..45) '\n'
+    CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''
+Diagnostics:
+  CS1003 [37..38) Syntax error, \',\' expected

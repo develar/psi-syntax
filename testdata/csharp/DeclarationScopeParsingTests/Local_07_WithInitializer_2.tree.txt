@@ -1,0 +1,21 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    LocalDeclarationStatement [0..27)
+      VariableDeclaration [0..25)
+        ScopedType [0..14)
+          ScopedKeyword [0..6) 'scoped'
+          T:WhitespaceTrivia [6..7) ' '
+          IdentifierName [7..14)
+            IdentifierToken [7..13) 'scoped'
+            T:WhitespaceTrivia [13..14) ' '
+        VariableDeclarator [14..25)
+          IdentifierToken [14..15) 'a'
+          T:WhitespaceTrivia [15..16) ' '
+          EqualsValueClause [16..25)
+            EqualsToken [16..17) '='
+            T:WhitespaceTrivia [17..18) ' '
+            DefaultLiteralExpression [18..25)
+              DefaultKeyword [18..25) 'default'
+      SemicolonToken [25..26) ';'
+      T:EndOfLineTrivia [26..27) '\n'
+  EndOfFileToken [27..27) ''

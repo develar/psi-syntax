@@ -1,0 +1,1 @@
+class c { int m( x y $ ); }

@@ -1,0 +1,17 @@
+CompilationUnit [0..18)
+  IncompleteMember [0..11)
+    GenericName [0..11)
+      IdentifierToken [0..4) 'List'
+      TypeArgumentList [4..11)
+        LessThanToken [4..5) '<'
+        IdentifierName [5..9)
+          IdentifierToken [5..9) 'Type'
+        GreaterThanToken [9..10) '>'
+        T:EndOfLineTrivia [10..11) '\n'
+  IncompleteMember [11..18)
+    L:EndOfLineTrivia [11..12) '\n'
+    PublicKeyword [12..18) 'public'
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1585 [12..18) Member modifier \'public\' must precede the member type and name
+  CS0116 [12..18) A namespace cannot directly contain members such as fields, methods or statements

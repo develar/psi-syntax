@@ -1,0 +1,1 @@
+using unsafe static System.Console;

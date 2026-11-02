@@ -1,0 +1,69 @@
+CompilationUnit [0..106)
+  ClassDeclaration [0..106)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    MethodDeclaration [14..104)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      StaticKeyword [25..31) 'static'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..36)
+        IntKeyword [32..35) 'int'
+        T:WhitespaceTrivia [35..36) ' '
+      IdentifierToken [36..40) 'Main'
+      ParameterList [40..43)
+        OpenParenToken [40..41) '('
+        CloseParenToken [41..42) ')'
+        T:EndOfLineTrivia [42..43) '\n'
+      Block [43..104)
+        L:WhitespaceTrivia [43..47) '    '
+        OpenBraceToken [47..48) '{'
+        T:EndOfLineTrivia [48..49) '\n'
+        LocalDeclarationStatement [49..66)
+          VariableDeclaration [49..66)
+            PredefinedType [49..61)
+              L:WhitespaceTrivia [49..57) '        '
+              IntKeyword [57..60) 'int'
+              T:WhitespaceTrivia [60..61) ' '
+            VariableDeclarator [61..66)
+              IdentifierToken [61..62) 'i'
+              T:WhitespaceTrivia [62..63) ' '
+              EqualsValueClause [63..66)
+                EqualsToken [63..64) '='
+                T:WhitespaceTrivia [64..65) ' '
+                IdentifierName [65..66)
+                  IdentifierToken [65..65) missing
+                  T:SkippedTokensTrivia [65..66)
+                    BadToken [65..66) '@'
+          SemicolonToken [66..66) missing
+        ExpressionStatement [66..80)
+          NumericLiteralExpression [66..67)
+            NumericLiteralToken [66..67) '5'
+          SemicolonToken [67..68) ';'
+          T:WhitespaceTrivia [68..70) '  '
+          T:SingleLineCommentTrivia [70..79) '// CS1646'
+          T:EndOfLineTrivia [79..80) '\n'
+        ReturnStatement [80..98)
+          L:WhitespaceTrivia [80..88) '        '
+          ReturnKeyword [88..94) 'return'
+          T:WhitespaceTrivia [94..95) ' '
+          NumericLiteralExpression [95..96)
+            NumericLiteralToken [95..96) '1'
+          SemicolonToken [96..97) ';'
+          T:EndOfLineTrivia [97..98) '\n'
+        L:WhitespaceTrivia [98..102) '    '
+        CloseBraceToken [102..103) '}'
+        T:EndOfLineTrivia [103..104) '\n'
+    CloseBraceToken [104..105) '}'
+    T:EndOfLineTrivia [105..106) '\n'
+  EndOfFileToken [106..106) ''
+Diagnostics:
+  CS1525 [65..66) Invalid expression term \'\'
+  CS1646 [65..65) Keyword, identifier, or string expected after verbatim specifier: @
+  CS1002 [66..67) ; expected

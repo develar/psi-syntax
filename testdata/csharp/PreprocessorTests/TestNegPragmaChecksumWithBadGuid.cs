@@ -1,0 +1,1 @@
+#pragma checksum "bogus.cs" "{abc-123}" "ab007f1d23d9"

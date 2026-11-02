@@ -1,0 +1,29 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    LocalDeclarationStatement [0..21)
+      VariableDeclaration [0..20)
+        IdentifierName [0..4)
+          IdentifierToken [0..3) 'var'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..20)
+          IdentifierToken [4..5) 'v'
+          T:WhitespaceTrivia [5..6) ' '
+          EqualsValueClause [6..20)
+            EqualsToken [6..7) '='
+            T:WhitespaceTrivia [7..8) ' '
+            ParenthesizedExpression [8..20)
+              OpenParenToken [8..9) '('
+              IdentifierName [9..19)
+                IdentifierToken [9..12) 'Boo'
+                T:WhitespaceTrivia [12..13) ' '
+                T:SkippedTokensTrivia [13..17)
+                  IdentifierToken [13..17) 'Quux'
+                T:SkippedTokensTrivia [17..18)
+                  OpenParenToken [17..18) '('
+                T:SkippedTokensTrivia [18..19)
+                  CloseParenToken [18..19) ')'
+              CloseParenToken [19..20) ')'
+      SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1073 [13..17) Unexpected token \'Quux\'

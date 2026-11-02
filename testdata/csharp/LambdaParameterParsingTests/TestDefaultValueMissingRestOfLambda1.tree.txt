@@ -1,0 +1,15 @@
+ParenthesizedExpression [0..8)
+  OpenParenToken [0..1) '('
+  PredefinedType [1..5)
+    IntKeyword [1..4) 'int'
+    T:WhitespaceTrivia [4..5) ' '
+  CloseParenToken [5..5) missing
+  T:SkippedTokensTrivia [5..6)
+    IdentifierToken [5..6) 'x'
+  T:WhitespaceTrivia [6..7) ' '
+  T:SkippedTokensTrivia [7..8)
+    EqualsToken [7..8) '='
+Diagnostics:
+  CS1073 [0..5) Unexpected token \'x\'
+  CS1525 [1..4) Invalid expression term \'int\'
+  CS1026 [5..6) ) expected

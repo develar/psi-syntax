@@ -1,0 +1,24 @@
+CompilationUnit [0..11)
+  L:LineSpanDirectiveTrivia [0..11)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    LineDirectivePosition [6..11)
+      OpenParenToken [6..7) '('
+      NumericLiteralToken [7..8) '1'
+      CommaToken [8..9) ','
+      T:WhitespaceTrivia [9..10) ' '
+      NumericLiteralToken [10..11) '2'
+      CloseParenToken [11..11) missing
+    MinusToken [11..11) missing
+    LineDirectivePosition [11..11)
+      OpenParenToken [11..11) missing
+      NumericLiteralToken [11..11) missing
+      CommaToken [11..11) missing
+      NumericLiteralToken [11..11) missing
+      CloseParenToken [11..11) missing
+    StringLiteralToken [11..11) missing
+    EndOfDirectiveToken [11..11) ''
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS1026 [11..11) ) expected

@@ -1,0 +1,21 @@
+ParenthesizedLambdaExpression [0..8)
+  ParameterList [0..8)
+    OpenParenToken [0..1) '('
+    T:WhitespaceTrivia [1..2) ' '
+    T:SkippedTokensTrivia [2..4)
+      EqualsGreaterThanToken [2..4) '=>'
+    T:WhitespaceTrivia [4..5) ' '
+    T:SkippedTokensTrivia [5..6)
+      OpenBraceToken [5..6) '{'
+    T:WhitespaceTrivia [6..7) ' '
+    T:SkippedTokensTrivia [7..8)
+      CloseBraceToken [7..8) '}'
+    CloseParenToken [8..8) missing
+  EqualsGreaterThanToken [8..8) missing
+  IdentifierName [8..8)
+    IdentifierToken [8..8) missing
+Diagnostics:
+  CS1001 [2..4) Identifier expected
+  CS1026 [8..8) ) expected
+  CS1003 [8..8) Syntax error, \'=>\' expected
+  CS1733 [8..8) Expected expression

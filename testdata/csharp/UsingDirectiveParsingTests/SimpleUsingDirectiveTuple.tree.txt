@@ -1,0 +1,32 @@
+CompilationUnit [0..17)
+  GlobalStatement [0..17)
+    UsingStatement [0..17)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      OpenParenToken [6..7) '('
+      VariableDeclaration [7..12)
+        PredefinedType [7..10)
+          IntKeyword [7..10) 'int'
+        VariableDeclarator [10..10)
+          IdentifierToken [10..10) missing
+        CommaToken [10..11) ','
+        T:WhitespaceTrivia [11..12) ' '
+        VariableDeclarator [12..12)
+          IdentifierToken [12..12) missing
+      CloseParenToken [12..12) missing
+      LocalDeclarationStatement [12..17)
+        VariableDeclaration [12..16)
+          PredefinedType [12..15)
+            IntKeyword [12..15) 'int'
+          VariableDeclarator [15..16)
+            IdentifierToken [15..15) missing
+            T:SkippedTokensTrivia [15..16)
+              CloseParenToken [15..16) ')'
+        SemicolonToken [16..17) ';'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1001 [10..11) Identifier expected
+  CS1001 [12..15) Identifier expected
+  CS1026 [12..15) ) expected
+  CS1001 [15..16) Identifier expected
+  CS1003 [15..16) Syntax error, \',\' expected

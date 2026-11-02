@@ -1,0 +1,7 @@
+OpenBraceToken [0..1) '{'
+T:EndOfLineTrivia [1..3) '\r\n'
+LessThanLessThanToken [3..5) '<<'
+LessThanLessThanToken [5..7) '<<'
+LessThanLessThanToken [7..9) '<<'
+LessThanToken [9..10) '<'
+EndOfFileToken [10..10) ''

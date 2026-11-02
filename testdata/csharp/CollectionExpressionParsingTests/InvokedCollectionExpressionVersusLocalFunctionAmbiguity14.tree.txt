@@ -1,0 +1,68 @@
+CompilationUnit [0..86)
+  ClassDeclaration [0..86)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..85)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..85)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        LocalFunctionStatement [29..79)
+          AttributeList [29..44)
+            L:WhitespaceTrivia [29..37) '        '
+            OpenBracketToken [37..38) '['
+            Attribute [38..43)
+              IdentifierName [38..43)
+                IdentifierToken [38..43) 'Attr1'
+            CloseBracketToken [43..44) ']'
+          AttributeList [44..52)
+            OpenBracketToken [44..45) '['
+            Attribute [45..50)
+              IdentifierName [45..50)
+                IdentifierToken [45..50) 'Attr2'
+            CloseBracketToken [50..51) ']'
+            T:WhitespaceTrivia [51..52) ' '
+          TupleType [52..63)
+            OpenParenToken [52..53) '('
+            TupleElement [53..56)
+              IdentifierName [53..55)
+                IdentifierToken [53..54) 'A'
+                T:WhitespaceTrivia [54..55) ' '
+              IdentifierToken [55..56) 'a'
+            CommaToken [56..57) ','
+            T:WhitespaceTrivia [57..58) ' '
+            TupleElement [58..61)
+              IdentifierName [58..60)
+                IdentifierToken [58..59) 'B'
+                T:WhitespaceTrivia [59..60) ' '
+              IdentifierToken [60..61) 'b'
+            CloseParenToken [61..62) ')'
+            T:WhitespaceTrivia [62..63) ' '
+          IdentifierToken [63..72) 'LocalFunc'
+          ParameterList [72..75)
+            OpenParenToken [72..73) '('
+            CloseParenToken [73..74) ')'
+            T:WhitespaceTrivia [74..75) ' '
+          Block [75..79)
+            OpenBraceToken [75..76) '{'
+            T:WhitespaceTrivia [76..77) ' '
+            CloseBraceToken [77..78) '}'
+            T:EndOfLineTrivia [78..79) '\n'
+        L:WhitespaceTrivia [79..83) '    '
+        CloseBraceToken [83..84) '}'
+        T:EndOfLineTrivia [84..85) '\n'
+    CloseBraceToken [85..86) '}'
+  EndOfFileToken [86..86) ''

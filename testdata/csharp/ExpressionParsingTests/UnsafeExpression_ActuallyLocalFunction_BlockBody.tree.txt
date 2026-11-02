@@ -1,0 +1,44 @@
+CompilationUnit [0..44)
+  GlobalStatement [0..44)
+    LocalFunctionStatement [0..44)
+      UnsafeKeyword [0..6) 'unsafe'
+      T:WhitespaceTrivia [6..7) ' '
+      TupleType [7..18)
+        OpenParenToken [7..8) '('
+        TupleElement [8..11)
+          PredefinedType [8..11)
+            IntKeyword [8..11) 'int'
+        CommaToken [11..12) ','
+        T:WhitespaceTrivia [12..13) ' '
+        TupleElement [13..16)
+          PredefinedType [13..16)
+            IntKeyword [13..16) 'int'
+        CloseParenToken [16..17) ')'
+        T:WhitespaceTrivia [17..18) ' '
+      IdentifierToken [18..19) 'F'
+      ParameterList [19..22)
+        OpenParenToken [19..20) '('
+        CloseParenToken [20..21) ')'
+        T:EndOfLineTrivia [21..22) '\n'
+      Block [22..44)
+        OpenBraceToken [22..23) '{'
+        T:EndOfLineTrivia [23..24) '\n'
+        ReturnStatement [24..43)
+          L:WhitespaceTrivia [24..28) '    '
+          ReturnKeyword [28..34) 'return'
+          T:WhitespaceTrivia [34..35) ' '
+          TupleExpression [35..41)
+            OpenParenToken [35..36) '('
+            Argument [36..37)
+              NumericLiteralExpression [36..37)
+                NumericLiteralToken [36..37) '1'
+            CommaToken [37..38) ','
+            T:WhitespaceTrivia [38..39) ' '
+            Argument [39..40)
+              NumericLiteralExpression [39..40)
+                NumericLiteralToken [39..40) '2'
+            CloseParenToken [40..41) ')'
+          SemicolonToken [41..42) ';'
+          T:EndOfLineTrivia [42..43) '\n'
+        CloseBraceToken [43..44) '}'
+  EndOfFileToken [44..44) ''

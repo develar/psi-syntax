@@ -1,0 +1,55 @@
+CompilationUnit [0..47)
+  ClassDeclaration [0..47)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..46)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..46)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..44)
+          VariableDeclaration [21..42)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..42)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..42)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                ObjectCreationExpression [29..42)
+                  NewKeyword [29..32) 'new'
+                  T:WhitespaceTrivia [32..33) ' '
+                  IdentifierName [33..35)
+                    IdentifierToken [33..34) 'C'
+                    T:WhitespaceTrivia [34..35) ' '
+                  CollectionInitializerExpression [35..42)
+                    OpenBraceToken [35..36) '{'
+                    T:WhitespaceTrivia [36..37) ' '
+                    IdentifierName [37..41)
+                      IdentifierToken [37..38) 'a'
+                      T:WhitespaceTrivia [38..39) ' '
+                      T:SkippedTokensTrivia [39..40)
+                        BadToken [39..40) '$'
+                      T:WhitespaceTrivia [40..41) ' '
+                    CloseBraceToken [41..42) '}'
+          SemicolonToken [42..43) ';'
+          T:WhitespaceTrivia [43..44) ' '
+        CloseBraceToken [44..45) '}'
+        T:WhitespaceTrivia [45..46) ' '
+    CloseBraceToken [46..47) '}'
+  EndOfFileToken [47..47) ''
+Diagnostics:
+  CS1056 [39..39) Unexpected character \'$\'

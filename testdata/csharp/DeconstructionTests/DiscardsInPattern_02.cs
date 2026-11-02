@@ -1,0 +1,1 @@
+void M() { if (e is var _) {} }

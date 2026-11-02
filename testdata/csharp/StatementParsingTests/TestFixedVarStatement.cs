@@ -1,0 +1,1 @@
+fixed(var a = b) { }

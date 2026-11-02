@@ -1,0 +1,36 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    ExpressionStatement [0..27)
+      SwitchExpression [0..26)
+        CollectionExpression [0..7)
+          OpenBracketToken [0..1) '['
+          ExpressionElement [1..2)
+            IdentifierName [1..2)
+              IdentifierToken [1..2) 'A'
+          CommaToken [2..3) ','
+          T:WhitespaceTrivia [3..4) ' '
+          ExpressionElement [4..5)
+            IdentifierName [4..5)
+              IdentifierToken [4..5) 'B'
+          CloseBracketToken [5..6) ']'
+          T:WhitespaceTrivia [6..7) ' '
+        SwitchKeyword [7..13) 'switch'
+        T:WhitespaceTrivia [13..14) ' '
+        OpenBraceToken [14..15) '{'
+        T:WhitespaceTrivia [15..16) ' '
+        SwitchExpressionArm [16..25)
+          DiscardPattern [16..18)
+            UnderscoreToken [16..17) '_'
+            T:WhitespaceTrivia [17..18) ' '
+          EqualsGreaterThanToken [18..20) '=>'
+          T:WhitespaceTrivia [20..21) ' '
+          InvocationExpression [21..25)
+            IdentifierName [21..22)
+              IdentifierToken [21..22) 'M'
+            ArgumentList [22..25)
+              OpenParenToken [22..23) '('
+              CloseParenToken [23..24) ')'
+              T:WhitespaceTrivia [24..25) ' '
+        CloseBraceToken [25..26) '}'
+      SemicolonToken [26..27) ';'
+  EndOfFileToken [27..27) ''

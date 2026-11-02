@@ -1,0 +1,26 @@
+CompilationUnit [0..21)
+  FileScopedNamespaceDeclaration [0..21)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'A'
+    SemicolonToken [11..12) ';'
+    T:EndOfLineTrivia [12..13) '\n'
+    T:SkippedTokensTrivia [13..14)
+      OpenBracketToken [13..14) '['
+    T:SkippedTokensTrivia [14..15)
+      IdentifierToken [14..15) 'B'
+    T:SkippedTokensTrivia [15..16)
+      CloseBracketToken [15..16) ']'
+    T:SkippedTokensTrivia [16..17)
+      DotToken [16..17) '.'
+    ConstructorDeclaration [17..21)
+      IdentifierToken [17..18) 'C'
+      ParameterList [18..20)
+        OpenParenToken [18..19) '('
+        CloseParenToken [19..20) ')'
+      SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS0116 [15..16) A namespace cannot directly contain members such as fields, methods or statements
+  CS1022 [16..17) Type or namespace definition, or end-of-file expected

@@ -1,0 +1,39 @@
+CompilationUnit [0..36)
+  ClassDeclaration [0..36)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SingleLineDocumentationCommentTrivia [1..24)
+      XmlText [1..5)
+        L:DocumentationCommentExteriorTrivia [1..4) '///'
+        XmlTextLiteralToken [4..5) ' '
+      XmlEmptyElement [5..23)
+        LessThanToken [5..6) '<'
+        XmlName [6..9)
+          IdentifierToken [6..9) 'see'
+        XmlCrefAttribute [9..21)
+          XmlName [9..14)
+            L:WhitespaceTrivia [9..10) ' '
+            IdentifierToken [10..14) 'cref'
+          EqualsToken [14..15) '='
+          SingleQuoteToken [15..16) '\''
+          NameMemberCref [16..20)
+            GenericName [16..20)
+              IdentifierToken [16..17) 'C'
+              TypeArgumentList [17..20)
+                LessThanToken [17..18) '{'
+                IdentifierName [18..19)
+                  IdentifierToken [18..19) 'T'
+                GreaterThanToken [19..20) '}'
+          SingleQuoteToken [20..21) '\''
+        SlashGreaterThanToken [21..23) '/>'
+      XmlText [23..24)
+        XmlTextLiteralNewLineToken [23..24) '\n'
+      EndOfDocumentationCommentToken [24..24) ''
+    ClassKeyword [24..29) 'class'
+    T:WhitespaceTrivia [29..30) ' '
+    IdentifierToken [30..31) 'C'
+    T:EndOfLineTrivia [31..32) '\n'
+    OpenBraceToken [32..33) '{'
+    T:EndOfLineTrivia [33..34) '\n'
+    CloseBraceToken [34..35) '}'
+    T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''

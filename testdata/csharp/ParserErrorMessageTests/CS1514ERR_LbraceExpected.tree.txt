@@ -1,0 +1,14 @@
+CompilationUnit [0..13)
+  NamespaceDeclaration [0..13)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..13) missing
+    CloseBraceToken [13..13) missing
+  EndOfFileToken [13..13) ''
+Diagnostics:
+  CS1514 [12..12) { expected
+  CS1513 [13..13) } expected

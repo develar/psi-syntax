@@ -1,0 +1,39 @@
+LocalFunctionStatement [0..31)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..28)
+    OpenParenToken [6..7) '('
+    Parameter [7..16)
+      ArgListKeyword [7..16) '__arglist'
+    CommaToken [16..16) missing
+    Parameter [16..26)
+      AttributeList [16..18)
+        OpenBracketToken [16..17) '['
+        Attribute [17..17)
+          IdentifierName [17..17)
+            IdentifierToken [17..17) missing
+        CloseBracketToken [17..18) ']'
+      IdentifierName [18..18)
+        IdentifierToken [18..18) missing
+      IdentifierToken [18..18) missing
+      T:SkippedTokensTrivia [18..19)
+        ExclamationToken [18..19) '!'
+      T:SkippedTokensTrivia [19..21)
+        ExclamationEqualsToken [19..21) '!='
+      T:WhitespaceTrivia [21..22) ' '
+      T:SkippedTokensTrivia [22..26)
+        NullKeyword [22..26) 'null'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  Block [28..31)
+    OpenBraceToken [28..29) '{'
+    T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+Diagnostics:
+  CS1003 [16..17) Syntax error, \',\' expected
+  CS1001 [17..18) Identifier expected
+  CS1031 [18..19) Type expected
+  CS1001 [18..19) Identifier expected
+  CS1003 [18..19) Syntax error, \',\' expected

@@ -1,0 +1,40 @@
+CompilationUnit [0..48)
+  ClassDeclaration [0..48)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..30)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..30)
+        OpenParenToken [23..24) '('
+        Parameter [24..28)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      OpenBraceToken [30..30) missing
+      CloseBraceToken [30..30) missing
+    MethodDeclaration [30..47)
+      PredefinedType [30..39)
+        L:WhitespaceTrivia [30..34) '    '
+        VoidKeyword [34..38) 'void'
+        T:WhitespaceTrivia [38..39) ' '
+      IdentifierToken [39..40) 'M'
+      ParameterList [40..43)
+        OpenParenToken [40..41) '('
+        CloseParenToken [41..42) ')'
+        T:WhitespaceTrivia [42..43) ' '
+      Block [43..47)
+        OpenBraceToken [43..44) '{'
+        T:WhitespaceTrivia [44..45) ' '
+        CloseBraceToken [45..46) '}'
+        T:EndOfLineTrivia [46..47) '\n'
+    CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1514 [29..29) { expected
+  CS1513 [29..29) } expected

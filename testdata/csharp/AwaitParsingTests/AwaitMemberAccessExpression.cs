@@ -1,0 +1,2 @@
+
+async () => await base.g();

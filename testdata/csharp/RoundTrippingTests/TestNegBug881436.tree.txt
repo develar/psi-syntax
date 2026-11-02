@@ -1,0 +1,99 @@
+CompilationUnit [0..111)
+  ClassDeclaration [0..111)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..103)
+      L:WhitespaceTrivia [21..25) '    '
+      PublicKeyword [25..31) 'public'
+      T:WhitespaceTrivia [31..32) ' '
+      StaticKeyword [32..38) 'static'
+      T:WhitespaceTrivia [38..39) ' '
+      PredefinedType [39..44)
+        VoidKeyword [39..43) 'void'
+        T:WhitespaceTrivia [43..44) ' '
+      IdentifierToken [44..48) 'Main'
+      ParameterList [48..51)
+        OpenParenToken [48..49) '('
+        CloseParenToken [49..50) ')'
+        T:EndOfLineTrivia [50..51) '\n'
+      Block [51..101)
+        L:WhitespaceTrivia [51..55) '    '
+        OpenBraceToken [55..56) '{'
+        T:EndOfLineTrivia [56..57) '\n'
+        LocalDeclarationStatement [57..87)
+          VariableDeclaration [57..85)
+            IdentifierName [57..69)
+              L:WhitespaceTrivia [57..65) '        '
+              IdentifierToken [65..68) 'var'
+              T:WhitespaceTrivia [68..69) ' '
+            VariableDeclarator [69..85)
+              IdentifierToken [69..71) 'v1'
+              T:WhitespaceTrivia [71..72) ' '
+              EqualsValueClause [72..85)
+                EqualsToken [72..73) '='
+                T:WhitespaceTrivia [73..74) ' '
+                AnonymousObjectCreationExpression [74..85)
+                  NewKeyword [74..77) 'new'
+                  T:WhitespaceTrivia [77..78) ' '
+                  OpenBraceToken [78..79) '{'
+                  T:WhitespaceTrivia [79..80) ' '
+                  AnonymousObjectMemberDeclarator [80..85)
+                    NameEquals [80..84)
+                      IdentifierName [80..82)
+                        IdentifierToken [80..81) 'X'
+                        T:WhitespaceTrivia [81..82) ' '
+                      EqualsToken [82..83) '='
+                      T:WhitespaceTrivia [83..84) ' '
+                    IdentifierName [84..85)
+                      IdentifierToken [84..85) 'x'
+                  CloseBraceToken [85..85) missing
+          SemicolonToken [85..86) ';'
+          T:WhitespaceTrivia [86..87) ' '
+        ExpressionStatement [87..94)
+          SimpleAssignmentExpression [87..92)
+            IdentifierName [87..89)
+              IdentifierToken [87..88) 'Y'
+              T:WhitespaceTrivia [88..89) ' '
+            EqualsToken [89..90) '='
+            T:WhitespaceTrivia [90..91) ' '
+            IdentifierName [91..92)
+              IdentifierToken [91..92) 'y'
+          SemicolonToken [92..92) missing
+          T:SkippedTokensTrivia [92..93)
+            CommaToken [92..93) ','
+          T:WhitespaceTrivia [93..94) ' '
+        ExpressionStatement [94..100)
+          SimpleAssignmentExpression [94..100)
+            IdentifierName [94..96)
+              IdentifierToken [94..95) 'Z'
+              T:WhitespaceTrivia [95..96) ' '
+            EqualsToken [96..97) '='
+            T:WhitespaceTrivia [97..98) ' '
+            IdentifierName [98..100)
+              IdentifierToken [98..99) 'z'
+              T:WhitespaceTrivia [99..100) ' '
+          SemicolonToken [100..100) missing
+        CloseBraceToken [100..101) '}'
+      SemicolonToken [101..102) ';'
+      T:EndOfLineTrivia [102..103) '\n'
+    L:WhitespaceTrivia [103..107) '    '
+    CloseBraceToken [107..108) '}'
+    T:EndOfLineTrivia [108..109) '\n'
+    T:SkippedTokensTrivia [109..110)
+      CloseBraceToken [109..110) '}'
+    T:EndOfLineTrivia [110..111) '\n'
+  EndOfFileToken [111..111) ''
+Diagnostics:
+  CS1513 [85..86) } expected
+  CS1002 [92..93) ; expected
+  CS1513 [92..93) } expected
+  CS1002 [100..101) ; expected
+  CS1597 [101..102) Semicolon after method or accessor block is not valid
+  CS1022 [109..110) Type or namespace definition, or end-of-file expected

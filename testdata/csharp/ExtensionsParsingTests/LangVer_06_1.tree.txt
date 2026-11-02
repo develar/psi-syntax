@@ -1,0 +1,29 @@
+CompilationUnit [0..23)
+  GlobalStatement [0..20)
+    ExpressionStatement [0..20)
+      InvocationExpression [0..20)
+        IdentifierName [0..9)
+          IdentifierToken [0..9) 'extension'
+        ArgumentList [9..20)
+          OpenParenToken [9..10) '('
+          Argument [10..17)
+            PredefinedType [10..17)
+              ObjectKeyword [10..16) 'object'
+              T:WhitespaceTrivia [16..17) ' '
+          CommaToken [17..17) missing
+          Argument [17..18)
+            IdentifierName [17..18)
+              IdentifierToken [17..18) 'o'
+          CloseParenToken [18..19) ')'
+          T:WhitespaceTrivia [19..20) ' '
+      SemicolonToken [20..20) missing
+  GlobalStatement [20..23)
+    Block [20..23)
+      OpenBraceToken [20..21) '{'
+      T:WhitespaceTrivia [21..22) ' '
+      CloseBraceToken [22..23) '}'
+  EndOfFileToken [23..23) ''
+Diagnostics:
+  CS1525 [10..16) Invalid expression term \'object\'
+  CS1003 [17..18) Syntax error, \',\' expected
+  CS1002 [20..21) ; expected

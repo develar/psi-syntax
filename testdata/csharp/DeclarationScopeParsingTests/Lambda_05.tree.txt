@@ -1,0 +1,28 @@
+ParenthesizedExpression [0..33)
+  OpenParenToken [0..1) '('
+  IdentifierName [1..8)
+    IdentifierToken [1..7) 'scoped'
+    T:WhitespaceTrivia [7..8) ' '
+  CloseParenToken [8..8) missing
+  T:SkippedTokensTrivia [8..14)
+    IdentifierToken [8..14) 'scoped'
+  T:WhitespaceTrivia [14..15) ' '
+  T:SkippedTokensTrivia [15..18)
+    RefKeyword [15..18) 'ref'
+  T:WhitespaceTrivia [18..19) ' '
+  T:SkippedTokensTrivia [19..22)
+    IntKeyword [19..22) 'int'
+  T:WhitespaceTrivia [22..23) ' '
+  T:SkippedTokensTrivia [23..24)
+    IdentifierToken [23..24) 'i'
+  T:SkippedTokensTrivia [24..25)
+    CloseParenToken [24..25) ')'
+  T:WhitespaceTrivia [25..26) ' '
+  T:SkippedTokensTrivia [26..28)
+    EqualsGreaterThanToken [26..28) '=>'
+  T:WhitespaceTrivia [28..29) ' '
+  T:SkippedTokensTrivia [29..33)
+    NullKeyword [29..33) 'null'
+Diagnostics:
+  CS1073 [0..8) Unexpected token \'scoped\'
+  CS1026 [8..14) ) expected

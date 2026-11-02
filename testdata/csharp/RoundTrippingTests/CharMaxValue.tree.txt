@@ -1,0 +1,18 @@
+CompilationUnit [0..9)
+  GlobalStatement [0..9)
+    LocalDeclarationStatement [0..9)
+      VariableDeclaration [0..9)
+        IdentifierName [0..3)
+          IdentifierToken [0..3) 'abc'
+        VariableDeclarator [3..9)
+          IdentifierToken [3..3) missing
+          T:SkippedTokensTrivia [3..6)
+            BadToken [3..6) '￿'
+          T:SkippedTokensTrivia [6..9)
+            IdentifierToken [6..9) 'def'
+      SemicolonToken [9..9) missing
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1001 [3..6) Identifier expected
+  CS1056 [3..3) Unexpected character \'\\uffff\'
+  CS1002 [9..9) ; expected

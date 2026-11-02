@@ -1,0 +1,1 @@
+return (isValid ? Errors.IsValid : Errors.HasErrors, i);

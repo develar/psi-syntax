@@ -1,0 +1,3 @@
+ThrowStatement [0..6)
+  ThrowKeyword [0..5) 'throw'
+  SemicolonToken [5..6) ';'

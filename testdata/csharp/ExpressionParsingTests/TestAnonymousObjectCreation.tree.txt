@@ -1,0 +1,13 @@
+AnonymousObjectCreationExpression [0..10)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenBraceToken [4..5) '{'
+  AnonymousObjectMemberDeclarator [5..6)
+    IdentifierName [5..6)
+      IdentifierToken [5..6) 'a'
+  CommaToken [6..7) ','
+  T:WhitespaceTrivia [7..8) ' '
+  AnonymousObjectMemberDeclarator [8..9)
+    IdentifierName [8..9)
+      IdentifierToken [8..9) 'b'
+  CloseBraceToken [9..10) '}'

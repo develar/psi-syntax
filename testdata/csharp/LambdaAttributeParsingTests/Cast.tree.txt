@@ -1,0 +1,29 @@
+InvocationExpression [0..17)
+  ElementAccessExpression [0..8)
+    ParenthesizedExpression [0..4)
+      OpenParenToken [0..1) '('
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'F'
+      CloseParenToken [2..3) ')'
+      T:WhitespaceTrivia [3..4) ' '
+    BracketedArgumentList [4..8)
+      OpenBracketToken [4..5) '['
+      Argument [5..6)
+        IdentifierName [5..6)
+          IdentifierToken [5..6) 'A'
+      CloseBracketToken [6..7) ']'
+      T:WhitespaceTrivia [7..8) ' '
+  ArgumentList [8..17)
+    OpenParenToken [8..9) '('
+    CloseParenToken [9..10) ')'
+    T:WhitespaceTrivia [10..11) ' '
+    T:SkippedTokensTrivia [11..13)
+      EqualsGreaterThanToken [11..13) '=>'
+    T:WhitespaceTrivia [13..14) ' '
+    T:SkippedTokensTrivia [14..15)
+      OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    T:SkippedTokensTrivia [16..17)
+      CloseBraceToken [16..17) '}'
+Diagnostics:
+  CS1073 [0..10) Unexpected token \'=>\'

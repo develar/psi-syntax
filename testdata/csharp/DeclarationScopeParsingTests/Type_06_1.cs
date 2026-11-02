@@ -1,0 +1,1 @@
+delegate ref scoped B();

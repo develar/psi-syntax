@@ -1,0 +1,85 @@
+CompilationUnit [0..113)
+  UsingDirective [0..53)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    NameEquals [7..11)
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'D'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsToken [9..10) '='
+      T:WhitespaceTrivia [10..11) ' '
+    QualifiedName [11..51)
+      QualifiedName [11..37)
+        QualifiedName [11..29)
+          IdentifierName [11..17)
+            IdentifierToken [11..17) 'System'
+          DotToken [17..18) '.'
+          IdentifierName [18..29)
+            IdentifierToken [18..29) 'Collections'
+        DotToken [29..30) '.'
+        IdentifierName [30..37)
+          IdentifierToken [30..37) 'Generic'
+      DotToken [37..38) '.'
+      GenericName [38..51)
+        IdentifierToken [38..42) 'List'
+        TypeArgumentList [42..51)
+          LessThanToken [42..43) '<'
+          IdentifierName [43..50)
+            IdentifierToken [43..50) 'dynamic'
+          GreaterThanToken [50..51) '>'
+    SemicolonToken [51..52) ';'
+    T:EndOfLineTrivia [52..53) '\n'
+  ClassDeclaration [53..113)
+    L:EndOfLineTrivia [53..54) '\n'
+    ClassKeyword [54..59) 'class'
+    T:WhitespaceTrivia [59..60) ' '
+    IdentifierToken [60..61) 'C'
+    T:EndOfLineTrivia [61..62) '\n'
+    OpenBraceToken [62..63) '{'
+    T:EndOfLineTrivia [63..64) '\n'
+    MethodDeclaration [64..112)
+      PredefinedType [64..73)
+        L:WhitespaceTrivia [64..68) '    '
+        VoidKeyword [68..72) 'void'
+        T:WhitespaceTrivia [72..73) ' '
+      IdentifierToken [73..74) 'M'
+      ParameterList [74..80)
+        OpenParenToken [74..75) '('
+        Parameter [75..78)
+          IdentifierName [75..77)
+            IdentifierToken [75..76) 'D'
+            T:WhitespaceTrivia [76..77) ' '
+          IdentifierToken [77..78) 'd'
+        CloseParenToken [78..79) ')'
+        T:EndOfLineTrivia [79..80) '\n'
+      Block [80..112)
+        L:WhitespaceTrivia [80..84) '    '
+        OpenBraceToken [84..85) '{'
+        T:EndOfLineTrivia [85..86) '\n'
+        ExpressionStatement [86..106)
+          InvocationExpression [86..104)
+            SimpleMemberAccessExpression [86..102)
+              ElementAccessExpression [86..98)
+                IdentifierName [86..95)
+                  L:WhitespaceTrivia [86..94) '        '
+                  IdentifierToken [94..95) 'd'
+                BracketedArgumentList [95..98)
+                  OpenBracketToken [95..96) '['
+                  Argument [96..97)
+                    NumericLiteralExpression [96..97)
+                      NumericLiteralToken [96..97) '0'
+                  CloseBracketToken [97..98) ']'
+              DotToken [98..99) '.'
+              IdentifierName [99..102)
+                IdentifierToken [99..102) 'Goo'
+            ArgumentList [102..104)
+              OpenParenToken [102..103) '('
+              CloseParenToken [103..104) ')'
+          SemicolonToken [104..105) ';'
+          T:EndOfLineTrivia [105..106) '\n'
+        L:WhitespaceTrivia [106..110) '    '
+        CloseBraceToken [110..111) '}'
+        T:EndOfLineTrivia [111..112) '\n'
+    CloseBraceToken [112..113) '}'
+  EndOfFileToken [113..113) ''

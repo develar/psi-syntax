@@ -1,0 +1,17 @@
+CastExpression [0..14)
+  OpenParenToken [0..1) '('
+  TupleType [1..11)
+    OpenParenToken [1..2) '('
+    TupleElement [2..5)
+      PredefinedType [2..5)
+        IntKeyword [2..5) 'int'
+    CommaToken [5..6) ','
+    T:WhitespaceTrivia [6..7) ' '
+    TupleElement [7..10)
+      PredefinedType [7..10)
+        IntKeyword [7..10) 'int'
+    CloseParenToken [10..11) ')'
+  CloseParenToken [11..12) ')'
+  CollectionExpression [12..14)
+    OpenBracketToken [12..13) '['
+    CloseBracketToken [13..14) ']'

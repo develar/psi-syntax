@@ -1,0 +1,27 @@
+ElementAccessExpression [0..16)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 's'
+  BracketedArgumentList [1..16)
+    OpenBracketToken [1..2) '['
+    Argument [2..15)
+      RangeExpression [2..15)
+        DotDotToken [2..4) '..'
+        InvocationExpression [4..15)
+          IdentifierName [4..6)
+            IdentifierToken [4..5) 'x'
+            T:WhitespaceTrivia [5..6) ' '
+          ArgumentList [6..15)
+            OpenParenToken [6..7) '('
+            CloseParenToken [7..8) ')'
+            T:WhitespaceTrivia [8..9) ' '
+            T:SkippedTokensTrivia [9..11)
+              EqualsGreaterThanToken [9..11) '=>'
+            T:WhitespaceTrivia [11..12) ' '
+            T:SkippedTokensTrivia [12..13)
+              OpenBraceToken [12..13) '{'
+            T:WhitespaceTrivia [13..14) ' '
+            T:SkippedTokensTrivia [14..15)
+              CloseBraceToken [14..15) '}'
+    CloseBracketToken [15..16) ']'
+Diagnostics:
+  CS1003 [9..11) Syntax error, \',\' expected

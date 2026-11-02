@@ -1,0 +1,14 @@
+CompilationUnit [0..28)
+  InterfaceDeclaration [0..28)
+    FileKeyword [0..4) 'file'
+    T:WhitespaceTrivia [4..5) ' '
+    PartialKeyword [5..12) 'partial'
+    T:WhitespaceTrivia [12..13) ' '
+    InterfaceKeyword [13..22) 'interface'
+    T:WhitespaceTrivia [22..23) ' '
+    IdentifierToken [23..24) 'C'
+    T:WhitespaceTrivia [24..25) ' '
+    OpenBraceToken [25..26) '{'
+    T:WhitespaceTrivia [26..27) ' '
+    CloseBraceToken [27..28) '}'
+  EndOfFileToken [28..28) ''

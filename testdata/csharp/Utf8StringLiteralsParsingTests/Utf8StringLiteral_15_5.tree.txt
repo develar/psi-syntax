@@ -1,0 +1,2 @@
+Utf8StringLiteralExpression [0..15)
+  Utf8MultiLineRawStringLiteralToken [0..15) '"""\nhello\n"""U8'

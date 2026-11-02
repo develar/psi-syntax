@@ -1,0 +1,17 @@
+ParenthesizedLambdaExpression [0..25)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..19)
+    OpenParenToken [7..8) '('
+    T:SkippedTokensTrivia [8..17)
+      ArgListKeyword [8..17) '__arglist'
+    CloseParenToken [17..18) ')'
+    T:WhitespaceTrivia [18..19) ' '
+  EqualsGreaterThanToken [19..21) '=>'
+  T:WhitespaceTrivia [21..22) ' '
+  Block [22..25)
+    OpenBraceToken [22..23) '{'
+    T:WhitespaceTrivia [23..24) ' '
+    CloseBraceToken [24..25) '}'
+Diagnostics:
+  CS1041 [8..17) Identifier expected; \'__arglist\' is a keyword

@@ -1,0 +1,1 @@
+safe public extern event EHandler E { add; remove; }

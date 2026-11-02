@@ -1,0 +1,59 @@
+CompilationUnit [0..77)
+  ClassDeclaration [0..77)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..75)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      PredefinedType [21..26)
+        VoidKeyword [21..25) 'void'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..27) 'M'
+      ParameterList [27..30)
+        OpenParenToken [27..28) '('
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      Block [30..75)
+        L:WhitespaceTrivia [30..34) '    '
+        OpenBraceToken [34..35) '{'
+        T:EndOfLineTrivia [35..36) '\n'
+        LocalDeclarationStatement [36..60)
+          VariableDeclaration [36..60)
+            QualifiedName [36..55)
+              IdentifierName [36..48)
+                L:WhitespaceTrivia [36..44) '        '
+                IdentifierToken [44..48) 'Task'
+              DotToken [48..49) '.'
+              IdentifierName [49..55)
+                IdentifierToken [49..54) 'await'
+                T:WhitespaceTrivia [54..55) ' '
+            VariableDeclarator [55..60)
+              IdentifierToken [55..59) 'Task'
+              T:SkippedTokensTrivia [59..60)
+                DotToken [59..60) '.'
+          SemicolonToken [60..60) missing
+        ExpressionStatement [60..69)
+          InvocationExpression [60..67)
+            IdentifierName [60..65)
+              IdentifierToken [60..65) 'Delay'
+            ArgumentList [65..67)
+              OpenParenToken [65..66) '('
+              CloseParenToken [66..67) ')'
+          SemicolonToken [67..68) ';'
+          T:EndOfLineTrivia [68..69) '\n'
+        L:WhitespaceTrivia [69..73) '    '
+        CloseBraceToken [73..74) '}'
+        T:EndOfLineTrivia [74..75) '\n'
+    CloseBraceToken [75..76) '}'
+    T:EndOfLineTrivia [76..77) '\n'
+  EndOfFileToken [77..77) ''
+Diagnostics:
+  CS4003 [49..54) \'await\' cannot be used as an identifier within an async method or lambda expression
+  CS1003 [59..60) Syntax error, \',\' expected
+  CS1002 [60..65) ; expected

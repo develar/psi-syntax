@@ -1,0 +1,8 @@
+LocalDeclarationStatement [0..6)
+  VariableDeclaration [0..5)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..5)
+      IdentifierToken [4..5) 'a'
+  SemicolonToken [5..6) ';'

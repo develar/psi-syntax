@@ -1,0 +1,17 @@
+LocalDeclarationStatement [0..16)
+  VariableDeclaration [0..15)
+    FunctionPointerType [0..12)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..12)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..10)
+          IdentifierName [10..10)
+            IdentifierToken [10..10) missing
+        GreaterThanToken [10..11) '>'
+        T:WhitespaceTrivia [11..12) ' '
+    VariableDeclarator [12..15)
+      IdentifierToken [12..15) 'ptr'
+  SemicolonToken [15..16) ';'
+Diagnostics:
+  CS1031 [10..11) Type expected

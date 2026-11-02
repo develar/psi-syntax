@@ -1,0 +1,13 @@
+CompilationUnit [0..14)
+  FileScopedNamespaceDeclaration [0..14)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..11)
+      IdentifierToken [10..11) 'A'
+    SemicolonToken [11..12) ';'
+    T:WhitespaceTrivia [12..13) ' '
+    T:SkippedTokensTrivia [13..14)
+      CloseBraceToken [13..14) '}'
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1022 [13..14) Type or namespace definition, or end-of-file expected

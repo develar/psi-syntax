@@ -1,0 +1,1 @@
+async Task<SomeNamespace.SomeType Method();

@@ -1,0 +1,11 @@
+RecordStructDeclaration [0..29)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  RecordKeyword [12..18) 'record'
+  T:WhitespaceTrivia [18..19) ' '
+  StructKeyword [19..25) 'struct'
+  T:WhitespaceTrivia [25..26) ' '
+  IdentifierToken [26..28) 'RS'
+  SemicolonToken [28..29) ';'

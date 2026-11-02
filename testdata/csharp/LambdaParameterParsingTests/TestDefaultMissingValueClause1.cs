@@ -1,0 +1,1 @@
+(string a, double b = ) => double.Parse(a) + b

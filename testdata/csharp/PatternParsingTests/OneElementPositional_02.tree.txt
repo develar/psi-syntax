@@ -1,0 +1,20 @@
+ExpressionStatement [0..13)
+  SimpleAssignmentExpression [0..12)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    IsPatternExpression [4..12)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      IsKeyword [6..8) 'is'
+      T:WhitespaceTrivia [8..9) ' '
+      ConstantPattern [9..12)
+        ParenthesizedExpression [9..12)
+          OpenParenToken [9..10) '('
+          IdentifierName [10..11)
+            IdentifierToken [10..11) 'A'
+          CloseParenToken [11..12) ')'
+  SemicolonToken [12..13) ';'

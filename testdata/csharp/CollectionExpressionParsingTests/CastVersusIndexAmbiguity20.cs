@@ -1,0 +1,1 @@
+(alias::type.member)[1, 2, 3]

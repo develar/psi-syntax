@@ -1,0 +1,1 @@
+[A(delegate*<void> () => default)] class C { }

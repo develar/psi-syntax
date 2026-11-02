@@ -1,0 +1,105 @@
+CompilationUnit [0..132)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..132)
+    L:SingleLineDocumentationCommentTrivia [14..61)
+      XmlText [14..18)
+        L:DocumentationCommentExteriorTrivia [14..17) '///'
+        XmlTextLiteralToken [17..18) ' '
+      XmlElement [18..61)
+        XmlElementStartTag [18..27)
+          LessThanToken [18..19) '<'
+          XmlName [19..26)
+            IdentifierToken [19..26) 'summary'
+          GreaterThanToken [26..27) '>'
+        XmlText [27..32)
+          XmlTextLiteralNewLineToken [27..28) '\n'
+          L:DocumentationCommentExteriorTrivia [28..31) '///'
+          XmlTextLiteralToken [31..32) ' '
+        XmlEmptyElement [32..33)
+          LessThanToken [32..33) '<'
+          XmlName [33..33)
+            IdentifierToken [33..33) missing
+          SlashGreaterThanToken [33..33) missing
+        XmlElement [33..60)
+          XmlElementStartTag [33..44)
+            LessThanToken [33..34) '<'
+            XmlName [34..42)
+              L:WhitespaceTrivia [34..35) ' '
+              IdentifierToken [35..36) 'A'
+              T:WhitespaceTrivia [36..37) ' '
+              T:SkippedTokensTrivia [37..38)
+                SingleQuoteToken [37..38) '\''
+              T:SkippedTokensTrivia [38..39)
+                BadToken [38..39) '&'
+              T:SkippedTokensTrivia [39..40)
+                SingleQuoteToken [39..40) '\''
+              T:WhitespaceTrivia [40..41) ' '
+              T:SkippedTokensTrivia [41..42)
+                IdentifierToken [41..42) 'B'
+            L:WhitespaceTrivia [42..43) ' '
+            GreaterThanToken [43..44) '>'
+          XmlText [44..50)
+            XmlTextLiteralToken [44..45) '>'
+            XmlTextLiteralNewLineToken [45..46) '\n'
+            L:DocumentationCommentExteriorTrivia [46..49) '///'
+            XmlTextLiteralToken [49..50) ' '
+          XmlElementEndTag [50..60)
+            LessThanSlashToken [50..52) '</'
+            XmlName [52..59)
+              IdentifierToken [52..59) 'summary'
+            GreaterThanToken [59..60) '>'
+        XmlText [60..61)
+          XmlTextLiteralNewLineToken [60..61) '\n'
+        XmlElementEndTag [61..61)
+          LessThanSlashToken [61..61) missing
+          XmlName [61..61)
+            IdentifierToken [61..61) missing
+          GreaterThanToken [61..61) missing
+      EndOfDocumentationCommentToken [61..61) ''
+    PublicKeyword [61..67) 'public'
+    T:WhitespaceTrivia [67..68) ' '
+    ClassKeyword [68..73) 'class'
+    T:WhitespaceTrivia [73..74) ' '
+    IdentifierToken [74..78) 'Test'
+    T:EndOfLineTrivia [78..79) '\n'
+    OpenBraceToken [79..80) '{'
+    T:EndOfLineTrivia [80..81) '\n'
+    MethodDeclaration [81..131)
+      PredefinedType [81..90)
+        L:WhitespaceTrivia [81..85) '    '
+        BoolKeyword [85..89) 'bool'
+        T:WhitespaceTrivia [89..90) ' '
+      IdentifierToken [90..94) 'Find'
+      ParameterList [94..97)
+        OpenParenToken [94..95) '('
+        CloseParenToken [95..96) ')'
+        T:EndOfLineTrivia [96..97) '\n'
+      Block [97..131)
+        L:WhitespaceTrivia [97..101) '    '
+        OpenBraceToken [101..102) '{'
+        T:EndOfLineTrivia [102..103) '\n'
+        ReturnStatement [103..125)
+          L:WhitespaceTrivia [103..111) '        '
+          ReturnKeyword [111..117) 'return'
+          T:WhitespaceTrivia [117..118) ' '
+          FalseLiteralExpression [118..123)
+            FalseKeyword [118..123) 'false'
+          SemicolonToken [123..124) ';'
+          T:EndOfLineTrivia [124..125) '\n'
+        L:WhitespaceTrivia [125..129) '    '
+        CloseBraceToken [129..130) '}'
+        T:EndOfLineTrivia [130..131) '\n'
+    CloseBraceToken [131..132) '}'
+  EndOfFileToken [132..132) ''
+Diagnostics:
+  CS1570 [33..33) XML comment has badly formed XML -- \'An identifier was expected.\'
+  CS1570 [35..36) XML comment has badly formed XML -- \'Whitespace is not allowed at this location.\'
+  CS1570 [37..38) XML comment has badly formed XML -- \'The character(s) \'\'\' cannot be used at this location.\'
+  CS1570 [52..59) XML comment has badly formed XML -- \'End tag \'summary\' does not match the start tag \'A\'.\'
+  CS1570 [61..61) XML comment has badly formed XML -- \'Expected an end tag for element \'summary\'.\'

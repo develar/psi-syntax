@@ -1,0 +1,44 @@
+CompilationUnit [0..36)
+  ClassDeclaration [0..36)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    FieldDeclaration [10..35)
+      L:WhitespaceTrivia [10..14) '    '
+      FixedKeyword [14..19) 'fixed'
+      T:WhitespaceTrivia [19..20) ' '
+      VariableDeclaration [20..33)
+        PredefinedType [20..24)
+          IntKeyword [20..23) 'int'
+          T:WhitespaceTrivia [23..24) ' '
+        VariableDeclarator [24..33)
+          IdentifierToken [24..29) 'value'
+          T:WhitespaceTrivia [29..30) ' '
+          BracketedArgumentList [30..33)
+            OpenBracketToken [30..30) missing
+            Argument [30..33)
+              SimpleAssignmentExpression [30..33)
+                IdentifierName [30..30)
+                  IdentifierToken [30..30) missing
+                EqualsToken [30..31) '='
+                T:WhitespaceTrivia [31..32) ' '
+                NumericLiteralExpression [32..33)
+                  NumericLiteralToken [32..33) '5'
+            CommaToken [33..33) missing
+            Argument [33..33)
+              IdentifierName [33..33)
+                IdentifierToken [33..33) missing
+            CloseBracketToken [33..33) missing
+      SemicolonToken [33..34) ';'
+      T:EndOfLineTrivia [34..35) '\n'
+    CloseBraceToken [35..36) '}'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1003 [30..31) Syntax error, \'[\' expected
+  CS1525 [30..31) Invalid expression term \'=\'
+  CS1003 [33..34) Syntax error, \',\' expected
+  CS0443 [33..33) Syntax error; value expected
+  CS1003 [33..34) Syntax error, \']\' expected

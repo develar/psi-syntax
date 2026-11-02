@@ -1,0 +1,17 @@
+CompilationUnit [0..33)
+  IncompleteMember [0..8)
+    IdentifierName [0..8)
+      IdentifierToken [0..7) 'partial'
+      T:WhitespaceTrivia [7..8) ' '
+  RecordStructDeclaration [8..33)
+    ReadOnlyKeyword [8..16) 'readonly'
+    T:WhitespaceTrivia [16..17) ' '
+    RecordKeyword [17..23) 'record'
+    T:WhitespaceTrivia [23..24) ' '
+    StructKeyword [24..30) 'struct'
+    T:WhitespaceTrivia [30..31) ' '
+    IdentifierToken [31..32) 'S'
+    SemicolonToken [32..33) ';'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1585 [8..16) Member modifier \'readonly\' must precede the member type and name

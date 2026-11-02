@@ -1,0 +1,1 @@
+for (a is B b;a is B b;a is B b);

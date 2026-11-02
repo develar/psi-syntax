@@ -1,0 +1,55 @@
+CompilationUnit [0..114)
+  ClassDeclaration [0..114)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    MethodDeclaration [14..112)
+      L:WhitespaceTrivia [14..18) '    '
+      StaticKeyword [18..24) 'static'
+      T:WhitespaceTrivia [24..25) ' '
+      PredefinedType [25..30)
+        VoidKeyword [25..29) 'void'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..34) 'Main'
+      ParameterList [34..38)
+        OpenParenToken [34..35) '('
+        CloseParenToken [35..36) ')'
+        T:WhitespaceTrivia [36..37) ' '
+        T:EndOfLineTrivia [37..38) '\n'
+      Block [38..112)
+        L:WhitespaceTrivia [38..42) '    '
+        OpenBraceToken [42..43) '{'
+        T:EndOfLineTrivia [43..44) '\n'
+        ExpressionStatement [44..106)
+          InvocationExpression [44..104)
+            SimpleMemberAccessExpression [44..71)
+              AliasQualifiedName [44..61)
+                IdentifierName [44..44)
+                  IdentifierToken [44..44) missing
+                L:WhitespaceTrivia [44..52) '        '
+                ColonColonToken [52..54) '::'
+                IdentifierName [54..61)
+                  IdentifierToken [54..61) 'Console'
+              DotToken [61..62) '.'
+              IdentifierName [62..71)
+                IdentifierToken [62..71) 'WriteLine'
+            ArgumentList [71..104)
+              OpenParenToken [71..72) '('
+              Argument [72..103)
+                StringLiteralExpression [72..103)
+                  StringLiteralToken [72..103) '"Missing identifier before :: "'
+              CloseParenToken [103..104) ')'
+          SemicolonToken [104..105) ';'
+          T:EndOfLineTrivia [105..106) '\n'
+        L:WhitespaceTrivia [106..110) '    '
+        CloseBraceToken [110..111) '}'
+        T:EndOfLineTrivia [111..112) '\n'
+    CloseBraceToken [112..113) '}'
+    T:EndOfLineTrivia [113..114) '\n'
+  EndOfFileToken [114..114) ''
+Diagnostics:
+  CS1001 [43..43) Identifier expected

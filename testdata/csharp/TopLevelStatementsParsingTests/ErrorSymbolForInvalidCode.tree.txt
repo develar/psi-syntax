@@ -1,0 +1,73 @@
+CompilationUnit [0..93)
+  ClassDeclaration [0..55)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'A'
+    T:WhitespaceTrivia [15..16) ' '
+    T:EndOfLineTrivia [16..17) '\n'
+    OpenBraceToken [17..18) '{'
+    T:EndOfLineTrivia [18..19) '\n'
+    PropertyDeclaration [19..30)
+      PredefinedType [19..24)
+        L:WhitespaceTrivia [19..20) '\t'
+        IntKeyword [20..23) 'int'
+        T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..27) 'goo'
+      T:WhitespaceTrivia [27..28) '\t'
+      AccessorList [28..30)
+        OpenBraceToken [28..29) '{'
+        T:WhitespaceTrivia [29..30) '\t'
+        CloseBraceToken [30..30) missing
+    MethodDeclaration [30..44)
+      PredefinedType [30..35)
+        VoidKeyword [30..34) 'void'
+        T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..38) 'goo'
+      ParameterList [38..41)
+        OpenParenToken [38..39) '('
+        CloseParenToken [39..40) ')'
+        T:WhitespaceTrivia [40..41) ' '
+      Block [41..44)
+        OpenBraceToken [41..42) '{'
+        CloseBraceToken [42..43) '}'
+        T:WhitespaceTrivia [43..44) '\t'
+    CloseBraceToken [44..45) '}'
+    T:WhitespaceTrivia [45..46) ' '
+    T:SingleLineCommentTrivia [46..54) '// Error'
+    T:EndOfLineTrivia [54..55) '\n'
+  GlobalStatement [55..93)
+    LocalFunctionStatement [55..93)
+      L:WhitespaceTrivia [55..56) '\t'
+      StaticKeyword [56..62) 'static'
+      T:WhitespaceTrivia [62..63) ' '
+      PredefinedType [63..67)
+        IntKeyword [63..66) 'int'
+        T:WhitespaceTrivia [66..67) ' '
+      IdentifierToken [67..71) 'Main'
+      ParameterList [71..74)
+        OpenParenToken [71..72) '('
+        CloseParenToken [72..73) ')'
+        T:WhitespaceTrivia [73..74) ' '
+      Block [74..93)
+        OpenBraceToken [74..75) '{'
+        T:WhitespaceTrivia [75..76) '\t'
+        ReturnStatement [76..89)
+          ReturnKeyword [76..82) 'return'
+          T:WhitespaceTrivia [82..83) ' '
+          NumericLiteralExpression [83..84)
+            NumericLiteralToken [83..84) '1'
+          SemicolonToken [84..85) ';'
+          T:WhitespaceTrivia [85..89) '    '
+        CloseBraceToken [89..90) '}'
+        T:EndOfLineTrivia [90..91) '\n'
+        T:SkippedTokensTrivia [91..92)
+          CloseBraceToken [91..92) '}'
+        T:EndOfLineTrivia [92..93) '\n'
+  EndOfFileToken [93..93) ''
+Diagnostics:
+  CS1513 [30..34) } expected
+  CS8803 [56..90) Top-level statements must precede namespace and type declarations.
+  CS1022 [91..92) Type or namespace definition, or end-of-file expected

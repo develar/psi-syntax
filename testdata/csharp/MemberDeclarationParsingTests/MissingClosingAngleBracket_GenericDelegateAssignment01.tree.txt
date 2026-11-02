@@ -1,0 +1,48 @@
+MethodDeclaration [0..53)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..12)
+    VoidKeyword [7..11) 'void'
+    T:WhitespaceTrivia [11..12) ' '
+  IdentifierToken [12..18) 'Method'
+  TypeParameterList [18..20)
+    LessThanToken [18..19) '<'
+    TypeParameter [19..20)
+      IdentifierToken [19..20) 'T'
+    GreaterThanToken [20..20) missing
+  ParameterList [20..23)
+    OpenParenToken [20..21) '('
+    CloseParenToken [21..22) ')'
+    T:EndOfLineTrivia [22..23) '\n'
+  Block [23..53)
+    OpenBraceToken [23..24) '{'
+    T:EndOfLineTrivia [24..25) '\n'
+    LocalDeclarationStatement [25..52)
+      VariableDeclaration [25..50)
+        GenericName [25..38)
+          L:WhitespaceTrivia [25..29) '    '
+          IdentifierToken [29..35) 'Action'
+          TypeArgumentList [35..38)
+            LessThanToken [35..36) '<'
+            IdentifierName [36..38)
+              IdentifierToken [36..37) 'T'
+              T:WhitespaceTrivia [37..38) ' '
+            GreaterThanToken [38..38) missing
+        VariableDeclarator [38..50)
+          IdentifierToken [38..39) 't'
+          T:WhitespaceTrivia [39..40) ' '
+          EqualsValueClause [40..50)
+            EqualsToken [40..41) '='
+            T:WhitespaceTrivia [41..42) ' '
+            LessThanExpression [42..50)
+              IdentifierName [42..48)
+                IdentifierToken [42..48) 'Method'
+              LessThanToken [48..49) '<'
+              IdentifierName [49..50)
+                IdentifierToken [49..50) 'T'
+      SemicolonToken [50..51) ';'
+      T:EndOfLineTrivia [51..52) '\n'
+    CloseBraceToken [52..53) '}'
+Diagnostics:
+  CS1003 [20..21) Syntax error, \'>\' expected
+  CS1003 [38..39) Syntax error, \'>\' expected

@@ -1,0 +1,20 @@
+CompilationUnit [0..20)
+  ClassDeclaration [0..20)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    BaseList [9..18)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      PrimaryConstructorBaseType [11..18)
+        IdentifierName [11..15)
+          IdentifierToken [11..15) 'Base'
+        ArgumentList [15..18)
+          OpenParenToken [15..16) '('
+          CloseParenToken [16..17) ')'
+          T:WhitespaceTrivia [17..18) ' '
+    OpenBraceToken [18..19) '{'
+    CloseBraceToken [19..20) '}'
+  EndOfFileToken [20..20) ''

@@ -1,0 +1,1 @@
+closed public interface C { }

@@ -1,0 +1,24 @@
+PropertyDeclaration [0..39)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  PredefinedType [7..11)
+    IntKeyword [7..10) 'int'
+    T:WhitespaceTrivia [10..11) ' '
+  IdentifierToken [11..12) 'P'
+  T:WhitespaceTrivia [12..13) ' '
+  AccessorList [13..39)
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    GetAccessorDeclaration [15..20)
+      GetKeyword [15..18) 'get'
+      SemicolonToken [18..19) ';'
+      T:WhitespaceTrivia [19..20) ' '
+    SetAccessorDeclaration [20..38)
+      PrivateKeyword [20..27) 'private'
+      T:WhitespaceTrivia [27..28) ' '
+      SafeKeyword [28..32) 'safe'
+      T:WhitespaceTrivia [32..33) ' '
+      SetKeyword [33..36) 'set'
+      SemicolonToken [36..37) ';'
+      T:WhitespaceTrivia [37..38) ' '
+    CloseBraceToken [38..39) '}'

@@ -1,0 +1,12 @@
+ParenthesizedLambdaExpression [0..21)
+  IdentifierName [0..8)
+    IdentifierToken [0..7) 'dynamic'
+    T:WhitespaceTrivia [7..8) ' '
+  ParameterList [8..11)
+    OpenParenToken [8..9) '('
+    CloseParenToken [9..10) ')'
+    T:WhitespaceTrivia [10..11) ' '
+  EqualsGreaterThanToken [11..13) '=>'
+  T:WhitespaceTrivia [13..14) ' '
+  DefaultLiteralExpression [14..21)
+    DefaultKeyword [14..21) 'default'

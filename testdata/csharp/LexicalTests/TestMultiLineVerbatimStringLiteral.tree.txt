@@ -1,0 +1,2 @@
+StringLiteralToken [0..22) '@"multi line\r\nliteral"'
+EndOfFileToken [22..22) ''

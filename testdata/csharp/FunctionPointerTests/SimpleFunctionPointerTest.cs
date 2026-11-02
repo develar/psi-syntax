@@ -1,0 +1,1 @@
+delegate*<string, Goo, int> ptr;

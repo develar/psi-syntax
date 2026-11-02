@@ -1,0 +1,10 @@
+LeftShiftExpression [0..7)
+  AddExpression [0..4)
+    NumericLiteralExpression [0..1)
+      NumericLiteralToken [0..1) '1'
+    PlusToken [1..2) '+'
+    RangeExpression [2..4)
+      DotDotToken [2..4) '..'
+  LessThanLessThanToken [4..6) '<<'
+  NumericLiteralExpression [6..7)
+    NumericLiteralToken [6..7) '2'

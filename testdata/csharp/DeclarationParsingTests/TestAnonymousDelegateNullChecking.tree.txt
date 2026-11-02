@@ -1,0 +1,62 @@
+CompilationUnit [0..69)
+  DelegateDeclaration [0..29)
+    L:EndOfLineTrivia [0..1) '\n'
+    DelegateKeyword [1..9) 'delegate'
+    T:WhitespaceTrivia [9..10) ' '
+    PredefinedType [10..15)
+      VoidKeyword [10..14) 'void'
+      T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..18) 'Del'
+    ParameterList [18..27)
+      OpenParenToken [18..19) '('
+      Parameter [19..26)
+        PredefinedType [19..23)
+          IntKeyword [19..22) 'int'
+          T:WhitespaceTrivia [22..23) ' '
+        IdentifierToken [23..24) 'x'
+        T:SkippedTokensTrivia [24..25)
+          ExclamationToken [24..25) '!'
+        T:SkippedTokensTrivia [25..26)
+          ExclamationToken [25..26) '!'
+      CloseParenToken [26..27) ')'
+    SemicolonToken [27..28) ';'
+    T:EndOfLineTrivia [28..29) '\n'
+  GlobalStatement [29..69)
+    LocalDeclarationStatement [29..69)
+      VariableDeclaration [29..68)
+        IdentifierName [29..33)
+          IdentifierToken [29..32) 'Del'
+          T:WhitespaceTrivia [32..33) ' '
+        VariableDeclarator [33..68)
+          IdentifierToken [33..34) 'd'
+          T:WhitespaceTrivia [34..35) ' '
+          EqualsValueClause [35..68)
+            EqualsToken [35..36) '='
+            T:WhitespaceTrivia [36..37) ' '
+            AnonymousMethodExpression [37..68)
+              DelegateKeyword [37..45) 'delegate'
+              ParameterList [45..55)
+                OpenParenToken [45..46) '('
+                Parameter [46..53)
+                  PredefinedType [46..50)
+                    IntKeyword [46..49) 'int'
+                    T:WhitespaceTrivia [49..50) ' '
+                  IdentifierToken [50..51) 'k'
+                  T:SkippedTokensTrivia [51..52)
+                    ExclamationToken [51..52) '!'
+                  T:SkippedTokensTrivia [52..53)
+                    ExclamationToken [52..53) '!'
+                CloseParenToken [53..54) ')'
+                T:WhitespaceTrivia [54..55) ' '
+              Block [55..68)
+                OpenBraceToken [55..56) '{'
+                T:WhitespaceTrivia [56..57) ' '
+                T:MultiLineCommentTrivia [57..66) '/* ... */'
+                T:WhitespaceTrivia [66..67) ' '
+                CloseBraceToken [67..68) '}'
+      SemicolonToken [68..69) ';'
+  EndOfFileToken [69..69) ''
+Diagnostics:
+  CS1003 [24..25) Syntax error, \',\' expected
+  CS8803 [29..69) Top-level statements must precede namespace and type declarations.
+  CS1003 [51..52) Syntax error, \',\' expected

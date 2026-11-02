@@ -1,0 +1,16 @@
+CoalesceExpression [0..10)
+  CollectionExpression [0..4)
+    OpenBracketToken [0..1) '['
+    ExpressionElement [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+    T:WhitespaceTrivia [3..4) ' '
+  QuestionQuestionToken [4..6) '??'
+  T:WhitespaceTrivia [6..7) ' '
+  CollectionExpression [7..10)
+    OpenBracketToken [7..8) '['
+    ExpressionElement [8..9)
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'B'
+    CloseBracketToken [9..10) ']'

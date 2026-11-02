@@ -1,0 +1,60 @@
+CompilationUnit [0..81)
+  ClassDeclaration [0..81)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..79)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      PredefinedType [21..26)
+        VoidKeyword [21..25) 'void'
+        T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..27) 'M'
+      ParameterList [27..30)
+        OpenParenToken [27..28) '('
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      Block [30..79)
+        L:WhitespaceTrivia [30..34) '    '
+        OpenBraceToken [34..35) '{'
+        T:EndOfLineTrivia [35..36) '\n'
+        ExpressionStatement [36..50)
+          SimpleMemberAccessExpression [36..50)
+            IdentifierName [36..48)
+              L:WhitespaceTrivia [36..44) '        '
+              IdentifierToken [44..48) 'Task'
+            DotToken [48..49) '.'
+            T:EndOfLineTrivia [49..50) '\n'
+            IdentifierName [50..50)
+              IdentifierToken [50..50) missing
+          SemicolonToken [50..50) missing
+        ExpressionStatement [50..73)
+          AwaitExpression [50..71)
+            L:WhitespaceTrivia [50..58) '        '
+            AwaitKeyword [58..63) 'await'
+            T:WhitespaceTrivia [63..64) ' '
+            ElementAccessExpression [64..71)
+              IdentifierName [64..68)
+                IdentifierToken [64..68) 'Task'
+              BracketedArgumentList [68..71)
+                OpenBracketToken [68..69) '['
+                Argument [69..70)
+                  NumericLiteralExpression [69..70)
+                    NumericLiteralToken [69..70) '1'
+                CloseBracketToken [70..71) ']'
+          SemicolonToken [71..72) ';'
+          T:EndOfLineTrivia [72..73) '\n'
+        L:WhitespaceTrivia [73..77) '    '
+        CloseBraceToken [77..78) '}'
+        T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:EndOfLineTrivia [80..81) '\n'
+  EndOfFileToken [81..81) ''
+Diagnostics:
+  CS1001 [49..49) Identifier expected
+  CS1002 [49..49) ; expected

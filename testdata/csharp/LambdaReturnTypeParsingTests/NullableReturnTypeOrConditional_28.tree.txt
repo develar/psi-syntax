@@ -1,0 +1,29 @@
+ParenthesizedLambdaExpression [0..18)
+  AttributeList [0..4)
+    OpenBracketToken [0..1) '['
+    Attribute [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+    T:WhitespaceTrivia [3..4) ' '
+  NullableType [4..7)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'T'
+    QuestionToken [5..6) '?'
+    T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..18)
+    IdentifierToken [13..14) 'x'
+    T:WhitespaceTrivia [14..15) ' '
+    T:SkippedTokensTrivia [15..16)
+      ColonToken [15..16) ':'
+    T:WhitespaceTrivia [16..17) ' '
+    T:SkippedTokensTrivia [17..18)
+      IdentifierToken [17..18) 'y'
+Diagnostics:
+  CS1073 [0..14) Unexpected token \':\'

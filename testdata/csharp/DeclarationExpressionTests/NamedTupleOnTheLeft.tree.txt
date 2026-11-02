@@ -1,0 +1,29 @@
+ExpressionStatement [0..17)
+  SimpleAssignmentExpression [0..16)
+    TupleExpression [0..13)
+      OpenParenToken [0..1) '('
+      Argument [1..5)
+        NameColon [1..4)
+          IdentifierName [1..2)
+            IdentifierToken [1..2) 'x'
+          ColonToken [2..3) ':'
+          T:WhitespaceTrivia [3..4) ' '
+        NumericLiteralExpression [4..5)
+          NumericLiteralToken [4..5) '1'
+      CommaToken [5..6) ','
+      T:WhitespaceTrivia [6..7) ' '
+      Argument [7..11)
+        NameColon [7..10)
+          IdentifierName [7..8)
+            IdentifierToken [7..8) 'y'
+          ColonToken [8..9) ':'
+          T:WhitespaceTrivia [9..10) ' '
+        NumericLiteralExpression [10..11)
+          NumericLiteralToken [10..11) '2'
+      CloseParenToken [11..12) ')'
+      T:WhitespaceTrivia [12..13) ' '
+    EqualsToken [13..14) '='
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierName [15..16)
+      IdentifierToken [15..16) 'e'
+  SemicolonToken [16..17) ';'

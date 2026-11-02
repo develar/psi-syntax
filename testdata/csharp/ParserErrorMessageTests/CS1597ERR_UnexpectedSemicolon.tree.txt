@@ -1,0 +1,47 @@
+CompilationUnit [0..82)
+  ClassDeclaration [0..82)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..80)
+      L:WhitespaceTrivia [21..24) '   '
+      PublicKeyword [24..30) 'public'
+      T:WhitespaceTrivia [30..31) ' '
+      StaticKeyword [31..37) 'static'
+      T:WhitespaceTrivia [37..38) ' '
+      PredefinedType [38..42)
+        IntKeyword [38..41) 'int'
+        T:WhitespaceTrivia [41..42) ' '
+      IdentifierToken [42..46) 'Main'
+      ParameterList [46..49)
+        OpenParenToken [46..47) '('
+        CloseParenToken [47..48) ')'
+        T:EndOfLineTrivia [48..49) '\n'
+      Block [49..75)
+        L:WhitespaceTrivia [49..52) '   '
+        OpenBraceToken [52..53) '{'
+        T:EndOfLineTrivia [53..54) '\n'
+        ReturnStatement [54..71)
+          L:WhitespaceTrivia [54..61) '       '
+          ReturnKeyword [61..67) 'return'
+          T:WhitespaceTrivia [67..68) ' '
+          NumericLiteralExpression [68..69)
+            NumericLiteralToken [68..69) '1'
+          SemicolonToken [69..70) ';'
+          T:EndOfLineTrivia [70..71) '\n'
+        L:WhitespaceTrivia [71..74) '   '
+        CloseBraceToken [74..75) '}'
+      SemicolonToken [75..76) ';'
+      T:WhitespaceTrivia [76..79) '   '
+      T:EndOfLineTrivia [79..80) '\n'
+    CloseBraceToken [80..81) '}'
+    T:EndOfLineTrivia [81..82) '\n'
+  EndOfFileToken [82..82) ''
+Diagnostics:
+  CS1597 [75..76) Semicolon after method or accessor block is not valid

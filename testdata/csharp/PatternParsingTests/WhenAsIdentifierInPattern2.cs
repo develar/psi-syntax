@@ -1,0 +1,1 @@
+if (x is string { Length: 5 } when) ;

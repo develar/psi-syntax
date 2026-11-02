@@ -1,0 +1,1 @@
+struct a { readonly void M() { } }

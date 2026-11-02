@@ -1,0 +1,33 @@
+CompilationUnit [0..36)
+  GlobalStatement [0..36)
+    UsingStatement [0..36)
+      L:EndOfLineTrivia [0..1) '\n'
+      UsingKeyword [1..6) 'using'
+      T:WhitespaceTrivia [6..7) ' '
+      OpenParenToken [7..8) '('
+      RefExpression [8..19)
+        RefKeyword [8..11) 'ref'
+        T:WhitespaceTrivia [11..12) ' '
+        IdentifierName [12..19)
+          IdentifierToken [12..18) 'scoped'
+          T:WhitespaceTrivia [18..19) ' '
+      CloseParenToken [19..19) missing
+      LocalDeclarationStatement [19..36)
+        ReadOnlyKeyword [19..27) 'readonly'
+        T:WhitespaceTrivia [27..28) ' '
+        VariableDeclaration [28..34)
+          PredefinedType [28..32)
+            IntKeyword [28..31) 'int'
+            T:WhitespaceTrivia [31..32) ' '
+          VariableDeclarator [32..34)
+            IdentifierToken [32..33) 'c'
+            T:SkippedTokensTrivia [33..34)
+              CloseParenToken [33..34) ')'
+        SemicolonToken [34..35) ';'
+        T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''
+Diagnostics:
+  CS1525 [8..18) Invalid expression term \'ref\'
+  CS1026 [19..27) ) expected
+  CS0106 [19..27) The modifier \'readonly\' is not valid for this item
+  CS1003 [33..34) Syntax error, \',\' expected

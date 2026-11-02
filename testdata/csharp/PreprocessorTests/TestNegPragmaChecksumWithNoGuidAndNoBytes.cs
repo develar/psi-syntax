@@ -1,0 +1,1 @@
+#pragma checksum "bogus.cs"

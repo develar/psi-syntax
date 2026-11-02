@@ -1,0 +1,1 @@
+e is X<Y { Property: A<B a }

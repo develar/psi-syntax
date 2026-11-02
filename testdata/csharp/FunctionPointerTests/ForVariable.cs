@@ -1,0 +1,1 @@
+for (delegate*<void> ptr = null;;) {}

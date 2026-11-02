@@ -1,0 +1,30 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    ExpressionStatement [0..21)
+      InvocationExpression [0..20)
+        SimpleMemberAccessExpression [0..18)
+          SuppressNullableWarningExpression [0..6)
+            CollectionExpression [0..5)
+              OpenBracketToken [0..1) '['
+              ExpressionElement [1..3)
+                IdentifierName [1..3)
+                  IdentifierToken [1..2) 'A'
+                  T:SkippedTokensTrivia [2..3)
+                    ColonToken [2..3) ':'
+              CommaToken [3..3) missing
+              ExpressionElement [3..4)
+                IdentifierName [3..4)
+                  IdentifierToken [3..4) 'B'
+              CloseBracketToken [4..5) ']'
+            ExclamationToken [5..6) '!'
+          DotToken [6..7) '.'
+          IdentifierName [7..18)
+            IdentifierToken [7..18) 'GetHashCode'
+        ArgumentList [18..20)
+          OpenParenToken [18..19) '('
+          CloseParenToken [19..20) ')'
+      SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''
+Diagnostics:
+  CS1003 [2..3) Syntax error, \',\' expected
+  CS1003 [3..4) Syntax error, \',\' expected

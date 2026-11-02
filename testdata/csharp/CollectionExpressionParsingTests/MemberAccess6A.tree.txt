@@ -1,0 +1,28 @@
+CompilationUnit [0..75)
+  GlobalStatement [0..75)
+    ExpressionStatement [0..75)
+      InvocationExpression [0..74)
+        SimpleMemberAccessExpression [0..72)
+          ElementAccessExpression [0..60)
+            CollectionExpression [0..54)
+              L:SingleLineCommentTrivia [0..50) '// Indexing into collection, then invoking member.'
+              L:EndOfLineTrivia [50..51) '\n'
+              OpenBracketToken [51..52) '['
+              ExpressionElement [52..53)
+                NumericLiteralExpression [52..53)
+                  NumericLiteralToken [52..53) '1'
+              CloseBracketToken [53..54) ']'
+            BracketedArgumentList [54..60)
+              OpenBracketToken [54..55) '['
+              Argument [55..59)
+                IdentifierName [55..59)
+                  IdentifierToken [55..59) 'Main'
+              CloseBracketToken [59..60) ']'
+          DotToken [60..61) '.'
+          IdentifierName [61..72)
+            IdentifierToken [61..72) 'GetHashCode'
+        ArgumentList [72..74)
+          OpenParenToken [72..73) '('
+          CloseParenToken [73..74) ')'
+      SemicolonToken [74..75) ';'
+  EndOfFileToken [75..75) ''

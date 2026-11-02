@@ -1,0 +1,1 @@
+struct S { ref readonly T F; }

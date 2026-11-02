@@ -1,0 +1,18 @@
+PropertyDeclaration [0..30)
+  PredefinedType [0..7)
+    StringKeyword [0..6) 'string'
+    T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..15) 'Property'
+  T:WhitespaceTrivia [15..16) ' '
+  AccessorList [16..30)
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    InitAccessorDeclaration [18..24)
+      InitKeyword [18..22) 'init'
+      SemicolonToken [22..23) ';'
+      T:WhitespaceTrivia [23..24) ' '
+    SetAccessorDeclaration [24..29)
+      SetKeyword [24..27) 'set'
+      SemicolonToken [27..28) ';'
+      T:WhitespaceTrivia [28..29) ' '
+    CloseBraceToken [29..30) '}'

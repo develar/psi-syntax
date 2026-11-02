@@ -1,0 +1,16 @@
+CompilationUnit [0..17)
+  NamespaceDeclaration [0..17)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'n'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'
+    T:WhitespaceTrivia [15..16) ' '
+    T:SkippedTokensTrivia [16..17)
+      BadToken [16..17) '$'
+  EndOfFileToken [17..17) ''
+Diagnostics:
+  CS1056 [16..16) Unexpected character \'$\'

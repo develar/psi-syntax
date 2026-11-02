@@ -1,0 +1,28 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..26)
+    LocalDeclarationStatement [0..26)
+      L:EndOfLineTrivia [0..1) '\n'
+      AwaitKeyword [1..6) 'await'
+      T:WhitespaceTrivia [6..7) ' '
+      UsingKeyword [7..12) 'using'
+      T:WhitespaceTrivia [12..13) ' '
+      VariableDeclaration [13..26)
+        RefType [13..24)
+          RefKeyword [13..16) 'ref'
+          T:WhitespaceTrivia [16..17) ' '
+          IdentifierName [17..24)
+            IdentifierToken [17..23) 'scoped'
+            T:WhitespaceTrivia [23..24) ' '
+        VariableDeclarator [24..26)
+          IdentifierToken [24..25) 'R'
+          T:WhitespaceTrivia [25..26) ' '
+      SemicolonToken [26..26) missing
+  GlobalStatement [26..30)
+    ExpressionStatement [26..30)
+      IdentifierName [26..28)
+        IdentifierToken [26..28) 'r2'
+      SemicolonToken [28..29) ';'
+      T:EndOfLineTrivia [29..30) '\n'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1002 [26..28) ; expected

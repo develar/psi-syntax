@@ -1,0 +1,41 @@
+MethodDeclaration [0..68)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  PredefinedType [6..11)
+    VoidKeyword [6..10) 'void'
+    T:WhitespaceTrivia [10..11) ' '
+  IdentifierToken [11..12) 'M'
+  ParameterList [12..15)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'
+    T:EndOfLineTrivia [14..15) '\n'
+  Block [15..68)
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    WhileStatement [17..67)
+      L:WhitespaceTrivia [17..21) '    '
+      WhileKeyword [21..26) 'while'
+      T:WhitespaceTrivia [26..27) ' '
+      OpenParenToken [27..28) '('
+      TrueLiteralExpression [28..32)
+        TrueKeyword [28..32) 'true'
+      CloseParenToken [32..33) ')'
+      T:EndOfLineTrivia [33..34) '\n'
+      Block [34..67)
+        L:WhitespaceTrivia [34..38) '    '
+        OpenBraceToken [38..39) '{'
+        T:EndOfLineTrivia [39..40) '\n'
+        BreakStatement [40..61)
+          L:WhitespaceTrivia [40..48) '        '
+          BreakKeyword [48..53) 'break'
+          T:WhitespaceTrivia [53..54) ' '
+          IdentifierName [54..59)
+            IdentifierToken [54..59) 'await'
+          SemicolonToken [59..60) ';'
+          T:EndOfLineTrivia [60..61) '\n'
+        L:WhitespaceTrivia [61..65) '    '
+        CloseBraceToken [65..66) '}'
+        T:EndOfLineTrivia [66..67) '\n'
+    CloseBraceToken [67..68) '}'
+Diagnostics:
+  CS4003 [54..59) \'await\' cannot be used as an identifier within an async method or lambda expression

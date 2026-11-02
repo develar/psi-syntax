@@ -1,0 +1,36 @@
+SwitchStatement [0..55)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..54)
+    CaseSwitchLabel [15..39)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      ConditionalExpression [24..39)
+        IdentifierName [24..28)
+          IdentifierToken [24..28) 'Type'
+        QuestionToken [28..29) '?'
+        T:WhitespaceTrivia [29..30) ' '
+        IdentifierName [30..37)
+          IdentifierToken [30..37) 'varName'
+        ColonToken [37..38) ':'
+        T:EndOfLineTrivia [38..39) '\n'
+        IdentifierName [39..39)
+          IdentifierToken [39..39) missing
+      ColonToken [39..39) missing
+    BreakStatement [39..54)
+      L:WhitespaceTrivia [39..47) '        '
+      BreakKeyword [47..52) 'break'
+      SemicolonToken [52..53) ';'
+      T:EndOfLineTrivia [53..54) '\n'
+  CloseBraceToken [54..55) '}'
+Diagnostics:
+  CS1525 [38..38) Invalid expression term \'break\'
+  CS1003 [38..38) Syntax error, \':\' expected

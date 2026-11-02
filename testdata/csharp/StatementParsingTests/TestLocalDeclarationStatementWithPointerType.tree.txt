@@ -1,0 +1,10 @@
+LocalDeclarationStatement [0..5)
+  VariableDeclaration [0..4)
+    PointerType [0..3)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'T'
+      AsteriskToken [1..2) '*'
+      T:WhitespaceTrivia [2..3) ' '
+    VariableDeclarator [3..4)
+      IdentifierToken [3..4) 'a'
+  SemicolonToken [4..5) ';'

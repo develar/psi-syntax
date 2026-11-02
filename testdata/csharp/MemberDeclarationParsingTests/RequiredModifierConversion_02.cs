@@ -1,0 +1,1 @@
+static implicit required operator C(S s) {}

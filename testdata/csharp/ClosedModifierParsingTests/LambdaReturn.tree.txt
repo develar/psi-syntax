@@ -1,0 +1,25 @@
+CompilationUnit [0..21)
+  GlobalStatement [0..21)
+    ExpressionStatement [0..21)
+      SimpleAssignmentExpression [0..20)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) '_'
+          T:WhitespaceTrivia [1..2) ' '
+        EqualsToken [2..3) '='
+        T:WhitespaceTrivia [3..4) ' '
+        ParenthesizedLambdaExpression [4..20)
+          IdentifierName [4..11)
+            IdentifierToken [4..10) 'closed'
+            T:WhitespaceTrivia [10..11) ' '
+          ParameterList [11..14)
+            OpenParenToken [11..12) '('
+            CloseParenToken [12..13) ')'
+            T:WhitespaceTrivia [13..14) ' '
+          EqualsGreaterThanToken [14..16) '=>'
+          T:WhitespaceTrivia [16..17) ' '
+          Block [17..20)
+            OpenBraceToken [17..18) '{'
+            T:WhitespaceTrivia [18..19) ' '
+            CloseBraceToken [19..20) '}'
+      SemicolonToken [20..21) ';'
+  EndOfFileToken [21..21) ''

@@ -1,0 +1,24 @@
+InvocationExpression [0..10)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..10)
+    OpenParenToken [1..2) '('
+    Argument [2..8)
+      RefKeyword [2..5) 'ref'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'A'
+        T:WhitespaceTrivia [7..8) ' '
+    CommaToken [8..8) missing
+    Argument [8..9)
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'a'
+    CommaToken [9..10) ','
+    Argument [10..10)
+      IdentifierName [10..10)
+        IdentifierToken [10..10) missing
+    CloseParenToken [10..10) missing
+Diagnostics:
+  CS1003 [8..9) Syntax error, \',\' expected
+  CS1733 [10..10) Expected expression
+  CS1026 [10..10) ) expected

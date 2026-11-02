@@ -1,0 +1,16 @@
+CompilationUnit [0..18)
+  L:ShebangDirectiveTrivia [0..6)
+    HashToken [0..1) '#'
+    ExclamationToken [1..2) '!'
+    L:PreprocessingMessageTrivia [2..5) 'xyz'
+    EndOfDirectiveToken [5..5) ''
+    T:EndOfLineTrivia [5..6) '\n'
+  L:IgnoredDirectiveTrivia [6..18)
+    HashToken [6..7) '#'
+    ColonToken [7..8) ':'
+    StringLiteralToken [8..18) 'name value'
+    EndOfDirectiveToken [18..18) ''
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS9314 [1..2) \'#!\' directives can be only used in scripts or file-based programs
+  CS9298 [7..8) \'#:\' directives can be only used in file-based programs (\'-features:FileBasedProgram\')

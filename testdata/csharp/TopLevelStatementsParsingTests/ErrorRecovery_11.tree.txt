@@ -1,0 +1,26 @@
+CompilationUnit [0..39)
+  UsingDirective [0..21)
+    L:EndOfLineTrivia [0..1) '\n'
+    GlobalKeyword [1..7) 'global'
+    T:WhitespaceTrivia [7..8) ' '
+    UsingKeyword [8..13) 'using'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierName [14..17)
+      IdentifierToken [14..17) 'Goo'
+    SemicolonToken [17..18) ';'
+    T:EndOfLineTrivia [18..19) '\n'
+    T:SkippedTokensTrivia [19..20)
+      IdentifierToken [19..20) 'p'
+    T:EndOfLineTrivia [20..21) '\n'
+  UsingDirective [21..39)
+    GlobalKeyword [21..27) 'global'
+    T:WhitespaceTrivia [27..28) ' '
+    UsingKeyword [28..33) 'using'
+    T:WhitespaceTrivia [33..34) ' '
+    IdentifierName [34..37)
+      IdentifierToken [34..37) 'Bar'
+    SemicolonToken [37..38) ';'
+    T:EndOfLineTrivia [38..39) '\n'
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS0116 [19..20) A namespace cannot directly contain members such as fields, methods or statements

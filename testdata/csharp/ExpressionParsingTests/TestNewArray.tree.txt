@@ -1,0 +1,11 @@
+ArrayCreationExpression [0..8)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..8)
+    IdentifierName [4..5)
+      IdentifierToken [4..5) 'a'
+    ArrayRankSpecifier [5..8)
+      OpenBracketToken [5..6) '['
+      NumericLiteralExpression [6..7)
+        NumericLiteralToken [6..7) '1'
+      CloseBracketToken [7..8) ']'

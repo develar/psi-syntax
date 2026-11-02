@@ -1,0 +1,33 @@
+CompilationUnit [0..26)
+  StructDeclaration [0..13)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'S'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'
+    T:EndOfLineTrivia [12..13) '\n'
+  GlobalStatement [13..26)
+    LocalDeclarationStatement [13..26)
+      VariableDeclaration [13..26)
+        IdentifierName [13..13)
+          IdentifierToken [13..13) missing
+        VariableDeclarator [13..26)
+          IdentifierToken [13..13) missing
+          T:SkippedTokensTrivia [13..20)
+            IdentifierToken [13..20) 'partial'
+          T:WhitespaceTrivia [20..21) ' '
+          T:SkippedTokensTrivia [21..24)
+            IdentifierToken [21..24) 'ext'
+          T:WhitespaceTrivia [24..25) ' '
+          T:SkippedTokensTrivia [25..26)
+            IdentifierToken [25..26) 'X'
+      SemicolonToken [26..26) missing
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS8803 [13..20) Top-level statements must precede namespace and type declarations.
+  CS1031 [12..12) Type expected
+  CS1525 [12..12) Invalid expression term \'partial\'
+  CS1003 [12..12) Syntax error, \',\' expected
+  CS1002 [26..26) ; expected

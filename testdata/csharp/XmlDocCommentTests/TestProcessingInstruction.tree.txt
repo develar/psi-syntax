@@ -1,0 +1,19 @@
+CompilationUnit [0..107)
+  L:SingleLineDocumentationCommentTrivia [0..107)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlProcessingInstruction [4..107)
+      XmlProcessingInstructionStartToken [4..6) '<?'
+      XmlName [6..27)
+        IdentifierToken [6..27) 'ProcessingInstruction'
+      XmlTextLiteralToken [27..42) ' this is a test'
+      XmlTextLiteralNewLineToken [42..43) '\n'
+      L:DocumentationCommentExteriorTrivia [43..46) '///'
+      XmlTextLiteralToken [46..86) ' of &a; ProcessingInstruction /// */ /**'
+      XmlTextLiteralNewLineToken [86..87) '\n'
+      L:DocumentationCommentExteriorTrivia [87..90) '///'
+      XmlTextLiteralToken [90..105) ' "\']]>/>?</text'
+      XmlProcessingInstructionEndToken [105..107) '?>'
+    EndOfDocumentationCommentToken [107..107) ''
+  EndOfFileToken [107..107) ''

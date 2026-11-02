@@ -1,0 +1,33 @@
+CompilationUnit [0..39)
+  StructDeclaration [0..39)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:WhitespaceTrivia [9..10) ' '
+    TypeParameterConstraintClause [10..24)
+      WhereKeyword [10..15) 'where'
+      T:WhitespaceTrivia [15..16) ' '
+      IdentifierName [16..19)
+        IdentifierToken [16..18) 'T1'
+        T:WhitespaceTrivia [18..19) ' '
+      ColonToken [19..20) ':'
+      T:WhitespaceTrivia [20..21) ' '
+      TypeConstraint [21..24)
+        IdentifierName [21..24)
+          IdentifierToken [21..23) 'U1'
+          T:WhitespaceTrivia [23..24) ' '
+    TypeParameterConstraintClause [24..38)
+      WhereKeyword [24..29) 'where'
+      T:WhitespaceTrivia [29..30) ' '
+      IdentifierName [30..33)
+        IdentifierToken [30..32) 'T2'
+        T:WhitespaceTrivia [32..33) ' '
+      ColonToken [33..34) ':'
+      T:WhitespaceTrivia [34..35) ' '
+      TypeConstraint [35..38)
+        IdentifierName [35..38)
+          IdentifierToken [35..37) 'U2'
+          T:WhitespaceTrivia [37..38) ' '
+    SemicolonToken [38..39) ';'
+  EndOfFileToken [39..39) ''

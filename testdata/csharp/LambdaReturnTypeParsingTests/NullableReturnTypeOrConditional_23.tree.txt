@@ -1,0 +1,14 @@
+ParenthesizedLambdaExpression [0..14)
+  NullableType [0..7)
+    IdentifierName [0..5)
+      IdentifierToken [0..5) 'async'
+    QuestionToken [5..6) '?'
+    T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..14)
+    IdentifierToken [13..14) 'x'

@@ -1,0 +1,37 @@
+CompilationUnit [0..31)
+  GlobalStatement [0..26)
+    ExpressionStatement [0..26)
+      GreaterThanExpression [0..26)
+        IdentifierName [0..0)
+          IdentifierToken [0..0) missing
+        L:WhitespaceTrivia [0..1) ' '
+        GreaterThanToken [1..2) '>'
+        T:WhitespaceTrivia [2..3) ' '
+        SuppressNullableWarningExpression [3..26)
+          SimpleMemberAccessExpression [3..23)
+            SimpleMemberAccessExpression [3..19)
+              IdentifierName [3..9)
+                IdentifierToken [3..9) 'Roslyn'
+              DotToken [9..10) '.'
+              IdentifierName [10..19)
+                IdentifierToken [10..19) 'Utilities'
+            DotToken [19..20) '.'
+            IdentifierName [20..23)
+              IdentifierToken [20..23) 'dll'
+          ExclamationToken [23..24) '!'
+          T:WhitespaceTrivia [24..26) '  '
+      SemicolonToken [26..26) missing
+  GlobalStatement [26..31)
+    LocalDeclarationStatement [26..31)
+      VariableDeclaration [26..31)
+        IdentifierName [26..31)
+          IdentifierToken [26..31) 'Basic'
+        VariableDeclarator [31..31)
+          IdentifierToken [31..31) missing
+      SemicolonToken [31..31) missing
+  EndOfFileToken [31..31) ''
+Diagnostics:
+  CS1525 [1..2) Invalid expression term \'>\'
+  CS1002 [26..31) ; expected
+  CS1001 [31..31) Identifier expected
+  CS1002 [31..31) ; expected

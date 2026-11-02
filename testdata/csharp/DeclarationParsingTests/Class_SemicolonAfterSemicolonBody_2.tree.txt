@@ -1,0 +1,14 @@
+CompilationUnit [0..11)
+  ClassDeclaration [0..10)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    SemicolonToken [8..9) ';'
+    T:EndOfLineTrivia [9..10) '\n'
+  GlobalStatement [10..11)
+    EmptyStatement [10..11)
+      SemicolonToken [10..11) ';'
+  EndOfFileToken [11..11) ''
+Diagnostics:
+  CS8803 [10..11) Top-level statements must precede namespace and type declarations.

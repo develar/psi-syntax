@@ -1,0 +1,20 @@
+ParenthesizedLambdaExpression [0..17)
+  ArrayType [0..8)
+    IdentifierName [0..5)
+      IdentifierToken [0..5) 'async'
+    ArrayRankSpecifier [5..8)
+      OpenBracketToken [5..6) '['
+      OmittedArraySizeExpression [6..6)
+        OmittedArraySizeExpressionToken [6..6) ''
+      CloseBracketToken [6..7) ']'
+      T:WhitespaceTrivia [7..8) ' '
+  ParameterList [8..11)
+    OpenParenToken [8..9) '('
+    CloseParenToken [9..10) ')'
+    T:WhitespaceTrivia [10..11) ' '
+  EqualsGreaterThanToken [11..13) '=>'
+  T:WhitespaceTrivia [13..14) ' '
+  Block [14..17)
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    CloseBraceToken [16..17) '}'

@@ -1,0 +1,45 @@
+ImplicitArrayCreationExpression [0..35)
+  NewKeyword [0..3) 'new'
+  OpenBracketToken [3..4) '['
+  CloseBracketToken [4..5) ']'
+  T:WhitespaceTrivia [5..6) ' '
+  ArrayInitializerExpression [6..35)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    SimpleLambdaExpression [8..18)
+      AttributeList [8..12)
+        OpenBracketToken [8..9) '['
+        Attribute [9..10)
+          IdentifierName [9..10)
+            IdentifierToken [9..10) 'A'
+        CloseBracketToken [10..11) ']'
+        T:WhitespaceTrivia [11..12) ' '
+      Parameter [12..14)
+        IdentifierToken [12..13) 'x'
+        T:WhitespaceTrivia [13..14) ' '
+      EqualsGreaterThanToken [14..16) '=>'
+      T:WhitespaceTrivia [16..17) ' '
+      IdentifierName [17..18)
+        IdentifierToken [17..18) 'x'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    ParenthesizedLambdaExpression [20..34)
+      AttributeList [20..24)
+        OpenBracketToken [20..21) '['
+        Attribute [21..22)
+          IdentifierName [21..22)
+            IdentifierToken [21..22) 'B'
+        CloseBracketToken [22..23) ']'
+        T:WhitespaceTrivia [23..24) ' '
+      ParameterList [24..27)
+        OpenParenToken [24..25) '('
+        CloseParenToken [25..26) ')'
+        T:WhitespaceTrivia [26..27) ' '
+      EqualsGreaterThanToken [27..29) '=>'
+      T:WhitespaceTrivia [29..30) ' '
+      Block [30..34)
+        OpenBraceToken [30..31) '{'
+        T:WhitespaceTrivia [31..32) ' '
+        CloseBraceToken [32..33) '}'
+        T:WhitespaceTrivia [33..34) ' '
+    CloseBraceToken [34..35) '}'

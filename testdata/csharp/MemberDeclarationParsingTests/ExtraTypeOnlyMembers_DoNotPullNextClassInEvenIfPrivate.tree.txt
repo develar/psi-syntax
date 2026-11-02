@@ -1,0 +1,67 @@
+CompilationUnit [0..203)
+  NamespaceDeclaration [0..203)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..99)
+      L:WhitespaceTrivia [14..18) '    '
+      ClassKeyword [18..23) 'class'
+      T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..25) 'C'
+      T:EndOfLineTrivia [25..26) '\n'
+      L:WhitespaceTrivia [26..30) '    '
+      OpenBraceToken [30..31) '{'
+      T:EndOfLineTrivia [31..32) '\n'
+      MethodDeclaration [32..99)
+        PredefinedType [32..78)
+          L:WhitespaceTrivia [32..36) '    '
+          L:SkippedTokensTrivia [36..37)
+            CloseBraceToken [36..37) '}'
+          L:EndOfLineTrivia [37..38) '\n'
+          L:EndOfLineTrivia [38..39) '\n'
+          L:WhitespaceTrivia [39..43) '    '
+          L:SingleLineCommentTrivia [43..68) '// Will get pulled into C'
+          L:EndOfLineTrivia [68..69) '\n'
+          L:WhitespaceTrivia [69..73) '    '
+          VoidKeyword [73..77) 'void'
+          T:WhitespaceTrivia [77..78) ' '
+        IdentifierToken [78..84) 'Method'
+        ParameterList [84..87)
+          OpenParenToken [84..85) '('
+          CloseParenToken [85..86) ')'
+          T:EndOfLineTrivia [86..87) '\n'
+        Block [87..99)
+          L:WhitespaceTrivia [87..91) '    '
+          OpenBraceToken [91..92) '{'
+          T:EndOfLineTrivia [92..93) '\n'
+          L:WhitespaceTrivia [93..97) '    '
+          CloseBraceToken [97..98) '}'
+          T:EndOfLineTrivia [98..99) '\n'
+      CloseBraceToken [99..99) missing
+    ClassDeclaration [99..202)
+      L:EndOfLineTrivia [99..100) '\n'
+      L:WhitespaceTrivia [100..104) '    '
+      L:SingleLineCommentTrivia [104..169) '// Not currently pulled in.  But could consider it in the future.'
+      L:EndOfLineTrivia [169..170) '\n'
+      L:WhitespaceTrivia [170..174) '    '
+      PrivateKeyword [174..181) 'private'
+      T:WhitespaceTrivia [181..182) ' '
+      ClassKeyword [182..187) 'class'
+      T:WhitespaceTrivia [187..188) ' '
+      IdentifierToken [188..189) 'T'
+      T:EndOfLineTrivia [189..190) '\n'
+      L:WhitespaceTrivia [190..194) '    '
+      OpenBraceToken [194..195) '{'
+      T:EndOfLineTrivia [195..196) '\n'
+      L:WhitespaceTrivia [196..200) '    '
+      CloseBraceToken [200..201) '}'
+      T:EndOfLineTrivia [201..202) '\n'
+    CloseBraceToken [202..203) '}'
+  EndOfFileToken [203..203) ''
+Diagnostics:
+  CS1519 [36..37) Invalid token \'}\' in a member declaration
+  CS1513 [98..98) } expected

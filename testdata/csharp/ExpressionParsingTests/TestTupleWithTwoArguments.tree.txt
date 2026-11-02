@@ -1,0 +1,11 @@
+TupleExpression [0..7)
+  OpenParenToken [0..1) '('
+  Argument [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'a'
+  CommaToken [2..3) ','
+  T:WhitespaceTrivia [3..4) ' '
+  Argument [4..6)
+    IdentifierName [4..6)
+      IdentifierToken [4..6) 'a2'
+  CloseParenToken [6..7) ')'

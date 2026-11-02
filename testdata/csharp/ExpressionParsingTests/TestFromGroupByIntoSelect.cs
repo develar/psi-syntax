@@ -1,0 +1,1 @@
+from a in A group b by c into d select e

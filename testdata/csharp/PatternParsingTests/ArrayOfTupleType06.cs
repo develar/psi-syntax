@@ -1,0 +1,1 @@
+if (o is (Int a, Int b)[]) { }

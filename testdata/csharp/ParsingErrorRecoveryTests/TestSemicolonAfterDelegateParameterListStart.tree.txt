@@ -1,0 +1,16 @@
+CompilationUnit [0..18)
+  DelegateDeclaration [0..18)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    PredefinedType [9..14)
+      VoidKeyword [9..13) 'void'
+      T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'd'
+    ParameterList [15..17)
+      OpenParenToken [15..16) '('
+      T:WhitespaceTrivia [16..17) ' '
+      CloseParenToken [17..17) missing
+    SemicolonToken [17..18) ';'
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1026 [17..18) ) expected

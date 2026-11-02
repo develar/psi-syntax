@@ -1,0 +1,1 @@
+/// <see cref="A(ref B, out C)"/>

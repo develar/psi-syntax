@@ -1,0 +1,8 @@
+L:ConflictMarkerTrivia [0..16) '||||||| Trailing'
+L:EndOfLineTrivia [16..17) '\n'
+L:DisabledTextTrivia [17..31) 'disabled text\n'
+L:ConflictMarkerTrivia [31..55) '>>>>>>> Actually the end'
+EndOfFileToken [55..55) ''
+Diagnostics:
+  CS8300 [0..7) Merge conflict marker encountered
+  CS8300 [31..38) Merge conflict marker encountered

@@ -1,0 +1,1 @@
+var x = o is Type (Param: 3, Param2: 4) { Prop : 3 } x;

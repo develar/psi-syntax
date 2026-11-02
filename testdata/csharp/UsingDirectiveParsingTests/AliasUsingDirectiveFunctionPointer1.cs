@@ -1,0 +1,1 @@
+using x = delegate*<int, void>;

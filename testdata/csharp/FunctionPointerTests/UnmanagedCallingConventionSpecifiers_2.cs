@@ -1,0 +1,1 @@
+delegate* unmanaged[Stdcall]<string, Goo, int> ptr;

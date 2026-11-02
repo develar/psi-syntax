@@ -1,0 +1,33 @@
+CompilationUnit [0..48)
+  InterfaceDeclaration [0..48)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..15) 'async'
+    T:WhitespaceTrivia [15..16) ' '
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    IndexerDeclaration [18..47)
+      IdentifierName [18..24)
+        IdentifierToken [18..23) 'async'
+        T:WhitespaceTrivia [23..24) ' '
+      ThisKeyword [24..28) 'this'
+      BracketedParameterList [28..38)
+        OpenBracketToken [28..29) '['
+        Parameter [29..36)
+          IdentifierName [29..35)
+            IdentifierToken [29..34) 'async'
+            T:WhitespaceTrivia [34..35) ' '
+          IdentifierToken [35..36) 'i'
+        CloseBracketToken [36..37) ']'
+        T:WhitespaceTrivia [37..38) ' '
+      AccessorList [38..47)
+        OpenBraceToken [38..39) '{'
+        T:WhitespaceTrivia [39..40) ' '
+        GetAccessorDeclaration [40..45)
+          GetKeyword [40..43) 'get'
+          SemicolonToken [43..44) ';'
+          T:WhitespaceTrivia [44..45) ' '
+        CloseBraceToken [45..46) '}'
+        T:WhitespaceTrivia [46..47) ' '
+    CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''

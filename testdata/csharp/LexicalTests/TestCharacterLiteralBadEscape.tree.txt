@@ -1,0 +1,4 @@
+CharacterLiteralToken [0..4) '\'\\q\''
+EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1009 [1..3) Unrecognized escape sequence

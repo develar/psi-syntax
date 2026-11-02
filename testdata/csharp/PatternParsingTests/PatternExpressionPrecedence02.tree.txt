@@ -1,0 +1,15 @@
+LessThanExpression [0..13)
+  IsPatternExpression [0..10)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'A'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    ConstantPattern [5..10)
+      NullLiteralExpression [5..10)
+        NullKeyword [5..9) 'null'
+        T:WhitespaceTrivia [9..10) ' '
+  LessThanToken [10..11) '<'
+  T:WhitespaceTrivia [11..12) ' '
+  IdentifierName [12..13)
+    IdentifierToken [12..13) 'B'

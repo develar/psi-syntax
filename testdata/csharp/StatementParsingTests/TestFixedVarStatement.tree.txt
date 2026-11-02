@@ -1,0 +1,21 @@
+FixedStatement [0..20)
+  FixedKeyword [0..5) 'fixed'
+  OpenParenToken [5..6) '('
+  VariableDeclaration [6..15)
+    IdentifierName [6..10)
+      IdentifierToken [6..9) 'var'
+      T:WhitespaceTrivia [9..10) ' '
+    VariableDeclarator [10..15)
+      IdentifierToken [10..11) 'a'
+      T:WhitespaceTrivia [11..12) ' '
+      EqualsValueClause [12..15)
+        EqualsToken [12..13) '='
+        T:WhitespaceTrivia [13..14) ' '
+        IdentifierName [14..15)
+          IdentifierToken [14..15) 'b'
+  CloseParenToken [15..16) ')'
+  T:WhitespaceTrivia [16..17) ' '
+  Block [17..20)
+    OpenBraceToken [17..18) '{'
+    T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'

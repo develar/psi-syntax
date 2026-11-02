@@ -1,0 +1,93 @@
+CompilationUnit [0..122)
+  ClassDeclaration [0..65)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:WhitespaceTrivia [11..12) ' '
+    BaseList [12..20)
+      ColonToken [12..13) ':'
+      T:WhitespaceTrivia [13..14) ' '
+      SimpleBaseType [14..20)
+        IdentifierName [14..20)
+          IdentifierToken [14..19) 'Itest'
+          T:EndOfLineTrivia [19..20) '\n'
+    OpenBraceToken [20..21) '{'
+    T:EndOfLineTrivia [21..22) '\n'
+    EventDeclaration [22..40)
+      L:WhitespaceTrivia [22..25) '   '
+      EventKeyword [25..30) 'event'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierName [31..33)
+        IdentifierToken [31..32) 'D'
+        T:WhitespaceTrivia [32..33) ' '
+      ExplicitInterfaceSpecifier [33..39)
+        IdentifierName [33..38)
+          IdentifierToken [33..38) 'ITest'
+        DotToken [38..39) '.'
+      IdentifierToken [39..40) 'E'
+      AccessorList [40..40)
+        OpenBraceToken [40..40) missing
+        CloseBraceToken [40..40) missing
+    IncompleteMember [40..60)
+      TupleType [40..60)
+        OpenParenToken [40..41) '('
+        TupleElement [41..41)
+          IdentifierName [41..41)
+            IdentifierToken [41..41) missing
+        CommaToken [41..41) missing
+        TupleElement [41..41)
+          IdentifierName [41..41)
+            IdentifierToken [41..41) missing
+        CloseParenToken [41..42) ')'
+        T:WhitespaceTrivia [42..45) '   '
+        T:SingleLineCommentTrivia [45..54) '// CS0071'
+        T:EndOfLineTrivia [54..55) '\n'
+        T:WhitespaceTrivia [55..58) '   '
+        T:SkippedTokensTrivia [58..59)
+          OpenBraceToken [58..59) '{'
+        T:EndOfLineTrivia [59..60) '\n'
+    L:WhitespaceTrivia [60..63) '   '
+    CloseBraceToken [63..64) '}'
+    T:EndOfLineTrivia [64..65) '\n'
+  GlobalStatement [65..122)
+    LocalFunctionStatement [65..122)
+      L:WhitespaceTrivia [65..68) '   '
+      PublicKeyword [68..74) 'public'
+      T:WhitespaceTrivia [74..75) ' '
+      StaticKeyword [75..81) 'static'
+      T:WhitespaceTrivia [81..82) ' '
+      PredefinedType [82..86)
+        IntKeyword [82..85) 'int'
+        T:WhitespaceTrivia [85..86) ' '
+      IdentifierToken [86..90) 'Main'
+      ParameterList [90..93)
+        OpenParenToken [90..91) '('
+        CloseParenToken [91..92) ')'
+        T:EndOfLineTrivia [92..93) '\n'
+      Block [93..122)
+        L:WhitespaceTrivia [93..96) '   '
+        OpenBraceToken [96..97) '{'
+        T:EndOfLineTrivia [97..98) '\n'
+        ReturnStatement [98..115)
+          L:WhitespaceTrivia [98..105) '       '
+          ReturnKeyword [105..111) 'return'
+          T:WhitespaceTrivia [111..112) ' '
+          NumericLiteralExpression [112..113)
+            NumericLiteralToken [112..113) '1'
+          SemicolonToken [113..114) ';'
+          T:EndOfLineTrivia [114..115) '\n'
+        L:WhitespaceTrivia [115..118) '   '
+        CloseBraceToken [118..119) '}'
+        T:EndOfLineTrivia [119..120) '\n'
+        T:SkippedTokensTrivia [120..121)
+          CloseBraceToken [120..121) '}'
+        T:EndOfLineTrivia [121..122) '\n'
+  EndOfFileToken [122..122) ''
+Diagnostics:
+  CS0071 [38..39) An explicit interface implementation of an event must use event accessor syntax
+  CS8124 [41..42) Tuple must contain at least two elements.
+  CS1519 [58..59) Invalid token \'{\' in a member declaration
+  CS8803 [68..119) Top-level statements must precede namespace and type declarations.
+  CS0106 [68..74) The modifier \'public\' is not valid for this item
+  CS1022 [120..121) Type or namespace definition, or end-of-file expected

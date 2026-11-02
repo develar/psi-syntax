@@ -1,0 +1,30 @@
+ObjectCreationExpression [0..23)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'a'
+    T:WhitespaceTrivia [5..6) ' '
+  ObjectInitializerExpression [6..23)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    SimpleAssignmentExpression [8..22)
+      IdentifierName [8..10)
+        IdentifierToken [8..9) 'B'
+        T:WhitespaceTrivia [9..10) ' '
+      EqualsToken [10..11) '='
+      T:WhitespaceTrivia [11..12) ' '
+      ObjectInitializerExpression [12..22)
+        OpenBraceToken [12..13) '{'
+        T:WhitespaceTrivia [13..14) ' '
+        SimpleAssignmentExpression [14..20)
+          IdentifierName [14..16)
+            IdentifierToken [14..15) 'X'
+            T:WhitespaceTrivia [15..16) ' '
+          EqualsToken [16..17) '='
+          T:WhitespaceTrivia [17..18) ' '
+          IdentifierName [18..20)
+            IdentifierToken [18..19) 'x'
+            T:WhitespaceTrivia [19..20) ' '
+        CloseBraceToken [20..21) '}'
+        T:WhitespaceTrivia [21..22) ' '
+    CloseBraceToken [22..23) '}'

@@ -1,0 +1,1 @@
+class C { [Attr(ref)] void M() { } }

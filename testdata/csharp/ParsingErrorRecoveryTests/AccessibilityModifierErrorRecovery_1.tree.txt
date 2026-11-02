@@ -1,0 +1,140 @@
+CompilationUnit [0..370)
+  ClassDeclaration [0..105)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..29)
+      PredefinedType [10..19)
+        L:WhitespaceTrivia [10..14) '    '
+        VoidKeyword [14..18) 'void'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..20) 'M'
+      ParameterList [20..23)
+        OpenParenToken [20..21) '('
+        CloseParenToken [21..22) ')'
+        T:EndOfLineTrivia [22..23) '\n'
+      Block [23..29)
+        L:WhitespaceTrivia [23..27) '    '
+        OpenBraceToken [27..28) '{'
+        T:EndOfLineTrivia [28..29) '\n'
+        CloseBraceToken [29..29) missing
+    MethodDeclaration [29..99)
+      L:WhitespaceTrivia [29..37) '        '
+      L:SingleLineCommentTrivia [37..63) '// bad visibility modifier'
+      L:EndOfLineTrivia [63..64) '\n'
+      L:WhitespaceTrivia [64..72) '        '
+      PublicKeyword [72..78) 'public'
+      T:WhitespaceTrivia [78..79) ' '
+      PredefinedType [79..84)
+        VoidKeyword [79..83) 'void'
+        T:WhitespaceTrivia [83..84) ' '
+      IdentifierToken [84..93) 'localFunc'
+      ParameterList [93..96)
+        OpenParenToken [93..94) '('
+        CloseParenToken [94..95) ')'
+        T:WhitespaceTrivia [95..96) ' '
+      Block [96..99)
+        OpenBraceToken [96..97) '{'
+        CloseBraceToken [97..98) '}'
+        T:EndOfLineTrivia [98..99) '\n'
+    L:WhitespaceTrivia [99..103) '    '
+    CloseBraceToken [103..104) '}'
+    T:EndOfLineTrivia [104..105) '\n'
+  GlobalStatement [105..140)
+    LocalFunctionStatement [105..140)
+      PredefinedType [105..114)
+        L:WhitespaceTrivia [105..109) '    '
+        VoidKeyword [109..113) 'void'
+        T:WhitespaceTrivia [113..114) ' '
+      IdentifierToken [114..116) 'M2'
+      ParameterList [116..119)
+        OpenParenToken [116..117) '('
+        CloseParenToken [117..118) ')'
+        T:EndOfLineTrivia [118..119) '\n'
+      Block [119..140)
+        L:WhitespaceTrivia [119..123) '    '
+        OpenBraceToken [123..124) '{'
+        T:EndOfLineTrivia [124..125) '\n'
+        ExpressionStatement [125..140)
+          IdentifierName [125..140)
+            L:WhitespaceTrivia [125..133) '        '
+            IdentifierToken [133..139) 'typing'
+            T:EndOfLineTrivia [139..140) '\n'
+          SemicolonToken [140..140) missing
+        CloseBraceToken [140..140) missing
+  GlobalStatement [140..181)
+    LocalFunctionStatement [140..181)
+      L:WhitespaceTrivia [140..148) '        '
+      PublicKeyword [148..154) 'public'
+      T:WhitespaceTrivia [154..155) ' '
+      PredefinedType [155..160)
+        VoidKeyword [155..159) 'void'
+        T:WhitespaceTrivia [159..160) ' '
+      IdentifierToken [160..169) 'localFunc'
+      ParameterList [169..172)
+        OpenParenToken [169..170) '('
+        CloseParenToken [170..171) ')'
+        T:WhitespaceTrivia [171..172) ' '
+      Block [172..181)
+        OpenBraceToken [172..173) '{'
+        CloseBraceToken [173..174) '}'
+        T:EndOfLineTrivia [174..175) '\n'
+        T:WhitespaceTrivia [175..179) '    '
+        T:SkippedTokensTrivia [179..180)
+          CloseBraceToken [179..180) '}'
+        T:EndOfLineTrivia [180..181) '\n'
+  GlobalStatement [181..201)
+    LocalFunctionStatement [181..201)
+      PredefinedType [181..190)
+        L:WhitespaceTrivia [181..185) '    '
+        VoidKeyword [185..189) 'void'
+        T:WhitespaceTrivia [189..190) ' '
+      IdentifierToken [190..192) 'M3'
+      ParameterList [192..195)
+        OpenParenToken [192..193) '('
+        CloseParenToken [193..194) ')'
+        T:EndOfLineTrivia [194..195) '\n'
+      Block [195..201)
+        L:WhitespaceTrivia [195..199) '    '
+        OpenBraceToken [199..200) '{'
+        T:EndOfLineTrivia [200..201) '\n'
+        CloseBraceToken [201..201) missing
+  GlobalStatement [201..370)
+    LocalFunctionStatement [201..370)
+      L:WhitespaceTrivia [201..205) '    '
+      L:SingleLineCommentTrivia [205..274) '// Ambiguous between local func with bad modifier and missing closing'
+      L:EndOfLineTrivia [274..275) '\n'
+      L:WhitespaceTrivia [275..279) '    '
+      L:SingleLineCommentTrivia [279..344) '// brace on previous method. Parsing currently assumes the latter'
+      L:EndOfLineTrivia [344..345) '\n'
+      L:WhitespaceTrivia [345..349) '    '
+      PublicKeyword [349..355) 'public'
+      T:WhitespaceTrivia [355..356) ' '
+      PredefinedType [356..361)
+        VoidKeyword [356..360) 'void'
+        T:WhitespaceTrivia [360..361) ' '
+      IdentifierToken [361..363) 'M4'
+      ParameterList [363..366)
+        OpenParenToken [363..364) '('
+        CloseParenToken [364..365) ')'
+        T:WhitespaceTrivia [365..366) ' '
+      Block [366..370)
+        OpenBraceToken [366..367) '{'
+        CloseBraceToken [367..368) '}'
+        T:EndOfLineTrivia [368..369) '\n'
+        T:SkippedTokensTrivia [369..370)
+          CloseBraceToken [369..370) '}'
+  EndOfFileToken [370..370) ''
+Diagnostics:
+  CS1513 [28..28) } expected
+  CS8803 [109..140) Top-level statements must precede namespace and type declarations.
+  CS1002 [139..139) ; expected
+  CS1513 [139..139) } expected
+  CS0106 [148..154) The modifier \'public\' is not valid for this item
+  CS1022 [179..180) Type or namespace definition, or end-of-file expected
+  CS1513 [200..200) } expected
+  CS0106 [349..355) The modifier \'public\' is not valid for this item
+  CS1022 [369..370) Type or namespace definition, or end-of-file expected

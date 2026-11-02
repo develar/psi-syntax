@@ -1,0 +1,25 @@
+CastExpression [0..34)
+  OpenParenToken [0..1) '('
+  GenericName [1..28)
+    IdentifierToken [1..15) 'ImmutableArray'
+    TypeArgumentList [15..28)
+      LessThanToken [15..16) '<'
+      GenericName [16..27)
+        IdentifierToken [16..20) 'List'
+        TypeArgumentList [20..27)
+          LessThanToken [20..21) '<'
+          IdentifierName [21..26)
+            IdentifierToken [21..26) 'Int32'
+          GreaterThanToken [26..27) '>'
+      GreaterThanToken [27..28) '>'
+  CloseParenToken [28..29) ')'
+  CollectionExpression [29..34)
+    OpenBracketToken [29..30) '['
+    ExpressionElement [30..33)
+      CollectionExpression [30..33)
+        OpenBracketToken [30..31) '['
+        ExpressionElement [31..32)
+          NumericLiteralExpression [31..32)
+            NumericLiteralToken [31..32) '1'
+        CloseBracketToken [32..33) ']'
+    CloseBracketToken [33..34) ']'

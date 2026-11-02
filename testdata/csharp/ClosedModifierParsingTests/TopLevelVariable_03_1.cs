@@ -1,0 +1,2 @@
+bool closed;
+closed = true;

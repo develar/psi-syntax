@@ -1,0 +1,20 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..7)
+    LocalDeclarationStatement [0..7)
+      VariableDeclaration [0..7)
+        IdentifierName [0..7)
+          IdentifierToken [0..6) 'closed'
+          T:WhitespaceTrivia [6..7) ' '
+        VariableDeclarator [7..7)
+          IdentifierToken [7..7) missing
+      SemicolonToken [7..7) missing
+  FileScopedNamespaceDeclaration [7..20)
+    NamespaceKeyword [7..16) 'namespace'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..19)
+      IdentifierToken [17..19) 'NS'
+    SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1001 [7..16) Identifier expected
+  CS1002 [7..16) ; expected

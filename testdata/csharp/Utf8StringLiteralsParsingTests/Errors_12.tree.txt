@@ -1,0 +1,6 @@
+StringLiteralExpression [0..9)
+  StringLiteralToken [0..8) '@"hello"'
+  T:SkippedTokensTrivia [8..9)
+    IdentifierToken [8..9) 'U'
+Diagnostics:
+  CS1073 [0..8) Unexpected token \'U\'

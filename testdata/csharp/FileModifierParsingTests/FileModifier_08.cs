@@ -1,0 +1,1 @@
+partial file ref struct C { }

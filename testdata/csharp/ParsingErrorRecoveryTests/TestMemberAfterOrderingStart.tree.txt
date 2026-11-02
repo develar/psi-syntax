@@ -1,0 +1,73 @@
+CompilationUnit [0..66)
+  ClassDeclaration [0..66)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..49)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..49)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..49)
+          VariableDeclaration [21..49)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..49)
+              IdentifierToken [25..26) 'q'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..49)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                QueryExpression [29..49)
+                  FromClause [29..41)
+                    FromKeyword [29..33) 'from'
+                    T:WhitespaceTrivia [33..34) ' '
+                    IdentifierToken [34..35) 'x'
+                    T:WhitespaceTrivia [35..36) ' '
+                    InKeyword [36..38) 'in'
+                    T:WhitespaceTrivia [38..39) ' '
+                    IdentifierName [39..41)
+                      IdentifierToken [39..40) 'y'
+                      T:WhitespaceTrivia [40..41) ' '
+                  QueryBody [41..49)
+                    OrderByClause [41..49)
+                      OrderByKeyword [41..48) 'orderby'
+                      T:WhitespaceTrivia [48..49) ' '
+                      AscendingOrdering [49..49)
+                        IdentifierName [49..49)
+                          IdentifierToken [49..49) missing
+                    SelectClause [49..49)
+                      SelectKeyword [49..49) missing
+                      IdentifierName [49..49)
+                        IdentifierToken [49..49) missing
+          SemicolonToken [49..49) missing
+        CloseBraceToken [49..49) missing
+    FieldDeclaration [49..65)
+      PublicKeyword [49..55) 'public'
+      T:WhitespaceTrivia [55..56) ' '
+      VariableDeclaration [56..63)
+        PredefinedType [56..60)
+          IntKeyword [56..59) 'int'
+          T:WhitespaceTrivia [59..60) ' '
+        VariableDeclarator [60..63)
+          IdentifierToken [60..63) 'Goo'
+      SemicolonToken [63..64) ';'
+      T:WhitespaceTrivia [64..65) ' '
+    CloseBraceToken [65..66) '}'
+  EndOfFileToken [66..66) ''
+Diagnostics:
+  CS1525 [49..55) Invalid expression term \'public\'
+  CS0742 [49..55) A query body must end with a select clause or a group clause
+  CS1002 [49..55) ; expected
+  CS1513 [49..55) } expected

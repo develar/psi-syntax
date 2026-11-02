@@ -1,0 +1,26 @@
+CompilationUnit [0..56)
+  ClassDeclaration [0..56)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    L:WhitespaceTrivia [21..25) '    '
+    L:LineDirectiveTrivia [25..54)
+      HashToken [25..26) '#'
+      T:WhitespaceTrivia [26..27) ' '
+      LineKeyword [27..31) 'line'
+      T:WhitespaceTrivia [31..32) ' '
+      NumericLiteralToken [32..53) '999999999999999999999'
+      EndOfDirectiveToken [53..53) ''
+      T:EndOfLineTrivia [53..54) '\n'
+    CloseBraceToken [54..55) '}'
+    T:EndOfLineTrivia [55..56) '\n'
+  EndOfFileToken [56..56) ''
+Diagnostics:
+  CS1021 [32..32) Integral constant is too large
+  CS1576 [32..53) The line number specified for #line directive is missing or invalid

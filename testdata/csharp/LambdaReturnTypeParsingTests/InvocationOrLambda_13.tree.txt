@@ -1,0 +1,38 @@
+ParenthesizedLambdaExpression [0..34)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ParameterList [1..28)
+    OpenParenToken [1..2) '('
+    Parameter [2..9)
+      RefKeyword [2..5) 'ref'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'A'
+        T:WhitespaceTrivia [7..8) ' '
+      IdentifierToken [8..9) 'a'
+    CommaToken [9..10) ','
+    T:WhitespaceTrivia [10..11) ' '
+    Parameter [11..18)
+      OutKeyword [11..14) 'out'
+      T:WhitespaceTrivia [14..15) ' '
+      IdentifierName [15..17)
+        IdentifierToken [15..16) 'B'
+        T:WhitespaceTrivia [16..17) ' '
+      IdentifierToken [17..18) 'b'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    Parameter [20..26)
+      InKeyword [20..22) 'in'
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'C'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'c'
+    CloseParenToken [26..27) ')'
+    T:WhitespaceTrivia [27..28) ' '
+  EqualsGreaterThanToken [28..30) '=>'
+  T:WhitespaceTrivia [30..31) ' '
+  Block [31..34)
+    OpenBraceToken [31..32) '{'
+    T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'

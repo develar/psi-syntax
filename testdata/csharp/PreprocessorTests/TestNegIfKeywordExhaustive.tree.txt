@@ -1,0 +1,69 @@
+CompilationUnit [0..76)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..13)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..5)
+      IdentifierToken [5..5) missing
+    L:SkippedTokensTrivia [5..12)
+      DefaultKeyword [5..12) 'default'
+    EndOfDirectiveToken [12..12) ''
+    T:EndOfLineTrivia [12..13) '\n'
+  L:ElifDirectiveTrivia [13..26)
+    HashToken [13..14) '#'
+    ElifKeyword [14..18) 'elif'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..19)
+      IdentifierToken [19..19) missing
+    L:SkippedTokensTrivia [19..25)
+      HiddenKeyword [19..25) 'hidden'
+    EndOfDirectiveToken [25..25) ''
+    T:EndOfLineTrivia [25..26) '\n'
+  L:ElifDirectiveTrivia [26..41)
+    HashToken [26..27) '#'
+    ElifKeyword [27..31) 'elif'
+    T:WhitespaceTrivia [31..32) ' '
+    IdentifierName [32..32)
+      IdentifierToken [32..32) missing
+    L:SkippedTokensTrivia [32..40)
+      ChecksumKeyword [32..40) 'checksum'
+    EndOfDirectiveToken [40..40) ''
+    T:EndOfLineTrivia [40..41) '\n'
+  L:ElifDirectiveTrivia [41..55)
+    HashToken [41..42) '#'
+    ElifKeyword [42..46) 'elif'
+    T:WhitespaceTrivia [46..47) ' '
+    IdentifierName [47..47)
+      IdentifierToken [47..47) missing
+    L:SkippedTokensTrivia [47..54)
+      DisableKeyword [47..54) 'disable'
+    EndOfDirectiveToken [54..54) ''
+    T:EndOfLineTrivia [54..55) '\n'
+  L:ElifDirectiveTrivia [55..69)
+    HashToken [55..56) '#'
+    ElifKeyword [56..60) 'elif'
+    T:WhitespaceTrivia [60..61) ' '
+    IdentifierName [61..61)
+      IdentifierToken [61..61) missing
+    L:SkippedTokensTrivia [61..68)
+      RestoreKeyword [61..68) 'restore'
+    EndOfDirectiveToken [68..68) ''
+    T:EndOfLineTrivia [68..69) '\n'
+  L:EndIfDirectiveTrivia [69..76)
+    HashToken [69..70) '#'
+    EndIfKeyword [70..75) 'endif'
+    EndOfDirectiveToken [75..75) ''
+    T:EndOfLineTrivia [75..76) '\n'
+  EndOfFileToken [76..76) ''
+Diagnostics:
+  CS1517 [5..12) Invalid preprocessor expression
+  CS1025 [5..12) Single-line comment or end-of-line expected
+  CS1517 [19..25) Invalid preprocessor expression
+  CS1025 [19..25) Single-line comment or end-of-line expected
+  CS1517 [32..40) Invalid preprocessor expression
+  CS1025 [32..40) Single-line comment or end-of-line expected
+  CS1517 [47..54) Invalid preprocessor expression
+  CS1025 [47..54) Single-line comment or end-of-line expected
+  CS1517 [61..68) Invalid preprocessor expression
+  CS1025 [61..68) Single-line comment or end-of-line expected

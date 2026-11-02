@@ -1,0 +1,27 @@
+ExpressionStatement [0..19)
+  SimpleAssignmentExpression [0..18)
+    InvocationExpression [0..15)
+      SimpleMemberAccessExpression [0..8)
+        IdentifierName [0..3)
+          IdentifierToken [0..3) 'var'
+        DotToken [3..4) '.'
+        IdentifierName [4..8)
+          IdentifierToken [4..7) 'var'
+          T:WhitespaceTrivia [7..8) ' '
+      ArgumentList [8..15)
+        OpenParenToken [8..9) '('
+        Argument [9..10)
+          IdentifierName [9..10)
+            IdentifierToken [9..10) 'x'
+        CommaToken [10..11) ','
+        T:WhitespaceTrivia [11..12) ' '
+        Argument [12..13)
+          IdentifierName [12..13)
+            IdentifierToken [12..13) 'y'
+        CloseParenToken [13..14) ')'
+        T:WhitespaceTrivia [14..15) ' '
+    EqualsToken [15..16) '='
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..18)
+      IdentifierToken [17..18) 'e'
+  SemicolonToken [18..19) ';'

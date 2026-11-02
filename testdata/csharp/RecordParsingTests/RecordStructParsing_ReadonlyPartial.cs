@@ -1,0 +1,1 @@
+readonly partial record struct S;

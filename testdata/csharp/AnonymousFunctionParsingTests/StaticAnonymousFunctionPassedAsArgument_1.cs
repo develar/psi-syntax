@@ -1,0 +1,1 @@
+M1(static delegate(int x) { });

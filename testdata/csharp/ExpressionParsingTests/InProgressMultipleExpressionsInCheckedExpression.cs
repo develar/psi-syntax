@@ -1,0 +1,1 @@
+var v = checked(Boo Quux());

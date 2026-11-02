@@ -1,0 +1,34 @@
+QueryExpression [0..47)
+  FromClause [0..12)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 't'
+    T:WhitespaceTrivia [6..7) ' '
+    InKeyword [7..9) 'in'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'e'
+      T:EndOfLineTrivia [11..12) '\n'
+  QueryBody [12..47)
+    WhereClause [12..39)
+      WhereKeyword [12..17) 'where'
+      T:EndOfLineTrivia [17..18) '\n'
+      EqualsExpression [18..39)
+        IdentifierName [18..20)
+          IdentifierToken [18..19) 't'
+          T:WhitespaceTrivia [19..20) ' '
+        EqualsEqualsToken [20..22) '=='
+        T:WhitespaceTrivia [22..23) ' '
+        SimpleMemberAccessExpression [23..39)
+          IdentifierName [23..28)
+            IdentifierToken [23..28) 'Int32'
+          DotToken [28..29) '.'
+          T:EndOfLineTrivia [29..30) '\n'
+          IdentifierName [30..39)
+            IdentifierToken [30..38) 'MinValue'
+            T:EndOfLineTrivia [38..39) '\n'
+    SelectClause [39..47)
+      SelectKeyword [39..45) 'select'
+      T:WhitespaceTrivia [45..46) ' '
+      IdentifierName [46..47)
+        IdentifierToken [46..47) 't'

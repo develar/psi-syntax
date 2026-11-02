@@ -1,0 +1,1 @@
+delegate* unmanaged[Fastcall]<string, Goo, int> ptr;

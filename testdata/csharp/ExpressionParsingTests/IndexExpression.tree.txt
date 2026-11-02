@@ -1,0 +1,4 @@
+IndexExpression [0..2)
+  CaretToken [0..1) '^'
+  NumericLiteralExpression [1..2)
+    NumericLiteralToken [1..2) '1'

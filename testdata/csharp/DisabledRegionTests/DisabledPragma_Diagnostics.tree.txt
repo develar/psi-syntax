@@ -1,0 +1,240 @@
+CompilationUnit [0..479)
+  ClassDeclaration [0..479)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:IfDirectiveTrivia [1..11)
+      HashToken [1..2) '#'
+      IfKeyword [2..4) 'if'
+      T:WhitespaceTrivia [4..5) ' '
+      FalseLiteralExpression [5..10)
+        FalseKeyword [5..10) 'false'
+      EndOfDirectiveToken [10..10) ''
+      T:EndOfLineTrivia [10..11) '\n'
+    L:PragmaWarningDirectiveTrivia [11..19)
+      HashToken [11..12) '#'
+      PragmaKeyword [12..18) 'pragma'
+      WarningKeyword [18..18) missing
+      DisableKeyword [18..18) missing
+      EndOfDirectiveToken [18..18) ''
+      T:EndOfLineTrivia [18..19) '\n'
+    L:PragmaWarningDirectiveTrivia [19..35)
+      HashToken [19..20) '#'
+      PragmaKeyword [20..26) 'pragma'
+      T:WhitespaceTrivia [26..27) ' '
+      WarningKeyword [27..34) 'warning'
+      DisableKeyword [34..34) missing
+      EndOfDirectiveToken [34..34) ''
+      T:EndOfLineTrivia [34..35) '\n'
+    L:PragmaWarningDirectiveTrivia [35..71)
+      HashToken [35..36) '#'
+      PragmaKeyword [36..42) 'pragma'
+      T:WhitespaceTrivia [42..43) ' '
+      WarningKeyword [43..50) 'warning'
+      T:WhitespaceTrivia [50..51) ' '
+      DisableKeyword [51..58) 'disable'
+      T:WhitespaceTrivia [58..59) ' '
+      NumericLiteralExpression [59..59)
+        NumericLiteralToken [59..59) missing
+      L:SkippedTokensTrivia [59..70)
+        StringLiteralToken [59..70) '"something"'
+      EndOfDirectiveToken [70..70) ''
+      T:EndOfLineTrivia [70..71) '\n'
+    L:PragmaWarningDirectiveTrivia [71..97)
+      HashToken [71..72) '#'
+      PragmaKeyword [72..78) 'pragma'
+      T:WhitespaceTrivia [78..79) ' '
+      WarningKeyword [79..86) 'warning'
+      T:WhitespaceTrivia [86..87) ' '
+      DisableKeyword [87..94) 'disable'
+      T:WhitespaceTrivia [94..95) ' '
+      NumericLiteralExpression [95..96)
+        NumericLiteralToken [95..96) '0'
+      EndOfDirectiveToken [96..96) ''
+      T:EndOfLineTrivia [96..97) '\n'
+    L:PragmaWarningDirectiveTrivia [97..124)
+      HashToken [97..98) '#'
+      PragmaKeyword [98..104) 'pragma'
+      T:WhitespaceTrivia [104..105) ' '
+      WarningKeyword [105..112) 'warning'
+      T:WhitespaceTrivia [112..113) ' '
+      DisableKeyword [113..120) 'disable'
+      T:WhitespaceTrivia [120..121) ' '
+      NumericLiteralExpression [121..121)
+        NumericLiteralToken [121..121) missing
+      L:SkippedTokensTrivia [121..123)
+        MinusToken [121..122) '-'
+        NumericLiteralToken [122..123) '1'
+      EndOfDirectiveToken [123..123) ''
+      T:EndOfLineTrivia [123..124) '\n'
+    L:PragmaChecksumDirectiveTrivia [124..141)
+      HashToken [124..125) '#'
+      PragmaKeyword [125..131) 'pragma'
+      T:WhitespaceTrivia [131..132) ' '
+      ChecksumKeyword [132..140) 'checksum'
+      StringLiteralToken [140..140) missing
+      StringLiteralToken [140..140) missing
+      StringLiteralToken [140..140) missing
+      EndOfDirectiveToken [140..140) ''
+      T:EndOfLineTrivia [140..141) '\n'
+    L:PragmaChecksumDirectiveTrivia [141..165)
+      HashToken [141..142) '#'
+      PragmaKeyword [142..148) 'pragma'
+      T:WhitespaceTrivia [148..149) ' '
+      ChecksumKeyword [149..157) 'checksum'
+      T:WhitespaceTrivia [157..158) ' '
+      StringLiteralToken [158..164) '"file"'
+      StringLiteralToken [164..164) missing
+      StringLiteralToken [164..164) missing
+      EndOfDirectiveToken [164..164) ''
+      T:EndOfLineTrivia [164..165) '\n'
+    L:PragmaChecksumDirectiveTrivia [165..196)
+      HashToken [165..166) '#'
+      PragmaKeyword [166..172) 'pragma'
+      T:WhitespaceTrivia [172..173) ' '
+      ChecksumKeyword [173..181) 'checksum'
+      T:WhitespaceTrivia [181..182) ' '
+      StringLiteralToken [182..188) '"file"'
+      T:WhitespaceTrivia [188..189) ' '
+      StringLiteralToken [189..195) '"guid"'
+      StringLiteralToken [195..195) missing
+      EndOfDirectiveToken [195..195) ''
+      T:EndOfLineTrivia [195..196) '\n'
+    L:PragmaChecksumDirectiveTrivia [196..235)
+      HashToken [196..197) '#'
+      PragmaKeyword [197..203) 'pragma'
+      T:WhitespaceTrivia [203..204) ' '
+      ChecksumKeyword [204..212) 'checksum'
+      T:WhitespaceTrivia [212..213) ' '
+      StringLiteralToken [213..219) '"file"'
+      T:WhitespaceTrivia [219..220) ' '
+      StringLiteralToken [220..226) '"guid"'
+      T:WhitespaceTrivia [226..227) ' '
+      StringLiteralToken [227..234) '"bytes"'
+      EndOfDirectiveToken [234..234) ''
+      T:EndOfLineTrivia [234..235) '\n'
+    L:EndIfDirectiveTrivia [235..242)
+      HashToken [235..236) '#'
+      EndIfKeyword [236..241) 'endif'
+      EndOfDirectiveToken [241..241) ''
+      T:EndOfLineTrivia [241..242) '\n'
+    L:PragmaWarningDirectiveTrivia [242..250)
+      HashToken [242..243) '#'
+      PragmaKeyword [243..249) 'pragma'
+      WarningKeyword [249..249) missing
+      DisableKeyword [249..249) missing
+      EndOfDirectiveToken [249..249) ''
+      T:EndOfLineTrivia [249..250) '\n'
+    L:PragmaWarningDirectiveTrivia [250..266)
+      HashToken [250..251) '#'
+      PragmaKeyword [251..257) 'pragma'
+      T:WhitespaceTrivia [257..258) ' '
+      WarningKeyword [258..265) 'warning'
+      DisableKeyword [265..265) missing
+      EndOfDirectiveToken [265..265) ''
+      T:EndOfLineTrivia [265..266) '\n'
+    L:PragmaWarningDirectiveTrivia [266..303)
+      HashToken [266..267) '#'
+      PragmaKeyword [267..273) 'pragma'
+      T:WhitespaceTrivia [273..274) ' '
+      WarningKeyword [274..281) 'warning'
+      T:WhitespaceTrivia [281..282) ' '
+      DisableKeyword [282..289) 'disable'
+      T:WhitespaceTrivia [289..290) ' '
+      NumericLiteralExpression [290..290)
+        NumericLiteralToken [290..290) missing
+      L:SkippedTokensTrivia [290..302)
+        StringLiteralToken [290..302) '"something2"'
+      EndOfDirectiveToken [302..302) ''
+      T:EndOfLineTrivia [302..303) '\n'
+    L:PragmaWarningDirectiveTrivia [303..329)
+      HashToken [303..304) '#'
+      PragmaKeyword [304..310) 'pragma'
+      T:WhitespaceTrivia [310..311) ' '
+      WarningKeyword [311..318) 'warning'
+      T:WhitespaceTrivia [318..319) ' '
+      DisableKeyword [319..326) 'disable'
+      T:WhitespaceTrivia [326..327) ' '
+      NumericLiteralExpression [327..328)
+        NumericLiteralToken [327..328) '1'
+      EndOfDirectiveToken [328..328) ''
+      T:EndOfLineTrivia [328..329) '\n'
+    L:PragmaWarningDirectiveTrivia [329..356)
+      HashToken [329..330) '#'
+      PragmaKeyword [330..336) 'pragma'
+      T:WhitespaceTrivia [336..337) ' '
+      WarningKeyword [337..344) 'warning'
+      T:WhitespaceTrivia [344..345) ' '
+      DisableKeyword [345..352) 'disable'
+      T:WhitespaceTrivia [352..353) ' '
+      NumericLiteralExpression [353..353)
+        NumericLiteralToken [353..353) missing
+      L:SkippedTokensTrivia [353..355)
+        MinusToken [353..354) '-'
+        NumericLiteralToken [354..355) '2'
+      EndOfDirectiveToken [355..355) ''
+      T:EndOfLineTrivia [355..356) '\n'
+    L:PragmaChecksumDirectiveTrivia [356..373)
+      HashToken [356..357) '#'
+      PragmaKeyword [357..363) 'pragma'
+      T:WhitespaceTrivia [363..364) ' '
+      ChecksumKeyword [364..372) 'checksum'
+      StringLiteralToken [372..372) missing
+      StringLiteralToken [372..372) missing
+      StringLiteralToken [372..372) missing
+      EndOfDirectiveToken [372..372) ''
+      T:EndOfLineTrivia [372..373) '\n'
+    L:PragmaChecksumDirectiveTrivia [373..397)
+      HashToken [373..374) '#'
+      PragmaKeyword [374..380) 'pragma'
+      T:WhitespaceTrivia [380..381) ' '
+      ChecksumKeyword [381..389) 'checksum'
+      T:WhitespaceTrivia [389..390) ' '
+      StringLiteralToken [390..396) '"file"'
+      StringLiteralToken [396..396) missing
+      StringLiteralToken [396..396) missing
+      EndOfDirectiveToken [396..396) ''
+      T:EndOfLineTrivia [396..397) '\n'
+    L:PragmaChecksumDirectiveTrivia [397..428)
+      HashToken [397..398) '#'
+      PragmaKeyword [398..404) 'pragma'
+      T:WhitespaceTrivia [404..405) ' '
+      ChecksumKeyword [405..413) 'checksum'
+      T:WhitespaceTrivia [413..414) ' '
+      StringLiteralToken [414..420) '"file"'
+      T:WhitespaceTrivia [420..421) ' '
+      StringLiteralToken [421..427) '"guid"'
+      StringLiteralToken [427..427) missing
+      EndOfDirectiveToken [427..427) ''
+      T:EndOfLineTrivia [427..428) '\n'
+    L:PragmaChecksumDirectiveTrivia [428..467)
+      HashToken [428..429) '#'
+      PragmaKeyword [429..435) 'pragma'
+      T:WhitespaceTrivia [435..436) ' '
+      ChecksumKeyword [436..444) 'checksum'
+      T:WhitespaceTrivia [444..445) ' '
+      StringLiteralToken [445..451) '"file"'
+      T:WhitespaceTrivia [451..452) ' '
+      StringLiteralToken [452..458) '"guid"'
+      T:WhitespaceTrivia [458..459) ' '
+      StringLiteralToken [459..466) '"bytes"'
+      EndOfDirectiveToken [466..466) ''
+      T:EndOfLineTrivia [466..467) '\n'
+    ClassKeyword [467..472) 'class'
+    T:WhitespaceTrivia [472..473) ' '
+    IdentifierToken [473..474) 'C'
+    T:WhitespaceTrivia [474..475) ' '
+    OpenBraceToken [475..476) '{'
+    T:WhitespaceTrivia [476..477) ' '
+    CloseBraceToken [477..478) '}'
+    T:EndOfLineTrivia [478..479) '\n'
+  EndOfFileToken [479..479) ''
+Diagnostics:
+  CS1633 [249..249) Unrecognized #pragma directive
+  CS1634 [265..265) Expected \'disable\' or \'restore\'
+  CS1072 [290..302) Expected identifier or numeric literal.
+  CS1072 [353..354) Expected identifier or numeric literal.
+  CS1695 [372..372) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."
+  CS1695 [396..396) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."
+  CS1695 [421..427) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."
+  CS1695 [427..427) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."
+  CS1695 [452..458) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."
+  CS1695 [459..466) Invalid #pragma checksum syntax; should be #pragma checksum "filename" "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}" "XXXX..."

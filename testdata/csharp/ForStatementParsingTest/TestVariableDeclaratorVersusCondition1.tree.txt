@@ -1,0 +1,47 @@
+ForStatement [0..35)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..14)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..10) 'i'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        NumericLiteralExpression [13..14)
+          NumericLiteralToken [13..14) '0'
+  SemicolonToken [14..14) missing
+  T:SkippedTokensTrivia [14..15)
+    CommaToken [14..15) ','
+  T:WhitespaceTrivia [15..16) ' '
+  PostIncrementExpression [16..19)
+    IdentifierName [16..17)
+      IdentifierToken [16..17) 'i'
+    PlusPlusToken [17..19) '++'
+  SemicolonToken [19..20) ';'
+  T:WhitespaceTrivia [20..21) ' '
+  LessThanExpression [21..27)
+    IdentifierName [21..23)
+      IdentifierToken [21..22) 'i'
+      T:WhitespaceTrivia [22..23) ' '
+    LessThanToken [23..24) '<'
+    T:WhitespaceTrivia [24..25) ' '
+    NumericLiteralExpression [25..27)
+      NumericLiteralToken [25..27) '10'
+  SemicolonToken [27..28) ';'
+  T:WhitespaceTrivia [28..29) ' '
+  PostIncrementExpression [29..32)
+    IdentifierName [29..30)
+      IdentifierToken [29..30) 'i'
+    PlusPlusToken [30..32) '++'
+  CloseParenToken [32..33) ')'
+  T:WhitespaceTrivia [33..34) ' '
+  EmptyStatement [34..35)
+    SemicolonToken [34..35) ';'
+Diagnostics:
+  CS1002 [14..15) ; expected
+  CS1003 [27..28) Syntax error, \',\' expected

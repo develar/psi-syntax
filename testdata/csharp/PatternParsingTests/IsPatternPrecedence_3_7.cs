@@ -1,0 +1,1 @@
+new { X = e is A<B> }

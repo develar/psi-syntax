@@ -1,0 +1,2 @@
+/// </summary>        /// <returns></returns>         else  int OPERATOR @uint  $ )        { -              static ? operator  :: ]  @readonly  = @on   async  int? , [ return ] { 1 ! ,  @property  &  3 !   @case  %   partial   += ;/*[] bug*/ // YES []            int % ] endregion  var  =   ]]>   @for  |=   @struct , 3, lock  4 @on  %  5 goto  } @stackalloc  } /*,;*/            int %=  i = @fixed   ?> int << a base  <= 1] default ; 
+

@@ -1,0 +1,58 @@
+SwitchStatement [0..74)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..11)
+    IdentifierToken [8..11) 'obj'
+  CloseParenToken [11..12) ')'
+  T:EndOfLineTrivia [12..13) '\n'
+  OpenBraceToken [13..14) '{'
+  T:EndOfLineTrivia [14..15) '\n'
+  SwitchSection [15..44)
+    CasePatternSwitchLabel [15..42)
+      L:WhitespaceTrivia [15..19) '    '
+      CaseKeyword [19..23) 'case'
+      T:WhitespaceTrivia [23..24) ' '
+      RecursivePattern [24..42)
+        PropertyPatternClause [24..42)
+          OpenBraceToken [24..25) '{'
+          T:WhitespaceTrivia [25..26) ' '
+          T:SkippedTokensTrivia [26..28)
+            EqualsGreaterThanToken [26..28) '=>'
+          T:EndOfLineTrivia [28..29) '\n'
+          T:WhitespaceTrivia [29..37) '        '
+          T:SkippedTokensTrivia [37..42)
+            BreakKeyword [37..42) 'break'
+          CloseBraceToken [42..42) missing
+      ColonToken [42..42) missing
+    EmptyStatement [42..44)
+      SemicolonToken [42..43) ';'
+      T:EndOfLineTrivia [43..44) '\n'
+  SwitchSection [44..73)
+    CasePatternSwitchLabel [44..71)
+      L:WhitespaceTrivia [44..48) '    '
+      CaseKeyword [48..52) 'case'
+      T:WhitespaceTrivia [52..53) ' '
+      RecursivePattern [53..71)
+        PropertyPatternClause [53..71)
+          OpenBraceToken [53..54) '{'
+          T:WhitespaceTrivia [54..55) ' '
+          T:SkippedTokensTrivia [55..57)
+            EqualsGreaterThanToken [55..57) '=>'
+          T:EndOfLineTrivia [57..58) '\n'
+          T:WhitespaceTrivia [58..66) '        '
+          T:SkippedTokensTrivia [66..71)
+            BreakKeyword [66..71) 'break'
+          CloseBraceToken [71..71) missing
+      ColonToken [71..71) missing
+    EmptyStatement [71..73)
+      SemicolonToken [71..72) ';'
+      T:EndOfLineTrivia [72..73) '\n'
+  CloseBraceToken [73..74) '}'
+Diagnostics:
+  CS1001 [26..28) Identifier expected
+  CS1513 [42..43) } expected
+  CS1003 [42..43) Syntax error, \':\' expected
+  CS1001 [55..57) Identifier expected
+  CS1513 [71..72) } expected
+  CS1003 [71..72) Syntax error, \':\' expected

@@ -1,0 +1,5 @@
+BarBarToken [0..2) '||'
+BarBarToken [2..4) '||'
+BarBarToken [4..6) '||'
+T:WhitespaceTrivia [6..7) ' '
+EndOfFileToken [7..7) ''

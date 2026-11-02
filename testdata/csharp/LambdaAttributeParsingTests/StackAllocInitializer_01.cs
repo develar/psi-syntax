@@ -1,0 +1,1 @@
+stackalloc[] { [A] x => x, [B] () => { } }

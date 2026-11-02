@@ -1,0 +1,1 @@
+class a<b> where b : c { }

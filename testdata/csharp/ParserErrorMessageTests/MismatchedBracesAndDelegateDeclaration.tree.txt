@@ -1,0 +1,88 @@
+CompilationUnit [0..116)
+  ClassDeclaration [0..116)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..116)
+      L:WhitespaceTrivia [17..21) '    '
+      PublicKeyword [21..27) 'public'
+      T:WhitespaceTrivia [27..28) ' '
+      StaticKeyword [28..34) 'static'
+      T:WhitespaceTrivia [34..35) ' '
+      PredefinedType [35..40)
+        VoidKeyword [35..39) 'void'
+        T:WhitespaceTrivia [39..40) ' '
+      IdentifierToken [40..44) 'Main'
+      ParameterList [44..60)
+        OpenParenToken [44..45) '('
+        Parameter [45..58)
+          ArrayType [45..54)
+            PredefinedType [45..51)
+              StringKeyword [45..51) 'string'
+            ArrayRankSpecifier [51..54)
+              OpenBracketToken [51..52) '['
+              OmittedArraySizeExpression [52..52)
+                OmittedArraySizeExpressionToken [52..52) ''
+              CloseBracketToken [52..53) ']'
+              T:WhitespaceTrivia [53..54) ' '
+          IdentifierToken [54..58) 'args'
+        CloseParenToken [58..59) ')'
+        T:EndOfLineTrivia [59..60) '\n'
+      Block [60..116)
+        L:WhitespaceTrivia [60..64) '    '
+        OpenBraceToken [64..65) '{'
+        T:EndOfLineTrivia [65..66) '\n'
+        ExpressionStatement [66..80)
+          AnonymousMethodExpression [66..80)
+            L:EndOfLineTrivia [66..67) '\n'
+            L:WhitespaceTrivia [67..71) '    '
+            DelegateKeyword [71..79) 'delegate'
+            T:WhitespaceTrivia [79..80) ' '
+            Block [80..80)
+              OpenBraceToken [80..80) missing
+              CloseBraceToken [80..80) missing
+          SemicolonToken [80..80) missing
+        LocalFunctionStatement [80..91)
+          PredefinedType [80..84)
+            IntKeyword [80..83) 'int'
+            T:WhitespaceTrivia [83..84) ' '
+          IdentifierToken [84..86) 'F1'
+          ParameterList [86..88)
+            OpenParenToken [86..87) '('
+            CloseParenToken [87..88) ')'
+          SemicolonToken [88..89) ';'
+          T:WhitespaceTrivia [89..90) ' '
+          T:EndOfLineTrivia [90..91) '\n'
+        ExpressionStatement [91..104)
+          AnonymousMethodExpression [91..104)
+            L:WhitespaceTrivia [91..95) '    '
+            DelegateKeyword [95..103) 'delegate'
+            T:WhitespaceTrivia [103..104) ' '
+            Block [104..104)
+              OpenBraceToken [104..104) missing
+              CloseBraceToken [104..104) missing
+          SemicolonToken [104..104) missing
+        LocalFunctionStatement [104..114)
+          PredefinedType [104..108)
+            IntKeyword [104..107) 'int'
+            T:WhitespaceTrivia [107..108) ' '
+          IdentifierToken [108..110) 'F2'
+          ParameterList [110..112)
+            OpenParenToken [110..111) '('
+            CloseParenToken [111..112) ')'
+          SemicolonToken [112..113) ';'
+          T:EndOfLineTrivia [113..114) '\n'
+        CloseBraceToken [114..115) '}'
+        T:EndOfLineTrivia [115..116) '\n'
+    CloseBraceToken [116..116) missing
+  EndOfFileToken [116..116) ''
+Diagnostics:
+  CS1514 [80..83) { expected
+  CS1002 [80..83) ; expected
+  CS1514 [104..107) { expected
+  CS1002 [104..107) ; expected
+  CS1513 [115..115) } expected

@@ -1,0 +1,20 @@
+ExpressionStatement [0..10)
+  ObjectCreationExpression [0..9)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    RefType [4..9)
+      RefKeyword [4..7) 'ref'
+      ArrayType [7..9)
+        IdentifierName [7..7)
+          IdentifierToken [7..7) missing
+        ArrayRankSpecifier [7..9)
+          OpenBracketToken [7..8) '['
+          OmittedArraySizeExpression [8..8)
+            OmittedArraySizeExpressionToken [8..8) ''
+          CloseBracketToken [8..9) ']'
+    ArgumentList [9..9)
+      OpenParenToken [9..9) missing
+      CloseParenToken [9..9) missing
+  SemicolonToken [9..10) ';'
+Diagnostics:
+  CS1031 [7..8) Type expected

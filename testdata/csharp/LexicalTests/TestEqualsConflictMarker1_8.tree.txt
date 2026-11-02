@@ -1,0 +1,7 @@
+L:ConflictMarkerTrivia [0..16) '======= Trailing'
+L:EndOfLineTrivia [16..18) '\r\n'
+L:ConflictMarkerTrivia [18..42) '>>>>>>> Actually the end'
+EndOfFileToken [42..42) ''
+Diagnostics:
+  CS8300 [0..7) Merge conflict marker encountered
+  CS8300 [18..25) Merge conflict marker encountered

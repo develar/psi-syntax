@@ -1,0 +1,8 @@
+CompilationUnit [0..6)
+  L:ErrorDirectiveTrivia [0..6)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    EndOfDirectiveToken [6..6) ''
+  EndOfFileToken [6..6) ''
+Diagnostics:
+  CS1029 [6..6) #error: \'\'

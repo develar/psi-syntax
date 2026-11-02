@@ -1,0 +1,1 @@
+delegate* unmanaged[invalidcallingconvention]<string, Goo, int> ptr;

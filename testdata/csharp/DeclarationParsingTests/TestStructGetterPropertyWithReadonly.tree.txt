@@ -1,0 +1,38 @@
+CompilationUnit [0..50)
+  StructDeclaration [0..50)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'a'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    PropertyDeclaration [11..49)
+      PredefinedType [11..15)
+        IntKeyword [11..14) 'int'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'P'
+      T:WhitespaceTrivia [16..17) ' '
+      AccessorList [17..49)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        GetAccessorDeclaration [19..47)
+          ReadOnlyKeyword [19..27) 'readonly'
+          T:WhitespaceTrivia [27..28) ' '
+          GetKeyword [28..31) 'get'
+          T:WhitespaceTrivia [31..32) ' '
+          Block [32..47)
+            OpenBraceToken [32..33) '{'
+            T:WhitespaceTrivia [33..34) ' '
+            ReturnStatement [34..45)
+              ReturnKeyword [34..40) 'return'
+              T:WhitespaceTrivia [40..41) ' '
+              NumericLiteralExpression [41..43)
+                NumericLiteralToken [41..43) '42'
+              SemicolonToken [43..44) ';'
+              T:WhitespaceTrivia [44..45) ' '
+            CloseBraceToken [45..46) '}'
+            T:WhitespaceTrivia [46..47) ' '
+        CloseBraceToken [47..48) '}'
+        T:WhitespaceTrivia [48..49) ' '
+    CloseBraceToken [49..50) '}'
+  EndOfFileToken [50..50) ''

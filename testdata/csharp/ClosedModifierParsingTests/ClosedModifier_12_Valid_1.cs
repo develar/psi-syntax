@@ -1,0 +1,1 @@
+closed public class C { }

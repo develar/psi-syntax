@@ -1,0 +1,1 @@
+if (o is (S.Int a, S.Int b)[] q) { }

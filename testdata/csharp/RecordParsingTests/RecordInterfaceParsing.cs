@@ -1,0 +1,1 @@
+record interface C(int X, int Y);

@@ -1,0 +1,49 @@
+CompilationUnit [0..75)
+  DelegateDeclaration [0..57)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    DelegateKeyword [8..16) 'delegate'
+    T:WhitespaceTrivia [16..17) ' '
+    PredefinedType [17..22)
+      VoidKeyword [17..21) 'void'
+      T:WhitespaceTrivia [21..22) ' '
+    IdentifierToken [22..25) 'Del'
+    TypeParameterList [25..28)
+      LessThanToken [25..26) '<'
+      TypeParameter [26..27)
+        IdentifierToken [26..27) 'T'
+      GreaterThanToken [27..28) '>'
+    ParameterList [28..34)
+      OpenParenToken [28..29) '('
+      Parameter [29..32)
+        IdentifierName [29..31)
+          IdentifierToken [29..30) 'T'
+          T:WhitespaceTrivia [30..31) ' '
+        IdentifierToken [31..32) 't'
+      CloseParenToken [32..33) ')'
+      T:WhitespaceTrivia [33..34) ' '
+    TypeParameterConstraintClause [34..55)
+      WhereKeyword [34..39) 'where'
+      T:WhitespaceTrivia [39..40) ' '
+      IdentifierName [40..42)
+        IdentifierToken [40..41) 'T'
+        T:WhitespaceTrivia [41..42) ' '
+      ColonToken [42..43) ':'
+      T:WhitespaceTrivia [43..44) ' '
+      TypeConstraint [44..55)
+        IdentifierName [44..55)
+          IdentifierToken [44..55) 'IEnumerable'
+    SemicolonToken [55..56) ';'
+    T:EndOfLineTrivia [56..57) '\n'
+  ClassDeclaration [57..75)
+    PublicKeyword [57..63) 'public'
+    T:WhitespaceTrivia [63..64) ' '
+    ClassKeyword [64..69) 'class'
+    T:WhitespaceTrivia [69..70) ' '
+    IdentifierToken [70..71) 'A'
+    T:WhitespaceTrivia [71..72) ' '
+    OpenBraceToken [72..73) '{'
+    CloseBraceToken [73..74) '}'
+    T:EndOfLineTrivia [74..75) '\n'
+  EndOfFileToken [75..75) ''

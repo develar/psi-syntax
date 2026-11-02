@@ -1,0 +1,18 @@
+CompilationUnit [0..16)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:LineDirectiveTrivia [1..9)
+    HashToken [1..2) '#'
+    LineKeyword [2..6) 'line'
+    T:WhitespaceTrivia [6..7) ' '
+    NumericLiteralToken [7..8) '0'
+    EndOfDirectiveToken [8..8) ''
+    T:EndOfLineTrivia [8..9) '\n'
+  L:ErrorDirectiveTrivia [9..16)
+    HashToken [9..10) '#'
+    ErrorKeyword [10..15) 'error'
+    EndOfDirectiveToken [15..15) ''
+    T:EndOfLineTrivia [15..16) '\n'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1576 [7..8) The line number specified for #line directive is missing or invalid
+  CS1029 [15..15) #error: \'\'

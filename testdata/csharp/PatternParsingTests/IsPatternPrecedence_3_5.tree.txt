@@ -1,0 +1,19 @@
+BitwiseAndExpression [0..13)
+  IsExpression [0..10)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'e'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    GenericName [5..10)
+      IdentifierToken [5..6) 'A'
+      TypeArgumentList [6..10)
+        LessThanToken [6..7) '<'
+        IdentifierName [7..8)
+          IdentifierToken [7..8) 'B'
+        GreaterThanToken [8..9) '>'
+        T:WhitespaceTrivia [9..10) ' '
+  AmpersandToken [10..11) '&'
+  T:WhitespaceTrivia [11..12) ' '
+  IdentifierName [12..13)
+    IdentifierToken [12..13) 'e'

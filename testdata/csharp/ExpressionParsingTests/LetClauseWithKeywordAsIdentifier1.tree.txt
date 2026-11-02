@@ -1,0 +1,31 @@
+QueryExpression [0..41)
+  FromClause [0..18)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'm'
+    T:WhitespaceTrivia [6..7) ' '
+    InKeyword [7..9) 'in'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..18)
+      IdentifierToken [10..17) 'methods'
+      T:WhitespaceTrivia [17..18) ' '
+  QueryBody [18..41)
+    LetClause [18..33)
+      LetKeyword [18..21) 'let'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierToken [22..22) missing
+      T:SkippedTokensTrivia [22..28)
+        ParamsKeyword [22..28) 'params'
+      T:WhitespaceTrivia [28..29) ' '
+      EqualsToken [29..30) '='
+      T:WhitespaceTrivia [30..31) ' '
+      NumericLiteralExpression [31..33)
+        NumericLiteralToken [31..32) '1'
+        T:WhitespaceTrivia [32..33) ' '
+    SelectClause [33..41)
+      SelectKeyword [33..39) 'select'
+      T:WhitespaceTrivia [39..40) ' '
+      IdentifierName [40..41)
+        IdentifierToken [40..41) 'm'
+Diagnostics:
+  CS1041 [22..28) Identifier expected; \'params\' is a keyword

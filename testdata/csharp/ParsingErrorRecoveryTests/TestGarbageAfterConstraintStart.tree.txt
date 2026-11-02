@@ -1,0 +1,32 @@
+CompilationUnit [0..22)
+  ClassDeclaration [0..22)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    TypeParameterList [7..11)
+      LessThanToken [7..8) '<'
+      TypeParameter [8..9)
+        IdentifierToken [8..9) 't'
+      GreaterThanToken [9..10) '>'
+      T:WhitespaceTrivia [10..11) ' '
+    TypeParameterConstraintClause [11..19)
+      WhereKeyword [11..16) 'where'
+      T:WhitespaceTrivia [16..17) ' '
+      IdentifierName [17..17)
+        IdentifierToken [17..17) missing
+      ColonToken [17..17) missing
+      TypeConstraint [17..19)
+        IdentifierName [17..19)
+          IdentifierToken [17..17) missing
+          T:SkippedTokensTrivia [17..18)
+            BadToken [17..18) '$'
+          T:WhitespaceTrivia [18..19) ' '
+    OpenBraceToken [19..20) '{'
+    T:WhitespaceTrivia [20..21) ' '
+    CloseBraceToken [21..22) '}'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1001 [17..18) Identifier expected
+  CS1003 [17..18) Syntax error, \':\' expected
+  CS1031 [17..18) Type expected
+  CS1056 [17..17) Unexpected character \'$\'

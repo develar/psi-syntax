@@ -1,0 +1,89 @@
+CompilationUnit [0..126)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  ClassDeclaration [14..81)
+    ClassKeyword [14..19) 'class'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..30) 'AAttribute'
+    T:WhitespaceTrivia [30..31) ' '
+    BaseList [31..43)
+      ColonToken [31..32) ':'
+      T:WhitespaceTrivia [32..33) ' '
+      SimpleBaseType [33..43)
+        IdentifierName [33..43)
+          IdentifierToken [33..42) 'Attribute'
+          T:WhitespaceTrivia [42..43) ' '
+    OpenBraceToken [43..44) '{'
+    T:EndOfLineTrivia [44..45) '\n'
+    ConstructorDeclaration [45..79)
+      L:WhitespaceTrivia [45..47) '  '
+      PublicKeyword [47..53) 'public'
+      T:WhitespaceTrivia [53..54) ' '
+      IdentifierToken [54..64) 'AAttribute'
+      ParameterList [64..75)
+        OpenParenToken [64..65) '('
+        Parameter [65..73)
+          PredefinedType [65..72)
+            ObjectKeyword [65..71) 'object'
+            T:WhitespaceTrivia [71..72) ' '
+          IdentifierToken [72..73) 'o'
+        CloseParenToken [73..74) ')'
+        T:WhitespaceTrivia [74..75) ' '
+      Block [75..79)
+        OpenBraceToken [75..76) '{'
+        T:WhitespaceTrivia [76..77) ' '
+        CloseBraceToken [77..78) '}'
+        T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:EndOfLineTrivia [80..81) '\n'
+  ClassDeclaration [81..126)
+    AttributeList [81..114)
+      OpenBracketToken [81..82) '['
+      Attribute [82..112)
+        IdentifierName [82..83)
+          IdentifierToken [82..83) 'A'
+        AttributeArgumentList [83..112)
+          OpenParenToken [83..84) '('
+          AttributeArgument [84..111)
+            IsPatternExpression [84..111)
+              ArrayCreationExpression [84..97)
+                NewKeyword [84..87) 'new'
+                T:WhitespaceTrivia [87..88) ' '
+                ArrayType [88..97)
+                  PredefinedType [88..94)
+                    StringKeyword [88..94) 'string'
+                  ArrayRankSpecifier [94..97)
+                    OpenBracketToken [94..95) '['
+                    OmittedArraySizeExpression [95..95)
+                      OmittedArraySizeExpressionToken [95..95) ''
+                    CloseBracketToken [95..96) ']'
+                    T:WhitespaceTrivia [96..97) ' '
+              IsKeyword [97..99) 'is'
+              T:WhitespaceTrivia [99..100) ' '
+              RecursivePattern [100..111)
+                PropertyPatternClause [100..111)
+                  OpenBraceToken [100..101) '{'
+                  T:WhitespaceTrivia [101..102) ' '
+                  Subpattern [102..110)
+                    ConstantPattern [102..110)
+                      StringLiteralExpression [102..110)
+                        StringLiteralToken [102..109) '"hello"'
+                        T:WhitespaceTrivia [109..110) ' '
+                  CloseBraceToken [110..111) '}'
+          CloseParenToken [111..112) ')'
+      CloseBracketToken [112..113) ']'
+      T:EndOfLineTrivia [113..114) '\n'
+    ClassKeyword [114..119) 'class'
+    T:WhitespaceTrivia [119..120) ' '
+    IdentifierToken [120..121) 'C'
+    T:WhitespaceTrivia [121..122) ' '
+    OpenBraceToken [122..123) '{'
+    T:EndOfLineTrivia [123..124) '\n'
+    CloseBraceToken [124..125) '}'
+    T:EndOfLineTrivia [125..126) '\n'
+  EndOfFileToken [126..126) ''

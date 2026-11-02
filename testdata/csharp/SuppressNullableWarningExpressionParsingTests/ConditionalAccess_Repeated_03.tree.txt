@@ -1,0 +1,16 @@
+SuppressNullableWarningExpression [0..8)
+  SuppressNullableWarningExpression [0..7)
+    ConditionalAccessExpression [0..6)
+      IdentifierName [0..1)
+        IdentifierToken [0..1) 'x'
+      QuestionToken [1..2) '?'
+      SimpleMemberAccessExpression [2..6)
+        MemberBindingExpression [2..4)
+          DotToken [2..3) '.'
+          IdentifierName [3..4)
+            IdentifierToken [3..4) 'y'
+        DotToken [4..5) '.'
+        IdentifierName [5..6)
+          IdentifierToken [5..6) 'z'
+    ExclamationToken [6..7) '!'
+  ExclamationToken [7..8) '!'

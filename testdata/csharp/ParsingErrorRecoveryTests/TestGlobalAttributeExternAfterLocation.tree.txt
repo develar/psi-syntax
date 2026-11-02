@@ -1,0 +1,26 @@
+CompilationUnit [0..26)
+  AttributeList [0..26)
+    OpenBracketToken [0..1) '['
+    AttributeTargetSpecifier [1..11)
+      AssemblyKeyword [1..9) 'assembly'
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+    Attribute [11..11)
+      IdentifierName [11..11)
+        IdentifierToken [11..11) missing
+    CloseBracketToken [11..11) missing
+    T:SkippedTokensTrivia [11..17)
+      ExternKeyword [11..17) 'extern'
+    T:WhitespaceTrivia [17..18) ' '
+    T:SkippedTokensTrivia [18..23)
+      AliasKeyword [18..23) 'alias'
+    T:WhitespaceTrivia [23..24) ' '
+    T:SkippedTokensTrivia [24..25)
+      IdentifierToken [24..25) 'a'
+    T:SkippedTokensTrivia [25..26)
+      SemicolonToken [25..26) ';'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1001 [11..17) Identifier expected
+  CS1003 [11..17) Syntax error, \']\' expected
+  CS0439 [11..17) An extern alias declaration must precede all other elements defined in the namespace

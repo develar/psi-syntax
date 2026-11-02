@@ -1,0 +1,22 @@
+CompilationUnit [0..34)
+  GlobalStatement [0..34)
+    LocalDeclarationStatement [0..34)
+      AwaitKeyword [0..5) 'await'
+      T:WhitespaceTrivia [5..6) ' '
+      UsingKeyword [6..11) 'using'
+      T:WhitespaceTrivia [11..12) ' '
+      VariableDeclaration [12..32)
+        ScopedType [12..30)
+          ScopedKeyword [12..18) 'scoped'
+          T:WhitespaceTrivia [18..19) ' '
+          RefType [19..30)
+            RefKeyword [19..22) 'ref'
+            T:WhitespaceTrivia [22..23) ' '
+            IdentifierName [23..30)
+              IdentifierToken [23..29) 'scoped'
+              T:WhitespaceTrivia [29..30) ' '
+        VariableDeclarator [30..32)
+          IdentifierToken [30..32) 'r1'
+      SemicolonToken [32..33) ';'
+      T:EndOfLineTrivia [33..34) '\n'
+  EndOfFileToken [34..34) ''

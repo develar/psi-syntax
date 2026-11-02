@@ -1,0 +1,28 @@
+CompilationUnit [0..24)
+  DelegateDeclaration [0..20)
+    L:EndOfLineTrivia [0..1) '\n'
+    PartialKeyword [1..8) 'partial'
+    T:WhitespaceTrivia [8..9) ' '
+    DelegateKeyword [9..17) 'delegate'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierName [18..20)
+      IdentifierToken [18..19) 'E'
+      T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..20) missing
+    ParameterList [20..20)
+      OpenParenToken [20..20) missing
+      CloseParenToken [20..20) missing
+    SemicolonToken [20..20) missing
+  GlobalStatement [20..24)
+    Block [20..24)
+      OpenBraceToken [20..21) '{'
+      T:WhitespaceTrivia [21..22) ' '
+      CloseBraceToken [22..23) '}'
+      T:EndOfLineTrivia [23..24) '\n'
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1001 [20..21) Identifier expected
+  CS1003 [20..21) Syntax error, \'(\' expected
+  CS1026 [20..21) ) expected
+  CS1002 [20..21) ; expected
+  CS8803 [20..23) Top-level statements must precede namespace and type declarations.

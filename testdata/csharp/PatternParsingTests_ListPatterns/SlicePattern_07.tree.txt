@@ -1,0 +1,22 @@
+IsPatternExpression [0..16)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..16)
+    OpenBracketToken [5..6) '['
+    SlicePattern [6..15)
+      DotDotToken [6..8) '..'
+      T:WhitespaceTrivia [8..9) ' '
+      OrPattern [9..15)
+        ConstantPattern [9..11)
+          IdentifierName [9..11)
+            IdentifierToken [9..10) 'p'
+            T:WhitespaceTrivia [10..11) ' '
+        OrKeyword [11..13) 'or'
+        T:WhitespaceTrivia [13..14) ' '
+        ConstantPattern [14..15)
+          IdentifierName [14..15)
+            IdentifierToken [14..15) 'q'
+    CloseBracketToken [15..16) ']'

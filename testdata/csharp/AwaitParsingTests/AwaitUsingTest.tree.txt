@@ -1,0 +1,42 @@
+ParenthesizedLambdaExpression [0..54)
+  L:EndOfLineTrivia [0..1) '\n'
+  AsyncKeyword [1..6) 'async'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  Block [13..54)
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    UsingStatement [15..51)
+      L:WhitespaceTrivia [15..19) '    '
+      UsingKeyword [19..24) 'using'
+      T:WhitespaceTrivia [24..25) ' '
+      OpenParenToken [25..26) '('
+      AwaitExpression [26..37)
+        AwaitKeyword [26..31) 'await'
+        T:WhitespaceTrivia [31..32) ' '
+        InvocationExpression [32..37)
+          IdentifierName [32..35)
+            IdentifierToken [32..35) 'goo'
+          ArgumentList [35..37)
+            OpenParenToken [35..36) '('
+            CloseParenToken [36..37) ')'
+      CloseParenToken [37..38) ')'
+      T:EndOfLineTrivia [38..39) '\n'
+      Block [39..51)
+        L:WhitespaceTrivia [39..43) '    '
+        OpenBraceToken [43..44) '{'
+        T:EndOfLineTrivia [44..45) '\n'
+        L:WhitespaceTrivia [45..49) '    '
+        CloseBraceToken [49..50) '}'
+        T:EndOfLineTrivia [50..51) '\n'
+    CloseBraceToken [51..52) '}'
+    T:SkippedTokensTrivia [52..53)
+      SemicolonToken [52..53) ';'
+    T:EndOfLineTrivia [53..54) '\n'
+Diagnostics:
+  CS1073 [1..52) Unexpected token \';\'

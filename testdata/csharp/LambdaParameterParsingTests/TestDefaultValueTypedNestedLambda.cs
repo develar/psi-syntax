@@ -1,0 +1,1 @@
+(Func<int, int> a = (int b = 5) => b) => a

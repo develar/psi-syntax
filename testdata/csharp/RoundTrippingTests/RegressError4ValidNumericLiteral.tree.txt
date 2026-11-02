@@ -1,0 +1,199 @@
+CompilationUnit [0..325)
+  ClassDeclaration [0..325)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..17) 'Test'
+    T:EndOfLineTrivia [17..18) '\n'
+    OpenBraceToken [18..19) '{'
+    T:EndOfLineTrivia [19..20) '\n'
+    MethodDeclaration [20..323)
+      PublicKeyword [20..26) 'public'
+      T:WhitespaceTrivia [26..27) ' '
+      StaticKeyword [27..33) 'static'
+      T:WhitespaceTrivia [33..34) ' '
+      PredefinedType [34..39)
+        VoidKeyword [34..38) 'void'
+        T:WhitespaceTrivia [38..39) ' '
+      IdentifierToken [39..43) 'Main'
+      ParameterList [43..46)
+        OpenParenToken [43..44) '('
+        CloseParenToken [44..45) ')'
+        T:EndOfLineTrivia [45..46) '\n'
+      Block [46..323)
+        OpenBraceToken [46..47) '{'
+        T:EndOfLineTrivia [47..48) '\n'
+        LocalDeclarationStatement [48..79)
+          VariableDeclaration [48..77)
+            PredefinedType [48..54)
+              SByteKeyword [48..53) 'sbyte'
+              T:WhitespaceTrivia [53..54) ' '
+            VariableDeclarator [54..65)
+              IdentifierToken [54..58) 'min1'
+              T:WhitespaceTrivia [58..59) ' '
+              EqualsValueClause [59..65)
+                EqualsToken [59..60) '='
+                T:WhitespaceTrivia [60..61) ' '
+                UnaryMinusExpression [61..65)
+                  MinusToken [61..62) '-'
+                  NumericLiteralExpression [62..65)
+                    NumericLiteralToken [62..65) '128'
+            CommaToken [65..66) ','
+            T:WhitespaceTrivia [66..67) ' '
+            VariableDeclarator [67..77)
+              IdentifierToken [67..71) 'max1'
+              T:WhitespaceTrivia [71..72) ' '
+              EqualsValueClause [72..77)
+                EqualsToken [72..73) '='
+                T:WhitespaceTrivia [73..74) ' '
+                NumericLiteralExpression [74..77)
+                  NumericLiteralToken [74..77) '127'
+          SemicolonToken [77..78) ';'
+          T:EndOfLineTrivia [78..79) '\n'
+        LocalDeclarationStatement [79..114)
+          VariableDeclaration [79..112)
+            PredefinedType [79..85)
+              ShortKeyword [79..84) 'short'
+              T:WhitespaceTrivia [84..85) ' '
+            VariableDeclarator [85..98)
+              IdentifierToken [85..89) 'min2'
+              T:WhitespaceTrivia [89..90) ' '
+              EqualsValueClause [90..98)
+                EqualsToken [90..91) '='
+                T:WhitespaceTrivia [91..92) ' '
+                UnaryMinusExpression [92..98)
+                  MinusToken [92..93) '-'
+                  NumericLiteralExpression [93..98)
+                    NumericLiteralToken [93..98) '32768'
+            CommaToken [98..99) ','
+            T:WhitespaceTrivia [99..100) ' '
+            VariableDeclarator [100..112)
+              IdentifierToken [100..104) 'max2'
+              T:WhitespaceTrivia [104..105) ' '
+              EqualsValueClause [105..112)
+                EqualsToken [105..106) '='
+                T:WhitespaceTrivia [106..107) ' '
+                NumericLiteralExpression [107..112)
+                  NumericLiteralToken [107..112) '32767'
+          SemicolonToken [112..113) ';'
+          T:EndOfLineTrivia [113..114) '\n'
+        LocalDeclarationStatement [114..159)
+          VariableDeclaration [114..157)
+            PredefinedType [114..120)
+              IntKeyword [114..117) 'int'
+              T:WhitespaceTrivia [117..120) '   '
+            VariableDeclarator [120..138)
+              IdentifierToken [120..124) 'min3'
+              T:WhitespaceTrivia [124..125) ' '
+              EqualsValueClause [125..138)
+                EqualsToken [125..126) '='
+                T:WhitespaceTrivia [126..127) ' '
+                UnaryMinusExpression [127..138)
+                  MinusToken [127..128) '-'
+                  NumericLiteralExpression [128..138)
+                    NumericLiteralToken [128..138) '2147483648'
+            CommaToken [138..139) ','
+            T:WhitespaceTrivia [139..140) ' '
+            VariableDeclarator [140..157)
+              IdentifierToken [140..144) 'max3'
+              T:WhitespaceTrivia [144..145) ' '
+              EqualsValueClause [145..157)
+                EqualsToken [145..146) '='
+                T:WhitespaceTrivia [146..147) ' '
+                NumericLiteralExpression [147..157)
+                  NumericLiteralToken [147..157) '2147483647'
+          SemicolonToken [157..158) ';'
+          T:EndOfLineTrivia [158..159) '\n'
+        LocalDeclarationStatement [159..224)
+          VariableDeclaration [159..222)
+            PredefinedType [159..165)
+              LongKeyword [159..163) 'long'
+              T:WhitespaceTrivia [163..165) '  '
+            VariableDeclarator [165..193)
+              IdentifierToken [165..169) 'min4'
+              T:WhitespaceTrivia [169..170) ' '
+              EqualsValueClause [170..193)
+                EqualsToken [170..171) '='
+                T:WhitespaceTrivia [171..172) ' '
+                UnaryMinusExpression [172..193)
+                  MinusToken [172..173) '-'
+                  NumericLiteralExpression [173..193)
+                    NumericLiteralToken [173..193) '9223372036854775808L'
+            CommaToken [193..194) ','
+            T:WhitespaceTrivia [194..195) ' '
+            VariableDeclarator [195..222)
+              IdentifierToken [195..199) 'max4'
+              T:WhitespaceTrivia [199..200) ' '
+              EqualsValueClause [200..222)
+                EqualsToken [200..201) '='
+                T:WhitespaceTrivia [201..202) ' '
+                NumericLiteralExpression [202..222)
+                  NumericLiteralToken [202..222) '9223372036854775807L'
+          SemicolonToken [222..223) ';'
+          T:EndOfLineTrivia [223..224) '\n'
+        LocalDeclarationStatement [224..241)
+          VariableDeclaration [224..239)
+            PredefinedType [224..229)
+              ByteKeyword [224..228) 'byte'
+              T:WhitespaceTrivia [228..229) ' '
+            VariableDeclarator [229..239)
+              IdentifierToken [229..233) 'max5'
+              T:WhitespaceTrivia [233..234) ' '
+              EqualsValueClause [234..239)
+                EqualsToken [234..235) '='
+                T:WhitespaceTrivia [235..236) ' '
+                NumericLiteralExpression [236..239)
+                  NumericLiteralToken [236..239) '255'
+          SemicolonToken [239..240) ';'
+          T:EndOfLineTrivia [240..241) '\n'
+        LocalDeclarationStatement [241..262)
+          VariableDeclaration [241..260)
+            PredefinedType [241..248)
+              UShortKeyword [241..247) 'ushort'
+              T:WhitespaceTrivia [247..248) ' '
+            VariableDeclarator [248..260)
+              IdentifierToken [248..252) 'max6'
+              T:WhitespaceTrivia [252..253) ' '
+              EqualsValueClause [253..260)
+                EqualsToken [253..254) '='
+                T:WhitespaceTrivia [254..255) ' '
+                NumericLiteralExpression [255..260)
+                  NumericLiteralToken [255..260) '65535'
+          SemicolonToken [260..261) ';'
+          T:EndOfLineTrivia [261..262) '\n'
+        LocalDeclarationStatement [262..286)
+          VariableDeclaration [262..284)
+            PredefinedType [262..267)
+              UIntKeyword [262..266) 'uint'
+              T:WhitespaceTrivia [266..267) ' '
+            VariableDeclarator [267..284)
+              IdentifierToken [267..271) 'max7'
+              T:WhitespaceTrivia [271..272) ' '
+              EqualsValueClause [272..284)
+                EqualsToken [272..273) '='
+                T:WhitespaceTrivia [273..274) ' '
+                NumericLiteralExpression [274..284)
+                  NumericLiteralToken [274..284) '4294967295'
+          SemicolonToken [284..285) ';'
+          T:EndOfLineTrivia [285..286) '\n'
+        LocalDeclarationStatement [286..321)
+          VariableDeclaration [286..319)
+            PredefinedType [286..292)
+              ULongKeyword [286..291) 'ulong'
+              T:WhitespaceTrivia [291..292) ' '
+            VariableDeclarator [292..319)
+              IdentifierToken [292..296) 'max8'
+              T:WhitespaceTrivia [296..297) ' '
+              EqualsValueClause [297..319)
+                EqualsToken [297..298) '='
+                T:WhitespaceTrivia [298..299) ' '
+                NumericLiteralExpression [299..319)
+                  NumericLiteralToken [299..319) '18446744073709551615'
+          SemicolonToken [319..320) ';'
+          T:EndOfLineTrivia [320..321) '\n'
+        CloseBraceToken [321..322) '}'
+        T:EndOfLineTrivia [322..323) '\n'
+    CloseBraceToken [323..324) '}'
+    T:EndOfLineTrivia [324..325) '\n'
+  EndOfFileToken [325..325) ''

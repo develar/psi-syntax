@@ -1,0 +1,22 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..11)
+    ExpressionStatement [0..11)
+      ObjectCreationExpression [0..11)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        IdentifierName [4..11)
+          IdentifierToken [4..10) 'record'
+          T:WhitespaceTrivia [10..11) ' '
+        ArgumentList [11..11)
+          OpenParenToken [11..11) missing
+          CloseParenToken [11..11) missing
+      SemicolonToken [11..11) missing
+  StructDeclaration [11..20)
+    StructKeyword [11..17) 'struct'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..19) 'S'
+    SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1526 [11..17) A new expression requires an argument list or (), [], or {} after type
+  CS1002 [11..17) ; expected

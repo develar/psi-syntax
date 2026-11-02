@@ -1,0 +1,38 @@
+QueryExpression [0..38)
+  FromClause [0..18)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierToken [5..6) 'm'
+    T:WhitespaceTrivia [6..7) ' '
+    InKeyword [7..9) 'in'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..18)
+      IdentifierToken [10..17) 'methods'
+      T:WhitespaceTrivia [17..18) ' '
+  QueryBody [18..38)
+    LetClause [18..22)
+      LetKeyword [18..21) 'let'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierToken [22..22) missing
+      EqualsToken [22..22) missing
+      IdentifierName [22..22)
+        IdentifierToken [22..22) missing
+    LetClause [22..30)
+      LetKeyword [22..25) 'let'
+      T:WhitespaceTrivia [25..26) ' '
+      IdentifierToken [26..26) missing
+      EqualsToken [26..27) '='
+      T:WhitespaceTrivia [27..28) ' '
+      NumericLiteralExpression [28..30)
+        NumericLiteralToken [28..29) '1'
+        T:WhitespaceTrivia [29..30) ' '
+    SelectClause [30..38)
+      SelectKeyword [30..36) 'select'
+      T:WhitespaceTrivia [36..37) ' '
+      IdentifierName [37..38)
+        IdentifierToken [37..38) 'm'
+Diagnostics:
+  CS1525 [22..25) Invalid expression term \'let\'
+  CS1003 [22..25) Syntax error, \'=\' expected
+  CS1525 [22..25) Invalid expression term \'let\'
+  CS1001 [26..27) Identifier expected

@@ -1,0 +1,93 @@
+CompilationUnit [0..186)
+  NamespaceDeclaration [0..186)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..121)
+      L:WhitespaceTrivia [15..19) '    '
+      PublicKeyword [19..25) 'public'
+      T:WhitespaceTrivia [25..26) ' '
+      ClassKeyword [26..31) 'class'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'a'
+      T:EndOfLineTrivia [33..34) '\n'
+      L:WhitespaceTrivia [34..38) '    '
+      OpenBraceToken [38..39) '{'
+      T:EndOfLineTrivia [39..40) '\n'
+      MethodDeclaration [40..115)
+        L:WhitespaceTrivia [40..48) '        '
+        PublicKeyword [48..54) 'public'
+        T:WhitespaceTrivia [54..55) ' '
+        StaticKeyword [55..61) 'static'
+        T:WhitespaceTrivia [61..62) ' '
+        PredefinedType [62..66)
+          IntKeyword [62..65) 'int'
+          T:WhitespaceTrivia [65..66) ' '
+        IdentifierToken [66..70) 'Main'
+        ParameterList [70..73)
+          OpenParenToken [70..71) '('
+          CloseParenToken [71..72) ')'
+          T:EndOfLineTrivia [72..73) '\n'
+        Block [73..115)
+          L:WhitespaceTrivia [73..81) '        '
+          OpenBraceToken [81..82) '{'
+          T:EndOfLineTrivia [82..83) '\n'
+          ReturnStatement [83..105)
+            L:WhitespaceTrivia [83..95) '            '
+            ReturnKeyword [95..101) 'return'
+            T:WhitespaceTrivia [101..102) ' '
+            NumericLiteralExpression [102..103)
+              NumericLiteralToken [102..103) '1'
+            SemicolonToken [103..104) ';'
+            T:EndOfLineTrivia [104..105) '\n'
+          L:WhitespaceTrivia [105..113) '        '
+          CloseBraceToken [113..114) '}'
+          T:EndOfLineTrivia [114..115) '\n'
+      L:WhitespaceTrivia [115..119) '    '
+      CloseBraceToken [119..120) '}'
+      T:EndOfLineTrivia [120..121) '\n'
+    ClassDeclaration [121..184)
+      L:WhitespaceTrivia [121..125) '    '
+      PublicKeyword [125..131) 'public'
+      T:WhitespaceTrivia [131..132) ' '
+      ClassKeyword [132..137) 'class'
+      T:WhitespaceTrivia [137..138) ' '
+      IdentifierToken [138..139) 'b'
+      T:WhitespaceTrivia [139..140) ' '
+      BaseList [140..144)
+        ColonToken [140..141) ':'
+        T:WhitespaceTrivia [141..142) ' '
+        SimpleBaseType [142..144)
+          IdentifierName [142..144)
+            IdentifierToken [142..143) 'a'
+            T:EndOfLineTrivia [143..144) '\n'
+      L:WhitespaceTrivia [144..148) '    '
+      OpenBraceToken [148..149) '{'
+      T:EndOfLineTrivia [149..150) '\n'
+      FieldDeclaration [150..178)
+        L:WhitespaceTrivia [150..158) '        '
+        PublicKeyword [158..164) 'public'
+        T:WhitespaceTrivia [164..165) ' '
+        ConstKeyword [165..170) 'const'
+        T:WhitespaceTrivia [170..171) ' '
+        VariableDeclaration [171..176)
+          PredefinedType [171..175)
+            IntKeyword [171..174) 'int'
+            T:WhitespaceTrivia [174..175) ' '
+          VariableDeclarator [175..176)
+            IdentifierToken [175..176) 'i'
+        SemicolonToken [176..177) ';'
+        T:EndOfLineTrivia [177..178) '\n'
+      L:WhitespaceTrivia [178..182) '    '
+      CloseBraceToken [182..183) '}'
+      T:EndOfLineTrivia [183..184) '\n'
+    CloseBraceToken [184..185) '}'
+    T:EndOfLineTrivia [185..186) '\n'
+  EndOfFileToken [186..186) ''
+Diagnostics:
+  CS0145 [175..176) A const field requires a value to be provided

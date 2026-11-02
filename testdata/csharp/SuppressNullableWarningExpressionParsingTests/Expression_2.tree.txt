@@ -1,0 +1,12 @@
+SimpleAssignmentExpression [0..7)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsToken [2..3) '='
+  T:WhitespaceTrivia [3..4) ' '
+  SuppressNullableWarningExpression [4..7)
+    SuppressNullableWarningExpression [4..6)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'o'
+      ExclamationToken [5..6) '!'
+    ExclamationToken [6..7) '!'

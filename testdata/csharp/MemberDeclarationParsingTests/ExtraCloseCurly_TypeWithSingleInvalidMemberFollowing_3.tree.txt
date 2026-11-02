@@ -1,0 +1,51 @@
+CompilationUnit [0..134)
+  NamespaceDeclaration [0..134)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    InterfaceDeclaration [14..134)
+      L:WhitespaceTrivia [14..18) '    '
+      InterfaceKeyword [18..27) 'interface'
+      T:WhitespaceTrivia [27..28) ' '
+      IdentifierToken [28..32) 'Type'
+      T:EndOfLineTrivia [32..33) '\n'
+      L:WhitespaceTrivia [33..37) '    '
+      OpenBraceToken [37..38) '{'
+      T:EndOfLineTrivia [38..39) '\n'
+      MethodDeclaration [39..133)
+        L:WhitespaceTrivia [39..43) '    '
+        L:SkippedTokensTrivia [43..44)
+          CloseBraceToken [43..44) '}'
+        L:EndOfLineTrivia [44..45) '\n'
+        L:EndOfLineTrivia [45..46) '\n'
+        L:WhitespaceTrivia [46..50) '    '
+        L:SingleLineCommentTrivia [50..99) '// One method that will move into the type above.'
+        L:EndOfLineTrivia [99..100) '\n'
+        L:WhitespaceTrivia [100..104) '    '
+        PrivateKeyword [104..111) 'private'
+        T:WhitespaceTrivia [111..112) ' '
+        PredefinedType [112..117)
+          VoidKeyword [112..116) 'void'
+          T:WhitespaceTrivia [116..117) ' '
+        IdentifierToken [117..118) 'M'
+        ParameterList [118..121)
+          OpenParenToken [118..119) '('
+          CloseParenToken [119..120) ')'
+          T:EndOfLineTrivia [120..121) '\n'
+        Block [121..133)
+          L:WhitespaceTrivia [121..125) '    '
+          OpenBraceToken [125..126) '{'
+          T:EndOfLineTrivia [126..127) '\n'
+          L:WhitespaceTrivia [127..131) '    '
+          CloseBraceToken [131..132) '}'
+          T:EndOfLineTrivia [132..133) '\n'
+      CloseBraceToken [133..134) '}'
+    CloseBraceToken [134..134) missing
+  EndOfFileToken [134..134) ''
+Diagnostics:
+  CS1519 [43..44) Invalid token \'}\' in a member declaration
+  CS1513 [134..134) } expected

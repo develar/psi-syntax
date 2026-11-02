@@ -1,0 +1,36 @@
+CompilationUnit [0..50)
+  ClassDeclaration [0..50)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..49)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..45)
+        OpenParenToken [23..24) '('
+        Parameter [24..28)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+        CommaToken [28..29) ','
+        T:WhitespaceTrivia [29..30) ' '
+        Parameter [30..37)
+          PredefinedType [30..37)
+            ObjectKeyword [30..36) 'object'
+            T:WhitespaceTrivia [36..37) ' '
+        CommaToken [37..37) missing
+        Parameter [37..43)
+          PredefinedType [37..43)
+            ObjectKeyword [37..43) 'object'
+        CloseParenToken [43..44) ')'
+        T:WhitespaceTrivia [44..45) ' '
+      OpenBraceToken [45..46) '{'
+      T:WhitespaceTrivia [46..47) ' '
+      CloseBraceToken [47..48) '}'
+      T:EndOfLineTrivia [48..49) '\n'
+    CloseBraceToken [49..50) '}'
+  EndOfFileToken [50..50) ''
+Diagnostics:
+  CS1003 [37..43) Syntax error, \',\' expected

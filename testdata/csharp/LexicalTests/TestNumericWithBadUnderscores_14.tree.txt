@@ -1,0 +1,5 @@
+NumericLiteralToken [0..3) '1E_'
+EndOfFileToken [3..3) ''
+Diagnostics:
+  CS1013 [0..3) Invalid number
+  CS0594 [0..0) Floating-point constant is outside the range of type \'double\'

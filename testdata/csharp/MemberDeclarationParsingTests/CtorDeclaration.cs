@@ -1,0 +1,1 @@
+public ThisClassName(int x) : base(x) { }

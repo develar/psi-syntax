@@ -1,0 +1,21 @@
+CompilationUnit [0..8)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:WhitespaceTrivia [1..2) ' '
+  L:SkippedTokensTrivia [2..3)
+    CloseBraceToken [2..3) '}'
+  L:SkippedTokensTrivia [3..4)
+    CloseBraceToken [3..4) '}'
+  L:SkippedTokensTrivia [4..5)
+    CloseBraceToken [4..5) '}'
+  L:SkippedTokensTrivia [5..6)
+    CloseBraceToken [5..6) '}'
+  L:SkippedTokensTrivia [6..7)
+    CloseBraceToken [6..7) '}'
+  L:EndOfLineTrivia [7..8) '\n'
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1022 [2..3) Type or namespace definition, or end-of-file expected
+  CS1022 [3..4) Type or namespace definition, or end-of-file expected
+  CS1022 [4..5) Type or namespace definition, or end-of-file expected
+  CS1022 [5..6) Type or namespace definition, or end-of-file expected
+  CS1022 [6..7) Type or namespace definition, or end-of-file expected

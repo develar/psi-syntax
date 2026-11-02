@@ -1,0 +1,118 @@
+CompilationUnit [0..216)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  UsingDirective [14..39)
+    UsingKeyword [14..19) 'using'
+    T:WhitespaceTrivia [19..20) ' '
+    QualifiedName [20..37)
+      IdentifierName [20..26)
+        IdentifierToken [20..26) 'System'
+      DotToken [26..27) '.'
+      IdentifierName [27..37)
+        IdentifierToken [27..37) 'Reflection'
+    SemicolonToken [37..38) ';'
+    T:EndOfLineTrivia [38..39) '\n'
+  ClassDeclaration [39..128)
+    L:EndOfLineTrivia [39..40) '\n'
+    PublicKeyword [40..46) 'public'
+    T:WhitespaceTrivia [46..47) ' '
+    ClassKeyword [47..52) 'class'
+    T:WhitespaceTrivia [52..53) ' '
+    IdentifierToken [53..56) 'goo'
+    T:WhitespaceTrivia [56..57) ' '
+    T:EndOfLineTrivia [57..58) '\n'
+    OpenBraceToken [58..59) '{'
+    T:EndOfLineTrivia [59..60) '\n'
+    MethodDeclaration [60..126)
+      AttributeList [60..83)
+        L:WhitespaceTrivia [60..64) '    '
+        OpenBracketToken [64..65) '['
+        AttributeTargetSpecifier [65..73)
+          MethodKeyword [65..71) 'method'
+          ColonToken [71..72) ':'
+          T:WhitespaceTrivia [72..73) ' '
+        Attribute [73..80)
+          IdentifierName [73..80)
+            IdentifierToken [73..79) 'method'
+            T:SkippedTokensTrivia [79..80)
+              ColonToken [79..80) ':'
+        CommaToken [80..80) missing
+        Attribute [80..81)
+          IdentifierName [80..81)
+            IdentifierToken [80..81) 'A'
+        CloseBracketToken [81..82) ']'
+        T:EndOfLineTrivia [82..83) '\n'
+      L:WhitespaceTrivia [83..87) '    '
+      PublicKeyword [87..93) 'public'
+      T:WhitespaceTrivia [93..94) ' '
+      StaticKeyword [94..100) 'static'
+      T:WhitespaceTrivia [100..101) ' '
+      PredefinedType [101..106)
+        VoidKeyword [101..105) 'void'
+        T:WhitespaceTrivia [105..106) ' '
+      IdentifierToken [106..110) 'Main'
+      ParameterList [110..114)
+        OpenParenToken [110..111) '('
+        CloseParenToken [111..112) ')'
+        T:WhitespaceTrivia [112..113) ' '
+        T:EndOfLineTrivia [113..114) '\n'
+      Block [114..126)
+        L:WhitespaceTrivia [114..118) '    '
+        OpenBraceToken [118..119) '{'
+        T:EndOfLineTrivia [119..120) '\n'
+        L:WhitespaceTrivia [120..124) '    '
+        CloseBraceToken [124..125) '}'
+        T:EndOfLineTrivia [125..126) '\n'
+    CloseBraceToken [126..127) '}'
+    T:EndOfLineTrivia [127..128) '\n'
+  ClassDeclaration [128..216)
+    AttributeList [128..186)
+      OpenBracketToken [128..129) '['
+      Attribute [129..184)
+        IdentifierName [129..143)
+          IdentifierToken [129..143) 'AttributeUsage'
+        AttributeArgumentList [143..184)
+          OpenParenToken [143..144) '('
+          AttributeArgument [144..164)
+            SimpleMemberAccessExpression [144..164)
+              IdentifierName [144..160)
+                IdentifierToken [144..160) 'AttributeTargets'
+              DotToken [160..161) '.'
+              IdentifierName [161..164)
+                IdentifierToken [161..164) 'All'
+          CommaToken [164..165) ','
+          AttributeArgument [165..183)
+            NameEquals [165..179)
+              IdentifierName [165..178)
+                IdentifierToken [165..178) 'AllowMultiple'
+              EqualsToken [178..179) '='
+            TrueLiteralExpression [179..183)
+              TrueKeyword [179..183) 'true'
+          CloseParenToken [183..184) ')'
+      CloseBracketToken [184..185) ']'
+      T:EndOfLineTrivia [185..186) '\n'
+    PublicKeyword [186..192) 'public'
+    T:WhitespaceTrivia [192..193) ' '
+    ClassKeyword [193..198) 'class'
+    T:WhitespaceTrivia [198..199) ' '
+    IdentifierToken [199..200) 'A'
+    T:WhitespaceTrivia [200..201) ' '
+    BaseList [201..213)
+      ColonToken [201..202) ':'
+      T:WhitespaceTrivia [202..203) ' '
+      SimpleBaseType [203..213)
+        IdentifierName [203..213)
+          IdentifierToken [203..212) 'Attribute'
+          T:EndOfLineTrivia [212..213) '\n'
+    OpenBraceToken [213..214) '{'
+    T:EndOfLineTrivia [214..215) '\n'
+    CloseBraceToken [215..216) '}'
+  EndOfFileToken [216..216) ''
+Diagnostics:
+  CS1003 [79..80) Syntax error, \',\' expected
+  CS1003 [80..81) Syntax error, \',\' expected

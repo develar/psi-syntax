@@ -1,0 +1,19 @@
+CompilationUnit [0..12)
+  GlobalStatement [0..12)
+    ExpressionStatement [0..12)
+      ArrayCreationExpression [0..12)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        ArrayType [4..12)
+          IdentifierName [4..11)
+            IdentifierToken [4..11) 'partial'
+          ArrayRankSpecifier [11..12)
+            OpenBracketToken [11..12) '['
+            OmittedArraySizeExpression [12..12)
+              OmittedArraySizeExpressionToken [12..12) ''
+            CloseBracketToken [12..12) missing
+      SemicolonToken [12..12) missing
+  EndOfFileToken [12..12) ''
+Diagnostics:
+  CS1003 [12..12) Syntax error, \']\' expected
+  CS1002 [12..12) ; expected

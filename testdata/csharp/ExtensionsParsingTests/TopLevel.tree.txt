@@ -1,0 +1,14 @@
+CompilationUnit [0..21)
+  ExtensionBlockDeclaration [0..21)
+    ExtensionKeyword [0..9) 'extension'
+    ParameterList [9..18)
+      OpenParenToken [9..10) '('
+      Parameter [10..16)
+        PredefinedType [10..16)
+          ObjectKeyword [10..16) 'object'
+      CloseParenToken [16..17) ')'
+      T:WhitespaceTrivia [17..18) ' '
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    CloseBraceToken [20..21) '}'
+  EndOfFileToken [21..21) ''

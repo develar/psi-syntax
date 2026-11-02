@@ -1,0 +1,11 @@
+BreakStatement [0..10)
+  BreakKeyword [0..5) 'break'
+  T:WhitespaceTrivia [5..6) ' '
+  SemicolonToken [6..6) missing
+  T:SkippedTokensTrivia [6..9)
+    IntKeyword [6..9) 'int'
+  T:SkippedTokensTrivia [9..10)
+    SemicolonToken [9..10) ';'
+Diagnostics:
+  CS1073 [0..6) Unexpected token \'int\'
+  CS1002 [6..9) ; expected

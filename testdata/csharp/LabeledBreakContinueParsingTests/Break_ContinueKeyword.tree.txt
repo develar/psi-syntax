@@ -1,0 +1,14 @@
+BreakStatement [0..17)
+  BreakKeyword [0..5) 'break'
+  T:WhitespaceTrivia [5..6) ' '
+  SemicolonToken [6..6) missing
+  T:SkippedTokensTrivia [6..14)
+    ContinueKeyword [6..14) 'continue'
+  T:WhitespaceTrivia [14..15) ' '
+  T:SkippedTokensTrivia [15..16)
+    IdentifierToken [15..16) 'a'
+  T:SkippedTokensTrivia [16..17)
+    SemicolonToken [16..17) ';'
+Diagnostics:
+  CS1073 [0..6) Unexpected token \'continue\'
+  CS1002 [6..14) ; expected

@@ -1,0 +1,53 @@
+CompilationUnit [0..77)
+  ClassDeclaration [0..77)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'A'
+    T:WhitespaceTrivia [7..8) ' '
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    OperatorDeclaration [11..75)
+      L:WhitespaceTrivia [11..13) '  '
+      PublicKeyword [13..19) 'public'
+      T:WhitespaceTrivia [19..20) ' '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      IdentifierName [27..29)
+        IdentifierToken [27..28) 'A'
+        T:WhitespaceTrivia [28..29) ' '
+      OperatorKeyword [29..37) 'operator'
+      T:WhitespaceTrivia [37..38) ' '
+      PlusToken [38..38) missing
+      T:SkippedTokensTrivia [38..39)
+        OpenParenToken [38..39) '('
+      ParameterList [39..54)
+        OpenParenToken [39..39) missing
+        Parameter [39..42)
+          IdentifierName [39..41)
+            IdentifierToken [39..40) 'A'
+            T:WhitespaceTrivia [40..41) ' '
+          IdentifierToken [41..42) 'a'
+        CloseParenToken [42..43) ')'
+        T:WhitespaceTrivia [43..44) ' '
+        T:SingleLineCommentTrivia [44..53) '// CS1019'
+        T:EndOfLineTrivia [53..54) '\n'
+      Block [54..75)
+        L:WhitespaceTrivia [54..56) '  '
+        OpenBraceToken [56..57) '{'
+        T:WhitespaceTrivia [57..61) '    '
+        ReturnStatement [61..73)
+          ReturnKeyword [61..67) 'return'
+          T:WhitespaceTrivia [67..68) ' '
+          IdentifierName [68..69)
+            IdentifierToken [68..69) 'a'
+          SemicolonToken [69..70) ';'
+          T:WhitespaceTrivia [70..73) '   '
+        CloseBraceToken [73..74) '}'
+        T:EndOfLineTrivia [74..75) '\n'
+    CloseBraceToken [75..76) '}'
+    T:EndOfLineTrivia [76..77) '\n'
+  EndOfFileToken [77..77) ''
+Diagnostics:
+  CS1019 [38..39) Overloadable unary operator expected
+  CS1003 [39..40) Syntax error, \'(\' expected

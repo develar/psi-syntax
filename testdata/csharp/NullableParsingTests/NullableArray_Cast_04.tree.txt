@@ -1,0 +1,23 @@
+CastExpression [0..18)
+  OpenParenToken [0..1) '('
+  ArrayType [1..13)
+    NullableType [1..11)
+      ArrayType [1..10)
+        NullableType [1..8)
+          PredefinedType [1..7)
+            ObjectKeyword [1..7) 'object'
+          QuestionToken [7..8) '?'
+        ArrayRankSpecifier [8..10)
+          OpenBracketToken [8..9) '['
+          OmittedArraySizeExpression [9..9)
+            OmittedArraySizeExpressionToken [9..9) ''
+          CloseBracketToken [9..10) ']'
+      QuestionToken [10..11) '?'
+    ArrayRankSpecifier [11..13)
+      OpenBracketToken [11..12) '['
+      OmittedArraySizeExpression [12..12)
+        OmittedArraySizeExpressionToken [12..12) ''
+      CloseBracketToken [12..13) ']'
+  CloseParenToken [13..14) ')'
+  NullLiteralExpression [14..18)
+    NullKeyword [14..18) 'null'

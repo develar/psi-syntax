@@ -1,0 +1,34 @@
+CompilationUnit [0..16)
+  GlobalStatement [0..16)
+    LocalDeclarationStatement [0..16)
+      UsingKeyword [0..5) 'using'
+      T:WhitespaceTrivia [5..6) ' '
+      VariableDeclaration [6..16)
+        PredefinedType [6..10)
+          IntKeyword [6..9) 'int'
+          T:WhitespaceTrivia [9..10) ' '
+        VariableDeclarator [10..16)
+          IdentifierToken [10..10) missing
+          BracketedArgumentList [10..16)
+            OpenBracketToken [10..10) missing
+            T:SkippedTokensTrivia [10..11)
+              OpenParenToken [10..11) '('
+            Argument [11..12)
+              IdentifierName [11..12)
+                IdentifierToken [11..12) 'x'
+            CommaToken [12..13) ','
+            T:WhitespaceTrivia [13..14) ' '
+            Argument [14..15)
+              IdentifierName [14..15)
+                IdentifierToken [14..15) 'y'
+            CloseBracketToken [15..15) missing
+            T:SkippedTokensTrivia [15..16)
+              CloseParenToken [15..16) ')'
+      SemicolonToken [16..16) missing
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1001 [10..11) Identifier expected
+  CS1528 [10..15) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [10..11) Syntax error, \'[\' expected
+  CS1003 [15..16) Syntax error, \']\' expected
+  CS1002 [16..16) ; expected

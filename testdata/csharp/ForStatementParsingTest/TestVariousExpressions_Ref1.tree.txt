@@ -1,0 +1,33 @@
+ForStatement [0..26)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..10)
+    RefType [5..10)
+      RefKeyword [5..8) 'ref'
+      T:WhitespaceTrivia [8..9) ' '
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'a'
+    VariableDeclarator [10..10)
+      IdentifierToken [10..10) missing
+  SemicolonToken [10..11) ';'
+  T:WhitespaceTrivia [11..12) ' '
+  RefExpression [12..17)
+    RefKeyword [12..15) 'ref'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierName [16..17)
+      IdentifierToken [16..17) 'a'
+  SemicolonToken [17..18) ';'
+  T:WhitespaceTrivia [18..19) ' '
+  RefExpression [19..24)
+    RefKeyword [19..22) 'ref'
+    T:WhitespaceTrivia [22..23) ' '
+    IdentifierName [23..24)
+      IdentifierToken [23..24) 'a'
+  CloseParenToken [24..25) ')'
+  EmptyStatement [25..26)
+    SemicolonToken [25..26) ';'
+Diagnostics:
+  CS1001 [10..11) Identifier expected
+  CS1525 [12..17) Invalid expression term \'ref\'
+  CS1525 [19..24) Invalid expression term \'ref\'

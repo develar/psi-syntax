@@ -1,0 +1,39 @@
+CompilationUnit [0..44)
+  ClassDeclaration [0..44)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    EventDeclaration [10..43)
+      EventKeyword [10..15) 'event'
+      T:WhitespaceTrivia [15..16) ' '
+      IdentifierName [16..18)
+        IdentifierToken [16..17) 'b'
+        T:WhitespaceTrivia [17..18) ' '
+      IdentifierToken [18..19) 'c'
+      T:WhitespaceTrivia [19..20) ' '
+      AccessorList [20..43)
+        OpenBraceToken [20..21) '{'
+        T:WhitespaceTrivia [21..22) ' '
+        AddAccessorDeclaration [22..30)
+          AddKeyword [22..25) 'add'
+          T:WhitespaceTrivia [25..26) ' '
+          Block [26..30)
+            OpenBraceToken [26..27) '{'
+            T:WhitespaceTrivia [27..28) ' '
+            CloseBraceToken [28..29) '}'
+            T:WhitespaceTrivia [29..30) ' '
+        RemoveAccessorDeclaration [30..41)
+          RemoveKeyword [30..36) 'remove'
+          T:WhitespaceTrivia [36..37) ' '
+          Block [37..41)
+            OpenBraceToken [37..38) '{'
+            T:WhitespaceTrivia [38..39) ' '
+            CloseBraceToken [39..40) '}'
+            T:WhitespaceTrivia [40..41) ' '
+        CloseBraceToken [41..42) '}'
+        T:WhitespaceTrivia [42..43) ' '
+    CloseBraceToken [43..44) '}'
+  EndOfFileToken [44..44) ''

@@ -1,0 +1,30 @@
+CompilationUnit [0..22)
+  L:SingleLineDocumentationCommentTrivia [0..22)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..22)
+      XmlElementStartTag [4..15)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'goo'
+        XmlTextAttribute [8..14)
+          XmlName [8..10)
+            L:WhitespaceTrivia [8..9) ' '
+            IdentifierToken [9..10) 'a'
+          EqualsToken [10..10) missing
+          DoubleQuoteToken [10..11) '"'
+          XmlTextLiteralToken [11..13) 'as'
+          DoubleQuoteToken [13..14) '"'
+        GreaterThanToken [14..15) '>'
+      XmlText [15..16)
+        XmlTextLiteralToken [15..16) ' '
+      XmlElementEndTag [16..22)
+        LessThanSlashToken [16..18) '</'
+        XmlName [18..21)
+          IdentifierToken [18..21) 'goo'
+        GreaterThanToken [21..22) '>'
+    EndOfDocumentationCommentToken [22..22) ''
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1570 [10..10) XML comment has badly formed XML -- \'Missing equals sign between attribute and attribute value.\'

@@ -1,0 +1,19 @@
+ConditionalExpression [0..14)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'T'
+  QuestionToken [1..2) '?'
+  T:WhitespaceTrivia [2..3) ' '
+  ParenthesizedLambdaExpression [3..11)
+    ParameterList [3..6)
+      OpenParenToken [3..4) '('
+      CloseParenToken [4..5) ')'
+      T:WhitespaceTrivia [5..6) ' '
+    EqualsGreaterThanToken [6..8) '=>'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..11)
+      IdentifierToken [9..10) 'x'
+      T:WhitespaceTrivia [10..11) ' '
+  ColonToken [11..12) ':'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..14)
+    IdentifierToken [13..14) 'y'

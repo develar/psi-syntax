@@ -1,0 +1,1 @@
+class a { ref readonly b c { get; set; } }

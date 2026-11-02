@@ -1,0 +1,1 @@
+foreach ((var (x, y), z) in e) {}

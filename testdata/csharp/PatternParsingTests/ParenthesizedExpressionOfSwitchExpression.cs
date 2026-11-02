@@ -1,0 +1,1 @@
+Console.Write((t) switch {var x => x});

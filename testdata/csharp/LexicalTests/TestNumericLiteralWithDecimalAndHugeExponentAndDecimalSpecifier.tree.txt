@@ -1,0 +1,4 @@
+NumericLiteralToken [0..12) '123.456e999m'
+EndOfFileToken [12..12) ''
+Diagnostics:
+  CS0594 [0..12) Floating-point constant is outside the range of type \'decimal\'

@@ -1,0 +1,39 @@
+ForEachVariableStatement [0..44)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  IdentifierName [10..18)
+    IdentifierToken [10..17) '@scoped'
+    T:WhitespaceTrivia [17..18) ' '
+  InKeyword [18..18) missing
+  RefExpression [18..26)
+    RefKeyword [18..21) 'ref'
+    T:WhitespaceTrivia [21..22) ' '
+    PredefinedType [22..26)
+      IntKeyword [22..25) 'int'
+      T:WhitespaceTrivia [25..26) ' '
+  CloseParenToken [26..26) missing
+  ExpressionStatement [26..44)
+    IdentifierName [26..28)
+      IdentifierToken [26..27) 'b'
+      T:WhitespaceTrivia [27..28) ' '
+    SemicolonToken [28..28) missing
+    T:SkippedTokensTrivia [28..30)
+      InKeyword [28..30) 'in'
+    T:WhitespaceTrivia [30..31) ' '
+    T:SkippedTokensTrivia [31..41)
+      IdentifierToken [31..41) 'collection'
+    T:SkippedTokensTrivia [41..42)
+      CloseParenToken [41..42) ')'
+    T:SkippedTokensTrivia [42..43)
+      SemicolonToken [42..43) ';'
+    T:EndOfLineTrivia [43..44) '\n'
+Diagnostics:
+  CS1073 [1..28) Unexpected token \'in\'
+  CS1515 [18..21) \'in\' expected
+  CS0230 [18..21) Type and identifier are both required in a foreach statement
+  CS1525 [18..25) Invalid expression term \'ref\'
+  CS1525 [22..25) Invalid expression term \'int\'
+  CS1026 [26..27) ) expected
+  CS1002 [28..30) ; expected

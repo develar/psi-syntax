@@ -1,0 +1,22 @@
+ConversionOperatorDeclaration [0..28)
+  ExplicitKeyword [0..8) 'explicit'
+  T:WhitespaceTrivia [8..9) ' '
+  ExplicitInterfaceSpecifier [9..11)
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'I'
+    DotToken [10..11) '.'
+  OperatorKeyword [11..19) 'operator'
+  T:WhitespaceTrivia [19..20) ' '
+  IdentifierName [20..20)
+    IdentifierToken [20..20) missing
+  ParameterList [20..27)
+    OpenParenToken [20..21) '('
+    Parameter [21..26)
+      PredefinedType [21..25)
+        IntKeyword [21..24) 'int'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'x'
+    CloseParenToken [26..27) ')'
+  SemicolonToken [27..28) ';'
+Diagnostics:
+  CS1001 [20..21) Identifier expected

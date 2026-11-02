@@ -1,0 +1,24 @@
+IncompleteMember [0..35)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  GenericName [6..35)
+    IdentifierToken [6..10) 'Task'
+    TypeArgumentList [10..35)
+      LessThanToken [10..11) '<'
+      QualifiedName [11..32)
+        IdentifierName [11..24)
+          IdentifierToken [11..24) 'SomeNamespace'
+        DotToken [24..25) '.'
+        T:WhitespaceTrivia [25..26) ' '
+        IdentifierName [26..32)
+          IdentifierToken [26..32) 'Method'
+      GreaterThanToken [32..32) missing
+      T:SkippedTokensTrivia [32..33)
+        OpenParenToken [32..33) '('
+      T:SkippedTokensTrivia [33..34)
+        CloseParenToken [33..34) ')'
+      T:SkippedTokensTrivia [34..35)
+        SemicolonToken [34..35) ';'
+Diagnostics:
+  CS1073 [0..32) Unexpected token \'(\'
+  CS1003 [32..33) Syntax error, \'>\' expected

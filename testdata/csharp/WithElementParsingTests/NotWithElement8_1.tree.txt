@@ -1,0 +1,12 @@
+CollectionExpression [0..12)
+  OpenBracketToken [0..1) '['
+  ExpressionElement [1..11)
+    ConditionalAccessExpression [1..11)
+      IdentifierName [1..5)
+        IdentifierToken [1..5) 'with'
+      QuestionToken [5..6) '?'
+      MemberBindingExpression [6..11)
+        DotToken [6..7) '.'
+        IdentifierName [7..11)
+          IdentifierToken [7..11) 'with'
+  CloseBracketToken [11..12) ']'

@@ -1,0 +1,32 @@
+SwitchStatement [0..34)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..33)
+    CaseSwitchLabel [13..26)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      MultiplyExpression [18..24)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'B'
+        AsteriskToken [19..20) '*'
+        PointerIndirectionExpression [20..24)
+          AsteriskToken [20..21) '*'
+          PointerIndirectionExpression [21..24)
+            AsteriskToken [21..22) '*'
+            T:WhitespaceTrivia [22..23) ' '
+            IdentifierName [23..24)
+              IdentifierToken [23..24) 'C'
+      ColonToken [24..25) ':'
+      T:WhitespaceTrivia [25..26) ' '
+    BreakStatement [26..33)
+      BreakKeyword [26..31) 'break'
+      SemicolonToken [31..32) ';'
+      T:WhitespaceTrivia [32..33) ' '
+  CloseBraceToken [33..34) '}'

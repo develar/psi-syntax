@@ -1,0 +1,13 @@
+CompilationUnit [0..4)
+  GlobalStatement [0..4)
+    LocalDeclarationStatement [0..4)
+      VariableDeclaration [0..4)
+        IdentifierName [0..4)
+          IdentifierToken [0..4) 'file'
+        VariableDeclarator [4..4)
+          IdentifierToken [4..4) missing
+      SemicolonToken [4..4) missing
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1001 [4..4) Identifier expected
+  CS1002 [4..4) ; expected

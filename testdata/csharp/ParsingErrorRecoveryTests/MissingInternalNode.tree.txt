@@ -1,0 +1,13 @@
+CompilationUnit [0..3)
+  GlobalStatement [0..3)
+    ExpressionStatement [0..3)
+      CollectionExpression [0..3)
+        OpenBracketToken [0..1) '['
+        ExpressionElement [1..2)
+          NumericLiteralExpression [1..2)
+            NumericLiteralToken [1..2) '1'
+        CloseBracketToken [2..3) ']'
+      SemicolonToken [3..3) missing
+  EndOfFileToken [3..3) ''
+Diagnostics:
+  CS1002 [3..3) ; expected

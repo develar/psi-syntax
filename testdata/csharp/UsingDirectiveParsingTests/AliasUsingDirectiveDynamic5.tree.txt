@@ -1,0 +1,63 @@
+CompilationUnit [0..199)
+  UsingDirective [0..142)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SingleLineCommentTrivia [1..121) '// Note: this is weird, but is supported by language.  It checks just that the ValueText is `dynamic`, not the raw text.'
+    L:EndOfLineTrivia [121..122) '\n'
+    UsingKeyword [122..127) 'using'
+    T:WhitespaceTrivia [127..128) ' '
+    NameEquals [128..132)
+      IdentifierName [128..130)
+        IdentifierToken [128..129) 'D'
+        T:WhitespaceTrivia [129..130) ' '
+      EqualsToken [130..131) '='
+      T:WhitespaceTrivia [131..132) ' '
+    IdentifierName [132..140)
+      IdentifierToken [132..140) '@dynamic'
+    SemicolonToken [140..141) ';'
+    T:EndOfLineTrivia [141..142) '\n'
+  ClassDeclaration [142..199)
+    L:EndOfLineTrivia [142..143) '\n'
+    ClassKeyword [143..148) 'class'
+    T:WhitespaceTrivia [148..149) ' '
+    IdentifierToken [149..150) 'C'
+    T:EndOfLineTrivia [150..151) '\n'
+    OpenBraceToken [151..152) '{'
+    T:EndOfLineTrivia [152..153) '\n'
+    MethodDeclaration [153..198)
+      PredefinedType [153..162)
+        L:WhitespaceTrivia [153..157) '    '
+        VoidKeyword [157..161) 'void'
+        T:WhitespaceTrivia [161..162) ' '
+      IdentifierToken [162..163) 'M'
+      ParameterList [163..169)
+        OpenParenToken [163..164) '('
+        Parameter [164..167)
+          IdentifierName [164..166)
+            IdentifierToken [164..165) 'D'
+            T:WhitespaceTrivia [165..166) ' '
+          IdentifierToken [166..167) 'd'
+        CloseParenToken [167..168) ')'
+        T:EndOfLineTrivia [168..169) '\n'
+      Block [169..198)
+        L:WhitespaceTrivia [169..173) '    '
+        OpenBraceToken [173..174) '{'
+        T:EndOfLineTrivia [174..175) '\n'
+        ExpressionStatement [175..192)
+          InvocationExpression [175..190)
+            SimpleMemberAccessExpression [175..188)
+              IdentifierName [175..184)
+                L:WhitespaceTrivia [175..183) '        '
+                IdentifierToken [183..184) 'd'
+              DotToken [184..185) '.'
+              IdentifierName [185..188)
+                IdentifierToken [185..188) 'Goo'
+            ArgumentList [188..190)
+              OpenParenToken [188..189) '('
+              CloseParenToken [189..190) ')'
+          SemicolonToken [190..191) ';'
+          T:EndOfLineTrivia [191..192) '\n'
+        L:WhitespaceTrivia [192..196) '    '
+        CloseBraceToken [196..197) '}'
+        T:EndOfLineTrivia [197..198) '\n'
+    CloseBraceToken [198..199) '}'
+  EndOfFileToken [199..199) ''

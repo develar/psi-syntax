@@ -1,0 +1,43 @@
+CompilationUnit [0..46)
+  GlobalStatement [0..46)
+    LocalFunctionStatement [0..46)
+      PredefinedType [0..5)
+        VoidKeyword [0..4) 'void'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'M'
+      ParameterList [6..9)
+        OpenParenToken [6..7) '('
+        CloseParenToken [7..8) ')'
+        T:WhitespaceTrivia [8..9) ' '
+      Block [9..46)
+        OpenBraceToken [9..10) '{'
+        T:WhitespaceTrivia [10..11) ' '
+        SwitchStatement [11..45)
+          SwitchKeyword [11..17) 'switch'
+          T:WhitespaceTrivia [17..18) ' '
+          OpenParenToken [18..19) '('
+          IdentifierName [19..20)
+            IdentifierToken [19..20) 'e'
+          CloseParenToken [20..21) ')'
+          T:WhitespaceTrivia [21..22) ' '
+          OpenBraceToken [22..23) '{'
+          T:WhitespaceTrivia [23..24) ' '
+          SwitchSection [24..43)
+            CasePatternSwitchLabel [24..36)
+              CaseKeyword [24..28) 'case'
+              T:WhitespaceTrivia [28..29) ' '
+              VarPattern [29..34)
+                VarKeyword [29..32) 'var'
+                T:WhitespaceTrivia [32..33) ' '
+                DiscardDesignation [33..34)
+                  UnderscoreToken [33..34) '_'
+              ColonToken [34..35) ':'
+              T:WhitespaceTrivia [35..36) ' '
+            BreakStatement [36..43)
+              BreakKeyword [36..41) 'break'
+              SemicolonToken [41..42) ';'
+              T:WhitespaceTrivia [42..43) ' '
+          CloseBraceToken [43..44) '}'
+          T:WhitespaceTrivia [44..45) ' '
+        CloseBraceToken [45..46) '}'
+  EndOfFileToken [46..46) ''

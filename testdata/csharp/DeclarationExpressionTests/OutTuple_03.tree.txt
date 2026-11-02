@@ -1,0 +1,26 @@
+ExpressionStatement [0..20)
+  InvocationExpression [0..19)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'M'
+    ArgumentList [1..19)
+      OpenParenToken [1..2) '('
+      Argument [2..18)
+        OutKeyword [2..5) 'out'
+        T:WhitespaceTrivia [5..6) ' '
+        SimpleMemberAccessExpression [6..18)
+          TupleExpression [6..12)
+            OpenParenToken [6..7) '('
+            Argument [7..8)
+              NumericLiteralExpression [7..8)
+                NumericLiteralToken [7..8) '1'
+            CommaToken [8..9) ','
+            T:WhitespaceTrivia [9..10) ' '
+            Argument [10..11)
+              NumericLiteralExpression [10..11)
+                NumericLiteralToken [10..11) '2'
+            CloseParenToken [11..12) ')'
+          DotToken [12..13) '.'
+          IdentifierName [13..18)
+            IdentifierToken [13..18) 'Field'
+      CloseParenToken [18..19) ')'
+  SemicolonToken [19..20) ';'

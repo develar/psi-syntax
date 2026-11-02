@@ -1,0 +1,13 @@
+ObjectCreationExpression [0..11)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..5)
+    IdentifierToken [4..5) 'a'
+  ArgumentList [5..8)
+    OpenParenToken [5..6) '('
+    CloseParenToken [6..7) ')'
+    T:WhitespaceTrivia [7..8) ' '
+  ObjectInitializerExpression [8..11)
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    CloseBraceToken [10..11) '}'

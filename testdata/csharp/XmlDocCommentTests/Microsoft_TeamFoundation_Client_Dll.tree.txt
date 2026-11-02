@@ -1,0 +1,222 @@
+CompilationUnit [0..434)
+  ClassDeclaration [0..434)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SingleLineDocumentationCommentTrivia [1..25)
+      XmlText [1..5)
+        L:DocumentationCommentExteriorTrivia [1..4) '///'
+        XmlTextLiteralToken [4..5) ' '
+      XmlElement [5..24)
+        XmlElementStartTag [5..14)
+          LessThanToken [5..6) '<'
+          XmlName [6..13)
+            IdentifierToken [6..13) 'summary'
+          GreaterThanToken [13..14) '>'
+        XmlElementEndTag [14..24)
+          LessThanSlashToken [14..16) '</'
+          XmlName [16..23)
+            IdentifierToken [16..23) 'summary'
+          GreaterThanToken [23..24) '>'
+      XmlText [24..25)
+        XmlTextLiteralNewLineToken [24..25) '\n'
+      EndOfDocumentationCommentToken [25..25) ''
+    PublicKeyword [25..31) 'public'
+    T:WhitespaceTrivia [31..32) ' '
+    ClassKeyword [32..37) 'class'
+    T:WhitespaceTrivia [37..38) ' '
+    IdentifierToken [38..45) 'Program'
+    T:EndOfLineTrivia [45..46) '\n'
+    OpenBraceToken [46..47) '{'
+    T:EndOfLineTrivia [47..48) '\n'
+    MethodDeclaration [48..76)
+      L:WhitespaceTrivia [48..53) '     '
+      StaticKeyword [53..59) 'static'
+      T:WhitespaceTrivia [59..60) ' '
+      PredefinedType [60..65)
+        VoidKeyword [60..64) 'void'
+        T:WhitespaceTrivia [64..65) ' '
+      IdentifierToken [65..69) 'Main'
+      ParameterList [69..72)
+        OpenParenToken [69..70) '('
+        CloseParenToken [70..71) ')'
+        T:WhitespaceTrivia [71..72) ' '
+      Block [72..76)
+        OpenBraceToken [72..73) '{'
+        T:WhitespaceTrivia [73..74) ' '
+        CloseBraceToken [74..75) '}'
+        T:EndOfLineTrivia [75..76) '\n'
+    MethodDeclaration [76..433)
+      L:WhitespaceTrivia [76..80) '    '
+      L:SingleLineDocumentationCommentTrivia [80..325)
+        XmlText [80..84)
+          L:DocumentationCommentExteriorTrivia [80..83) '///'
+          XmlTextLiteralToken [83..84) ' '
+        XmlElement [84..325)
+          XmlElementStartTag [84..93)
+            LessThanToken [84..85) '<'
+            XmlName [85..92)
+              IdentifierToken [85..92) 'summary'
+            GreaterThanToken [92..93) '>'
+          XmlText [93..181)
+            XmlTextLiteralNewLineToken [93..94) '\n'
+            L:DocumentationCommentExteriorTrivia [94..101) '    ///'
+            XmlTextLiteralToken [101..150) ' GetEntityConnectionString from the selected path'
+            XmlTextLiteralNewLineToken [150..151) '\n'
+            L:DocumentationCommentExteriorTrivia [151..158) '    ///'
+            XmlTextLiteralToken [158..181) ' path is of the format '
+          XmlElement [181..325)
+            XmlElementStartTag [181..195)
+              LessThanToken [181..182) '<'
+              XmlName [182..189)
+                IdentifierToken [182..189) 'project'
+              XmlTextAttribute [189..194)
+                XmlName [189..194)
+                  L:WhitespaceTrivia [189..190) ' '
+                  IdentifierToken [190..194) 'name'
+                EqualsToken [194..194) missing
+                DoubleQuoteToken [194..194) missing
+                DoubleQuoteToken [194..194) missing
+              GreaterThanToken [194..195) '>'
+            XmlText [195..196)
+              XmlTextLiteralToken [195..196) '\\'
+            XmlElement [196..325)
+              XmlElementStartTag [196..206)
+                LessThanToken [196..197) '<'
+                XmlName [197..205)
+                  IdentifierToken [197..205) 'nodename'
+                GreaterThanToken [205..206) '>'
+              XmlText [206..207)
+                XmlTextLiteralToken [206..207) '\\'
+              XmlElement [207..236)
+                XmlElementStartTag [207..217)
+                  LessThanToken [207..208) '<'
+                  XmlName [208..216)
+                    IdentifierToken [208..216) 'nodename'
+                  GreaterThanToken [216..217) '>'
+                XmlText [217..226)
+                  XmlTextLiteralNewLineToken [217..218) '\n'
+                  L:DocumentationCommentExteriorTrivia [218..225) '    ///'
+                  XmlTextLiteralToken [225..226) ' '
+                XmlElementEndTag [226..236)
+                  LessThanSlashToken [226..228) '</'
+                  XmlName [228..235)
+                    IdentifierToken [228..235) 'summary'
+                  GreaterThanToken [235..236) '>'
+              XmlText [236..245)
+                XmlTextLiteralNewLineToken [236..237) '\n'
+                L:DocumentationCommentExteriorTrivia [237..244) '    ///'
+                XmlTextLiteralToken [244..245) ' '
+              XmlElement [245..280)
+                XmlElementStartTag [245..272)
+                  LessThanToken [245..246) '<'
+                  XmlName [246..251)
+                    IdentifierToken [246..251) 'param'
+                  XmlNameAttribute [251..271)
+                    XmlName [251..256)
+                      L:WhitespaceTrivia [251..252) ' '
+                      IdentifierToken [252..256) 'name'
+                    EqualsToken [256..257) '='
+                    DoubleQuoteToken [257..257) missing
+                    T:SkippedTokensTrivia [257..260)
+                      BadToken [257..260) '”'
+                    IdentifierName [260..268)
+                      IdentifierToken [260..268) 'metadata'
+                    DoubleQuoteToken [268..268) missing
+                    T:SkippedTokensTrivia [268..271)
+                      BadToken [268..271) '”'
+                  GreaterThanToken [271..272) '>'
+                XmlElementEndTag [272..280)
+                  LessThanSlashToken [272..274) '</'
+                  XmlName [274..279)
+                    IdentifierToken [274..279) 'param'
+                  GreaterThanToken [279..280) '>'
+              XmlText [280..289)
+                XmlTextLiteralNewLineToken [280..281) '\n'
+                L:DocumentationCommentExteriorTrivia [281..288) '    ///'
+                XmlTextLiteralToken [288..289) ' '
+              XmlElement [289..324)
+                XmlElementStartTag [289..316)
+                  LessThanToken [289..290) '<'
+                  XmlName [290..295)
+                    IdentifierToken [290..295) 'param'
+                  XmlNameAttribute [295..315)
+                    XmlName [295..300)
+                      L:WhitespaceTrivia [295..296) ' '
+                      IdentifierToken [296..300) 'name'
+                    EqualsToken [300..301) '='
+                    DoubleQuoteToken [301..301) missing
+                    T:SkippedTokensTrivia [301..304)
+                      BadToken [301..304) '”'
+                    IdentifierName [304..312)
+                      IdentifierToken [304..312) 'provider'
+                    DoubleQuoteToken [312..312) missing
+                    T:SkippedTokensTrivia [312..315)
+                      BadToken [312..315) '”'
+                  GreaterThanToken [315..316) '>'
+                XmlElementEndTag [316..324)
+                  LessThanSlashToken [316..318) '</'
+                  XmlName [318..323)
+                    IdentifierToken [318..323) 'param'
+                  GreaterThanToken [323..324) '>'
+              XmlText [324..325)
+                XmlTextLiteralNewLineToken [324..325) '\n'
+              XmlElementEndTag [325..325)
+                LessThanSlashToken [325..325) missing
+                XmlName [325..325)
+                  IdentifierToken [325..325) missing
+                GreaterThanToken [325..325) missing
+            XmlElementEndTag [325..325)
+              LessThanSlashToken [325..325) missing
+              XmlName [325..325)
+                IdentifierToken [325..325) missing
+              GreaterThanToken [325..325) missing
+          XmlElementEndTag [325..325)
+            LessThanSlashToken [325..325) missing
+            XmlName [325..325)
+              IdentifierToken [325..325) missing
+            GreaterThanToken [325..325) missing
+        EndOfDocumentationCommentToken [325..325) ''
+      L:WhitespaceTrivia [325..329) '    '
+      ProtectedKeyword [329..338) 'protected'
+      T:WhitespaceTrivia [338..339) ' '
+      PredefinedType [339..344)
+        VoidKeyword [339..343) 'void'
+        T:WhitespaceTrivia [343..344) ' '
+      IdentifierToken [344..369) 'GetEntityConnectionString'
+      ParameterList [369..421)
+        OpenParenToken [369..370) '('
+        T:EndOfLineTrivia [370..371) '\n'
+        Parameter [371..394)
+          PredefinedType [371..386)
+            L:WhitespaceTrivia [371..379) '        '
+            StringKeyword [379..385) 'string'
+            T:WhitespaceTrivia [385..386) ' '
+          IdentifierToken [386..394) 'metadata'
+        CommaToken [394..395) ','
+        T:EndOfLineTrivia [395..396) '\n'
+        Parameter [396..419)
+          PredefinedType [396..411)
+            L:WhitespaceTrivia [396..404) '        '
+            StringKeyword [404..410) 'string'
+            T:WhitespaceTrivia [410..411) ' '
+          IdentifierToken [411..419) 'provider'
+        CloseParenToken [419..420) ')'
+        T:EndOfLineTrivia [420..421) '\n'
+      Block [421..433)
+        L:WhitespaceTrivia [421..425) '    '
+        OpenBraceToken [425..426) '{'
+        T:EndOfLineTrivia [426..427) '\n'
+        L:WhitespaceTrivia [427..431) '    '
+        CloseBraceToken [431..432) '}'
+        T:EndOfLineTrivia [432..433) '\n'
+    CloseBraceToken [433..434) '}'
+  EndOfFileToken [434..434) ''
+Diagnostics:
+  CS1570 [194..194) XML comment has badly formed XML -- \'Missing equals sign between attribute and attribute value.\'
+  CS1570 [228..235) XML comment has badly formed XML -- \'End tag \'summary\' does not match the start tag \'nodename\'.\'
+  CS1570 [257..257) XML comment has badly formed XML -- \'Non-ASCII quotations marks may not be used around string literals.\'
+  CS1570 [268..268) XML comment has badly formed XML -- \'Non-ASCII quotations marks may not be used around string literals.\'
+  CS1570 [301..301) XML comment has badly formed XML -- \'Non-ASCII quotations marks may not be used around string literals.\'
+  CS1570 [312..312) XML comment has badly formed XML -- \'Non-ASCII quotations marks may not be used around string literals.\'
+  CS1570 [325..325) XML comment has badly formed XML -- \'Expected an end tag for element \'nodename\'.\'
+  CS1570 [325..325) XML comment has badly formed XML -- \'Expected an end tag for element \'project\'.\'
+  CS1570 [325..325) XML comment has badly formed XML -- \'Expected an end tag for element \'summary\'.\'

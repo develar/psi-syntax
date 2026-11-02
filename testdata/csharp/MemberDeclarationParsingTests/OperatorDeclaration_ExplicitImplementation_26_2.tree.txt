@@ -1,0 +1,33 @@
+OperatorDeclaration [0..31)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  ExplicitInterfaceSpecifier [4..8)
+    QualifiedName [4..8)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'N'
+      DotToken [5..6) '.'
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'I'
+        T:WhitespaceTrivia [7..8) ' '
+    DotToken [8..8) missing
+  OperatorKeyword [8..16) 'operator'
+  T:WhitespaceTrivia [16..17) ' '
+  PlusToken [17..18) '+'
+  ParameterList [18..26)
+    OpenParenToken [18..19) '('
+    Parameter [19..24)
+      PredefinedType [19..23)
+        IntKeyword [19..22) 'int'
+        T:WhitespaceTrivia [22..23) ' '
+      IdentifierToken [23..24) 'x'
+    CloseParenToken [24..25) ')'
+    T:WhitespaceTrivia [25..26) ' '
+  ArrowExpressionClause [26..30)
+    EqualsGreaterThanToken [26..28) '=>'
+    T:WhitespaceTrivia [28..29) ' '
+    IdentifierName [29..30)
+      IdentifierToken [29..30) 'x'
+  SemicolonToken [30..31) ';'
+Diagnostics:
+  CS1003 [8..16) Syntax error, \'.\' expected

@@ -1,0 +1,61 @@
+CompilationUnit [0..78)
+  ClassDeclaration [0..78)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'b'
+    T:EndOfLineTrivia [15..16) '\n'
+    OpenBraceToken [16..17) '{'
+    T:EndOfLineTrivia [17..18) '\n'
+    MethodDeclaration [18..76)
+      L:WhitespaceTrivia [18..22) '    '
+      PublicKeyword [22..28) 'public'
+      T:WhitespaceTrivia [28..29) ' '
+      PredefinedType [29..34)
+        VoidKeyword [29..33) 'void'
+        T:WhitespaceTrivia [33..34) ' '
+      IdentifierToken [34..38) 'Main'
+      ParameterList [38..41)
+        OpenParenToken [38..39) '('
+        CloseParenToken [39..40) ')'
+        T:EndOfLineTrivia [40..41) '\n'
+      Block [41..76)
+        L:WhitespaceTrivia [41..45) '    '
+        OpenBraceToken [45..46) '{'
+        T:EndOfLineTrivia [46..47) '\n'
+        ForEachStatement [47..70)
+          ForEachKeyword [47..47) missing
+          T:WhitespaceTrivia [47..55) '        '
+          T:SkippedTokensTrivia [55..58)
+            ForKeyword [55..58) 'for'
+          T:WhitespaceTrivia [58..59) ' '
+          OpenParenToken [59..60) '('
+          IdentifierName [60..64)
+            IdentifierToken [60..63) 'var'
+            T:WhitespaceTrivia [63..64) ' '
+          IdentifierToken [64..65) 'v'
+          T:WhitespaceTrivia [65..66) ' '
+          InKeyword [66..68) 'in'
+          T:WhitespaceTrivia [68..69) ' '
+          T:EndOfLineTrivia [69..70) '\n'
+          IdentifierName [70..70)
+            IdentifierToken [70..70) missing
+          CloseParenToken [70..70) missing
+          ExpressionStatement [70..70)
+            IdentifierName [70..70)
+              IdentifierToken [70..70) missing
+            SemicolonToken [70..70) missing
+        L:WhitespaceTrivia [70..74) '    '
+        CloseBraceToken [74..75) '}'
+        T:EndOfLineTrivia [75..76) '\n'
+    CloseBraceToken [76..77) '}'
+    T:EndOfLineTrivia [77..78) '\n'
+  EndOfFileToken [78..78) ''
+Diagnostics:
+  CS1003 [55..58) Syntax error, \'foreach\' expected
+  CS1525 [68..68) Invalid expression term \'}\'
+  CS1026 [68..68) ) expected
+  CS1525 [68..68) Invalid expression term \'}\'
+  CS1002 [68..68) ; expected

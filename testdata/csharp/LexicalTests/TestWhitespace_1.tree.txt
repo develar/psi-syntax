@@ -1,0 +1,4 @@
+L:WhitespaceTrivia [0..6) ' \t\u{000B}\u{000C} '
+IdentifierToken [6..11) 'token'
+T:WhitespaceTrivia [11..17) ' \u{000C}\u{000B}\t '
+EndOfFileToken [17..17) ''

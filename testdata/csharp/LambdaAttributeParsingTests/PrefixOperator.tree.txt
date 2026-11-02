@@ -1,0 +1,25 @@
+PreDecrementExpression [0..16)
+  MinusMinusToken [0..2) '--'
+  T:WhitespaceTrivia [2..3) ' '
+  InvocationExpression [3..16)
+    CollectionExpression [3..7)
+      OpenBracketToken [3..4) '['
+      ExpressionElement [4..5)
+        IdentifierName [4..5)
+          IdentifierToken [4..5) 'A'
+      CloseBracketToken [5..6) ']'
+      T:WhitespaceTrivia [6..7) ' '
+    ArgumentList [7..16)
+      OpenParenToken [7..8) '('
+      CloseParenToken [8..9) ')'
+      T:WhitespaceTrivia [9..10) ' '
+      T:SkippedTokensTrivia [10..12)
+        EqualsGreaterThanToken [10..12) '=>'
+      T:WhitespaceTrivia [12..13) ' '
+      T:SkippedTokensTrivia [13..14)
+        OpenBraceToken [13..14) '{'
+      T:WhitespaceTrivia [14..15) ' '
+      T:SkippedTokensTrivia [15..16)
+        CloseBraceToken [15..16) '}'
+Diagnostics:
+  CS1073 [0..9) Unexpected token \'=>\'

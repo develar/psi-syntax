@@ -1,0 +1,27 @@
+ExpressionStatement [0..23)
+  SimpleAssignmentExpression [0..22)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    WithExpression [4..22)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'x'
+        T:WhitespaceTrivia [5..6) ' '
+      WithKeyword [6..10) 'with'
+      T:WhitespaceTrivia [10..11) ' '
+      WithInitializerExpression [11..22)
+        OpenBraceToken [11..12) '{'
+        T:WhitespaceTrivia [12..13) ' '
+        SimpleAssignmentExpression [13..21)
+          IdentifierName [13..15)
+            IdentifierToken [13..14) 'X'
+            T:WhitespaceTrivia [14..15) ' '
+          EqualsToken [15..16) '='
+          T:WhitespaceTrivia [16..17) ' '
+          StringLiteralExpression [17..21)
+            StringLiteralToken [17..20) '"2"'
+            T:WhitespaceTrivia [20..21) ' '
+        CloseBraceToken [21..22) '}'
+  SemicolonToken [22..23) ';'

@@ -1,0 +1,1 @@
+I<delegate*<void>[]> i;

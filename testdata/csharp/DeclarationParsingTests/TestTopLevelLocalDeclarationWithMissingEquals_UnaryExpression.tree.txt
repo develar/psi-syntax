@@ -1,0 +1,20 @@
+CompilationUnit [0..9)
+  GlobalStatement [0..9)
+    LocalDeclarationStatement [0..9)
+      VariableDeclaration [0..8)
+        PredefinedType [0..4)
+          IntKeyword [0..3) 'int'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..8)
+          IdentifierToken [4..5) 'x'
+          T:WhitespaceTrivia [5..6) ' '
+          EqualsValueClause [6..8)
+            EqualsToken [6..6) missing
+            UnaryMinusExpression [6..8)
+              MinusToken [6..7) '-'
+              IdentifierName [7..8)
+                IdentifierToken [7..8) 'y'
+      SemicolonToken [8..9) ';'
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1003 [6..7) Syntax error, \'=\' expected

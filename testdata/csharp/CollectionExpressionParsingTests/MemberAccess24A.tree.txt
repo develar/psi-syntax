@@ -1,0 +1,10 @@
+CompilationUnit [0..5)
+  GlobalStatement [0..5)
+    ExpressionStatement [0..5)
+      PostDecrementExpression [0..4)
+        CollectionExpression [0..2)
+          OpenBracketToken [0..1) '['
+          CloseBracketToken [1..2) ']'
+        MinusMinusToken [2..4) '--'
+      SemicolonToken [4..5) ';'
+  EndOfFileToken [5..5) ''

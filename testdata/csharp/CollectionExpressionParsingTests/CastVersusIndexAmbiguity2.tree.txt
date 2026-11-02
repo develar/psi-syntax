@@ -1,0 +1,26 @@
+CastExpression [0..30)
+  OpenParenToken [0..1) '('
+  GenericName [1..20)
+    IdentifierToken [1..15) 'ImmutableArray'
+    TypeArgumentList [15..20)
+      LessThanToken [15..16) '<'
+      PredefinedType [16..19)
+        IntKeyword [16..19) 'int'
+      GreaterThanToken [19..20) '>'
+  CloseParenToken [20..21) ')'
+  CollectionExpression [21..30)
+    OpenBracketToken [21..22) '['
+    ExpressionElement [22..23)
+      NumericLiteralExpression [22..23)
+        NumericLiteralToken [22..23) '1'
+    CommaToken [23..24) ','
+    T:WhitespaceTrivia [24..25) ' '
+    ExpressionElement [25..26)
+      NumericLiteralExpression [25..26)
+        NumericLiteralToken [25..26) '2'
+    CommaToken [26..27) ','
+    T:WhitespaceTrivia [27..28) ' '
+    ExpressionElement [28..29)
+      NumericLiteralExpression [28..29)
+        NumericLiteralToken [28..29) '3'
+    CloseBracketToken [29..30) ']'

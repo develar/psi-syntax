@@ -1,0 +1,30 @@
+CastExpression [0..42)
+  OpenParenToken [0..1) '('
+  AliasQualifiedName [1..32)
+    IdentifierName [1..11)
+      IdentifierToken [1..11) 'ColonColon'
+    ColonColonToken [11..13) '::'
+    GenericName [13..32)
+      IdentifierToken [13..27) 'ImmutableArray'
+      TypeArgumentList [27..32)
+        LessThanToken [27..28) '<'
+        PredefinedType [28..31)
+          IntKeyword [28..31) 'int'
+        GreaterThanToken [31..32) '>'
+  CloseParenToken [32..33) ')'
+  CollectionExpression [33..42)
+    OpenBracketToken [33..34) '['
+    ExpressionElement [34..35)
+      NumericLiteralExpression [34..35)
+        NumericLiteralToken [34..35) '1'
+    CommaToken [35..36) ','
+    T:WhitespaceTrivia [36..37) ' '
+    ExpressionElement [37..38)
+      NumericLiteralExpression [37..38)
+        NumericLiteralToken [37..38) '2'
+    CommaToken [38..39) ','
+    T:WhitespaceTrivia [39..40) ' '
+    ExpressionElement [40..41)
+      NumericLiteralExpression [40..41)
+        NumericLiteralToken [40..41) '3'
+    CloseBracketToken [41..42) ']'

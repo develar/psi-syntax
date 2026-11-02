@@ -1,0 +1,16 @@
+CompilationUnit [0..10)
+  IncompleteMember [0..10)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayType [4..10)
+      IdentifierName [4..9)
+        IdentifierToken [4..8) 'file'
+        T:EndOfLineTrivia [8..9) '\n'
+      ArrayRankSpecifier [9..10)
+        OpenBracketToken [9..10) '['
+        OmittedArraySizeExpression [10..10)
+          OmittedArraySizeExpressionToken [10..10) ''
+        CloseBracketToken [10..10) missing
+  EndOfFileToken [10..10) ''
+Diagnostics:
+  CS1003 [10..10) Syntax error, \']\' expected

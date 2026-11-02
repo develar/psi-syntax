@@ -1,0 +1,25 @@
+CompilationUnit [0..28)
+  RecordStructDeclaration [0..28)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    StructKeyword [7..13) 'struct'
+    IdentifierToken [13..13) missing
+    ParameterList [13..27)
+      OpenParenToken [13..14) '('
+      Parameter [14..19)
+        PredefinedType [14..18)
+          IntKeyword [14..17) 'int'
+          T:WhitespaceTrivia [17..18) ' '
+        IdentifierToken [18..19) 'X'
+      CommaToken [19..20) ','
+      T:WhitespaceTrivia [20..21) ' '
+      Parameter [21..26)
+        PredefinedType [21..25)
+          IntKeyword [21..24) 'int'
+          T:WhitespaceTrivia [24..25) ' '
+        IdentifierToken [25..26) 'Y'
+      CloseParenToken [26..27) ')'
+    SemicolonToken [27..28) ';'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS1001 [13..14) Identifier expected

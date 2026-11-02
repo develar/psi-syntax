@@ -1,0 +1,26 @@
+CompilationUnit [0..31)
+  RecordDeclaration [0..31)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'R'
+    TypeParameterList [8..12)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..10)
+        IdentifierToken [9..10) 'T'
+      GreaterThanToken [10..11) '>'
+      T:WhitespaceTrivia [11..12) ' '
+    TypeParameterConstraintClause [12..28)
+      WhereKeyword [12..17) 'where'
+      T:WhitespaceTrivia [17..18) ' '
+      IdentifierName [18..20)
+        IdentifierToken [18..19) 'T'
+        T:WhitespaceTrivia [19..20) ' '
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+      ClassConstraint [22..28)
+        ClassKeyword [22..27) 'class'
+        T:WhitespaceTrivia [27..28) ' '
+    OpenBraceToken [28..29) '{'
+    T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''

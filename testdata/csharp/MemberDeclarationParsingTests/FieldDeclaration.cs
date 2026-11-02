@@ -1,0 +1,1 @@
+static int F1 = a, F2 = b;

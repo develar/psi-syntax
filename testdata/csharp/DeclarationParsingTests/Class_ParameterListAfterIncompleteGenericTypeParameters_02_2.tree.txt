@@ -1,0 +1,25 @@
+CompilationUnit [0..19)
+  StructDeclaration [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:EndOfLineTrivia [9..10) '\n'
+    TypeParameterList [10..13)
+      LessThanToken [10..11) '<'
+      TypeParameter [11..13)
+        IdentifierToken [11..12) 'T'
+        T:EndOfLineTrivia [12..13) '\n'
+      GreaterThanToken [13..13) missing
+    ParameterList [13..18)
+      OpenParenToken [13..14) '('
+      Parameter [14..17)
+        IdentifierName [14..16)
+          IdentifierToken [14..15) 'T'
+          T:WhitespaceTrivia [15..16) ' '
+        IdentifierToken [16..17) 'x'
+      CloseParenToken [17..18) ')'
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS1003 [12..12) Syntax error, \'>\' expected

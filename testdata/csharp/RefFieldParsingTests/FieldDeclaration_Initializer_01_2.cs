@@ -1,0 +1,1 @@
+struct S { ref int _f = ref F(); }

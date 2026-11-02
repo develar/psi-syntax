@@ -1,0 +1,40 @@
+CompilationUnit [0..48)
+  NamespaceDeclaration [0..48)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'x'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..32)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      ClassKeyword [25..30) 'class'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..31) missing
+      OpenBraceToken [31..31) missing
+      CloseBraceToken [31..31) missing
+      T:SkippedTokensTrivia [31..32)
+        BadToken [31..32) '\\'
+    PropertyDeclaration [32..47)
+      IdentifierName [32..35)
+        IdentifierToken [32..34) 'eX'
+        T:EndOfLineTrivia [34..35) '\n'
+      IdentifierToken [35..35) missing
+      AccessorList [35..47)
+        L:WhitespaceTrivia [35..39) '    '
+        OpenBraceToken [39..40) '{'
+        T:EndOfLineTrivia [40..41) '\n'
+        L:WhitespaceTrivia [41..45) '    '
+        CloseBraceToken [45..46) '}'
+        T:EndOfLineTrivia [46..47) '\n'
+    CloseBraceToken [47..48) '}'
+  EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1001 [31..32) Identifier expected
+  CS1514 [31..32) { expected
+  CS1513 [31..32) } expected
+  CS1056 [31..31) Unexpected character \'\\\'
+  CS1001 [34..34) Identifier expected

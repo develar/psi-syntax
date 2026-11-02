@@ -1,0 +1,30 @@
+TupleExpression [0..25)
+  OpenParenToken [0..1) '('
+  Argument [1..14)
+    NameColon [1..7)
+      IdentifierName [1..5)
+        IdentifierToken [1..5) 'arg1'
+      ColonToken [5..6) ':'
+      T:WhitespaceTrivia [6..7) ' '
+    TupleExpression [7..14)
+      OpenParenToken [7..8) '('
+      Argument [8..9)
+        IdentifierName [8..9)
+          IdentifierToken [8..9) 'a'
+      CommaToken [9..10) ','
+      T:WhitespaceTrivia [10..11) ' '
+      Argument [11..13)
+        IdentifierName [11..13)
+          IdentifierToken [11..13) 'a2'
+      CloseParenToken [13..14) ')'
+  CommaToken [14..15) ','
+  T:WhitespaceTrivia [15..16) ' '
+  Argument [16..24)
+    NameColon [16..22)
+      IdentifierName [16..20)
+        IdentifierToken [16..20) 'arg2'
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+    IdentifierName [22..24)
+      IdentifierToken [22..24) 'a2'
+  CloseParenToken [24..25) ')'

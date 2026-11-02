@@ -1,0 +1,19 @@
+CompilationUnit [0..14)
+  ClassDeclaration [0..14)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    T:EndOfLineTrivia [7..8) '\n'
+    IdentifierToken [8..8) missing
+    ParameterList [8..13)
+      OpenParenToken [8..9) '('
+      Parameter [9..12)
+        IdentifierName [9..11)
+          IdentifierToken [9..10) 'T'
+          T:WhitespaceTrivia [10..11) ' '
+        IdentifierToken [11..12) 'x'
+      CloseParenToken [12..13) ')'
+    SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''
+Diagnostics:
+  CS1001 [6..6) Identifier expected

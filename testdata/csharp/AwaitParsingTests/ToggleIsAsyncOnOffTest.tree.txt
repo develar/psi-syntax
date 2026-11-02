@@ -1,0 +1,64 @@
+ParenthesizedLambdaExpression [0..82)
+  L:EndOfLineTrivia [0..1) '\n'
+  AsyncKeyword [1..6) 'async'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  Block [13..82)
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ExpressionStatement [15..28)
+      AwaitExpression [15..26)
+        L:WhitespaceTrivia [15..19) '    '
+        AwaitKeyword [19..24) 'await'
+        T:WhitespaceTrivia [24..25) ' '
+        NumericLiteralExpression [25..26)
+          NumericLiteralToken [25..26) '1'
+      SemicolonToken [26..27) ';'
+      T:EndOfLineTrivia [27..28) '\n'
+    ExpressionStatement [28..66)
+      ParenthesizedLambdaExpression [28..64)
+        ParameterList [28..35)
+          L:WhitespaceTrivia [28..32) '    '
+          OpenParenToken [32..33) '('
+          CloseParenToken [33..34) ')'
+          T:WhitespaceTrivia [34..35) ' '
+        EqualsGreaterThanToken [35..37) '=>'
+        T:WhitespaceTrivia [37..38) ' '
+        Block [38..64)
+          OpenBraceToken [38..39) '{'
+          T:EndOfLineTrivia [39..40) '\n'
+          LocalDeclarationStatement [40..59)
+            VariableDeclaration [40..57)
+              PredefinedType [40..52)
+                L:WhitespaceTrivia [40..48) '        '
+                IntKeyword [48..51) 'int'
+                T:WhitespaceTrivia [51..52) ' '
+              VariableDeclarator [52..57)
+                IdentifierToken [52..57) 'await'
+            SemicolonToken [57..58) ';'
+            T:EndOfLineTrivia [58..59) '\n'
+          L:WhitespaceTrivia [59..63) '    '
+          CloseBraceToken [63..64) '}'
+      SemicolonToken [64..65) ';'
+      T:EndOfLineTrivia [65..66) '\n'
+    ExpressionStatement [66..79)
+      AwaitExpression [66..77)
+        L:WhitespaceTrivia [66..70) '    '
+        AwaitKeyword [70..75) 'await'
+        T:WhitespaceTrivia [75..76) ' '
+        NumericLiteralExpression [76..77)
+          NumericLiteralToken [76..77) '1'
+      SemicolonToken [77..78) ';'
+      T:EndOfLineTrivia [78..79) '\n'
+    CloseBraceToken [79..80) '}'
+    T:SkippedTokensTrivia [80..81)
+      SemicolonToken [80..81) ';'
+    T:EndOfLineTrivia [81..82) '\n'
+Diagnostics:
+  CS1073 [1..80) Unexpected token \';\'
+  CS4003 [52..57) \'await\' cannot be used as an identifier within an async method or lambda expression

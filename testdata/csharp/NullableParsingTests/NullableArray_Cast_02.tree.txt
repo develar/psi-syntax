@@ -1,0 +1,23 @@
+ParenthesizedExpression [0..16)
+  OpenParenToken [0..1) '('
+  CoalesceExpression [1..11)
+    ElementAccessExpression [1..9)
+      PredefinedType [1..7)
+        ObjectKeyword [1..7) 'object'
+      BracketedArgumentList [7..9)
+        OpenBracketToken [7..8) '['
+        Argument [8..8)
+          IdentifierName [8..8)
+            IdentifierToken [8..8) missing
+        CloseBracketToken [8..9) ']'
+    QuestionQuestionToken [9..11) '??'
+    IdentifierName [11..11)
+      IdentifierToken [11..11) missing
+  CloseParenToken [11..12) ')'
+  T:SkippedTokensTrivia [12..16)
+    NullKeyword [12..16) 'null'
+Diagnostics:
+  CS1073 [0..12) Unexpected token \'null\'
+  CS1525 [1..7) Invalid expression term \'object\'
+  CS0443 [8..9) Syntax error; value expected
+  CS1525 [11..12) Invalid expression term \')\'

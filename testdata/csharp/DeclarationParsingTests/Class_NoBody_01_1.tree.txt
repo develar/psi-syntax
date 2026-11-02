@@ -1,0 +1,12 @@
+CompilationUnit [0..8)
+  ClassDeclaration [0..8)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:EndOfLineTrivia [6..7) '\n'
+    IdentifierToken [7..8) 'C'
+    OpenBraceToken [8..8) missing
+    CloseBraceToken [8..8) missing
+  EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1514 [8..8) { expected
+  CS1513 [8..8) } expected

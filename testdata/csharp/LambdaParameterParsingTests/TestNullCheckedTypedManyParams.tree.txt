@@ -1,0 +1,60 @@
+FieldDeclaration [0..50)
+  VariableDeclaration [0..49)
+    GenericName [0..20)
+      IdentifierToken [0..4) 'Func'
+      TypeArgumentList [4..20)
+        LessThanToken [4..5) '<'
+        PredefinedType [5..8)
+          IntKeyword [5..8) 'int'
+        CommaToken [8..9) ','
+        T:WhitespaceTrivia [9..10) ' '
+        PredefinedType [10..13)
+          IntKeyword [10..13) 'int'
+        CommaToken [13..14) ','
+        T:WhitespaceTrivia [14..15) ' '
+        PredefinedType [15..18)
+          IntKeyword [15..18) 'int'
+        GreaterThanToken [18..19) '>'
+        T:WhitespaceTrivia [19..20) ' '
+    VariableDeclarator [20..36)
+      IdentifierToken [20..25) 'func1'
+      T:WhitespaceTrivia [25..26) ' '
+      EqualsValueClause [26..36)
+        EqualsToken [26..27) '='
+        T:WhitespaceTrivia [27..28) ' '
+        ParenthesizedExpression [28..36)
+          OpenParenToken [28..29) '('
+          PredefinedType [29..33)
+            IntKeyword [29..32) 'int'
+            T:WhitespaceTrivia [32..33) ' '
+          CloseParenToken [33..33) missing
+          T:SkippedTokensTrivia [33..34)
+            IdentifierToken [33..34) 'x'
+          T:SkippedTokensTrivia [34..35)
+            ExclamationToken [34..35) '!'
+          T:SkippedTokensTrivia [35..36)
+            ExclamationToken [35..36) '!'
+    CommaToken [36..37) ','
+    T:WhitespaceTrivia [37..38) ' '
+    VariableDeclarator [38..49)
+      IdentifierToken [38..38) missing
+      T:SkippedTokensTrivia [38..41)
+        IntKeyword [38..41) 'int'
+      T:WhitespaceTrivia [41..42) ' '
+      T:SkippedTokensTrivia [42..43)
+        IdentifierToken [42..43) 'y'
+      T:SkippedTokensTrivia [43..44)
+        CloseParenToken [43..44) ')'
+      T:WhitespaceTrivia [44..45) ' '
+      T:SkippedTokensTrivia [45..47)
+        EqualsGreaterThanToken [45..47) '=>'
+      T:WhitespaceTrivia [47..48) ' '
+      T:SkippedTokensTrivia [48..49)
+        IdentifierToken [48..49) 'x'
+  SemicolonToken [49..50) ';'
+Diagnostics:
+  CS1525 [29..32) Invalid expression term \'int\'
+  CS1026 [33..34) ) expected
+  CS1003 [33..34) Syntax error, \',\' expected
+  CS1001 [38..41) Identifier expected
+  CS1003 [38..41) Syntax error, \',\' expected

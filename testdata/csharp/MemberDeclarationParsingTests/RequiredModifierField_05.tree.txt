@@ -1,0 +1,9 @@
+IncompleteMember [0..18)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  RequiredKeyword [9..17) 'required'
+  T:SkippedTokensTrivia [17..18)
+    SemicolonToken [17..18) ';'
+Diagnostics:
+  CS1519 [17..18) Invalid token \';\' in a member declaration
+  CS1073 [0..17) Unexpected token \';\'

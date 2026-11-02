@@ -1,0 +1,22 @@
+ConditionalExpression [0..13)
+  ConditionalAccessExpression [0..6)
+    IdentifierName [0..1)
+      IdentifierToken [0..1) 'a'
+    QuestionToken [1..2) '?'
+    ElementBindingExpression [2..6)
+      BracketedArgumentList [2..6)
+        OpenBracketToken [2..3) '['
+        Argument [3..4)
+          IdentifierName [3..4)
+            IdentifierToken [3..4) 'c'
+        CloseBracketToken [4..5) ']'
+        T:WhitespaceTrivia [5..6) ' '
+  QuestionToken [6..7) '?'
+  T:WhitespaceTrivia [7..8) ' '
+  IdentifierName [8..10)
+    IdentifierToken [8..9) 'b'
+    T:WhitespaceTrivia [9..10) ' '
+  ColonToken [10..11) ':'
+  T:WhitespaceTrivia [11..12) ' '
+  IdentifierName [12..13)
+    IdentifierToken [12..13) 'd'

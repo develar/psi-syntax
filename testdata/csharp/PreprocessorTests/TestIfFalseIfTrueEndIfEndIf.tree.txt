@@ -1,0 +1,29 @@
+CompilationUnit [0..34)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:IfDirectiveTrivia [11..20)
+    HashToken [11..12) '#'
+    IfKeyword [12..14) 'if'
+    T:WhitespaceTrivia [14..15) ' '
+    TrueLiteralExpression [15..19)
+      TrueKeyword [15..19) 'true'
+    EndOfDirectiveToken [19..19) ''
+    T:EndOfLineTrivia [19..20) '\n'
+  L:EndIfDirectiveTrivia [20..27)
+    HashToken [20..21) '#'
+    EndIfKeyword [21..26) 'endif'
+    EndOfDirectiveToken [26..26) ''
+    T:EndOfLineTrivia [26..27) '\n'
+  L:EndIfDirectiveTrivia [27..34)
+    HashToken [27..28) '#'
+    EndIfKeyword [28..33) 'endif'
+    EndOfDirectiveToken [33..33) ''
+    T:EndOfLineTrivia [33..34) '\n'
+  EndOfFileToken [34..34) ''

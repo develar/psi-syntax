@@ -1,0 +1,1 @@
+_ = e is global::E.A;

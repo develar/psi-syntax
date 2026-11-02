@@ -1,0 +1,1 @@
+safe public static C operator +(C x, C y);

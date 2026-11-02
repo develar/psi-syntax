@@ -1,0 +1,1 @@
+safe public extern int P { get; }

@@ -1,0 +1,1 @@
+const record struct S;

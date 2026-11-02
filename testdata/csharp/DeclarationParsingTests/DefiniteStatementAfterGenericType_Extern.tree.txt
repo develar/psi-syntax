@@ -1,0 +1,48 @@
+MethodDeclaration [0..38)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..38)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..26)
+      VariableDeclaration [11..26)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:EndOfLineTrivia [25..26) '\n'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    LocalDeclarationStatement [26..38)
+      L:WhitespaceTrivia [26..30) '    '
+      ExternKeyword [30..36) 'extern'
+      T:EndOfLineTrivia [36..37) '\n'
+      VariableDeclaration [37..38)
+        IdentifierName [37..37)
+          IdentifierToken [37..37) missing
+        VariableDeclarator [37..38)
+          IdentifierToken [37..37) missing
+          T:SkippedTokensTrivia [37..38)
+            CloseBraceToken [37..38) '}'
+      SemicolonToken [38..38) missing
+    CloseBraceToken [38..38) missing
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected
+  CS0106 [30..36) The modifier \'extern\' is not valid for this item
+  CS1031 [36..36) Type expected
+  CS1001 [36..36) Identifier expected
+  CS1003 [36..36) Syntax error, \',\' expected
+  CS1002 [38..38) ; expected
+  CS1513 [38..38) } expected

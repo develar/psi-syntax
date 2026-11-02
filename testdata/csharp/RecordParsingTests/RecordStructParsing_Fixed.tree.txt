@@ -1,0 +1,29 @@
+CompilationUnit [0..22)
+  FieldDeclaration [0..13)
+    FixedKeyword [0..5) 'fixed'
+    T:WhitespaceTrivia [5..6) ' '
+    VariableDeclaration [6..13)
+      IdentifierName [6..13)
+        IdentifierToken [6..12) 'record'
+        T:WhitespaceTrivia [12..13) ' '
+      VariableDeclarator [13..13)
+        IdentifierToken [13..13) missing
+        BracketedArgumentList [13..13)
+          OpenBracketToken [13..13) missing
+          Argument [13..13)
+            OmittedArraySizeExpression [13..13)
+              OmittedArraySizeExpressionToken [13..13) ''
+          CloseBracketToken [13..13) missing
+    SemicolonToken [13..13) missing
+  StructDeclaration [13..22)
+    StructKeyword [13..19) 'struct'
+    T:WhitespaceTrivia [19..20) ' '
+    IdentifierToken [20..21) 'S'
+    SemicolonToken [21..22) ';'
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1001 [13..19) Identifier expected
+  CS1003 [13..19) Syntax error, \'[\' expected
+  CS1003 [13..19) Syntax error, \']\' expected
+  CS0443 [13..19) Syntax error; value expected
+  CS1002 [13..19) ; expected

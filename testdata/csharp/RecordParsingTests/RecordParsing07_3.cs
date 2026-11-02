@@ -1,0 +1,1 @@
+interface P(int x, int y);

@@ -1,0 +1,22 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..15)
+    LocalDeclarationStatement [0..15)
+      VariableDeclaration [0..15)
+        IdentifierName [0..8)
+          IdentifierToken [0..7) 'partial'
+          T:WhitespaceTrivia [7..8) ' '
+        VariableDeclarator [8..15)
+          IdentifierToken [8..14) 'closed'
+          T:WhitespaceTrivia [14..15) ' '
+      SemicolonToken [15..15) missing
+  InterfaceDeclaration [15..30)
+    InterfaceKeyword [15..24) 'interface'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierToken [25..26) 'C'
+    T:WhitespaceTrivia [26..27) ' '
+    OpenBraceToken [27..28) '{'
+    T:WhitespaceTrivia [28..29) ' '
+    CloseBraceToken [29..30) '}'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1002 [15..24) ; expected

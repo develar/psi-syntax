@@ -1,0 +1,14 @@
+CompilationUnit [0..9)
+  UsingDirective [0..9)
+    L:SkippedTokensTrivia [0..3)
+      IdentifierToken [0..3) 'abc'
+    L:WhitespaceTrivia [3..4) ' '
+    UsingKeyword [4..9) 'using'
+    IdentifierName [9..9)
+      IdentifierToken [9..9) missing
+    SemicolonToken [9..9) missing
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS0116 [0..3) A namespace cannot directly contain members such as fields, methods or statements
+  CS1001 [9..9) Identifier expected
+  CS1002 [9..9) ; expected

@@ -1,0 +1,29 @@
+CastExpression [0..17)
+  OpenParenToken [0..1) '('
+  NullableType [1..7)
+    ArrayType [1..6)
+      PredefinedType [1..4)
+        IntKeyword [1..4) 'int'
+      ArrayRankSpecifier [4..6)
+        OpenBracketToken [4..5) '['
+        OmittedArraySizeExpression [5..5)
+          OmittedArraySizeExpressionToken [5..5) ''
+        CloseBracketToken [5..6) ']'
+    QuestionToken [6..7) '?'
+  CloseParenToken [7..8) ')'
+  CollectionExpression [8..17)
+    OpenBracketToken [8..9) '['
+    ExpressionElement [9..10)
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '1'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    ExpressionElement [12..13)
+      NumericLiteralExpression [12..13)
+        NumericLiteralToken [12..13) '2'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    ExpressionElement [15..16)
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '3'
+    CloseBracketToken [16..17) ']'

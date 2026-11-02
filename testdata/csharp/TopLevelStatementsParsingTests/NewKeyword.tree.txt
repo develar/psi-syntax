@@ -1,0 +1,16 @@
+CompilationUnit [0..4)
+  GlobalStatement [0..4)
+    ExpressionStatement [0..4)
+      ObjectCreationExpression [0..4)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        IdentifierName [4..4)
+          IdentifierToken [4..4) missing
+        ArgumentList [4..4)
+          OpenParenToken [4..4) missing
+          CloseParenToken [4..4) missing
+      SemicolonToken [4..4) missing
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1526 [4..4) A new expression requires an argument list or (), [], or {} after type
+  CS1002 [4..4) ; expected

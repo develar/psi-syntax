@@ -1,0 +1,29 @@
+ForStatement [0..19)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  VariableDeclaration [5..14)
+    PredefinedType [5..9)
+      IntKeyword [5..8) 'int'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..14)
+      IdentifierToken [9..10) 'i'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..14)
+        EqualsToken [11..12) '='
+        T:WhitespaceTrivia [12..13) ' '
+        NumericLiteralExpression [13..14)
+          NumericLiteralToken [13..14) '0'
+  SemicolonToken [14..14) missing
+  T:SkippedTokensTrivia [14..15)
+    CommaToken [14..15) ','
+  SemicolonToken [15..15) missing
+  T:SkippedTokensTrivia [15..16)
+    CommaToken [15..16) ','
+  CloseParenToken [16..17) ')'
+  T:WhitespaceTrivia [17..18) ' '
+  EmptyStatement [18..19)
+    SemicolonToken [18..19) ';'
+Diagnostics:
+  CS1002 [14..15) ; expected
+  CS1002 [15..16) ; expected

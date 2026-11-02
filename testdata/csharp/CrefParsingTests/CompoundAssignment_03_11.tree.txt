@@ -1,0 +1,28 @@
+L:SingleLineDocumentationCommentTrivia [0..39)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..39)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..37)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      OperatorMemberCref [15..36)
+        OperatorKeyword [15..23) 'operator'
+        T:WhitespaceTrivia [23..24) ' '
+        T:SkippedTokensTrivia [24..33)
+          UncheckedKeyword [24..33) 'unchecked'
+        L:WhitespaceTrivia [33..34) ' '
+        SlashEqualsToken [34..36) '/='
+      DoubleQuoteToken [36..37) '"'
+    SlashGreaterThanToken [37..39) '/>'
+  EndOfDocumentationCommentToken [39..39) ''
+EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1584 [15..36) XML comment has syntactically incorrect cref attribute \'operator unchecked /=\'
+  CS1658 [24..33) Unexpected keyword \'unchecked\'. See also error CS9027.

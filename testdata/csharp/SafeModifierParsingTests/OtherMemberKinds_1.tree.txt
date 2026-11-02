@@ -1,0 +1,12 @@
+FieldDeclaration [0..18)
+  SafeKeyword [0..4) 'safe'
+  T:WhitespaceTrivia [4..5) ' '
+  PublicKeyword [5..11) 'public'
+  T:WhitespaceTrivia [11..12) ' '
+  VariableDeclaration [12..17)
+    PredefinedType [12..16)
+      IntKeyword [12..15) 'int'
+      T:WhitespaceTrivia [15..16) ' '
+    VariableDeclarator [16..17)
+      IdentifierToken [16..17) 'F'
+  SemicolonToken [17..18) ';'

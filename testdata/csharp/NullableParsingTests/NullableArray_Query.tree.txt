@@ -1,0 +1,28 @@
+QueryExpression [0..25)
+  FromClause [0..17)
+    FromKeyword [0..4) 'from'
+    T:WhitespaceTrivia [4..5) ' '
+    NullableType [5..10)
+      ArrayType [5..8)
+        IdentifierName [5..6)
+          IdentifierToken [5..6) 'A'
+        ArrayRankSpecifier [6..8)
+          OpenBracketToken [6..7) '['
+          OmittedArraySizeExpression [7..7)
+            OmittedArraySizeExpressionToken [7..7) ''
+          CloseBracketToken [7..8) ']'
+      QuestionToken [8..9) '?'
+      T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'a'
+    T:WhitespaceTrivia [11..12) ' '
+    InKeyword [12..14) 'in'
+    T:WhitespaceTrivia [14..15) ' '
+    IdentifierName [15..17)
+      IdentifierToken [15..16) 'b'
+      T:WhitespaceTrivia [16..17) ' '
+  QueryBody [17..25)
+    SelectClause [17..25)
+      SelectKeyword [17..23) 'select'
+      T:WhitespaceTrivia [23..24) ' '
+      IdentifierName [24..25)
+        IdentifierToken [24..25) 'a'

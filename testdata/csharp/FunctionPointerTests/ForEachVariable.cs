@@ -1,0 +1,1 @@
+foreach (delegate*<void> ptr in ptrs) {}

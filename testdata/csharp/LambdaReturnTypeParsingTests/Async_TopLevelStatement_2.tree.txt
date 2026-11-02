@@ -1,0 +1,18 @@
+CompilationUnit [0..25)
+  GlobalStatement [0..25)
+    LocalFunctionStatement [0..25)
+      IdentifierName [0..6)
+        IdentifierToken [0..5) 'async'
+        T:WhitespaceTrivia [5..6) ' '
+      IdentifierToken [6..14) 'MyMethod'
+      ParameterList [14..17)
+        OpenParenToken [14..15) '('
+        CloseParenToken [15..16) ')'
+        T:WhitespaceTrivia [16..17) ' '
+      ArrowExpressionClause [17..24)
+        EqualsGreaterThanToken [17..19) '=>'
+        T:WhitespaceTrivia [19..20) ' '
+        NullLiteralExpression [20..24)
+          NullKeyword [20..24) 'null'
+      SemicolonToken [24..25) ';'
+  EndOfFileToken [25..25) ''

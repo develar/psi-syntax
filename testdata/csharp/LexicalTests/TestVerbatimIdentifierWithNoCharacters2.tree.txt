@@ -1,0 +1,4 @@
+BadToken [0..2) '@@'
+EndOfFileToken [2..2) ''
+Diagnostics:
+  CS1646 [0..0) Keyword, identifier, or string expected after verbatim specifier: @

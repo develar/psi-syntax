@@ -1,0 +1,49 @@
+CompilationUnit [0..43)
+  GlobalStatement [0..43)
+    TryStatement [0..43)
+      L:EndOfLineTrivia [0..1) '\n'
+      TryKeyword [1..4) 'try'
+      T:WhitespaceTrivia [4..5) ' '
+      Block [5..8)
+        OpenBraceToken [5..6) '{'
+        CloseBraceToken [6..7) '}'
+        T:EndOfLineTrivia [7..8) '\n'
+      CatchClause [8..43)
+        CatchKeyword [8..13) 'catch'
+        T:WhitespaceTrivia [13..14) ' '
+        CatchDeclaration [14..22)
+          OpenParenToken [14..15) '('
+          IdentifierName [15..22)
+            IdentifierToken [15..21) 'scoped'
+            T:WhitespaceTrivia [21..22) ' '
+          CloseParenToken [22..22) missing
+        Block [22..43)
+          OpenBraceToken [22..22) missing
+          LocalDeclarationStatement [22..40)
+            VariableDeclaration [22..40)
+              RefType [22..37)
+                RefKeyword [22..25) 'ref'
+                T:WhitespaceTrivia [25..26) ' '
+                ReadOnlyKeyword [26..34) 'readonly'
+                T:WhitespaceTrivia [34..35) ' '
+                IdentifierName [35..37)
+                  IdentifierToken [35..36) 'T'
+                  T:WhitespaceTrivia [36..37) ' '
+              VariableDeclarator [37..40)
+                IdentifierToken [37..38) 'a'
+                T:SkippedTokensTrivia [38..39)
+                  CloseParenToken [38..39) ')'
+                T:WhitespaceTrivia [39..40) ' '
+            SemicolonToken [40..40) missing
+          Block [40..43)
+            OpenBraceToken [40..41) '{'
+            CloseBraceToken [41..42) '}'
+            T:EndOfLineTrivia [42..43) '\n'
+          CloseBraceToken [43..43) missing
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1026 [22..25) ) expected
+  CS1514 [22..25) { expected
+  CS1003 [38..39) Syntax error, \',\' expected
+  CS1002 [40..41) ; expected
+  CS1513 [42..42) } expected

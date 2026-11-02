@@ -1,0 +1,24 @@
+ParenthesizedLambdaExpression [0..27)
+  PredefinedType [0..7)
+    ObjectKeyword [0..6) 'object'
+    T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  ParenthesizedLambdaExpression [13..27)
+    PredefinedType [13..18)
+      VoidKeyword [13..17) 'void'
+      T:WhitespaceTrivia [17..18) ' '
+    ParameterList [18..21)
+      OpenParenToken [18..19) '('
+      CloseParenToken [19..20) ')'
+      T:WhitespaceTrivia [20..21) ' '
+    EqualsGreaterThanToken [21..23) '=>'
+    T:WhitespaceTrivia [23..24) ' '
+    Block [24..27)
+      OpenBraceToken [24..25) '{'
+      T:WhitespaceTrivia [25..26) ' '
+      CloseBraceToken [26..27) '}'

@@ -1,0 +1,16 @@
+CompilationUnit [0..35)
+  L:IfDirectiveTrivia [0..8)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    IdentifierName [4..7)
+      IdentifierToken [4..7) 'DBG'
+    EndOfDirectiveToken [7..7) ''
+    T:EndOfLineTrivia [7..8) '\n'
+  L:DisabledTextTrivia [8..22) '  class A { }\n'
+  L:WhitespaceTrivia [22..29) '       '
+  L:EndIfDirectiveTrivia [29..35)
+    HashToken [29..30) '#'
+    EndIfKeyword [30..35) 'endif'
+    EndOfDirectiveToken [35..35) ''
+  EndOfFileToken [35..35) ''

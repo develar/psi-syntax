@@ -1,0 +1,25 @@
+ExpressionStatement [0..17)
+  SimpleAssignmentExpression [0..16)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    LessThanExpression [4..16)
+      IsPatternExpression [4..13)
+        IdentifierName [4..6)
+          IdentifierToken [4..5) 'e'
+          T:WhitespaceTrivia [5..6) ' '
+        IsKeyword [6..8) 'is'
+        T:WhitespaceTrivia [8..9) ' '
+        RelationalPattern [9..13)
+          LessThanToken [9..10) '<'
+          T:WhitespaceTrivia [10..11) ' '
+          NumericLiteralExpression [11..13)
+            NumericLiteralToken [11..12) '4'
+            T:WhitespaceTrivia [12..13) ' '
+      LessThanToken [13..14) '<'
+      T:WhitespaceTrivia [14..15) ' '
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '4'
+  SemicolonToken [16..17) ';'

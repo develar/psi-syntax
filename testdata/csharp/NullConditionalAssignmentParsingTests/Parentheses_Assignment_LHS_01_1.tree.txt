@@ -1,0 +1,17 @@
+SimpleAssignmentExpression [0..10)
+  ParenthesizedExpression [0..7)
+    OpenParenToken [0..1) '('
+    ConditionalAccessExpression [1..5)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'c'
+      QuestionToken [2..3) '?'
+      MemberBindingExpression [3..5)
+        DotToken [3..4) '.'
+        IdentifierName [4..5)
+          IdentifierToken [4..5) 'F'
+    CloseParenToken [5..6) ')'
+    T:WhitespaceTrivia [6..7) ' '
+  EqualsToken [7..8) '='
+  T:WhitespaceTrivia [8..9) ' '
+  NumericLiteralExpression [9..10)
+    NumericLiteralToken [9..10) '1'

@@ -1,0 +1,27 @@
+CompilationUnit [0..12)
+  GlobalStatement [0..12)
+    ExpressionStatement [0..12)
+      InvocationExpression [0..11)
+        SimpleMemberAccessExpression [0..9)
+          ElementAccessExpression [0..7)
+            CollectionExpression [0..4)
+              OpenBracketToken [0..1) '['
+              ExpressionElement [1..2)
+                IdentifierName [1..2)
+                  IdentifierToken [1..2) 'A'
+              CloseBracketToken [2..3) ']'
+              T:WhitespaceTrivia [3..4) ' '
+            BracketedArgumentList [4..7)
+              OpenBracketToken [4..5) '['
+              Argument [5..6)
+                IdentifierName [5..6)
+                  IdentifierToken [5..6) 'B'
+              CloseBracketToken [6..7) ']'
+          DotToken [7..8) '.'
+          IdentifierName [8..9)
+            IdentifierToken [8..9) 'C'
+        ArgumentList [9..11)
+          OpenParenToken [9..10) '('
+          CloseParenToken [10..11) ')'
+      SemicolonToken [11..12) ';'
+  EndOfFileToken [12..12) ''

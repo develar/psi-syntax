@@ -1,0 +1,4 @@
+StringLiteralToken [0..8) '"literal'
+EndOfFileToken [8..8) ''
+Diagnostics:
+  CS1010 [0..0) Newline in constant

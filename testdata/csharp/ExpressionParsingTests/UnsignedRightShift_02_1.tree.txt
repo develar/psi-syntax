@@ -1,0 +1,15 @@
+GreaterThanExpression [0..8)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  GreaterThanToken [2..3) '>'
+  T:WhitespaceTrivia [3..4) ' '
+  RightShiftExpression [4..8)
+    IdentifierName [4..4)
+      IdentifierToken [4..4) missing
+    GreaterThanGreaterThanToken [4..6) '>>'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierName [7..8)
+      IdentifierToken [7..8) 'y'
+Diagnostics:
+  CS1525 [4..5) Invalid expression term \'>\'

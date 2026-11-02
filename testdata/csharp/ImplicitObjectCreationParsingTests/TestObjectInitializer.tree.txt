@@ -1,0 +1,21 @@
+ImplicitObjectCreationExpression [0..13)
+  NewKeyword [0..3) 'new'
+  ArgumentList [3..8)
+    OpenParenToken [3..4) '('
+    Argument [4..5)
+      NumericLiteralExpression [4..5)
+        NumericLiteralToken [4..5) '1'
+    CommaToken [5..6) ','
+    Argument [6..7)
+      NumericLiteralExpression [6..7)
+        NumericLiteralToken [6..7) '2'
+    CloseParenToken [7..8) ')'
+  ObjectInitializerExpression [8..13)
+    OpenBraceToken [8..9) '{'
+    SimpleAssignmentExpression [9..12)
+      IdentifierName [9..10)
+        IdentifierToken [9..10) 'x'
+      EqualsToken [10..11) '='
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'y'
+    CloseBraceToken [12..13) '}'

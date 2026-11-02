@@ -1,0 +1,1 @@
+x is Type? t and (1, 2)

@@ -1,0 +1,32 @@
+CompilationUnit [0..53)
+  ClassDeclaration [0..46)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:DefineDirectiveTrivia [1..21)
+      HashToken [1..2) '#'
+      DefineKeyword [2..8) 'define'
+      T:WhitespaceTrivia [8..9) ' '
+      IdentifierToken [9..20) '\\u0066oxbar'
+      EndOfDirectiveToken [20..20) ''
+      T:EndOfLineTrivia [20..21) '\n'
+    L:IfDirectiveTrivia [21..32)
+      HashToken [21..22) '#'
+      IfKeyword [22..24) 'if'
+      T:WhitespaceTrivia [24..25) ' '
+      IdentifierName [25..31)
+        IdentifierToken [25..31) 'foxbar'
+      EndOfDirectiveToken [31..31) ''
+      T:EndOfLineTrivia [31..32) '\n'
+    ClassKeyword [32..37) 'class'
+    T:WhitespaceTrivia [37..38) ' '
+    IdentifierToken [38..41) 'Goo'
+    T:WhitespaceTrivia [41..42) ' '
+    OpenBraceToken [42..43) '{'
+    T:WhitespaceTrivia [43..44) ' '
+    CloseBraceToken [44..45) '}'
+    T:EndOfLineTrivia [45..46) '\n'
+  L:EndIfDirectiveTrivia [46..53)
+    HashToken [46..47) '#'
+    EndIfKeyword [47..52) 'endif'
+    EndOfDirectiveToken [52..52) ''
+    T:EndOfLineTrivia [52..53) '\n'
+  EndOfFileToken [53..53) ''

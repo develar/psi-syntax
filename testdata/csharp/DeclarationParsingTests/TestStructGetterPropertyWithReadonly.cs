@@ -1,0 +1,1 @@
+struct a { int P { readonly get { return 42; } } }

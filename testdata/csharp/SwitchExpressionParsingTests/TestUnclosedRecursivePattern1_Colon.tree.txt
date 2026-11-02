@@ -1,0 +1,79 @@
+SwitchExpression [0..75)
+  IdentifierName [0..4)
+    IdentifierToken [0..3) 'obj'
+    T:WhitespaceTrivia [3..4) ' '
+  SwitchKeyword [4..10) 'switch'
+  T:EndOfLineTrivia [10..11) '\n'
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchExpressionArm [13..42)
+    RecursivePattern [13..39)
+      IdentifierName [13..22)
+        L:WhitespaceTrivia [13..17) '    '
+        IdentifierToken [17..21) 'Type'
+        T:WhitespaceTrivia [21..22) ' '
+      PropertyPatternClause [22..39)
+        OpenBraceToken [22..23) '{'
+        T:WhitespaceTrivia [23..24) ' '
+        Subpattern [24..39)
+          NameColon [24..30)
+            IdentifierName [24..28)
+              IdentifierToken [24..28) 'Prop'
+            ColonToken [28..29) ':'
+            T:WhitespaceTrivia [29..30) ' '
+          RecursivePattern [30..39)
+            IdentifierName [30..35)
+              IdentifierToken [30..34) 'Type'
+              T:WhitespaceTrivia [34..35) ' '
+            PropertyPatternClause [35..39)
+              OpenBraceToken [35..36) '{'
+              T:WhitespaceTrivia [36..37) ' '
+              CloseBraceToken [37..38) '}'
+              T:WhitespaceTrivia [38..39) ' '
+        CloseBraceToken [39..39) missing
+    EqualsGreaterThanToken [39..39) missing
+    T:SkippedTokensTrivia [39..40)
+      ColonToken [39..40) ':'
+    T:WhitespaceTrivia [40..41) ' '
+    NumericLiteralExpression [41..42)
+      NumericLiteralToken [41..42) '1'
+  CommaToken [42..43) ','
+  T:EndOfLineTrivia [43..44) '\n'
+  SwitchExpressionArm [44..74)
+    RecursivePattern [44..70)
+      IdentifierName [44..53)
+        L:WhitespaceTrivia [44..48) '    '
+        IdentifierToken [48..52) 'Type'
+        T:WhitespaceTrivia [52..53) ' '
+      PropertyPatternClause [53..70)
+        OpenBraceToken [53..54) '{'
+        T:WhitespaceTrivia [54..55) ' '
+        Subpattern [55..70)
+          NameColon [55..61)
+            IdentifierName [55..59)
+              IdentifierToken [55..59) 'Prop'
+            ColonToken [59..60) ':'
+            T:WhitespaceTrivia [60..61) ' '
+          RecursivePattern [61..70)
+            IdentifierName [61..66)
+              IdentifierToken [61..65) 'Type'
+              T:WhitespaceTrivia [65..66) ' '
+            PropertyPatternClause [66..70)
+              OpenBraceToken [66..67) '{'
+              T:WhitespaceTrivia [67..68) ' '
+              CloseBraceToken [68..69) '}'
+              T:WhitespaceTrivia [69..70) ' '
+        CloseBraceToken [70..70) missing
+    EqualsGreaterThanToken [70..70) missing
+    T:SkippedTokensTrivia [70..71)
+      ColonToken [70..71) ':'
+    T:WhitespaceTrivia [71..72) ' '
+    NumericLiteralExpression [72..74)
+      NumericLiteralToken [72..73) '2'
+      T:EndOfLineTrivia [73..74) '\n'
+  CloseBraceToken [74..75) '}'
+Diagnostics:
+  CS1513 [39..40) } expected
+  CS1003 [39..40) Syntax error, \'=>\' expected
+  CS1513 [70..71) } expected
+  CS1003 [70..71) Syntax error, \'=>\' expected

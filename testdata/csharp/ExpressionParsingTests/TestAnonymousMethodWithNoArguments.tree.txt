@@ -1,0 +1,11 @@
+AnonymousMethodExpression [0..15)
+  DelegateKeyword [0..8) 'delegate'
+  T:WhitespaceTrivia [8..9) ' '
+  ParameterList [9..12)
+    OpenParenToken [9..10) '('
+    CloseParenToken [10..11) ')'
+    T:WhitespaceTrivia [11..12) ' '
+  Block [12..15)
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    CloseBraceToken [14..15) '}'

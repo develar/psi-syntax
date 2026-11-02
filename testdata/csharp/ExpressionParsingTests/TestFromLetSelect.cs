@@ -1,0 +1,1 @@
+from a in A let b = B select c

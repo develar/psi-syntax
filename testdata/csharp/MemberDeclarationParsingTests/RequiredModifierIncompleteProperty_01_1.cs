@@ -1,0 +1,1 @@
+required string Prop { get;

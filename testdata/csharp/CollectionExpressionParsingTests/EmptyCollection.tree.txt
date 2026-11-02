@@ -1,0 +1,14 @@
+CompilationUnit [0..7)
+  GlobalStatement [0..7)
+    ExpressionStatement [0..7)
+      SimpleAssignmentExpression [0..6)
+        IdentifierName [0..2)
+          IdentifierToken [0..1) '_'
+          T:WhitespaceTrivia [1..2) ' '
+        EqualsToken [2..3) '='
+        T:WhitespaceTrivia [3..4) ' '
+        CollectionExpression [4..6)
+          OpenBracketToken [4..5) '['
+          CloseBracketToken [5..6) ']'
+      SemicolonToken [6..7) ';'
+  EndOfFileToken [7..7) ''

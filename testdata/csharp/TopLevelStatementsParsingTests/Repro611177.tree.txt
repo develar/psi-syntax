@@ -1,0 +1,53 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..19)
+    LocalDeclarationStatement [0..19)
+      AttributeList [0..14)
+        OpenBracketToken [0..1) '['
+        Attribute [1..14)
+          GenericName [1..14)
+            IdentifierToken [1..2) '_'
+            TypeArgumentList [2..14)
+              LessThanToken [2..3) '<'
+              ArrayType [3..14)
+                IdentifierName [3..4)
+                  IdentifierToken [3..4) '_'
+                ArrayRankSpecifier [4..14)
+                  OpenBracketToken [4..5) '['
+                  AnonymousMethodExpression [5..14)
+                    DelegateKeyword [5..13) 'delegate'
+                    T:WhitespaceTrivia [13..14) ' '
+                    Block [14..14)
+                      OpenBraceToken [14..14) missing
+                      CloseBraceToken [14..14) missing
+                  CommaToken [14..14) missing
+                  IdentifierName [14..14)
+                    IdentifierToken [14..14) missing
+                  CloseBracketToken [14..14) missing
+              GreaterThanToken [14..14) missing
+        CloseBracketToken [14..14) missing
+      UsingKeyword [14..19) 'using'
+      VariableDeclaration [19..19)
+        IdentifierName [19..19)
+          IdentifierToken [19..19) missing
+        VariableDeclarator [19..19)
+          IdentifierToken [19..19) missing
+      SemicolonToken [19..19) missing
+  GlobalStatement [19..20)
+    ExpressionStatement [19..20)
+      CharacterLiteralExpression [19..20)
+        CharacterLiteralToken [19..20) '\''
+      SemicolonToken [20..20) missing
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1514 [14..19) { expected
+  CS1003 [14..19) Syntax error, \',\' expected
+  CS0443 [14..14) Syntax error; value expected
+  CS1003 [14..19) Syntax error, \']\' expected
+  CS1003 [14..19) Syntax error, \'>\' expected
+  CS1003 [14..19) Syntax error, \']\' expected
+  CS1031 [19..20) Type expected
+  CS1001 [19..20) Identifier expected
+  CS1002 [19..20) ; expected
+  CS1010 [19..19) Newline in constant
+  CS1011 [19..19) Empty character literal
+  CS1002 [20..20) ; expected

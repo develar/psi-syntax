@@ -1,0 +1,13 @@
+CompilationUnit [0..4)
+  GlobalStatement [0..4)
+    ExpressionStatement [0..4)
+      LessThanExpression [0..4)
+        IdentifierName [0..2)
+          IdentifierToken [0..2) 'c1'
+        LessThanToken [2..3) '<'
+        IdentifierName [3..4)
+          IdentifierToken [3..4) 't'
+      SemicolonToken [4..4) missing
+  EndOfFileToken [4..4) ''
+Diagnostics:
+  CS1002 [4..4) ; expected

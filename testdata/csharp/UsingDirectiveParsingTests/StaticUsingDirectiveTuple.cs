@@ -1,0 +1,1 @@
+using static (int, int);

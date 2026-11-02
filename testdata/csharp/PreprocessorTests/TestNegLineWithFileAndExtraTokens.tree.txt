@@ -1,0 +1,15 @@
+CompilationUnit [0..25)
+  L:LineDirectiveTrivia [0..25)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..10) '1000'
+    T:WhitespaceTrivia [10..11) ' '
+    StringLiteralToken [11..21) '"bogus.cs"'
+    T:WhitespaceTrivia [21..22) ' '
+    L:SkippedTokensTrivia [22..25)
+      IdentifierToken [22..25) 'XYZ'
+    EndOfDirectiveToken [25..25) ''
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1025 [22..25) Single-line comment or end-of-line expected

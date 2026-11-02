@@ -1,0 +1,24 @@
+CompilationUnit [0..36)
+  ClassDeclaration [0..36)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    EventFieldDeclaration [11..34)
+      L:WhitespaceTrivia [11..15) '    '
+      EventKeyword [15..20) 'event'
+      T:WhitespaceTrivia [20..21) ' '
+      VariableDeclaration [21..32)
+        IdentifierName [21..27)
+          IdentifierToken [21..26) 'async'
+          T:WhitespaceTrivia [26..27) ' '
+        VariableDeclarator [27..32)
+          IdentifierToken [27..32) 'async'
+      SemicolonToken [32..33) ';'
+      T:EndOfLineTrivia [33..34) '\n'
+    CloseBraceToken [34..35) '}'
+    T:EndOfLineTrivia [35..36) '\n'
+  EndOfFileToken [36..36) ''

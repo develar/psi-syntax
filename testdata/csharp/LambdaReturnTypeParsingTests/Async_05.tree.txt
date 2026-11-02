@@ -1,0 +1,12 @@
+ParenthesizedLambdaExpression [0..20)
+  IdentifierName [0..7)
+    IdentifierToken [0..6) '@async'
+    T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  DefaultLiteralExpression [13..20)
+    DefaultKeyword [13..20) 'default'

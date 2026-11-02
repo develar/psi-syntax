@@ -1,0 +1,25 @@
+CompilationUnit [0..16)
+  ClassDeclaration [0..16)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    TypeParameterList [7..9)
+      LessThanToken [7..8) '<'
+      T:WhitespaceTrivia [8..9) ' '
+      TypeParameter [9..9)
+        IdentifierToken [9..9) missing
+      GreaterThanToken [9..9) missing
+    BaseList [9..13)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      SimpleBaseType [11..13)
+        IdentifierName [11..13)
+          IdentifierToken [11..12) 'x'
+          T:WhitespaceTrivia [12..13) ' '
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    CloseBraceToken [15..16) '}'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1001 [9..10) Identifier expected
+  CS1003 [9..10) Syntax error, \'>\' expected

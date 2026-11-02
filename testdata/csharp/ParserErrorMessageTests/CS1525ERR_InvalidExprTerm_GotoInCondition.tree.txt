@@ -1,0 +1,116 @@
+CompilationUnit [0..177)
+  ClassDeclaration [0..177)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..13) 'Program'
+    T:EndOfLineTrivia [13..14) '\n'
+    OpenBraceToken [14..15) '{'
+    T:EndOfLineTrivia [15..16) '\n'
+    MethodDeclaration [16..175)
+      L:WhitespaceTrivia [16..20) '    '
+      StaticKeyword [20..26) 'static'
+      T:WhitespaceTrivia [26..27) ' '
+      PredefinedType [27..31)
+        IntKeyword [27..30) 'int'
+        T:WhitespaceTrivia [30..31) ' '
+      IdentifierToken [31..35) 'Main'
+      ParameterList [35..51)
+        OpenParenToken [35..36) '('
+        Parameter [36..49)
+          ArrayType [36..45)
+            PredefinedType [36..42)
+              StringKeyword [36..42) 'string'
+            ArrayRankSpecifier [42..45)
+              OpenBracketToken [42..43) '['
+              OmittedArraySizeExpression [43..43)
+                OmittedArraySizeExpressionToken [43..43) ''
+              CloseBracketToken [43..44) ']'
+              T:WhitespaceTrivia [44..45) ' '
+          IdentifierToken [45..49) 'args'
+        CloseParenToken [49..50) ')'
+        T:EndOfLineTrivia [50..51) '\n'
+      Block [51..175)
+        L:WhitespaceTrivia [51..55) '    '
+        OpenBraceToken [55..56) '{'
+        T:EndOfLineTrivia [56..57) '\n'
+        LocalDeclarationStatement [57..80)
+          VariableDeclaration [57..80)
+            PredefinedType [57..69)
+              L:WhitespaceTrivia [57..65) '        '
+              IntKeyword [65..68) 'int'
+              T:WhitespaceTrivia [68..69) ' '
+            VariableDeclarator [69..80)
+              IdentifierToken [69..70) 's'
+              T:WhitespaceTrivia [70..71) ' '
+              EqualsValueClause [71..80)
+                EqualsToken [71..72) '='
+                T:WhitespaceTrivia [72..73) ' '
+                ConditionalExpression [73..80)
+                  TrueLiteralExpression [73..78)
+                    TrueKeyword [73..77) 'true'
+                    T:WhitespaceTrivia [77..78) ' '
+                  QuestionToken [78..79) '?'
+                  T:WhitespaceTrivia [79..80) ' '
+                  IdentifierName [80..80)
+                    IdentifierToken [80..80) missing
+                  ColonToken [80..80) missing
+                  IdentifierName [80..80)
+                    IdentifierToken [80..80) missing
+          SemicolonToken [80..80) missing
+        GotoStatement [80..91)
+          GotoKeyword [80..84) 'goto'
+          T:WhitespaceTrivia [84..85) ' '
+          IdentifierName [85..89)
+            IdentifierToken [85..89) 'lab1'
+          SemicolonToken [89..89) missing
+          T:SkippedTokensTrivia [89..90)
+            ColonToken [89..90) ':'
+          T:WhitespaceTrivia [90..91) ' '
+        GotoStatement [91..113)
+          GotoKeyword [91..95) 'goto'
+          T:WhitespaceTrivia [95..96) ' '
+          IdentifierName [96..100)
+            IdentifierToken [96..100) 'lab2'
+          SemicolonToken [100..101) ';'
+          T:WhitespaceTrivia [101..102) ' '
+          T:SingleLineCommentTrivia [102..112) '// Invalid'
+          T:EndOfLineTrivia [112..113) '\n'
+        LabeledStatement [113..141)
+          L:WhitespaceTrivia [113..117) '    '
+          IdentifierToken [117..121) 'lab1'
+          ColonToken [121..122) ':'
+          T:EndOfLineTrivia [122..123) '\n'
+          ReturnStatement [123..141)
+            L:WhitespaceTrivia [123..131) '        '
+            ReturnKeyword [131..137) 'return'
+            T:WhitespaceTrivia [137..138) ' '
+            NumericLiteralExpression [138..139)
+              NumericLiteralToken [138..139) '0'
+            SemicolonToken [139..140) ';'
+            T:EndOfLineTrivia [140..141) '\n'
+        LabeledStatement [141..169)
+          L:WhitespaceTrivia [141..145) '    '
+          IdentifierToken [145..149) 'lab2'
+          ColonToken [149..150) ':'
+          T:EndOfLineTrivia [150..151) '\n'
+          ReturnStatement [151..169)
+            L:WhitespaceTrivia [151..159) '        '
+            ReturnKeyword [159..165) 'return'
+            T:WhitespaceTrivia [165..166) ' '
+            NumericLiteralExpression [166..167)
+              NumericLiteralToken [166..167) '1'
+            SemicolonToken [167..168) ';'
+            T:EndOfLineTrivia [168..169) '\n'
+        L:WhitespaceTrivia [169..173) '    '
+        CloseBraceToken [173..174) '}'
+        T:EndOfLineTrivia [174..175) '\n'
+    CloseBraceToken [175..176) '}'
+    T:EndOfLineTrivia [176..177) '\n'
+  EndOfFileToken [177..177) ''
+Diagnostics:
+  CS1525 [80..84) Invalid expression term \'goto\'
+  CS1003 [80..84) Syntax error, \':\' expected
+  CS1525 [80..84) Invalid expression term \'goto\'
+  CS1002 [80..84) ; expected
+  CS1002 [89..90) ; expected
+  CS1513 [89..90) } expected

@@ -1,0 +1,22 @@
+CompilationUnit [0..26)
+  ClassDeclaration [0..26)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    IncompleteMember [10..25)
+      L:WhitespaceTrivia [10..14) '    '
+      FileKeyword [14..18) 'file'
+      T:WhitespaceTrivia [18..19) ' '
+      IdentifierName [19..25)
+        IdentifierToken [19..23) 'item'
+        T:SkippedTokensTrivia [23..24)
+          SemicolonToken [23..24) ';'
+        T:EndOfLineTrivia [24..25) '\n'
+    CloseBraceToken [25..26) '}'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1519 [23..24) Invalid token \';\' in a member declaration
+  CS1519 [23..24) Invalid token \';\' in a member declaration

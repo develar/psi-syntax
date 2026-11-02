@@ -1,0 +1,1 @@
+closed namespace NS { }

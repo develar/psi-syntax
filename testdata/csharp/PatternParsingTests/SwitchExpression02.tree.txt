@@ -1,0 +1,33 @@
+SwitchExpression [0..23)
+  NumericLiteralExpression [0..2)
+    NumericLiteralToken [0..1) '1'
+    T:WhitespaceTrivia [1..2) ' '
+  SwitchKeyword [2..8) 'switch'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  SwitchExpressionArm [11..22)
+    ConstantPattern [11..12)
+      IdentifierName [11..12)
+        IdentifierToken [11..12) 'a'
+    EqualsGreaterThanToken [12..12) missing
+    ConditionalExpression [12..22)
+      IdentifierName [12..12)
+        IdentifierToken [12..12) missing
+      QuestionToken [12..13) '?'
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'b'
+      ColonToken [14..15) ':'
+      SimpleLambdaExpression [15..22)
+        Parameter [15..17)
+          IdentifierToken [15..16) 'c'
+          T:WhitespaceTrivia [16..17) ' '
+        EqualsGreaterThanToken [17..19) '=>'
+        T:WhitespaceTrivia [19..20) ' '
+        IdentifierName [20..22)
+          IdentifierToken [20..21) 'd'
+          T:WhitespaceTrivia [21..22) ' '
+  CloseBraceToken [22..23) '}'
+Diagnostics:
+  CS1003 [12..13) Syntax error, \'=>\' expected
+  CS1525 [12..13) Invalid expression term \'?\'

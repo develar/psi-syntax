@@ -1,0 +1,2 @@
+StringLiteralToken [0..4) '"\\e"'
+EndOfFileToken [4..4) ''

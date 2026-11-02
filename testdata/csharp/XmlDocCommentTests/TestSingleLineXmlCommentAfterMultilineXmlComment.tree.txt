@@ -1,0 +1,67 @@
+CompilationUnit [0..63)
+  L:MultiLineDocumentationCommentTrivia [0..37)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlElement [4..34)
+      XmlElementStartTag [4..17)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'bar'
+        XmlTextAttribute [8..16)
+          XmlName [8..10)
+            L:WhitespaceTrivia [8..9) ' '
+            IdentifierToken [9..10) 'a'
+          EqualsToken [10..11) '='
+          SingleQuoteToken [11..12) '\''
+          XmlTextLiteralToken [12..15) 'val'
+          SingleQuoteToken [15..16) '\''
+        GreaterThanToken [16..17) '>'
+      XmlText [17..28)
+        XmlTextLiteralToken [17..18) ' '
+        XmlTextLiteralNewLineToken [18..19) '\n'
+        L:DocumentationCommentExteriorTrivia [19..20) '*'
+        XmlTextLiteralToken [20..25) ' text'
+        XmlTextLiteralNewLineToken [25..26) '\n'
+        L:DocumentationCommentExteriorTrivia [26..27) '*'
+        XmlTextLiteralToken [27..28) ' '
+      XmlElementEndTag [28..34)
+        LessThanSlashToken [28..30) '</'
+        XmlName [30..33)
+          IdentifierToken [30..33) 'bar'
+        GreaterThanToken [33..34) '>'
+    XmlText [34..35)
+      XmlTextLiteralNewLineToken [34..35) '\n'
+    L:DocumentationCommentExteriorTrivia [35..37) '*/'
+    EndOfDocumentationCommentToken [37..37) ''
+  L:EndOfLineTrivia [37..38) '\n'
+  L:EndOfLineTrivia [38..39) '\n'
+  L:SingleLineDocumentationCommentTrivia [39..63)
+    XmlText [39..43)
+      L:DocumentationCommentExteriorTrivia [39..42) '///'
+      XmlTextLiteralToken [42..43) ' '
+    XmlElement [43..62)
+      XmlElementStartTag [43..55)
+        LessThanToken [43..44) '<'
+        XmlName [44..47)
+          IdentifierToken [44..47) 'goo'
+        XmlTextAttribute [47..54)
+          XmlName [47..49)
+            L:WhitespaceTrivia [47..48) ' '
+            IdentifierToken [48..49) 'a'
+          EqualsToken [49..50) '='
+          DoubleQuoteToken [50..51) '"'
+          XmlTextLiteralToken [51..53) 'as'
+          DoubleQuoteToken [53..54) '"'
+        GreaterThanToken [54..55) '>'
+      XmlText [55..56)
+        XmlTextLiteralToken [55..56) ' '
+      XmlElementEndTag [56..62)
+        LessThanSlashToken [56..58) '</'
+        XmlName [58..61)
+          IdentifierToken [58..61) 'goo'
+        GreaterThanToken [61..62) '>'
+    XmlText [62..63)
+      XmlTextLiteralNewLineToken [62..63) '\n'
+    EndOfDocumentationCommentToken [63..63) ''
+  EndOfFileToken [63..63) ''

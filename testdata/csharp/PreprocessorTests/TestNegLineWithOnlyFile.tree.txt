@@ -1,0 +1,11 @@
+CompilationUnit [0..16)
+  L:LineDirectiveTrivia [0..16)
+    HashToken [0..1) '#'
+    LineKeyword [1..5) 'line'
+    T:WhitespaceTrivia [5..6) ' '
+    NumericLiteralToken [6..6) missing
+    StringLiteralToken [6..16) '"bogus.cs"'
+    EndOfDirectiveToken [16..16) ''
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1576 [6..16) The line number specified for #line directive is missing or invalid

@@ -1,0 +1,1 @@
+bool isLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';

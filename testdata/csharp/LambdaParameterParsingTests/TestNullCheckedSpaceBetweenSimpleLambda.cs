@@ -1,0 +1,1 @@
+Func<string, string> func0 = x! ! => x;

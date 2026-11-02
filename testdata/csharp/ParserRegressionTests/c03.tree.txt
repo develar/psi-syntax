@@ -1,0 +1,13 @@
+CompilationUnit [0..437)
+  L:SingleLineDocumentationCommentTrivia [0..436)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlText [4..436)
+      XmlTextLiteralToken [4..291) '</summary>        /// <returns></returns>         else  int OPERATOR @uint  $ )        { -              static ? operator  :: ]  @readonly  = @on   async  int? , [ return ] { 1 ! ,  @property  &  3 !   @case  %   partial   += ;/*[] bug*/ // YES []            int % ] endregion  var  =   '
+      XmlCDataEndToken [291..294) ']]>'
+      XmlTextLiteralToken [294..435) '   @for  |=   @struct , 3, lock  4 @on  %  5 goto  } @stackalloc  } /*,;*/            int %=  i = @fixed   ?> int << a base  <= 1] default ; '
+      XmlTextLiteralNewLineToken [435..436) '\n'
+    EndOfDocumentationCommentToken [436..436) ''
+  L:EndOfLineTrivia [436..437) '\n'
+  EndOfFileToken [437..437) ''

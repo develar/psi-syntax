@@ -1,0 +1,35 @@
+CompilationUnit [0..39)
+  OperatorDeclaration [0..39)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    PredefinedType [7..11)
+      IntKeyword [7..10) 'int'
+      T:WhitespaceTrivia [10..11) ' '
+    ExplicitInterfaceSpecifier [11..16)
+      GenericName [11..15)
+        IdentifierToken [11..12) 'I'
+        TypeArgumentList [12..15)
+          LessThanToken [12..13) '<'
+          IdentifierName [13..14)
+            IdentifierToken [13..14) 'T'
+          GreaterThanToken [14..15) '>'
+      DotToken [15..16) '.'
+    OperatorKeyword [16..24) 'operator'
+    T:WhitespaceTrivia [24..25) ' '
+    PlusToken [25..26) '+'
+    ParameterList [26..34)
+      OpenParenToken [26..27) '('
+      Parameter [27..32)
+        PredefinedType [27..31)
+          IntKeyword [27..30) 'int'
+          T:WhitespaceTrivia [30..31) ' '
+        IdentifierToken [31..32) 'x'
+      CloseParenToken [32..33) ')'
+      T:WhitespaceTrivia [33..34) ' '
+    ArrowExpressionClause [34..38)
+      EqualsGreaterThanToken [34..36) '=>'
+      T:WhitespaceTrivia [36..37) ' '
+      IdentifierName [37..38)
+        IdentifierToken [37..38) 'x'
+    SemicolonToken [38..39) ';'
+  EndOfFileToken [39..39) ''

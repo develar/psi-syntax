@@ -1,0 +1,22 @@
+StructDeclaration [0..20)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  T:SkippedTokensTrivia [11..13)
+    InKeyword [11..13) 'in'
+  T:WhitespaceTrivia [13..14) ' '
+  FieldDeclaration [14..19)
+    VariableDeclaration [14..17)
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'T'
+        T:WhitespaceTrivia [15..16) ' '
+      VariableDeclarator [16..17)
+        IdentifierToken [16..17) 'F'
+    SemicolonToken [17..18) ';'
+    T:WhitespaceTrivia [18..19) ' '
+  CloseBraceToken [19..20) '}'
+Diagnostics:
+  CS1519 [11..13) Invalid token \'in\' in a member declaration

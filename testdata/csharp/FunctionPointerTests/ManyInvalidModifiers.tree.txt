@@ -1,0 +1,27 @@
+LocalDeclarationStatement [0..53)
+  VariableDeclaration [0..52)
+    FunctionPointerType [0..49)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..49)
+        LessThanToken [9..10) '<'
+        FunctionPointerParameter [10..47)
+          ThisKeyword [10..14) 'this'
+          T:WhitespaceTrivia [14..15) ' '
+          ParamsKeyword [15..21) 'params'
+          T:WhitespaceTrivia [21..22) ' '
+          ReadOnlyKeyword [22..30) 'readonly'
+          T:WhitespaceTrivia [30..31) ' '
+          RefKeyword [31..34) 'ref'
+          T:WhitespaceTrivia [34..35) ' '
+          RefKeyword [35..38) 'ref'
+          T:WhitespaceTrivia [38..39) ' '
+          ThisKeyword [39..43) 'this'
+          T:WhitespaceTrivia [43..44) ' '
+          PredefinedType [44..47)
+            IntKeyword [44..47) 'int'
+        GreaterThanToken [47..48) '>'
+        T:WhitespaceTrivia [48..49) ' '
+    VariableDeclarator [49..52)
+      IdentifierToken [49..52) 'ptr'
+  SemicolonToken [52..53) ';'

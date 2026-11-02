@@ -1,0 +1,6 @@
+StringLiteralExpression [0..9)
+  StringLiteralToken [0..8) '@"hello"'
+  T:SkippedTokensTrivia [8..9)
+    NumericLiteralToken [8..9) '8'
+Diagnostics:
+  CS1073 [0..8) Unexpected token \'8\'

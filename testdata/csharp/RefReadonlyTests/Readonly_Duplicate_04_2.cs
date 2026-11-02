@@ -1,0 +1,1 @@
+void M(readonly readonly ref int p);

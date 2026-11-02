@@ -1,0 +1,11 @@
+WhileStatement [0..12)
+  WhileKeyword [0..5) 'while'
+  OpenParenToken [5..6) '('
+  IdentifierName [6..7)
+    IdentifierToken [6..7) 'a'
+  CloseParenToken [7..8) ')'
+  T:WhitespaceTrivia [8..9) ' '
+  Block [9..12)
+    OpenBraceToken [9..10) '{'
+    T:WhitespaceTrivia [10..11) ' '
+    CloseBraceToken [11..12) '}'

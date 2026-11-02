@@ -1,0 +1,20 @@
+IncompleteMember [0..10)
+  IdentifierName [0..10)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+    T:SkippedTokensTrivia [2..3)
+      EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    T:SkippedTokensTrivia [4..5)
+      IdentifierToken [4..5) 'x'
+    T:WhitespaceTrivia [5..6) ' '
+    T:SkippedTokensTrivia [6..7)
+      PlusToken [6..7) '+'
+    T:WhitespaceTrivia [7..8) ' '
+    T:SkippedTokensTrivia [8..9)
+      NumericLiteralToken [8..9) '1'
+    T:SkippedTokensTrivia [9..10)
+      SemicolonToken [9..10) ';'
+Diagnostics:
+  CS1519 [2..3) Invalid token \'=\' in a member declaration
+  CS1073 [0..1) Unexpected token \'=\'

@@ -1,0 +1,63 @@
+CompilationUnit [0..98)
+  ClassDeclaration [0..98)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..97)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..23) 'Goo'
+      ParameterList [23..51)
+        OpenParenToken [23..24) '('
+        Parameter [24..49)
+          QualifiedName [24..48)
+            IdentifierName [24..30)
+              IdentifierToken [24..30) 'System'
+            DotToken [30..31) '.'
+            IdentifierName [31..48)
+              IdentifierToken [31..47) 'IAsyncDisposable'
+              T:WhitespaceTrivia [47..48) ' '
+          IdentifierToken [48..49) 'd'
+        CloseParenToken [49..50) ')'
+        T:EndOfLineTrivia [50..51) '\n'
+      Block [51..97)
+        L:WhitespaceTrivia [51..55) '    '
+        OpenBraceToken [55..56) '{'
+        T:EndOfLineTrivia [56..57) '\n'
+        LocalDeclarationStatement [57..91)
+          AttributeList [57..68)
+            L:WhitespaceTrivia [57..65) '        '
+            OpenBracketToken [65..66) '['
+            Attribute [66..67)
+              IdentifierName [66..67)
+                IdentifierToken [66..67) 'A'
+            CloseBracketToken [67..68) ']'
+          AwaitKeyword [68..73) 'await'
+          T:WhitespaceTrivia [73..74) ' '
+          UsingKeyword [74..79) 'using'
+          T:WhitespaceTrivia [79..80) ' '
+          VariableDeclaration [80..89)
+            IdentifierName [80..84)
+              IdentifierToken [80..83) 'var'
+              T:WhitespaceTrivia [83..84) ' '
+            VariableDeclarator [84..89)
+              IdentifierToken [84..85) 'i'
+              T:WhitespaceTrivia [85..86) ' '
+              EqualsValueClause [86..89)
+                EqualsToken [86..87) '='
+                T:WhitespaceTrivia [87..88) ' '
+                IdentifierName [88..89)
+                  IdentifierToken [88..89) 'd'
+          SemicolonToken [89..90) ';'
+          T:EndOfLineTrivia [90..91) '\n'
+        L:WhitespaceTrivia [91..95) '    '
+        CloseBraceToken [95..96) '}'
+        T:EndOfLineTrivia [96..97) '\n'
+    CloseBraceToken [97..98) '}'
+  EndOfFileToken [98..98) ''

@@ -1,0 +1,26 @@
+CompilationUnit [0..52)
+  GlobalStatement [0..5)
+    ExpressionStatement [0..5)
+      InvocationExpression [0..3)
+        IdentifierName [0..1)
+          IdentifierToken [0..1) 'a'
+        ArgumentList [1..3)
+          OpenParenToken [1..2) '('
+          CloseParenToken [2..3) ')'
+      SemicolonToken [3..4) ';'
+      T:EndOfLineTrivia [4..5) '\n'
+  L:IfDirectiveTrivia [5..16)
+    HashToken [5..6) '#'
+    IfKeyword [6..8) 'if'
+    T:WhitespaceTrivia [8..9) ' '
+    FalseLiteralExpression [9..15)
+      FalseKeyword [9..14) 'false'
+      T:WhitespaceTrivia [14..15) ' '
+    EndOfDirectiveToken [15..15) ''
+    T:EndOfLineTrivia [15..16) '\n'
+  L:DisabledTextTrivia [16..46) 'b();\n/* comment */ #else\nc();\n'
+  L:EndIfDirectiveTrivia [46..52)
+    HashToken [46..47) '#'
+    EndIfKeyword [47..52) 'endif'
+    EndOfDirectiveToken [52..52) ''
+  EndOfFileToken [52..52) ''

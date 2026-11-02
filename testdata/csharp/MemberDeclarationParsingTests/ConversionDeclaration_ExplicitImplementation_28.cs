@@ -1,0 +1,1 @@
+explicit I.T1 T2(int x) => x;

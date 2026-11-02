@@ -1,0 +1,1 @@
+delegate*<void, void, void> ptr;

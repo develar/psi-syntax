@@ -1,0 +1,1 @@
+struct S { D _f = ref F() => ref i; }

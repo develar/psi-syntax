@@ -1,0 +1,108 @@
+CompilationUnit [0..552)
+  NamespaceDeclaration [0..552)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..13)
+      IdentifierToken [10..12) 'N1'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    NamespaceDeclaration [15..232)
+      L:WhitespaceTrivia [15..19) '    '
+      NamespaceKeyword [19..28) 'namespace'
+      T:WhitespaceTrivia [28..29) ' '
+      IdentifierName [29..32)
+        IdentifierToken [29..31) 'N2'
+        T:EndOfLineTrivia [31..32) '\n'
+      L:WhitespaceTrivia [32..36) '    '
+      OpenBraceToken [36..37) '{'
+      T:EndOfLineTrivia [37..38) '\n'
+      RecordDeclaration [38..232)
+        L:WhitespaceTrivia [38..46) '        '
+        RecordKeyword [46..52) 'record'
+        T:WhitespaceTrivia [52..53) ' '
+        ClassKeyword [53..58) 'class'
+        T:WhitespaceTrivia [58..59) ' '
+        IdentifierToken [59..63) 'Type'
+        T:EndOfLineTrivia [63..64) '\n'
+        L:WhitespaceTrivia [64..72) '        '
+        OpenBraceToken [72..73) '{'
+        T:EndOfLineTrivia [73..74) '\n'
+        MethodDeclaration [74..161)
+          L:WhitespaceTrivia [74..82) '        '
+          L:SkippedTokensTrivia [82..83)
+            CloseBraceToken [82..83) '}'
+          L:EndOfLineTrivia [83..84) '\n'
+          L:EndOfLineTrivia [84..85) '\n'
+          L:WhitespaceTrivia [85..93) '        '
+          L:SingleLineCommentTrivia [93..115) '// Should go into type'
+          L:EndOfLineTrivia [115..116) '\n'
+          L:WhitespaceTrivia [116..124) '        '
+          PrivateKeyword [124..131) 'private'
+          T:WhitespaceTrivia [131..132) ' '
+          PredefinedType [132..137)
+            VoidKeyword [132..136) 'void'
+            T:WhitespaceTrivia [136..137) ' '
+          IdentifierToken [137..138) 'M'
+          ParameterList [138..141)
+            OpenParenToken [138..139) '('
+            CloseParenToken [139..140) ')'
+            T:EndOfLineTrivia [140..141) '\n'
+          Block [141..161)
+            L:WhitespaceTrivia [141..149) '        '
+            OpenBraceToken [149..150) '{'
+            T:EndOfLineTrivia [150..151) '\n'
+            L:WhitespaceTrivia [151..159) '        '
+            CloseBraceToken [159..160) '}'
+            T:EndOfLineTrivia [160..161) '\n'
+        L:EndOfLineTrivia [161..162) '\n'
+        L:WhitespaceTrivia [162..170) '        '
+        L:SingleLineCommentTrivia [170..221) '// Should become the close curly of Type initially.'
+        L:EndOfLineTrivia [221..222) '\n'
+        L:WhitespaceTrivia [222..230) '        '
+        CloseBraceToken [230..231) '}'
+        T:EndOfLineTrivia [231..232) '\n'
+      CloseBraceToken [232..232) missing
+    MethodDeclaration [232..487)
+      L:EndOfLineTrivia [232..233) '\n'
+      L:WhitespaceTrivia [233..241) '        '
+      L:SingleLineCommentTrivia [241..310) '// Will not go into Type because N2 will initially end prior to this.'
+      L:EndOfLineTrivia [310..311) '\n'
+      L:WhitespaceTrivia [311..319) '        '
+      L:SingleLineCommentTrivia [319..386) '// After M joins into Type and NT finishes, this will be a child of'
+      L:EndOfLineTrivia [386..387) '\n'
+      L:WhitespaceTrivia [387..395) '        '
+      L:SingleLineCommentTrivia [395..461) '// N1.  We could think about merging this into Type at some point.'
+      L:EndOfLineTrivia [461..462) '\n'
+      L:WhitespaceTrivia [462..470) '        '
+      PrivateKeyword [470..477) 'private'
+      T:WhitespaceTrivia [477..478) ' '
+      PredefinedType [478..483)
+        VoidKeyword [478..482) 'void'
+        T:WhitespaceTrivia [482..483) ' '
+      IdentifierToken [483..484) 'N'
+      ParameterList [484..487)
+        OpenParenToken [484..485) '('
+        CloseParenToken [485..486) ')'
+        T:EndOfLineTrivia [486..487) '\n'
+      SemicolonToken [487..487) missing
+    L:EndOfLineTrivia [487..488) '\n'
+    L:WhitespaceTrivia [488..496) '        '
+    L:SingleLineCommentTrivia [496..534) '// Should become the close curly of N1'
+    L:EndOfLineTrivia [534..535) '\n'
+    L:WhitespaceTrivia [535..543) '        '
+    CloseBraceToken [543..544) '}'
+    T:EndOfLineTrivia [544..545) '\n'
+    T:WhitespaceTrivia [545..549) '    '
+    T:SkippedTokensTrivia [549..550)
+      CloseBraceToken [549..550) '}'
+    T:EndOfLineTrivia [550..551) '\n'
+    T:SkippedTokensTrivia [551..552)
+      CloseBraceToken [551..552) '}'
+  EndOfFileToken [552..552) ''
+Diagnostics:
+  CS1519 [82..83) Invalid token \'}\' in a member declaration
+  CS1513 [231..231) } expected
+  CS1002 [486..486) ; expected
+  CS1022 [549..550) Type or namespace definition, or end-of-file expected
+  CS1022 [551..552) Type or namespace definition, or end-of-file expected

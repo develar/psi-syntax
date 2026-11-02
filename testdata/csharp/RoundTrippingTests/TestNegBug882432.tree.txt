@@ -1,0 +1,53 @@
+CompilationUnit [0..58)
+  ClassDeclaration [0..58)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..19) 'Base1'
+    T:WhitespaceTrivia [19..20) ' '
+    OpenBraceToken [20..21) '{'
+    T:EndOfLineTrivia [21..22) '\n'
+    PropertyDeclaration [22..56)
+      L:WhitespaceTrivia [22..26) '    '
+      PublicKeyword [26..32) 'public'
+      T:WhitespaceTrivia [32..33) ' '
+      StaticKeyword [33..39) 'static'
+      T:WhitespaceTrivia [39..40) ' '
+      IdentifierName [40..43)
+        IdentifierToken [40..42) 'E1'
+        T:WhitespaceTrivia [42..43) ' '
+      IdentifierToken [43..43) missing
+      AccessorList [43..54)
+        OpenBraceToken [43..44) '{'
+        UnknownAccessorDeclaration [44..47)
+          IdentifierToken [44..45) 'a'
+          T:SkippedTokensTrivia [45..46)
+            CommaToken [45..46) ','
+          T:WhitespaceTrivia [46..47) ' '
+        UnknownAccessorDeclaration [47..50)
+          IdentifierToken [47..48) 'b'
+          T:SkippedTokensTrivia [48..49)
+            CommaToken [48..49) ','
+          T:WhitespaceTrivia [49..50) ' '
+        UnknownAccessorDeclaration [50..53)
+          IdentifierToken [50..51) 'c'
+          T:SkippedTokensTrivia [51..52)
+            CommaToken [51..52) ','
+          T:WhitespaceTrivia [52..53) ' '
+        CloseBraceToken [53..54) '}'
+      SemicolonToken [54..55) ';'
+      T:EndOfLineTrivia [55..56) '\n'
+    CloseBraceToken [56..57) '}'
+    T:EndOfLineTrivia [57..58) '\n'
+  EndOfFileToken [58..58) ''
+Diagnostics:
+  CS1001 [43..44) Identifier expected
+  CS1014 [44..45) A get or set accessor expected
+  CS1014 [45..46) A get or set accessor expected
+  CS1014 [47..48) A get or set accessor expected
+  CS1014 [48..49) A get or set accessor expected
+  CS1014 [50..51) A get or set accessor expected
+  CS1014 [51..52) A get or set accessor expected
+  CS1597 [54..55) Semicolon after method or accessor block is not valid

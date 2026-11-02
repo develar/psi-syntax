@@ -1,0 +1,22 @@
+MethodDeclaration [0..43)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  GenericName [6..34)
+    IdentifierToken [6..10) 'Task'
+    TypeArgumentList [10..34)
+      LessThanToken [10..11) '<'
+      QualifiedName [11..34)
+        IdentifierName [11..24)
+          IdentifierToken [11..24) 'SomeNamespace'
+        DotToken [24..25) '.'
+        IdentifierName [25..34)
+          IdentifierToken [25..33) 'SomeType'
+          T:WhitespaceTrivia [33..34) ' '
+      GreaterThanToken [34..34) missing
+  IdentifierToken [34..40) 'Method'
+  ParameterList [40..42)
+    OpenParenToken [40..41) '('
+    CloseParenToken [41..42) ')'
+  SemicolonToken [42..43) ';'
+Diagnostics:
+  CS1003 [34..40) Syntax error, \'>\' expected

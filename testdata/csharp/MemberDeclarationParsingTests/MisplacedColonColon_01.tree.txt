@@ -1,0 +1,27 @@
+MethodDeclaration [0..20)
+  PredefinedType [0..4)
+    IntKeyword [0..3) 'int'
+    T:WhitespaceTrivia [3..4) ' '
+  ExplicitInterfaceSpecifier [4..10)
+    AliasQualifiedName [4..8)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'N'
+      ColonColonToken [5..7) '::'
+      IdentifierName [7..8)
+        IdentifierToken [7..8) 'I'
+    DotToken [8..8) missing
+    T:SkippedTokensTrivia [8..10)
+      ColonColonToken [8..10) '::'
+  IdentifierToken [10..12) 'M1'
+  ParameterList [12..15)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'
+    T:WhitespaceTrivia [14..15) ' '
+  ArrowExpressionClause [15..19)
+    EqualsGreaterThanToken [15..17) '=>'
+    T:WhitespaceTrivia [17..18) ' '
+    NumericLiteralExpression [18..19)
+      NumericLiteralToken [18..19) '0'
+  SemicolonToken [19..20) ';'
+Diagnostics:
+  CS7000 [8..10) Unexpected use of an aliased name

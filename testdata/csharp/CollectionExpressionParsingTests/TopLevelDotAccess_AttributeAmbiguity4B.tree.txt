@@ -1,0 +1,27 @@
+CompilationUnit [0..24)
+  GlobalStatement [0..24)
+    LocalFunctionStatement [0..24)
+      AttributeList [0..12)
+        OpenBracketToken [0..1) '['
+        AttributeTargetSpecifier [1..9)
+          ReturnKeyword [1..7) 'return'
+          ColonToken [7..8) ':'
+          T:WhitespaceTrivia [8..9) ' '
+        Attribute [9..10)
+          IdentifierName [9..10)
+            IdentifierToken [9..10) 'A'
+        CloseBracketToken [10..11) ']'
+        T:WhitespaceTrivia [11..12) ' '
+      PredefinedType [12..17)
+        VoidKeyword [12..16) 'void'
+        T:WhitespaceTrivia [16..17) ' '
+      IdentifierToken [17..18) 'F'
+      ParameterList [18..21)
+        OpenParenToken [18..19) '('
+        CloseParenToken [19..20) ')'
+        T:WhitespaceTrivia [20..21) ' '
+      Block [21..24)
+        OpenBraceToken [21..22) '{'
+        T:WhitespaceTrivia [22..23) ' '
+        CloseBraceToken [23..24) '}'
+  EndOfFileToken [24..24) ''

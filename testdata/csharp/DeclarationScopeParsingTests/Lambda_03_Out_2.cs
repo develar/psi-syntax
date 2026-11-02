@@ -1,0 +1,1 @@
+(out scoped int a) => null

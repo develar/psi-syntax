@@ -1,0 +1,16 @@
+CompilationUnit [0..19)
+  InterfaceDeclaration [0..19)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'C'
+    T:WhitespaceTrivia [12..13) ' '
+    BaseList [13..18)
+      ColonToken [13..14) ':'
+      T:WhitespaceTrivia [14..15) ' '
+      SimpleBaseType [15..18)
+        IdentifierName [15..18)
+          IdentifierToken [15..17) 'I1'
+          T:EndOfLineTrivia [17..18) '\n'
+    SemicolonToken [18..19) ';'
+  EndOfFileToken [19..19) ''

@@ -1,0 +1,8 @@
+SuppressNullableWarningExpression [0..4)
+  CollectionExpression [0..3)
+    OpenBracketToken [0..1) '['
+    ExpressionElement [1..2)
+      IdentifierName [1..2)
+        IdentifierToken [1..2) 'A'
+    CloseBracketToken [2..3) ']'
+  ExclamationToken [3..4) '!'

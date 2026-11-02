@@ -1,0 +1,10 @@
+ImplicitArrayCreationExpression [0..5)
+  NewKeyword [0..3) 'new'
+  OpenBracketToken [3..4) '['
+  CloseBracketToken [4..5) ']'
+  ArrayInitializerExpression [5..5)
+    OpenBraceToken [5..5) missing
+    CloseBraceToken [5..5) missing
+Diagnostics:
+  CS1514 [5..5) { expected
+  CS1513 [5..5) } expected

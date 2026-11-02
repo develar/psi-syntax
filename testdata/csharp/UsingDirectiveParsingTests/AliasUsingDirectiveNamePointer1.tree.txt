@@ -1,0 +1,26 @@
+CompilationUnit [0..27)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    NameEquals [6..10)
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'x'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsToken [8..9) '='
+      T:WhitespaceTrivia [9..10) ' '
+    PointerType [10..12)
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'A'
+      AsteriskToken [11..12) '*'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  StructDeclaration [14..27)
+    L:EndOfLineTrivia [14..15) '\n'
+    StructKeyword [15..21) 'struct'
+    T:WhitespaceTrivia [21..22) ' '
+    IdentifierToken [22..23) 'A'
+    T:WhitespaceTrivia [23..24) ' '
+    OpenBraceToken [24..25) '{'
+    T:WhitespaceTrivia [25..26) ' '
+    CloseBraceToken [26..27) '}'
+  EndOfFileToken [27..27) ''

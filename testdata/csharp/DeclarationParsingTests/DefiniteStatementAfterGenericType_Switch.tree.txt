@@ -1,0 +1,44 @@
+MethodDeclaration [0..38)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..38)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ExpressionStatement [11..26)
+      GreaterThanExpression [11..26)
+        LessThanExpression [11..24)
+          IdentifierName [11..19)
+            L:WhitespaceTrivia [11..15) '    '
+            IdentifierToken [15..19) 'List'
+          LessThanToken [19..20) '<'
+          IdentifierName [20..24)
+            IdentifierToken [20..24) 'Type'
+        GreaterThanToken [24..25) '>'
+        T:EndOfLineTrivia [25..26) '\n'
+        IdentifierName [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    SwitchStatement [26..38)
+      L:WhitespaceTrivia [26..30) '    '
+      SwitchKeyword [30..36) 'switch'
+      T:EndOfLineTrivia [36..37) '\n'
+      OpenParenToken [37..37) missing
+      IdentifierName [37..37)
+        IdentifierToken [37..37) missing
+      CloseParenToken [37..37) missing
+      OpenBraceToken [37..37) missing
+      CloseBraceToken [37..38) '}'
+    CloseBraceToken [38..38) missing
+Diagnostics:
+  CS1525 [25..25) Invalid expression term \'switch\'
+  CS1002 [25..25) ; expected
+  CS1525 [36..36) Invalid expression term \'}\'
+  CS8515 [36..36) Parentheses are required around the switch governing expression.
+  CS1514 [36..36) { expected
+  CS1513 [38..38) } expected

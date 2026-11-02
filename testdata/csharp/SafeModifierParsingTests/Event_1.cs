@@ -1,0 +1,1 @@
+safe public static extern event System.Action E;

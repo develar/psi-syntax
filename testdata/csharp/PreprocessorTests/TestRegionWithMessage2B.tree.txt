@@ -1,0 +1,14 @@
+CompilationUnit [0..26)
+  L:RegionDirectiveTrivia [0..15)
+    HashToken [0..1) '#'
+    RegionKeyword [1..7) 'region'
+    T:WhitespaceTrivia [7..8) ' '
+    L:PreprocessingMessageTrivia [8..14) '"goo" '
+    EndOfDirectiveToken [14..14) ''
+    T:EndOfLineTrivia [14..15) '\n'
+  L:EndRegionDirectiveTrivia [15..26)
+    HashToken [15..16) '#'
+    EndRegionKeyword [16..25) 'endregion'
+    EndOfDirectiveToken [25..25) ''
+    T:EndOfLineTrivia [25..26) '\n'
+  EndOfFileToken [26..26) ''

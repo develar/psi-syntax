@@ -1,0 +1,23 @@
+CompilationUnit [0..18)
+  ClassDeclaration [0..18)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    ConstructorDeclaration [10..17)
+      IdentifierToken [10..11) 'c'
+      ParameterList [11..13)
+        OpenParenToken [11..12) '('
+        T:WhitespaceTrivia [12..13) ' '
+        CloseParenToken [13..13) missing
+      Block [13..17)
+        OpenBraceToken [13..14) '{'
+        T:WhitespaceTrivia [14..15) ' '
+        CloseBraceToken [15..16) '}'
+        T:WhitespaceTrivia [16..17) ' '
+    CloseBraceToken [17..18) '}'
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1026 [13..14) ) expected

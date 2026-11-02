@@ -1,0 +1,30 @@
+CastExpression [0..17)
+  OpenParenToken [0..1) '('
+  TupleType [1..7)
+    OpenParenToken [1..2) '('
+    TupleElement [2..3)
+      IdentifierName [2..3)
+        IdentifierToken [2..3) 'A'
+    CommaToken [3..4) ','
+    T:WhitespaceTrivia [4..5) ' '
+    TupleElement [5..6)
+      IdentifierName [5..6)
+        IdentifierToken [5..6) 'B'
+    CloseParenToken [6..7) ')'
+  CloseParenToken [7..8) ')'
+  CollectionExpression [8..17)
+    OpenBracketToken [8..9) '['
+    ExpressionElement [9..10)
+      NumericLiteralExpression [9..10)
+        NumericLiteralToken [9..10) '1'
+    CommaToken [10..11) ','
+    T:WhitespaceTrivia [11..12) ' '
+    ExpressionElement [12..13)
+      NumericLiteralExpression [12..13)
+        NumericLiteralToken [12..13) '2'
+    CommaToken [13..14) ','
+    T:WhitespaceTrivia [14..15) ' '
+    ExpressionElement [15..16)
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '3'
+    CloseBracketToken [16..17) ']'

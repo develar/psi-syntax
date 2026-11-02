@@ -1,0 +1,1 @@
+M(out (int x, int y));

@@ -1,0 +1,1 @@
+class C { void M(readonly ref int i) { } }

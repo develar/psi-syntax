@@ -1,0 +1,33 @@
+L:SingleLineDocumentationCommentTrivia [0..47)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..47)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..45)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      ConversionOperatorMemberCref [15..44)
+        ExplicitKeyword [15..23) 'explicit'
+        L:WhitespaceTrivia [23..24) ' '
+        OperatorKeyword [24..32) 'operator'
+        L:WhitespaceTrivia [32..33) ' '
+        CheckedKeyword [33..40) 'checked'
+        ArrayType [40..44)
+          IdentifierName [40..42)
+            L:WhitespaceTrivia [40..41) ' '
+            IdentifierToken [41..42) 'C'
+          ArrayRankSpecifier [42..44)
+            OpenBracketToken [42..43) '['
+            OmittedArraySizeExpression [43..43)
+              OmittedArraySizeExpressionToken [43..43) ''
+            CloseBracketToken [43..44) ']'
+      DoubleQuoteToken [44..45) '"'
+    SlashGreaterThanToken [45..47) '/>'
+  EndOfDocumentationCommentToken [47..47) ''
+EndOfFileToken [47..47) ''

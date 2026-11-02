@@ -1,0 +1,1 @@
+((delegate*<int, void> i1, delegate* managed<C, D> i2))ptr

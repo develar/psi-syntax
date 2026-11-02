@@ -1,0 +1,22 @@
+MethodDeclaration [0..36)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  GenericName [6..27)
+    IdentifierToken [6..10) 'Task'
+    TypeArgumentList [10..27)
+      LessThanToken [10..11) '<'
+      QualifiedName [11..25)
+        IdentifierName [11..24)
+          IdentifierToken [11..24) 'SomeNamespace'
+        DotToken [24..25) '.'
+        IdentifierName [25..25)
+          IdentifierToken [25..25) missing
+      GreaterThanToken [25..26) '>'
+      T:WhitespaceTrivia [26..27) ' '
+  IdentifierToken [27..33) 'Method'
+  ParameterList [33..35)
+    OpenParenToken [33..34) '('
+    CloseParenToken [34..35) ')'
+  SemicolonToken [35..36) ';'
+Diagnostics:
+  CS1001 [25..26) Identifier expected

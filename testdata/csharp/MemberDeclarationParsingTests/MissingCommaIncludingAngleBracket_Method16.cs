@@ -1,0 +1,1 @@
+static IDictionary<(string Value, string Description) ref int> GetAllValues(Type t);

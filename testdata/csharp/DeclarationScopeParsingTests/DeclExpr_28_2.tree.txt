@@ -1,0 +1,35 @@
+CompilationUnit [0..28)
+  IncompleteMember [0..16)
+    L:EndOfLineTrivia [0..1) '\n'
+    ScopedKeyword [1..7) 'scoped'
+    T:WhitespaceTrivia [7..8) ' '
+    RefType [8..16)
+      RefKeyword [8..11) 'ref'
+      T:WhitespaceTrivia [11..12) ' '
+      IdentifierName [12..16)
+        IdentifierToken [12..15) 'var'
+        T:WhitespaceTrivia [15..16) ' '
+  GlobalStatement [16..28)
+    ExpressionStatement [16..28)
+      SimpleAssignmentExpression [16..26)
+        TupleExpression [16..23)
+          OpenParenToken [16..17) '('
+          Argument [17..18)
+            IdentifierName [17..18)
+              IdentifierToken [17..18) 'a'
+          CommaToken [18..19) ','
+          T:WhitespaceTrivia [19..20) ' '
+          Argument [20..21)
+            IdentifierName [20..21)
+              IdentifierToken [20..21) 'b'
+          CloseParenToken [21..22) ')'
+          T:WhitespaceTrivia [22..23) ' '
+        EqualsToken [23..24) '='
+        T:WhitespaceTrivia [24..25) ' '
+        IdentifierName [25..26)
+          IdentifierToken [25..26) 'M'
+      SemicolonToken [26..27) ';'
+      T:EndOfLineTrivia [27..28) '\n'
+  EndOfFileToken [28..28) ''
+Diagnostics:
+  CS0116 [12..15) A namespace cannot directly contain members such as fields, methods or statements

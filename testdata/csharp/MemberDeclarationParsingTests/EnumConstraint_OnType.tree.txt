@@ -1,0 +1,37 @@
+CompilationUnit [0..59)
+  InterfaceDeclaration [0..59)
+    L:EndOfLineTrivia [0..1) '\n'
+    InterfaceKeyword [1..10) 'interface'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierToken [11..12) 'I'
+    TypeParameterList [12..16)
+      LessThanToken [12..13) '<'
+      TypeParameter [13..14)
+        IdentifierToken [13..14) 'T'
+      GreaterThanToken [14..15) '>'
+      T:WhitespaceTrivia [15..16) ' '
+    TypeParameterConstraintClause [16..55)
+      WhereKeyword [16..21) 'where'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierName [22..24)
+        IdentifierToken [22..23) 'T'
+        T:WhitespaceTrivia [23..24) ' '
+      ColonToken [24..25) ':'
+      T:WhitespaceTrivia [25..26) ' '
+      T:MultiLineCommentTrivia [26..37) '/*comment*/'
+      T:WhitespaceTrivia [37..38) ' '
+      TypeConstraint [38..55)
+        IdentifierName [38..55)
+          IdentifierToken [38..38) missing
+          T:SkippedTokensTrivia [38..42)
+            EnumKeyword [38..42) 'enum'
+          T:WhitespaceTrivia [42..43) ' '
+          T:MultiLineCommentTrivia [43..54) '/*comment*/'
+          T:WhitespaceTrivia [54..55) ' '
+    OpenBraceToken [55..56) '{'
+    T:WhitespaceTrivia [56..57) ' '
+    CloseBraceToken [57..58) '}'
+    T:EndOfLineTrivia [58..59) '\n'
+  EndOfFileToken [59..59) ''
+Diagnostics:
+  CS9010 [38..42) Keyword \'enum\' cannot be used as a constraint. Did you mean \'struct, System.Enum\'?

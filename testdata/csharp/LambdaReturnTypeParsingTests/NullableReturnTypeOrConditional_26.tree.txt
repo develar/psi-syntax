@@ -1,0 +1,26 @@
+IdentifierName [0..20)
+  IdentifierToken [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  T:SkippedTokensTrivia [6..7)
+    IdentifierToken [6..7) 'T'
+  T:SkippedTokensTrivia [7..8)
+    QuestionToken [7..8) '?'
+  T:WhitespaceTrivia [8..9) ' '
+  T:SkippedTokensTrivia [9..10)
+    OpenParenToken [9..10) '('
+  T:SkippedTokensTrivia [10..11)
+    CloseParenToken [10..11) ')'
+  T:WhitespaceTrivia [11..12) ' '
+  T:SkippedTokensTrivia [12..14)
+    EqualsGreaterThanToken [12..14) '=>'
+  T:WhitespaceTrivia [14..15) ' '
+  T:SkippedTokensTrivia [15..16)
+    IdentifierToken [15..16) 'x'
+  T:WhitespaceTrivia [16..17) ' '
+  T:SkippedTokensTrivia [17..18)
+    ColonToken [17..18) ':'
+  T:WhitespaceTrivia [18..19) ' '
+  T:SkippedTokensTrivia [19..20)
+    IdentifierToken [19..20) 'y'
+Diagnostics:
+  CS1073 [0..5) Unexpected token \'T\'

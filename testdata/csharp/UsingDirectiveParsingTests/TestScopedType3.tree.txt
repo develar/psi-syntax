@@ -1,0 +1,24 @@
+CompilationUnit [0..26)
+  UsingDirective [0..18)
+    L:EndOfLineTrivia [0..1) '\n'
+    UsingKeyword [1..6) 'using'
+    T:WhitespaceTrivia [6..7) ' '
+    NameEquals [7..11)
+      IdentifierName [7..9)
+        IdentifierToken [7..8) 'X'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsToken [9..10) '='
+      T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..18)
+      IdentifierToken [11..17) 'scoped'
+      T:WhitespaceTrivia [17..18) ' '
+    SemicolonToken [18..18) missing
+  GlobalStatement [18..26)
+    ExpressionStatement [18..26)
+      IdentifierName [18..24)
+        IdentifierToken [18..24) 'System'
+      SemicolonToken [24..25) ';'
+      T:EndOfLineTrivia [25..26) '\n'
+  EndOfFileToken [26..26) ''
+Diagnostics:
+  CS1002 [18..24) ; expected

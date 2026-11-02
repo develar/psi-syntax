@@ -1,0 +1,25 @@
+LocalDeclarationStatement [0..25)
+  VariableDeclaration [0..24)
+    FunctionPointerType [0..24)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      T:WhitespaceTrivia [9..10) ' '
+      FunctionPointerCallingConvention [10..24)
+        UnmanagedKeyword [10..19) 'unmanaged'
+        FunctionPointerUnmanagedCallingConventionList [19..24)
+          OpenBracketToken [19..20) '['
+          FunctionPointerUnmanagedCallingConvention [20..23)
+            IdentifierToken [20..23) 'ptr'
+          CloseBracketToken [23..24) ']'
+      FunctionPointerParameterList [24..24)
+        LessThanToken [24..24) missing
+        FunctionPointerParameter [24..24)
+          IdentifierName [24..24)
+            IdentifierToken [24..24) missing
+        GreaterThanToken [24..24) missing
+    VariableDeclarator [24..24)
+      IdentifierToken [24..24) missing
+  SemicolonToken [24..25) ';'
+Diagnostics:
+  CS1003 [24..25) Syntax error, \'<\' expected
+  CS1001 [24..25) Identifier expected

@@ -1,0 +1,4 @@
+NumericLiteralToken [0..9) '1000.0_e1'
+EndOfFileToken [9..9) ''
+Diagnostics:
+  CS1013 [0..9) Invalid number

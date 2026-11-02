@@ -1,0 +1,1 @@
+class c { void m() { int a, if (x) y(); } }

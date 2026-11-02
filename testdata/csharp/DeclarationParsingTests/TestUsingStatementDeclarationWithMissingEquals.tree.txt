@@ -1,0 +1,20 @@
+UsingStatement [0..20)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..18)
+    PredefinedType [7..11)
+      IntKeyword [7..10) 'int'
+      T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..18)
+      IdentifierToken [11..16) 'value'
+      T:WhitespaceTrivia [16..17) ' '
+      EqualsValueClause [17..18)
+        EqualsToken [17..17) missing
+        NumericLiteralExpression [17..18)
+          NumericLiteralToken [17..18) '5'
+  CloseParenToken [18..19) ')'
+  EmptyStatement [19..20)
+    SemicolonToken [19..20) ';'
+Diagnostics:
+  CS1003 [17..18) Syntax error, \'=\' expected

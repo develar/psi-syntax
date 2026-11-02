@@ -1,0 +1,2 @@
+
+using (scoped var a);

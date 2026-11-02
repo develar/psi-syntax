@@ -1,0 +1,18 @@
+ParenthesizedLambdaExpression [0..34)
+  AsyncKeyword [0..5) 'async'
+  T:WhitespaceTrivia [5..6) ' '
+  AsyncKeyword [6..11) 'async'
+  T:WhitespaceTrivia [11..12) ' '
+  ParameterList [12..26)
+    OpenParenToken [12..13) '('
+    Parameter [13..24)
+      IdentifierName [13..19)
+        IdentifierToken [13..18) 'async'
+        T:WhitespaceTrivia [18..19) ' '
+      IdentifierToken [19..24) 'async'
+    CloseParenToken [24..25) ')'
+    T:WhitespaceTrivia [25..26) ' '
+  EqualsGreaterThanToken [26..28) '=>'
+  T:WhitespaceTrivia [28..29) ' '
+  IdentifierName [29..34)
+    IdentifierToken [29..34) 'async'

@@ -1,0 +1,2 @@
+IdentifierName [0..12)
+  IdentifierToken [0..12) 'MyPermission'

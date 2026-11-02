@@ -1,0 +1,50 @@
+MethodDeclaration [0..36)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:EndOfLineTrivia [8..9) '\n'
+  Block [9..36)
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    LocalDeclarationStatement [11..26)
+      VariableDeclaration [11..26)
+        GenericName [11..26)
+          L:WhitespaceTrivia [11..15) '    '
+          IdentifierToken [15..19) 'List'
+          TypeArgumentList [19..26)
+            LessThanToken [19..20) '<'
+            IdentifierName [20..24)
+              IdentifierToken [20..24) 'Type'
+            GreaterThanToken [24..25) '>'
+            T:EndOfLineTrivia [25..26) '\n'
+        VariableDeclarator [26..26)
+          IdentifierToken [26..26) missing
+      SemicolonToken [26..26) missing
+    SwitchStatement [26..36)
+      SwitchKeyword [26..26) missing
+      OpenParenToken [26..26) missing
+      IdentifierName [26..26)
+        IdentifierToken [26..26) missing
+      CloseParenToken [26..26) missing
+      OpenBraceToken [26..26) missing
+      SwitchSection [26..35)
+        CaseSwitchLabel [26..35)
+          L:WhitespaceTrivia [26..30) '    '
+          CaseKeyword [30..34) 'case'
+          T:EndOfLineTrivia [34..35) '\n'
+          IdentifierName [35..35)
+            IdentifierToken [35..35) missing
+          ColonToken [35..35) missing
+      CloseBraceToken [35..36) '}'
+    CloseBraceToken [36..36) missing
+Diagnostics:
+  CS1001 [25..25) Identifier expected
+  CS1002 [25..25) ; expected
+  CS1003 [25..25) Syntax error, \'switch\' expected
+  CS8504 [34..34) Pattern missing
+  CS1003 [34..34) Syntax error, \':\' expected
+  CS1513 [36..36) } expected

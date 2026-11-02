@@ -1,0 +1,40 @@
+CompilationUnit [0..52)
+  GlobalStatement [0..22)
+    LocalDeclarationStatement [0..22)
+      VariableDeclaration [0..20)
+        RefType [0..12)
+          L:EndOfLineTrivia [0..1) '\n'
+          RefKeyword [1..4) 'ref'
+          T:WhitespaceTrivia [4..5) ' '
+          IdentifierName [5..12)
+            IdentifierToken [5..11) 'scoped'
+            T:WhitespaceTrivia [11..12) ' '
+        VariableDeclarator [12..20)
+          IdentifierToken [12..18) 'scoped'
+          T:WhitespaceTrivia [18..19) ' '
+          T:SkippedTokensTrivia [19..20)
+            IdentifierToken [19..20) 'd'
+      SemicolonToken [20..21) ';'
+      T:EndOfLineTrivia [21..22) '\n'
+  GlobalStatement [22..52)
+    LocalDeclarationStatement [22..52)
+      VariableDeclaration [22..50)
+        RefType [22..42)
+          RefKeyword [22..25) 'ref'
+          T:WhitespaceTrivia [25..26) ' '
+          ReadOnlyKeyword [26..34) 'readonly'
+          T:WhitespaceTrivia [34..35) ' '
+          IdentifierName [35..42)
+            IdentifierToken [35..41) 'scoped'
+            T:WhitespaceTrivia [41..42) ' '
+        VariableDeclarator [42..50)
+          IdentifierToken [42..48) 'scoped'
+          T:WhitespaceTrivia [48..49) ' '
+          T:SkippedTokensTrivia [49..50)
+            IdentifierToken [49..50) 'e'
+      SemicolonToken [50..51) ';'
+      T:EndOfLineTrivia [51..52) '\n'
+  EndOfFileToken [52..52) ''
+Diagnostics:
+  CS1003 [19..20) Syntax error, \',\' expected
+  CS1003 [49..50) Syntax error, \',\' expected

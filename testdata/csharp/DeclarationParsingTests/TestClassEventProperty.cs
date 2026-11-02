@@ -1,0 +1,1 @@
+class a { event b c { add { } remove { } } }

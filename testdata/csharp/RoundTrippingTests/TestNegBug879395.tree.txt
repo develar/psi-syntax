@@ -1,0 +1,22 @@
+CompilationUnit [0..22)
+  GlobalStatement [0..22)
+    LocalDeclarationStatement [0..22)
+      VariableDeclaration [0..22)
+        IdentifierName [0..8)
+          L:EndOfLineTrivia [0..1) '\n'
+          IdentifierToken [1..7) 'module'
+          T:WhitespaceTrivia [7..8) ' '
+        VariableDeclarator [8..22)
+          IdentifierToken [8..10) 'm1'
+          T:EndOfLineTrivia [10..11) '\n'
+          T:SkippedTokensTrivia [11..14)
+            IdentifierToken [11..14) 'end'
+          T:WhitespaceTrivia [14..15) ' '
+          T:SkippedTokensTrivia [15..21)
+            IdentifierToken [15..21) 'module'
+          T:EndOfLineTrivia [21..22) '\n'
+      SemicolonToken [22..22) missing
+  EndOfFileToken [22..22) ''
+Diagnostics:
+  CS1003 [10..10) Syntax error, \',\' expected
+  CS1002 [21..21) ; expected

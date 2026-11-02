@@ -1,0 +1,33 @@
+CompilationUnit [0..30)
+  GlobalStatement [0..28)
+    UsingStatement [0..28)
+      L:EndOfLineTrivia [0..1) '\n'
+      UsingKeyword [1..6) 'using'
+      T:WhitespaceTrivia [6..7) ' '
+      OpenParenToken [7..8) '('
+      VariableDeclaration [8..26)
+        ScopedType [8..22)
+          ScopedKeyword [8..14) 'scoped'
+          T:WhitespaceTrivia [14..15) ' '
+          IdentifierName [15..22)
+            IdentifierToken [15..21) 'scoped'
+            T:WhitespaceTrivia [21..22) ' '
+        VariableDeclarator [22..26)
+          IdentifierToken [22..25) 'var'
+          T:WhitespaceTrivia [25..26) ' '
+      CloseParenToken [26..26) missing
+      ExpressionStatement [26..28)
+        IdentifierName [26..27)
+          IdentifierToken [26..27) 'b'
+        SemicolonToken [27..27) missing
+        T:SkippedTokensTrivia [27..28)
+          CloseParenToken [27..28) ')'
+  GlobalStatement [28..30)
+    EmptyStatement [28..30)
+      SemicolonToken [28..29) ';'
+      T:EndOfLineTrivia [29..30) '\n'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1026 [26..27) ) expected
+  CS1002 [27..28) ; expected
+  CS1022 [27..28) Type or namespace definition, or end-of-file expected

@@ -1,0 +1,1 @@
+new M<delegate* unmanaged[thiscall]<void>, delegate*<C, D>>()

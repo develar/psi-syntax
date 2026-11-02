@@ -1,0 +1,47 @@
+CompilationUnit [0..64)
+  ClassDeclaration [0..64)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'mine'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..62)
+      PredefinedType [21..30)
+        L:WhitespaceTrivia [21..25) '    '
+        VoidKeyword [25..29) 'void'
+        T:WhitespaceTrivia [29..30) ' '
+      IdentifierToken [30..31) 'M'
+      ParameterList [31..34)
+        OpenParenToken [31..32) '('
+        CloseParenToken [32..33) ')'
+        T:EndOfLineTrivia [33..34) '\n'
+      Block [34..62)
+        L:WhitespaceTrivia [34..38) '    '
+        OpenBraceToken [38..39) '{'
+        T:EndOfLineTrivia [39..40) '\n'
+        TryStatement [40..56)
+          L:WhitespaceTrivia [40..48) '        '
+          TryKeyword [48..51) 'try'
+          T:WhitespaceTrivia [51..52) ' '
+          Block [52..56)
+            OpenBraceToken [52..53) '{'
+            T:WhitespaceTrivia [53..54) ' '
+            CloseBraceToken [54..55) '}'
+            T:EndOfLineTrivia [55..56) '\n'
+          FinallyClause [56..56)
+            FinallyKeyword [56..56) missing
+            Block [56..56)
+              OpenBraceToken [56..56) missing
+              CloseBraceToken [56..56) missing
+        L:WhitespaceTrivia [56..60) '    '
+        CloseBraceToken [60..61) '}'
+        T:EndOfLineTrivia [61..62) '\n'
+    CloseBraceToken [62..63) '}'
+    T:EndOfLineTrivia [63..64) '\n'
+  EndOfFileToken [64..64) ''
+Diagnostics:
+  CS1524 [54..55) Expected catch or finally

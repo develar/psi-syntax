@@ -1,0 +1,16 @@
+CompilationUnit [0..22)
+  MethodDeclaration [0..22)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:WhitespaceTrivia [1..2) ' '
+    PartialKeyword [2..9) 'partial'
+    T:WhitespaceTrivia [9..10) ' '
+    PredefinedType [10..15)
+      VoidKeyword [10..14) 'void'
+      T:WhitespaceTrivia [14..15) ' '
+    IdentifierToken [15..18) 'Goo'
+    ParameterList [18..20)
+      OpenParenToken [18..19) '('
+      CloseParenToken [19..20) ')'
+    SemicolonToken [20..21) ';'
+    T:EndOfLineTrivia [21..22) '\n'
+  EndOfFileToken [22..22) ''

@@ -1,0 +1,40 @@
+CompilationUnit [0..37)
+  OperatorDeclaration [0..37)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    PredefinedType [7..11)
+      IntKeyword [7..10) 'int'
+      T:WhitespaceTrivia [10..11) ' '
+    ExplicitInterfaceSpecifier [11..15)
+      QualifiedName [11..14)
+        IdentifierName [11..12)
+          IdentifierToken [11..12) 'N'
+        DotToken [12..13) '.'
+        IdentifierName [13..14)
+          IdentifierToken [13..14) 'I'
+      DotToken [14..15) '.'
+    OperatorKeyword [15..15) missing
+    PlusToken [15..15) missing
+    T:SkippedTokensTrivia [15..23)
+      ExplicitKeyword [15..23) 'explicit'
+    T:WhitespaceTrivia [23..24) ' '
+    ParameterList [24..32)
+      OpenParenToken [24..25) '('
+      Parameter [25..30)
+        PredefinedType [25..29)
+          IntKeyword [25..28) 'int'
+          T:WhitespaceTrivia [28..29) ' '
+        IdentifierToken [29..30) 'x'
+      CloseParenToken [30..31) ')'
+      T:WhitespaceTrivia [31..32) ' '
+    ArrowExpressionClause [32..36)
+      EqualsGreaterThanToken [32..34) '=>'
+      T:WhitespaceTrivia [34..35) ' '
+      IdentifierName [35..36)
+        IdentifierToken [35..36) 'x'
+    SemicolonToken [36..37) ';'
+  EndOfFileToken [37..37) ''
+Diagnostics:
+  CS1553 [7..10) Declaration is not valid; use \'+ operator <dest-type> (...\' instead
+  CS1003 [15..23) Syntax error, \'operator\' expected
+  CS1019 [15..23) Overloadable unary operator expected

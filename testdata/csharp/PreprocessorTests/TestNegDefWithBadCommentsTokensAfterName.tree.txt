@@ -1,0 +1,33 @@
+CompilationUnit [0..20)
+  GlobalStatement [0..20)
+    ExpressionStatement [0..20)
+      DivideExpression [0..20)
+        PointerIndirectionExpression [0..19)
+          L:DefineDirectiveTrivia [0..16)
+            HashToken [0..1) '#'
+            DefineKeyword [1..7) 'define'
+            T:WhitespaceTrivia [7..8) ' '
+            IdentifierToken [8..11) 'A_1'
+            T:WhitespaceTrivia [11..12) ' '
+            L:SkippedTokensTrivia [12..15)
+              BadToken [12..13) '/'
+              BadToken [13..14) '*'
+              BadToken [14..15) '*'
+            EndOfDirectiveToken [15..15) ''
+            T:EndOfLineTrivia [15..16) '\n'
+          AsteriskToken [16..17) '*'
+          T:EndOfLineTrivia [17..18) '\n'
+          PointerIndirectionExpression [18..19)
+            AsteriskToken [18..19) '*'
+            IdentifierName [19..19)
+              IdentifierToken [19..19) missing
+        SlashToken [19..20) '/'
+        IdentifierName [20..20)
+          IdentifierToken [20..20) missing
+      SemicolonToken [20..20) missing
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1025 [12..13) Single-line comment or end-of-line expected
+  CS1525 [19..20) Invalid expression term \'/\'
+  CS1733 [20..20) Expected expression
+  CS1002 [20..20) ; expected

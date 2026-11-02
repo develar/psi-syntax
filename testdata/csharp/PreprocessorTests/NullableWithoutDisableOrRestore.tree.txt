@@ -1,0 +1,10 @@
+CompilationUnit [0..9)
+  L:NullableDirectiveTrivia [0..9)
+    HashToken [0..1) '#'
+    NullableKeyword [1..9) 'nullable'
+    DisableKeyword [9..9) missing
+    EndOfDirectiveToken [9..9) ''
+  EndOfFileToken [9..9) ''
+Diagnostics:
+  CS8025 [1..9) Feature \'nullable reference types\' is not available in C# 4. Please use language version 8.0 or greater.
+  CS8637 [9..9) Expected \'enable\', \'disable\', or \'restore\'

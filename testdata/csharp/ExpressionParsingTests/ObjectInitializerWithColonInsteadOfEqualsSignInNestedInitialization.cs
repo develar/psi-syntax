@@ -1,0 +1,1 @@
+new Class1 { X = { Y: 0 } }

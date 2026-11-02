@@ -1,0 +1,1 @@
+_ = e switch { int or System.Int64 => 1, };

@@ -1,0 +1,18 @@
+ParenthesizedLambdaExpression [0..17)
+  ParameterList [0..4)
+    L:EndOfLineTrivia [0..1) '\n'
+    OpenParenToken [1..2) '('
+    CloseParenToken [2..3) ')'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  AwaitExpression [7..17)
+    AwaitKeyword [7..12) 'await'
+    T:WhitespaceTrivia [12..13) ' '
+    NumericLiteralExpression [13..17)
+      NumericLiteralToken [13..15) '42'
+      T:SkippedTokensTrivia [15..16)
+        SemicolonToken [15..16) ';'
+      T:EndOfLineTrivia [16..17) '\n'
+Diagnostics:
+  CS1073 [1..15) Unexpected token \';\'

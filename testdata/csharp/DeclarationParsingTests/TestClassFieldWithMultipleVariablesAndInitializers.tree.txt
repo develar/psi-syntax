@@ -1,0 +1,45 @@
+CompilationUnit [0..34)
+  ClassDeclaration [0..34)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'a'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    FieldDeclaration [10..33)
+      VariableDeclaration [10..31)
+        IdentifierName [10..12)
+          IdentifierToken [10..11) 'b'
+          T:WhitespaceTrivia [11..12) ' '
+        VariableDeclarator [12..17)
+          IdentifierToken [12..13) 'c'
+          T:WhitespaceTrivia [13..14) ' '
+          EqualsValueClause [14..17)
+            EqualsToken [14..15) '='
+            T:WhitespaceTrivia [15..16) ' '
+            IdentifierName [16..17)
+              IdentifierToken [16..17) 'x'
+        CommaToken [17..18) ','
+        T:WhitespaceTrivia [18..19) ' '
+        VariableDeclarator [19..24)
+          IdentifierToken [19..20) 'd'
+          T:WhitespaceTrivia [20..21) ' '
+          EqualsValueClause [21..24)
+            EqualsToken [21..22) '='
+            T:WhitespaceTrivia [22..23) ' '
+            IdentifierName [23..24)
+              IdentifierToken [23..24) 'y'
+        CommaToken [24..25) ','
+        T:WhitespaceTrivia [25..26) ' '
+        VariableDeclarator [26..31)
+          IdentifierToken [26..27) 'e'
+          T:WhitespaceTrivia [27..28) ' '
+          EqualsValueClause [28..31)
+            EqualsToken [28..29) '='
+            T:WhitespaceTrivia [29..30) ' '
+            IdentifierName [30..31)
+              IdentifierToken [30..31) 'z'
+      SemicolonToken [31..32) ';'
+      T:WhitespaceTrivia [32..33) ' '
+    CloseBraceToken [33..34) '}'
+  EndOfFileToken [34..34) ''

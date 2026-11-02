@@ -1,0 +1,1 @@
+class a { b X<c>() where b : d { } }

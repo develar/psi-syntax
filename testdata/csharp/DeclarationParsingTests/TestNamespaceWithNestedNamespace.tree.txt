@@ -1,0 +1,21 @@
+CompilationUnit [0..31)
+  NamespaceDeclaration [0..31)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'a'
+      T:WhitespaceTrivia [11..12) ' '
+    OpenBraceToken [12..13) '{'
+    T:WhitespaceTrivia [13..14) ' '
+    NamespaceDeclaration [14..30)
+      NamespaceKeyword [14..23) 'namespace'
+      T:WhitespaceTrivia [23..24) ' '
+      IdentifierName [24..26)
+        IdentifierToken [24..25) 'b'
+        T:WhitespaceTrivia [25..26) ' '
+      OpenBraceToken [26..27) '{'
+      T:WhitespaceTrivia [27..28) ' '
+      CloseBraceToken [28..29) '}'
+      T:WhitespaceTrivia [29..30) ' '
+    CloseBraceToken [30..31) '}'
+  EndOfFileToken [31..31) ''

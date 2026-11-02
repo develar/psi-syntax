@@ -1,0 +1,8 @@
+UnsignedRightShiftAssignmentExpression [0..8)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  GreaterThanGreaterThanGreaterThanEqualsToken [2..6) '>>>='
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierName [7..8)
+    IdentifierToken [7..8) 'y'

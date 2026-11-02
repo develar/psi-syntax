@@ -1,0 +1,65 @@
+CompilationUnit [0..81)
+  ClassDeclaration [0..81)
+    L:SingleLineDocumentationCommentTrivia [0..71)
+      XmlText [0..4)
+        L:DocumentationCommentExteriorTrivia [0..3) '///'
+        XmlTextLiteralToken [3..4) ' '
+      XmlElement [4..70)
+        XmlElementStartTag [4..9)
+          LessThanToken [4..5) '<'
+          XmlName [5..8)
+            IdentifierToken [5..8) 'doc'
+          GreaterThanToken [8..9) '>'
+        XmlText [9..14)
+          XmlTextLiteralNewLineToken [9..10) '\n'
+          L:DocumentationCommentExteriorTrivia [10..13) '///'
+          XmlTextLiteralToken [13..14) ' '
+        XmlElement [14..34)
+          XmlElementStartTag [14..20)
+            LessThanToken [14..15) '<'
+            XmlName [15..19)
+              IdentifierToken [15..19) 'line'
+            GreaterThanToken [19..20) '>'
+          XmlText [20..27)
+            XmlEntityLiteralToken [20..27) '&#1631;'
+          XmlElementEndTag [27..34)
+            LessThanSlashToken [27..29) '</'
+            XmlName [29..33)
+              IdentifierToken [29..33) 'line'
+            GreaterThanToken [33..34) '>'
+        XmlText [34..39)
+          XmlTextLiteralNewLineToken [34..35) '\n'
+          L:DocumentationCommentExteriorTrivia [35..38) '///'
+          XmlTextLiteralToken [38..39) ' '
+        XmlElement [39..59)
+          XmlElementStartTag [39..45)
+            LessThanToken [39..40) '<'
+            XmlName [40..44)
+              IdentifierToken [40..44) 'line'
+            GreaterThanToken [44..45) '>'
+          XmlText [45..52)
+            XmlEntityLiteralToken [45..52) '&#x65f;'
+          XmlElementEndTag [52..59)
+            LessThanSlashToken [52..54) '</'
+            XmlName [54..58)
+              IdentifierToken [54..58) 'line'
+            GreaterThanToken [58..59) '>'
+        XmlText [59..64)
+          XmlTextLiteralNewLineToken [59..60) '\n'
+          L:DocumentationCommentExteriorTrivia [60..63) '///'
+          XmlTextLiteralToken [63..64) ' '
+        XmlElementEndTag [64..70)
+          LessThanSlashToken [64..66) '</'
+          XmlName [66..69)
+            IdentifierToken [66..69) 'doc'
+          GreaterThanToken [69..70) '>'
+      XmlText [70..71)
+        XmlTextLiteralNewLineToken [70..71) '\n'
+      EndOfDocumentationCommentToken [71..71) ''
+    ClassKeyword [71..76) 'class'
+    T:WhitespaceTrivia [76..77) ' '
+    IdentifierToken [77..78) 'A'
+    T:WhitespaceTrivia [78..79) ' '
+    OpenBraceToken [79..80) '{'
+    CloseBraceToken [80..81) '}'
+  EndOfFileToken [81..81) ''

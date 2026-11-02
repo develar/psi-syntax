@@ -1,0 +1,28 @@
+RangeExpression [0..17)
+  IsPatternExpression [0..15)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'c'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    DeclarationPattern [5..15)
+      QualifiedName [5..13)
+        QualifiedName [5..8)
+          IdentifierName [5..7)
+            IdentifierToken [5..6) 'a'
+            T:WhitespaceTrivia [6..7) ' '
+          DotToken [7..8) '.'
+          IdentifierName [8..8)
+            IdentifierToken [8..8) missing
+        DotToken [8..9) '.'
+        T:WhitespaceTrivia [9..10) ' '
+        IdentifierName [10..13)
+          IdentifierToken [10..12) 'or'
+          T:WhitespaceTrivia [12..13) ' '
+      SingleVariableDesignation [13..15)
+        IdentifierToken [13..14) 'b'
+        T:WhitespaceTrivia [14..15) ' '
+  DotDotToken [15..17) '..'
+Diagnostics:
+  CS1001 [8..9) Identifier expected
+  CS1073 [15..17) Unexpected token \'..\'

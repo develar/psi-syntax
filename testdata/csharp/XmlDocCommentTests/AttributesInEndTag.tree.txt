@@ -1,0 +1,56 @@
+CompilationUnit [0..61)
+  ClassDeclaration [0..61)
+    L:EndOfLineTrivia [0..1) '\n'
+    L:SingleLineDocumentationCommentTrivia [1..48)
+      XmlText [1..5)
+        L:DocumentationCommentExteriorTrivia [1..4) '///'
+        XmlTextLiteralToken [4..5) ' '
+      XmlElement [5..47)
+        XmlElementStartTag [5..23)
+          LessThanToken [5..6) '<'
+          XmlName [6..13)
+            IdentifierToken [6..13) 'summary'
+          XmlTextAttribute [13..22)
+            XmlName [13..18)
+              L:WhitespaceTrivia [13..14) ' '
+              IdentifierToken [14..18) 'attr'
+            EqualsToken [18..19) '='
+            DoubleQuoteToken [19..20) '"'
+            XmlTextLiteralToken [20..21) 'A'
+            DoubleQuoteToken [21..22) '"'
+          GreaterThanToken [22..23) '>'
+        XmlText [23..28)
+          XmlTextLiteralNewLineToken [23..24) '\n'
+          L:DocumentationCommentExteriorTrivia [24..27) '///'
+          XmlTextLiteralToken [27..28) ' '
+        XmlElementEndTag [28..47)
+          LessThanSlashToken [28..30) '</'
+          XmlName [30..46)
+            IdentifierToken [30..37) 'summary'
+            T:WhitespaceTrivia [37..38) ' '
+            T:SkippedTokensTrivia [38..42)
+              IdentifierToken [38..42) 'attr'
+            T:SkippedTokensTrivia [42..43)
+              EqualsToken [42..43) '='
+            T:SkippedTokensTrivia [43..44)
+              DoubleQuoteToken [43..44) '"'
+            T:SkippedTokensTrivia [44..45)
+              IdentifierToken [44..45) 'A'
+            T:SkippedTokensTrivia [45..46)
+              DoubleQuoteToken [45..46) '"'
+          GreaterThanToken [46..47) '>'
+      XmlText [47..48)
+        XmlTextLiteralNewLineToken [47..48) '\n'
+      EndOfDocumentationCommentToken [48..48) ''
+    ClassKeyword [48..53) 'class'
+    T:WhitespaceTrivia [53..54) ' '
+    IdentifierToken [54..55) 'A'
+    T:EndOfLineTrivia [55..56) '\n'
+    OpenBraceToken [56..57) '{'
+    T:WhitespaceTrivia [57..58) ' '
+    T:EndOfLineTrivia [58..59) '\n'
+    CloseBraceToken [59..60) '}'
+    T:EndOfLineTrivia [60..61) '\n'
+  EndOfFileToken [61..61) ''
+Diagnostics:
+  CS1570 [38..42) XML comment has badly formed XML -- \'The character(s) \'attr\' cannot be used at this location.\'

@@ -1,0 +1,18 @@
+CompilationUnit [0..28)
+  DelegateDeclaration [0..28)
+    DelegateKeyword [0..8) 'delegate'
+    T:WhitespaceTrivia [8..9) ' '
+    RefType [9..24)
+      RefKeyword [9..12) 'ref'
+      T:WhitespaceTrivia [12..13) ' '
+      ReadOnlyKeyword [13..21) 'readonly'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierName [22..24)
+        IdentifierToken [22..23) 'a'
+        T:WhitespaceTrivia [23..24) ' '
+    IdentifierToken [24..25) 'b'
+    ParameterList [25..27)
+      OpenParenToken [25..26) '('
+      CloseParenToken [26..27) ')'
+    SemicolonToken [27..28) ';'
+  EndOfFileToken [28..28) ''

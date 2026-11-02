@@ -1,0 +1,61 @@
+SwitchStatement [0..44)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:WhitespaceTrivia [12..13) ' '
+  SwitchSection [13..43)
+    CasePatternSwitchLabel [13..41)
+      CaseKeyword [13..17) 'case'
+      T:WhitespaceTrivia [17..18) ' '
+      RecursivePattern [18..39)
+        IdentifierName [18..19)
+          IdentifierToken [18..19) 'T'
+        PositionalPatternClause [19..31)
+          OpenParenToken [19..20) '('
+          Subpattern [20..24)
+            NameColon [20..23)
+              IdentifierName [20..21)
+                IdentifierToken [20..21) 'X'
+              ColonToken [21..22) ':'
+              T:WhitespaceTrivia [22..23) ' '
+            ConstantPattern [23..24)
+              NumericLiteralExpression [23..24)
+                NumericLiteralToken [23..24) '3'
+          CommaToken [24..25) ','
+          T:WhitespaceTrivia [25..26) ' '
+          Subpattern [26..30)
+            NameColon [26..29)
+              IdentifierName [26..27)
+                IdentifierToken [26..27) 'Y'
+              ColonToken [27..28) ':'
+              T:WhitespaceTrivia [28..29) ' '
+            ConstantPattern [29..30)
+              NumericLiteralExpression [29..30)
+                NumericLiteralToken [29..30) '4'
+          CloseParenToken [30..31) ')'
+        PropertyPatternClause [31..38)
+          OpenBraceToken [31..32) '{'
+          Subpattern [32..36)
+            NameColon [32..35)
+              IdentifierName [32..33)
+                IdentifierToken [32..33) 'L'
+              ColonToken [33..34) ':'
+              T:WhitespaceTrivia [34..35) ' '
+            ConstantPattern [35..36)
+              NumericLiteralExpression [35..36)
+                NumericLiteralToken [35..36) '5'
+          CloseBraceToken [36..37) '}'
+          T:WhitespaceTrivia [37..38) ' '
+        SingleVariableDesignation [38..39)
+          IdentifierToken [38..39) 'p'
+      ColonToken [39..40) ':'
+      T:WhitespaceTrivia [40..41) ' '
+    EmptyStatement [41..43)
+      SemicolonToken [41..42) ';'
+      T:WhitespaceTrivia [42..43) ' '
+  CloseBraceToken [43..44) '}'

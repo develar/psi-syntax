@@ -1,0 +1,15 @@
+CompilationUnit [0..28)
+  NamespaceDeclaration [0..28)
+    L:EndOfLineTrivia [0..1) '\n'
+    PrivateKeyword [1..8) 'private'
+    T:WhitespaceTrivia [8..9) ' '
+    NamespaceKeyword [9..18) 'namespace'
+    T:WhitespaceTrivia [18..19) ' '
+    IdentifierName [19..24)
+      IdentifierToken [19..23) 'test'
+      T:EndOfLineTrivia [23..24) '\n'
+    OpenBraceToken [24..25) '{'
+    T:EndOfLineTrivia [25..26) '\n'
+    CloseBraceToken [26..27) '}'
+    T:EndOfLineTrivia [27..28) '\n'
+  EndOfFileToken [28..28) ''

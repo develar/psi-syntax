@@ -1,0 +1,21 @@
+LocalDeclarationStatement [0..12)
+  VariableDeclaration [0..11)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'C'
+      T:WhitespaceTrivia [1..2) ' '
+    VariableDeclarator [2..11)
+      IdentifierToken [2..3) 'x'
+      T:WhitespaceTrivia [3..4) ' '
+      EqualsValueClause [4..11)
+        EqualsToken [4..4) missing
+        ObjectCreationExpression [4..11)
+          NewKeyword [4..7) 'new'
+          T:WhitespaceTrivia [7..8) ' '
+          IdentifierName [8..9)
+            IdentifierToken [8..9) 'C'
+          ArgumentList [9..11)
+            OpenParenToken [9..10) '('
+            CloseParenToken [10..11) ')'
+  SemicolonToken [11..12) ';'
+Diagnostics:
+  CS1003 [4..7) Syntax error, \'=\' expected

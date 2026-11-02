@@ -1,0 +1,8 @@
+
+class C
+{
+    void Goo()
+    {
+        [A]int i = 0;
+    }
+}

@@ -1,0 +1,1 @@
+from m in methods let params = 1 select m

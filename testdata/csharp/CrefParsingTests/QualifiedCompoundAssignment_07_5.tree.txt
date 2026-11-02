@@ -1,0 +1,31 @@
+L:SingleLineDocumentationCommentTrivia [0..32)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..32)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..30)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      QualifiedCref [15..29)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'T'
+        DotToken [16..17) '.'
+        OperatorMemberCref [17..29)
+          OperatorKeyword [17..25) 'operator'
+          L:WhitespaceTrivia [25..26) ' '
+          MinusToken [26..27) '-'
+          T:WhitespaceTrivia [27..28) ' '
+          T:SkippedTokensTrivia [28..29)
+            EqualsToken [28..29) '='
+      DoubleQuoteToken [29..30) '"'
+    SlashGreaterThanToken [30..32) '/>'
+  EndOfDocumentationCommentToken [32..32) ''
+EndOfFileToken [32..32) ''
+Diagnostics:
+  CS1584 [15..27) XML comment has syntactically incorrect cref attribute \'T.operator - =\'

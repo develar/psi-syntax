@@ -1,0 +1,1 @@
+class a { ref b c { get; set; } }

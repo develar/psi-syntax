@@ -1,0 +1,33 @@
+ForStatement [0..30)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  ObjectCreationExpression [5..12)
+    NewKeyword [5..8) 'new'
+    T:WhitespaceTrivia [8..9) ' '
+    IdentifierName [9..10)
+      IdentifierToken [9..10) 'A'
+    ArgumentList [10..12)
+      OpenParenToken [10..11) '('
+      CloseParenToken [11..12) ')'
+  SemicolonToken [12..13) ';'
+  ObjectCreationExpression [13..20)
+    NewKeyword [13..16) 'new'
+    T:WhitespaceTrivia [16..17) ' '
+    IdentifierName [17..18)
+      IdentifierToken [17..18) 'A'
+    ArgumentList [18..20)
+      OpenParenToken [18..19) '('
+      CloseParenToken [19..20) ')'
+  SemicolonToken [20..21) ';'
+  ObjectCreationExpression [21..28)
+    NewKeyword [21..24) 'new'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierName [25..26)
+      IdentifierToken [25..26) 'A'
+    ArgumentList [26..28)
+      OpenParenToken [26..27) '('
+      CloseParenToken [27..28) ')'
+  CloseParenToken [28..29) ')'
+  EmptyStatement [29..30)
+    SemicolonToken [29..30) ';'

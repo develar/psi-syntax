@@ -1,0 +1,7 @@
+CompilationUnit [0..5)
+  GlobalStatement [0..5)
+    ExpressionStatement [0..5)
+      IdentifierName [0..4)
+        IdentifierToken [0..4) 'file'
+      SemicolonToken [4..5) ';'
+  EndOfFileToken [5..5) ''

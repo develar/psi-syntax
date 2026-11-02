@@ -1,0 +1,51 @@
+MethodDeclaration [0..83)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'F'
+  ParameterList [6..80)
+    OpenParenToken [6..7) '('
+    Parameter [7..22)
+      ScopedKeyword [7..13) 'scoped'
+      T:WhitespaceTrivia [13..14) ' '
+      IdentifierName [14..21)
+        IdentifierToken [14..20) 'scoped'
+        T:WhitespaceTrivia [20..21) ' '
+      IdentifierToken [21..22) 'x'
+    CommaToken [22..23) ','
+    T:WhitespaceTrivia [23..24) ' '
+    Parameter [24..36)
+      RefKeyword [24..27) 'ref'
+      T:WhitespaceTrivia [27..28) ' '
+      IdentifierName [28..35)
+        IdentifierToken [28..34) 'scoped'
+        T:WhitespaceTrivia [34..35) ' '
+      IdentifierToken [35..36) 'y'
+    CommaToken [36..37) ','
+    T:WhitespaceTrivia [37..38) ' '
+    Parameter [38..57)
+      RefKeyword [38..41) 'ref'
+      T:WhitespaceTrivia [41..42) ' '
+      ScopedKeyword [42..48) 'scoped'
+      T:WhitespaceTrivia [48..49) ' '
+      IdentifierName [49..56)
+        IdentifierToken [49..55) 'scoped'
+        T:WhitespaceTrivia [55..56) ' '
+      IdentifierToken [56..57) 'z'
+    CommaToken [57..58) ','
+    T:WhitespaceTrivia [58..59) ' '
+    Parameter [59..78)
+      ScopedKeyword [59..65) 'scoped'
+      T:WhitespaceTrivia [65..66) ' '
+      RefKeyword [66..69) 'ref'
+      T:WhitespaceTrivia [69..70) ' '
+      IdentifierName [70..77)
+        IdentifierToken [70..76) 'scoped'
+        T:WhitespaceTrivia [76..77) ' '
+      IdentifierToken [77..78) 'w'
+    CloseParenToken [78..79) ')'
+    T:WhitespaceTrivia [79..80) ' '
+  Block [80..83)
+    OpenBraceToken [80..81) '{'
+    T:WhitespaceTrivia [81..82) ' '
+    CloseBraceToken [82..83) '}'

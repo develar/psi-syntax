@@ -1,0 +1,16 @@
+CompilationUnit [0..20)
+  IncompleteMember [0..11)
+    RefType [0..11)
+      RefKeyword [0..3) 'ref'
+      T:WhitespaceTrivia [3..4) ' '
+      IdentifierName [4..11)
+        IdentifierToken [4..10) 'record'
+        T:WhitespaceTrivia [10..11) ' '
+  StructDeclaration [11..20)
+    StructKeyword [11..17) 'struct'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..19) 'S'
+    SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS0116 [4..10) A namespace cannot directly contain members such as fields, methods or statements

@@ -1,0 +1,47 @@
+CompilationUnit [0..78)
+  ClassDeclaration [0..78)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..14) 'Program'
+    T:EndOfLineTrivia [14..15) '\n'
+    OpenBraceToken [15..16) '{'
+    T:EndOfLineTrivia [16..17) '\n'
+    MethodDeclaration [17..77)
+      AttributeList [17..42)
+        L:WhitespaceTrivia [17..21) '    '
+        OpenBracketToken [21..22) '['
+        Attribute [22..42)
+          IdentifierName [22..39)
+            IdentifierToken [22..39) 'ObsoleteAttribute'
+          AttributeArgumentList [39..42)
+            OpenParenToken [39..40) '('
+            AttributeArgument [40..42)
+              IdentifierName [40..42)
+                IdentifierToken [40..41) 'x'
+                T:EndOfLineTrivia [41..42) '\n'
+            CloseParenToken [42..42) missing
+        CloseBracketToken [42..42) missing
+      L:WhitespaceTrivia [42..46) '    '
+      StaticKeyword [46..52) 'static'
+      T:WhitespaceTrivia [52..53) ' '
+      PredefinedType [53..58)
+        VoidKeyword [53..57) 'void'
+        T:WhitespaceTrivia [57..58) ' '
+      IdentifierToken [58..62) 'Main'
+      ParameterList [62..65)
+        OpenParenToken [62..63) '('
+        CloseParenToken [63..64) ')'
+        T:EndOfLineTrivia [64..65) '\n'
+      Block [65..77)
+        L:WhitespaceTrivia [65..69) '    '
+        OpenBraceToken [69..70) '{'
+        T:EndOfLineTrivia [70..71) '\n'
+        L:WhitespaceTrivia [71..75) '    '
+        CloseBraceToken [75..76) '}'
+        T:EndOfLineTrivia [76..77) '\n'
+    CloseBraceToken [77..78) '}'
+  EndOfFileToken [78..78) ''
+Diagnostics:
+  CS1026 [41..41) ) expected
+  CS1003 [41..41) Syntax error, \']\' expected

@@ -1,0 +1,40 @@
+CompilationUnit [0..27)
+  GlobalStatement [0..27)
+    LocalDeclarationStatement [0..27)
+      VariableDeclaration [0..26)
+        IdentifierName [0..4)
+          IdentifierToken [0..3) 'var'
+          T:WhitespaceTrivia [3..4) ' '
+        VariableDeclarator [4..26)
+          IdentifierToken [4..5) 'v'
+          T:WhitespaceTrivia [5..6) ' '
+          EqualsValueClause [6..26)
+            EqualsToken [6..7) '='
+            T:WhitespaceTrivia [7..8) ' '
+            InvocationExpression [8..26)
+              IdentifierName [8..11)
+                IdentifierToken [8..11) 'Goo'
+              ArgumentList [11..26)
+                OpenParenToken [11..12) '('
+                Argument [12..16)
+                  IdentifierName [12..16)
+                    IdentifierToken [12..15) 'Boo'
+                    T:WhitespaceTrivia [15..16) ' '
+                CommaToken [16..16) missing
+                Argument [16..22)
+                  InvocationExpression [16..22)
+                    IdentifierName [16..20)
+                      IdentifierToken [16..20) 'Quux'
+                    ArgumentList [20..22)
+                      OpenParenToken [20..21) '('
+                      CloseParenToken [21..22) ')'
+                CommaToken [22..23) ','
+                T:WhitespaceTrivia [23..24) ' '
+                Argument [24..25)
+                  NumericLiteralExpression [24..25)
+                    NumericLiteralToken [24..25) '1'
+                CloseParenToken [25..26) ')'
+      SemicolonToken [26..27) ';'
+  EndOfFileToken [27..27) ''
+Diagnostics:
+  CS1003 [16..20) Syntax error, \',\' expected

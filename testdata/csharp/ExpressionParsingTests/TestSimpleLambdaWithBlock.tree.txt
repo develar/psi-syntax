@@ -1,0 +1,10 @@
+SimpleLambdaExpression [0..8)
+  Parameter [0..2)
+    IdentifierToken [0..1) 'a'
+    T:WhitespaceTrivia [1..2) ' '
+  EqualsGreaterThanToken [2..4) '=>'
+  T:WhitespaceTrivia [4..5) ' '
+  Block [5..8)
+    OpenBraceToken [5..6) '{'
+    T:WhitespaceTrivia [6..7) ' '
+    CloseBraceToken [7..8) '}'

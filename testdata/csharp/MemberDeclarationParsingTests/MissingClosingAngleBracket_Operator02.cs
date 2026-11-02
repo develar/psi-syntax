@@ -1,0 +1,1 @@
+public static IEnumerable<(string Value, string Description) operator checked +(X left, X right);

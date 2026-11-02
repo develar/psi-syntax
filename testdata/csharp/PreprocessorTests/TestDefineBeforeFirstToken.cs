@@ -1,0 +1,3 @@
+
+#define XXX
+class A { }

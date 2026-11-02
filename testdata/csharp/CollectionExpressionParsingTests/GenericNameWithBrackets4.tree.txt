@@ -1,0 +1,30 @@
+TypeOfExpression [0..20)
+  TypeOfKeyword [0..6) 'typeof'
+  OpenParenToken [6..7) '('
+  GenericName [7..18)
+    IdentifierToken [7..8) 'A'
+    T:WhitespaceTrivia [8..9) ' '
+    TypeArgumentList [9..18)
+      LessThanToken [9..10) '<'
+      T:WhitespaceTrivia [10..11) ' '
+      ArrayType [11..16)
+        NullableType [11..13)
+          IdentifierName [11..12)
+            IdentifierToken [11..12) 'B'
+          QuestionToken [12..13) '?'
+        ArrayRankSpecifier [13..16)
+          OpenBracketToken [13..14) '['
+          OmittedArraySizeExpression [14..14)
+            OmittedArraySizeExpressionToken [14..14) ''
+          CloseBracketToken [14..15) ']'
+          T:WhitespaceTrivia [15..16) ' '
+      GreaterThanToken [16..17) '>'
+      T:WhitespaceTrivia [17..18) ' '
+  CloseParenToken [18..18) missing
+  T:SkippedTokensTrivia [18..19)
+    IdentifierToken [18..19) 'D'
+  T:SkippedTokensTrivia [19..20)
+    CloseParenToken [19..20) ')'
+Diagnostics:
+  CS1073 [0..18) Unexpected token \'D\'
+  CS1026 [18..19) ) expected

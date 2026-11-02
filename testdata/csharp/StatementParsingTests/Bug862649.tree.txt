@@ -1,0 +1,18 @@
+LocalDeclarationStatement [0..24)
+  StaticKeyword [0..6) 'static'
+  T:WhitespaceTrivia [6..7) ' '
+  VariableDeclaration [7..23)
+    ArrayType [7..14)
+      PredefinedType [7..11)
+        CharKeyword [7..11) 'char'
+      ArrayRankSpecifier [11..14)
+        OpenBracketToken [11..12) '['
+        OmittedArraySizeExpression [12..12)
+          OmittedArraySizeExpressionToken [12..12) ''
+        CloseBracketToken [12..13) ']'
+        T:WhitespaceTrivia [13..14) ' '
+    VariableDeclarator [14..23)
+      IdentifierToken [14..23) 'delimiter'
+  SemicolonToken [23..24) ';'
+Diagnostics:
+  CS0106 [0..6) The modifier \'static\' is not valid for this item

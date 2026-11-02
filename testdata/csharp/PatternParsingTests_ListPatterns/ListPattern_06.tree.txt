@@ -1,0 +1,17 @@
+IsPatternExpression [0..16)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'c'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  ListPattern [5..16)
+    OpenBracketToken [5..6) '['
+    TypePattern [6..15)
+      GenericName [6..15)
+        IdentifierToken [6..10) 'List'
+        TypeArgumentList [10..15)
+          LessThanToken [10..11) '<'
+          PredefinedType [11..14)
+            IntKeyword [11..14) 'int'
+          GreaterThanToken [14..15) '>'
+    CloseBracketToken [15..16) ']'

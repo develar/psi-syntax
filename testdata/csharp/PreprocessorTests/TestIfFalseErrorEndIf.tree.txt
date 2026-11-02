@@ -1,0 +1,23 @@
+CompilationUnit [0..46)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..11)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    FalseLiteralExpression [5..10)
+      FalseKeyword [5..10) 'false'
+    EndOfDirectiveToken [10..10) ''
+    T:EndOfLineTrivia [10..11) '\n'
+  L:ErrorDirectiveTrivia [11..39)
+    HashToken [11..12) '#'
+    ErrorKeyword [12..17) 'error'
+    T:WhitespaceTrivia [17..18) ' '
+    L:PreprocessingMessageTrivia [18..38) 'Your monkey is alive'
+    EndOfDirectiveToken [38..38) ''
+    T:EndOfLineTrivia [38..39) '\n'
+  L:EndIfDirectiveTrivia [39..46)
+    HashToken [39..40) '#'
+    EndIfKeyword [40..45) 'endif'
+    EndOfDirectiveToken [45..45) ''
+    T:EndOfLineTrivia [45..46) '\n'
+  EndOfFileToken [46..46) ''

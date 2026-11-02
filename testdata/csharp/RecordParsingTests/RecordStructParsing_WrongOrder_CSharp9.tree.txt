@@ -1,0 +1,28 @@
+CompilationUnit [0..30)
+  RecordStructDeclaration [0..30)
+    L:SkippedTokensTrivia [0..6)
+      StructKeyword [0..6) 'struct'
+    L:WhitespaceTrivia [6..7) ' '
+    RecordKeyword [7..13) 'record'
+    T:WhitespaceTrivia [13..14) ' '
+    StructKeyword [14..14) missing
+    IdentifierToken [14..15) 'C'
+    ParameterList [15..29)
+      OpenParenToken [15..16) '('
+      Parameter [16..21)
+        PredefinedType [16..20)
+          IntKeyword [16..19) 'int'
+          T:WhitespaceTrivia [19..20) ' '
+        IdentifierToken [20..21) 'X'
+      CommaToken [21..22) ','
+      T:WhitespaceTrivia [22..23) ' '
+      Parameter [23..28)
+        PredefinedType [23..27)
+          IntKeyword [23..26) 'int'
+          T:WhitespaceTrivia [26..27) ' '
+        IdentifierToken [27..28) 'Y'
+      CloseParenToken [28..29) ')'
+    SemicolonToken [29..30) ';'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS9012 [7..13) Unexpected keyword \'record\'. Did you mean \'record struct\' or \'record class\'?

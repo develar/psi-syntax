@@ -1,0 +1,17 @@
+ParenthesizedExpression [0..15)
+  OpenParenToken [0..1) '('
+  ElementAccessExpression [1..10)
+    PredefinedType [1..7)
+      ObjectKeyword [1..7) 'object'
+    BracketedArgumentList [7..10)
+      OpenBracketToken [7..8) '['
+      T:SkippedTokensTrivia [8..9)
+        QuestionToken [8..9) '?'
+      CloseBracketToken [9..10) ']'
+  CloseParenToken [10..11) ')'
+  T:SkippedTokensTrivia [11..15)
+    NullKeyword [11..15) 'null'
+Diagnostics:
+  CS1073 [0..11) Unexpected token \'null\'
+  CS1525 [1..7) Invalid expression term \'object\'
+  CS1001 [8..9) Identifier expected

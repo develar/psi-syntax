@@ -1,0 +1,39 @@
+CompilationUnit [0..51)
+  ClassDeclaration [0..51)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..51)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..30)
+        OpenParenToken [23..24) '('
+        Parameter [24..28)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+        CloseParenToken [28..29) ')'
+        T:WhitespaceTrivia [29..30) ' '
+      OpenBraceToken [30..31) '{'
+      T:WhitespaceTrivia [31..32) ' '
+      T:SkippedTokensTrivia [32..33)
+        SemicolonToken [32..33) ';'
+      T:EndOfLineTrivia [33..34) '\n'
+      ClassDeclaration [34..50)
+        L:WhitespaceTrivia [34..38) '    '
+        ClassKeyword [38..43) 'class'
+        T:WhitespaceTrivia [43..44) ' '
+        IdentifierToken [44..45) 'D'
+        T:WhitespaceTrivia [45..46) ' '
+        OpenBraceToken [46..47) '{'
+        T:WhitespaceTrivia [47..48) ' '
+        CloseBraceToken [48..49) '}'
+        T:EndOfLineTrivia [49..50) '\n'
+      CloseBraceToken [50..51) '}'
+    CloseBraceToken [51..51) missing
+  EndOfFileToken [51..51) ''
+Diagnostics:
+  CS1519 [32..33) Invalid token \';\' in a member declaration
+  CS1513 [51..51) } expected

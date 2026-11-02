@@ -1,0 +1,6 @@
+StringLiteralExpression [0..14)
+  MultiLineRawStringLiteralToken [0..13) '"""\nhello\n"""'
+  T:SkippedTokensTrivia [13..14)
+    NumericLiteralToken [13..14) '8'
+Diagnostics:
+  CS1073 [0..13) Unexpected token \'8\'

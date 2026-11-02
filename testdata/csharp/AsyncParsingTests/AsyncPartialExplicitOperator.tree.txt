@@ -1,0 +1,35 @@
+CompilationUnit [0..47)
+  ClassDeclaration [0..47)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    ConversionOperatorDeclaration [11..47)
+      L:WhitespaceTrivia [11..15) '    '
+      AsyncKeyword [15..20) 'async'
+      T:WhitespaceTrivia [20..21) ' '
+      L:SkippedTokensTrivia [21..28)
+        IdentifierToken [21..28) 'partial'
+      L:WhitespaceTrivia [28..29) ' '
+      ExplicitKeyword [29..37) 'explicit'
+      T:WhitespaceTrivia [37..38) ' '
+      OperatorKeyword [38..46) 'operator'
+      T:EndOfLineTrivia [46..47) '\n'
+      IdentifierName [47..47)
+        IdentifierToken [47..47) missing
+      ParameterList [47..47)
+        OpenParenToken [47..47) missing
+        CloseParenToken [47..47) missing
+      SemicolonToken [47..47) missing
+    CloseBraceToken [47..47) missing
+  EndOfFileToken [47..47) ''
+Diagnostics:
+  CS1553 [21..28) Declaration is not valid; use \'explicit operator <dest-type> (...\' instead
+  CS1031 [46..46) Type expected
+  CS1003 [46..46) Syntax error, \'(\' expected
+  CS1026 [46..46) ) expected
+  CS1002 [46..46) ; expected
+  CS1513 [46..46) } expected

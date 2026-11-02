@@ -1,0 +1,1 @@
+from Ta a in A join Tb b in B on a equals b select c

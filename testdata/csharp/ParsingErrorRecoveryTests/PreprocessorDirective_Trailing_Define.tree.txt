@@ -1,0 +1,36 @@
+CompilationUnit [0..56)
+  GlobalStatement [0..50)
+    ExpressionStatement [0..50)
+      InvocationExpression [0..48)
+        IdentifierName [0..46)
+          L:MultiLineCommentTrivia [0..13) '/* comment */'
+          L:WhitespaceTrivia [13..14) ' '
+          L:SkippedTokensTrivia [14..26)
+            BadToken [14..26) '#define ABC\n'
+          L:IfDirectiveTrivia [26..34)
+            HashToken [26..27) '#'
+            IfKeyword [27..29) 'if'
+            T:WhitespaceTrivia [29..30) ' '
+            IdentifierName [30..33)
+              IdentifierToken [30..33) 'ABC'
+            EndOfDirectiveToken [33..33) ''
+            T:EndOfLineTrivia [33..34) '\n'
+          L:DisabledTextTrivia [34..39) 'x();\n'
+          L:ElseDirectiveTrivia [39..45)
+            HashToken [39..40) '#'
+            ElseKeyword [40..44) 'else'
+            EndOfDirectiveToken [44..44) ''
+            T:EndOfLineTrivia [44..45) '\n'
+          IdentifierToken [45..46) 'y'
+        ArgumentList [46..48)
+          OpenParenToken [46..47) '('
+          CloseParenToken [47..48) ')'
+      SemicolonToken [48..49) ';'
+      T:EndOfLineTrivia [49..50) '\n'
+  L:EndIfDirectiveTrivia [50..56)
+    HashToken [50..51) '#'
+    EndIfKeyword [51..56) 'endif'
+    EndOfDirectiveToken [56..56) ''
+  EndOfFileToken [56..56) ''
+Diagnostics:
+  CS1040 [14..15) Preprocessor directives must appear as the first non-whitespace character on a line

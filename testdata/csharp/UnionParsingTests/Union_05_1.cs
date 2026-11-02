@@ -1,0 +1,1 @@
+ref union U1(E1);

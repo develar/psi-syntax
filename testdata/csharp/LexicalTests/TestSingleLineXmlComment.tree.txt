@@ -1,0 +1,6 @@
+L:SingleLineDocumentationCommentTrivia [0..15)
+  XmlText [0..15)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..15) ' xml comment'
+  EndOfDocumentationCommentToken [15..15) ''
+EndOfFileToken [15..15) ''

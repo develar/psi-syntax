@@ -1,0 +1,1 @@
+namespace a { extern alias b; }

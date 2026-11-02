@@ -1,0 +1,1 @@
+for(ref T a = ref b, c = ref d;;) { }

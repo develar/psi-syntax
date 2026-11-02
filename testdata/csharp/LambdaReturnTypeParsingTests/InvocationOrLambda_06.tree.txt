@@ -1,0 +1,42 @@
+InvocationExpression [0..27)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'F'
+  ArgumentList [1..27)
+    OpenParenToken [1..2) '('
+    Argument [2..8)
+      RefKeyword [2..5) 'ref'
+      T:WhitespaceTrivia [5..6) ' '
+      IdentifierName [6..8)
+        IdentifierToken [6..7) 'A'
+        T:WhitespaceTrivia [7..8) ' '
+    CommaToken [8..8) missing
+    Argument [8..9)
+      IdentifierName [8..9)
+        IdentifierToken [8..9) 'a'
+    CommaToken [9..10) ','
+    T:WhitespaceTrivia [10..11) ' '
+    Argument [11..18)
+      OutKeyword [11..14) 'out'
+      T:WhitespaceTrivia [14..15) ' '
+      DeclarationExpression [15..18)
+        IdentifierName [15..17)
+          IdentifierToken [15..16) 'B'
+          T:WhitespaceTrivia [16..17) ' '
+        SingleVariableDesignation [17..18)
+          IdentifierToken [17..18) 'b'
+    CommaToken [18..19) ','
+    T:WhitespaceTrivia [19..20) ' '
+    Argument [20..25)
+      InKeyword [20..22) 'in'
+      T:WhitespaceTrivia [22..23) ' '
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'C'
+        T:WhitespaceTrivia [24..25) ' '
+    CommaToken [25..25) missing
+    Argument [25..26)
+      IdentifierName [25..26)
+        IdentifierToken [25..26) 'c'
+    CloseParenToken [26..27) ')'
+Diagnostics:
+  CS1003 [8..9) Syntax error, \',\' expected
+  CS1003 [25..26) Syntax error, \',\' expected

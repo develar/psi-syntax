@@ -1,0 +1,1 @@
+e is { Prop: Type? propVal Prop2: int? val2 }

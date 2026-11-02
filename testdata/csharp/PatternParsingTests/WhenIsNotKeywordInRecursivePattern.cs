@@ -1,0 +1,1 @@
+_ = e switch { T(X when) => 1, };

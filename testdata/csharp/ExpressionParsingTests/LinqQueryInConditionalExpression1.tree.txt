@@ -1,0 +1,34 @@
+ConditionalExpression [0..51)
+  IsExpression [0..7)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'x'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..7)
+      IdentifierToken [5..6) 'X'
+      T:WhitespaceTrivia [6..7) ' '
+  QuestionToken [7..8) '?'
+  T:WhitespaceTrivia [8..9) ' '
+  QueryExpression [9..45)
+    FromClause [9..33)
+      FromKeyword [9..13) 'from'
+      T:WhitespaceTrivia [13..14) ' '
+      IdentifierToken [14..18) 'item'
+      T:WhitespaceTrivia [18..19) ' '
+      InKeyword [19..21) 'in'
+      T:WhitespaceTrivia [21..22) ' '
+      IdentifierName [22..33)
+        IdentifierToken [22..32) 'collection'
+        T:WhitespaceTrivia [32..33) ' '
+    QueryBody [33..45)
+      SelectClause [33..45)
+        SelectKeyword [33..39) 'select'
+        T:WhitespaceTrivia [39..40) ' '
+        IdentifierName [40..45)
+          IdentifierToken [40..44) 'item'
+          T:WhitespaceTrivia [44..45) ' '
+  ColonToken [45..46) ':'
+  T:WhitespaceTrivia [46..47) ' '
+  NullLiteralExpression [47..51)
+    NullKeyword [47..51) 'null'

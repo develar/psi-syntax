@@ -1,0 +1,34 @@
+L:SingleLineDocumentationCommentTrivia [0..35)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..35)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..33)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      QualifiedCref [15..32)
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'T'
+        DotToken [16..17) '.'
+        OperatorMemberCref [17..32)
+          OperatorKeyword [17..25) 'operator'
+          L:WhitespaceTrivia [25..26) ' '
+          GreaterThanGreaterThanToken [26..28) '}}'
+          T:WhitespaceTrivia [28..29) ' '
+          T:SkippedTokensTrivia [29..30)
+            GreaterThanToken [29..30) '}'
+          T:WhitespaceTrivia [30..31) ' '
+          T:SkippedTokensTrivia [31..32)
+            EqualsToken [31..32) '='
+      DoubleQuoteToken [32..33) '"'
+    SlashGreaterThanToken [33..35) '/>'
+  EndOfDocumentationCommentToken [35..35) ''
+EndOfFileToken [35..35) ''
+Diagnostics:
+  CS1584 [15..28) XML comment has syntactically incorrect cref attribute \'T.operator }} } =\'

@@ -1,0 +1,1 @@
+implicit operator checked D(C x) => x;

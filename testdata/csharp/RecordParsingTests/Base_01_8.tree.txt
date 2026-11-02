@@ -1,0 +1,15 @@
+CompilationUnit [0..14)
+  RecordDeclaration [0..14)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    BaseList [9..13)
+      ColonToken [9..10) ':'
+      T:WhitespaceTrivia [10..11) ' '
+      SimpleBaseType [11..13)
+        IdentifierName [11..13)
+          IdentifierToken [11..12) 'B'
+          T:EndOfLineTrivia [12..13) '\n'
+    SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

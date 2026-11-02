@@ -1,0 +1,107 @@
+CompilationUnit [0..106)
+  ClassDeclaration [0..106)
+    L:EndOfLineTrivia [0..1) '\n'
+    StaticKeyword [1..7) 'static'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..98)
+      L:WhitespaceTrivia [21..25) '    '
+      StaticKeyword [25..31) 'static'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..37)
+        VoidKeyword [32..36) 'void'
+        T:WhitespaceTrivia [36..37) ' '
+      IdentifierToken [37..41) 'Main'
+      ParameterList [41..44)
+        OpenParenToken [41..42) '('
+        CloseParenToken [42..43) ')'
+        T:EndOfLineTrivia [43..44) '\n'
+      Block [44..96)
+        L:WhitespaceTrivia [44..48) '    '
+        OpenBraceToken [48..49) '{'
+        T:EndOfLineTrivia [49..50) '\n'
+        LocalDeclarationStatement [50..93)
+          VariableDeclaration [50..93)
+            IdentifierName [50..60)
+              L:WhitespaceTrivia [50..58) '        '
+              IdentifierToken [58..59) 'A'
+              T:WhitespaceTrivia [59..60) ' '
+            VariableDeclarator [60..91)
+              IdentifierToken [60..61) 'a'
+              T:WhitespaceTrivia [61..62) ' '
+              EqualsValueClause [62..91)
+                EqualsToken [62..63) '='
+                T:WhitespaceTrivia [63..64) ' '
+                ObjectCreationExpression [64..91)
+                  NewKeyword [64..67) 'new'
+                  T:WhitespaceTrivia [67..68) ' '
+                  IdentifierName [68..70)
+                    IdentifierToken [68..69) 'A'
+                    T:WhitespaceTrivia [69..70) ' '
+                  CollectionInitializerExpression [70..91)
+                    OpenBraceToken [70..71) '{'
+                    T:WhitespaceTrivia [71..72) ' '
+                    NumericLiteralExpression [72..73)
+                      NumericLiteralToken [72..73) '5'
+                    CommaToken [73..74) ','
+                    T:WhitespaceTrivia [74..75) ' '
+                    ComplexElementInitializerExpression [75..83)
+                      OpenBraceToken [75..76) '{'
+                      T:WhitespaceTrivia [76..77) ' '
+                      NumericLiteralExpression [77..78)
+                        NumericLiteralToken [77..78) '1'
+                      CommaToken [78..79) ','
+                      T:WhitespaceTrivia [79..80) ' '
+                      NumericLiteralExpression [80..81)
+                        NumericLiteralToken [80..81) '2'
+                      CommaToken [81..82) ','
+                      T:WhitespaceTrivia [82..83) ' '
+                      IdentifierName [83..83)
+                        IdentifierToken [83..83) missing
+                      CloseBraceToken [83..83) missing
+                    CommaToken [83..83) missing
+                    ComplexElementInitializerExpression [83..90)
+                      OpenBraceToken [83..84) '{'
+                      NumericLiteralExpression [84..85)
+                        NumericLiteralToken [84..85) '1'
+                      CommaToken [85..86) ','
+                      T:WhitespaceTrivia [86..87) ' '
+                      NumericLiteralExpression [87..88)
+                        NumericLiteralToken [87..88) '2'
+                      CloseBraceToken [88..89) '}'
+                      T:WhitespaceTrivia [89..90) ' '
+                    CloseBraceToken [90..91) '}'
+            CommaToken [91..92) ','
+            T:WhitespaceTrivia [92..93) ' '
+            VariableDeclarator [93..93)
+              IdentifierToken [93..93) missing
+          SemicolonToken [93..93) missing
+        ExpressionStatement [93..95)
+          NumericLiteralExpression [93..95)
+            NumericLiteralToken [93..94) '3'
+            T:WhitespaceTrivia [94..95) ' '
+          SemicolonToken [95..95) missing
+        CloseBraceToken [95..96) '}'
+      SemicolonToken [96..97) ';'
+      T:EndOfLineTrivia [97..98) '\n'
+    L:WhitespaceTrivia [98..102) '    '
+    CloseBraceToken [102..103) '}'
+    T:EndOfLineTrivia [103..104) '\n'
+    T:SkippedTokensTrivia [104..105)
+      CloseBraceToken [104..105) '}'
+    T:EndOfLineTrivia [105..106) '\n'
+  EndOfFileToken [106..106) ''
+Diagnostics:
+  CS1525 [83..84) Invalid expression term \'{\'
+  CS1513 [83..84) } expected
+  CS1003 [83..84) Syntax error, \',\' expected
+  CS1001 [93..94) Identifier expected
+  CS1002 [93..94) ; expected
+  CS1002 [95..96) ; expected
+  CS1597 [96..97) Semicolon after method or accessor block is not valid
+  CS1022 [104..105) Type or namespace definition, or end-of-file expected

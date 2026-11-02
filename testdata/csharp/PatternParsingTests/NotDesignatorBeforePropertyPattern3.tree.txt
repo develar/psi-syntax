@@ -1,0 +1,31 @@
+IsPatternExpression [0..30)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'o'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  OrPattern [5..30)
+    DeclarationPattern [5..14)
+      PredefinedType [5..12)
+        StringKeyword [5..11) 'string'
+        T:WhitespaceTrivia [11..12) ' '
+      DiscardDesignation [12..14)
+        UnderscoreToken [12..13) '_'
+        T:WhitespaceTrivia [13..14) ' '
+    OrKeyword [14..16) 'or'
+    T:WhitespaceTrivia [16..17) ' '
+    RecursivePattern [17..30)
+      PropertyPatternClause [17..30)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        Subpattern [19..29)
+          NameColon [19..27)
+            IdentifierName [19..25)
+              IdentifierToken [19..25) 'Length'
+            ColonToken [25..26) ':'
+            T:WhitespaceTrivia [26..27) ' '
+          ConstantPattern [27..29)
+            NumericLiteralExpression [27..29)
+              NumericLiteralToken [27..28) '5'
+              T:WhitespaceTrivia [28..29) ' '
+        CloseBraceToken [29..30) '}'

@@ -1,0 +1,51 @@
+CompilationUnit [0..124)
+  NamespaceDeclaration [0..124)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierName [10..12)
+      IdentifierToken [10..11) 'N'
+      T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    ClassDeclaration [14..47)
+      L:WhitespaceTrivia [14..18) '    '
+      ClassKeyword [18..23) 'class'
+      T:WhitespaceTrivia [23..24) ' '
+      IdentifierToken [24..28) 'Type'
+      T:EndOfLineTrivia [28..29) '\n'
+      L:WhitespaceTrivia [29..33) '    '
+      OpenBraceToken [33..34) '{'
+      T:EndOfLineTrivia [34..35) '\n'
+      L:WhitespaceTrivia [35..43) '        '
+      CloseBraceToken [43..44) '}'
+      T:WhitespaceTrivia [44..45) ' '
+      T:SkippedTokensTrivia [45..46)
+        BadToken [45..46) '\\'
+      T:EndOfLineTrivia [46..47) '\n'
+    ConstructorDeclaration [47..117)
+      L:EndOfLineTrivia [47..48) '\n'
+      L:WhitespaceTrivia [48..56) '        '
+      L:SingleLineCommentTrivia [56..82) '// Will not move into type'
+      L:EndOfLineTrivia [82..83) '\n'
+      L:WhitespaceTrivia [83..91) '        '
+      PrivateKeyword [91..98) 'private'
+      T:WhitespaceTrivia [98..99) ' '
+      IdentifierToken [99..110) 'Constructor'
+      ParameterList [110..113)
+        OpenParenToken [110..111) '('
+        CloseParenToken [111..112) ')'
+        T:WhitespaceTrivia [112..113) ' '
+      Block [113..117)
+        OpenBraceToken [113..114) '{'
+        T:WhitespaceTrivia [114..115) ' '
+        CloseBraceToken [115..116) '}'
+        T:EndOfLineTrivia [116..117) '\n'
+    L:WhitespaceTrivia [117..121) '    '
+    CloseBraceToken [121..122) '}'
+    T:EndOfLineTrivia [122..123) '\n'
+    T:SkippedTokensTrivia [123..124)
+      CloseBraceToken [123..124) '}'
+  EndOfFileToken [124..124) ''
+Diagnostics:
+  CS1056 [45..45) Unexpected character \'\\\'
+  CS1022 [123..124) Type or namespace definition, or end-of-file expected

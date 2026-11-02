@@ -1,0 +1,12 @@
+CompilationUnit [0..15)
+  FileScopedNamespaceDeclaration [0..15)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    AliasQualifiedName [10..14)
+      IdentifierName [10..11)
+        IdentifierToken [10..11) 'A'
+      ColonColonToken [11..13) '::'
+      IdentifierName [13..14)
+        IdentifierToken [13..14) 'B'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

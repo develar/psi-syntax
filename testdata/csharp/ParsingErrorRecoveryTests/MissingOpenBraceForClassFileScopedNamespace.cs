@@ -1,0 +1,3 @@
+namespace n;
+
+class c

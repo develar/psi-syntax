@@ -1,0 +1,51 @@
+TryStatement [0..58)
+  TryKeyword [0..3) 'try'
+  T:WhitespaceTrivia [3..4) ' '
+  Block [4..8)
+    OpenBraceToken [4..5) '{'
+    T:WhitespaceTrivia [5..6) ' '
+    CloseBraceToken [6..7) '}'
+    T:WhitespaceTrivia [7..8) ' '
+  CatchClause [8..23)
+    CatchKeyword [8..13) 'catch'
+    CatchDeclaration [13..19)
+      OpenParenToken [13..14) '('
+      IdentifierName [14..16)
+        IdentifierToken [14..15) 'T'
+        T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'e'
+      CloseParenToken [17..18) ')'
+      T:WhitespaceTrivia [18..19) ' '
+    Block [19..23)
+      OpenBraceToken [19..20) '{'
+      T:WhitespaceTrivia [20..21) ' '
+      CloseBraceToken [21..22) '}'
+      T:WhitespaceTrivia [22..23) ' '
+  CatchClause [23..37)
+    CatchKeyword [23..28) 'catch'
+    CatchDeclaration [28..33)
+      OpenParenToken [28..29) '('
+      IdentifierName [29..31)
+        IdentifierToken [29..31) 'T2'
+      CloseParenToken [31..32) ')'
+      T:WhitespaceTrivia [32..33) ' '
+    Block [33..37)
+      OpenBraceToken [33..34) '{'
+      T:WhitespaceTrivia [34..35) ' '
+      CloseBraceToken [35..36) '}'
+      T:WhitespaceTrivia [36..37) ' '
+  CatchClause [37..47)
+    CatchKeyword [37..42) 'catch'
+    T:WhitespaceTrivia [42..43) ' '
+    Block [43..47)
+      OpenBraceToken [43..44) '{'
+      T:WhitespaceTrivia [44..45) ' '
+      CloseBraceToken [45..46) '}'
+      T:WhitespaceTrivia [46..47) ' '
+  FinallyClause [47..58)
+    FinallyKeyword [47..54) 'finally'
+    T:WhitespaceTrivia [54..55) ' '
+    Block [55..58)
+      OpenBraceToken [55..56) '{'
+      T:WhitespaceTrivia [56..57) ' '
+      CloseBraceToken [57..58) '}'

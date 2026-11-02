@@ -1,0 +1,44 @@
+CompilationUnit [0..52)
+  GlobalStatement [0..52)
+    LocalFunctionStatement [0..52)
+      L:EndOfLineTrivia [0..1) '\n'
+      AsyncKeyword [1..6) 'async'
+      T:WhitespaceTrivia [6..7) ' '
+      PredefinedType [7..12)
+        VoidKeyword [7..11) 'void'
+        T:WhitespaceTrivia [11..12) ' '
+      IdentifierToken [12..13) 'M'
+      ParameterList [13..16)
+        OpenParenToken [13..14) '('
+        CloseParenToken [14..15) ')'
+        T:EndOfLineTrivia [15..16) '\n'
+      Block [16..52)
+        OpenBraceToken [16..17) '{'
+        T:EndOfLineTrivia [17..18) '\n'
+        LocalDeclarationStatement [18..51)
+          VariableDeclaration [18..49)
+            FunctionPointerType [18..46)
+              L:WhitespaceTrivia [18..22) '    '
+              DelegateKeyword [22..30) 'delegate'
+              AsteriskToken [30..31) '*'
+              FunctionPointerParameterList [31..46)
+                LessThanToken [31..32) '<'
+                FunctionPointerParameter [32..37)
+                  IdentifierName [32..37)
+                    IdentifierToken [32..37) 'await'
+                CommaToken [37..38) ','
+                T:WhitespaceTrivia [38..39) ' '
+                FunctionPointerParameter [39..44)
+                  IdentifierName [39..44)
+                    IdentifierToken [39..44) 'await'
+                GreaterThanToken [44..45) '>'
+                T:WhitespaceTrivia [45..46) ' '
+            VariableDeclarator [46..49)
+              IdentifierToken [46..49) 'ptr'
+          SemicolonToken [49..50) ';'
+          T:EndOfLineTrivia [50..51) '\n'
+        CloseBraceToken [51..52) '}'
+  EndOfFileToken [52..52) ''
+Diagnostics:
+  CS4003 [32..37) \'await\' cannot be used as an identifier within an async method or lambda expression
+  CS4003 [39..44) \'await\' cannot be used as an identifier within an async method or lambda expression

@@ -1,0 +1,24 @@
+IncompleteMember [0..36)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  GenericName [7..36)
+    IdentifierToken [7..11) 'Task'
+    TypeArgumentList [11..36)
+      LessThanToken [11..12) '<'
+      QualifiedName [12..33)
+        IdentifierName [12..25)
+          IdentifierToken [12..25) 'SomeNamespace'
+        DotToken [25..26) '.'
+        T:WhitespaceTrivia [26..27) ' '
+        IdentifierName [27..33)
+          IdentifierToken [27..33) 'Method'
+      GreaterThanToken [33..33) missing
+      T:SkippedTokensTrivia [33..34)
+        OpenParenToken [33..34) '('
+      T:SkippedTokensTrivia [34..35)
+        CloseParenToken [34..35) ')'
+      T:SkippedTokensTrivia [35..36)
+        SemicolonToken [35..36) ';'
+Diagnostics:
+  CS1073 [0..33) Unexpected token \'(\'
+  CS1003 [33..34) Syntax error, \'>\' expected

@@ -1,0 +1,12 @@
+ElementAccessExpression [0..8)
+  ImplicitObjectCreationExpression [0..5)
+    NewKeyword [0..3) 'new'
+    ArgumentList [3..5)
+      OpenParenToken [3..4) '('
+      CloseParenToken [4..5) ')'
+  BracketedArgumentList [5..8)
+    OpenBracketToken [5..6) '['
+    Argument [6..7)
+      NumericLiteralExpression [6..7)
+        NumericLiteralToken [6..7) '0'
+    CloseBracketToken [7..8) ']'

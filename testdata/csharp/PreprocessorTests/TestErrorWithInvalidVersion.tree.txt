@@ -1,0 +1,10 @@
+CompilationUnit [0..18)
+  L:ErrorDirectiveTrivia [0..18)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..7) ' '
+    L:PreprocessingMessageTrivia [7..18) 'version:A.B'
+    EndOfDirectiveToken [18..18) ''
+  EndOfFileToken [18..18) ''
+Diagnostics:
+  CS1029 [7..18) #error: \'version:A.B\'

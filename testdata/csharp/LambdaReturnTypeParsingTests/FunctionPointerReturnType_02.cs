@@ -1,0 +1,1 @@
+delegate* unmanaged[Cdecl]<ref delegate*<void>, void> () => default

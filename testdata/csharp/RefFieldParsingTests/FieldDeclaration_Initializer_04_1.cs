@@ -1,0 +1,1 @@
+struct S { const ref int _f = ref s; }

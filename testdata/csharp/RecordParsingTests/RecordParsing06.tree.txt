@@ -1,0 +1,7 @@
+CompilationUnit [0..12)
+  InterfaceDeclaration [0..12)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'P'
+    SemicolonToken [11..12) ';'
+  EndOfFileToken [12..12) ''

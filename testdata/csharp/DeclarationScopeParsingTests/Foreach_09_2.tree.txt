@@ -1,0 +1,35 @@
+ForEachVariableStatement [0..40)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  IdentifierName [10..18)
+    IdentifierToken [10..17) '@scoped'
+    T:WhitespaceTrivia [17..18) ' '
+  InKeyword [18..18) missing
+  PredefinedType [18..22)
+    IntKeyword [18..21) 'int'
+    T:WhitespaceTrivia [21..22) ' '
+  CloseParenToken [22..22) missing
+  ExpressionStatement [22..40)
+    IdentifierName [22..24)
+      IdentifierToken [22..23) 'a'
+      T:WhitespaceTrivia [23..24) ' '
+    SemicolonToken [24..24) missing
+    T:SkippedTokensTrivia [24..26)
+      InKeyword [24..26) 'in'
+    T:WhitespaceTrivia [26..27) ' '
+    T:SkippedTokensTrivia [27..37)
+      IdentifierToken [27..37) 'collection'
+    T:SkippedTokensTrivia [37..38)
+      CloseParenToken [37..38) ')'
+    T:SkippedTokensTrivia [38..39)
+      SemicolonToken [38..39) ';'
+    T:EndOfLineTrivia [39..40) '\n'
+Diagnostics:
+  CS1073 [1..24) Unexpected token \'in\'
+  CS1515 [18..21) \'in\' expected
+  CS0230 [18..21) Type and identifier are both required in a foreach statement
+  CS1525 [18..21) Invalid expression term \'int\'
+  CS1026 [22..23) ) expected
+  CS1002 [24..26) ; expected

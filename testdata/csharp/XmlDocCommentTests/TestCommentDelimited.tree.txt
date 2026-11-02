@@ -1,0 +1,21 @@
+CompilationUnit [0..72)
+  L:MultiLineDocumentationCommentTrivia [0..72)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralToken [3..4) ' '
+    XmlComment [4..67)
+      XmlCommentStartToken [4..8) '<!--'
+      XmlTextLiteralToken [8..23) ' this is a test'
+      XmlTextLiteralNewLineToken [23..24) '\n'
+      L:DocumentationCommentExteriorTrivia [24..27) '  *'
+      XmlTextLiteralToken [27..45) ' of &some; comment'
+      XmlTextLiteralNewLineToken [45..46) '\n'
+      L:DocumentationCommentExteriorTrivia [46..49) '  *'
+      XmlTextLiteralToken [49..64) ' "\']]<>/></text'
+      XmlCommentEndToken [64..67) '-->'
+    XmlText [67..68)
+      XmlTextLiteralNewLineToken [67..68) '\n'
+    L:DocumentationCommentExteriorTrivia [68..70) '  '
+    L:DocumentationCommentExteriorTrivia [70..72) '*/'
+    EndOfDocumentationCommentToken [72..72) ''
+  EndOfFileToken [72..72) ''

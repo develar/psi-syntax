@@ -1,0 +1,26 @@
+CollectionExpression [0..28)
+  OpenBracketToken [0..1) '['
+  WithElement [1..27)
+    WithKeyword [1..5) 'with'
+    ArgumentList [5..27)
+      OpenParenToken [5..6) '('
+      Argument [6..26)
+        QueryExpression [6..26)
+          FromClause [6..18)
+            FromKeyword [6..10) 'from'
+            T:WhitespaceTrivia [10..11) ' '
+            IdentifierToken [11..12) 'x'
+            T:WhitespaceTrivia [12..13) ' '
+            InKeyword [13..15) 'in'
+            T:WhitespaceTrivia [15..16) ' '
+            IdentifierName [16..18)
+              IdentifierToken [16..17) 'y'
+              T:WhitespaceTrivia [17..18) ' '
+          QueryBody [18..26)
+            SelectClause [18..26)
+              SelectKeyword [18..24) 'select'
+              T:WhitespaceTrivia [24..25) ' '
+              IdentifierName [25..26)
+                IdentifierToken [25..26) 'x'
+      CloseParenToken [26..27) ')'
+  CloseBracketToken [27..28) ']'

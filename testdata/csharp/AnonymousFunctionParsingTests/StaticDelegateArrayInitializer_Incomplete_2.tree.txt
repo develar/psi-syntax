@@ -1,0 +1,35 @@
+ExpressionStatement [0..36)
+  SimpleAssignmentExpression [0..36)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    ArrayCreationExpression [4..36)
+      NewKeyword [4..7) 'new'
+      T:WhitespaceTrivia [7..8) ' '
+      ArrayType [8..17)
+        IdentifierName [8..14)
+          IdentifierToken [8..14) 'Action'
+        ArrayRankSpecifier [14..17)
+          OpenBracketToken [14..15) '['
+          OmittedArraySizeExpression [15..15)
+            OmittedArraySizeExpressionToken [15..15) ''
+          CloseBracketToken [15..16) ']'
+          T:WhitespaceTrivia [16..17) ' '
+      ArrayInitializerExpression [17..36)
+        OpenBraceToken [17..18) '{'
+        T:WhitespaceTrivia [18..19) ' '
+        AnonymousMethodExpression [19..35)
+          StaticKeyword [19..25) 'static'
+          T:WhitespaceTrivia [25..26) ' '
+          DelegateKeyword [26..34) 'delegate'
+          T:WhitespaceTrivia [34..35) ' '
+          Block [35..35)
+            OpenBraceToken [35..35) missing
+            CloseBraceToken [35..35) missing
+        CloseBraceToken [35..36) '}'
+  SemicolonToken [36..36) missing
+Diagnostics:
+  CS1514 [35..36) { expected
+  CS1002 [36..36) ; expected

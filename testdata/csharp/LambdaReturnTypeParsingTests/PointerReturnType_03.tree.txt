@@ -1,0 +1,14 @@
+ParenthesizedLambdaExpression [0..19)
+  PointerType [0..6)
+    PredefinedType [0..4)
+      VoidKeyword [0..4) 'void'
+    AsteriskToken [4..5) '*'
+    T:WhitespaceTrivia [5..6) ' '
+  ParameterList [6..9)
+    OpenParenToken [6..7) '('
+    CloseParenToken [7..8) ')'
+    T:WhitespaceTrivia [8..9) ' '
+  EqualsGreaterThanToken [9..11) '=>'
+  T:WhitespaceTrivia [11..12) ' '
+  DefaultLiteralExpression [12..19)
+    DefaultKeyword [12..19) 'default'

@@ -1,0 +1,12 @@
+ImplicitStackAllocArrayCreationExpression [0..19)
+  StackAllocKeyword [0..10) 'stackalloc'
+  OpenBracketToken [10..11) '['
+  CloseBracketToken [11..12) ']'
+  T:WhitespaceTrivia [12..13) ' '
+  ArrayInitializerExpression [13..19)
+    OpenBraceToken [13..14) '{'
+    T:WhitespaceTrivia [14..15) ' '
+    NumericLiteralExpression [15..18)
+      NumericLiteralToken [15..17) '42'
+      T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'

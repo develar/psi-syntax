@@ -1,0 +1,65 @@
+CompilationUnit [0..103)
+  ClassDeclaration [0..103)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    MethodDeclaration [14..101)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      StaticKeyword [25..31) 'static'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..36)
+        IntKeyword [32..35) 'int'
+        T:WhitespaceTrivia [35..36) ' '
+      IdentifierToken [36..41) 'Test2'
+      ParameterList [41..44)
+        OpenParenToken [41..42) '('
+        CloseParenToken [42..43) ')'
+        T:EndOfLineTrivia [43..44) '\n'
+      Block [44..101)
+        L:WhitespaceTrivia [44..48) '    '
+        OpenBraceToken [48..49) '{'
+        T:EndOfLineTrivia [49..50) '\n'
+        LocalDeclarationStatement [50..96)
+          VariableDeclaration [50..94)
+            IdentifierName [50..62)
+              L:WhitespaceTrivia [50..58) '        '
+              IdentifierToken [58..61) 'var'
+              T:WhitespaceTrivia [61..62) ' '
+            VariableDeclarator [62..94)
+              IdentifierToken [62..72) 'testResult'
+              T:WhitespaceTrivia [72..73) ' '
+              EqualsValueClause [73..94)
+                EqualsToken [73..74) '='
+                T:WhitespaceTrivia [74..75) ' '
+                InvocationExpression [75..94)
+                  IdentifierName [75..83)
+                    IdentifierToken [75..83) 'testFunc'
+                  ArgumentList [83..94)
+                    OpenParenToken [83..84) '('
+                    Argument [84..93)
+                      CastExpression [84..93)
+                        OpenParenToken [84..85) '('
+                        NullableType [85..90)
+                          PredefinedType [85..89)
+                            LongKeyword [85..89) 'long'
+                          QuestionToken [89..90) '?'
+                        CloseParenToken [90..91) ')'
+                        UnaryMinusExpression [91..93)
+                          MinusToken [91..92) '-'
+                          NumericLiteralExpression [92..93)
+                            NumericLiteralToken [92..93) '1'
+                    CloseParenToken [93..94) ')'
+          SemicolonToken [94..95) ';'
+          T:EndOfLineTrivia [95..96) '\n'
+        L:WhitespaceTrivia [96..99) '   '
+        CloseBraceToken [99..100) '}'
+        T:EndOfLineTrivia [100..101) '\n'
+    CloseBraceToken [101..102) '}'
+    T:EndOfLineTrivia [102..103) '\n'
+  EndOfFileToken [103..103) ''

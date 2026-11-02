@@ -1,0 +1,1 @@
+class a { internal class b { } }

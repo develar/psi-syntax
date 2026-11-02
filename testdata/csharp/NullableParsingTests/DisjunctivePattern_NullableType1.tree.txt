@@ -1,0 +1,20 @@
+IsPatternExpression [0..20)
+  IdentifierName [0..2)
+    IdentifierToken [0..1) 'x'
+    T:WhitespaceTrivia [1..2) ' '
+  IsKeyword [2..4) 'is'
+  T:WhitespaceTrivia [4..5) ' '
+  OrPattern [5..20)
+    TypePattern [5..10)
+      NullableType [5..10)
+        PredefinedType [5..8)
+          IntKeyword [5..8) 'int'
+        QuestionToken [8..9) '?'
+        T:WhitespaceTrivia [9..10) ' '
+    OrKeyword [10..12) 'or'
+    T:WhitespaceTrivia [12..13) ' '
+    TypePattern [13..20)
+      NullableType [13..20)
+        PredefinedType [13..19)
+          StringKeyword [13..19) 'string'
+        QuestionToken [19..20) '?'

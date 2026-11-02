@@ -1,0 +1,54 @@
+CompilationUnit [0..43)
+  ClassDeclaration [0..43)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..43)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..43)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..42)
+          VariableDeclaration [21..42)
+            IdentifierName [21..25)
+              IdentifierToken [21..24) 'var'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..42)
+              IdentifierToken [25..26) 'x'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..42)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                ObjectCreationExpression [29..42)
+                  NewKeyword [29..32) 'new'
+                  T:WhitespaceTrivia [32..33) ' '
+                  IdentifierName [33..35)
+                    IdentifierToken [33..34) 'C'
+                    T:WhitespaceTrivia [34..35) ' '
+                  CollectionInitializerExpression [35..42)
+                    OpenBraceToken [35..36) '{'
+                    T:WhitespaceTrivia [36..37) ' '
+                    IdentifierName [37..38)
+                      IdentifierToken [37..38) 'a'
+                    SemicolonToken [38..39) ';'
+                    T:WhitespaceTrivia [39..40) ' '
+                    CloseBraceToken [40..41) '}'
+                    T:WhitespaceTrivia [41..42) ' '
+          SemicolonToken [42..42) missing
+        CloseBraceToken [42..43) '}'
+    CloseBraceToken [43..43) missing
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1003 [38..39) Syntax error, \',\' expected
+  CS1002 [42..43) ; expected
+  CS1513 [43..43) } expected

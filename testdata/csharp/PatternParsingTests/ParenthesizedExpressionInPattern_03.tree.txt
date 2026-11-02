@@ -1,0 +1,42 @@
+SwitchStatement [0..45)
+  SwitchKeyword [0..6) 'switch'
+  T:WhitespaceTrivia [6..7) ' '
+  OpenParenToken [7..8) '('
+  IdentifierName [8..9)
+    IdentifierToken [8..9) 'e'
+  CloseParenToken [9..10) ')'
+  T:WhitespaceTrivia [10..11) ' '
+  OpenBraceToken [11..12) '{'
+  T:EndOfLineTrivia [12..13) '\n'
+  SwitchSection [13..44)
+    CaseSwitchLabel [13..37)
+      L:WhitespaceTrivia [13..17) '    '
+      CaseKeyword [17..21) 'case'
+      T:WhitespaceTrivia [21..22) ' '
+      ParenthesizedExpression [22..35)
+        OpenParenToken [22..23) '('
+        SubtractExpression [23..34)
+          ParenthesizedExpression [23..31)
+            OpenParenToken [23..24) '('
+            AddExpression [24..29)
+              NumericLiteralExpression [24..26)
+                NumericLiteralToken [24..25) '2'
+                T:WhitespaceTrivia [25..26) ' '
+              PlusToken [26..27) '+'
+              T:WhitespaceTrivia [27..28) ' '
+              NumericLiteralExpression [28..29)
+                NumericLiteralToken [28..29) '2'
+            CloseParenToken [29..30) ')'
+            T:WhitespaceTrivia [30..31) ' '
+          MinusToken [31..32) '-'
+          T:WhitespaceTrivia [32..33) ' '
+          NumericLiteralExpression [33..34)
+            NumericLiteralToken [33..34) '2'
+        CloseParenToken [34..35) ')'
+      ColonToken [35..36) ':'
+      T:WhitespaceTrivia [36..37) ' '
+    BreakStatement [37..44)
+      BreakKeyword [37..42) 'break'
+      SemicolonToken [42..43) ';'
+      T:EndOfLineTrivia [43..44) '\n'
+  CloseBraceToken [44..45) '}'

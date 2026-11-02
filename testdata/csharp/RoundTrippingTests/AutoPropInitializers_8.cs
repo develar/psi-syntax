@@ -1,0 +1,1 @@
+interface I { public int GetInt { get; } = 0; }

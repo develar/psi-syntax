@@ -1,0 +1,5 @@
+GotoDefaultStatement [0..13)
+  GotoKeyword [0..4) 'goto'
+  T:WhitespaceTrivia [4..5) ' '
+  DefaultKeyword [5..12) 'default'
+  SemicolonToken [12..13) ';'

@@ -1,0 +1,1 @@
+partial readonly record struct S;

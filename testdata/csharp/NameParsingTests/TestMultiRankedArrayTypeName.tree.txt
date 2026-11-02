@@ -1,0 +1,27 @@
+ArrayType [0..12)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  ArrayRankSpecifier [3..5)
+    OpenBracketToken [3..4) '['
+    OmittedArraySizeExpression [4..4)
+      OmittedArraySizeExpressionToken [4..4) ''
+    CloseBracketToken [4..5) ']'
+  ArrayRankSpecifier [5..8)
+    OpenBracketToken [5..6) '['
+    OmittedArraySizeExpression [6..6)
+      OmittedArraySizeExpressionToken [6..6) ''
+    CommaToken [6..7) ','
+    OmittedArraySizeExpression [7..7)
+      OmittedArraySizeExpressionToken [7..7) ''
+    CloseBracketToken [7..8) ']'
+  ArrayRankSpecifier [8..12)
+    OpenBracketToken [8..9) '['
+    OmittedArraySizeExpression [9..9)
+      OmittedArraySizeExpressionToken [9..9) ''
+    CommaToken [9..10) ','
+    OmittedArraySizeExpression [10..10)
+      OmittedArraySizeExpressionToken [10..10) ''
+    CommaToken [10..11) ','
+    OmittedArraySizeExpression [11..11)
+      OmittedArraySizeExpressionToken [11..11) ''
+    CloseBracketToken [11..12) ']'

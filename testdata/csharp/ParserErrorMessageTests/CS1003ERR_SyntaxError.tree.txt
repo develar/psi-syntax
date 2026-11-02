@@ -1,0 +1,77 @@
+CompilationUnit [0..139)
+  NamespaceDeclaration [0..139)
+    L:EndOfLineTrivia [0..1) '\n'
+    NamespaceKeyword [1..10) 'namespace'
+    T:WhitespaceTrivia [10..11) ' '
+    IdentifierName [11..13)
+      IdentifierToken [11..12) 'x'
+      T:EndOfLineTrivia [12..13) '\n'
+    OpenBraceToken [13..14) '{'
+    T:EndOfLineTrivia [14..15) '\n'
+    ClassDeclaration [15..137)
+      L:WhitespaceTrivia [15..19) '    '
+      PublicKeyword [19..25) 'public'
+      T:WhitespaceTrivia [25..26) ' '
+      ClassKeyword [26..31) 'class'
+      T:WhitespaceTrivia [31..32) ' '
+      IdentifierToken [32..33) 'b'
+      T:EndOfLineTrivia [33..34) '\n'
+      L:WhitespaceTrivia [34..38) '    '
+      OpenBraceToken [38..39) '{'
+      T:EndOfLineTrivia [39..40) '\n'
+      MethodDeclaration [40..131)
+        L:WhitespaceTrivia [40..48) '        '
+        PublicKeyword [48..54) 'public'
+        T:WhitespaceTrivia [54..55) ' '
+        StaticKeyword [55..61) 'static'
+        T:WhitespaceTrivia [61..62) ' '
+        PredefinedType [62..67)
+          VoidKeyword [62..66) 'void'
+          T:WhitespaceTrivia [66..67) ' '
+        IdentifierToken [67..71) 'Main'
+        ParameterList [71..81)
+          OpenParenToken [71..72) '('
+          CloseParenToken [72..73) ')'
+          T:WhitespaceTrivia [73..81) '        '
+        Block [81..131)
+          OpenBraceToken [81..82) '{'
+          T:EndOfLineTrivia [82..83) '\n'
+          LocalDeclarationStatement [83..104)
+            VariableDeclaration [83..102)
+              ArrayType [83..101)
+                PredefinedType [83..98)
+                  L:WhitespaceTrivia [83..95) '            '
+                  IntKeyword [95..98) 'int'
+                ArrayRankSpecifier [98..101)
+                  OpenBracketToken [98..99) '['
+                  OmittedArraySizeExpression [99..99)
+                    OmittedArraySizeExpressionToken [99..99) ''
+                  CloseBracketToken [99..100) ']'
+                  T:WhitespaceTrivia [100..101) ' '
+              VariableDeclarator [101..102)
+                IdentifierToken [101..102) 'a'
+            SemicolonToken [102..103) ';'
+            T:EndOfLineTrivia [103..104) '\n'
+          ExpressionStatement [104..121)
+            ElementAccessExpression [104..119)
+              IdentifierName [104..117)
+                L:WhitespaceTrivia [104..116) '            '
+                IdentifierToken [116..117) 'a'
+              BracketedArgumentList [117..119)
+                OpenBracketToken [117..118) '['
+                CloseBracketToken [118..118) missing
+                T:SkippedTokensTrivia [118..119)
+                  CloseParenToken [118..119) ')'
+            SemicolonToken [119..120) ';'
+            T:EndOfLineTrivia [120..121) '\n'
+          L:WhitespaceTrivia [121..129) '        '
+          CloseBraceToken [129..130) '}'
+          T:EndOfLineTrivia [130..131) '\n'
+      L:WhitespaceTrivia [131..135) '    '
+      CloseBraceToken [135..136) '}'
+      T:EndOfLineTrivia [136..137) '\n'
+    CloseBraceToken [137..138) '}'
+    T:EndOfLineTrivia [138..139) '\n'
+  EndOfFileToken [139..139) ''
+Diagnostics:
+  CS1003 [118..119) Syntax error, \']\' expected

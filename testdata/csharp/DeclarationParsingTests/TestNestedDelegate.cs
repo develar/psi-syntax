@@ -1,0 +1,1 @@
+class a { delegate b c(); }

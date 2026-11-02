@@ -1,0 +1,25 @@
+ParenthesizedLambdaExpression [0..31)
+  TupleType [0..18)
+    OpenParenToken [0..1) '('
+    TupleElement [1..6)
+      PredefinedType [1..5)
+        IntKeyword [1..4) 'int'
+        T:WhitespaceTrivia [4..5) ' '
+      IdentifierToken [5..6) 'x'
+    CommaToken [6..7) ','
+    T:WhitespaceTrivia [7..8) ' '
+    TupleElement [8..16)
+      PredefinedType [8..15)
+        ObjectKeyword [8..14) 'object'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'y'
+    CloseParenToken [16..17) ')'
+    T:WhitespaceTrivia [17..18) ' '
+  ParameterList [18..21)
+    OpenParenToken [18..19) '('
+    CloseParenToken [19..20) ')'
+    T:WhitespaceTrivia [20..21) ' '
+  EqualsGreaterThanToken [21..23) '=>'
+  T:WhitespaceTrivia [23..24) ' '
+  DefaultLiteralExpression [24..31)
+    DefaultKeyword [24..31) 'default'

@@ -1,0 +1,1 @@
+C operator unchecked <<=(C x) => x;

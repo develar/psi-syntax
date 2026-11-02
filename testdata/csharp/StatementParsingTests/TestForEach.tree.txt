@@ -1,0 +1,18 @@
+ForEachStatement [0..21)
+  ForEachKeyword [0..7) 'foreach'
+  OpenParenToken [7..8) '('
+  IdentifierName [8..10)
+    IdentifierToken [8..9) 'T'
+    T:WhitespaceTrivia [9..10) ' '
+  IdentifierToken [10..11) 'a'
+  T:WhitespaceTrivia [11..12) ' '
+  InKeyword [12..14) 'in'
+  T:WhitespaceTrivia [14..15) ' '
+  IdentifierName [15..16)
+    IdentifierToken [15..16) 'b'
+  CloseParenToken [16..17) ')'
+  T:WhitespaceTrivia [17..18) ' '
+  Block [18..21)
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    CloseBraceToken [20..21) '}'

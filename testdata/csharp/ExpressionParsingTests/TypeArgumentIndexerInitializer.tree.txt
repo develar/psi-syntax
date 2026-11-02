@@ -1,0 +1,45 @@
+ObjectCreationExpression [0..37)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'C'
+    T:WhitespaceTrivia [5..6) ' '
+  ObjectInitializerExpression [6..37)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    SimpleAssignmentExpression [8..23)
+      ImplicitElementAccess [8..12)
+        BracketedArgumentList [8..12)
+          OpenBracketToken [8..9) '['
+          Argument [9..10)
+            NumericLiteralExpression [9..10)
+              NumericLiteralToken [9..10) '0'
+          CloseBracketToken [10..11) ']'
+          T:WhitespaceTrivia [11..12) ' '
+      EqualsToken [12..13) '='
+      T:WhitespaceTrivia [13..14) ' '
+      LessThanExpression [14..23)
+        IdentifierName [14..18)
+          IdentifierToken [14..17) 'op1'
+          T:WhitespaceTrivia [17..18) ' '
+        LessThanToken [18..19) '<'
+        T:WhitespaceTrivia [19..20) ' '
+        IdentifierName [20..23)
+          IdentifierToken [20..23) 'op2'
+    CommaToken [23..24) ','
+    T:WhitespaceTrivia [24..25) ' '
+    SimpleAssignmentExpression [25..36)
+      ImplicitElementAccess [25..29)
+        BracketedArgumentList [25..29)
+          OpenBracketToken [25..26) '['
+          Argument [26..27)
+            NumericLiteralExpression [26..27)
+              NumericLiteralToken [26..27) '1'
+          CloseBracketToken [27..28) ']'
+          T:WhitespaceTrivia [28..29) ' '
+      EqualsToken [29..30) '='
+      T:WhitespaceTrivia [30..31) ' '
+      TrueLiteralExpression [31..36)
+        TrueKeyword [31..35) 'true'
+        T:WhitespaceTrivia [35..36) ' '
+    CloseBraceToken [36..37) '}'

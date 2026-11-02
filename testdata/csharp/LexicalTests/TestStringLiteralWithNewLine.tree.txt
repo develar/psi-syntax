@@ -1,0 +1,12 @@
+StringLiteralToken [0..8) '"literal'
+T:EndOfLineTrivia [8..10) '\r\n'
+IdentifierToken [10..14) 'with'
+T:WhitespaceTrivia [14..15) ' '
+NewKeyword [15..18) 'new'
+T:WhitespaceTrivia [18..19) ' '
+IdentifierToken [19..23) 'line'
+StringLiteralToken [23..24) '"'
+EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1010 [0..0) Newline in constant
+  CS1010 [23..23) Newline in constant

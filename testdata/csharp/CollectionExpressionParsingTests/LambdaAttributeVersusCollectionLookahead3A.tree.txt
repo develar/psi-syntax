@@ -1,0 +1,39 @@
+ConditionalExpression [0..22)
+  InvocationExpression [0..13)
+    ElementAccessExpression [0..6)
+      CollectionExpression [0..3)
+        OpenBracketToken [0..1) '['
+        ExpressionElement [1..2)
+          IdentifierName [1..2)
+            IdentifierToken [1..2) 'A'
+        CloseBracketToken [2..3) ']'
+      BracketedArgumentList [3..6)
+        OpenBracketToken [3..4) '['
+        Argument [4..5)
+          IdentifierName [4..5)
+            IdentifierToken [4..5) 'B'
+        CloseBracketToken [5..6) ']'
+    ArgumentList [6..13)
+      OpenParenToken [6..7) '('
+      Argument [7..8)
+        IdentifierName [7..8)
+          IdentifierToken [7..8) 'C'
+      CommaToken [8..9) ','
+      T:WhitespaceTrivia [9..10) ' '
+      Argument [10..11)
+        IdentifierName [10..11)
+          IdentifierToken [10..11) 'D'
+      CloseParenToken [11..12) ')'
+      T:WhitespaceTrivia [12..13) ' '
+  QuestionToken [13..14) '?'
+  T:WhitespaceTrivia [14..15) ' '
+  ParenthesizedExpression [15..19)
+    OpenParenToken [15..16) '('
+    IdentifierName [16..17)
+      IdentifierToken [16..17) 'e'
+    CloseParenToken [17..18) ')'
+    T:WhitespaceTrivia [18..19) ' '
+  ColonToken [19..20) ':'
+  T:WhitespaceTrivia [20..21) ' '
+  IdentifierName [21..22)
+    IdentifierToken [21..22) 'f'

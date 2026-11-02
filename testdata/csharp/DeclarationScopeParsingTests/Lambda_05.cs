@@ -1,0 +1,1 @@
+(scoped scoped ref int i) => null

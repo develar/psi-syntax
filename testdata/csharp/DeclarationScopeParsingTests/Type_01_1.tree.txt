@@ -1,0 +1,41 @@
+CompilationUnit [0..44)
+  GlobalStatement [0..7)
+    LocalDeclarationStatement [0..7)
+      VariableDeclaration [0..7)
+        IdentifierName [0..7)
+          IdentifierToken [0..6) 'scoped'
+          T:WhitespaceTrivia [6..7) ' '
+        VariableDeclarator [7..7)
+          IdentifierToken [7..7) missing
+      SemicolonToken [7..7) missing
+  StructDeclaration [7..20)
+    StructKeyword [7..13) 'struct'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..15) 'A'
+    T:WhitespaceTrivia [15..16) ' '
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'
+    T:EndOfLineTrivia [19..20) '\n'
+  IncompleteMember [20..31)
+    ScopedKeyword [20..26) 'scoped'
+    T:WhitespaceTrivia [26..27) ' '
+    RefType [27..31)
+      RefKeyword [27..30) 'ref'
+      T:WhitespaceTrivia [30..31) ' '
+      IdentifierName [31..31)
+        IdentifierToken [31..31) missing
+  StructDeclaration [31..44)
+    StructKeyword [31..37) 'struct'
+    T:WhitespaceTrivia [37..38) ' '
+    IdentifierToken [38..39) 'B'
+    T:WhitespaceTrivia [39..40) ' '
+    OpenBraceToken [40..41) '{'
+    T:WhitespaceTrivia [41..42) ' '
+    CloseBraceToken [42..43) '}'
+    T:EndOfLineTrivia [43..44) '\n'
+  EndOfFileToken [44..44) ''
+Diagnostics:
+  CS1001 [7..13) Identifier expected
+  CS1002 [7..13) ; expected
+  CS1031 [31..37) Type expected

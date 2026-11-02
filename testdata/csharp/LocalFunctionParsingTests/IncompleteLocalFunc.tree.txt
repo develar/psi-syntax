@@ -1,0 +1,216 @@
+CompilationUnit [0..264)
+  ClassDeclaration [0..264)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:EndOfLineTrivia [8..9) '\n'
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    MethodDeclaration [11..54)
+      PredefinedType [11..20)
+        L:WhitespaceTrivia [11..15) '    '
+        VoidKeyword [15..19) 'void'
+        T:WhitespaceTrivia [19..20) ' '
+      IdentifierToken [20..22) 'M1'
+      ParameterList [22..25)
+        OpenParenToken [22..23) '('
+        CloseParenToken [23..24) ')'
+        T:EndOfLineTrivia [24..25) '\n'
+      Block [25..54)
+        L:WhitespaceTrivia [25..29) '    '
+        OpenBraceToken [29..30) '{'
+        T:EndOfLineTrivia [30..31) '\n'
+        ExpressionStatement [31..48)
+          LessThanExpression [31..48)
+            AwaitExpression [31..46)
+              L:WhitespaceTrivia [31..39) '        '
+              AwaitKeyword [39..44) 'await'
+              T:WhitespaceTrivia [44..45) ' '
+              IdentifierName [45..46)
+                IdentifierToken [45..46) 'L'
+            LessThanToken [46..47) '<'
+            T:EndOfLineTrivia [47..48) '\n'
+            IdentifierName [48..48)
+              IdentifierToken [48..48) missing
+          SemicolonToken [48..48) missing
+        L:WhitespaceTrivia [48..52) '    '
+        CloseBraceToken [52..53) '}'
+        T:EndOfLineTrivia [53..54) '\n'
+    MethodDeclaration [54..95)
+      PredefinedType [54..63)
+        L:WhitespaceTrivia [54..58) '    '
+        VoidKeyword [58..62) 'void'
+        T:WhitespaceTrivia [62..63) ' '
+      IdentifierToken [63..65) 'M2'
+      ParameterList [65..68)
+        OpenParenToken [65..66) '('
+        CloseParenToken [66..67) ')'
+        T:EndOfLineTrivia [67..68) '\n'
+      Block [68..95)
+        L:WhitespaceTrivia [68..72) '    '
+        OpenBraceToken [72..73) '{'
+        T:EndOfLineTrivia [73..74) '\n'
+        LocalFunctionStatement [74..89)
+          PredefinedType [74..86)
+            L:WhitespaceTrivia [74..82) '        '
+            IntKeyword [82..85) 'int'
+            T:WhitespaceTrivia [85..86) ' '
+          IdentifierToken [86..87) 'L'
+          TypeParameterList [87..89)
+            LessThanToken [87..88) '<'
+            T:EndOfLineTrivia [88..89) '\n'
+            TypeParameter [89..89)
+              IdentifierToken [89..89) missing
+            GreaterThanToken [89..89) missing
+          ParameterList [89..89)
+            OpenParenToken [89..89) missing
+            CloseParenToken [89..89) missing
+          SemicolonToken [89..89) missing
+        L:WhitespaceTrivia [89..93) '    '
+        CloseBraceToken [93..94) '}'
+        T:EndOfLineTrivia [94..95) '\n'
+    MethodDeclaration [95..137)
+      PredefinedType [95..104)
+        L:WhitespaceTrivia [95..99) '    '
+        VoidKeyword [99..103) 'void'
+        T:WhitespaceTrivia [103..104) ' '
+      IdentifierToken [104..106) 'M3'
+      ParameterList [106..109)
+        OpenParenToken [106..107) '('
+        CloseParenToken [107..108) ')'
+        T:EndOfLineTrivia [108..109) '\n'
+      Block [109..137)
+        L:WhitespaceTrivia [109..113) '    '
+        OpenBraceToken [113..114) '{'
+        T:EndOfLineTrivia [114..115) '\n'
+        LocalFunctionStatement [115..131)
+          NullableType [115..128)
+            PredefinedType [115..126)
+              L:WhitespaceTrivia [115..123) '        '
+              IntKeyword [123..126) 'int'
+            QuestionToken [126..127) '?'
+            T:WhitespaceTrivia [127..128) ' '
+          IdentifierToken [128..129) 'L'
+          TypeParameterList [129..131)
+            LessThanToken [129..130) '<'
+            T:EndOfLineTrivia [130..131) '\n'
+            TypeParameter [131..131)
+              IdentifierToken [131..131) missing
+            GreaterThanToken [131..131) missing
+          ParameterList [131..131)
+            OpenParenToken [131..131) missing
+            CloseParenToken [131..131) missing
+          SemicolonToken [131..131) missing
+        L:WhitespaceTrivia [131..135) '    '
+        CloseBraceToken [135..136) '}'
+        T:EndOfLineTrivia [136..137) '\n'
+    MethodDeclaration [137..180)
+      PredefinedType [137..146)
+        L:WhitespaceTrivia [137..141) '    '
+        VoidKeyword [141..145) 'void'
+        T:WhitespaceTrivia [145..146) ' '
+      IdentifierToken [146..148) 'M4'
+      ParameterList [148..151)
+        OpenParenToken [148..149) '('
+        CloseParenToken [149..150) ')'
+        T:EndOfLineTrivia [150..151) '\n'
+      Block [151..180)
+        L:WhitespaceTrivia [151..155) '    '
+        OpenBraceToken [155..156) '{'
+        T:EndOfLineTrivia [156..157) '\n'
+        ExpressionStatement [157..174)
+          AwaitExpression [157..174)
+            L:WhitespaceTrivia [157..165) '        '
+            AwaitKeyword [165..170) 'await'
+            T:WhitespaceTrivia [170..171) ' '
+            InvocationExpression [171..174)
+              IdentifierName [171..172)
+                IdentifierToken [171..172) 'L'
+              ArgumentList [172..174)
+                OpenParenToken [172..173) '('
+                T:EndOfLineTrivia [173..174) '\n'
+                CloseParenToken [174..174) missing
+          SemicolonToken [174..174) missing
+        L:WhitespaceTrivia [174..178) '    '
+        CloseBraceToken [178..179) '}'
+        T:EndOfLineTrivia [179..180) '\n'
+    MethodDeclaration [180..221)
+      PredefinedType [180..189)
+        L:WhitespaceTrivia [180..184) '    '
+        VoidKeyword [184..188) 'void'
+        T:WhitespaceTrivia [188..189) ' '
+      IdentifierToken [189..191) 'M5'
+      ParameterList [191..194)
+        OpenParenToken [191..192) '('
+        CloseParenToken [192..193) ')'
+        T:EndOfLineTrivia [193..194) '\n'
+      Block [194..221)
+        L:WhitespaceTrivia [194..198) '    '
+        OpenBraceToken [198..199) '{'
+        T:EndOfLineTrivia [199..200) '\n'
+        LocalFunctionStatement [200..215)
+          PredefinedType [200..212)
+            L:WhitespaceTrivia [200..208) '        '
+            IntKeyword [208..211) 'int'
+            T:WhitespaceTrivia [211..212) ' '
+          IdentifierToken [212..213) 'L'
+          ParameterList [213..215)
+            OpenParenToken [213..214) '('
+            T:EndOfLineTrivia [214..215) '\n'
+            CloseParenToken [215..215) missing
+          SemicolonToken [215..215) missing
+        L:WhitespaceTrivia [215..219) '    '
+        CloseBraceToken [219..220) '}'
+        T:EndOfLineTrivia [220..221) '\n'
+    MethodDeclaration [221..263)
+      PredefinedType [221..230)
+        L:WhitespaceTrivia [221..225) '    '
+        VoidKeyword [225..229) 'void'
+        T:WhitespaceTrivia [229..230) ' '
+      IdentifierToken [230..232) 'M6'
+      ParameterList [232..235)
+        OpenParenToken [232..233) '('
+        CloseParenToken [233..234) ')'
+        T:EndOfLineTrivia [234..235) '\n'
+      Block [235..263)
+        L:WhitespaceTrivia [235..239) '    '
+        OpenBraceToken [239..240) '{'
+        T:EndOfLineTrivia [240..241) '\n'
+        LocalFunctionStatement [241..257)
+          NullableType [241..254)
+            PredefinedType [241..252)
+              L:WhitespaceTrivia [241..249) '        '
+              IntKeyword [249..252) 'int'
+            QuestionToken [252..253) '?'
+            T:WhitespaceTrivia [253..254) ' '
+          IdentifierToken [254..255) 'L'
+          ParameterList [255..257)
+            OpenParenToken [255..256) '('
+            T:EndOfLineTrivia [256..257) '\n'
+            CloseParenToken [257..257) missing
+          SemicolonToken [257..257) missing
+        L:WhitespaceTrivia [257..261) '    '
+        CloseBraceToken [261..262) '}'
+        T:EndOfLineTrivia [262..263) '\n'
+    CloseBraceToken [263..264) '}'
+  EndOfFileToken [264..264) ''
+Diagnostics:
+  CS1525 [47..47) Invalid expression term \'}\'
+  CS1002 [47..47) ; expected
+  CS1001 [88..88) Identifier expected
+  CS1003 [88..88) Syntax error, \'>\' expected
+  CS1003 [88..88) Syntax error, \'(\' expected
+  CS1026 [88..88) ) expected
+  CS1002 [88..88) ; expected
+  CS1001 [130..130) Identifier expected
+  CS1003 [130..130) Syntax error, \'>\' expected
+  CS1003 [130..130) Syntax error, \'(\' expected
+  CS1026 [130..130) ) expected
+  CS1002 [130..130) ; expected
+  CS1026 [173..173) ) expected
+  CS1002 [173..173) ; expected
+  CS1026 [214..214) ) expected
+  CS1002 [214..214) ; expected
+  CS1026 [256..256) ) expected
+  CS1002 [256..256) ; expected

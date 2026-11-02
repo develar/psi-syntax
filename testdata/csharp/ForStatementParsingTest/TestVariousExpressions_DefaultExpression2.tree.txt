@@ -1,0 +1,15 @@
+ForStatement [0..30)
+  ForKeyword [0..3) 'for'
+  T:WhitespaceTrivia [3..4) ' '
+  OpenParenToken [4..5) '('
+  DefaultLiteralExpression [5..12)
+    DefaultKeyword [5..12) 'default'
+  SemicolonToken [12..13) ';'
+  DefaultLiteralExpression [13..20)
+    DefaultKeyword [13..20) 'default'
+  SemicolonToken [20..21) ';'
+  DefaultLiteralExpression [21..28)
+    DefaultKeyword [21..28) 'default'
+  CloseParenToken [28..29) ')'
+  EmptyStatement [29..30)
+    SemicolonToken [29..30) ';'

@@ -1,0 +1,1 @@
+record struct C(int X, int Y) { }

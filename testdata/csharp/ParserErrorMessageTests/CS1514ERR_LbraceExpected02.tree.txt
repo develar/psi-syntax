@@ -1,0 +1,63 @@
+CompilationUnit [0..58)
+  ClassDeclaration [0..15)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..14) 'S'
+    OpenBraceToken [14..14) missing
+    CloseBraceToken [14..14) missing
+    T:SkippedTokensTrivia [14..15)
+      DotToken [14..15) '.'
+  GlobalStatement [15..20)
+    LocalDeclarationStatement [15..20)
+      VariableDeclaration [15..20)
+        IdentifierName [15..18)
+          IdentifierToken [15..16) 'D'
+          T:WhitespaceTrivia [16..17) ' '
+          T:EndOfLineTrivia [17..18) '\n'
+        VariableDeclarator [18..20)
+          IdentifierToken [18..18) missing
+          T:SkippedTokensTrivia [18..19)
+            OpenBraceToken [18..19) '{'
+          T:EndOfLineTrivia [19..20) '\n'
+      SemicolonToken [20..20) missing
+  PropertyDeclaration [20..58)
+    L:WhitespaceTrivia [20..24) '    '
+    PublicKeyword [24..30) 'public'
+    T:WhitespaceTrivia [30..31) ' '
+    PredefinedType [31..38)
+      StringKeyword [31..37) 'string'
+      T:WhitespaceTrivia [37..38) ' '
+    ExplicitInterfaceSpecifier [38..40)
+      IdentifierName [38..39)
+        IdentifierToken [38..39) 'P'
+      DotToken [39..40) '.'
+    IdentifierToken [40..41) 'P'
+    T:WhitespaceTrivia [41..42) ' '
+    AccessorList [42..58)
+      OpenBraceToken [42..43) '{'
+      T:WhitespaceTrivia [43..44) ' '
+      GetAccessorDeclaration [44..49)
+        GetKeyword [44..47) 'get'
+        SemicolonToken [47..48) ';'
+        T:WhitespaceTrivia [48..49) ' '
+      SetAccessorDeclaration [49..54)
+        SetKeyword [49..52) 'set'
+        SemicolonToken [52..53) ';'
+        T:WhitespaceTrivia [53..54) ' '
+      CloseBraceToken [54..55) '}'
+      T:EndOfLineTrivia [55..56) '\n'
+      T:SkippedTokensTrivia [56..57)
+        CloseBraceToken [56..57) '}'
+      T:EndOfLineTrivia [57..58) '\n'
+  EndOfFileToken [58..58) ''
+Diagnostics:
+  CS1514 [14..15) { expected
+  CS1513 [14..15) } expected
+  CS1022 [14..15) Type or namespace definition, or end-of-file expected
+  CS8803 [15..20) Top-level statements must precede namespace and type declarations.
+  CS1001 [16..16) Identifier expected
+  CS1003 [16..16) Syntax error, \',\' expected
+  CS1002 [19..19) ; expected
+  CS1022 [56..57) Type or namespace definition, or end-of-file expected

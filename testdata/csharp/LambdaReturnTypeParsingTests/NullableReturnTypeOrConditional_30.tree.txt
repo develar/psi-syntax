@@ -1,0 +1,29 @@
+ConditionalExpression [0..21)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'b'
+  QuestionToken [1..2) '?'
+  T:WhitespaceTrivia [2..3) ' '
+  ConditionalExpression [3..18)
+    IdentifierName [3..4)
+      IdentifierToken [3..4) 'c'
+    QuestionToken [4..5) '?'
+    T:WhitespaceTrivia [5..6) ' '
+    ParenthesizedLambdaExpression [6..14)
+      ParameterList [6..9)
+        OpenParenToken [6..7) '('
+        CloseParenToken [7..8) ')'
+        T:WhitespaceTrivia [8..9) ' '
+      EqualsGreaterThanToken [9..11) '=>'
+      T:WhitespaceTrivia [11..12) ' '
+      IdentifierName [12..14)
+        IdentifierToken [12..13) 'x'
+        T:WhitespaceTrivia [13..14) ' '
+    ColonToken [14..15) ':'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierName [16..18)
+      IdentifierToken [16..17) 'y'
+      T:WhitespaceTrivia [17..18) ' '
+  ColonToken [18..19) ':'
+  T:WhitespaceTrivia [19..20) ' '
+  IdentifierName [20..21)
+    IdentifierToken [20..21) 'z'

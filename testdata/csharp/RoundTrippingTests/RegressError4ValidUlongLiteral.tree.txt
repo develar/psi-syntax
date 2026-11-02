@@ -1,0 +1,100 @@
+CompilationUnit [0..218)
+  ClassDeclaration [0..218)
+    PublicKeyword [0..6) 'public'
+    T:WhitespaceTrivia [6..7) ' '
+    ClassKeyword [7..12) 'class'
+    T:WhitespaceTrivia [12..13) ' '
+    IdentifierToken [13..17) 'Test'
+    T:EndOfLineTrivia [17..18) '\n'
+    OpenBraceToken [18..19) '{'
+    T:EndOfLineTrivia [19..20) '\n'
+    MethodDeclaration [20..216)
+      PublicKeyword [20..26) 'public'
+      T:WhitespaceTrivia [26..27) ' '
+      StaticKeyword [27..33) 'static'
+      T:WhitespaceTrivia [33..34) ' '
+      PredefinedType [34..38)
+        IntKeyword [34..37) 'int'
+        T:WhitespaceTrivia [37..38) ' '
+      IdentifierToken [38..42) 'Main'
+      ParameterList [42..45)
+        OpenParenToken [42..43) '('
+        CloseParenToken [43..44) ')'
+        T:EndOfLineTrivia [44..45) '\n'
+      Block [45..216)
+        OpenBraceToken [45..46) '{'
+        T:EndOfLineTrivia [46..47) '\n'
+        LocalDeclarationStatement [47..103)
+          VariableDeclaration [47..77)
+            PredefinedType [47..53)
+              ULongKeyword [47..52) 'ulong'
+              T:WhitespaceTrivia [52..53) ' '
+            VariableDeclarator [53..77)
+              IdentifierToken [53..54) 'n'
+              T:WhitespaceTrivia [54..55) ' '
+              EqualsValueClause [55..77)
+                EqualsToken [55..56) '='
+                T:WhitespaceTrivia [56..57) ' '
+                NumericLiteralExpression [57..77)
+                  NumericLiteralToken [57..77) '9223372036854775808U'
+          SemicolonToken [77..78) ';'
+          T:WhitespaceTrivia [78..79) ' '
+          T:SingleLineCommentTrivia [79..102) '//this should fit ulong'
+          T:EndOfLineTrivia [102..103) '\n'
+        LocalDeclarationStatement [103..137)
+          VariableDeclaration [103..135)
+            PredefinedType [103..109)
+              ULongKeyword [103..108) 'ulong'
+              T:WhitespaceTrivia [108..109) ' '
+            VariableDeclarator [109..135)
+              IdentifierToken [109..111) 'n1'
+              T:WhitespaceTrivia [111..112) ' '
+              EqualsValueClause [112..135)
+                EqualsToken [112..113) '='
+                T:WhitespaceTrivia [113..114) ' '
+                NumericLiteralExpression [114..135)
+                  NumericLiteralToken [114..135) '9223372036854775808Ul'
+          SemicolonToken [135..136) ';'
+          T:EndOfLineTrivia [136..137) '\n'
+        LocalDeclarationStatement [137..171)
+          VariableDeclaration [137..169)
+            PredefinedType [137..143)
+              ULongKeyword [137..142) 'ulong'
+              T:WhitespaceTrivia [142..143) ' '
+            VariableDeclarator [143..169)
+              IdentifierToken [143..145) 'n2'
+              T:WhitespaceTrivia [145..146) ' '
+              EqualsValueClause [146..169)
+                EqualsToken [146..147) '='
+                T:WhitespaceTrivia [147..148) ' '
+                NumericLiteralExpression [148..169)
+                  NumericLiteralToken [148..169) '9223372036854775808uL'
+          SemicolonToken [169..170) ';'
+          T:EndOfLineTrivia [170..171) '\n'
+        LocalDeclarationStatement [171..204)
+          VariableDeclaration [171..202)
+            PredefinedType [171..177)
+              ULongKeyword [171..176) 'ulong'
+              T:WhitespaceTrivia [176..177) ' '
+            VariableDeclarator [177..202)
+              IdentifierToken [177..179) 'n3'
+              T:WhitespaceTrivia [179..180) ' '
+              EqualsValueClause [180..202)
+                EqualsToken [180..181) '='
+                T:WhitespaceTrivia [181..182) ' '
+                NumericLiteralExpression [182..202)
+                  NumericLiteralToken [182..202) '9223372036854775808u'
+          SemicolonToken [202..203) ';'
+          T:EndOfLineTrivia [203..204) '\n'
+        ReturnStatement [204..214)
+          ReturnKeyword [204..210) 'return'
+          T:WhitespaceTrivia [210..211) ' '
+          NumericLiteralExpression [211..212)
+            NumericLiteralToken [211..212) '0'
+          SemicolonToken [212..213) ';'
+          T:EndOfLineTrivia [213..214) '\n'
+        CloseBraceToken [214..215) '}'
+        T:EndOfLineTrivia [215..216) '\n'
+    CloseBraceToken [216..217) '}'
+    T:EndOfLineTrivia [217..218) '\n'
+  EndOfFileToken [218..218) ''

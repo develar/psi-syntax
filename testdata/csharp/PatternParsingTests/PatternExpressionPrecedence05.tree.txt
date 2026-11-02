@@ -1,0 +1,15 @@
+LogicalAndExpression [0..14)
+  IsPatternExpression [0..10)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) 'A'
+      T:WhitespaceTrivia [1..2) ' '
+    IsKeyword [2..4) 'is'
+    T:WhitespaceTrivia [4..5) ' '
+    ConstantPattern [5..10)
+      NullLiteralExpression [5..10)
+        NullKeyword [5..9) 'null'
+        T:WhitespaceTrivia [9..10) ' '
+  AmpersandAmpersandToken [10..12) '&&'
+  T:WhitespaceTrivia [12..13) ' '
+  IdentifierName [13..14)
+    IdentifierToken [13..14) 'B'

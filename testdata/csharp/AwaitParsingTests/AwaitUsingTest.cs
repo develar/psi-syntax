@@ -1,0 +1,6 @@
+
+async () => {
+    using (await goo())
+    {
+    }
+};

@@ -1,0 +1,33 @@
+CompilationUnit [0..25)
+  StructDeclaration [0..25)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    T:EndOfLineTrivia [9..10) '\n'
+    ParameterList [10..18)
+      OpenParenToken [10..11) '('
+      Parameter [11..16)
+        PredefinedType [11..15)
+          IntKeyword [11..14) 'int'
+          T:WhitespaceTrivia [14..15) ' '
+        IdentifierToken [15..16) 'x'
+      CommaToken [16..17) ','
+      T:EndOfLineTrivia [17..18) '\n'
+      Parameter [18..18)
+        IdentifierName [18..18)
+          IdentifierToken [18..18) missing
+        IdentifierToken [18..18) missing
+      CloseParenToken [18..18) missing
+    BaseList [18..24)
+      ColonToken [18..19) ':'
+      T:WhitespaceTrivia [19..20) ' '
+      SimpleBaseType [20..24)
+        IdentifierName [20..24)
+          IdentifierToken [20..24) 'Base'
+    SemicolonToken [24..25) ';'
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1031 [17..17) Type expected
+  CS1001 [17..17) Identifier expected
+  CS1026 [17..17) ) expected

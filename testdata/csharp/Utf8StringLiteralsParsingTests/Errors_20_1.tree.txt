@@ -1,0 +1,6 @@
+Utf8StringLiteralExpression [0..14)
+  Utf8SingleLineRawStringLiteralToken [0..13) '"""hello"""u8'
+  T:SkippedTokensTrivia [13..14)
+    NumericLiteralToken [13..14) '0'
+Diagnostics:
+  CS1073 [0..13) Unexpected token \'0\'

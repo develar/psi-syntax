@@ -1,0 +1,288 @@
+CompilationUnit [0..595)
+  UsingDirective [0..14)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..12)
+      IdentifierToken [6..12) 'System'
+    SemicolonToken [12..13) ';'
+    T:EndOfLineTrivia [13..14) '\n'
+  UsingDirective [14..52)
+    UsingKeyword [14..19) 'using'
+    T:WhitespaceTrivia [19..20) ' '
+    QualifiedName [20..50)
+      QualifiedName [20..34)
+        IdentifierName [20..26)
+          IdentifierToken [20..26) 'System'
+        DotToken [26..27) '.'
+        IdentifierName [27..34)
+          IdentifierToken [27..34) 'Runtime'
+      DotToken [34..35) '.'
+      IdentifierName [35..50)
+        IdentifierToken [35..50) 'InteropServices'
+    SemicolonToken [50..51) ';'
+    T:EndOfLineTrivia [51..52) '\n'
+  InterfaceDeclaration [52..413)
+    L:EndOfLineTrivia [52..53) '\n'
+    InterfaceKeyword [53..62) 'interface'
+    T:WhitespaceTrivia [62..63) ' '
+    IdentifierToken [63..67) 'IGoo'
+    T:EndOfLineTrivia [67..68) '\n'
+    OpenBraceToken [68..69) '{'
+    T:EndOfLineTrivia [69..70) '\n'
+    MethodDeclaration [70..127)
+      AttributeList [70..112)
+        L:WhitespaceTrivia [70..74) '    '
+        OpenBracketToken [74..75) '['
+        AttributeTargetSpecifier [75..83)
+          ReturnKeyword [75..81) 'return'
+          ColonToken [81..82) ':'
+          T:WhitespaceTrivia [82..83) ' '
+        Attribute [83..110)
+          IdentifierName [83..92)
+            IdentifierToken [83..92) 'MarshalAs'
+          AttributeArgumentList [92..110)
+            OpenParenToken [92..93) '('
+            AttributeArgument [93..109)
+              SimpleMemberAccessExpression [93..109)
+                IdentifierName [93..106)
+                  IdentifierToken [93..106) 'UnmanagedType'
+                DotToken [106..107) '.'
+                IdentifierName [107..109)
+                  IdentifierToken [107..109) 'I2'
+            CloseParenToken [109..110) ')'
+        CloseBracketToken [110..111) ']'
+        T:EndOfLineTrivia [111..112) '\n'
+      PredefinedType [112..122)
+        L:WhitespaceTrivia [112..116) '    '
+        ShortKeyword [116..121) 'short'
+        T:WhitespaceTrivia [121..122) ' '
+      IdentifierToken [122..123) 'M'
+      ParameterList [123..125)
+        OpenParenToken [123..124) '('
+        CloseParenToken [124..125) ')'
+      SemicolonToken [125..126) ';'
+      T:EndOfLineTrivia [126..127) '\n'
+    PropertyDeclaration [127..270)
+      PredefinedType [127..136)
+        L:EndOfLineTrivia [127..128) '\n'
+        L:WhitespaceTrivia [128..132) '    '
+        IntKeyword [132..135) 'int'
+        T:WhitespaceTrivia [135..136) ' '
+      IdentifierToken [136..140) 'Prop'
+      T:EndOfLineTrivia [140..141) '\n'
+      AccessorList [141..270)
+        L:WhitespaceTrivia [141..145) '    '
+        OpenBraceToken [145..146) '{'
+        T:EndOfLineTrivia [146..147) '\n'
+        GetAccessorDeclaration [147..206)
+          AttributeList [147..193)
+            L:WhitespaceTrivia [147..155) '        '
+            OpenBracketToken [155..156) '['
+            AttributeTargetSpecifier [156..164)
+              ReturnKeyword [156..162) 'return'
+              ColonToken [162..163) ':'
+              T:WhitespaceTrivia [163..164) ' '
+            Attribute [164..191)
+              IdentifierName [164..173)
+                IdentifierToken [164..173) 'MarshalAs'
+              AttributeArgumentList [173..191)
+                OpenParenToken [173..174) '('
+                AttributeArgument [174..190)
+                  SimpleMemberAccessExpression [174..190)
+                    IdentifierName [174..187)
+                      IdentifierToken [174..187) 'UnmanagedType'
+                    DotToken [187..188) '.'
+                    IdentifierName [188..190)
+                      IdentifierToken [188..190) 'I4'
+                CloseParenToken [190..191) ')'
+            CloseBracketToken [191..192) ']'
+            T:EndOfLineTrivia [192..193) '\n'
+          L:WhitespaceTrivia [193..201) '        '
+          GetKeyword [201..204) 'get'
+          SemicolonToken [204..205) ';'
+          T:EndOfLineTrivia [205..206) '\n'
+        SetAccessorDeclaration [206..264)
+          AttributeList [206..251)
+            L:WhitespaceTrivia [206..214) '        '
+            OpenBracketToken [214..215) '['
+            AttributeTargetSpecifier [215..222)
+              ParamKeyword [215..220) 'param'
+              ColonToken [220..221) ':'
+              T:WhitespaceTrivia [221..222) ' '
+            Attribute [222..249)
+              IdentifierName [222..231)
+                IdentifierToken [222..231) 'MarshalAs'
+              AttributeArgumentList [231..249)
+                OpenParenToken [231..232) '('
+                AttributeArgument [232..248)
+                  SimpleMemberAccessExpression [232..248)
+                    IdentifierName [232..245)
+                      IdentifierToken [232..245) 'UnmanagedType'
+                    DotToken [245..246) '.'
+                    IdentifierName [246..248)
+                      IdentifierToken [246..248) 'I4'
+                CloseParenToken [248..249) ')'
+            CloseBracketToken [249..250) ']'
+            T:EndOfLineTrivia [250..251) '\n'
+          L:WhitespaceTrivia [251..259) '        '
+          SetKeyword [259..262) 'set'
+          SemicolonToken [262..263) ';'
+          T:EndOfLineTrivia [263..264) '\n'
+        L:WhitespaceTrivia [264..268) '    '
+        CloseBraceToken [268..269) '}'
+        T:EndOfLineTrivia [269..270) '\n'
+    IndexerDeclaration [270..411)
+      PredefinedType [270..280)
+        L:EndOfLineTrivia [270..271) '\n'
+        L:WhitespaceTrivia [271..275) '    '
+        LongKeyword [275..279) 'long'
+        T:WhitespaceTrivia [279..280) ' '
+      ThisKeyword [280..284) 'this'
+      BracketedParameterList [284..327)
+        OpenBracketToken [284..285) '['
+        Parameter [285..325)
+          AttributeList [285..317)
+            OpenBracketToken [285..286) '['
+            Attribute [286..315)
+              IdentifierName [286..295)
+                IdentifierToken [286..295) 'MarshalAs'
+              AttributeArgumentList [295..315)
+                OpenParenToken [295..296) '('
+                AttributeArgument [296..314)
+                  SimpleMemberAccessExpression [296..314)
+                    IdentifierName [296..309)
+                      IdentifierToken [296..309) 'UnmanagedType'
+                    DotToken [309..310) '.'
+                    IdentifierName [310..314)
+                      IdentifierToken [310..314) 'BStr'
+                CloseParenToken [314..315) ')'
+            CloseBracketToken [315..316) ']'
+            T:WhitespaceTrivia [316..317) ' '
+          PredefinedType [317..324)
+            StringKeyword [317..323) 'string'
+            T:WhitespaceTrivia [323..324) ' '
+          IdentifierToken [324..325) 's'
+        CloseBracketToken [325..326) ']'
+        T:EndOfLineTrivia [326..327) '\n'
+      AccessorList [327..411)
+        L:WhitespaceTrivia [327..331) '    '
+        OpenBraceToken [331..332) '{'
+        T:EndOfLineTrivia [332..333) '\n'
+        GetAccessorDeclaration [333..392)
+          AttributeList [333..379)
+            L:WhitespaceTrivia [333..341) '        '
+            OpenBracketToken [341..342) '['
+            AttributeTargetSpecifier [342..350)
+              ReturnKeyword [342..348) 'return'
+              ColonToken [348..349) ':'
+              T:WhitespaceTrivia [349..350) ' '
+            Attribute [350..377)
+              IdentifierName [350..359)
+                IdentifierToken [350..359) 'MarshalAs'
+              AttributeArgumentList [359..377)
+                OpenParenToken [359..360) '('
+                AttributeArgument [360..376)
+                  SimpleMemberAccessExpression [360..376)
+                    IdentifierName [360..373)
+                      IdentifierToken [360..373) 'UnmanagedType'
+                    DotToken [373..374) '.'
+                    IdentifierName [374..376)
+                      IdentifierToken [374..376) 'I8'
+                CloseParenToken [376..377) ')'
+            CloseBracketToken [377..378) ']'
+            T:EndOfLineTrivia [378..379) '\n'
+          L:WhitespaceTrivia [379..387) '        '
+          GetKeyword [387..390) 'get'
+          SemicolonToken [390..391) ';'
+          T:EndOfLineTrivia [391..392) '\n'
+        SetAccessorDeclaration [392..405)
+          L:WhitespaceTrivia [392..400) '        '
+          SetKeyword [400..403) 'set'
+          SemicolonToken [403..404) ';'
+          T:EndOfLineTrivia [404..405) '\n'
+        L:WhitespaceTrivia [405..409) '    '
+        CloseBraceToken [409..410) '}'
+        T:EndOfLineTrivia [410..411) '\n'
+    CloseBraceToken [411..412) '}'
+    T:EndOfLineTrivia [412..413) '\n'
+  ClassDeclaration [413..595)
+    L:EndOfLineTrivia [413..414) '\n'
+    PublicKeyword [414..420) 'public'
+    T:WhitespaceTrivia [420..421) ' '
+    ClassKeyword [421..426) 'class'
+    T:WhitespaceTrivia [426..427) ' '
+    IdentifierToken [427..430) 'Goo'
+    T:EndOfLineTrivia [430..431) '\n'
+    OpenBraceToken [431..432) '{'
+    T:EndOfLineTrivia [432..433) '\n'
+    DelegateDeclaration [433..472)
+      L:WhitespaceTrivia [433..437) '    '
+      PublicKeyword [437..443) 'public'
+      T:WhitespaceTrivia [443..444) ' '
+      DelegateKeyword [444..452) 'delegate'
+      T:WhitespaceTrivia [452..453) ' '
+      PredefinedType [453..458)
+        VoidKeyword [453..457) 'void'
+        T:WhitespaceTrivia [457..458) ' '
+      IdentifierToken [458..468) 'MyDelegate'
+      ParameterList [468..470)
+        OpenParenToken [468..469) '('
+        CloseParenToken [469..470) ')'
+      SemicolonToken [470..471) ';'
+      T:EndOfLineTrivia [471..472) '\n'
+    EventDeclaration [472..594)
+      L:WhitespaceTrivia [472..476) '    '
+      PublicKeyword [476..482) 'public'
+      T:WhitespaceTrivia [482..483) ' '
+      EventKeyword [483..488) 'event'
+      T:WhitespaceTrivia [488..489) ' '
+      IdentifierName [489..500)
+        IdentifierToken [489..499) 'MyDelegate'
+        T:WhitespaceTrivia [499..500) ' '
+      IdentifierToken [500..511) 'eventMethod'
+      T:EndOfLineTrivia [511..512) '\n'
+      AccessorList [512..594)
+        L:WhitespaceTrivia [512..516) '    '
+        OpenBraceToken [516..517) '{'
+        T:EndOfLineTrivia [517..518) '\n'
+        AddAccessorDeclaration [518..569)
+          AttributeList [518..553)
+            L:WhitespaceTrivia [518..526) '        '
+            OpenBracketToken [526..527) '['
+            AttributeTargetSpecifier [527..535)
+              MethodKeyword [527..533) 'method'
+              ColonToken [533..534) ':'
+              T:WhitespaceTrivia [534..535) ' '
+            Attribute [535..551)
+              IdentifierName [535..545)
+                IdentifierToken [535..545) 'ComVisible'
+              AttributeArgumentList [545..551)
+                OpenParenToken [545..546) '('
+                AttributeArgument [546..550)
+                  TrueLiteralExpression [546..550)
+                    TrueKeyword [546..550) 'true'
+                CloseParenToken [550..551) ')'
+            CloseBracketToken [551..552) ']'
+            T:EndOfLineTrivia [552..553) '\n'
+          L:WhitespaceTrivia [553..561) '        '
+          AddKeyword [561..564) 'add'
+          T:WhitespaceTrivia [564..565) ' '
+          Block [565..569)
+            OpenBraceToken [565..566) '{'
+            T:WhitespaceTrivia [566..567) ' '
+            CloseBraceToken [567..568) '}'
+            T:EndOfLineTrivia [568..569) '\n'
+        RemoveAccessorDeclaration [569..588)
+          L:WhitespaceTrivia [569..577) '        '
+          RemoveKeyword [577..583) 'remove'
+          T:WhitespaceTrivia [583..584) ' '
+          Block [584..588)
+            OpenBraceToken [584..585) '{'
+            T:WhitespaceTrivia [585..586) ' '
+            CloseBraceToken [586..587) '}'
+            T:EndOfLineTrivia [587..588) '\n'
+        L:WhitespaceTrivia [588..592) '    '
+        CloseBraceToken [592..593) '}'
+        T:EndOfLineTrivia [593..594) '\n'
+    CloseBraceToken [594..595) '}'
+  EndOfFileToken [595..595) ''

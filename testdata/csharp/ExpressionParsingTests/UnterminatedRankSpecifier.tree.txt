@@ -1,0 +1,13 @@
+ArrayCreationExpression [0..8)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  ArrayType [4..8)
+    PredefinedType [4..7)
+      IntKeyword [4..7) 'int'
+    ArrayRankSpecifier [7..8)
+      OpenBracketToken [7..8) '['
+      OmittedArraySizeExpression [8..8)
+        OmittedArraySizeExpressionToken [8..8) ''
+      CloseBracketToken [8..8) missing
+Diagnostics:
+  CS1003 [8..8) Syntax error, \']\' expected

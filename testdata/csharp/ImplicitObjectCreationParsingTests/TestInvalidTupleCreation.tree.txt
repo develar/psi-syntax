@@ -1,0 +1,15 @@
+ObjectCreationExpression [0..14)
+  NewKeyword [0..3) 'new'
+  TupleType [3..12)
+    OpenParenToken [3..4) '('
+    TupleElement [4..7)
+      PredefinedType [4..7)
+        IntKeyword [4..7) 'int'
+    CommaToken [7..8) ','
+    TupleElement [8..11)
+      PredefinedType [8..11)
+        IntKeyword [8..11) 'int'
+    CloseParenToken [11..12) ')'
+  ArgumentList [12..14)
+    OpenParenToken [12..13) '('
+    CloseParenToken [13..14) ')'

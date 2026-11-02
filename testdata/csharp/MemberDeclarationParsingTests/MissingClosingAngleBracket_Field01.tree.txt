@@ -1,0 +1,28 @@
+FieldDeclaration [0..54)
+  VariableDeclaration [0..53)
+    GenericName [0..47)
+      IdentifierToken [0..11) 'IEnumerable'
+      TypeArgumentList [11..47)
+        LessThanToken [11..12) '<'
+        TupleType [12..47)
+          OpenParenToken [12..13) '('
+          TupleElement [13..25)
+            PredefinedType [13..20)
+              StringKeyword [13..19) 'string'
+              T:WhitespaceTrivia [19..20) ' '
+            IdentifierToken [20..25) 'Value'
+          CommaToken [25..26) ','
+          T:WhitespaceTrivia [26..27) ' '
+          TupleElement [27..45)
+            PredefinedType [27..34)
+              StringKeyword [27..33) 'string'
+              T:WhitespaceTrivia [33..34) ' '
+            IdentifierToken [34..45) 'Description'
+          CloseParenToken [45..46) ')'
+          T:WhitespaceTrivia [46..47) ' '
+        GreaterThanToken [47..47) missing
+    VariableDeclarator [47..53)
+      IdentifierToken [47..53) 'values'
+  SemicolonToken [53..54) ';'
+Diagnostics:
+  CS1003 [47..53) Syntax error, \'>\' expected

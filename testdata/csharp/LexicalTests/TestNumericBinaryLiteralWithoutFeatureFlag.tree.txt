@@ -1,0 +1,4 @@
+NumericLiteralToken [0..3) '0b1'
+EndOfFileToken [3..3) ''
+Diagnostics:
+  CS8059 [0..0) Feature \'binary literals\' is not available in C# 6. Please use language version 7.0 or greater.

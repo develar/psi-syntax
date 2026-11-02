@@ -1,0 +1,28 @@
+CompilationUnit [0..33)
+  UnionDeclaration [0..33)
+    UnionKeyword [0..5) 'union'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'M'
+    ParameterList [7..10)
+      OpenParenToken [7..8) '('
+      Parameter [8..8)
+        IdentifierName [8..8)
+          IdentifierToken [8..8) missing
+      CloseParenToken [8..9) ')'
+      T:EndOfLineTrivia [9..10) '\n'
+    OpenBraceToken [10..11) '{'
+    T:EndOfLineTrivia [11..12) '\n'
+    T:WhitespaceTrivia [12..16) '    '
+    T:SkippedTokensTrivia [16..22)
+      ReturnKeyword [16..22) 'return'
+    T:WhitespaceTrivia [22..23) ' '
+    T:SkippedTokensTrivia [23..30)
+      DefaultKeyword [23..30) 'default'
+    T:SkippedTokensTrivia [30..31)
+      SemicolonToken [30..31) ';'
+    T:EndOfLineTrivia [31..32) '\n'
+    CloseBraceToken [32..33) '}'
+  EndOfFileToken [33..33) ''
+Diagnostics:
+  CS1031 [8..9) Type expected
+  CS1519 [16..22) Invalid token \'return\' in a member declaration

@@ -1,0 +1,28 @@
+IfStatement [0..31)
+  IfKeyword [0..2) 'if'
+  T:WhitespaceTrivia [2..3) ' '
+  OpenParenToken [3..4) '('
+  ConditionalExpression [4..27)
+    IsExpression [4..13)
+      IdentifierName [4..6)
+        IdentifierToken [4..5) 'e'
+        T:WhitespaceTrivia [5..6) ' '
+      IsKeyword [6..8) 'is'
+      T:WhitespaceTrivia [8..9) ' '
+      PredefinedType [9..13)
+        IntKeyword [9..12) 'int'
+        T:WhitespaceTrivia [12..13) ' '
+    QuestionToken [13..14) '?'
+    T:WhitespaceTrivia [14..15) ' '
+    TrueLiteralExpression [15..20)
+      TrueKeyword [15..19) 'true'
+      T:WhitespaceTrivia [19..20) ' '
+    ColonToken [20..21) ':'
+    T:WhitespaceTrivia [21..22) ' '
+    FalseLiteralExpression [22..27)
+      FalseKeyword [22..27) 'false'
+  CloseParenToken [27..28) ')'
+  T:WhitespaceTrivia [28..29) ' '
+  Block [29..31)
+    OpenBraceToken [29..30) '{'
+    CloseBraceToken [30..31) '}'

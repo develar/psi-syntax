@@ -1,0 +1,24 @@
+CompilationUnit [0..25)
+  IncompleteMember [0..11)
+    RefType [0..11)
+      RefKeyword [0..3) 'ref'
+      T:WhitespaceTrivia [3..4) ' '
+      IdentifierName [4..11)
+        IdentifierToken [4..10) 'scoped'
+        T:WhitespaceTrivia [10..11) ' '
+  GlobalStatement [11..25)
+    LocalDeclarationStatement [11..25)
+      ReadOnlyKeyword [11..19) 'readonly'
+      T:WhitespaceTrivia [19..20) ' '
+      VariableDeclaration [20..23)
+        IdentifierName [20..22)
+          IdentifierToken [20..21) 'S'
+          T:WhitespaceTrivia [21..22) ' '
+        VariableDeclarator [22..23)
+          IdentifierToken [22..23) 'a'
+      SemicolonToken [23..24) ';'
+      T:EndOfLineTrivia [24..25) '\n'
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1585 [11..19) Member modifier \'readonly\' must precede the member type and name
+  CS0106 [11..19) The modifier \'readonly\' is not valid for this item

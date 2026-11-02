@@ -1,0 +1,37 @@
+CompilationUnit [0..43)
+  ClassDeclaration [0..43)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    TypeParameterList [8..12)
+      LessThanToken [8..9) '<'
+      TypeParameter [9..10)
+        IdentifierToken [9..10) 'T'
+      GreaterThanToken [10..11) '>'
+      T:WhitespaceTrivia [11..12) ' '
+    TypeParameterConstraintClause [12..41)
+      WhereKeyword [12..17) 'where'
+      T:WhitespaceTrivia [17..18) ' '
+      IdentifierName [18..20)
+        IdentifierToken [18..19) 'T'
+        T:WhitespaceTrivia [19..20) ' '
+      ColonToken [20..21) ':'
+      T:WhitespaceTrivia [21..22) ' '
+      TypeConstraint [22..34)
+        IdentifierName [22..34)
+          IdentifierToken [22..29) '@allows'
+          T:WhitespaceTrivia [29..30) ' '
+          T:SkippedTokensTrivia [30..33)
+            RefKeyword [30..33) 'ref'
+          T:WhitespaceTrivia [33..34) ' '
+      CommaToken [34..34) missing
+      StructConstraint [34..41)
+        StructKeyword [34..40) 'struct'
+        T:EndOfLineTrivia [40..41) '\n'
+    OpenBraceToken [41..42) '{'
+    CloseBraceToken [42..43) '}'
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1003 [30..33) Syntax error, \',\' expected
+  CS1003 [34..40) Syntax error, \',\' expected

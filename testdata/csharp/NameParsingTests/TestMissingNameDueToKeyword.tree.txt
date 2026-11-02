@@ -1,0 +1,7 @@
+IdentifierName [0..5)
+  IdentifierToken [0..0) missing
+  T:SkippedTokensTrivia [0..5)
+    ClassKeyword [0..5) 'class'
+Diagnostics:
+  CS1073 [0..0) Unexpected token \'class\'
+  CS1001 [0..5) Identifier expected

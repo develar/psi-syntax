@@ -1,0 +1,47 @@
+ParenthesizedLambdaExpression [0..42)
+  ParameterList [0..38)
+    OpenParenToken [0..1) '('
+    Parameter [1..36)
+      GenericName [1..16)
+        IdentifierToken [1..5) 'Func'
+        TypeArgumentList [5..16)
+          LessThanToken [5..6) '<'
+          PredefinedType [6..9)
+            IntKeyword [6..9) 'int'
+          CommaToken [9..10) ','
+          T:WhitespaceTrivia [10..11) ' '
+          PredefinedType [11..14)
+            IntKeyword [11..14) 'int'
+          GreaterThanToken [14..15) '>'
+          T:WhitespaceTrivia [15..16) ' '
+      IdentifierToken [16..17) 'a'
+      T:WhitespaceTrivia [17..18) ' '
+      EqualsValueClause [18..36)
+        EqualsToken [18..19) '='
+        T:WhitespaceTrivia [19..20) ' '
+        ParenthesizedLambdaExpression [20..36)
+          ParameterList [20..32)
+            OpenParenToken [20..21) '('
+            Parameter [21..30)
+              PredefinedType [21..25)
+                IntKeyword [21..24) 'int'
+                T:WhitespaceTrivia [24..25) ' '
+              IdentifierToken [25..26) 'b'
+              T:WhitespaceTrivia [26..27) ' '
+              EqualsValueClause [27..30)
+                EqualsToken [27..28) '='
+                T:WhitespaceTrivia [28..29) ' '
+                NumericLiteralExpression [29..30)
+                  NumericLiteralToken [29..30) '5'
+            CloseParenToken [30..31) ')'
+            T:WhitespaceTrivia [31..32) ' '
+          EqualsGreaterThanToken [32..34) '=>'
+          T:WhitespaceTrivia [34..35) ' '
+          IdentifierName [35..36)
+            IdentifierToken [35..36) 'b'
+    CloseParenToken [36..37) ')'
+    T:WhitespaceTrivia [37..38) ' '
+  EqualsGreaterThanToken [38..40) '=>'
+  T:WhitespaceTrivia [40..41) ' '
+  IdentifierName [41..42)
+    IdentifierToken [41..42) 'a'

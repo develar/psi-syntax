@@ -1,0 +1,22 @@
+CompilationUnit [0..26)
+  InterfaceDeclaration [0..26)
+    InterfaceKeyword [0..9) 'interface'
+    T:WhitespaceTrivia [9..10) ' '
+    IdentifierToken [10..11) 'P'
+    ParameterList [11..25)
+      OpenParenToken [11..12) '('
+      Parameter [12..17)
+        PredefinedType [12..16)
+          IntKeyword [12..15) 'int'
+          T:WhitespaceTrivia [15..16) ' '
+        IdentifierToken [16..17) 'x'
+      CommaToken [17..18) ','
+      T:WhitespaceTrivia [18..19) ' '
+      Parameter [19..24)
+        PredefinedType [19..23)
+          IntKeyword [19..22) 'int'
+          T:WhitespaceTrivia [22..23) ' '
+        IdentifierToken [23..24) 'y'
+      CloseParenToken [24..25) ')'
+    SemicolonToken [25..26) ';'
+  EndOfFileToken [26..26) ''

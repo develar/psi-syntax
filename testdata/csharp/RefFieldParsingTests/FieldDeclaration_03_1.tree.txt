@@ -1,0 +1,22 @@
+StructDeclaration [0..21)
+  StructKeyword [0..6) 'struct'
+  T:WhitespaceTrivia [6..7) ' '
+  IdentifierToken [7..8) 'S'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenBraceToken [9..10) '{'
+  T:WhitespaceTrivia [10..11) ' '
+  T:SkippedTokensTrivia [11..14)
+    OutKeyword [11..14) 'out'
+  T:WhitespaceTrivia [14..15) ' '
+  FieldDeclaration [15..20)
+    VariableDeclaration [15..18)
+      IdentifierName [15..17)
+        IdentifierToken [15..16) 'T'
+        T:WhitespaceTrivia [16..17) ' '
+      VariableDeclarator [17..18)
+        IdentifierToken [17..18) 'F'
+    SemicolonToken [18..19) ';'
+    T:WhitespaceTrivia [19..20) ' '
+  CloseBraceToken [20..21) '}'
+Diagnostics:
+  CS1519 [11..14) Invalid token \'out\' in a member declaration

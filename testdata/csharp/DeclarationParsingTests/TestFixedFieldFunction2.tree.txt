@@ -1,0 +1,42 @@
+CompilationUnit [0..38)
+  StructDeclaration [0..38)
+    StructKeyword [0..6) 'struct'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    T:WhitespaceTrivia [8..9) ' '
+    OpenBraceToken [9..10) '{'
+    T:EndOfLineTrivia [10..11) '\n'
+    FieldDeclaration [11..35)
+      L:WhitespaceTrivia [11..15) '    '
+      FixedKeyword [15..20) 'fixed'
+      T:WhitespaceTrivia [20..21) ' '
+      VariableDeclaration [21..35)
+        PredefinedType [21..25)
+          IntKeyword [21..24) 'int'
+          T:WhitespaceTrivia [24..25) ' '
+        VariableDeclarator [25..35)
+          IdentifierToken [25..30) 'value'
+          BracketedArgumentList [30..35)
+            OpenBracketToken [30..30) missing
+            T:SkippedTokensTrivia [30..31)
+              OpenParenToken [30..31) '('
+            CloseBracketToken [31..31) missing
+            T:SkippedTokensTrivia [31..32)
+              CloseParenToken [31..32) ')'
+            T:WhitespaceTrivia [32..33) ' '
+            T:SkippedTokensTrivia [33..34)
+              OpenBraceToken [33..34) '{'
+            T:WhitespaceTrivia [34..35) ' '
+      SemicolonToken [35..35) missing
+    CloseBraceToken [35..36) '}'
+    T:EndOfLineTrivia [36..37) '\n'
+    T:SkippedTokensTrivia [37..38)
+      CloseBraceToken [37..38) '}'
+  EndOfFileToken [38..38) ''
+Diagnostics:
+  CS1528 [30..31) Expected ; or = (cannot specify constructor arguments in declaration)
+  CS1003 [30..31) Syntax error, \'[\' expected
+  CS1003 [31..32) Syntax error, \']\' expected
+  CS1003 [33..34) Syntax error, \',\' expected
+  CS1002 [35..36) ; expected
+  CS1022 [37..38) Type or namespace definition, or end-of-file expected

@@ -1,0 +1,24 @@
+UsingStatement [0..25)
+  UsingKeyword [0..5) 'using'
+  T:WhitespaceTrivia [5..6) ' '
+  OpenParenToken [6..7) '('
+  VariableDeclaration [7..23)
+    IdentifierName [7..9)
+      IdentifierToken [7..8) 'C'
+      T:WhitespaceTrivia [8..9) ' '
+    VariableDeclarator [9..23)
+      IdentifierToken [9..10) 'x'
+      T:WhitespaceTrivia [10..11) ' '
+      EqualsValueClause [11..23)
+        EqualsToken [11..11) missing
+        SimpleMemberAccessExpression [11..23)
+          PredefinedType [11..14)
+            IntKeyword [11..14) 'int'
+          DotToken [14..15) '.'
+          IdentifierName [15..23)
+            IdentifierToken [15..23) 'MaxValue'
+  CloseParenToken [23..24) ')'
+  EmptyStatement [24..25)
+    SemicolonToken [24..25) ';'
+Diagnostics:
+  CS1003 [11..14) Syntax error, \'=\' expected

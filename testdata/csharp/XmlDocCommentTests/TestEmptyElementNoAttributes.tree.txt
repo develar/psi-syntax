@@ -1,0 +1,13 @@
+CompilationUnit [0..11)
+  L:SingleLineDocumentationCommentTrivia [0..11)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '///'
+      XmlTextLiteralToken [3..4) ' '
+    XmlEmptyElement [4..11)
+      LessThanToken [4..5) '<'
+      XmlName [5..8)
+        IdentifierToken [5..8) 'goo'
+      L:WhitespaceTrivia [8..9) ' '
+      SlashGreaterThanToken [9..11) '/>'
+    EndOfDocumentationCommentToken [11..11) ''
+  EndOfFileToken [11..11) ''

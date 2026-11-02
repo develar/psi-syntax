@@ -1,0 +1,1 @@
+void F(ref scoped int b, in scoped int c, out scoped int d) { }

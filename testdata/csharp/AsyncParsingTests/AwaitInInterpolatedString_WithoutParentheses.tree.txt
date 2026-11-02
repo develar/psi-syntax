@@ -1,0 +1,58 @@
+CompilationUnit [0..74)
+  ClassDeclaration [0..74)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    MethodDeclaration [10..73)
+      L:WhitespaceTrivia [10..14) '    '
+      AsyncKeyword [14..19) 'async'
+      T:WhitespaceTrivia [19..20) ' '
+      PredefinedType [20..25)
+        VoidKeyword [20..24) 'void'
+        T:WhitespaceTrivia [24..25) ' '
+      IdentifierToken [25..26) 'M'
+      ParameterList [26..29)
+        OpenParenToken [26..27) '('
+        CloseParenToken [27..28) ')'
+        T:EndOfLineTrivia [28..29) '\n'
+      Block [29..73)
+        L:WhitespaceTrivia [29..33) '    '
+        OpenBraceToken [33..34) '{'
+        T:EndOfLineTrivia [34..35) '\n'
+        LocalDeclarationStatement [35..67)
+          VariableDeclaration [35..65)
+            IdentifierName [35..47)
+              L:WhitespaceTrivia [35..43) '        '
+              IdentifierToken [43..46) 'var'
+              T:WhitespaceTrivia [46..47) ' '
+            VariableDeclarator [47..65)
+              IdentifierToken [47..48) 'v'
+              T:WhitespaceTrivia [48..49) ' '
+              EqualsValueClause [49..65)
+                EqualsToken [49..50) '='
+                T:WhitespaceTrivia [50..51) ' '
+                InterpolatedStringExpression [51..65)
+                  InterpolatedStringStartToken [51..53) '$"'
+                  Interpolation [53..64)
+                    OpenBraceToken [53..54) '{'
+                    AwaitExpression [54..63)
+                      AwaitKeyword [54..59) 'await'
+                      T:WhitespaceTrivia [59..60) ' '
+                      InvocationExpression [60..63)
+                        IdentifierName [60..61)
+                          IdentifierToken [60..61) 'M'
+                        ArgumentList [61..63)
+                          OpenParenToken [61..62) '('
+                          CloseParenToken [62..63) ')'
+                    CloseBraceToken [63..64) '}'
+                  InterpolatedStringEndToken [64..65) '"'
+          SemicolonToken [65..66) ';'
+          T:EndOfLineTrivia [66..67) '\n'
+        L:WhitespaceTrivia [67..71) '    '
+        CloseBraceToken [71..72) '}'
+        T:EndOfLineTrivia [72..73) '\n'
+    CloseBraceToken [73..74) '}'
+  EndOfFileToken [74..74) ''

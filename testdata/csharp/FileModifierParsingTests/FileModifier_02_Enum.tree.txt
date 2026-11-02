@@ -1,0 +1,14 @@
+CompilationUnit [0..23)
+  EnumDeclaration [0..23)
+    FileKeyword [0..4) 'file'
+    T:WhitespaceTrivia [4..5) ' '
+    PartialKeyword [5..12) 'partial'
+    T:WhitespaceTrivia [12..13) ' '
+    EnumKeyword [13..17) 'enum'
+    T:WhitespaceTrivia [17..18) ' '
+    IdentifierToken [18..19) 'C'
+    T:WhitespaceTrivia [19..20) ' '
+    OpenBraceToken [20..21) '{'
+    T:WhitespaceTrivia [21..22) ' '
+    CloseBraceToken [22..23) '}'
+  EndOfFileToken [23..23) ''

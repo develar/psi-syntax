@@ -1,0 +1,1 @@
+M(out (var x, var y));

@@ -1,0 +1,6 @@
+CompilationUnit [0..1)
+  L:SkippedTokensTrivia [0..1)
+    BadToken [0..1) '\u{0000}'
+  EndOfFileToken [1..1) ''
+Diagnostics:
+  CS1056 [0..0) Unexpected character \'\\0\'

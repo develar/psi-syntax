@@ -1,0 +1,23 @@
+ObjectCreationExpression [0..17)
+  NewKeyword [0..3) 'new'
+  T:WhitespaceTrivia [3..4) ' '
+  IdentifierName [4..6)
+    IdentifierToken [4..5) 'C'
+    T:WhitespaceTrivia [5..6) ' '
+  ObjectInitializerExpression [6..17)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    SimpleAssignmentExpression [8..16)
+      IdentifierName [8..10)
+        IdentifierToken [8..9) 'P'
+        T:WhitespaceTrivia [9..10) ' '
+      EqualsToken [10..11) '='
+      T:WhitespaceTrivia [11..12) ' '
+      RefExpression [12..16)
+        RefKeyword [12..15) 'ref'
+        T:WhitespaceTrivia [15..16) ' '
+        IdentifierName [16..16)
+          IdentifierToken [16..16) missing
+    CloseBraceToken [16..17) '}'
+Diagnostics:
+  CS1525 [16..17) Invalid expression term \'}\'

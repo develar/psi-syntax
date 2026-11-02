@@ -1,0 +1,1 @@
+class c { int this[ x $ ] { } }

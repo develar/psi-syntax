@@ -1,0 +1,2 @@
+L:MultiLineCommentTrivia [0..13) '/* comment */'
+EndOfFileToken [13..13) ''

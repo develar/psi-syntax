@@ -1,0 +1,1 @@
+int N1::N2::I.operator +(int x) => x;

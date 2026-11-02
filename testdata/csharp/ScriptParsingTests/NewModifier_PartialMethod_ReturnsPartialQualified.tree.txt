@@ -1,0 +1,19 @@
+CompilationUnit [0..38)
+  MethodDeclaration [0..38)
+    NewKeyword [0..3) 'new'
+    T:WhitespaceTrivia [3..4) ' '
+    PartialKeyword [4..11) 'partial'
+    T:WhitespaceTrivia [11..12) ' '
+    QualifiedName [12..28)
+      IdentifierName [12..19)
+        IdentifierToken [12..19) 'partial'
+      DotToken [19..20) '.'
+      IdentifierName [20..28)
+        IdentifierToken [20..27) 'partial'
+        T:WhitespaceTrivia [27..28) ' '
+    IdentifierToken [28..35) 'partial'
+    ParameterList [35..37)
+      OpenParenToken [35..36) '('
+      CloseParenToken [36..37) ')'
+    SemicolonToken [37..38) ';'
+  EndOfFileToken [38..38) ''

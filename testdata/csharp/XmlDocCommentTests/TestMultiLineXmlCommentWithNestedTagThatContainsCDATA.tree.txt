@@ -1,0 +1,47 @@
+CompilationUnit [0..59)
+  L:MultiLineDocumentationCommentTrivia [0..59)
+    XmlText [0..4)
+      L:DocumentationCommentExteriorTrivia [0..3) '/**'
+      XmlTextLiteralNewLineToken [3..4) '\n'
+    XmlElement [4..56)
+      XmlElementStartTag [4..9)
+        LessThanToken [4..5) '<'
+        XmlName [5..8)
+          IdentifierToken [5..8) 'goo'
+        GreaterThanToken [8..9) '>'
+      XmlText [9..10)
+        XmlTextLiteralNewLineToken [9..10) '\n'
+      XmlElement [10..49)
+        XmlElementStartTag [10..17)
+          L:DocumentationCommentExteriorTrivia [10..12) '  '
+          LessThanToken [12..13) '<'
+          XmlName [13..16)
+            IdentifierToken [13..16) 'bar'
+          GreaterThanToken [16..17) '>'
+        XmlText [17..18)
+          XmlTextLiteralToken [17..18) ' '
+        XmlCDataSection [18..42)
+          XmlCDataStartToken [18..27) '<![CDATA['
+          XmlTextLiteralToken [27..37) ' Some text'
+          XmlTextLiteralNewLineToken [37..38) '\n'
+          L:DocumentationCommentExteriorTrivia [38..39) ' '
+          XmlCDataEndToken [39..42) ']]>'
+        XmlText [42..43)
+          XmlTextLiteralToken [42..43) ' '
+        XmlElementEndTag [43..49)
+          LessThanSlashToken [43..45) '</'
+          XmlName [45..48)
+            IdentifierToken [45..48) 'bar'
+          GreaterThanToken [48..49) '>'
+      XmlText [49..50)
+        XmlTextLiteralNewLineToken [49..50) '\n'
+      XmlElementEndTag [50..56)
+        LessThanSlashToken [50..52) '</'
+        XmlName [52..55)
+          IdentifierToken [52..55) 'goo'
+        GreaterThanToken [55..56) '>'
+    XmlText [56..57)
+      XmlTextLiteralNewLineToken [56..57) '\n'
+    L:DocumentationCommentExteriorTrivia [57..59) '*/'
+    EndOfDocumentationCommentToken [59..59) ''
+  EndOfFileToken [59..59) ''

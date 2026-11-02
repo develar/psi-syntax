@@ -1,0 +1,12 @@
+CompilationUnit [0..13)
+  StructDeclaration [0..13)
+    L:EndOfLineTrivia [0..1) '\n'
+    StructKeyword [1..7) 'struct'
+    T:WhitespaceTrivia [7..8) ' '
+    IdentifierToken [8..9) 'C'
+    ParameterList [9..11)
+      OpenParenToken [9..10) '('
+      CloseParenToken [10..11) ')'
+    OpenBraceToken [11..12) '{'
+    CloseBraceToken [12..13) '}'
+  EndOfFileToken [13..13) ''

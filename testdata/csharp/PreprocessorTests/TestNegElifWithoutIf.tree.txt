@@ -1,0 +1,9 @@
+CompilationUnit [0..5)
+  L:BadDirectiveTrivia [0..5)
+    HashToken [0..1) '#'
+    ElifKeyword [1..5) 'elif'
+    L:DisabledTextTrivia [5..5) ''
+    EndOfDirectiveToken [5..5) ''
+  EndOfFileToken [5..5) ''
+Diagnostics:
+  CS1028 [0..5) Unexpected preprocessor directive

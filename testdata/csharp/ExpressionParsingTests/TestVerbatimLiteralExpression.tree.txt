@@ -1,0 +1,2 @@
+StringLiteralExpression [0..12)
+  StringLiteralToken [0..12) '@"""stuff"""'

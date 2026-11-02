@@ -1,0 +1,11 @@
+ParenthesizedLambdaExpression [0..9)
+  ParameterList [0..3)
+    OpenParenToken [0..1) '('
+    CloseParenToken [1..2) ')'
+    T:WhitespaceTrivia [2..3) ' '
+  EqualsGreaterThanToken [3..5) '=>'
+  T:WhitespaceTrivia [5..6) ' '
+  Block [6..9)
+    OpenBraceToken [6..7) '{'
+    T:WhitespaceTrivia [7..8) ' '
+    CloseBraceToken [8..9) '}'

@@ -1,0 +1,1 @@
+o is string s { Length: 5 }

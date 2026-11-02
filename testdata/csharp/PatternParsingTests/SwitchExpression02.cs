@@ -1,0 +1,1 @@
+1 switch { a?b:c => d }

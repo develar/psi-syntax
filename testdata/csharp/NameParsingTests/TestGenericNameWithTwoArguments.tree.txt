@@ -1,0 +1,10 @@
+GenericName [0..12)
+  IdentifierToken [0..3) 'goo'
+  TypeArgumentList [3..12)
+    LessThanToken [3..4) '<'
+    IdentifierName [4..7)
+      IdentifierToken [4..7) 'bar'
+    CommaToken [7..8) ','
+    IdentifierName [8..11)
+      IdentifierToken [8..11) 'zed'
+    GreaterThanToken [11..12) '>'

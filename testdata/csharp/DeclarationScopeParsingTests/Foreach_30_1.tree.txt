@@ -1,0 +1,59 @@
+ForEachVariableStatement [0..57)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  IdentifierName [10..17)
+    IdentifierToken [10..16) 'scoped'
+    T:WhitespaceTrivia [16..17) ' '
+  InKeyword [17..17) missing
+  RefExpression [17..39)
+    RefKeyword [17..20) 'ref'
+    T:WhitespaceTrivia [20..21) ' '
+    ElementAccessExpression [21..39)
+      PredefinedType [21..24)
+        IntKeyword [21..24) 'int'
+      BracketedArgumentList [24..39)
+        OpenBracketToken [24..25) '['
+        Argument [25..37)
+          InvocationExpression [25..37)
+            IdentifierName [25..26)
+              IdentifierToken [25..26) 'M'
+            ArgumentList [26..37)
+              OpenParenToken [26..27) '('
+              Argument [27..36)
+                OutKeyword [27..30) 'out'
+                T:WhitespaceTrivia [30..31) ' '
+                DeclarationExpression [31..36)
+                  IdentifierName [31..35)
+                    IdentifierToken [31..34) 'var'
+                    T:WhitespaceTrivia [34..35) ' '
+                  SingleVariableDesignation [35..36)
+                    IdentifierToken [35..36) 'b'
+              CloseParenToken [36..37) ')'
+        CloseBracketToken [37..38) ']'
+        T:WhitespaceTrivia [38..39) ' '
+  CloseParenToken [39..39) missing
+  ExpressionStatement [39..57)
+    IdentifierName [39..41)
+      IdentifierToken [39..40) 'a'
+      T:WhitespaceTrivia [40..41) ' '
+    SemicolonToken [41..41) missing
+    T:SkippedTokensTrivia [41..43)
+      InKeyword [41..43) 'in'
+    T:WhitespaceTrivia [43..44) ' '
+    T:SkippedTokensTrivia [44..54)
+      IdentifierToken [44..54) 'collection'
+    T:SkippedTokensTrivia [54..55)
+      CloseParenToken [54..55) ')'
+    T:SkippedTokensTrivia [55..56)
+      SemicolonToken [55..56) ';'
+    T:EndOfLineTrivia [56..57) '\n'
+Diagnostics:
+  CS1073 [1..41) Unexpected token \'in\'
+  CS1515 [17..20) \'in\' expected
+  CS0230 [17..20) Type and identifier are both required in a foreach statement
+  CS1525 [17..38) Invalid expression term \'ref\'
+  CS1525 [21..24) Invalid expression term \'int\'
+  CS1026 [39..40) ) expected
+  CS1002 [41..43) ; expected

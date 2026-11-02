@@ -1,0 +1,1 @@
+([A] object x) => x

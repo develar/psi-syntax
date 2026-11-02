@@ -1,0 +1,64 @@
+CompilationUnit [0..89)
+  ClassDeclaration [0..89)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:EndOfLineTrivia [7..8) '\n'
+    OpenBraceToken [8..9) '{'
+    T:EndOfLineTrivia [9..10) '\n'
+    ExtensionBlockDeclaration [10..88)
+      L:WhitespaceTrivia [10..14) '    '
+      ExtensionKeyword [14..23) 'extension'
+      ParameterList [23..30)
+        OpenParenToken [23..24) '('
+        Parameter [24..28)
+          IdentifierName [24..28)
+            IdentifierToken [24..28) 'Type'
+        CloseParenToken [28..29) ')'
+        T:EndOfLineTrivia [29..30) '\n'
+      L:WhitespaceTrivia [30..34) '    '
+      OpenBraceToken [34..35) '{'
+      T:EndOfLineTrivia [35..36) '\n'
+      IndexerDeclaration [36..82)
+        PredefinedType [36..48)
+          L:WhitespaceTrivia [36..44) '        '
+          IntKeyword [44..47) 'int'
+          T:WhitespaceTrivia [47..48) ' '
+        ThisKeyword [48..52) 'this'
+        BracketedParameterList [52..60)
+          OpenBracketToken [52..53) '['
+          Parameter [53..58)
+            PredefinedType [53..57)
+              IntKeyword [53..56) 'int'
+              T:WhitespaceTrivia [56..57) ' '
+            IdentifierToken [57..58) 'i'
+          CloseBracketToken [58..59) ']'
+          T:WhitespaceTrivia [59..60) ' '
+        AccessorList [60..82)
+          OpenBraceToken [60..61) '{'
+          T:WhitespaceTrivia [61..62) ' '
+          GetAccessorDeclaration [62..72)
+            GetKeyword [62..65) 'get'
+            T:WhitespaceTrivia [65..66) ' '
+            ArrowExpressionClause [66..70)
+              EqualsGreaterThanToken [66..68) '=>'
+              T:WhitespaceTrivia [68..69) ' '
+              NumericLiteralExpression [69..70)
+                NumericLiteralToken [69..70) '0'
+            SemicolonToken [70..71) ';'
+            T:WhitespaceTrivia [71..72) ' '
+          SetAccessorDeclaration [72..80)
+            SetKeyword [72..75) 'set'
+            T:WhitespaceTrivia [75..76) ' '
+            Block [76..80)
+              OpenBraceToken [76..77) '{'
+              T:WhitespaceTrivia [77..78) ' '
+              CloseBraceToken [78..79) '}'
+              T:WhitespaceTrivia [79..80) ' '
+          CloseBraceToken [80..81) '}'
+          T:EndOfLineTrivia [81..82) '\n'
+      L:WhitespaceTrivia [82..86) '    '
+      CloseBraceToken [86..87) '}'
+      T:EndOfLineTrivia [87..88) '\n'
+    CloseBraceToken [88..89) '}'
+  EndOfFileToken [89..89) ''

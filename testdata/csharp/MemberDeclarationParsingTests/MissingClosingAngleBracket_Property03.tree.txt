@@ -1,0 +1,29 @@
+PropertyDeclaration [0..43)
+  GenericName [0..23)
+    IdentifierToken [0..10) 'Dictionary'
+    TypeArgumentList [10..23)
+      LessThanToken [10..11) '<'
+      PredefinedType [11..14)
+        IntKeyword [11..14) 'int'
+      CommaToken [14..15) ','
+      T:WhitespaceTrivia [15..16) ' '
+      PredefinedType [16..23)
+        StringKeyword [16..22) 'string'
+        T:WhitespaceTrivia [22..23) ' '
+      GreaterThanToken [23..23) missing
+  IdentifierToken [23..29) 'Values'
+  T:WhitespaceTrivia [29..30) ' '
+  AccessorList [30..43)
+    OpenBraceToken [30..31) '{'
+    T:WhitespaceTrivia [31..32) ' '
+    GetAccessorDeclaration [32..37)
+      GetKeyword [32..35) 'get'
+      SemicolonToken [35..36) ';'
+      T:WhitespaceTrivia [36..37) ' '
+    SetAccessorDeclaration [37..42)
+      SetKeyword [37..40) 'set'
+      SemicolonToken [40..41) ';'
+      T:WhitespaceTrivia [41..42) ' '
+    CloseBraceToken [42..43) '}'
+Diagnostics:
+  CS1003 [23..29) Syntax error, \'>\' expected

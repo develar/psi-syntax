@@ -1,0 +1,17 @@
+LocalDeclarationStatement [0..15)
+  VariableDeclaration [0..14)
+    FunctionPointerType [0..11)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      FunctionPointerParameterList [9..11)
+        LessThanToken [9..9) missing
+        FunctionPointerParameter [9..9)
+          IdentifierName [9..9)
+            IdentifierToken [9..9) missing
+        GreaterThanToken [9..10) '>'
+        T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..14)
+      IdentifierToken [11..14) 'ptr'
+  SemicolonToken [14..15) ';'
+Diagnostics:
+  CS1003 [9..10) Syntax error, \'<\' expected

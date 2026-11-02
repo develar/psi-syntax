@@ -1,0 +1,23 @@
+ForStatement [0..20)
+  ForKeyword [0..3) 'for'
+  OpenParenToken [3..4) '('
+  VariableDeclaration [4..13)
+    IdentifierName [4..8)
+      IdentifierToken [4..7) 'var'
+      T:WhitespaceTrivia [7..8) ' '
+    VariableDeclarator [8..13)
+      IdentifierToken [8..9) 'a'
+      T:WhitespaceTrivia [9..10) ' '
+      EqualsValueClause [10..13)
+        EqualsToken [10..11) '='
+        T:WhitespaceTrivia [11..12) ' '
+        NumericLiteralExpression [12..13)
+          NumericLiteralToken [12..13) '0'
+  SemicolonToken [13..14) ';'
+  SemicolonToken [14..15) ';'
+  CloseParenToken [15..16) ')'
+  T:WhitespaceTrivia [16..17) ' '
+  Block [17..20)
+    OpenBraceToken [17..18) '{'
+    T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'

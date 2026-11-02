@@ -1,0 +1,13 @@
+CompilationUnit [0..15)
+  FileScopedNamespaceDeclaration [0..15)
+    NamespaceKeyword [0..9) 'namespace'
+    T:WhitespaceTrivia [9..10) ' '
+    GenericName [10..14)
+      IdentifierToken [10..11) 'A'
+      TypeArgumentList [11..14)
+        LessThanToken [11..12) '<'
+        IdentifierName [12..13)
+          IdentifierToken [12..13) 'X'
+        GreaterThanToken [13..14) '>'
+    SemicolonToken [14..15) ';'
+  EndOfFileToken [15..15) ''

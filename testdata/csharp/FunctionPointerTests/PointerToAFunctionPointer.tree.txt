@@ -1,0 +1,22 @@
+LocalDeclarationStatement [0..26)
+  VariableDeclaration [0..25)
+    PointerType [0..22)
+      FunctionPointerType [0..20)
+        DelegateKeyword [0..8) 'delegate'
+        AsteriskToken [8..9) '*'
+        FunctionPointerParameterList [9..20)
+          LessThanToken [9..10) '<'
+          FunctionPointerParameter [10..13)
+            IdentifierName [10..13)
+              IdentifierToken [10..13) 'Goo'
+          CommaToken [13..14) ','
+          T:WhitespaceTrivia [14..15) ' '
+          FunctionPointerParameter [15..19)
+            PredefinedType [15..19)
+              VoidKeyword [15..19) 'void'
+          GreaterThanToken [19..20) '>'
+      AsteriskToken [20..21) '*'
+      T:WhitespaceTrivia [21..22) ' '
+    VariableDeclarator [22..25)
+      IdentifierToken [22..25) 'ptr'
+  SemicolonToken [25..26) ';'

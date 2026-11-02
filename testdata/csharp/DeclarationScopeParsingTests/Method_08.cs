@@ -1,0 +1,1 @@
+void F(ref scoped scoped R r) { }

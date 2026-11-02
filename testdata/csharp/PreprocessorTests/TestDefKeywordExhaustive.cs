@@ -1,0 +1,13 @@
+#define if
+#define else
+#define elif
+#define endif
+#define region
+#define endregion
+#define define
+#define undef
+#define warning
+#define error
+#define line
+#define pragma
+#define reference

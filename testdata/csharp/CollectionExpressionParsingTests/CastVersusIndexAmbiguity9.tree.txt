@@ -1,0 +1,59 @@
+CastExpression [0..34)
+  OpenParenToken [0..1) '('
+  ArrayType [1..12)
+    TupleType [1..10)
+      OpenParenToken [1..2) '('
+      TupleElement [2..5)
+        PredefinedType [2..5)
+          IntKeyword [2..5) 'int'
+      CommaToken [5..6) ','
+      TupleElement [6..9)
+        PredefinedType [6..9)
+          IntKeyword [6..9) 'int'
+      CloseParenToken [9..10) ')'
+    ArrayRankSpecifier [10..12)
+      OpenBracketToken [10..11) '['
+      OmittedArraySizeExpression [11..11)
+        OmittedArraySizeExpressionToken [11..11) ''
+      CloseBracketToken [11..12) ']'
+  CloseParenToken [12..13) ')'
+  CollectionExpression [13..34)
+    OpenBracketToken [13..14) '['
+    ExpressionElement [14..19)
+      TupleExpression [14..19)
+        OpenParenToken [14..15) '('
+        Argument [15..16)
+          NumericLiteralExpression [15..16)
+            NumericLiteralToken [15..16) '1'
+        CommaToken [16..17) ','
+        Argument [17..18)
+          NumericLiteralExpression [17..18)
+            NumericLiteralToken [17..18) '2'
+        CloseParenToken [18..19) ')'
+    CommaToken [19..20) ','
+    T:WhitespaceTrivia [20..21) ' '
+    ExpressionElement [21..26)
+      TupleExpression [21..26)
+        OpenParenToken [21..22) '('
+        Argument [22..23)
+          NumericLiteralExpression [22..23)
+            NumericLiteralToken [22..23) '2'
+        CommaToken [23..24) ','
+        Argument [24..25)
+          NumericLiteralExpression [24..25)
+            NumericLiteralToken [24..25) '3'
+        CloseParenToken [25..26) ')'
+    CommaToken [26..27) ','
+    T:WhitespaceTrivia [27..28) ' '
+    ExpressionElement [28..33)
+      TupleExpression [28..33)
+        OpenParenToken [28..29) '('
+        Argument [29..30)
+          NumericLiteralExpression [29..30)
+            NumericLiteralToken [29..30) '3'
+        CommaToken [30..31) ','
+        Argument [31..32)
+          NumericLiteralExpression [31..32)
+            NumericLiteralToken [31..32) '4'
+        CloseParenToken [32..33) ')'
+    CloseBracketToken [33..34) ']'

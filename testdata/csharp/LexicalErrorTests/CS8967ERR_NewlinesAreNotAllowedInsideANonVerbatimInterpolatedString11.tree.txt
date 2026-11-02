@@ -1,0 +1,66 @@
+CompilationUnit [0..105)
+  ClassDeclaration [0..105)
+    L:EndOfLineTrivia [0..1) '\n'
+    PublicKeyword [1..7) 'public'
+    T:WhitespaceTrivia [7..8) ' '
+    ClassKeyword [8..13) 'class'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierToken [14..18) 'Test'
+    T:EndOfLineTrivia [18..19) '\n'
+    OpenBraceToken [19..20) '{'
+    T:EndOfLineTrivia [20..21) '\n'
+    MethodDeclaration [21..103)
+      L:WhitespaceTrivia [21..24) '   '
+      PublicKeyword [24..30) 'public'
+      T:WhitespaceTrivia [30..31) ' '
+      StaticKeyword [31..37) 'static'
+      T:WhitespaceTrivia [37..38) ' '
+      PredefinedType [38..43)
+        VoidKeyword [38..42) 'void'
+        T:WhitespaceTrivia [42..43) ' '
+      IdentifierToken [43..47) 'Main'
+      ParameterList [47..50)
+        OpenParenToken [47..48) '('
+        CloseParenToken [48..49) ')'
+        T:EndOfLineTrivia [49..50) '\n'
+      Block [50..103)
+        L:WhitespaceTrivia [50..53) '   '
+        OpenBraceToken [53..54) '{'
+        T:EndOfLineTrivia [54..55) '\n'
+        LocalDeclarationStatement [55..98)
+          VariableDeclaration [55..96)
+            PredefinedType [55..68)
+              L:WhitespaceTrivia [55..61) '      '
+              StringKeyword [61..67) 'string'
+              T:WhitespaceTrivia [67..68) ' '
+            VariableDeclarator [68..96)
+              IdentifierToken [68..69) 's'
+              T:WhitespaceTrivia [69..70) ' '
+              EqualsValueClause [70..96)
+                EqualsToken [70..71) '='
+                T:WhitespaceTrivia [71..72) ' '
+                InterpolatedStringExpression [72..96)
+                  InterpolatedStringStartToken [72..74) '$"'
+                  InterpolatedStringText [74..76)
+                    InterpolatedStringTextToken [74..76) 'x '
+                  Interpolation [76..93)
+                    OpenBraceToken [76..77) '{'
+                    T:WhitespaceTrivia [77..78) ' '
+                    T:MultiLineCommentTrivia [78..91) '/* comment */'
+                    T:WhitespaceTrivia [91..92) ' '
+                    IdentifierName [92..92)
+                      IdentifierToken [92..92) missing
+                    CloseBraceToken [92..93) '}'
+                  InterpolatedStringText [93..95)
+                    InterpolatedStringTextToken [93..95) ' y'
+                  InterpolatedStringEndToken [95..96) '"'
+          SemicolonToken [96..97) ';'
+          T:EndOfLineTrivia [97..98) '\n'
+        L:WhitespaceTrivia [98..101) '   '
+        CloseBraceToken [101..102) '}'
+        T:EndOfLineTrivia [102..103) '\n'
+    CloseBraceToken [103..104) '}'
+    T:EndOfLineTrivia [104..105) '\n'
+  EndOfFileToken [105..105) ''
+Diagnostics:
+  CS1733 [92..92) Expected expression

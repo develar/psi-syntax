@@ -1,0 +1,14 @@
+MethodDeclaration [0..22)
+  RequiredKeyword [0..8) 'required'
+  T:WhitespaceTrivia [8..9) ' '
+  PredefinedType [9..16)
+    StringKeyword [9..15) 'string'
+    T:WhitespaceTrivia [15..16) ' '
+  IdentifierToken [16..17) 'M'
+  ParameterList [17..20)
+    OpenParenToken [17..18) '('
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  Block [20..22)
+    OpenBraceToken [20..21) '{'
+    CloseBraceToken [21..22) '}'

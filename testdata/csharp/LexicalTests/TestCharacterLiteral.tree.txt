@@ -1,0 +1,2 @@
+CharacterLiteralToken [0..3) '\'x\''
+EndOfFileToken [3..3) ''

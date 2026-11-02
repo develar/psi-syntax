@@ -1,0 +1,31 @@
+CompilationUnit [0..25)
+  GlobalStatement [0..25)
+    LocalDeclarationStatement [0..25)
+      VariableDeclaration [0..24)
+        RefType [0..4)
+          RefKeyword [0..3) 'ref'
+          T:WhitespaceTrivia [3..4) ' '
+          IdentifierName [4..4)
+            IdentifierToken [4..4) missing
+        VariableDeclarator [4..24)
+          IdentifierToken [4..4) missing
+          T:SkippedTokensTrivia [4..11)
+            IdentifierToken [4..11) 'partial'
+          T:WhitespaceTrivia [11..12) ' '
+          T:SkippedTokensTrivia [12..17)
+            IdentifierToken [12..17) 'union'
+          T:WhitespaceTrivia [17..18) ' '
+          T:SkippedTokensTrivia [18..20)
+            IdentifierToken [18..20) 'U1'
+          T:SkippedTokensTrivia [20..21)
+            OpenParenToken [20..21) '('
+          T:SkippedTokensTrivia [21..23)
+            IdentifierToken [21..23) 'E1'
+          T:SkippedTokensTrivia [23..24)
+            CloseParenToken [23..24) ')'
+      SemicolonToken [24..25) ';'
+  EndOfFileToken [25..25) ''
+Diagnostics:
+  CS1031 [4..11) Type expected
+  CS1525 [4..11) Invalid expression term \'partial\'
+  CS1003 [4..11) Syntax error, \',\' expected

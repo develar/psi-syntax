@@ -1,0 +1,2 @@
+
+new ref int M();

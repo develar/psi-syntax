@@ -1,0 +1,6 @@
+LabeledStatement [0..8)
+  IdentifierToken [0..5) 'label'
+  ColonToken [5..6) ':'
+  T:WhitespaceTrivia [6..7) ' '
+  EmptyStatement [7..8)
+    SemicolonToken [7..8) ';'

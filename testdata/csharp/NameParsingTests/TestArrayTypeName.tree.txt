@@ -1,0 +1,8 @@
+ArrayType [0..5)
+  IdentifierName [0..3)
+    IdentifierToken [0..3) 'goo'
+  ArrayRankSpecifier [3..5)
+    OpenBracketToken [3..4) '['
+    OmittedArraySizeExpression [4..4)
+      OmittedArraySizeExpressionToken [4..4) ''
+    CloseBracketToken [4..5) ']'

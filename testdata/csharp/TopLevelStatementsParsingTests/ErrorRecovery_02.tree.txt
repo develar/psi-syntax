@@ -1,0 +1,28 @@
+CompilationUnit [0..24)
+  GlobalStatement [0..22)
+    ExpressionStatement [0..22)
+      InvocationExpression [0..20)
+        SimpleMemberAccessExpression [0..18)
+          IdentifierName [0..8)
+            L:EndOfLineTrivia [0..1) '\n'
+            IdentifierToken [1..8) 'Console'
+          DotToken [8..9) '.'
+          IdentifierName [9..18)
+            IdentifierToken [9..18) 'WriteLine'
+        ArgumentList [18..20)
+          OpenParenToken [18..19) '('
+          CloseParenToken [19..20) ')'
+      SemicolonToken [20..21) ';'
+      T:EndOfLineTrivia [21..22) '\n'
+  GlobalStatement [22..24)
+    LocalDeclarationStatement [22..24)
+      VariableDeclaration [22..24)
+        IdentifierName [22..24)
+          IdentifierToken [22..24) 'ar'
+        VariableDeclarator [24..24)
+          IdentifierToken [24..24) missing
+      SemicolonToken [24..24) missing
+  EndOfFileToken [24..24) ''
+Diagnostics:
+  CS1001 [24..24) Identifier expected
+  CS1002 [24..24) ; expected

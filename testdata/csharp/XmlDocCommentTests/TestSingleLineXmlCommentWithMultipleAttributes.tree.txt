@@ -1,0 +1,50 @@
+CompilationUnit [0..58)
+  ClassDeclaration [0..58)
+    L:SingleLineDocumentationCommentTrivia [0..49)
+      XmlElement [0..48)
+        XmlElementStartTag [0..41)
+          L:DocumentationCommentExteriorTrivia [0..3) '///'
+          LessThanToken [3..4) '<'
+          XmlName [4..7)
+            IdentifierToken [4..7) 'goo'
+          XmlTextAttribute [7..17)
+            XmlName [7..13)
+              L:WhitespaceTrivia [7..8) ' '
+              IdentifierToken [8..13) 'attr1'
+            EqualsToken [13..14) '='
+            DoubleQuoteToken [14..15) '"'
+            XmlTextLiteralToken [15..16) 'a'
+            DoubleQuoteToken [16..17) '"'
+          XmlTextAttribute [17..27)
+            XmlName [17..23)
+              L:WhitespaceTrivia [17..18) ' '
+              IdentifierToken [18..23) 'attr2'
+            EqualsToken [23..24) '='
+            DoubleQuoteToken [24..25) '"'
+            XmlTextLiteralToken [25..26) 'b'
+            DoubleQuoteToken [26..27) '"'
+          XmlTextAttribute [27..40)
+            XmlName [27..33)
+              L:WhitespaceTrivia [27..28) ' '
+              IdentifierToken [28..33) 'attr3'
+            EqualsToken [33..34) '='
+            DoubleQuoteToken [34..35) '"'
+            XmlTextLiteralToken [35..39) 'test'
+            DoubleQuoteToken [39..40) '"'
+          GreaterThanToken [40..41) '>'
+        XmlText [41..42)
+          XmlTextLiteralToken [41..42) ' '
+        XmlElementEndTag [42..48)
+          LessThanSlashToken [42..44) '</'
+          XmlName [44..47)
+            IdentifierToken [44..47) 'goo'
+          GreaterThanToken [47..48) '>'
+      XmlText [48..49)
+        XmlTextLiteralNewLineToken [48..49) '\n'
+      EndOfDocumentationCommentToken [49..49) ''
+    ClassKeyword [49..54) 'class'
+    T:WhitespaceTrivia [54..55) ' '
+    IdentifierToken [55..56) 'C'
+    OpenBraceToken [56..57) '{'
+    CloseBraceToken [57..58) '}'
+  EndOfFileToken [58..58) ''

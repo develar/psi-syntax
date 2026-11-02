@@ -1,0 +1,30 @@
+CompilationUnit [0..28)
+  RecordDeclaration [0..28)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    ParameterList [8..23)
+      OpenParenToken [8..9) '('
+      Parameter [9..14)
+        PredefinedType [9..13)
+          IntKeyword [9..12) 'int'
+          T:WhitespaceTrivia [12..13) ' '
+        IdentifierToken [13..14) 'X'
+      CommaToken [14..15) ','
+      T:WhitespaceTrivia [15..16) ' '
+      Parameter [16..21)
+        PredefinedType [16..20)
+          IntKeyword [16..19) 'int'
+          T:WhitespaceTrivia [19..20) ' '
+        IdentifierToken [20..21) 'Y'
+      CloseParenToken [21..22) ')'
+      T:EndOfLineTrivia [22..23) '\n'
+    BaseList [23..27)
+      ColonToken [23..24) ':'
+      T:WhitespaceTrivia [24..25) ' '
+      SimpleBaseType [25..27)
+        IdentifierName [25..27)
+          IdentifierToken [25..26) 'B'
+          T:EndOfLineTrivia [26..27) '\n'
+    SemicolonToken [27..28) ';'
+  EndOfFileToken [28..28) ''

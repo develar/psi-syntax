@@ -1,0 +1,6 @@
+NumericLiteralExpression [0..3)
+  NumericLiteralToken [0..2) '1L'
+  T:SkippedTokensTrivia [2..3)
+    NumericLiteralToken [2..3) '0'
+Diagnostics:
+  CS1073 [0..2) Unexpected token \'0\'

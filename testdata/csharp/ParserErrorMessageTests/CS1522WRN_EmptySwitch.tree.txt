@@ -1,0 +1,71 @@
+CompilationUnit [0..135)
+  ClassDeclaration [0..135)
+    L:EndOfLineTrivia [0..1) '\n'
+    ClassKeyword [1..6) 'class'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..11) 'Test'
+    T:EndOfLineTrivia [11..12) '\n'
+    OpenBraceToken [12..13) '{'
+    T:EndOfLineTrivia [13..14) '\n'
+    MethodDeclaration [14..133)
+      L:WhitespaceTrivia [14..18) '    '
+      PublicKeyword [18..24) 'public'
+      T:WhitespaceTrivia [24..25) ' '
+      StaticKeyword [25..31) 'static'
+      T:WhitespaceTrivia [31..32) ' '
+      PredefinedType [32..36)
+        IntKeyword [32..35) 'int'
+        T:WhitespaceTrivia [35..36) ' '
+      IdentifierToken [36..40) 'Main'
+      ParameterList [40..43)
+        OpenParenToken [40..41) '('
+        CloseParenToken [41..42) ')'
+        T:EndOfLineTrivia [42..43) '\n'
+      Block [43..133)
+        L:WhitespaceTrivia [43..47) '    '
+        OpenBraceToken [47..48) '{'
+        T:EndOfLineTrivia [48..49) '\n'
+        LocalDeclarationStatement [49..68)
+          VariableDeclaration [49..66)
+            PredefinedType [49..61)
+              L:WhitespaceTrivia [49..57) '        '
+              IntKeyword [57..60) 'int'
+              T:WhitespaceTrivia [60..61) ' '
+            VariableDeclarator [61..66)
+              IdentifierToken [61..62) 'i'
+              T:WhitespaceTrivia [62..63) ' '
+              EqualsValueClause [63..66)
+                EqualsToken [63..64) '='
+                T:WhitespaceTrivia [64..65) ' '
+                NumericLiteralExpression [65..66)
+                  NumericLiteralToken [65..66) '6'
+          SemicolonToken [66..67) ';'
+          T:EndOfLineTrivia [67..68) '\n'
+        SwitchStatement [68..109)
+          L:WhitespaceTrivia [68..76) '        '
+          SwitchKeyword [76..82) 'switch'
+          OpenParenToken [82..83) '('
+          IdentifierName [83..84)
+            IdentifierToken [83..84) 'i'
+          CloseParenToken [84..85) ')'
+          T:WhitespaceTrivia [85..88) '   '
+          T:SingleLineCommentTrivia [88..97) '// CS1522'
+          T:EndOfLineTrivia [97..98) '\n'
+          L:WhitespaceTrivia [98..106) '        '
+          OpenBraceToken [106..107) '{'
+          CloseBraceToken [107..108) '}'
+          T:EndOfLineTrivia [108..109) '\n'
+        ReturnStatement [109..127)
+          L:WhitespaceTrivia [109..117) '        '
+          ReturnKeyword [117..123) 'return'
+          T:WhitespaceTrivia [123..124) ' '
+          NumericLiteralExpression [124..125)
+            NumericLiteralToken [124..125) '0'
+          SemicolonToken [125..126) ';'
+          T:EndOfLineTrivia [126..127) '\n'
+        L:WhitespaceTrivia [127..131) '    '
+        CloseBraceToken [131..132) '}'
+        T:EndOfLineTrivia [132..133) '\n'
+    CloseBraceToken [133..134) '}'
+    T:EndOfLineTrivia [134..135) '\n'
+  EndOfFileToken [135..135) ''

@@ -1,0 +1,1 @@
+F(async () => await Task.FromResult(4));

@@ -1,0 +1,8 @@
+GotoCaseStatement [0..16)
+  GotoKeyword [0..4) 'goto'
+  T:WhitespaceTrivia [4..5) ' '
+  CaseKeyword [5..9) 'case'
+  T:WhitespaceTrivia [9..10) ' '
+  IdentifierName [10..15)
+    IdentifierToken [10..15) 'label'
+  SemicolonToken [15..16) ';'

@@ -1,0 +1,1 @@
+using var a = new MyDisposable();

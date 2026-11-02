@@ -1,0 +1,27 @@
+ParenthesizedLambdaExpression [0..24)
+  ParameterList [0..4)
+    L:EndOfLineTrivia [0..1) '\n'
+    OpenParenToken [1..2) '('
+    CloseParenToken [2..3) ')'
+    T:WhitespaceTrivia [3..4) ' '
+  EqualsGreaterThanToken [4..6) '=>'
+  T:WhitespaceTrivia [6..7) ' '
+  AwaitExpression [7..24)
+    AwaitKeyword [7..12) 'await'
+    T:WhitespaceTrivia [12..13) ' '
+    ArrayCreationExpression [13..24)
+      NewKeyword [13..16) 'new'
+      T:WhitespaceTrivia [16..17) ' '
+      ArrayType [17..24)
+        PredefinedType [17..20)
+          IntKeyword [17..20) 'int'
+        ArrayRankSpecifier [20..24)
+          OpenBracketToken [20..21) '['
+          OmittedArraySizeExpression [21..21)
+            OmittedArraySizeExpressionToken [21..21) ''
+          CloseBracketToken [21..22) ']'
+          T:SkippedTokensTrivia [22..23)
+            SemicolonToken [22..23) ';'
+          T:EndOfLineTrivia [23..24) '\n'
+Diagnostics:
+  CS1073 [1..22) Unexpected token \';\'

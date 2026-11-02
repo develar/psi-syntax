@@ -1,0 +1,16 @@
+CompilationUnit [0..35)
+  UsingDirective [0..35)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    StaticKeyword [6..12) 'static'
+    T:WhitespaceTrivia [12..13) ' '
+    UnsafeKeyword [13..19) 'unsafe'
+    T:WhitespaceTrivia [19..20) ' '
+    QualifiedName [20..34)
+      IdentifierName [20..26)
+        IdentifierToken [20..26) 'System'
+      DotToken [26..27) '.'
+      IdentifierName [27..34)
+        IdentifierToken [27..34) 'Console'
+    SemicolonToken [34..35) ';'
+  EndOfFileToken [35..35) ''

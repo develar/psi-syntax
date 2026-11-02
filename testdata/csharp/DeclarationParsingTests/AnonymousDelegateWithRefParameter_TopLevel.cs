@@ -1,0 +1,1 @@
+var f = delegate (ref int i) { i = 42; };

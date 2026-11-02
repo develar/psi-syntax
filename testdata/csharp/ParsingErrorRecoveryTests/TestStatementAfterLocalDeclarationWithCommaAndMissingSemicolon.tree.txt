@@ -1,0 +1,56 @@
+CompilationUnit [0..43)
+  ClassDeclaration [0..43)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    MethodDeclaration [10..42)
+      PredefinedType [10..15)
+        VoidKeyword [10..14) 'void'
+        T:WhitespaceTrivia [14..15) ' '
+      IdentifierToken [15..16) 'm'
+      ParameterList [16..19)
+        OpenParenToken [16..17) '('
+        CloseParenToken [17..18) ')'
+        T:WhitespaceTrivia [18..19) ' '
+      Block [19..42)
+        OpenBraceToken [19..20) '{'
+        T:WhitespaceTrivia [20..21) ' '
+        LocalDeclarationStatement [21..28)
+          VariableDeclaration [21..28)
+            PredefinedType [21..25)
+              IntKeyword [21..24) 'int'
+              T:WhitespaceTrivia [24..25) ' '
+            VariableDeclarator [25..26)
+              IdentifierToken [25..26) 'a'
+            CommaToken [26..27) ','
+            T:WhitespaceTrivia [27..28) ' '
+            VariableDeclarator [28..28)
+              IdentifierToken [28..28) missing
+          SemicolonToken [28..28) missing
+        IfStatement [28..40)
+          IfKeyword [28..30) 'if'
+          T:WhitespaceTrivia [30..31) ' '
+          OpenParenToken [31..32) '('
+          IdentifierName [32..33)
+            IdentifierToken [32..33) 'x'
+          CloseParenToken [33..34) ')'
+          T:WhitespaceTrivia [34..35) ' '
+          ExpressionStatement [35..40)
+            InvocationExpression [35..38)
+              IdentifierName [35..36)
+                IdentifierToken [35..36) 'y'
+              ArgumentList [36..38)
+                OpenParenToken [36..37) '('
+                CloseParenToken [37..38) ')'
+            SemicolonToken [38..39) ';'
+            T:WhitespaceTrivia [39..40) ' '
+        CloseBraceToken [40..41) '}'
+        T:WhitespaceTrivia [41..42) ' '
+    CloseBraceToken [42..43) '}'
+  EndOfFileToken [43..43) ''
+Diagnostics:
+  CS1001 [28..30) Identifier expected
+  CS1002 [28..30) ; expected

@@ -1,0 +1,47 @@
+OperatorDeclaration [0..89)
+  PublicKeyword [0..6) 'public'
+  T:WhitespaceTrivia [6..7) ' '
+  StaticKeyword [7..13) 'static'
+  T:WhitespaceTrivia [13..14) ' '
+  GenericName [14..61)
+    IdentifierToken [14..25) 'IEnumerable'
+    TypeArgumentList [25..61)
+      LessThanToken [25..26) '<'
+      TupleType [26..61)
+        OpenParenToken [26..27) '('
+        TupleElement [27..39)
+          PredefinedType [27..34)
+            StringKeyword [27..33) 'string'
+            T:WhitespaceTrivia [33..34) ' '
+          IdentifierToken [34..39) 'Value'
+        CommaToken [39..40) ','
+        T:WhitespaceTrivia [40..41) ' '
+        TupleElement [41..59)
+          PredefinedType [41..48)
+            StringKeyword [41..47) 'string'
+            T:WhitespaceTrivia [47..48) ' '
+          IdentifierToken [48..59) 'Description'
+        CloseParenToken [59..60) ')'
+        T:WhitespaceTrivia [60..61) ' '
+      GreaterThanToken [61..61) missing
+  OperatorKeyword [61..69) 'operator'
+  T:WhitespaceTrivia [69..70) ' '
+  PlusToken [70..71) '+'
+  ParameterList [71..88)
+    OpenParenToken [71..72) '('
+    Parameter [72..78)
+      IdentifierName [72..74)
+        IdentifierToken [72..73) 'X'
+        T:WhitespaceTrivia [73..74) ' '
+      IdentifierToken [74..78) 'left'
+    CommaToken [78..79) ','
+    T:WhitespaceTrivia [79..80) ' '
+    Parameter [80..87)
+      IdentifierName [80..82)
+        IdentifierToken [80..81) 'X'
+        T:WhitespaceTrivia [81..82) ' '
+      IdentifierToken [82..87) 'right'
+    CloseParenToken [87..88) ')'
+  SemicolonToken [88..89) ';'
+Diagnostics:
+  CS1003 [61..69) Syntax error, \'>\' expected

@@ -1,0 +1,16 @@
+ParenthesizedExpression [0..18)
+  OpenParenToken [0..1) '('
+  ArgListExpression [1..10)
+    ArgListKeyword [1..10) '__arglist'
+  CloseParenToken [10..11) ')'
+  T:WhitespaceTrivia [11..12) ' '
+  T:SkippedTokensTrivia [12..14)
+    EqualsGreaterThanToken [12..14) '=>'
+  T:WhitespaceTrivia [14..15) ' '
+  T:SkippedTokensTrivia [15..16)
+    OpenBraceToken [15..16) '{'
+  T:WhitespaceTrivia [16..17) ' '
+  T:SkippedTokensTrivia [17..18)
+    CloseBraceToken [17..18) '}'
+Diagnostics:
+  CS1073 [0..11) Unexpected token \'=>\'

@@ -1,0 +1,35 @@
+LocalDeclarationStatement [0..22)
+  VariableDeclaration [0..21)
+    IdentifierName [0..4)
+      IdentifierToken [0..3) 'var'
+      T:WhitespaceTrivia [3..4) ' '
+    VariableDeclarator [4..21)
+      IdentifierToken [4..5) 'v'
+      T:WhitespaceTrivia [5..6) ' '
+      EqualsValueClause [6..21)
+        EqualsToken [6..7) '='
+        T:WhitespaceTrivia [7..8) ' '
+        IsExpression [8..21)
+          IdentifierName [8..10)
+            IdentifierToken [8..9) 'x'
+            T:WhitespaceTrivia [9..10) ' '
+          IsKeyword [10..12) 'is'
+          T:WhitespaceTrivia [12..13) ' '
+          ArrayType [13..21)
+            NullableType [13..17)
+              IdentifierName [13..15)
+                IdentifierToken [13..14) 'Y'
+                T:WhitespaceTrivia [14..15) ' '
+              QuestionToken [15..16) '?'
+              T:WhitespaceTrivia [16..17) ' '
+            ArrayRankSpecifier [17..19)
+              OpenBracketToken [17..18) '['
+              OmittedArraySizeExpression [18..18)
+                OmittedArraySizeExpressionToken [18..18) ''
+              CloseBracketToken [18..19) ']'
+            ArrayRankSpecifier [19..21)
+              OpenBracketToken [19..20) '['
+              OmittedArraySizeExpression [20..20)
+                OmittedArraySizeExpressionToken [20..20) ''
+              CloseBracketToken [20..21) ']'
+  SemicolonToken [21..22) ';'

@@ -1,0 +1,20 @@
+TupleExpression [0..11)
+  OpenParenToken [0..1) '('
+  Argument [1..2)
+    IdentifierName [1..2)
+      IdentifierToken [1..2) 'D'
+  CommaToken [2..3) ','
+  T:WhitespaceTrivia [3..4) ' '
+  Argument [4..10)
+    MultiplyExpression [4..10)
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'B'
+      AsteriskToken [5..6) '*'
+      PointerIndirectionExpression [6..10)
+        AsteriskToken [6..7) '*'
+        PointerIndirectionExpression [7..10)
+          AsteriskToken [7..8) '*'
+          T:WhitespaceTrivia [8..9) ' '
+          IdentifierName [9..10)
+            IdentifierToken [9..10) 'C'
+  CloseParenToken [10..11) ')'

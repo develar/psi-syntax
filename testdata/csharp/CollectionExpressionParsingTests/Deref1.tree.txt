@@ -1,0 +1,5 @@
+PointerIndirectionExpression [0..3)
+  AsteriskToken [0..1) '*'
+  CollectionExpression [1..3)
+    OpenBracketToken [1..2) '['
+    CloseBracketToken [2..3) ']'

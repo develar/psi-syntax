@@ -1,0 +1,6 @@
+BreakStatement [0..13)
+  BreakKeyword [0..5) 'break'
+  T:WhitespaceTrivia [5..6) ' '
+  IdentifierName [6..12)
+    IdentifierToken [6..12) '@class'
+  SemicolonToken [12..13) ';'

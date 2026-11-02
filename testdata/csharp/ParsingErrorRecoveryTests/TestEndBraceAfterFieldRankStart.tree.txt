@@ -1,0 +1,22 @@
+CompilationUnit [0..16)
+  ClassDeclaration [0..16)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'c'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    IncompleteMember [10..15)
+      ArrayType [10..15)
+        PredefinedType [10..13)
+          IntKeyword [10..13) 'int'
+        ArrayRankSpecifier [13..15)
+          OpenBracketToken [13..14) '['
+          T:WhitespaceTrivia [14..15) ' '
+          OmittedArraySizeExpression [15..15)
+            OmittedArraySizeExpressionToken [15..15) ''
+          CloseBracketToken [15..15) missing
+    CloseBraceToken [15..16) '}'
+  EndOfFileToken [16..16) ''
+Diagnostics:
+  CS1003 [15..16) Syntax error, \']\' expected

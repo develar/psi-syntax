@@ -1,0 +1,34 @@
+ExpressionStatement [0..29)
+  SimpleAssignmentExpression [0..28)
+    IdentifierName [0..2)
+      IdentifierToken [0..1) '_'
+      T:WhitespaceTrivia [1..2) ' '
+    EqualsToken [2..3) '='
+    T:WhitespaceTrivia [3..4) ' '
+    SwitchExpression [4..28)
+      IdentifierName [4..8)
+        IdentifierToken [4..7) 'goo'
+        T:WhitespaceTrivia [7..8) ' '
+      SwitchKeyword [8..14) 'switch'
+      T:WhitespaceTrivia [14..15) ' '
+      OpenBraceToken [15..16) '{'
+      T:WhitespaceTrivia [16..17) ' '
+      SwitchExpressionArm [17..27)
+        NotPattern [17..22)
+          NotKeyword [17..17) missing
+          T:SkippedTokensTrivia [17..19)
+            ExclamationEqualsToken [17..19) '!='
+          T:WhitespaceTrivia [19..20) ' '
+          ConstantPattern [20..22)
+            NumericLiteralExpression [20..22)
+              NumericLiteralToken [20..21) '5'
+              T:WhitespaceTrivia [21..22) ' '
+        EqualsGreaterThanToken [22..24) '=>'
+        T:WhitespaceTrivia [24..25) ' '
+        NumericLiteralExpression [25..27)
+          NumericLiteralToken [25..26) '5'
+          T:WhitespaceTrivia [26..27) ' '
+      CloseBraceToken [27..28) '}'
+  SemicolonToken [28..29) ';'
+Diagnostics:
+  CS9345 [17..19) The \'!=\' operator is not supported in a pattern. Use \'not\' to represent a negated pattern.

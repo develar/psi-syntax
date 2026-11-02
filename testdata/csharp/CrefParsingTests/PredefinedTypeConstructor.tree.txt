@@ -1,0 +1,24 @@
+L:SingleLineDocumentationCommentTrivia [0..26)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..26)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..24)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      NameMemberCref [15..23)
+        PredefinedType [15..21)
+          StringKeyword [15..21) 'string'
+        CrefParameterList [21..23)
+          OpenParenToken [21..22) '('
+          CloseParenToken [22..23) ')'
+      DoubleQuoteToken [23..24) '"'
+    SlashGreaterThanToken [24..26) '/>'
+  EndOfDocumentationCommentToken [26..26) ''
+EndOfFileToken [26..26) ''

@@ -1,0 +1,16 @@
+ImplicitStackAllocArrayCreationExpression [0..20)
+  StackAllocKeyword [0..10) 'stackalloc'
+  OpenBracketToken [10..11) '['
+  T:SkippedTokensTrivia [11..12)
+    NumericLiteralToken [11..12) '1'
+  CloseBracketToken [12..13) ']'
+  T:WhitespaceTrivia [13..14) ' '
+  ArrayInitializerExpression [14..20)
+    OpenBraceToken [14..15) '{'
+    T:WhitespaceTrivia [15..16) ' '
+    NumericLiteralExpression [16..19)
+      NumericLiteralToken [16..18) '42'
+      T:WhitespaceTrivia [18..19) ' '
+    CloseBraceToken [19..20) '}'
+Diagnostics:
+  CS8381 [11..12) "Invalid rank specifier: expected \']\'

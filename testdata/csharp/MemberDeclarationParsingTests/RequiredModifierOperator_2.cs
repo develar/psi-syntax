@@ -1,0 +1,1 @@
+static required C operator+(C c1, C c2) {}

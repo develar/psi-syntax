@@ -1,0 +1,44 @@
+L:SingleLineDocumentationCommentTrivia [0..48)
+  XmlText [0..4)
+    L:DocumentationCommentExteriorTrivia [0..3) '///'
+    XmlTextLiteralToken [3..4) ' '
+  XmlEmptyElement [4..48)
+    LessThanToken [4..5) '<'
+    XmlName [5..8)
+      IdentifierToken [5..8) 'see'
+    XmlCrefAttribute [8..46)
+      XmlName [8..13)
+        L:WhitespaceTrivia [8..9) ' '
+        IdentifierToken [9..13) 'cref'
+      EqualsToken [13..14) '='
+      DoubleQuoteToken [14..15) '"'
+      OperatorMemberCref [15..45)
+        OperatorKeyword [15..23) 'operator'
+        T:WhitespaceTrivia [23..24) ' '
+        T:SkippedTokensTrivia [24..33)
+          UncheckedKeyword [24..33) 'unchecked'
+        L:WhitespaceTrivia [33..34) ' '
+        GreaterThanGreaterThanToken [34..36) '}}'
+        CrefParameterList [36..45)
+          OpenParenToken [36..37) '('
+          CrefParameter [37..44)
+            GenericName [37..44)
+              IdentifierToken [37..38) 'A'
+              TypeArgumentList [38..44)
+                LessThanToken [38..39) '{'
+                GenericName [39..43)
+                  IdentifierToken [39..40) 'A'
+                  TypeArgumentList [40..43)
+                    LessThanToken [40..41) '{'
+                    IdentifierName [41..42)
+                      IdentifierToken [41..42) 'T'
+                    GreaterThanToken [42..43) '}'
+                GreaterThanToken [43..44) '}'
+          CloseParenToken [44..45) ')'
+      DoubleQuoteToken [45..46) '"'
+    SlashGreaterThanToken [46..48) '/>'
+  EndOfDocumentationCommentToken [48..48) ''
+EndOfFileToken [48..48) ''
+Diagnostics:
+  CS1584 [15..45) XML comment has syntactically incorrect cref attribute \'operator unchecked }}(A{A{T}})\'
+  CS1658 [24..33) Unexpected keyword \'unchecked\'. See also error CS9027.

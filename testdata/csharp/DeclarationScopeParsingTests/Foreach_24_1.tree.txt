@@ -1,0 +1,21 @@
+ForEachStatement [0..41)
+  L:EndOfLineTrivia [0..1) '\n'
+  ForEachKeyword [1..8) 'foreach'
+  T:WhitespaceTrivia [8..9) ' '
+  OpenParenToken [9..10) '('
+  RefType [10..21)
+    RefKeyword [10..13) 'ref'
+    T:WhitespaceTrivia [13..14) ' '
+    IdentifierName [14..21)
+      IdentifierToken [14..20) 'scoped'
+      T:WhitespaceTrivia [20..21) ' '
+  IdentifierToken [21..24) 'var'
+  T:WhitespaceTrivia [24..25) ' '
+  InKeyword [25..27) 'in'
+  T:WhitespaceTrivia [27..28) ' '
+  IdentifierName [28..38)
+    IdentifierToken [28..38) 'collection'
+  CloseParenToken [38..39) ')'
+  EmptyStatement [39..41)
+    SemicolonToken [39..40) ';'
+    T:EndOfLineTrivia [40..41) '\n'

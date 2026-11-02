@@ -1,0 +1,8 @@
+CompilationUnit [0..1)
+  L:BadDirectiveTrivia [0..1)
+    HashToken [0..1) '#'
+    IdentifierToken [1..1) missing
+    EndOfDirectiveToken [1..1) ''
+  EndOfFileToken [1..1) ''
+Diagnostics:
+  CS1024 [0..1) Preprocessor directive expected

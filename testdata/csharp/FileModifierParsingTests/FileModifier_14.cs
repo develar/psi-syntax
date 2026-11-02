@@ -1,0 +1,1 @@
+file delegate void D();

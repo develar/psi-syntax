@@ -1,0 +1,54 @@
+CompilationUnit [0..39)
+  RecordDeclaration [0..39)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..8) 'C'
+    ParameterList [8..23)
+      OpenParenToken [8..9) '('
+      Parameter [9..14)
+        PredefinedType [9..13)
+          IntKeyword [9..12) 'int'
+          T:WhitespaceTrivia [12..13) ' '
+        IdentifierToken [13..14) 'X'
+      CommaToken [14..15) ','
+      T:WhitespaceTrivia [15..16) ' '
+      Parameter [16..21)
+        PredefinedType [16..20)
+          IntKeyword [16..19) 'int'
+          T:WhitespaceTrivia [19..20) ' '
+        IdentifierToken [20..21) 'Y'
+      CloseParenToken [21..22) ')'
+      T:EndOfLineTrivia [22..23) '\n'
+    BaseList [23..36)
+      ColonToken [23..24) ':'
+      T:WhitespaceTrivia [24..25) ' '
+      SimpleBaseType [25..26)
+        IdentifierName [25..26)
+          IdentifierToken [25..26) 'B'
+      CommaToken [26..27) ','
+      T:WhitespaceTrivia [27..28) ' '
+      SimpleBaseType [28..30)
+        IdentifierName [28..30)
+          IdentifierToken [28..29) 'D'
+          T:SkippedTokensTrivia [29..30)
+            OpenParenToken [29..30) '('
+      CommaToken [30..30) missing
+      SimpleBaseType [30..31)
+        IdentifierName [30..31)
+          IdentifierToken [30..31) 'X'
+      CommaToken [31..32) ','
+      T:WhitespaceTrivia [32..33) ' '
+      SimpleBaseType [33..36)
+        IdentifierName [33..36)
+          IdentifierToken [33..34) 'Y'
+          T:SkippedTokensTrivia [34..35)
+            CloseParenToken [34..35) ')'
+          T:EndOfLineTrivia [35..36) '\n'
+    OpenBraceToken [36..37) '{'
+    T:WhitespaceTrivia [37..38) ' '
+    CloseBraceToken [38..39) '}'
+  EndOfFileToken [39..39) ''
+Diagnostics:
+  CS1003 [29..30) Syntax error, \',\' expected
+  CS1003 [30..31) Syntax error, \',\' expected
+  CS1003 [34..35) Syntax error, \',\' expected

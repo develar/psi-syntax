@@ -1,0 +1,43 @@
+LocalDeclarationStatement [0..100)
+  VariableDeclaration [0..99)
+    FunctionPointerType [0..96)
+      DelegateKeyword [0..8) 'delegate'
+      AsteriskToken [8..9) '*'
+      T:WhitespaceTrivia [9..10) ' '
+      FunctionPointerCallingConvention [10..89)
+        UnmanagedKeyword [10..19) 'unmanaged'
+        FunctionPointerUnmanagedCallingConventionList [19..89)
+          OpenBracketToken [19..20) '['
+          FunctionPointerUnmanagedCallingConvention [20..25)
+            IdentifierToken [20..25) 'Cdecl'
+          CommaToken [25..26) ','
+          T:WhitespaceTrivia [26..27) ' '
+          FunctionPointerUnmanagedCallingConvention [27..35)
+            IdentifierToken [27..35) 'Thiscall'
+          CommaToken [35..36) ','
+          T:WhitespaceTrivia [36..37) ' '
+          FunctionPointerUnmanagedCallingConvention [37..44)
+            IdentifierToken [37..44) 'Stdcall'
+          CommaToken [44..45) ','
+          T:WhitespaceTrivia [45..46) ' '
+          FunctionPointerUnmanagedCallingConvention [46..54)
+            IdentifierToken [46..54) 'Fastcall'
+          CommaToken [54..55) ','
+          T:WhitespaceTrivia [55..56) ' '
+          FunctionPointerUnmanagedCallingConvention [56..66)
+            IdentifierToken [56..66) 'Vectorcall'
+          CommaToken [66..67) ','
+          T:WhitespaceTrivia [67..68) ' '
+          FunctionPointerUnmanagedCallingConvention [68..88)
+            IdentifierToken [68..88) 'SuppressGCTransition'
+          CloseBracketToken [88..89) ']'
+      FunctionPointerParameterList [89..96)
+        LessThanToken [89..90) '<'
+        FunctionPointerParameter [90..94)
+          PredefinedType [90..94)
+            VoidKeyword [90..94) 'void'
+        GreaterThanToken [94..95) '>'
+        T:WhitespaceTrivia [95..96) ' '
+    VariableDeclarator [96..99)
+      IdentifierToken [96..99) 'ptr'
+  SemicolonToken [99..100) ';'

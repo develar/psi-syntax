@@ -1,0 +1,10 @@
+CompilationUnit [0..20)
+  L:ErrorDirectiveTrivia [0..20)
+    HashToken [0..1) '#'
+    ErrorKeyword [1..6) 'error'
+    T:WhitespaceTrivia [6..8) '  '
+    L:PreprocessingMessageTrivia [8..20) '/*abc def*/ '
+    EndOfDirectiveToken [20..20) ''
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1029 [8..20) #error: \'/*abc def*/ \'

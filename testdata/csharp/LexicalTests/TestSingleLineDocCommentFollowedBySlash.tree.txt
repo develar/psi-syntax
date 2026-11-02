@@ -1,0 +1,2 @@
+L:SingleLineCommentTrivia [0..8) '////test'
+EndOfFileToken [8..8) ''

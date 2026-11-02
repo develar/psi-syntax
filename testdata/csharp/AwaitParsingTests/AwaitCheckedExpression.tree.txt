@@ -1,0 +1,33 @@
+ParenthesizedLambdaExpression [0..32)
+  L:EndOfLineTrivia [0..1) '\n'
+  AsyncKeyword [1..6) 'async'
+  T:WhitespaceTrivia [6..7) ' '
+  ParameterList [7..10)
+    OpenParenToken [7..8) '('
+    CloseParenToken [8..9) ')'
+    T:WhitespaceTrivia [9..10) ' '
+  EqualsGreaterThanToken [10..12) '=>'
+  T:WhitespaceTrivia [12..13) ' '
+  AwaitExpression [13..32)
+    AwaitKeyword [13..18) 'await'
+    T:WhitespaceTrivia [18..19) ' '
+    CheckedExpression [19..32)
+      CheckedKeyword [19..26) 'checked'
+      T:WhitespaceTrivia [26..27) ' '
+      OpenParenToken [27..27) missing
+      IdentifierName [27..27)
+        IdentifierToken [27..27) missing
+      CloseParenToken [27..27) missing
+      T:SkippedTokensTrivia [27..28)
+        OpenBraceToken [27..28) '{'
+      T:WhitespaceTrivia [28..29) ' '
+      T:SkippedTokensTrivia [29..30)
+        CloseBraceToken [29..30) '}'
+      T:SkippedTokensTrivia [30..31)
+        SemicolonToken [30..31) ';'
+      T:EndOfLineTrivia [31..32) '\n'
+Diagnostics:
+  CS1073 [1..27) Unexpected token \'{\'
+  CS1003 [27..28) Syntax error, \'(\' expected
+  CS1525 [27..28) Invalid expression term \'{\'
+  CS1026 [27..28) ) expected

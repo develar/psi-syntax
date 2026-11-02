@@ -1,0 +1,1 @@
+class a { b I.this[c d] { get; set; } }

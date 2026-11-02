@@ -1,0 +1,1 @@
+void Goo(scoped scoped scoped) { }

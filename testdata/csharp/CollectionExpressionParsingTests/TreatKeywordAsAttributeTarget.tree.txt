@@ -1,0 +1,50 @@
+CompilationUnit [0..63)
+  ClassDeclaration [0..63)
+    ClassKeyword [0..5) 'class'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierToken [6..7) 'C'
+    T:WhitespaceTrivia [7..8) ' '
+    OpenBraceToken [8..9) '{'
+    T:WhitespaceTrivia [9..10) ' '
+    PropertyDeclaration [10..62)
+      PublicKeyword [10..16) 'public'
+      T:WhitespaceTrivia [16..17) ' '
+      GenericName [17..36)
+        IdentifierToken [17..29) 'ReadOnlySpan'
+        TypeArgumentList [29..36)
+          LessThanToken [29..30) '<'
+          PredefinedType [30..34)
+            ByteKeyword [30..34) 'byte'
+          GreaterThanToken [34..35) '>'
+          T:WhitespaceTrivia [35..36) ' '
+      IdentifierToken [36..37) 'B'
+      T:WhitespaceTrivia [37..38) ' '
+      ArrowExpressionClause [38..60)
+        EqualsGreaterThanToken [38..40) '=>'
+        T:WhitespaceTrivia [40..41) ' '
+        ParenthesizedLambdaExpression [41..60)
+          AttributeList [41..51)
+            OpenBracketToken [41..42) '['
+            AttributeTargetSpecifier [42..48)
+              TrueKeyword [42..46) 'true'
+              ColonToken [46..47) ':'
+              T:WhitespaceTrivia [47..48) ' '
+            Attribute [48..49)
+              IdentifierName [48..49)
+                IdentifierToken [48..49) 'A'
+            CloseBracketToken [49..50) ']'
+            T:WhitespaceTrivia [50..51) ' '
+          ParameterList [51..54)
+            OpenParenToken [51..52) '('
+            CloseParenToken [52..53) ')'
+            T:WhitespaceTrivia [53..54) ' '
+          EqualsGreaterThanToken [54..56) '=>'
+          T:WhitespaceTrivia [56..57) ' '
+          Block [57..60)
+            OpenBraceToken [57..58) '{'
+            T:WhitespaceTrivia [58..59) ' '
+            CloseBraceToken [59..60) '}'
+      SemicolonToken [60..61) ';'
+      T:WhitespaceTrivia [61..62) ' '
+    CloseBraceToken [62..63) '}'
+  EndOfFileToken [63..63) ''

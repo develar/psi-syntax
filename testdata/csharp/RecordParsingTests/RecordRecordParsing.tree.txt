@@ -1,0 +1,44 @@
+CompilationUnit [0..30)
+  RecordDeclaration [0..14)
+    RecordKeyword [0..6) 'record'
+    T:WhitespaceTrivia [6..7) ' '
+    IdentifierToken [7..13) 'record'
+    T:WhitespaceTrivia [13..14) ' '
+    OpenBraceToken [14..14) missing
+    CloseBraceToken [14..14) missing
+  GlobalStatement [14..30)
+    ExpressionStatement [14..30)
+      InvocationExpression [14..29)
+        IdentifierName [14..15)
+          IdentifierToken [14..15) 'C'
+        ArgumentList [15..29)
+          OpenParenToken [15..16) '('
+          Argument [16..20)
+            PredefinedType [16..20)
+              IntKeyword [16..19) 'int'
+              T:WhitespaceTrivia [19..20) ' '
+          CommaToken [20..20) missing
+          Argument [20..21)
+            IdentifierName [20..21)
+              IdentifierToken [20..21) 'X'
+          CommaToken [21..22) ','
+          T:WhitespaceTrivia [22..23) ' '
+          Argument [23..27)
+            PredefinedType [23..27)
+              IntKeyword [23..26) 'int'
+              T:WhitespaceTrivia [26..27) ' '
+          CommaToken [27..27) missing
+          Argument [27..28)
+            IdentifierName [27..28)
+              IdentifierToken [27..28) 'Y'
+          CloseParenToken [28..29) ')'
+      SemicolonToken [29..30) ';'
+  EndOfFileToken [30..30) ''
+Diagnostics:
+  CS1514 [14..15) { expected
+  CS1513 [14..15) } expected
+  CS8803 [14..30) Top-level statements must precede namespace and type declarations.
+  CS1525 [16..19) Invalid expression term \'int\'
+  CS1003 [20..21) Syntax error, \',\' expected
+  CS1525 [23..26) Invalid expression term \'int\'
+  CS1003 [27..28) Syntax error, \',\' expected

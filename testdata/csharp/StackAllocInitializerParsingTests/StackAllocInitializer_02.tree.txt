@@ -1,0 +1,19 @@
+StackAllocArrayCreationExpression [0..24)
+  StackAllocKeyword [0..10) 'stackalloc'
+  T:WhitespaceTrivia [10..11) ' '
+  ArrayType [11..18)
+    PredefinedType [11..14)
+      IntKeyword [11..14) 'int'
+    ArrayRankSpecifier [14..18)
+      OpenBracketToken [14..15) '['
+      NumericLiteralExpression [15..16)
+        NumericLiteralToken [15..16) '1'
+      CloseBracketToken [16..17) ']'
+      T:WhitespaceTrivia [17..18) ' '
+  ArrayInitializerExpression [18..24)
+    OpenBraceToken [18..19) '{'
+    T:WhitespaceTrivia [19..20) ' '
+    NumericLiteralExpression [20..23)
+      NumericLiteralToken [20..22) '42'
+      T:WhitespaceTrivia [22..23) ' '
+    CloseBraceToken [23..24) '}'

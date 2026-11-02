@@ -1,0 +1,16 @@
+CompilationUnit [0..14)
+  GlobalStatement [0..14)
+    ExpressionStatement [0..14)
+      ArrayCreationExpression [0..13)
+        NewKeyword [0..3) 'new'
+        T:WhitespaceTrivia [3..4) ' '
+        ArrayType [4..13)
+          IdentifierName [4..10)
+            IdentifierToken [4..10) 'scoped'
+          ArrayRankSpecifier [10..13)
+            OpenBracketToken [10..11) '['
+            NumericLiteralExpression [11..12)
+              NumericLiteralToken [11..12) '1'
+            CloseBracketToken [12..13) ']'
+      SemicolonToken [13..14) ';'
+  EndOfFileToken [14..14) ''

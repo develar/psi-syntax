@@ -1,0 +1,8 @@
+LocalDeclarationStatement [0..11)
+  VariableDeclaration [0..10)
+    IdentifierName [0..6)
+      IdentifierToken [0..5) 'await'
+      T:WhitespaceTrivia [5..6) ' '
+    VariableDeclarator [6..10)
+      IdentifierToken [6..10) 'with'
+  SemicolonToken [10..11) ';'

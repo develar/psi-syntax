@@ -1,0 +1,5 @@
+CompilationUnit [0..33)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:SingleLineCommentTrivia [1..32) '// C# compiler emits Void& type'
+  L:EndOfLineTrivia [32..33) '\n'
+  EndOfFileToken [33..33) ''

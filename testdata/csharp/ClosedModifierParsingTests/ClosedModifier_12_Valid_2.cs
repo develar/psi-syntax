@@ -1,0 +1,1 @@
+closed public record C { }

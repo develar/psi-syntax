@@ -1,0 +1,22 @@
+CompilationUnit [0..19)
+  IncompleteMember [0..12)
+    RefType [0..12)
+      L:EndOfLineTrivia [0..1) '\n'
+      RefKeyword [1..4) 'ref'
+      T:WhitespaceTrivia [4..5) ' '
+      IdentifierName [5..12)
+        IdentifierToken [5..11) 'scoped'
+        T:WhitespaceTrivia [11..12) ' '
+  GlobalStatement [12..19)
+    LocalDeclarationStatement [12..19)
+      VariableDeclaration [12..17)
+        PredefinedType [12..16)
+          IntKeyword [12..15) 'int'
+          T:WhitespaceTrivia [15..16) ' '
+        VariableDeclarator [16..17)
+          IdentifierToken [16..17) 'c'
+      SemicolonToken [17..18) ';'
+      T:EndOfLineTrivia [18..19) '\n'
+  EndOfFileToken [19..19) ''
+Diagnostics:
+  CS0116 [5..11) A namespace cannot directly contain members such as fields, methods or statements

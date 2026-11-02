@@ -1,0 +1,1 @@
+await var a = b;

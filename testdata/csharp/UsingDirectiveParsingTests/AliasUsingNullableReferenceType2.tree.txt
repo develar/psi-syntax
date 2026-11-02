@@ -1,0 +1,23 @@
+CompilationUnit [0..35)
+  UsingDirective [0..35)
+    L:NullableDirectiveTrivia [0..17)
+      HashToken [0..1) '#'
+      NullableKeyword [1..9) 'nullable'
+      T:WhitespaceTrivia [9..10) ' '
+      EnableKeyword [10..16) 'enable'
+      EndOfDirectiveToken [16..16) ''
+      T:EndOfLineTrivia [16..17) '\n'
+    UsingKeyword [17..22) 'using'
+    T:WhitespaceTrivia [22..23) ' '
+    NameEquals [23..27)
+      IdentifierName [23..25)
+        IdentifierToken [23..24) 'X'
+        T:WhitespaceTrivia [24..25) ' '
+      EqualsToken [25..26) '='
+      T:WhitespaceTrivia [26..27) ' '
+    NullableType [27..34)
+      PredefinedType [27..33)
+        StringKeyword [27..33) 'string'
+      QuestionToken [33..34) '?'
+    SemicolonToken [34..35) ';'
+  EndOfFileToken [35..35) ''

@@ -1,0 +1,9 @@
+InterpolatedStringExpression [0..17)
+  InterpolatedVerbatimStringStartToken [0..3) '$@"'
+  InterpolatedStringText [3..14)
+    InterpolatedStringTextToken [3..14) '""\nhello\n""'
+  InterpolatedStringEndToken [14..15) '"'
+  T:SkippedTokensTrivia [15..17)
+    IdentifierToken [15..17) 'u8'
+Diagnostics:
+  CS1073 [0..15) Unexpected token \'u8\'

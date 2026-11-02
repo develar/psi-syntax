@@ -1,0 +1,1 @@
+x is X.Y ? record with { } : record with { }

@@ -1,0 +1,16 @@
+CompilationUnit [0..20)
+  UsingDirective [0..6)
+    UsingKeyword [0..5) 'using'
+    T:WhitespaceTrivia [5..6) ' '
+    IdentifierName [6..6)
+      IdentifierToken [6..6) missing
+    SemicolonToken [6..6) missing
+  FileScopedNamespaceDeclaration [6..20)
+    NamespaceKeyword [6..15) 'namespace'
+    T:WhitespaceTrivia [15..16) ' '
+    IdentifierName [16..19)
+      IdentifierToken [16..19) 'Goo'
+    SemicolonToken [19..20) ';'
+  EndOfFileToken [20..20) ''
+Diagnostics:
+  CS1041 [6..15) Identifier expected; \'namespace\' is a keyword

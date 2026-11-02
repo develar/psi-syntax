@@ -1,0 +1,1 @@
+class a { b X(__arglist) { } }

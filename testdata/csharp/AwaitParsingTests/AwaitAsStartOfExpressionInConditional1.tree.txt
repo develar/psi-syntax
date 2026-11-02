@@ -1,0 +1,26 @@
+InvocationExpression [0..18)
+  IdentifierName [0..1)
+    IdentifierToken [0..1) 'f'
+  ArgumentList [1..18)
+    OpenParenToken [1..2) '('
+    Argument [2..17)
+      ConditionalExpression [2..17)
+        IsExpression [2..10)
+          IdentifierName [2..4)
+            IdentifierToken [2..3) 'x'
+            T:WhitespaceTrivia [3..4) ' '
+          IsKeyword [4..6) 'is'
+          T:WhitespaceTrivia [6..7) ' '
+          PredefinedType [7..10)
+            IntKeyword [7..10) 'int'
+        QuestionToken [10..11) '?'
+        T:WhitespaceTrivia [11..12) ' '
+        IdentifierName [12..17)
+          IdentifierToken [12..17) 'await'
+        ColonToken [17..17) missing
+        IdentifierName [17..17)
+          IdentifierToken [17..17) missing
+    CloseParenToken [17..18) ')'
+Diagnostics:
+  CS1003 [17..18) Syntax error, \':\' expected
+  CS1525 [17..18) Invalid expression term \')\'

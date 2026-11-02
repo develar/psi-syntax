@@ -1,0 +1,21 @@
+LocalFunctionStatement [0..23)
+  PredefinedType [0..5)
+    VoidKeyword [0..4) 'void'
+    T:WhitespaceTrivia [4..5) ' '
+  IdentifierToken [5..6) 'M'
+  ParameterList [6..20)
+    OpenParenToken [6..7) '('
+    Parameter [7..18)
+      ArgListKeyword [7..16) '__arglist'
+      T:SkippedTokensTrivia [16..17)
+        ExclamationToken [16..17) '!'
+      T:SkippedTokensTrivia [17..18)
+        ExclamationToken [17..18) '!'
+    CloseParenToken [18..19) ')'
+    T:WhitespaceTrivia [19..20) ' '
+  Block [20..23)
+    OpenBraceToken [20..21) '{'
+    T:WhitespaceTrivia [21..22) ' '
+    CloseBraceToken [22..23) '}'
+Diagnostics:
+  CS1003 [16..17) Syntax error, \',\' expected

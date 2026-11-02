@@ -1,0 +1,18 @@
+LocalDeclarationStatement [0..17)
+  ReadOnlyKeyword [0..8) 'readonly'
+  T:WhitespaceTrivia [8..9) ' '
+  VariableDeclaration [9..16)
+    IdentifierName [9..11)
+      IdentifierToken [9..10) 'T'
+      T:WhitespaceTrivia [10..11) ' '
+    VariableDeclarator [11..16)
+      IdentifierToken [11..12) 'a'
+      T:WhitespaceTrivia [12..13) ' '
+      EqualsValueClause [13..16)
+        EqualsToken [13..14) '='
+        T:WhitespaceTrivia [14..15) ' '
+        IdentifierName [15..16)
+          IdentifierToken [15..16) 'b'
+  SemicolonToken [16..17) ';'
+Diagnostics:
+  CS0106 [0..8) The modifier \'readonly\' is not valid for this item

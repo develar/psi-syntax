@@ -1,0 +1,1 @@
+static T a = b;

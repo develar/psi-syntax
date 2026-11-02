@@ -1,0 +1,26 @@
+ElementAccessExpression [0..21)
+  IdentifierName [0..4)
+    IdentifierToken [0..4) 'dict'
+  BracketedArgumentList [4..21)
+    OpenBracketToken [4..5) '['
+    Argument [5..20)
+      ConditionalExpression [5..20)
+        IsExpression [5..13)
+          IdentifierName [5..7)
+            IdentifierToken [5..6) 'x'
+            T:WhitespaceTrivia [6..7) ' '
+          IsKeyword [7..9) 'is'
+          T:WhitespaceTrivia [9..10) ' '
+          PredefinedType [10..13)
+            IntKeyword [10..13) 'int'
+        QuestionToken [13..14) '?'
+        T:WhitespaceTrivia [14..15) ' '
+        IdentifierName [15..20)
+          IdentifierToken [15..20) 'await'
+        ColonToken [20..20) missing
+        IdentifierName [20..20)
+          IdentifierToken [20..20) missing
+    CloseBracketToken [20..21) ']'
+Diagnostics:
+  CS1003 [20..21) Syntax error, \':\' expected
+  CS1525 [20..21) Invalid expression term \']\'

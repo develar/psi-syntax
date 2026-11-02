@@ -1,0 +1,1 @@
+class C { int GetInt { get;; } = 0;; }

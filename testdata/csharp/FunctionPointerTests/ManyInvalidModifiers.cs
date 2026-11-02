@@ -1,0 +1,1 @@
+delegate*<this params readonly ref ref this int> ptr;

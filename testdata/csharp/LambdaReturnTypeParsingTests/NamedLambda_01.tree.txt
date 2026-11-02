@@ -1,0 +1,17 @@
+IdentifierName [0..16)
+  IdentifierToken [0..1) 'T'
+  T:WhitespaceTrivia [1..2) ' '
+  T:SkippedTokensTrivia [2..3)
+    IdentifierToken [2..3) 'F'
+  T:SkippedTokensTrivia [3..4)
+    OpenParenToken [3..4) '('
+  T:SkippedTokensTrivia [4..5)
+    CloseParenToken [4..5) ')'
+  T:WhitespaceTrivia [5..6) ' '
+  T:SkippedTokensTrivia [6..8)
+    EqualsGreaterThanToken [6..8) '=>'
+  T:WhitespaceTrivia [8..9) ' '
+  T:SkippedTokensTrivia [9..16)
+    DefaultKeyword [9..16) 'default'
+Diagnostics:
+  CS1073 [0..1) Unexpected token \'F\'

@@ -1,0 +1,1 @@
+from a in A join b in B on a equals b into c select d
