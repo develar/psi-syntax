@@ -1,9 +1,7 @@
 //! Every golden of `testdata/java/manifest.tsv` parsed at its level through its entry: `dump::psi_to_string` against
-//! `NAME.txt` and `dump::node_tree_to_string` against `NAME_node.txt`, byte for byte. A parse that reaches a parser
-//! method not yet ported (`TODO(port)`, a `todo!` panic) counts apart. Prints the counts and the first differing line
+//! `NAME.txt` and `dump::node_tree_to_string` against `NAME_node.txt`, byte for byte. Prints the counts and the first differing line
 //! of each mismatch; fails with `JAVA_STRICT=1` or `KS_STRICT=1` (the gate's) unless all match.
 
-use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::{Path, PathBuf};
 
 use java_syntax::dump::{node_tree_to_string, psi_to_string};
@@ -50,9 +48,7 @@ fn first_difference(want: &str, got: &str) -> String {
 fn goldens() {
     let root = testdata();
     let manifest = std::fs::read_to_string(root.join("manifest.tsv")).expect("read manifest.tsv");
-    // the stubs' panics are counted, not printed
-    std::panic::set_hook(Box::new(|_| {}));
-    let (mut total, mut psi, mut node, mut unported) = (0, 0, 0, 0);
+    let (mut total, mut psi, mut node) = (0, 0, 0);
     for line in manifest.lines().filter(|l| !l.is_empty()) {
         let columns: Vec<&str> = line.split('\t').collect();
         let path = columns[0];
@@ -61,14 +57,8 @@ fn goldens() {
         let text = source_text(&root.join(path), columns[3] == "1");
         let name = path.rsplit('/').next().unwrap_or(path);
         total += 1;
-        let parsed = catch_unwind(AssertUnwindSafe(|| {
-            let tree = Parser::new().parse(&text, FileKind { level, entry });
-            (psi_to_string(&tree, name), node_tree_to_string(&tree))
-        }));
-        let Ok((psi_dump, node_dump)) = parsed else {
-            unported += 1;
-            continue;
-        };
+        let tree = Parser::new().parse(&text, FileKind { level, entry });
+        let (psi_dump, node_dump) = (psi_to_string(&tree, name), node_tree_to_string(&tree));
         let want_psi = std::fs::read_to_string(root.join(path.replace(".java", ".txt"))).expect("read .txt");
         let want_node = std::fs::read_to_string(root.join(path.replace(".java", "_node.txt"))).expect("read _node.txt");
         if psi_dump == want_psi.trim_end() {
@@ -82,10 +72,7 @@ fn goldens() {
             println!("MISMATCH {path} (_node.txt): {}", first_difference(want_node.trim_end(), &node_dump));
         }
     }
-    let _ = std::panic::take_hook();
-    println!(
-        "java goldens: {psi}/{total} .txt, {node}/{total} _node.txt ({unported} reach a parser method not yet ported)"
-    );
+    println!("java goldens: {psi}/{total} .txt, {node}/{total} _node.txt");
     if ["JAVA_STRICT", "KS_STRICT"].iter().any(|k| std::env::var_os(k).is_some_and(|v| v == "1")) {
         assert_eq!((psi, node), (total, total));
     }

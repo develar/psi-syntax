@@ -1,10 +1,8 @@
 //! `JavaDocParser` alone, before the file parsers: every golden of `testdata/java/manifest.tsv` is parsed flat (all
 //! tokens under the file root, no parser), so its doc comments are expanded as chameleons by `JavaDocParser`, and each
-//! `PsiDocComment` subtree of our dump is compared with the golden's, in order. A file whose doc comments reach a
-//! parser method not yet ported (a reference or type holder) counts apart. Prints the counts and the first difference
-//! of each mismatch; fails with `JAVA_STRICT=1` or `KS_STRICT=1` (the gate's) unless all compared comments match.
+//! `PsiDocComment` subtree of our dump is compared with the golden's, in order. Prints the counts and the first
+//! difference of each mismatch; fails with `JAVA_STRICT=1` or `KS_STRICT=1` (the gate's) unless all compared comments match.
 
-use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::{Path, PathBuf};
 
 use java_syntax::dump::psi_to_string;
@@ -70,8 +68,7 @@ fn doc_comments(dump: &str) -> Vec<Vec<String>> {
 fn doc_comments_of_the_goldens() {
     let root = testdata();
     let manifest = std::fs::read_to_string(root.join("manifest.tsv")).expect("read manifest.tsv");
-    std::panic::set_hook(Box::new(|_| {}));
-    let (mut files, mut compared, mut equal, mut unported) = (0, 0, 0, 0);
+    let (mut files, mut compared, mut equal) = (0, 0, 0);
     for line in manifest.lines().filter(|l| !l.is_empty()) {
         let columns: Vec<&str> = line.split('\t').collect();
         let path = columns[0];
@@ -84,21 +81,15 @@ fn doc_comments_of_the_goldens() {
         }
         files += 1;
         let name = path.rsplit('/').next().unwrap_or(path);
-        let parsed = catch_unwind(AssertUnwindSafe(|| {
-            let tree = Parser::new().parse_with(&text, FileKind { level, entry: Entry::File }, |mut builder, _| {
-                let file = builder.mark();
-                while !builder.eof() {
-                    builder.advance_lexer();
-                }
-                builder.done(file, NodeKind::JAVA_FILE);
-                builder
-            });
-            psi_to_string(&tree, name)
-        }));
-        let Ok(got_dump) = parsed else {
-            unported += 1;
-            continue;
-        };
+        let tree = Parser::new().parse_with(&text, FileKind { level, entry: Entry::File }, |mut builder, _| {
+            let file = builder.mark();
+            while !builder.eof() {
+                builder.advance_lexer();
+            }
+            builder.done(file, NodeKind::JAVA_FILE);
+            builder
+        });
+        let got_dump = psi_to_string(&tree, name);
         let got = doc_comments(&got_dump);
         for (k, want_comment) in want.iter().enumerate() {
             compared += 1;
@@ -124,10 +115,7 @@ fn doc_comments_of_the_goldens() {
             }
         }
     }
-    let _ = std::panic::take_hook();
-    println!(
-        "java doc comments: {equal}/{compared} equal in {files} goldens ({unported} files reach a parser method not yet ported)"
-    );
+    println!("java doc comments: {equal}/{compared} equal in {files} goldens");
     if ["JAVA_STRICT", "KS_STRICT"].iter().any(|k| std::env::var_os(k).is_some_and(|v| v == "1")) {
         assert_eq!(equal, compared);
     }

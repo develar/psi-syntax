@@ -190,6 +190,11 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
 - **Bench.** `ksdump --bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, every one a file). Java's parse counts
   no nesting levels yet (see "Open items"), so the Java bench threads run on a 64 MB stack; `--check-bodies` still
   refuses Java.
+- **`JavaParserUtil.stoppingBuilder(builder, condition)`** (JavaParserUtil.kt:133) is the one method not ported.
+  Nothing in intellij-community at decc943 calls it (the parsers call only `stoppingBuilder(builder, stopAt)`, from
+  `braceMatchingBuilder` and `DeclarationParser.parse`), and its adapter would call the condition on every
+  `tokenType` and `eof()` of every builder, where `SyntaxTreeBuilder` checks one offset. It was a `todo!` stub, a
+  panic path in a crate that must never panic, and is removed; `java_parser_util.rs` says where it would go.
 
 ### Parser driver and chameleons (`psi-builder` `src/tree.rs`, `kotlin-syntax` `src/language.rs`)
 
@@ -502,9 +507,6 @@ There is no line-level profile of the current code: `atos` returned no line info
 - **Java speed.** One thread at 54.5 MB/s (load 14-37) against Kotlin's 75.3 (load 4-24): Java has 395 nodes per
   source KB against Kotlin's 369 and no profile yet. Take one (`scripts/profile.py`) and a quiet round before speed
   work; the Java builder path has no `--features counters` output.
-- **`JavaParserUtil.stoppingBuilder(builder, condition)`** is a `todo!` stub: no parser calls it, and porting it needs
-  a condition adapter in `SyntaxTreeBuilder`, a check on every `token_type()`.
-
 - **The split's speed on a quiet machine.** Its A/B ran at load 6-18; repeat `scripts/ab.sh` against 26d5703 at load
   under 4 before attributing a later change's small delta.
 

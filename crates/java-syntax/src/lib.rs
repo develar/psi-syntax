@@ -1,6 +1,6 @@
 //! A lossless Java lexer and parser, ported from IntelliJ's java-syntax (`com.intellij.java.syntax`, see AGENTS.md):
 //! `lexer` and `doc_lexer` are `JavaLexer` and `JavaDocLexer` (complete), `parser` the parsers (ported but for
-//! `JavaParserUtil.stoppingBuilder(builder, condition)`, which no parser calls), `dump` the two dumps the Java parsing tests compare. The builder, the
+//! `JavaParserUtil.stoppingBuilder(builder, condition)`, which nothing calls), `dump` the two dumps the Java parsing tests compare. The builder, the
 //! tree and the parse driver are `psi_builder`'s, over the `Java` language.
 
 pub mod builder;

@@ -115,13 +115,7 @@ pub fn stopping_builder<'s>(builder: &'s mut SyntaxTreeBuilder<'_>, stop_at: i32
     builder.stopping_builder(stop_at)
 }
 
-/// `stoppingBuilder(builder, condition)`: no java-syntax parser calls it (`SyntaxTreeBuilder` has only the offset
-/// adapter); kept for the one function per method.
-pub fn stopping_builder_with_condition<'s>(
-    builder: &'s mut SyntaxTreeBuilder<'_>,
-    condition: fn(Option<TokenKind>, Option<&[u8]>) -> bool,
-) -> SyntaxTreeBuilder<'s> {
-    // TODO(port): JavaParserUtil.kt:133 (a condition adapter in `SyntaxTreeBuilder` when a caller appears)
-    let _ = (builder, condition);
-    todo!("JavaParserUtil.stoppingBuilder(builder, condition) (JavaParserUtil.kt:133)")
-}
+// `stoppingBuilder(builder, condition)` (JavaParserUtil.kt:133) is not ported: nothing in intellij-community at
+// decc943 calls it (the parsers call only `stoppingBuilder(builder, stopAt)`, from `braceMatchingBuilder` and
+// `DeclarationParser.parse`), and its adapter would put a call of the condition on every `tokenType` and `eof()` of
+// every builder (`SyntaxTreeBuilder` holds only the offset). Port it into `SyntaxTreeBuilder` with its first caller.
