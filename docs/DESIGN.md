@@ -625,6 +625,8 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 - A `Parser` keeps its buffers from file to file up to its retained bytes (`set_retained_bytes`,
   `buffers::RETAINED_BYTES` = 64 MiB by default): a parse that leaves more shrinks them to half of that. `heap_bytes()`
   is what they hold, `shrink_to(bytes)` shrinks them on demand (the same for the three languages, "Retained buffers").
+- C#: contextual keywords are `IdentifierToken` leaves unless the parser converts them (`partial class`, `async`,
+  `record`, `where` clauses: their keyword kinds), as in Roslyn's tree (`tests/contract.rs`).
 - C#: `csharp_syntax::Tree` derefs to the same `psi_builder::Tree` and adds `diagnostics()` (codes, byte spans,
   messages, in Roslyn's order) and `value_text(id)` (`SyntaxToken.ValueText`: `@class` is `class`, `\u0061` is `a`;
   "Value texts"). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`

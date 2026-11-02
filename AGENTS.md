@@ -120,7 +120,7 @@ reduced cases of `tests/oracle/`, `NAME.cs` with the oracle's `NAME.tree.txt` an
 `kinds.rs` (the generated tables against each other and `facts`), `flatten.rs` (hand-built green trees dumped),
 `pipeline.rs` (files and entries end to end), `memory.rs` (the arena budget, the retained buffers), `value_text.rs`
 (`Tree::value_text` against Roslyn's lexer tests, and `tests/values/` and the goldens against the oracle's `values
---kept` lines).
+--kept` lines), `contract.rs` (the consumer contract's contextual keywords, converted or not).
 
 The oracle is that package on .NET SDK 10.0.403 (`~/.cache/psi-syntax/dotnet`, pinned by `global.json`, packages by
 `packages.lock.json`), run with `DOTNET_ROOT=~/.cache/psi-syntax/dotnet DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1`
@@ -263,7 +263,10 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   inserted. Unstructured trivia (whitespace, end of line, comments, disabled text, ...) are leaves of `TokenKind`s;
   structured trivia (directives, documentation comments in `Parse` and `Diagnose` modes, skipped tokens) are subtrees
   whose root is the trivia's `NodeKind`. `leaves()` is exact for highlighting: contextual keywords the parser converts
-  (`partial`, `async`, `record`, ...) carry their keyword kind, `>>` and `>>>` are the parser's merged tokens.
+  (`partial`, `async`, `await`, `record`, `where`, accessors, query clauses, `global::`, pattern combinators, `with`,
+  `when`, `file`, `required`, `scoped`, `allows`, ...) carry their keyword kind, the ones it does not stay
+  `IdentifierToken` (`var` as a type, `nameof(x)`, any contextual keyword used as a name; `tests/contract.rs`, each
+  case Roslyn's tree), `>>` and `>>>` are the parser's merged tokens.
   `tree.value_text(id)` is `SyntaxToken.ValueText` of a token leaf, exact to Roslyn on every gate input (`ksdump
   --values --check` against `oracle.sh values --kept`; the goldens in `tests/value_text.rs`): an identifier without
   its verbatim `@` and with its unicode escapes (`\uXXXX`, `\UXXXXXXXX`) decoded and formatting characters dropped
