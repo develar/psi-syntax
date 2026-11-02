@@ -259,6 +259,99 @@ const ENTRY_ERROR_ITEM: u16 = 1;
 /// `Entry::flags` of a collapsed start marker.
 const ENTRY_COLLAPSED: u16 = 2;
 
+/// A builder's tokens as `balanceWhiteSpaces` reads them: types, starts (one more than types) and its text.
+struct TokenView<'a, T> {
+    types: &'a [T],
+    starts: &'a [u32],
+    text: &'a [u8],
+}
+
+impl<T: Copy> TokenView<'_, T> {
+    /// `balanceWhiteSpaces()`' step for one production entry: its lexeme moved over the whitespace and comments
+    /// around it as `binder` says, given `lastIndex` and the balanced lexeme of the entry before (`prev`).
+    ///
+    /// The two default binders take a shortcut, exact by their contract (`WhitespacesAndCommentsBinder`):
+    /// `DEFAULT_LEFT_BINDER` answers `tokens.size()` for every view, so the edge is the whitespace's end (`wsEndIndex`)
+    /// in all three of the Java's cases (a view of positive, negative or zero size); `DEFAULT_RIGHT_BINDER` answers 0,
+    /// so the edge is `wsStartIndex` in all three.
+    #[inline(always)]
+    fn balanced_lexeme<L: Language<Token = T>>(
+        &self,
+        binder: L::Binder,
+        lexeme_index: i32,
+        last_index: i32,
+        prev: i32,
+    ) -> i32 {
+        let count = self.types.len();
+        let ws_end = |from: i32| -> i32 {
+            let mut i = from.max(0) as usize;
+            while i < count && L::is_whitespace_or_comment(self.types[i]) {
+                i += 1;
+            }
+            i as i32
+        };
+        if binder == L::Binder::DEFAULT_LEFT_BINDER {
+            return ws_end(lexeme_index);
+        }
+        let recursive = binder.is_recursive();
+        let prev_production_lex_index = if recursive { 0 } else { prev };
+        let mut ws_start_index = lexeme_index.max(last_index);
+        while ws_start_index > prev_production_lex_index
+            && (ws_start_index as usize) <= count
+            && L::is_whitespace_or_comment(self.types[ws_start_index as usize - 1])
+        {
+            ws_start_index -= 1;
+        }
+        if binder == L::Binder::DEFAULT_RIGHT_BINDER {
+            return ws_start_index;
+        }
+        self.custom_edge::<L>(binder, lexeme_index, ws_start_index, ws_end(lexeme_index))
+    }
+
+    /// The rest of `balanced_lexeme` for a binder that is not a default one.
+    #[inline(never)]
+    fn custom_edge<L: Language<Token = T>>(
+        &self,
+        binder: L::Binder,
+        lexeme_index: i32,
+        ws_start_index: i32,
+        ws_end_index: i32,
+    ) -> i32 {
+        let count = self.types.len();
+        if ws_start_index < ws_end_index {
+            let start = ws_start_index as usize;
+            let end = ws_end_index as usize;
+            let at_end = ws_start_index == 0 || end == count;
+            let tokens = &self.types[start..end];
+            let (text, starts) = (self.text, self.starts);
+            let getter = |k: usize| -> &[u8] { &text[starts[start + k] as usize..starts[start + k + 1] as usize] };
+            let edge = binder.get_edge_position(tokens, at_end, &getter).min(end - start);
+            ws_start_index + edge as i32
+        } else if ws_start_index > ws_end_index {
+            // An earlier edge moved past this marker's whitespace: Java configures the token view with a negative
+            // size and the binder still answers (`WhitespacesAndCommentsBinder::negative_size_edge`).
+            let size = ws_end_index - ws_start_index;
+            let get = |index: i32| -> Option<T> {
+                let i = ws_start_index + index;
+                if i >= 0 && (i as usize) < count { Some(self.types[i as usize]) } else { None }
+            };
+            let text = |index: i32| -> &[u8] {
+                let i = ws_start_index + index;
+                if i >= 0 && (i as usize) < count {
+                    &self.text[self.starts[i as usize] as usize..self.starts[i as usize + 1] as usize]
+                } else {
+                    &[]
+                }
+            };
+            ws_start_index + binder.negative_size_edge(size, get, &text)
+        } else if lexeme_index < ws_start_index {
+            ws_start_index
+        } else {
+            lexeme_index
+        }
+    }
+}
+
 /// The buffers builders work in, kept by a `Parser` from one builder to the next (cleared, not freed): the token
 /// types a builder parses (filled by its caller), the marker pool with its free lists, the production, and the
 /// buffers of the language's builder layers (`layer`). A builder takes them in `new` and gives them back in `release`.
@@ -330,18 +423,26 @@ pub struct PsiBuilderImpl<L: Language> {
     /// Where token 0 is in the file's token list, when the tokens are an unmodified slice of it.
     file_token: Option<usize>,
     tokens_to_restore_on_rollback: BTreeMap<usize, L::Token>,
+    /// `myCurrentLexeme`: it moves over whitespace and comments only where the Java's does, in `eof()` (once after a
+    /// move, unless `myTokenTypeChecked` says not to) and in `mark()`.
     current_lexeme: usize,
-    token_type_checked: bool,
-    /// The current token, cached for `current_types` (not in the Java): `get_token_type()` and what the language's
-    /// layer derives from it (`Language::joined_token_type`; Kotlin's `getJoinedTokenType(raw, 1)`). `tt_valid` is
-    /// cleared wherever `current_lexeme` moves or `lex_types` is written: `advance_lexer`, `raw_advance_lexer` (and
-    /// `advance_to_eof` through it), `rollback_to` (which also restores remapped tokens), `remap_current_token` and
-    /// `skip_balanced_block`.
-    /// `skip_whitespace` only steps over whitespace and comments up to the token both values describe, so it keeps
-    /// them valid. It lives here, not in the language's layer, because markers mutate this builder directly.
+    /// Where `eof()` puts `current_lexeme` (not in the Java, which skips whitespace there when `myTokenTypeChecked` is
+    /// false): computed at every move (`refresh`), past the whitespace and comments when `skips` (a move cleared
+    /// `myTokenTypeChecked`), `current_lexeme` itself when not (`rollbackTo` set it). So `eof()` and `getTokenType()`
+    /// are a store and a read, without a branch on the flag.
+    sig: usize,
+    skips: bool,
+    /// `myTokenTypeChecked`: whether `eof()` ran since the cursor moved (a store there, read only where a remap
+    /// recomputes `sig`: a token remapped into whitespace is skipped only while the flag is false).
+    checked: bool,
+    /// The token at `sig` and what the language's layer derives from it (`Language::joined_token_type`; Kotlin's
+    /// `getJoinedTokenType(raw, 1)`), computed with `sig` wherever `current_lexeme` moves or `lex_types` is written:
+    /// `advance_lexer`, `raw_advance_lexer` (and `advance_to_eof` through it), `rollback_to` (which also restores
+    /// remapped tokens), `remap_current_token`, `remap_tokens`, `skip_balanced_block` and `mark` when it steps over
+    /// whitespace `eof()` would not. It lives here, not in the language's layer, because markers mutate this builder
+    /// directly.
     tt_raw: Option<L::Token>,
     tt_joined: Option<L::Token>,
-    tt_valid: bool,
     /// `MarkerPool.list`; id 0 is no marker.
     markers: Vec<MarkerData<L::Token, L::Node, L::Binder>>,
     free_start_markers: Vec<u32>,
@@ -439,7 +540,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         let lexeme_count = lex_types.len();
         lex_starts.resize(lexeme_count + 1, len as u32);
         lex_starts[lexeme_count] = len as u32;
-        PsiBuilderImpl {
+        let mut builder = PsiBuilderImpl {
             text,
             base,
             len,
@@ -456,10 +557,11 @@ impl<L: Language> PsiBuilderImpl<L> {
             file_token,
             tokens_to_restore_on_rollback: BTreeMap::new(),
             current_lexeme: 0,
-            token_type_checked: false,
+            sig: 0,
+            skips: true,
+            checked: false,
             tt_raw: None,
             tt_joined: None,
-            tt_valid: false,
             markers,
             free_start_markers,
             free_error_items,
@@ -478,7 +580,30 @@ impl<L: Language> PsiBuilderImpl<L> {
             block_scanned: 0,
             block_valid_from: 0,
             shared_block_closers: None,
+        };
+        builder.refresh(true);
+        builder
+    }
+
+    /// Computes `sig` and the token there after `current_lexeme` moved or a token was remapped: past whitespace and
+    /// comments when `skips` (the Java's `myTokenTypeChecked` is false), at `current_lexeme` when not.
+    #[inline(always)]
+    fn refresh(&mut self, skips: bool) {
+        let current = self.current_lexeme;
+        let mut sig = current;
+        if skips {
+            while sig < self.lexeme_count && L::is_whitespace_or_comment(self.lex_types[sig]) {
+                sig += 1;
+            }
         }
+        self.sig = sig;
+        self.skips = skips;
+        let raw = if sig < self.lexeme_count { Some(self.lex_types[sig]) } else { None };
+        // `joined_token_type` reads the raw tokens after the current one, which `eof()` will have moved to `sig`.
+        self.current_lexeme = sig;
+        self.tt_joined = L::joined_token_type(self, raw, 1);
+        self.current_lexeme = current;
+        self.tt_raw = raw;
     }
 
     /// Starts the nesting at `nesting`, with `limit` instead of `NESTING_LIMIT` (and no more than `limit` for the
@@ -617,7 +742,7 @@ impl<L: Language> PsiBuilderImpl<L> {
                 self.lex_types[i] = to;
             }
         }
-        self.tt_valid = false;
+        self.refresh(!self.checked);
     }
 
     /// A remap of token `index` from `old` to `new`: if either is a bracket of `block_pair`, the block table is stale
@@ -700,33 +825,32 @@ impl<L: Language> PsiBuilderImpl<L> {
     #[inline(always)]
     pub fn get_token_type(&mut self) -> Option<L::Token> {
         add(Counter::RawTokenType, 1);
-        if self.eof() {
-            return None;
-        }
-        Some(self.lex_types[self.current_lexeme])
+        self.current_lexeme = self.sig;
+        self.checked = true;
+        self.tt_raw
     }
 
     /// `get_token_type()` and `Language::joined_token_type(raw, 1)` (for Kotlin's
     /// `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` when it joins complex tokens, `getJoinedTokenType(raw,
-    /// 1)`), computed once per cursor position (see `tt_valid`).
+    /// 1)`), computed once per cursor position (see `sig`).
+    ///
+    /// Unlike `get_token_type` it does not record `myTokenTypeChecked` (`checked`), a store on the hottest path (0.6 G
+    /// instructions per Kotlin round): the flag decides only whether a token at the cursor remapped into whitespace or a
+    /// comment is skipped, so a layer that reads the cursor through this never remaps a token into one (Kotlin remaps
+    /// only to soft keywords and identifiers).
     #[inline(always)]
     pub fn current_types(&mut self) -> (Option<L::Token>, Option<L::Token>) {
-        if !self.tt_valid {
-            let raw = self.get_token_type();
-            self.tt_joined = L::joined_token_type(self, raw, 1);
-            self.tt_raw = raw;
-            self.tt_valid = true;
-        }
+        self.current_lexeme = self.sig;
         (self.tt_raw, self.tt_joined)
     }
 
     /// `remapCurrentToken(type)`.
     pub fn remap_current_token(&mut self, element_type: L::Token) {
-        self.tt_valid = false;
         if self.current_lexeme < self.lexeme_count {
             self.note_remap(self.current_lexeme, self.lex_types[self.current_lexeme], element_type);
             self.lex_types[self.current_lexeme] = element_type;
         }
+        self.refresh(!self.checked);
     }
 
     /// `remapCurrentTokenAndRestoreOnRollback(type)`.
@@ -797,8 +921,8 @@ impl<L: Language> PsiBuilderImpl<L> {
             return;
         }
         self.current_lexeme = (self.current_lexeme + steps as usize).min(self.lexeme_count);
-        self.token_type_checked = false;
-        self.tt_valid = false;
+        self.checked = false;
+        self.refresh(true);
     }
 
     /// `advanceToEOF()`.
@@ -813,9 +937,9 @@ impl<L: Language> PsiBuilderImpl<L> {
         if self.eof() {
             return;
         }
-        self.token_type_checked = false;
-        self.tt_valid = false;
         self.current_lexeme += 1;
+        self.checked = false;
+        self.refresh(true);
     }
 
     /// A balanced block skipped over the raw tokens (not in the Java; Kotlin's `KotlinParsing.advanceBalancedBlock()`
@@ -845,8 +969,8 @@ impl<L: Language> PsiBuilderImpl<L> {
             add(Counter::BalancedSkipTokens, stepped as u64);
         }
         self.current_lexeme = i;
-        self.token_type_checked = false;
-        self.tt_valid = false;
+        self.checked = false;
+        self.refresh(true);
     }
 
     /// Moves the cursor over the rest of a construct nested too deeply (not in the Java): from the current token to the
@@ -864,14 +988,22 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.raw_advance_lexer((end - current) as i32);
     }
 
-    /// Inlined into `eof()` and `mark()` (as it was inside one crate; instantiated in the language's crate the inliner
-    /// otherwise keeps it a call on every cursor move: measured -0.8 % parse throughput).
+    /// `skipWhitespace()` as `mark()` runs it: to `sig` when that is past the whitespace already; after `rollbackTo`
+    /// (no skip pending) the step is made here and `sig` follows it, since `eof()` then would not move.
     #[inline(always)]
     fn skip_whitespace(&mut self) {
-        while self.current_lexeme < self.lexeme_count
-            && self.is_whitespace_or_comment(self.lex_types[self.current_lexeme])
-        {
-            self.current_lexeme += 1;
+        if self.skips {
+            self.current_lexeme = self.sig;
+            return;
+        }
+        let current = self.current_lexeme;
+        let mut i = current;
+        while i < self.lexeme_count && L::is_whitespace_or_comment(self.lex_types[i]) {
+            i += 1;
+        }
+        if i != current {
+            self.current_lexeme = i;
+            self.refresh(false);
         }
     }
 
@@ -965,14 +1097,12 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
-    /// `eof()`: skips whitespace and comments the first time after the cursor moved.
+    /// `eof()`: skips whitespace and comments the first time after the cursor moved (to `sig`).
     #[inline(always)]
     pub fn eof(&mut self) -> bool {
-        if !self.token_type_checked {
-            self.token_type_checked = true;
-            self.skip_whitespace();
-        }
-        self.current_lexeme >= self.lexeme_count
+        self.current_lexeme = self.sig;
+        self.checked = true;
+        self.sig >= self.lexeme_count
     }
 
     /// `error(messageText)`: an error element at the current token, unless the last production is an error item there.
@@ -1191,54 +1321,97 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// (`getLexemeIndexAt`) before any is balanced. One walk does both when no extra done node is linked: then each
     /// lexeme field of a marker belongs to one entry (a start marker's `lexeme_index` to its start entry, its
     /// `done_lexeme` to its done node, an error item's to its start entry), so the entry reads it before balancing
-    /// writes it. With an extra node linked, two done entries share a `done_lexeme`, and the array is made first.
+    /// writes it. With an extra node linked, two done entries share a `done_lexeme`, and the array is made first
+    /// (`flatten_then_balance`).
     fn flatten_and_balance(&mut self, balance: bool) {
+        let size = self.production_len;
+        if !balance || self.extras_linked != 0 || size < 2 {
+            self.flatten_then_balance(balance);
+            return;
+        }
+        let mut entries = std::mem::take(&mut self.entries);
+        entries.clear();
+        entries.resize(size, Entry { id: 0, lex: 0, ty: 0, flags: 0 });
+        let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
+        let view = TokenView {
+            types: &self.lex_types[..self.lexeme_count],
+            starts: &self.lex_starts,
+            text: &self.text[self.base..self.base + self.len],
+        };
+        let links = &self.links;
+        let markers = &mut self.markers;
+        // `balanceWhiteSpaces`' `lastIndex` and the balanced lexeme of the entry before.
+        let (mut last_index, mut prev) = (0i32, 0i32);
+        // No extra node is linked: every node is a marker's own, `2 * id` its start, `2 * id + 1` its done.
+        let mut node = links[HEAD as usize][1];
+        let last = size - 1;
+        for (i, slot) in entries.iter_mut().enumerate() {
+            let item_id = node >> 1;
+            let done = node & 1 != 0;
+            let m = &mut markers[item_id as usize];
+            let (mut lex, binder, ty, flags);
+            if m.kind == MarkerKind::Error {
+                (lex, binder, ty, flags) = (m.lexeme_index, L::Binder::DEFAULT_RIGHT_BINDER, 0, ENTRY_ERROR_ITEM);
+            } else if done {
+                (lex, binder, ty, flags) = (m.done_lexeme, m.right_binder, 0, 0);
+            } else {
+                ty = m.element_type.map_or(error_index, |t| t.index() as u16);
+                flags = if m.collapsed { ENTRY_COLLAPSED } else { 0 };
+                (lex, binder) = (m.lexeme_index, m.left_binder);
+            }
+            if i != 0 && i != last {
+                let balanced = view.balanced_lexeme::<L>(binder, lex, last_index, prev);
+                if balanced != lex {
+                    lex = balanced;
+                    m.set_lexeme_index(lex, done);
+                }
+                last_index = lex;
+            }
+            prev = lex;
+            let id = if done { -(item_id as i32) } else { item_id as i32 };
+            *slot = Entry { id, lex, ty, flags };
+            node = links[node as usize][1];
+        }
+        self.entries = entries;
+    }
+
+    /// `flatten_and_balance` in two passes, as the Java: the production made into the array, every lexeme read from
+    /// its marker, then balanced (when `balance`).
+    fn flatten_then_balance(&mut self, balance: bool) {
         let size = self.production_len;
         let mut entries = std::mem::take(&mut self.entries);
         entries.clear();
         entries.reserve(size);
         let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
-        let fused = balance && self.extras_linked == 0;
-        // `balanceWhiteSpaces`' `lastIndex` and the balanced lexeme of the entry before.
-        let (mut last_index, mut prev) = (0i32, 0i32);
         let mut node = self.link(HEAD)[1];
         while node != HEAD {
             let id = self.node_id(node);
             let done = id < 0;
-            let item_id = id.unsigned_abs();
-            let m = &self.markers[item_id as usize];
-            let mut lex = m.get_lexeme_index(done);
+            let m = &self.markers[id.unsigned_abs() as usize];
+            let lex = m.get_lexeme_index(done);
             let (mut ty, mut flags) = (0u16, 0u16);
-            let binder = if m.kind == MarkerKind::Error {
+            if m.kind == MarkerKind::Error {
                 flags = ENTRY_ERROR_ITEM;
-                L::Binder::DEFAULT_RIGHT_BINDER
-            } else if done {
-                m.right_binder
-            } else {
+            } else if !done {
                 ty = m.element_type.map_or(error_index, |t| t.index() as u16);
                 if m.collapsed {
                     flags = ENTRY_COLLAPSED;
                 }
-                m.left_binder
-            };
-            let i = entries.len();
-            if fused && i >= 1 && i + 1 < size {
-                let balanced = self.balanced_lexeme(binder, lex, last_index, prev);
-                if balanced != lex {
-                    lex = balanced;
-                    self.markers[item_id as usize].set_lexeme_index(lex, done);
-                }
-                last_index = lex;
             }
-            prev = lex;
             entries.push(Entry { id, lex, ty, flags });
             node = self.link(node)[1];
         }
-        if balance && !fused && size >= 2 {
+        if balance && size >= 2 {
+            let view = TokenView {
+                types: &self.lex_types[..self.lexeme_count],
+                starts: &self.lex_starts,
+                text: &self.text[self.base..self.base + self.len],
+            };
+            let mut last_index = 0;
             for i in 1..size - 1 {
                 let Entry { id, lex, flags, .. } = entries[i];
                 let done = id < 0;
-                let item = self.marker(id.unsigned_abs());
+                let item = &mut self.markers[id.unsigned_abs() as usize];
                 let binder = if flags & ENTRY_ERROR_ITEM != 0 {
                     L::Binder::DEFAULT_RIGHT_BINDER
                 } else if done {
@@ -1246,61 +1419,15 @@ impl<L: Language> PsiBuilderImpl<L> {
                 } else {
                     item.left_binder
                 };
-                let balanced = self.balanced_lexeme(binder, lex, last_index, entries[i - 1].lex);
+                let balanced = view.balanced_lexeme::<L>(binder, lex, last_index, entries[i - 1].lex);
                 if balanced != lex {
-                    self.markers[id.unsigned_abs() as usize].set_lexeme_index(balanced, done);
+                    item.set_lexeme_index(balanced, done);
                     entries[i].lex = balanced;
                 }
                 last_index = balanced;
             }
         }
         self.entries = entries;
-    }
-
-    /// `balanceWhiteSpaces()`' step for one production entry: its lexeme moved over the whitespace and comments
-    /// around it as `binder` says, given `lastIndex` and the balanced lexeme of the entry before (`prev`).
-    ///
-    /// The two default binders take a shortcut, exact by their contract (`WhitespacesAndCommentsBinder`):
-    /// `DEFAULT_LEFT_BINDER` answers `tokens.size()` for every view, so the edge is the whitespace's end (`wsEndIndex`)
-    /// in all three of the Java's cases (a view of positive, negative or zero size); `DEFAULT_RIGHT_BINDER` answers 0,
-    /// so the edge is `wsStartIndex` in all three.
-    #[inline(always)]
-    fn balanced_lexeme(&self, binder: L::Binder, lexeme_index: i32, last_index: i32, prev: i32) -> i32 {
-        if binder == L::Binder::DEFAULT_LEFT_BINDER {
-            return self.shift_over_whitespace_forward(lexeme_index.max(0) as usize) as i32;
-        }
-        let recursive = binder.is_recursive();
-        let prev_production_lex_index = if recursive { 0 } else { prev };
-        let mut ws_start_index = lexeme_index.max(last_index);
-        while ws_start_index > prev_production_lex_index
-            && (ws_start_index as usize) <= self.lexeme_count
-            && self.is_whitespace_or_comment(self.lex_types[ws_start_index as usize - 1])
-        {
-            ws_start_index -= 1;
-        }
-        if binder == L::Binder::DEFAULT_RIGHT_BINDER {
-            return ws_start_index;
-        }
-        let ws_end_index = self.shift_over_whitespace_forward(lexeme_index.max(0) as usize) as i32;
-        if ws_start_index < ws_end_index {
-            let start = ws_start_index as usize;
-            let end = ws_end_index as usize;
-            let at_end = ws_start_index == 0 || end == self.lexeme_count;
-            let tokens = &self.lex_types[start..end];
-            let text = &self.text[self.base..self.base + self.len];
-            let starts = &self.lex_starts;
-            let getter = |k: usize| -> &[u8] { &text[starts[start + k] as usize..starts[start + k + 1] as usize] };
-            let edge = binder.get_edge_position(tokens, at_end, &getter).min(end - start);
-            ws_start_index + edge as i32
-        } else if ws_start_index > ws_end_index {
-            // An earlier edge moved past this marker's whitespace: Java configures the token view with a negative
-            // size and the binder still answers.
-            ws_start_index + self.negative_size_edge(binder, ws_start_index, ws_end_index)
-        } else if lexeme_index < ws_start_index {
-            ws_start_index
-        } else {
-            lexeme_index
-        }
     }
 
     // StartMarker
@@ -1336,8 +1463,8 @@ impl<L: Language> PsiBuilderImpl<L> {
             }
         }
         self.current_lexeme = lexeme_index as usize;
-        self.token_type_checked = true;
-        self.tt_valid = false;
+        self.checked = true;
+        self.refresh(false);
         self.production_rollback_to(marker.0);
     }
 
@@ -1490,30 +1617,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         let first = self.link(HEAD)[1];
         let root_marker = if first == HEAD { NONE } else { self.node_id(first).max(0) as u32 };
         self.flatten_and_balance(root_marker != NONE);
-        if root_marker != NONE {
-            self.token_type_checked = true;
-        }
         root_marker
-    }
-
-    /// What `binder.getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`
-    /// (`WhitespacesAndCommentsBinder::negative_size_edge`).
-    fn negative_size_edge(&self, binder: L::Binder, ws_start: i32, ws_end: i32) -> i32 {
-        let size = ws_end - ws_start;
-        let get = |index: i32| -> Option<L::Token> {
-            let i = ws_start + index;
-            if i >= 0 && (i as usize) < self.lexeme_count { Some(self.lex_types[i as usize]) } else { None }
-        };
-        let text = |index: i32| -> &[u8] {
-            let i = ws_start + index;
-            if i >= 0 && (i as usize) < self.lexeme_count {
-                let (start, end) = (self.lex_starts[i as usize] as usize, self.lex_starts[i as usize + 1] as usize);
-                &self.text[self.base + start..self.base + end]
-            } else {
-                &[]
-            }
-        };
-        binder.negative_size_edge(size, get, &text)
     }
 
     /// `bind()` with `createRootAST`, `insertLeaves`, `collapseLeaves`: appends the leaves and composites to `tree`,

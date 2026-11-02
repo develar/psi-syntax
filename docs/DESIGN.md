@@ -101,13 +101,24 @@ Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl` adds the newline-mode and token
 
 What the port adds to the hot path:
 
-- **A current-token cache** in `PsiBuilderImpl`: `tt_raw`, `tt_joined` and `tt_valid`. `current_types` computes the
-  joined type with `Language::joined_token_type`, Kotlin's `getJoinedTokenType` body.
+- **A current-token cache** in `PsiBuilderImpl`, computed at every move rather than at the first read: `sig` (where
+  `eof()` puts the cursor: past whitespace and comments after a move, the cursor itself after `rollbackTo`, which sets
+  `myTokenTypeChecked`), `tt_raw` and `tt_joined` (`Language::joined_token_type`, Kotlin's `getJoinedTokenType` body).
+  - `eof()`, `getTokenType()` and `current_types` are a store of `sig` into the cursor and a read, without a branch;
+    the cursor itself moves over whitespace only where the Java's does (`eof()`, `mark()`), so `rawTokenIndex`,
+    `rawLookup` and the lexemes markers record are the Java's.
+  - It is recomputed wherever the cursor moves or `lex_types` changes: `advance_lexer`, `raw_advance_lexer` (and
+    `advance_to_eof`), `rollback_to` (which also restores remapped tokens), `remap_current_token`, `remap_tokens`,
+    `skip_balanced_block`, and `mark()` when it steps over whitespace `eof()` would not (after a rollback).
+  - `myTokenTypeChecked` is kept as `checked` only for a remap: a token at the cursor remapped into whitespace or a
+    comment is skipped only while it is false. `current_types` does not record it (a store on the hottest path), so
+    a layer reading the cursor through it never remaps into whitespace (Kotlin remaps to soft keywords and
+    identifiers only).
   - The cache lives in `PsiBuilderImpl`, not in the semantic-whitespace layer, because `Marker` methods mutate
     `PsiBuilderImpl` directly.
-  - It is invalidated wherever `current_lexeme` moves or `lex_types` changes: `advance_lexer`, `raw_advance_lexer`
-    (and `advance_to_eof`), `rollback_to`, `remap_current_token` and `skip_balanced_block`.
-  - `skip_whitespace` keeps it valid, because it only steps over whitespace.
+- **The semantic layer's stack tops** (`join_top`, `newlines_top`) are fields updated on push and pop, so
+  `getTokenType()` reads a bool, not `Vec::last`; `newlineBeforeCurrentToken` walks the raw tokens before the cursor
+  as a slice.
 - **The handle caches** `top_trunc` and `min_eof` (the smallest non-negative `eof_position`). It sets them in
   `handle()`, `reborrow()` and `wrapped()`. This is sound by the borrow checker: `wrapped(self)` consumes the handle
   and `reborrow` freezes its parent, so the adapter prefix cannot change while the handle is alive.
