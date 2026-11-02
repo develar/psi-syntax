@@ -65,6 +65,19 @@ impl<T> Lexed<T> {
     pub fn end(&mut self, len: u32) {
         self.starts.push(len);
     }
+
+    /// The heap bytes of the list's buffers, by capacity.
+    pub fn heap_bytes(&self) -> usize {
+        use crate::buffers::vec_bytes;
+        vec_bytes(&self.types) + vec_bytes(&self.starts) + vec_bytes(&self.plain)
+    }
+
+    /// Empties the list, each buffer shrunk to its share of `shrink`.
+    pub fn shrink(&mut self, shrink: crate::buffers::Shrink) {
+        shrink.vec(&mut self.types);
+        shrink.vec(&mut self.starts);
+        shrink.vec(&mut self.plain);
+    }
 }
 
 impl<T: Copy> Lexed<T> {

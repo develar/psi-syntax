@@ -192,7 +192,7 @@ impl Deref for Tree {
 impl Tree {
     /// Parses `text` with a fresh `Parser` (keep a `Parser` per thread to reuse its buffers).
     pub fn parse(text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
-        Parser::new().parse(text, file_kind)
+        Parser::once().parse(text, file_kind)
     }
 
     /// The tree of the green `root` of `arena` over `source` (tests build green trees by hand).
@@ -244,8 +244,9 @@ impl Tree {
 }
 
 /// A reusable C# parser: owns the green arena, the lexer's and the parsers' buffers and the tree builder, cleared and
-/// reused from one file to the next. Keep one per thread; `Tree::parse` makes a fresh one per call.
-#[derive(Default)]
+/// reused from one file to the next. Keep one per thread; `Tree::parse` makes a fresh one per call. After a parse
+/// whose buffers outgrew the retained bytes (`psi_builder::buffers::RETAINED_BYTES` by default,
+/// `set_retained_bytes`) they are shrunk to half of them (`shrink_to`).
 pub struct Parser {
     arena: GreenArena,
     lexer: LexerBuffers,
@@ -255,11 +256,89 @@ pub struct Parser {
     flattener: Flattener,
     /// What `set_arena_budget` set in place of `green::budget_for`.
     arena_budget: Option<usize>,
+    /// What `set_retained_bytes` set.
+    retained_bytes: usize,
+    /// `heap_bytes` when the last parse ended, before it shrank to `retained_bytes`.
+    grown_bytes: usize,
+}
+
+impl Default for Parser {
+    fn default() -> Parser {
+        Parser {
+            arena: GreenArena::default(),
+            lexer: LexerBuffers::default(),
+            syntax_parser: SyntaxParserBuffers::default(),
+            pool: SyntaxListPool::default(),
+            builder: TreeBuilder::default(),
+            flattener: Flattener::default(),
+            arena_budget: None,
+            retained_bytes: psi_builder::buffers::RETAINED_BYTES,
+            grown_bytes: 0,
+        }
+    }
 }
 
 impl Parser {
     pub fn new() -> Parser {
         Parser::default()
+    }
+
+    /// A parser for one parse, which it never shrinks after (its buffers go with it).
+    fn once() -> Parser {
+        Parser { retained_bytes: usize::MAX, ..Parser::default() }
+    }
+
+    /// The heap bytes the parser's buffers hold between parses, by capacity: the green arena, the lexer's buffers
+    /// (with those of the directive, documentation comment and interpolated string parsers it runs), the token
+    /// window, the list builders, the tree builder and the flattener's stack.
+    pub fn heap_bytes(&self) -> usize {
+        self.arena.heap_bytes()
+            + self.lexer.heap_bytes()
+            + self.syntax_parser.heap_bytes()
+            + self.pool.heap_bytes()
+            + self.builder.heap_bytes()
+            + self.flattener.heap_bytes()
+    }
+
+    /// Shrinks the buffers to at most `bytes` when they hold more (`heap_bytes`; the directive store's empty stack
+    /// keeps one record, and a vector of nested buffers its first element's inline bytes, `Shrink::nested`): each is
+    /// emptied and keeps the same share of its capacity (`psi_builder::buffers::Shrink`), so the proportions of the
+    /// files that grew them stay. `shrink_to(0)` frees them. A parse after it grows what it needs again.
+    pub fn shrink_to(&mut self, bytes: usize) {
+        let total = self.heap_bytes();
+        if total <= bytes {
+            return;
+        }
+        let shrink = psi_builder::buffers::Shrink::new(bytes, total);
+        self.arena.shrink(shrink);
+        self.lexer.shrink(shrink);
+        self.syntax_parser.shrink(shrink);
+        self.pool.shrink(shrink);
+        self.builder.shrink(shrink);
+        self.flattener.shrink(shrink);
+    }
+
+    /// The most the buffers keep from one file to the next (`psi_builder::buffers::RETAINED_BYTES` by default): after a
+    /// parse that leaves more than `bytes` in them, they are shrunk to half of it
+    /// (`shrink_to(psi_builder::buffers::retained_after(bytes))`); after one that leaves `bytes` or less, they are kept
+    /// as they are. `usize::MAX` keeps all, `0` frees all after every file.
+    pub fn set_retained_bytes(&mut self, bytes: usize) {
+        self.retained_bytes = bytes;
+    }
+
+    /// `heap_bytes` when the last parse ended, before it shrank to the retained bytes (measurements).
+    #[doc(hidden)]
+    pub fn grown_bytes(&self) -> usize {
+        self.grown_bytes
+    }
+
+    /// The end of a parse: the bytes it grew to; past the retained bytes, the buffers shrunk to half of them
+    /// (`buffers::retained_after`).
+    fn retain(&mut self) {
+        self.grown_bytes = self.heap_bytes();
+        if self.grown_bytes > self.retained_bytes {
+            self.shrink_to(psi_builder::buffers::retained_after(self.retained_bytes));
+        }
     }
 
     /// Parses with an arena budget of `bytes` instead of `green::budget_for` of the text (tests: a small budget puts
@@ -323,6 +402,7 @@ impl Parser {
         self.lexer = lexer_buffers;
         let (tree, diagnostics) = self.flattener.flatten_tokens(&arena, &tokens, &source, &mut self.builder, file_kind);
         self.arena = arena;
+        self.retain();
         Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: true }
     }
 
@@ -344,6 +424,7 @@ impl Parser {
         let (arena, lexer_buffers) = lexer.into_parts();
         self.lexer = lexer_buffers;
         self.arena = arena;
+        self.retain();
         count
     }
 
@@ -357,6 +438,7 @@ impl Parser {
             self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind)
         };
         self.arena = arena;
+        self.retain();
         Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result, lexed: false }
     }
 }

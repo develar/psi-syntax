@@ -54,6 +54,32 @@ struct NestedBuffers {
     pool: SyntaxListPool,
 }
 
+impl InterpolatedStringBuffers {
+    /// The heap bytes of the buffers, by capacity, the nested levels' included.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        use psi_builder::buffers::vec_bytes;
+        let nested: usize =
+            self.nested.iter().map(|n| n.lexer.heap_bytes() + n.parser.heap_bytes() + n.pool.heap_bytes()).sum();
+        vec_bytes(&self.interpolations)
+            + vec_bytes(&self.nested)
+            + nested
+            + vec_bytes(&self.fake_string)
+            + vec_bytes(&self.content)
+    }
+
+    /// Empties the buffers, each shrunk to its share of `shrink`, the nested levels past their share dropped.
+    pub(crate) fn shrink(&mut self, shrink: psi_builder::buffers::Shrink) {
+        shrink.vec(&mut self.interpolations);
+        shrink.nested(&mut self.nested, |n| {
+            n.lexer.shrink(shrink);
+            n.parser.shrink(shrink);
+            n.pool.shrink(shrink);
+        });
+        shrink.vec(&mut self.fake_string);
+        shrink.vec(&mut self.content);
+    }
+}
+
 /// The buffers of a temporary lexer or parser over `lexer`'s level.
 fn take_nested(lexer: &mut Lexer<'_>) -> NestedBuffers {
     lexer.interpolated_string_buffers().nested.pop().unwrap_or_default()

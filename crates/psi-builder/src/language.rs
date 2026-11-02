@@ -115,6 +115,9 @@ pub trait Language: TreeLanguage {
     /// The builder of a frame.
     fn frame_builder(frame: &mut Self::Frame) -> &mut PsiBuilderImpl<Self>;
 
+    /// The builder of a frame, read-only (`Parser::heap_bytes`).
+    fn frame_builder_ref(frame: &Self::Frame) -> &PsiBuilderImpl<Self>;
+
     /// `ParserDefinition.getFileNodeType()`: the root's type when the parser produced no markers.
     const FILE: Self::Node;
 

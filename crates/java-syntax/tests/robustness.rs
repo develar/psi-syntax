@@ -470,3 +470,33 @@ fn tiny_nesting_limits_keep_trees_lossless() {
         assert!(deep > 0, "limit {limit}");
     }
 }
+
+/// A parser keeps at most its retained bytes from one file to the next (`Parser::set_retained_bytes`, the same
+/// mechanism as C#'s), and a parser whose buffers were shrunk parses as a fresh one does.
+#[test]
+fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
+    let file = "/** doc {@link A#b(int)} */\nclass C<T> { int f(int x) { return java.util.List.of(1, 2).stream().map(y -> y * x).count() > 0 ? 1 : 0; } }\n";
+    let big = file.repeat(20_000);
+    let kind = FileKind::file(LanguageLevel::HIGHEST);
+    let parse = |parser: &mut java_syntax::Parser, text: &str| {
+        let tree = parser.parse(text, kind);
+        let dump = |t: &Tree| java_syntax::dump::psi_to_string(t, "A.java");
+        assert_eq!(dump(&tree), dump(&Tree::parse(text, kind)));
+    };
+    let mut parser = java_syntax::Parser::new();
+    parser.set_retained_bytes(8 << 20);
+    parse(&mut parser, &big);
+    assert!(parser.grown_bytes() > 8 << 20, "{}", parser.grown_bytes());
+    assert!(parser.heap_bytes() <= 4 << 20, "{}", parser.heap_bytes());
+    // a share under 1 / the frames' capacity still keeps the file's builder (`Shrink::nested`), so the buffers keep
+    // nearly all of what they are shrunk to (0.58 of it while the share dropped every frame)
+    assert!(parser.heap_bytes() > 3 << 20, "{}", parser.heap_bytes());
+    parse(&mut parser, file);
+    parse(&mut parser, &big);
+    parser.shrink_to(0);
+    assert_eq!(parser.heap_bytes(), 0);
+    parse(&mut parser, file);
+    parser.set_retained_bytes(usize::MAX);
+    parse(&mut parser, &big);
+    assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+}

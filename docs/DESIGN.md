@@ -47,7 +47,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 
 | crate | holds | depends on |
 |---|---|---|
-| `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters | nothing |
+| `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters, the retained buffers (`buffers`: `Shrink`, `RETAINED_BYTES`) | nothing |
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
 | `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers | `psi-builder` |
 | `csharp-syntax` | `SyntaxKind`, `TokenKind`, `NodeKind`, the generated node types and diagnostics, the lexer and directive parser, `SyntaxParser`, `LanguageParser`, `DocumentationCommentParser`, the green arena, `flatten`, `CSharp: TreeLanguage`, `Tree` with diagnostics, the dump | `psi-builder` |
@@ -55,7 +55,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),
-`Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `Frame` (a builder with the language layers' state over it, `frame_builder`),
+`Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `Frame` (a builder with the language layers' state over it, `frame_builder`, `frame_builder_ref`),
 `FILE`, `ERROR_ELEMENT`, `is_whitespace_or_comment`, `is_left_bound`, `is_chameleon_token`, `chameleon`, `is_body`,
 `joined_token_type` (the cursor cache's derived token), `bracket_depth_change` (the too-deep skip), `tokenize_into`,
 `parse_file` and `parse_chameleon`. `tokenize_into` gets the file's `FileKind` and `Chameleon::file_kind` gives it to
@@ -428,8 +428,10 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   10-17 bytes of records per source byte ("C# memory"); past `green::budget_for` (256 bytes a source byte, at least
   256 MiB) the parse is abandoned as on an exhausted stack ("C# nesting and work").
 - **Buffers.** The arena, the token window, the trivia and list builders (`SyntaxListPool`), the directive store, the
-  interpolated string buffers and the flattener's stack belong to the `Parser` and are cleared, not freed, per file;
-  `Tree` is copied out exactly sized. A tree owns its text (`Arc<[u8]>`), nothing of the arena.
+  interpolated string and documentation comment parsers' buffers, the tree builder and the flattener's stack belong to
+  the `Parser` and are cleared, not freed, per file; `Tree` is copied out exactly sized. A tree owns its text
+  (`Arc<[u8]>`), nothing of the arena. A parse that leaves more than the retained bytes in them (64 MiB by default)
+  shrinks them to half of that, each to the same share of its capacity ("Retained buffers").
 - **Lexer.** `Lexer.cs` and its partial files ported method by method. Keywords are a perfect hash of the first eight
   bytes and the length into 1024 slots, built and checked at compile time, which is what `LexerCache` and
   `QuickScanner` cache (neither ported). Each token keeps the lexer state after it (position, directives, the
@@ -615,6 +617,9 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 - `ParseOptions { expand_bodies: false }` leaves each block and lambda as a childless node marked `is_unexpanded`. Doc
   comments are still expanded. `parse_body(id)` returns that body's exact subtree as its own `Tree`; the gate checks
   this on every community body.
+- A `Parser` keeps its buffers from file to file up to its retained bytes (`set_retained_bytes`,
+  `buffers::RETAINED_BYTES` = 64 MiB by default): a parse that leaves more shrinks them to half of that. `heap_bytes()`
+  is what they hold, `shrink_to(bytes)` shrinks them on demand (the same for the three languages, "Retained buffers").
 - C#: `csharp_syntax::Tree` derefs to the same `psi_builder::Tree` and adds `diagnostics()` (codes, byte spans,
   messages, in Roslyn's order). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`
   telling which token they belong to; an inserted token is an empty leaf with `is_missing`. There is no body-less
@@ -644,6 +649,7 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | C#: widths in bytes over a UTF-16 reading of the text | positions are the oracle's byte offsets with no second pass or UTF-16 copy; only the one sum Roslyn mixes is redone in UTF-16 | 0 differing lexer lines on every corpus since 7d7af22e; the last 10 fuzz differences were that sum (43519b4f) |
 | C#: TRAILING and MISSING bits in the shared `kinds` column | the token a trivia belongs to and an inserted token cannot be read off positions; two bits cost nothing per node | Kotlin and Java counters unchanged (30d40a2f); 12 bits of kind index hold C#'s 574 kinds |
 | C#: a depth counter, a work budget and an arena budget, failing as Roslyn's exhausted stack does | deterministic on any stack and machine, with the answer Roslyn itself gives at 100 000 levels; time and memory linear in the input | 153 forms 100 000 deep on 1 MB each under 220 ms; 26 forms compared at 100 000 levels equal Roslyn's tree (43ed5b13); no corpus tree reaches a bound (the gate) |
+| Buffers kept up to a bound; past it each shrunk to the same share of its capacity, to half the bound | A parser per thread for a process's lifetime kept its largest file's buffers (1.24 GB after one 24 MB C# file); freeing them all costs every next file its growth, a proportional share costs nothing to the files after it, and the half left free keeps files of other proportions from shrinking again at once | the four C# corpora keep 14.8-58.2 MB instead of 14.8-1245 MB, 16 shrinks in 62 615 files; the files after a shrink parse as fast as without one; freeing after every file costs 8-14 % ("Retained buffers") |
 | C#: an interpolated string's holes lexed and parsed over windows of the file | Roslyn cuts strings out of the token's text; windows give the source's texts and Roslyn's positions with no allocation per token | the interpolation goldens, the corpora and the fuzz at 0 differences (43519b4f) |
 
 ### Libraries
@@ -718,6 +724,56 @@ The machine is an Apple M5 Max shared with other sessions. Every comparison alte
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
 
+### Retained buffers (child of 6e8c19af), 2026-11-02
+
+`ksdump --bench` (one thread, one `Parser`, list order, load 1.4-2.8) with `--file-stats`' new `parser_grown` column:
+what a parser's buffers hold when a parse ends (`Parser::grown_bytes`, before the retained bound applies). With
+`--retain 0` every file starts from empty buffers, so the column is what each file needs alone:
+
+| corpus | median file | p99 | the largest | files over 32 / 64 MiB |
+|---|---|---|---|---|
+| dotnet/roslyn | 0.08 MB | 4.52 MB | 97.1 MB (`NullableReferenceTypesTests.cs`, 6.59 MB) | 9 / 1 |
+| dotnet/runtime | 0.09 MB | 4.72 MB | 1237.8 MB (`hugeexpr1.cs`, 24.12 MB; `HugeArray1.cs`, `HugeField1.cs`, `HugeField2.cs` of 10.0-10.7 MB 651.5 MB each) | 43 / 18 |
+| dotnet/aspnetcore | 0.08 MB | 2.18 MB | 76.4 MB (`MatcherAzureBenchmarkBase.generated.cs`, 3.05 MB) | 1 / 1 |
+| Avalonia | 0.08 MB | 1.76 MB | 14.4 MB (`UnicodeData.trie.cs`, 0.37 MB) | 0 / 0 |
+
+Of the 62 615 files 20 need more than 64 MiB, the smallest of them 1.04 MB; a file over 100 KB needs 25 bytes a source
+byte (median; p90 46, the most 92). The arena is 733 MB of `hugeexpr1.cs`'s 1238 ("C# memory"), the tree builder,
+token window and lexer the rest. What a thread keeps after the corpus, without a bound (`--retain max`, as before)
+and with the default (64 MiB, shrunk to 32 MiB when a parse passes it), and the throughput (`ksdump --bench`'s wall
+time, parse and flatten) of one run of each, two alternating runs of each on runtime:
+
+| corpus | kept without a bound | kept with the default | shrinks | MB/s without / with |
+|---|---|---|---|---|
+| dotnet/roslyn | 101.5 MB | 51.1 MB | 1 | 122.8 / 122.7 |
+| dotnet/runtime | 1245.0 MB | 58.2 MB | 14 | 78.9, 77.5 / 76.8, 76.1 |
+| dotnet/aspnetcore | 76.5 MB | 33.7 MB | 1 | 87.8 / 87.7 |
+| Avalonia | 14.8 MB | 14.8 MB | 0 | 82.6 / 81.3 |
+
+Shrinking the buffers to their share of half the bound keeps them in the proportions of the files that grew them.
+Shrinking them to exactly the bound did not: every later file whose proportions differ (a documentation comment after
+`hugeexpr1.cs`) grew some small buffer past it and shrank all of them again, 132 times on runtime. What a shrink costs,
+on runtime in 4 alternating rounds of each (the first, a warm-up, dropped; the summed parse times of the other 3, the
+shrink itself timed inside `parse`): the corpus 5.68-5.78 s without a bound, 5.77-5.86 s with it (+1-2 %); of that the
+14 files that shrink 1.77-1.79 s, 1.87-1.88 s (+5.7 %, 7 ms a file: they grow again from 32 MiB, by doubling); the 100
+files after each shrink 0.145-0.148 s either way, the other files 3.77-3.84 and 3.75-3.82 s. The 0.1 s of the 14 files
+is the corpus's whole cost, the 1.8-2.7 % of the table's alternating runs; a single run's difference of a point or two
+is noise of the size of Avalonia's, which never shrinks. Freeing everything after every file instead (`--retain 0`,
+single runs, each against a run with the default made with it) cost roslyn 122.7 → 105.7 MB/s (-14 %), runtime 74.7 →
+70.8, aspnetcore 87.7 → 81.5, Avalonia 81.3 → 79.3, Kotlin's community files 112.0 → 102.7 (-8 %) and Java's 120.6 →
+110.9 (-8 %): growing the buffers again costs the files after a free, which is why a shrink keeps a share. A vector of
+nested buffers (a Kotlin or Java parser's frames, C#'s nested interpolated string levels and list pools) counts its
+share in elements, so it keeps its first element even when that share rounds down to none: a parser's first frame is the
+file's builder, and a share under a quarter of the frames freed it whole (the 2.6 MB Kotlin file of `robustness.rs` kept
+0.58 of a shrink's target, now all of it; `buffers::Shrink::nested`).
+
+Kotlin and Java (`psi_builder::Parser`, the same mechanism over its tokens, frames, tree builder and tables): over
+the community files a parser keeps 15.6 MB (Kotlin) and 37.8 MB (Java); the most one file needs is 8.6 MB
+(`MetadataStorageImpl.kt`, 1.06 MB) and 30.9 MB (`java_after.java`, 0.44 MB); a file over 100 KB needs 14 and 18 bytes
+a source byte. No community file reaches the bound: 112.0 / 111.6 MB/s (Kotlin) and 120.6 / 120.3 (Java) without and
+with it. The tests (`memory.rs` for C#, `robustness.rs` for Kotlin and Java) shrink after a 2 MB file and compare every
+later tree with a fresh parser's.
+
 ### C# memory (19b40696), 2026-11-02
 
 A probe (a test that was not committed, reading `GreenArena::record_bytes`, `record_counts` and `heap_bytes` after
@@ -737,7 +793,8 @@ A tree node is a token, a trivia or a node, and a list's elements are its parent
 parse would make about one record per tree node: the copies and speculation add 4-7 %. The budget
 (`green::budget_for`, 256 bytes a source byte) is 4.7 times the most any file needs. The trees are 5.00-7.86 MB per
 source MB ("C# parse throughput and robustness"). The 733 MB of capacity are kept from dotnet/runtime's
-`hugeexpr1.cs` (24.12 MB of source; buffers grow by doubling, so capacity exceeds the records).
+`hugeexpr1.cs` (24.12 MB of source; buffers grow by doubling, so capacity exceeds the records); a parser now shrinks
+them past its retained bytes ("Retained buffers").
 
 ### The C# port, step by step (bb0fe20b → 174ecb80), 2026-11-02
 
@@ -1136,9 +1193,6 @@ There is no line-level profile of the current code: `atos` returned no line info
 - **C# speed.** 59-113 MB/s on one thread against Kotlin's and Java's 111-120 on a quiet machine, at 0.22-0.36 G
   instructions per source MB; no line-level profile yet. Flattening (about 18 %) and the token window (`current_kind`, 9 %)
   are the first candidates. A quiet-machine run of the table in "C# parse throughput and robustness" is open.
-- **C# arena capacity.** A `Parser` keeps the capacity of its largest file (733 MB after dotnet/runtime's
-  `hugeexpr1.cs`, "C# memory"); a long-lived consumer thread would want the arena shrunk after a file far above the
-  usual size. Not measured yet what a shrink costs the next file.
 - **C# speculation below the budget.** `a?[0]?[0]…` (17 or more) and 100 000 `a < a < …` fail as too deep; Roslyn
   parses the former in seconds and would recurse 100 000 deep for the latter. A memo of `?[`'s speculation, as of
   tuple scans, would make the first polynomial.

@@ -34,6 +34,10 @@ impl psi_builder::Language for Kotlin {
         &mut frame.delegate
     }
 
+    fn frame_builder_ref(frame: &SemanticWhitespaceAwarePsiBuilderImpl) -> &PsiBuilderImpl {
+        &frame.delegate
+    }
+
     /// `KtNodeTypes.KT_FILE` (printed as "KtFile: <name>").
     const FILE: NodeKind = NodeKind::KT_FILE;
 

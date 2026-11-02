@@ -1,10 +1,12 @@
 //! The language-neutral half of the PSI ports (see AGENTS.md): IntelliJ's `PsiBuilderImpl` with its marker
 //! production and edge binders (`builder`), the preorder column tree a builder binds into and its consumer API, with
 //! the parse driver that expands chameleons in place (`tree`), the PSI debug dump's layout (`dump`), token sets
-//! (`token_set`), what lexers share (`lexer`) and a file's text as IntelliJ's document holds it (`document`). A
+//! (`token_set`), what lexers share (`lexer`), a file's text as IntelliJ's document holds it (`document`) and what a
+//! reusable parser keeps of its buffers (`buffers`). A
 //! language (`kotlin-syntax`, `java-syntax`) implements `Language` and brings its tokens, node types, lexers, builder
 //! layers and parsers.
 
+pub mod buffers;
 pub mod builder;
 pub mod counters;
 pub mod document;

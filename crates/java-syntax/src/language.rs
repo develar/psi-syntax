@@ -39,6 +39,10 @@ impl psi_builder::Language for Java {
         frame
     }
 
+    fn frame_builder_ref(frame: &PsiBuilderImpl) -> &PsiBuilderImpl {
+        frame
+    }
+
     /// `JavaSyntaxElementType.JAVA_FILE` (printed as "PsiJavaFile:<name>").
     const FILE: NodeKind = NodeKind::JAVA_FILE;
 

@@ -42,3 +42,63 @@ fn the_budget_is_reset_for_the_next_file() {
     let small = parser.parse(TEXT, FileKind::default());
     assert!(small.diagnostics().iter().all(|d| d.code != ErrorCode::ERR_InsufficientStack));
 }
+
+/// A file of every kind of buffer the parser owns: directives, documentation comments, interpolated and raw strings
+/// with holes, attributes, generics, lambdas, queries.
+const MIXED: &str = r#"#define X
+#region R
+/// <summary>A <see cref="List{T}"/> &amp; <c>code</c>.</summary>
+/// <param name="a">the a</param>
+[Obsolete("no")]
+partial class C<T> where T : class {
+#if X
+    async Task<int> M(int a) { var s = $"{a,3:X}{$"{a}"}" + """raw {x}""" + $$"""{{a}}"""; return await F(x => x * 2, from y in z select y); }
+#else
+    void N() { }
+#endif
+}
+#endregion
+"#;
+
+/// The dump of `text` parsed by `parser` and by a fresh parser, which must be the same.
+fn parse_as_fresh(parser: &mut Parser, text: &str) {
+    let tree = parser.parse(text, FileKind::default());
+    let fresh = Parser::new().parse(text, FileKind::default());
+    assert_eq!(csharp_syntax::dump::tree_to_string(&tree), csharp_syntax::dump::tree_to_string(&fresh));
+}
+
+#[test]
+fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
+    let big = format!("{}{}", MIXED.repeat(2000), source(10_000));
+    let mut parser = Parser::new();
+    parser.set_retained_bytes(8 << 20);
+    parse_as_fresh(&mut parser, &big);
+    assert!(parser.grown_bytes() > 8 << 20, "the file grows the buffers past the bound: {}", parser.grown_bytes());
+    assert!(parser.heap_bytes() <= 4 << 20, "shrunk to half the bound: {}", parser.heap_bytes());
+    // the next files reuse what is left (and may grow a buffer of other proportions), and parse as a fresh parser
+    parse_as_fresh(&mut parser, MIXED);
+    assert!(parser.heap_bytes() <= 8 << 20);
+    parse_as_fresh(&mut parser, &big);
+    // freed entirely, the buffers grow again
+    parser.shrink_to(0);
+    assert!(parser.heap_bytes() < 1024, "only the empty directive stack's cell: {}", parser.heap_bytes());
+    parse_as_fresh(&mut parser, MIXED);
+    parse_as_fresh(&mut parser, &big);
+    // without a bound the buffers keep what they grew to
+    parser.set_retained_bytes(usize::MAX);
+    parse_as_fresh(&mut parser, &big);
+    assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+    assert!(parser.heap_bytes() > 8 << 20);
+    // a bound above what the buffers hold leaves them alone
+    let held = parser.heap_bytes();
+    parser.shrink_to(held);
+    assert_eq!(parser.heap_bytes(), held);
+}
+
+#[test]
+fn the_default_bound_keeps_an_ordinary_file_buffers() {
+    let mut parser = Parser::new();
+    parse_as_fresh(&mut parser, &source(1000));
+    assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+    assert!(parser.heap_bytes() <= csharp_syntax::psi_builder::buffers::RETAINED_BYTES);
+}

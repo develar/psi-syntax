@@ -136,6 +136,16 @@ impl Utf16Cursor {
 }
 
 impl Flattener {
+    /// The heap bytes of the walk's stack, by capacity.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        psi_builder::buffers::vec_bytes(&self.stack)
+    }
+
+    /// Empties the stack, shrunk to its share of `shrink`.
+    pub(crate) fn shrink(&mut self, shrink: psi_builder::buffers::Shrink) {
+        shrink.vec(&mut self.stack);
+    }
+
     /// The tree of the green `root` (a node) over `source`; its diagnostics in Roslyn's order.
     pub(crate) fn flatten(
         &mut self,

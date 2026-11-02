@@ -159,6 +159,20 @@ impl TreeData {
         self.body_depths.clear();
     }
 
+    /// The heap bytes of a builder's buffers (`nodes`, `errors`, `body_depths`) by capacity; the columns of a
+    /// finished tree are `Tree::heap_bytes`.
+    fn build_bytes(&self) -> usize {
+        use crate::buffers::vec_bytes;
+        vec_bytes(&self.nodes) + vec_bytes(&self.errors) + vec_bytes(&self.body_depths)
+    }
+
+    /// Empties a builder's buffers, each shrunk to its share of `shrink`.
+    fn shrink(&mut self, shrink: crate::buffers::Shrink) {
+        shrink.vec(&mut self.nodes);
+        shrink.vec(&mut self.errors);
+        shrink.vec(&mut self.body_depths);
+    }
+
     /// The finished tree: the nodes as three exactly sized columns; the errors are taken (most files have none: their
     /// list never allocates; the others' is shrunk to fit).
     fn take_exact(&mut self) -> TreeData {
@@ -227,6 +241,10 @@ pub struct Parser<L: Language> {
     /// builder holds it. `pair_stack` is the scratch of the pass.
     file_brace_pairs: Arc<Vec<u32>>,
     pair_stack: Vec<u32>,
+    /// What `set_retained_bytes` set (`buffers::RETAINED_BYTES` by default).
+    retained_bytes: usize,
+    /// `heap_bytes` when the last parse ended, before it shrank to `retained_bytes`.
+    grown_bytes: usize,
 }
 
 impl<L: Language> Default for Parser<L> {
@@ -242,6 +260,8 @@ impl<L: Language> Default for Parser<L> {
             file_block_closers: None,
             file_brace_pairs: Arc::new(Vec::new()),
             pair_stack: Vec::new(),
+            retained_bytes: crate::buffers::RETAINED_BYTES,
+            grown_bytes: 0,
         }
     }
 }
@@ -356,6 +376,11 @@ impl<L: Language> Parser<L> {
         Self::default()
     }
 
+    /// A parser for one parse, which it never shrinks after (its buffers go with it).
+    fn once() -> Self {
+        Parser { retained_bytes: usize::MAX, ..Self::default() }
+    }
+
     /// Parses with `limit` instead of `Language::NESTING_LIMIT` (tests: a small limit puts the too-deep paths on ordinary
     /// inputs). Not part of the consumer contract.
     #[doc(hidden)]
@@ -365,6 +390,68 @@ impl<L: Language> Parser<L> {
 
     fn limit(&self) -> u32 {
         self.nesting_limit.unwrap_or(L::NESTING_LIMIT)
+    }
+
+    /// The heap bytes the parser's buffers hold between parses, by capacity: the file's tokens, a chameleon's, every
+    /// frame's builder (tokens, markers, production, entries, tables), the tree being built and the file's tables.
+    pub fn heap_bytes(&self) -> usize {
+        use crate::buffers::vec_bytes;
+        let frames: usize = self.frames.iter().map(|f| L::frame_builder_ref(f).heap_bytes()).sum();
+        self.file.heap_bytes()
+            + self.relexed.heap_bytes()
+            + vec_bytes(&self.frames)
+            + frames
+            + self.data.build_bytes()
+            + self.file_block_closers.as_ref().map_or(0, |t| t.len() * size_of::<u32>())
+            + vec_bytes(&self.file_brace_pairs)
+            + vec_bytes(&self.pair_stack)
+    }
+
+    /// Shrinks the buffers to at most `bytes` when they hold more (`heap_bytes`): each is emptied and keeps the same
+    /// share of its capacity (`buffers::Shrink`), the frames past that share are dropped. `shrink_to(0)` frees them
+    /// all. A parse after it grows what it needs again.
+    pub fn shrink_to(&mut self, bytes: usize) {
+        let total = self.heap_bytes();
+        if total <= bytes {
+            return;
+        }
+        // the frames keep their first (`Shrink::nested`) past their share: its inline bytes are kept out of the
+        // others' share, so the buffers hold at most `bytes`
+        let first_frame = if bytes == 0 || self.frames.is_empty() { 0 } else { size_of::<L::Frame>() };
+        let shrink = crate::buffers::Shrink::new(bytes.saturating_sub(first_frame), total);
+        self.file.shrink(shrink);
+        self.relexed.shrink(shrink);
+        shrink.nested(&mut self.frames, |f| L::frame_builder(f).shrink(shrink));
+        self.data.shrink(shrink);
+        self.file_block_closers = None;
+        match Arc::get_mut(&mut self.file_brace_pairs) {
+            Some(pairs) => shrink.vec(pairs),
+            None => self.file_brace_pairs = Arc::new(Vec::new()),
+        }
+        shrink.vec(&mut self.pair_stack);
+    }
+
+    /// The most the buffers keep from one file to the next (`buffers::RETAINED_BYTES` by default): after a parse that
+    /// leaves more than `bytes` in them, they are shrunk to half of it (`shrink_to(buffers::retained_after(bytes))`);
+    /// after one that leaves `bytes` or less, they are kept as they are. `usize::MAX` keeps all, `0` frees all after
+    /// every file.
+    pub fn set_retained_bytes(&mut self, bytes: usize) {
+        self.retained_bytes = bytes;
+    }
+
+    /// `heap_bytes` when the last parse ended, before it shrank to the retained bytes (measurements).
+    #[doc(hidden)]
+    pub fn grown_bytes(&self) -> usize {
+        self.grown_bytes
+    }
+
+    /// The end of a parse: the bytes it grew to; past the retained bytes, the buffers shrunk to half of them
+    /// (`buffers::retained_after`).
+    fn retain(&mut self) {
+        self.grown_bytes = self.heap_bytes();
+        if self.grown_bytes > self.retained_bytes {
+            self.shrink_to(crate::buffers::retained_after(self.retained_bytes));
+        }
     }
 
     /// Parses `text` as a file of `file_kind` (see `Tree::parse`).
@@ -411,6 +498,7 @@ impl<L: Language> Parser<L> {
         let body = data.take_exact();
         self.data = data;
         self.options = ParseOptions::default();
+        self.retain();
         Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root, language: PhantomData })
     }
 
@@ -459,6 +547,7 @@ impl<L: Language> Parser<L> {
 
         let tree = data.take_exact();
         self.data = data;
+        self.retain();
         Tree { text, file_kind, data: tree, root, language: PhantomData }
     }
 
@@ -544,12 +633,12 @@ impl<L: Language> Tree<L> {
     /// as `BAD_CHARACTER`s. At most `u32::MAX - 1` bytes are parsed. A fresh `Parser` per call: to parse many files,
     /// keep a `Parser` and call `Parser::parse`.
     pub fn parse(text: impl AsRef<[u8]>, file_kind: L::FileKind) -> Tree<L> {
-        Parser::new().parse(text, file_kind)
+        Parser::once().parse(text, file_kind)
     }
 
     /// `Parser::parse_body` on a fresh parser, every body inside expanded.
     pub fn parse_body(&self, id: NodeId) -> Option<Tree<L>> {
-        Parser::new().parse_body(self, id, ParseOptions::default())
+        Parser::once().parse_body(self, id, ParseOptions::default())
     }
 }
 
@@ -873,6 +962,16 @@ impl<L: TreeLanguage> TreeBuilder<L> {
     /// Room for `additional` more nodes.
     pub fn reserve(&mut self, additional: usize) {
         self.data.reserve(additional);
+    }
+
+    /// The heap bytes of the builder's buffers, by capacity (kept from one `finish` to the next).
+    pub fn heap_bytes(&self) -> usize {
+        self.data.build_bytes()
+    }
+
+    /// Empties the builder, each buffer shrunk to its share of `shrink` (a language parser's `shrink_to`).
+    pub fn shrink(&mut self, shrink: crate::buffers::Shrink) {
+        self.data.shrink(shrink);
     }
 
     /// The number of nodes so far; the next node's id.

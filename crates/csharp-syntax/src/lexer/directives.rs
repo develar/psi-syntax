@@ -7,6 +7,8 @@
 //! the parser saved with a token stays what it was. `CompleteIf` and `CompleteRegion`, recursive in Roslyn, walk to the
 //! `#if` (`#region`) and rebuild the cells above it in a loop.
 
+use psi_builder::buffers::{Shrink, vec_bytes};
+
 use crate::green::{Green, GreenArena};
 use crate::syntax::types;
 use crate::syntax_kind::SyntaxKind;
@@ -89,6 +91,20 @@ impl DirectiveStore {
         let none =
             Directive { kind: SyntaxKind::None, is_active: false, branch_taken: false, name_start: 0, name_len: 0 };
         self.cells.push(Cell { head: none, tail: EMPTY, below_define: EMPTY, below_if: EMPTY });
+    }
+
+    /// The heap bytes of the store, by capacity.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        vec_bytes(&self.cells) + vec_bytes(&self.names) + vec_bytes(&self.scratch)
+    }
+
+    /// Forgets every stack but the empty one (`clear`), each buffer shrunk to its share of `shrink` (the empty stack's
+    /// cell stays).
+    pub(crate) fn shrink(&mut self, shrink: Shrink) {
+        shrink.vec(&mut self.cells);
+        shrink.vec(&mut self.names);
+        shrink.vec(&mut self.scratch);
+        self.clear();
     }
 
     /// `new Directive(node)` of a directive trivia `node` of `arena` (whose tokens index `source`).

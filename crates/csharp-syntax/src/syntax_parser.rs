@@ -8,6 +8,8 @@
 //! What Roslyn keeps per blended token for a parser that changes modes (the position, directives and lexer-driven mode
 //! after it) is kept for every token: a mode change re-lexes from the state after the last kept token.
 
+use psi_builder::buffers::{Shrink, vec_bytes};
+
 use crate::error_code::{ErrorCode, MessageID};
 use crate::green::{DiagArg, DiagnosticId, Green, GreenArena, Trivia, TriviaList};
 use crate::lexer::{DirectiveStack, Lexer, LexerMode, LexerOptions};
@@ -45,6 +47,20 @@ pub struct SyntaxParserBuffers {
     tokens: Vec<BufferedToken>,
     trivia: Vec<Trivia>,
     nodes: Vec<Green>,
+}
+
+impl SyntaxParserBuffers {
+    /// The heap bytes of the buffers, by capacity.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        vec_bytes(&self.tokens) + vec_bytes(&self.trivia) + vec_bytes(&self.nodes)
+    }
+
+    /// Empties the buffers, each shrunk to its share of `shrink`.
+    pub(crate) fn shrink(&mut self, shrink: Shrink) {
+        shrink.vec(&mut self.tokens);
+        shrink.vec(&mut self.trivia);
+        shrink.vec(&mut self.nodes);
+    }
 }
 
 /// `SyntaxParser.ResetPoint`.

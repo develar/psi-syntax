@@ -83,7 +83,7 @@ fn usage() -> ! {
         "usage:\n  \
          ksdump --list LIST --root ROOT --out OUT [--trim] [--node]   write OUT/<path>.psi.txt (Java: .node.txt too) per listed file\n  \
          ksdump --bench --list LIST --root ROOT [--trim] [--threads N] [--walk] [--no-bodies] [--repeat K]\n  \
-                [--file-stats OUT]                           parse throughput, tree bytes, walk cost\n  \
+                [--file-stats OUT] [--retain MIB|max]        parse throughput, tree bytes, walk cost, parser buffers\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
          ksdump --check ORACLE --list LIST --root ROOT [--out OUT] [--node]   our dumps against ORACLE's, in memory\n  \
          ksdump --lex --check LINES --list LIST --root ROOT  our lexer lines against the oracle's LINES\n  \
@@ -143,6 +143,9 @@ struct Args {
     docs: bool,
     /// `--full OUT` (C# `--lex`): the lexer dumps' directory.
     full: Option<PathBuf>,
+    /// `--retain MIB|max` (`--bench`): the bytes a parser's buffers keep after each parse
+    /// (`set_retained_bytes`), else the default.
+    retain: Option<usize>,
 }
 
 fn parse_args() -> Args {
@@ -170,6 +173,13 @@ fn parse_args() -> Args {
             "--repeat" => args.repeat = count(it.next()),
             "--file-stats" => args.file_stats = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--nesting-limit" => args.nesting_limit = Some(count(it.next()) as u32),
+            "--retain" => {
+                args.retain = Some(match it.next().as_deref() {
+                    Some("max") => usize::MAX,
+                    Some(mib) => mib.parse::<usize>().map(|m| m << 20).unwrap_or_else(|_| usage()),
+                    None => usage(),
+                })
+            }
             "--version" => {
                 let version = it.next().and_then(|v| csharp_syntax::LanguageVersion::from_name(&v));
                 let mut defaults = csharp_defaults();
@@ -753,6 +763,10 @@ trait BenchLanguage: TreeLanguage {
     fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self>;
     /// What a consumer pays to keep the tree.
     fn heap_bytes(tree: &Self::Tree) -> usize;
+    /// `set_retained_bytes`.
+    fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize);
+    /// The parser's `grown_bytes` and `heap_bytes`: what its buffers held when the last parse ended, and kept.
+    fn parser_bytes(parser: &Self::Parser) -> (usize, usize);
     /// The path of a list line and how its file is parsed.
     fn file_kind(line: &str) -> (&str, Self::FileKind);
     /// This thread's counters in `kotlin_syntax::counters::ALL` order, empty when the language has none.
@@ -785,6 +799,12 @@ macro_rules! psi_bench_language {
         }
         fn heap_bytes(tree: &Self::Tree) -> usize {
             tree.heap_bytes()
+        }
+        fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize) {
+            parser.set_retained_bytes(bytes);
+        }
+        fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
+            (parser.grown_bytes(), parser.heap_bytes())
         }
     };
 }
@@ -821,6 +841,12 @@ impl BenchLanguage for csharp_syntax::CSharp {
     }
     fn heap_bytes(tree: &Self::Tree) -> usize {
         tree.heap_bytes()
+    }
+    fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize) {
+        parser.set_retained_bytes(bytes);
+    }
+    fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
+        (parser.grown_bytes(), parser.heap_bytes())
     }
     /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing.
     fn file_kind(line: &str) -> (&str, csharp_syntax::FileKind) {
@@ -874,6 +900,9 @@ struct FileResult {
     /// Bytes allocated during `Parser::parse`, and the bytes still live when it returns (the tree).
     alloc_bytes: u64,
     live_bytes: i64,
+    /// The parser's buffers when the parse ended (`grown_bytes`) and what they kept (`heap_bytes`).
+    parser_grown: usize,
+    parser_kept: usize,
 }
 
 /// What one thread of a bench round measured.
@@ -888,6 +917,8 @@ struct ThreadResult {
     results: Vec<(usize, FileResult)>,
     /// This thread's `kotlin_syntax::counters` (`--features counters`).
     counters: Vec<u64>,
+    /// The parser's `heap_bytes` after its last file.
+    parser_kept: usize,
 }
 
 #[cfg(feature = "alloc-stats")]
@@ -1045,10 +1076,14 @@ fn bench_thread<L: BenchLanguage>(
     do_walk: bool,
     options: ParseOptions,
     nesting_limit: Option<u32>,
+    retain: Option<usize>,
 ) -> ThreadResult {
     let mut r = ThreadResult::default();
     // One parser per thread, as an indexer keeps one per worker: its buffers are reused from file to file.
     let mut parser = L::new_parser(nesting_limit);
+    if let Some(bytes) = retain {
+        L::set_retained_bytes(&mut parser, bytes);
+    }
     loop {
         let i = next.fetch_add(1, Ordering::Relaxed);
         let Some(source) = sources.get(i) else { break };
@@ -1057,6 +1092,7 @@ fn bench_thread<L: BenchLanguage>(
         let parsed_tree = L::parse(&mut parser, &source.text, source.kind, options);
         let parsed = Instant::now();
         let (calls1, allocated1, live1) = alloc_snapshot();
+        let (parser_grown, parser_kept) = L::parser_bytes(&parser);
         let tree = L::psi(&parsed_tree);
         let mut f = FileResult {
             parse_ns: (parsed - start).as_nanos() as u64,
@@ -1065,6 +1101,8 @@ fn bench_thread<L: BenchLanguage>(
             allocs: calls1 - calls0,
             alloc_bytes: allocated1 - allocated0,
             live_bytes: live1 - live0,
+            parser_grown,
+            parser_kept,
             ..FileResult::default()
         };
         if do_walk {
@@ -1084,6 +1122,7 @@ fn bench_thread<L: BenchLanguage>(
         r.results.push((i, f));
     }
     r.counters = L::counters();
+    r.parser_kept = L::parser_bytes(&parser).1;
     r
 }
 
@@ -1238,6 +1277,7 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
     let mut round_mbs = Vec::new();
     let mut last: Vec<FileResult> = Vec::new();
     let mut last_counters: Vec<u64> = Vec::new();
+    let mut parser_kept = 0usize;
     for round in 1..=args.repeat {
         let next = AtomicUsize::new(0);
         let start = Instant::now();
@@ -1245,7 +1285,7 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
             let handles: Vec<_> = (0..threads)
                 .map(|_| {
                     std::thread::Builder::new().spawn_scoped(scope, || {
-                        bench_thread::<L>(&sources, &next, args.walk, options, args.nesting_limit)
+                        bench_thread::<L>(&sources, &next, args.walk, options, args.nesting_limit, args.retain)
                     })
                 })
                 .collect();
@@ -1318,6 +1358,7 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
             last_counters = total;
         }
         last = results;
+        parser_kept = per_thread.iter().map(|t| t.parser_kept).max().unwrap_or(0);
     }
     if args.repeat > 1 {
         let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
@@ -1333,6 +1374,20 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
         tree_bytes as f64 / nodes.max(1) as f64,
         nodes as f64 * 1e3 / bytes.max(1) as f64,
         max_tree as f64 / 1e6
+    );
+    let retained = args.retain.unwrap_or(psi_builder::buffers::RETAINED_BYTES);
+    let mut grown: Vec<u64> = last.iter().map(|f| f.parser_grown as u64).collect();
+    grown.sort_unstable();
+    let _ = writeln!(
+        stdout,
+        "parser buffers at the end of a parse: median {:.2} MB  p99 {:.2} MB  max {:.1} MB  past the retained {} in {} \
+         files  kept after the round {:.1} MB (the most of a thread)",
+        percentile(&grown, 0.5) as f64 / 1e6,
+        percentile(&grown, 0.99) as f64 / 1e6,
+        grown.last().copied().unwrap_or(0) as f64 / 1e6,
+        if retained == usize::MAX { "max".to_string() } else { format!("{:.1} MB", retained as f64 / 1e6) },
+        last.iter().filter(|f| f.parser_grown > retained).count(),
+        parser_kept as f64 / 1e6
     );
     if cfg!(feature = "alloc-stats") {
         let mut allocs: Vec<u64> = last.iter().map(|f| f.allocs).collect();
@@ -1363,11 +1418,13 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
         }
     }
     if let Some(out) = &args.file_stats {
-        let mut text =
-            String::from("path\tbytes\tparse_us\twalk_us\tlinear_walk_us\tnodes\ttree_bytes\tallocs\talloc_bytes\n");
+        let mut text = String::from(
+            "path\tbytes\tparse_us\twalk_us\tlinear_walk_us\tnodes\ttree_bytes\tallocs\talloc_bytes\tparser_grown\t\
+             parser_kept\n",
+        );
         for (s, f) in sources.iter().zip(&last) {
             text.push_str(&format!(
-                "{}\t{}\t{:.1}\t{:.1}\t{:.1}\t{}\t{}\t{}\t{}\n",
+                "{}\t{}\t{:.1}\t{:.1}\t{:.1}\t{}\t{}\t{}\t{}\t{}\t{}\n",
                 s.path,
                 s.text.len(),
                 f.parse_ns as f64 / 1e3,
@@ -1376,7 +1433,9 @@ fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &
                 f.nodes,
                 f.tree_bytes,
                 f.allocs,
-                f.alloc_bytes
+                f.alloc_bytes,
+                f.parser_grown,
+                f.parser_kept
             ));
         }
         if let Err(e) = std::fs::write(out, text) {

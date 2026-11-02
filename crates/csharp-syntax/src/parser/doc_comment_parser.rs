@@ -33,6 +33,33 @@ pub struct DocumentationCommentParserBuffers {
     seen_index: HashMap<u64, u32>,
 }
 
+impl DocumentationCommentParserBuffers {
+    /// The heap bytes of the buffers, by capacity.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        use psi_builder::buffers::{map_bytes, vec_bytes};
+        self.syntax.heap_bytes()
+            + self.pool.heap_bytes()
+            + vec_bytes(&self.text)
+            + vec_bytes(&self.other_text)
+            + vec_bytes(&self.pieces)
+            + vec_bytes(&self.seen_text)
+            + vec_bytes(&self.attributes_seen)
+            + map_bytes(&self.seen_index)
+    }
+
+    /// Empties the buffers, each shrunk to its share of `shrink`.
+    pub(crate) fn shrink(&mut self, shrink: psi_builder::buffers::Shrink) {
+        self.syntax.shrink(shrink);
+        self.pool.shrink(shrink);
+        shrink.vec(&mut self.text);
+        shrink.vec(&mut self.other_text);
+        shrink.vec(&mut self.pieces);
+        shrink.vec(&mut self.seen_text);
+        shrink.vec(&mut self.attributes_seen);
+        shrink.map(&mut self.seen_index);
+    }
+}
+
 /// An attribute name of `_attributesSeen`: its range in `seen_text` and the previous name of the same hash.
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct SeenAttribute {

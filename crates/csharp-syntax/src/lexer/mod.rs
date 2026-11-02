@@ -145,6 +145,46 @@ pub struct LexerBuffers {
     interpolated_string: InterpolatedStringBuffers,
 }
 
+impl LexerBuffers {
+    /// The heap bytes of the buffers, by capacity: the trivia caches, errors, the scanners' code units, the directive
+    /// store and the nested parsers' buffers (directives, documentation comments, interpolated strings).
+    pub(crate) fn heap_bytes(&self) -> usize {
+        use psi_builder::buffers::vec_bytes;
+        vec_bytes(&self.leading_trivia)
+            + vec_bytes(&self.trailing_trivia)
+            + vec_bytes(&self.directive_trivia)
+            + vec_bytes(&self.xml_trivia)
+            + vec_bytes(&self.errors)
+            + vec_bytes(&self.token_errors)
+            + vec_bytes(&self.builder)
+            + vec_bytes(&self.ident_buffer)
+            + vec_bytes(&self.value)
+            + self.value_text.capacity()
+            + self.directives.heap_bytes()
+            + self.directive_parser.heap_bytes()
+            + self.xml_parser.heap_bytes()
+            + self.interpolated_string.heap_bytes()
+    }
+
+    /// Empties the buffers, each shrunk to its share of `shrink`.
+    pub(crate) fn shrink(&mut self, shrink: psi_builder::buffers::Shrink) {
+        shrink.vec(&mut self.leading_trivia);
+        shrink.vec(&mut self.trailing_trivia);
+        shrink.vec(&mut self.directive_trivia);
+        shrink.vec(&mut self.xml_trivia);
+        shrink.vec(&mut self.errors);
+        shrink.vec(&mut self.token_errors);
+        shrink.vec(&mut self.builder);
+        shrink.vec(&mut self.ident_buffer);
+        shrink.vec(&mut self.value);
+        shrink.string(&mut self.value_text);
+        self.directives.shrink(shrink);
+        self.directive_parser.shrink(shrink);
+        self.xml_parser.shrink(shrink);
+        self.interpolated_string.shrink(shrink);
+    }
+}
+
 /// `Lexer.TokenInfo`: what the scanners found. The text is always the lexeme (`lexeme_start..position`); the
 /// `StringValue`, when it is not the text, is in `Lexer::value` (`has_value`). The numeric and character values are
 /// not kept: no tree depends on them (the directive parser reads its numbers from the text).

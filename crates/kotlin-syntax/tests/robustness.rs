@@ -280,3 +280,31 @@ fn long_left_associative_chains_parse_in_linear_time() {
         assert!(elapsed.as_millis() < 1000, "{name}: {elapsed:?}");
     }
 }
+
+/// A parser keeps at most its retained bytes from one file to the next (`Parser::set_retained_bytes`, the same
+/// mechanism as C#'s), and a parser whose buffers were shrunk parses as a fresh one does.
+#[test]
+fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
+    let file = "/** doc [link] */\nclass C<T> { fun f(x: Int) = listOf(1, 2).map { it * x }.filter { y -> y > 0 }?.size ?: 0\n  val s = \"a${b}c\"\n}\n";
+    let big = file.repeat(20_000);
+    let parse = |parser: &mut kotlin_syntax::Parser, text: &str| {
+        let tree = parser.parse(text, FileKind::Kt);
+        assert_eq!(psi_to_string(&tree, "a.kt"), psi_to_string(&Tree::parse(text, FileKind::Kt), "a.kt"));
+    };
+    let mut parser = kotlin_syntax::Parser::new();
+    parser.set_retained_bytes(8 << 20);
+    parse(&mut parser, &big);
+    assert!(parser.grown_bytes() > 8 << 20, "{}", parser.grown_bytes());
+    assert!(parser.heap_bytes() <= 4 << 20, "{}", parser.heap_bytes());
+    // a share under 1 / the frames' capacity still keeps the file's builder (`Shrink::nested`), so the buffers keep
+    // nearly all of what they are shrunk to (0.58 of it while the share dropped every frame)
+    assert!(parser.heap_bytes() > 3 << 20, "{}", parser.heap_bytes());
+    parse(&mut parser, file);
+    parse(&mut parser, &big);
+    parser.shrink_to(0);
+    assert_eq!(parser.heap_bytes(), 0);
+    parse(&mut parser, file);
+    parser.set_retained_bytes(usize::MAX);
+    parse(&mut parser, &big);
+    assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+}

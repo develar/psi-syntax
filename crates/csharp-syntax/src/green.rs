@@ -8,6 +8,8 @@
 //! Widths are UTF-8 bytes (Roslyn's are UTF-16 code units): every width and offset of a tree is a sum of widths, so a
 //! tree in bytes is Roslyn's tree in UTF-16 with each position mapped to bytes.
 
+use psi_builder::buffers::{Shrink, map_bytes, vec_bytes};
+
 use crate::error_code::{ErrorCode, MessageID, XmlParseErrorCode};
 use crate::facts;
 use crate::language_version::LanguageVersion;
@@ -370,7 +372,26 @@ impl GreenArena {
 
     /// The bytes the arena's buffers hold (by capacity): garbage included, what a parse costs beyond its tree.
     pub fn heap_bytes(&self) -> usize {
-        self.buffers().iter().map(|&(_, capacity, size)| capacity * size).sum()
+        self.buffers().iter().map(|&(_, capacity, size)| capacity * size).sum::<usize>()
+            + vec_bytes(&self.stack)
+            + map_bytes(&self.growable)
+    }
+
+    /// Forgets every record (`clear`), each buffer shrunk to its share of `shrink` (`Parser::shrink_to`).
+    pub(crate) fn shrink(&mut self, shrink: Shrink) {
+        self.clear();
+        shrink.vec(&mut self.tokens);
+        shrink.vec(&mut self.nodes);
+        shrink.vec(&mut self.trivia);
+        shrink.vec(&mut self.slots);
+        shrink.vec(&mut self.trivia_refs);
+        shrink.vec(&mut self.diag_refs);
+        shrink.vec(&mut self.diagnostics);
+        shrink.vec(&mut self.args);
+        shrink.string(&mut self.strings);
+        shrink.vec(&mut self.values);
+        shrink.vec(&mut self.stack);
+        shrink.map(&mut self.growable);
     }
 
     /// The bytes of the records since the last `clear`, garbage included (the budget's measure).
@@ -1297,6 +1318,16 @@ impl SyntaxListPool {
         let list = arena.list(&builder);
         self.free(builder);
         list
+    }
+
+    /// The heap bytes of the free builders, by capacity.
+    pub(crate) fn heap_bytes(&self) -> usize {
+        vec_bytes(&self.free) + self.free.iter().map(vec_bytes).sum::<usize>()
+    }
+
+    /// Keeps the share of `shrink` of the free builders, each shrunk to its share.
+    pub(crate) fn shrink(&mut self, shrink: Shrink) {
+        shrink.nested(&mut self.free, |b| shrink.vec(b));
     }
 }
 

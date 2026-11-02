@@ -624,6 +624,45 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.brace_pairs = None;
     }
 
+    /// The heap bytes of the builder's buffers, by capacity (what `Parser::heap_bytes` counts of a frame; the tables
+    /// a builder shares with the `Parser` are the parser's).
+    pub(crate) fn heap_bytes(&self) -> usize {
+        use crate::buffers::vec_bytes;
+        vec_bytes(&self.lex_starts)
+            + vec_bytes(&self.lex_types)
+            + self.tokens_to_restore_on_rollback.len() * size_of::<(usize, L::Token)>()
+            + vec_bytes(&self.markers)
+            + vec_bytes(&self.free_start_markers)
+            + vec_bytes(&self.free_error_items)
+            + vec_bytes(&self.links)
+            + vec_bytes(&self.extra_links)
+            + vec_bytes(&self.extra_ids)
+            + vec_bytes(&self.entries)
+            + vec_bytes(&self.messages)
+            + vec_bytes(&self.closers)
+            + vec_bytes(&self.block_closers)
+    }
+
+    /// Empties every buffer to its share of `shrink` (`Parser::shrink_to`), then starts afresh over no text, as a
+    /// new builder does.
+    pub(crate) fn shrink(&mut self, shrink: crate::buffers::Shrink) {
+        shrink.vec(&mut self.lex_starts);
+        shrink.vec(&mut self.lex_types);
+        self.tokens_to_restore_on_rollback.clear();
+        shrink.vec(&mut self.markers);
+        shrink.vec(&mut self.free_start_markers);
+        shrink.vec(&mut self.free_error_items);
+        shrink.vec(&mut self.links);
+        shrink.vec(&mut self.extra_links);
+        shrink.vec(&mut self.extra_ids);
+        shrink.vec(&mut self.entries);
+        shrink.vec(&mut self.messages);
+        shrink.vec(&mut self.closers);
+        shrink.vec(&mut self.block_closers);
+        self.reset(Arc::from(&[][..]), 0, 0, None);
+        self.finish();
+    }
+
     /// Computes `sig` and the token there after `current_lexeme` moved or a token was remapped: past whitespace and
     /// comments when `skips` (the Java's `myTokenTypeChecked` is false), at `current_lexeme` when not.
     #[inline(always)]
