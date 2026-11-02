@@ -69,6 +69,9 @@ pub enum Entry {
     BracketedArgumentList,
     #[doc(hidden)]
     AttributeArgumentList,
+    /// `SyntaxFactory.ParseTokens`: the lexer's tokens, not a parse (`Parser::lex`); its dump is `dump::lex_to_string`.
+    #[doc(hidden)]
+    Tokens,
 }
 
 impl Entry {
@@ -87,6 +90,7 @@ impl Entry {
             "argument-list" => Entry::ArgumentList,
             "bracketed-argument-list" => Entry::BracketedArgumentList,
             "attribute-argument-list" => Entry::AttributeArgumentList,
+            "tokens" => Entry::Tokens,
             _ => return None,
         })
     }
@@ -104,6 +108,7 @@ impl Entry {
             Entry::ArgumentList => "argument-list",
             Entry::BracketedArgumentList => "bracketed-argument-list",
             Entry::AttributeArgumentList => "attribute-argument-list",
+            Entry::Tokens => "tokens",
         }
     }
 }
@@ -168,6 +173,8 @@ pub struct Tree {
     diagnostics: Box<[Diagnostic]>,
     /// The entry returned null (`ParseMemberDeclaration` of text that is no member): the tree is an empty root.
     no_result: bool,
+    /// The tokens of `Parser::lex` (`Entry::Tokens`) as the root's children, not a parse.
+    lexed: bool,
 }
 
 impl Deref for Tree {
@@ -190,7 +197,7 @@ impl Tree {
         let source: Arc<[u8]> = Arc::from(source);
         let mut builder = TreeBuilder::new();
         let (tree, diagnostics) = Flattener::default().flatten(arena, root, &source, &mut builder, file_kind);
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false }
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: false }
     }
 
     /// The tree of lexed `tokens` of `arena` as the children of a root, as `Parser::lex` builds it (tests).
@@ -199,7 +206,7 @@ impl Tree {
         let source: Arc<[u8]> = Arc::from(source);
         let mut builder = TreeBuilder::new();
         let (tree, diagnostics) = Flattener::default().flatten_tokens(arena, tokens, &source, &mut builder, file_kind);
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false }
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: true }
     }
 
     /// `GetDiagnostics()`, in Roslyn's order.
@@ -216,6 +223,12 @@ impl Tree {
     #[doc(hidden)]
     pub fn has_no_result(&self) -> bool {
         self.no_result
+    }
+
+    /// Whether the tree holds the lexer's tokens (`Parser::lex`, `Entry::Tokens`) rather than a parse.
+    #[doc(hidden)]
+    pub fn is_lexed(&self) -> bool {
+        self.lexed
     }
 
     /// The heap bytes of the tree and its diagnostics.
@@ -243,8 +256,11 @@ impl Parser {
         Parser::default()
     }
 
-    /// Parses `text` as `file_kind` says.
+    /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`).
     pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        if file_kind.entry == Entry::Tokens {
+            return self.lex(text, file_kind);
+        }
         let source: Arc<[u8]> = Arc::from(text.as_ref());
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
@@ -286,7 +302,7 @@ impl Parser {
         self.lexer = lexer_buffers;
         let (tree, diagnostics) = self.flattener.flatten_tokens(&arena, &tokens, &source, &mut self.builder, file_kind);
         self.arena = arena;
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false }
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result: false, lexed: true }
     }
 
     /// The number of tokens `lex` makes of `text`, without a tree: the lexer alone, what `ksdump --lex --bench` times.
@@ -320,7 +336,7 @@ impl Parser {
             self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind)
         };
         self.arena = arena;
-        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result }
+        Tree { tree, diagnostics: diagnostics.into_boxed_slice(), no_result, lexed: false }
     }
 }
 

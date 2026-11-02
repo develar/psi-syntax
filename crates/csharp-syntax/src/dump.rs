@@ -19,8 +19,11 @@ pub fn tree_to_string(tree: &Tree) -> String {
 }
 
 /// `tree_to_string`, or `None` when the dump passes `max_chars` UTF-16 code units before a line is printed, where the
-/// oracle gives up (`dump over 512 MB` with `MAX_CHARS`).
+/// oracle gives up (`dump over 512 MB` with `MAX_CHARS`). A lexed tree (`Entry::Tokens`) dumps as `lex_to_string`.
 pub fn tree_to_string_within(tree: &Tree, max_chars: usize) -> Option<String> {
+    if tree.is_lexed() {
+        return lex_to_string_within(tree, max_chars);
+    }
     let mut out = String::with_capacity(tree.source().len() * 8);
     let mut chars = 0usize;
     for (id, depth) in tree.preorder(tree.root()) {

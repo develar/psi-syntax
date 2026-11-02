@@ -128,6 +128,8 @@ impl<'l, 't> LanguageParser<'l, 't> {
     pub fn parse_entry(&mut self, entry: Entry) -> Green {
         let node = match entry {
             Entry::CompilationUnit => return self.parse_compilation_unit(),
+            // `Parser::parse` lexes these (`SyntaxFactory.ParseTokens`): no parse
+            Entry::Tokens => return Green::NULL,
             Entry::Expression => self.parse_expression(),
             Entry::Statement => self.parse_statement(),
             Entry::Member => self.parse_member_declaration(),
