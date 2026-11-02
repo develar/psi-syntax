@@ -27,8 +27,6 @@ use crate::tokens::{ElementType, TokenKind, TokenSet};
 
 /// `SyntaxTreeBuilderImpl` for Java: `psi_builder`'s builder.
 pub type PsiBuilderImpl = psi_builder::PsiBuilderImpl<Java>;
-/// The buffers a Java builder works in.
-pub type BuilderBuffers = psi_builder::BuilderBuffers<Java>;
 
 /// Java's `WhitespacesAndCommentsBinder`s.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]

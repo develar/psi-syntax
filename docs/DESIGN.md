@@ -45,7 +45,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense index below 256 and a debug name),
-`Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `LayerBuffers` (the language layers' reusable stacks),
+`Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `Frame` (a builder with the language layers' state over it, `frame_builder`),
 `FILE`, `ERROR_ELEMENT`, `is_whitespace_or_comment`, `is_left_bound`, `is_chameleon_token`, `chameleon`, `is_body`,
 `joined_token_type` (the cursor cache's derived token), `bracket_depth_change` (the too-deep skip), `tokenize_into`,
 `parse_file` and `parse_chameleon`. `tokenize_into` gets the file's `FileKind` and `Chameleon::file_kind` gives it to
@@ -219,21 +219,23 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
 
 `Parser` owns every buffer a parse needs:
 
-- `BuilderBuffers`: lex types, markers, free lists, production, the join/newline/adapter stacks;
+- the frames (`Language::Frame`: Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl` with its `PsiBuilderImpl`, Java's
+  `PsiBuilderImpl`), each a builder with all its buffers (lex types and starts, markers, free lists, production,
+  entries, the join/newline/adapter stacks);
 - the file's and the relexed `Lexed`;
-- the starts scratch;
-- the tree columns;
-- the stack of suspended builder frames, with spare buffers for them.
+- the tree being built.
 
-A builder takes these buffers in `new()` (clears them, pushes marker 0) and gives them back in `release()`. Nothing is
-global or thread-local.
+`frames[..depth]` are the builders still binding; the ones past `depth` are finished and are reset in place
+(`PsiBuilderImpl::reset`: cleared, marker 0 pushed) for the next file or chameleon, so no builder is moved or rebuilt
+per chameleon: moving them (a builder is 584 bytes, with its buffers 992) through the language's parse and the frame
+stack cost about 5.5 KB of copies per chameleon. Nothing is global or thread-local.
 
 PSI builds blocks, lambdas, doc comments and markdown links as chameleons: each is reparsed in a fresh builder over
 its own text. The port does the same, in place:
 
 1. `bind` is a resumable state machine that stops at each chameleon.
-2. The driver pushes the suspended frame on a heap stack, parses the chameleon (reusing the file's tokens when they
-   cover it exactly, relexing otherwise), binds it, then resumes.
+2. The driver leaves the suspended frame where it is, parses the chameleon on the next frame (reusing the file's
+   tokens when they cover it exactly, relexing otherwise), binds it, then resumes.
 
 No native recursion is involved, so chameleon nesting takes heap, not stack, and node
 ids come out strictly in preorder.

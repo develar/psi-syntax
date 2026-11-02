@@ -81,13 +81,12 @@ fn doc_comments_of_the_goldens() {
         }
         files += 1;
         let name = path.rsplit('/').next().unwrap_or(path);
-        let tree = Parser::new().parse_with(&text, FileKind { level, entry: Entry::File }, |mut builder, _| {
+        let tree = Parser::new().parse_with(&text, FileKind { level, entry: Entry::File }, |builder| {
             let file = builder.mark();
             while !builder.eof() {
                 builder.advance_lexer();
             }
             builder.done(file, NodeKind::JAVA_FILE);
-            builder
         });
         let got_dump = psi_to_string(&tree, name);
         let got = doc_comments(&got_dump);

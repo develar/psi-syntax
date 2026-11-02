@@ -6,7 +6,7 @@
 
 use psi_builder::{Chameleon, Marker};
 
-use crate::builder::{BuilderBuffers, PsiBuilderImpl, SyntaxTreeBuilder};
+use crate::builder::{PsiBuilderImpl, SyntaxTreeBuilder};
 use crate::bundle::message;
 use crate::doc_lexer;
 use crate::language_level::LanguageLevel;
@@ -28,7 +28,12 @@ impl psi_builder::Language for Java {
     type Binder = crate::builder::Binder;
     type Lazy = LazyKind;
     type FileKind = FileKind;
-    type LayerBuffers = ();
+    type Frame = PsiBuilderImpl;
+
+    #[inline(always)]
+    fn frame_builder(frame: &mut PsiBuilderImpl) -> &mut PsiBuilderImpl {
+        frame
+    }
 
     /// `JavaSyntaxElementType.JAVA_FILE` (printed as "PsiJavaFile:<name>").
     const FILE: NodeKind = NodeKind::JAVA_FILE;
@@ -105,15 +110,14 @@ impl psi_builder::Language for Java {
     /// `JavaParsingTestConfiguratorBase` runs: the entry under a root `test.java.file`, and an error "Unparsed
     /// tokens" over what it left.
     #[inline]
-    fn parse_file(mut builder: PsiBuilderImpl, _bufs: &mut BuilderBuffers, file_kind: FileKind) -> PsiBuilderImpl {
-        let mut b = SyntaxTreeBuilder::new(&mut builder);
+    fn parse_file(builder: &mut PsiBuilderImpl, file_kind: FileKind) {
+        let mut b = SyntaxTreeBuilder::new(builder);
         let parser = JavaParser::new(file_kind.level);
         if file_kind.entry == Entry::File {
             crate::parser::java_parser::parse(file_kind.level, &mut b);
         } else {
             parse_entry(&parser, file_kind.entry, &mut b);
         }
-        builder
     }
 
     /// The `LazyParser`s: a code block over its tokens (the file's when reusable) with
@@ -122,27 +126,24 @@ impl psi_builder::Language for Java {
     /// `JavaDocParser.parseDocCommentText()`; a reference or type holder lexed with `JavaLexer(JDK_1_3)` (the type's
     /// through `JavaTypeEscapeLexer`) and parsed with `parseJavadocReference` / `parseJavadocType`.
     #[inline]
-    fn parse_chameleon(kind: LazyKind, chameleon: &mut Chameleon<'_, Java>) -> PsiBuilderImpl {
+    fn parse_chameleon(kind: LazyKind, chameleon: &mut Chameleon<'_, Java>) {
         let level = chameleon.file_kind().level;
         match kind {
             LazyKind::CodeBlock => {
-                let mut builder = chameleon.body_builder();
-                let mut b = SyntaxTreeBuilder::new(&mut builder);
+                let mut b = SyntaxTreeBuilder::new(chameleon.body_builder());
                 let java_parser = JavaParser::new(level);
                 java_parser.statement_parser().parse_code_block_deep(&mut b, true);
-                builder
             }
             LazyKind::DocComment | LazyKind::DocMarkdownComment => {
                 let text = chameleon.text();
-                let bufs = &mut *chameleon.bufs;
+                let (types, starts) = chameleon.token_buffers();
                 doc_lexer::tokenize_into(
                     text,
                     LanguageLevel::HIGHEST.is_at_least(LanguageLevel::JDK_1_5),
-                    &mut bufs.lex_types,
-                    &mut bufs.starts,
+                    types,
+                    starts,
                 );
-                let mut builder = chameleon.builder();
-                let mut b = SyntaxTreeBuilder::new(&mut builder);
+                let mut b = SyntaxTreeBuilder::new(chameleon.builder());
                 let root_type = if kind == LazyKind::DocMarkdownComment {
                     TokenKind::DOC_MARKDOWN_COMMENT
                 } else {
@@ -151,24 +152,22 @@ impl psi_builder::Language for Java {
                 parse_fragment(&mut b, root_type.into(), false, |b| {
                     JavaDocParser::new(b, LanguageLevel::HIGHEST).parse_doc_comment_text();
                 });
-                builder
             }
             LazyKind::DocReferenceHolder | LazyKind::DocTypeHolder => {
                 let level = LanguageLevel::JDK_1_3;
                 let text = chameleon.text();
-                let bufs = &mut *chameleon.bufs;
                 let mut lexed = Lexed::default();
                 if kind == LazyKind::DocTypeHolder {
                     lexer::tokenize_type_escaped_into(text, level, &mut lexed);
                 } else {
                     lexer::tokenize_into(text, level, &mut lexed);
                 }
-                bufs.lex_types.clear();
-                bufs.lex_types.extend_from_slice(&lexed.types);
-                bufs.starts.clear();
-                bufs.starts.extend_from_slice(&lexed.starts);
-                let mut builder = chameleon.builder();
-                let mut b = SyntaxTreeBuilder::new(&mut builder);
+                let (types, starts) = chameleon.token_buffers();
+                types.clear();
+                types.extend_from_slice(&lexed.types);
+                starts.clear();
+                starts.extend_from_slice(&lexed.starts);
+                let mut b = SyntaxTreeBuilder::new(chameleon.builder());
                 let java_parser = JavaParser::new(level);
                 if kind == LazyKind::DocTypeHolder {
                     parse_fragment(&mut b, TokenKind::DOC_TYPE_HOLDER.into(), false, |b| {
@@ -179,7 +178,6 @@ impl psi_builder::Language for Java {
                         JavaDocParser::new(b, level).parse_javadoc_reference(&java_parser);
                     });
                 }
-                builder
             }
         }
     }

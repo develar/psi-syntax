@@ -5,7 +5,7 @@
 
 use psi_builder::Chameleon;
 
-use crate::builder::{Binder, BuilderBuffers, PsiBuilderImpl, SemanticBuffers, SemanticWhitespaceAwarePsiBuilderImpl};
+use crate::builder::{Binder, PsiBuilderImpl, SemanticWhitespaceAwarePsiBuilderImpl};
 use crate::counters::{Counter, add};
 use crate::lexer::{self, Lexed};
 use crate::node_kind::NodeKind;
@@ -23,7 +23,12 @@ impl psi_builder::Language for Kotlin {
     type Binder = Binder;
     type Lazy = LazyKind;
     type FileKind = FileKind;
-    type LayerBuffers = SemanticBuffers;
+    type Frame = SemanticWhitespaceAwarePsiBuilderImpl;
+
+    #[inline(always)]
+    fn frame_builder(frame: &mut SemanticWhitespaceAwarePsiBuilderImpl) -> &mut PsiBuilderImpl {
+        &mut frame.delegate
+    }
 
     /// `KtNodeTypes.KT_FILE` (printed as "KtFile: <name>").
     const FILE: NodeKind = NodeKind::KT_FILE;
@@ -85,47 +90,41 @@ impl psi_builder::Language for Kotlin {
 
     /// `KotlinParser.parse(psiBuilder, psiFile)` on the semantic layer over `builder`.
     #[inline]
-    fn parse_file(builder: PsiBuilderImpl, bufs: &mut BuilderBuffers, file_kind: FileKind) -> PsiBuilderImpl {
-        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(builder, bufs);
-        kotlin_parser::parse(&mut builder, file_kind);
-        builder.into_delegate(bufs)
+    fn parse_file(frame: &mut SemanticWhitespaceAwarePsiBuilderImpl, file_kind: FileKind) {
+        frame.reset_layer();
+        kotlin_parser::parse(frame, file_kind);
     }
 
     /// `parseContents` of the lazy element types: a block or lambda over its tokens (the file's when reusable) with
     /// `KotlinParser`, a doc comment lexed with `KDocLexer` and parsed with `KDocParser`, a markdown link lexed with
     /// `KotlinLexer` and parsed with `KDocLinkParser`.
     #[inline]
-    fn parse_chameleon(kind: LazyKind, chameleon: &mut Chameleon<'_, Kotlin>) -> PsiBuilderImpl {
+    fn parse_chameleon(kind: LazyKind, chameleon: &mut Chameleon<'_, Kotlin>) {
         match kind {
             LazyKind::Block | LazyKind::Lambda => {
                 add(if kind == LazyKind::Block { Counter::BlockChameleons } else { Counter::LambdaChameleons }, 1);
-                let delegate = chameleon.body_builder();
-                let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(delegate, chameleon.bufs);
+                chameleon.body_builder();
+                let frame = &mut *chameleon.frame;
+                frame.reset_layer();
                 if kind == LazyKind::Block {
-                    kotlin_parser::parse_block_expression(&mut builder);
+                    kotlin_parser::parse_block_expression(frame);
                 } else {
-                    kotlin_parser::parse_lambda_expression(&mut builder);
+                    kotlin_parser::parse_lambda_expression(frame);
                 }
-                builder.into_delegate(chameleon.bufs)
             }
             LazyKind::KDoc => {
                 let text = chameleon.text();
-                let bufs = &mut *chameleon.bufs;
-                crate::kdoc::lexer::tokenize_into(text, &mut bufs.lex_types, &mut bufs.starts);
+                let (types, starts) = chameleon.token_buffers();
+                crate::kdoc::lexer::tokenize_into(text, types, starts);
                 add(Counter::KDocChameleons, 1);
-                add(Counter::KDocTokens, chameleon.bufs.lex_types.len() as u64);
-                let mut builder = chameleon.builder();
-                crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), &mut builder);
-                builder
+                add(Counter::KDocTokens, types.len() as u64);
+                let builder = chameleon.builder();
+                crate::kdoc::parser::parse(ElementType::Token(TokenKind::DOC_COMMENT), builder);
             }
             LazyKind::KDocLink => {
                 add(Counter::KDocLinkChameleons, 1);
-                let mut builder = chameleon.relexed_builder();
-                crate::kdoc::parser::parse_markdown_link(
-                    ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK),
-                    &mut builder,
-                );
-                builder
+                let builder = chameleon.relexed_builder();
+                crate::kdoc::parser::parse_markdown_link(ElementType::Token(TokenKind::KDOC_MARKDOWN_LINK), builder);
             }
         }
     }

@@ -364,49 +364,6 @@ impl<T: Copy> TokenView<'_, T> {
     }
 }
 
-/// The buffers builders work in, kept by a `Parser` from one builder to the next (cleared, not freed): the token
-/// types a builder parses (filled by its caller), the marker pool with its free lists, the production, and the
-/// buffers of the language's builder layers (`layer`). A builder takes them in `new` and gives them back in `release`.
-pub struct BuilderBuffers<L: Language> {
-    pub lex_types: Vec<L::Token>,
-    /// The token starts a builder takes in `new` (filled by its caller) and gives back in `release`.
-    pub starts: Vec<u32>,
-    markers: Vec<MarkerData<L::Token, L::Node, L::Binder>>,
-    free_start_markers: Vec<u32>,
-    free_error_items: Vec<u32>,
-    links: Vec<[u32; 2]>,
-    extra_links: Vec<[u32; 2]>,
-    extra_ids: Vec<i32>,
-    entries: Vec<Entry>,
-    messages: Vec<Cow<'static, str>>,
-    bind_stack: Vec<(u32, u32)>,
-    closers: Vec<u32>,
-    block_closers: Vec<u32>,
-    /// The language layers' state stacks (Kotlin's newline and join stacks, its adapters), taken by the layer.
-    pub layer: L::LayerBuffers,
-}
-
-impl<L: Language> Default for BuilderBuffers<L> {
-    fn default() -> Self {
-        BuilderBuffers {
-            lex_types: Vec::new(),
-            starts: Vec::new(),
-            markers: Vec::new(),
-            free_start_markers: Vec::new(),
-            free_error_items: Vec::new(),
-            links: Vec::new(),
-            extra_links: Vec::new(),
-            extra_ids: Vec::new(),
-            entries: Vec::new(),
-            messages: Vec::new(),
-            bind_stack: Vec::new(),
-            closers: Vec::new(),
-            block_closers: Vec::new(),
-            layer: L::LayerBuffers::default(),
-        }
-    }
-}
-
 /// `PsiBuilderImpl`.
 pub struct PsiBuilderImpl<L: Language> {
     text: Arc<[u8]>,
@@ -497,6 +454,55 @@ pub struct PsiBuilderImpl<L: Language> {
     shared_block_closers: Option<(Arc<[u32]>, usize)>,
 }
 
+impl<L: Language> Default for PsiBuilderImpl<L> {
+    /// A builder over no text, to be `reset` before use.
+    fn default() -> Self {
+        let mut builder = PsiBuilderImpl {
+            text: Arc::from(&[][..]),
+            base: 0,
+            len: 0,
+            lex_starts: Vec::new(),
+            lex_types: Vec::new(),
+            lexeme_count: 0,
+            token_shift: 0,
+            nesting: 0,
+            nesting_limit: L::NESTING_LIMIT,
+            type_arguments: 0,
+            reparsed: 0,
+            type_arguments_too_deep_before: 0,
+            reparsed_too_deep_before: 0,
+            file_token: None,
+            tokens_to_restore_on_rollback: BTreeMap::new(),
+            current_lexeme: 0,
+            sig: 0,
+            skips: true,
+            checked: false,
+            tt_raw: None,
+            tt_joined: None,
+            markers: Vec::new(),
+            free_start_markers: Vec::new(),
+            free_error_items: Vec::new(),
+            links: Vec::new(),
+            extra_links: Vec::new(),
+            extra_ids: Vec::new(),
+            extras_linked: 0,
+            production_len: 0,
+            entries: Vec::new(),
+            messages: Vec::new(),
+            bind_stack: Vec::new(),
+            bind: BindState::default(),
+            closers: Vec::new(),
+            block_closers: Vec::new(),
+            block_pair: None,
+            block_scanned: 0,
+            block_valid_from: 0,
+            shared_block_closers: None,
+        };
+        builder.reset(Arc::from(&[][..]), 0, 0, None);
+        builder
+    }
+}
+
 /// The `PsiBuilder` methods a marker needs: implemented by every builder layer, so `marker.done(builder, kind)` works
 /// with any of them.
 pub trait AsPsiBuilder {
@@ -512,89 +518,63 @@ impl<L: Language> AsPsiBuilder for PsiBuilderImpl<L> {
 }
 
 impl<L: Language> PsiBuilderImpl<L> {
-    /// A builder over `text[base..base + len]` with the token types in `bufs.lex_types` and their starts in
-    /// `bufs.starts` (relative to `base`, one more entry than the types, the last being `len`). It works in `bufs`, emptied until `release`;
-    /// the marker pool starts afresh (id 0, no marker), whatever the previous builder left.
-    pub(crate) fn new(
-        text: Arc<[u8]>,
-        base: usize,
-        len: usize,
-        bufs: &mut BuilderBuffers<L>,
-        file_token: Option<usize>,
-    ) -> Self {
-        let lex_types = std::mem::take(&mut bufs.lex_types);
-        let mut lex_starts = std::mem::take(&mut bufs.starts);
-        let mut markers = std::mem::take(&mut bufs.markers);
-        markers.clear();
-        markers.push(MarkerData::new(MarkerKind::Start));
-        let mut free_start_markers = std::mem::take(&mut bufs.free_start_markers);
-        free_start_markers.clear();
-        let mut free_error_items = std::mem::take(&mut bufs.free_error_items);
-        free_error_items.clear();
-        let mut links = std::mem::take(&mut bufs.links);
-        links.clear();
+    /// Makes this builder one over `text[base..base + len]` with the token types and starts its caller put in
+    /// `tokens_mut()` (starts relative to `base`, the last being `len`): the marker pool, the production and every
+    /// other buffer start afresh, kept from the builder before (cleared, not freed), so a `Parser` reuses its builders
+    /// in place, never moving one.
+    pub(crate) fn reset(&mut self, text: Arc<[u8]>, base: usize, len: usize, file_token: Option<usize>) {
+        self.text = text;
+        self.base = base;
+        self.len = len;
+        let lexeme_count = self.lex_types.len();
+        self.lex_starts.resize(lexeme_count + 1, len as u32);
+        self.lex_starts[lexeme_count] = len as u32;
+        self.lexeme_count = lexeme_count;
+        self.token_shift = 0;
+        self.nesting = 0;
+        self.nesting_limit = L::NESTING_LIMIT;
+        self.type_arguments = 0;
+        self.reparsed = 0;
+        self.type_arguments_too_deep_before = 0;
+        self.reparsed_too_deep_before = 0;
+        self.file_token = file_token;
+        self.tokens_to_restore_on_rollback.clear();
+        self.current_lexeme = 0;
+        self.checked = false;
+        self.markers.clear();
+        self.markers.push(MarkerData::new(MarkerKind::Start));
+        self.free_start_markers.clear();
+        self.free_error_items.clear();
+        self.links.clear();
         // Marker 0 (no marker): its start node is the head, the empty list; its done node is never linked.
-        links.push([HEAD, HEAD]);
-        links.push([UNLINKED, UNLINKED]);
-        let mut extra_links = std::mem::take(&mut bufs.extra_links);
-        extra_links.clear();
-        let mut extra_ids = std::mem::take(&mut bufs.extra_ids);
-        extra_ids.clear();
-        let mut entries = std::mem::take(&mut bufs.entries);
-        entries.clear();
-        let mut messages = std::mem::take(&mut bufs.messages);
-        messages.clear();
-        let bind_stack = std::mem::take(&mut bufs.bind_stack);
-        let mut closers = std::mem::take(&mut bufs.closers);
-        closers.clear();
-        let mut block_closers = std::mem::take(&mut bufs.block_closers);
-        block_closers.clear();
-        let lexeme_count = lex_types.len();
-        lex_starts.resize(lexeme_count + 1, len as u32);
-        lex_starts[lexeme_count] = len as u32;
-        let mut builder = PsiBuilderImpl {
-            text,
-            base,
-            len,
-            lex_starts,
-            lex_types,
-            lexeme_count,
-            token_shift: 0,
-            nesting: 0,
-            nesting_limit: L::NESTING_LIMIT,
-            type_arguments: 0,
-            reparsed: 0,
-            type_arguments_too_deep_before: 0,
-            reparsed_too_deep_before: 0,
-            file_token,
-            tokens_to_restore_on_rollback: BTreeMap::new(),
-            current_lexeme: 0,
-            sig: 0,
-            skips: true,
-            checked: false,
-            tt_raw: None,
-            tt_joined: None,
-            markers,
-            free_start_markers,
-            free_error_items,
-            links,
-            extra_links,
-            extra_ids,
-            extras_linked: 0,
-            production_len: 0,
-            entries,
-            messages,
-            bind_stack,
-            bind: BindState::default(),
-            closers,
-            block_closers,
-            block_pair: None,
-            block_scanned: 0,
-            block_valid_from: 0,
-            shared_block_closers: None,
-        };
-        builder.refresh(true);
-        builder
+        self.links.push([HEAD, HEAD]);
+        self.links.push([UNLINKED, UNLINKED]);
+        self.extra_links.clear();
+        self.extra_ids.clear();
+        self.extras_linked = 0;
+        self.production_len = 0;
+        self.entries.clear();
+        self.messages.clear();
+        self.bind_stack.clear();
+        self.bind = BindState::default();
+        self.closers.clear();
+        self.block_closers.clear();
+        self.block_pair = None;
+        self.block_scanned = 0;
+        self.block_valid_from = 0;
+        self.shared_block_closers = None;
+        self.refresh(true);
+    }
+
+    /// The token types and starts the next `reset` builds over (cleared by none: the caller fills them).
+    pub(crate) fn tokens_mut(&mut self) -> (&mut Vec<L::Token>, &mut Vec<u32>) {
+        (&mut self.lex_types, &mut self.lex_starts)
+    }
+
+    /// Lets go of the text once the tree is built (the tree holds its own reference).
+    pub(crate) fn finish(&mut self) {
+        self.text = Arc::from(&[][..]);
+        self.shared_block_closers = None;
     }
 
     /// Computes `sig` and the token there after `current_lexeme` moved or a token was remapped: past whitespace and
@@ -797,23 +777,6 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// The start of token `index` relative to the builder's text, the text's length past the last token.
     pub fn token_start(&self, index: usize) -> u32 {
         self.lex_starts[index.min(self.lexeme_count)]
-    }
-
-    /// Gives the buffers back to `bufs`, the token starts to `bufs.starts`.
-    pub(crate) fn release(self, bufs: &mut BuilderBuffers<L>) {
-        bufs.starts = self.lex_starts;
-        bufs.lex_types = self.lex_types;
-        bufs.markers = self.markers;
-        bufs.free_start_markers = self.free_start_markers;
-        bufs.free_error_items = self.free_error_items;
-        bufs.links = self.links;
-        bufs.extra_links = self.extra_links;
-        bufs.extra_ids = self.extra_ids;
-        bufs.entries = self.entries;
-        bufs.messages = self.messages;
-        bufs.bind_stack = self.bind_stack;
-        bufs.closers = self.closers;
-        bufs.block_closers = self.block_closers;
     }
 
     /// `getOriginalText()`: this builder's text.

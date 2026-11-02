@@ -6,7 +6,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use crate::builder::{BuilderBuffers, PsiBuilderImpl, WhitespacesAndCommentsBinder};
+use crate::builder::{PsiBuilderImpl, WhitespacesAndCommentsBinder};
 use crate::lexer::Lexed;
 use crate::tree::Chameleon;
 
@@ -95,8 +95,13 @@ pub trait Language: Sized + 'static {
     type Lazy: Copy + Eq + Debug + Send + Sync + 'static;
     /// How a file is parsed (e.g. a Kotlin file or a script); the tree keeps it.
     type FileKind: Copy + Eq + Debug + Send + Sync + 'static;
-    /// The buffers of the language's builder layers (over `PsiBuilderImpl`), reused from one builder to the next.
-    type LayerBuffers: Default + Send + 'static;
+    /// What a parse of the language runs on: a `PsiBuilderImpl` (`frame_builder`) with the state of the language's
+    /// layers over it (Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl`). A `Parser` keeps one per nested builder and
+    /// reuses it in place, from one file and chameleon to the next.
+    type Frame: Default + Send + 'static;
+
+    /// The builder of a frame.
+    fn frame_builder(frame: &mut Self::Frame) -> &mut PsiBuilderImpl<Self>;
 
     /// `ParserDefinition.getFileNodeType()`: the root's type when the parser produced no markers.
     const FILE: Self::Node;
@@ -155,14 +160,10 @@ pub trait Language: Sized + 'static {
     /// first), as `TokenSequence.performLexing` does (Java's lexer depends on the file's language level).
     fn tokenize_into(text: &[u8], file_kind: Self::FileKind, lexed: &mut Lexed<Self::Token>);
 
-    /// Parses a file on `builder` (wrapped in the language's layers, whose buffers are `bufs.layer`) and returns the
-    /// builder, which then builds the tree.
-    fn parse_file(
-        builder: PsiBuilderImpl<Self>,
-        bufs: &mut BuilderBuffers<Self>,
-        file_kind: Self::FileKind,
-    ) -> PsiBuilderImpl<Self>;
+    /// Parses a file on `frame`, whose builder holds the file's tokens; the builder then builds the tree.
+    fn parse_file(frame: &mut Self::Frame, file_kind: Self::FileKind);
 
-    /// Lexes and parses a chameleon of `kind` (`ILazyParseableElementType.parseContents`) and returns its builder.
-    fn parse_chameleon(kind: Self::Lazy, chameleon: &mut Chameleon<'_, Self>) -> PsiBuilderImpl<Self>;
+    /// Lexes and parses a chameleon of `kind` (`ILazyParseableElementType.parseContents`) on `chameleon.frame`, its
+    /// builder made by one of the `Chameleon` methods.
+    fn parse_chameleon(kind: Self::Lazy, chameleon: &mut Chameleon<'_, Self>);
 }

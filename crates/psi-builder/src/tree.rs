@@ -9,7 +9,7 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{BuilderBuffers, NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED, closers_table};
+use crate::builder::{NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED, closers_table};
 
 /// The nesting from which a body reparsed from the file's tokens shares the file's table of block ends
 /// (`Language::BLOCK_BRACES`): below it, each frame counts its own blocks (most files never reach it, and pay for no
@@ -184,10 +184,11 @@ pub struct Parser<L: Language> {
     file: Lexed<L::Token>,
     /// A chameleon's text lexed afresh.
     relexed: Lexed<L::Token>,
-    /// The builders still binding: the file's, then each chameleon's being expanded inside the one before it.
-    frames: Vec<Frame<L>>,
-    /// The buffers of finished builders, for the next ones.
-    spare: Vec<BuilderBuffers<L>>,
+    /// The frames of the builders still binding, `frames[..depth]`: the file's, then each chameleon's being expanded
+    /// inside the one before it. The frames past `depth` are finished ones, reset in place for the next builders
+    /// (a frame is a builder with all its buffers: none is moved or rebuilt per chameleon).
+    frames: Vec<L::Frame>,
+    depth: usize,
     /// The tree being built; copied into exactly sized buffers when done.
     data: TreeData,
     options: ParseOptions,
@@ -204,19 +205,13 @@ impl<L: Language> Default for Parser<L> {
             file: Lexed::default(),
             relexed: Lexed::default(),
             frames: Vec::new(),
-            spare: Vec::new(),
+            depth: 0,
             data: TreeData::default(),
             options: ParseOptions::default(),
             nesting_limit: None,
             file_block_closers: None,
         }
     }
-}
-
-/// A builder whose tree is being appended, with the buffers it was made from (its own are taken out of them).
-struct Frame<L: Language> {
-    builder: PsiBuilderImpl<L>,
-    bufs: BuilderBuffers<L>,
 }
 
 /// A chameleon being expanded, for `Language::parse_chameleon`: its text and the builders it can be parsed with.
@@ -227,9 +222,8 @@ pub struct Chameleon<'a, L: Language> {
     relexed: &'a mut Lexed<L::Token>,
     /// `Parser::file_block_closers`.
     file_block_closers: &'a mut Option<Arc<[u32]>>,
-    /// The buffers its builder works in: `lex_types` and `starts` are what `builder` parses; `layer` is for the
-    /// language's layers over it.
-    pub bufs: &'a mut BuilderBuffers<L>,
+    /// The frame it is parsed on: one of the methods below makes its builder.
+    pub frame: &'a mut L::Frame,
     /// Its nesting (`NESTING_CHAMELEON` over where it sits) and the parser's limit.
     nesting: u32,
     limit: u32,
@@ -249,53 +243,62 @@ impl<'a, L: Language> Chameleon<'a, L> {
         &text[self.pending.start..self.pending.end]
     }
 
-    /// A builder over the tokens in `bufs.lex_types` and `bufs.starts` (relative to the chameleon's start, one more
-    /// start than types), at nesting 0 with the parser's limit: a doc comment or a link holds no body, so its frame
-    /// is bounded by its own tokens wherever it sits.
-    pub fn builder(&mut self) -> PsiBuilderImpl<L> {
+    /// The token types and starts `builder` makes the builder over (relative to the chameleon's start, one more
+    /// start than types), for the language to fill.
+    pub fn token_buffers(&mut self) -> (&mut Vec<L::Token>, &mut Vec<u32>) {
+        L::frame_builder(self.frame).tokens_mut()
+    }
+
+    /// The frame's builder over the tokens in `token_buffers`, at nesting 0 with the parser's limit: a doc comment or
+    /// a link holds no body, so its frame is bounded by its own tokens wherever it sits.
+    pub fn builder(&mut self) -> &mut PsiBuilderImpl<L> {
         let p = &self.pending;
-        let mut builder = PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, None);
+        let builder = L::frame_builder(self.frame);
+        builder.reset(self.text.clone(), p.start, p.end - p.start, None);
         builder.set_nesting(0, self.limit);
         builder
     }
 
-    /// A builder over the chameleon's text lexed afresh with `Language::tokenize_into`, at nesting 0 with the
-    /// parser's limit.
-    pub fn relexed_builder(&mut self) -> PsiBuilderImpl<L> {
+    /// The frame's builder over the chameleon's text lexed afresh with `Language::tokenize_into`, at nesting 0 with
+    /// the parser's limit.
+    pub fn relexed_builder(&mut self) -> &mut PsiBuilderImpl<L> {
         let p = &self.pending;
         L::tokenize_into(&self.text[p.start..p.end], self.file_kind, self.relexed);
         add(Counter::RelexedTokens, self.relexed.len() as u64);
-        self.bufs.lex_types.clear();
-        self.bufs.lex_types.extend_from_slice(&self.relexed.types);
-        self.bufs.starts.clear();
-        self.bufs.starts.extend_from_slice(&self.relexed.starts);
+        let (types, starts) = L::frame_builder(self.frame).tokens_mut();
+        types.clear();
+        types.extend_from_slice(&self.relexed.types);
+        starts.clear();
+        starts.extend_from_slice(&self.relexed.starts);
         self.builder()
     }
 
-    /// A builder over a body's tokens (`Language::is_body`) at its nesting: the file's own tokens when they lex alone
-    /// the same (`reusable_tokens`), its text lexed afresh otherwise.
-    pub fn body_builder(&mut self) -> PsiBuilderImpl<L> {
+    /// The frame's builder over a body's tokens (`Language::is_body`) at its nesting: the file's own tokens when they
+    /// lex alone the same (`reusable_tokens`), its text lexed afresh otherwise.
+    pub fn body_builder(&mut self) -> &mut PsiBuilderImpl<L> {
         let p = &self.pending;
+        let (types, starts) = L::frame_builder(self.frame).tokens_mut();
         let file_token = match reusable_tokens(self.file, p) {
             Some((first, last)) => {
                 add(Counter::ReusedTokens, (last - first) as u64);
-                self.bufs.lex_types.clear();
-                self.bufs.lex_types.extend_from_slice(&self.file.types[first..last]);
-                self.bufs.starts.clear();
-                self.bufs.starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
+                types.clear();
+                types.extend_from_slice(&self.file.types[first..last]);
+                starts.clear();
+                starts.extend(self.file.starts[first..=last].iter().map(|s| s - p.start as u32));
                 Some(first)
             }
             None => {
                 L::tokenize_into(&self.text[p.start..p.end], self.file_kind, self.relexed);
                 add(Counter::RelexedTokens, self.relexed.len() as u64);
-                self.bufs.lex_types.clear();
-                self.bufs.lex_types.extend_from_slice(&self.relexed.types);
-                self.bufs.starts.clear();
-                self.bufs.starts.extend_from_slice(&self.relexed.starts);
+                types.clear();
+                types.extend_from_slice(&self.relexed.types);
+                starts.clear();
+                starts.extend_from_slice(&self.relexed.starts);
                 None
             }
         };
-        let mut delegate = PsiBuilderImpl::new(self.text.clone(), p.start, p.end - p.start, self.bufs, file_token);
+        let delegate = L::frame_builder(self.frame);
+        delegate.reset(self.text.clone(), p.start, p.end - p.start, file_token);
         delegate.set_nesting(self.nesting, self.limit);
         if let (Some(first), Some((open, close))) = (file_token, L::BLOCK_BRACES)
             && p.depth >= SHARED_BLOCK_DEPTH
@@ -340,7 +343,7 @@ impl<L: Language> Parser<L> {
         options: ParseOptions,
     ) -> Tree<L> {
         self.options = options;
-        let tree = self.parse_with(text.as_ref(), file_kind, |builder, bufs| L::parse_file(builder, bufs, file_kind));
+        let tree = self.parse_with(text.as_ref(), file_kind, |frame| L::parse_file(frame, file_kind));
         self.options = ParseOptions::default();
         tree
     }
@@ -365,25 +368,19 @@ impl<L: Language> Parser<L> {
             Err(_) => 0,
         };
         let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None, depth };
-        if let Some(frame) = self.begin_chameleon(&tree.text, &mut data, chameleon, tree.file_kind) {
-            self.frames.push(frame);
-            self.bind_frames(&tree.text, &mut data, tree.file_kind);
-        }
+        self.depth = 0;
+        self.begin_chameleon(&tree.text, &mut data, chameleon, tree.file_kind);
+        self.bind_frames(&tree.text, &mut data, tree.file_kind);
         let body = data.take_exact();
         self.data = data;
         self.options = ParseOptions::default();
         Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root, language: PhantomData })
     }
 
-    /// Lexes `text`, runs `parse` on its builder (with `bufs` for the language's layers over it) and takes the builder
-    /// back, builds and expands the tree. `parse_with_options` runs `Language::parse_file`; tests run their own.
+    /// Lexes `text`, runs `parse` on the frame whose builder holds its tokens, builds and expands the tree.
+    /// `parse_with_options` runs `Language::parse_file`; tests run their own.
     #[doc(hidden)]
-    pub fn parse_with(
-        &mut self,
-        text: &[u8],
-        file_kind: L::FileKind,
-        parse: impl FnOnce(PsiBuilderImpl<L>, &mut BuilderBuffers<L>) -> PsiBuilderImpl<L>,
-    ) -> Tree<L> {
+    pub fn parse_with(&mut self, text: &[u8], file_kind: L::FileKind, parse: impl FnOnce(&mut L::Frame)) -> Tree<L> {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
         L::tokenize_into(&text, file_kind, &mut self.file);
         self.file_block_closers = None;
@@ -391,16 +388,22 @@ impl<L: Language> Parser<L> {
         let mut data = std::mem::take(&mut self.data);
         data.clear();
 
-        let mut bufs = self.spare.pop().unwrap_or_default();
-        bufs.lex_types.clear();
-        bufs.lex_types.extend_from_slice(&self.file.types);
-        bufs.starts.clear();
-        bufs.starts.extend_from_slice(&self.file.starts);
-        let mut file = PsiBuilderImpl::new(text.clone(), 0, text.len(), &mut bufs, Some(0));
-        file.set_nesting(0, self.limit());
-        let mut builder = parse(file, &mut bufs);
-        let root = builder.begin_bind(&mut data, None);
-        self.frames.push(Frame { builder, bufs });
+        if self.frames.is_empty() {
+            self.frames.push(L::Frame::default());
+        }
+        let limit = self.limit();
+        let frame = &mut self.frames[0];
+        let file = L::frame_builder(frame);
+        let (types, starts) = file.tokens_mut();
+        types.clear();
+        types.extend_from_slice(&self.file.types);
+        starts.clear();
+        starts.extend_from_slice(&self.file.starts);
+        file.reset(text.clone(), 0, text.len(), Some(0));
+        file.set_nesting(0, limit);
+        parse(frame);
+        let root = L::frame_builder(frame).begin_bind(&mut data, None);
+        self.depth = 1;
         self.bind_frames(&text, &mut data, file_kind);
 
         let tree = data.take_exact();
@@ -412,60 +415,53 @@ impl<L: Language> Parser<L> {
     /// builder then goes on top and appends the chameleon's subtree right after it. So node ids are in preorder, and
     /// nesting takes heap, not stack.
     fn bind_frames(&mut self, text: &Arc<[u8]>, data: &mut TreeData, file_kind: L::FileKind) {
-        while let Some(frame) = self.frames.last_mut() {
-            match frame.builder.resume_bind(data) {
+        while self.depth > 0 {
+            let top = self.depth - 1;
+            match L::frame_builder(&mut self.frames[top]).resume_bind(data) {
                 Some(chameleon) if !self.options.expand_bodies && L::is_body(chameleon.kind) => {
                     data.set_unexpanded(chameleon.node);
                     if chameleon.depth > 0 {
                         data.body_depths.push((chameleon.node, chameleon.depth));
                     }
                 }
-                Some(chameleon) => {
-                    if let Some(frame) = self.begin_chameleon(text, data, chameleon, file_kind) {
-                        self.frames.push(frame);
-                    }
-                }
+                Some(chameleon) => self.begin_chameleon(text, data, chameleon, file_kind),
                 None => {
-                    let Some(Frame { builder, mut bufs }) = self.frames.pop() else { break };
-                    builder.release(&mut bufs);
-                    self.spare.push(bufs);
+                    L::frame_builder(&mut self.frames[top]).finish();
+                    self.depth = top;
                 }
             }
         }
     }
 
-    /// Parses one chameleon's text with a new builder (`Language::parse_chameleon`) and starts appending its subtree
-    /// under its node. A body (`Language::is_body`) whose nesting (`NESTING_CHAMELEON` over where it sits) passes the
-    /// limit is not parsed: its subtree is appended whole, an error element "Code is too deeply nested" over its
-    /// tokens, and there is no frame.
-    fn begin_chameleon(
-        &mut self,
-        text: &Arc<[u8]>,
-        data: &mut TreeData,
-        p: Pending<L::Lazy>,
-        file_kind: L::FileKind,
-    ) -> Option<Frame<L>> {
+    /// Parses one chameleon's text with the next frame's builder (`Language::parse_chameleon`) and starts appending
+    /// its subtree under its node, that frame on top. A body (`Language::is_body`) whose nesting (`NESTING_CHAMELEON`
+    /// over where it sits) passes the limit is not parsed: its subtree is appended whole, an error element "Code is
+    /// too deeply nested" over its tokens, and no frame is added.
+    fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending<L::Lazy>, file_kind: L::FileKind) {
         let nesting = p.depth.saturating_add(NESTING_CHAMELEON);
         if L::is_body(p.kind) && nesting > self.limit() {
             self.append_too_deep(text, data, &p, file_kind);
-            return None;
+            return;
         }
-        let mut bufs = self.spare.pop().unwrap_or_default();
         let limit = self.limit();
+        if self.depth == self.frames.len() {
+            self.frames.push(L::Frame::default());
+        }
+        let frame = &mut self.frames[self.depth];
         let mut chameleon = Chameleon {
             text,
             pending: p,
             file: &self.file,
             relexed: &mut self.relexed,
             file_block_closers: &mut self.file_block_closers,
-            bufs: &mut bufs,
+            frame,
             nesting,
             limit,
             file_kind,
         };
-        let mut builder = L::parse_chameleon(p.kind, &mut chameleon);
-        builder.begin_bind(data, Some(p.node));
-        Some(Frame { builder, bufs })
+        L::parse_chameleon(p.kind, &mut chameleon);
+        L::frame_builder(&mut self.frames[self.depth]).begin_bind(data, Some(p.node));
+        self.depth += 1;
     }
 
     /// The subtree of a body nested too deeply to parse: under its node, one error element "Code is too deeply nested"

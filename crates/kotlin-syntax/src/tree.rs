@@ -58,10 +58,9 @@ pub(crate) fn parse_with(
     file_kind: FileKind,
     parse: impl FnOnce(&mut SemanticWhitespaceAwarePsiBuilderImpl),
 ) -> Tree {
-    Parser::new().parse_with(text, file_kind, |file, bufs| {
-        let mut builder = SemanticWhitespaceAwarePsiBuilderImpl::new(file, bufs);
-        parse(&mut builder);
-        builder.into_delegate(bufs)
+    Parser::new().parse_with(text, file_kind, |frame| {
+        frame.reset_layer();
+        parse(frame);
     })
 }
 

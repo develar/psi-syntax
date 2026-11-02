@@ -15,8 +15,6 @@ use crate::tokens::{TokenKind, TokenSet};
 
 /// `PsiBuilderImpl` over Kotlin's tokens.
 pub type PsiBuilderImpl = psi_builder::PsiBuilderImpl<Kotlin>;
-/// The buffers a Kotlin builder works in.
-pub type BuilderBuffers = psi_builder::BuilderBuffers<Kotlin>;
 
 /// Kotlin's `WhitespacesAndCommentsBinder`s: where a marker's edge goes among the whitespace and comments around it.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -195,15 +193,6 @@ pub enum Adapter {
     ForByClause { stack_size: i32 },
 }
 
-/// The state stacks of `SemanticWhitespaceAwarePsiBuilderImpl`, kept in `BuilderBuffers::layer` from one builder to
-/// the next.
-#[derive(Default)]
-pub struct SemanticBuffers {
-    join_complex_tokens: Vec<bool>,
-    newlines_enabled: Vec<bool>,
-    adapters: Vec<Adapter>,
-}
-
 /// `SemanticWhitespaceAwarePsiBuilderImpl.getJoinedTokenType(rawTokenType, rawLookupSteps)`: `?` before `.` is
 /// `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL` (`Language::joined_token_type`, which the
 /// delegate's per-position cache computes).
@@ -231,6 +220,9 @@ pub(crate) fn joined_token_type(
 
 /// `SemanticWhitespaceAwarePsiBuilderImpl`: the newline mode stack and the joining of `?.`, `?:`, `!!` over a
 /// `PsiBuilderImpl`. The adapters live here as a stack; a `SemanticWhitespaceAwarePsiBuilder` handle sees a prefix.
+/// It is Kotlin's `Language::Frame`: a `Parser` keeps one per nested builder and reuses it in place
+/// (`reset_layer` before each parse).
+#[derive(Default)]
 pub struct SemanticWhitespaceAwarePsiBuilderImpl {
     pub delegate: PsiBuilderImpl,
     /// `joinComplexTokens` below its top, which is `join_top` (not in the Java: every `getTokenType()` reads the top,
@@ -254,30 +246,14 @@ impl AsPsiBuilder for SemanticWhitespaceAwarePsiBuilderImpl {
 }
 
 impl SemanticWhitespaceAwarePsiBuilderImpl {
-    /// The semantic layer over `delegate`, its stacks and adapters in `bufs` (emptied until `release`).
-    pub(crate) fn new(delegate: PsiBuilderImpl, bufs: &mut BuilderBuffers) -> Self {
-        let mut join_complex_tokens = std::mem::take(&mut bufs.layer.join_complex_tokens);
-        join_complex_tokens.clear();
-        let mut newlines_enabled = std::mem::take(&mut bufs.layer.newlines_enabled);
-        newlines_enabled.clear();
-        let mut adapters = std::mem::take(&mut bufs.layer.adapters);
-        adapters.clear();
-        SemanticWhitespaceAwarePsiBuilderImpl {
-            delegate,
-            join_complex_tokens,
-            join_top: true,
-            newlines_enabled,
-            newlines_top: true,
-            adapters,
-        }
-    }
-
-    /// Gives this layer's buffers back to `bufs` and returns the delegate, which builds the tree.
-    pub(crate) fn into_delegate(self, bufs: &mut BuilderBuffers) -> PsiBuilderImpl {
-        bufs.layer.join_complex_tokens = self.join_complex_tokens;
-        bufs.layer.newlines_enabled = self.newlines_enabled;
-        bufs.layer.adapters = self.adapters;
-        self.delegate
+    /// Starts the layer afresh over its delegate (made for the text to parse): empty stacks, newlines enabled and
+    /// complex tokens joined, no adapter.
+    pub(crate) fn reset_layer(&mut self) {
+        self.join_complex_tokens.clear();
+        self.join_top = true;
+        self.newlines_enabled.clear();
+        self.newlines_top = true;
+        self.adapters.clear();
     }
 
     /// A handle without adapters: what `KotlinParser` passes to `KotlinParsing.createForTopLevel`.

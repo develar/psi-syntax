@@ -12,7 +12,7 @@ pub mod lexer;
 pub mod token_set;
 pub mod tree;
 
-pub use builder::{AsPsiBuilder, BuilderBuffers, Marker, Nesting, PsiBuilderImpl, WhitespacesAndCommentsBinder};
+pub use builder::{AsPsiBuilder, Marker, Nesting, PsiBuilderImpl, WhitespacesAndCommentsBinder};
 pub use language::{ElementType, ElementTypeOf, Language, NodeType, TokenType};
 pub use lexer::Lexed;
 pub use token_set::ElementTypeSet;

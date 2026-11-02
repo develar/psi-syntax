@@ -271,14 +271,13 @@ mod tests {
 
     /// A tree of the file's tokens under its root (no parser runs: the tokens and both dumps' labels).
     fn tokens_only(text: &str) -> Tree {
-        Parser::new().parse_with(text.as_bytes(), FileKind::default(), |mut builder, _| {
-            let mut b = SyntaxTreeBuilder::new(&mut builder);
+        Parser::new().parse_with(text.as_bytes(), FileKind::default(), |builder| {
+            let mut b = SyntaxTreeBuilder::new(builder);
             let root = b.mark();
             while !b.eof() {
                 b.advance_lexer();
             }
             root.done(&mut b, NodeKind::JAVA_FILE);
-            builder
         })
     }
 
