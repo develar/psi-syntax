@@ -752,6 +752,8 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "Modifiers", kind: SlotKind::List, optional: false },
             Slot { name: "Parameter", kind: SlotKind::Node, optional: false },
             Slot { name: "ArrowToken", kind: SlotKind::Token, optional: false },
+            Slot { name: "Block", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -777,6 +779,8 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "ReturnType", kind: SlotKind::Node, optional: true },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
             Slot { name: "ArrowToken", kind: SlotKind::Token, optional: false },
+            Slot { name: "Block", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -1401,6 +1405,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "TypeParameterList", kind: SlotKind::Node, optional: true },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
             Slot { name: "ConstraintClauses", kind: SlotKind::List, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -1638,6 +1645,8 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "AttributeLists", kind: SlotKind::List, optional: false },
             Slot { name: "ForKeyword", kind: SlotKind::Token, optional: false },
             Slot { name: "OpenParenToken", kind: SlotKind::Token, optional: false },
+            Slot { name: "Declaration", kind: SlotKind::Node, optional: true },
+            Slot { name: "Initializers", kind: SlotKind::SeparatedList, optional: false },
             Slot { name: "FirstSemicolonToken", kind: SlotKind::Token, optional: false },
             Slot { name: "Condition", kind: SlotKind::Node, optional: true },
             Slot { name: "SecondSemicolonToken", kind: SlotKind::Token, optional: false },
@@ -1694,6 +1703,8 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "AwaitKeyword", kind: SlotKind::Token, optional: true },
             Slot { name: "UsingKeyword", kind: SlotKind::Token, optional: false },
             Slot { name: "OpenParenToken", kind: SlotKind::Token, optional: false },
+            Slot { name: "Declaration", kind: SlotKind::Node, optional: true },
+            Slot { name: "Expression", kind: SlotKind::Node, optional: true },
             Slot { name: "CloseParenToken", kind: SlotKind::Token, optional: false },
             Slot { name: "Statement", kind: SlotKind::Node, optional: false },
         ],
@@ -1970,6 +1981,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
         slots: &[
             Slot { name: "GlobalKeyword", kind: SlotKind::Token, optional: true },
             Slot { name: "UsingKeyword", kind: SlotKind::Token, optional: false },
+            Slot { name: "StaticKeyword", kind: SlotKind::Token, optional: true },
+            Slot { name: "UnsafeKeyword", kind: SlotKind::Token, optional: true },
+            Slot { name: "Alias", kind: SlotKind::Node, optional: true },
             Slot { name: "NamespaceOrType", kind: SlotKind::Node, optional: false },
             Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: false },
         ],
@@ -2063,7 +2077,11 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
     NodeTypeInfo {
         name: "AttributeArgumentSyntax",
         kinds: &[SyntaxKind::AttributeArgument],
-        slots: &[Slot { name: "Expression", kind: SlotKind::Node, optional: false }],
+        slots: &[
+            Slot { name: "NameEquals", kind: SlotKind::Node, optional: true },
+            Slot { name: "NameColon", kind: SlotKind::Node, optional: true },
+            Slot { name: "Expression", kind: SlotKind::Node, optional: false },
+        ],
         bools: &[],
         is_directive: false,
         is_structured_trivia: false,
@@ -2431,6 +2449,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "TypeParameterList", kind: SlotKind::Node, optional: true },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
             Slot { name: "ConstraintClauses", kind: SlotKind::List, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2448,6 +2469,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "CheckedKeyword", kind: SlotKind::Token, optional: true },
             Slot { name: "OperatorToken", kind: SlotKind::Token, optional: false },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2465,6 +2489,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "CheckedKeyword", kind: SlotKind::Token, optional: true },
             Slot { name: "Type", kind: SlotKind::Node, optional: false },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2479,6 +2506,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "Identifier", kind: SlotKind::Token, optional: false },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
             Slot { name: "Initializer", kind: SlotKind::Node, optional: true },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2505,6 +2535,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "TildeToken", kind: SlotKind::Token, optional: false },
             Slot { name: "Identifier", kind: SlotKind::Token, optional: false },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2519,6 +2552,10 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "Type", kind: SlotKind::Node, optional: false },
             Slot { name: "ExplicitInterfaceSpecifier", kind: SlotKind::Node, optional: true },
             Slot { name: "Identifier", kind: SlotKind::Token, optional: false },
+            Slot { name: "AccessorList", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "Initializer", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2545,6 +2582,8 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "Type", kind: SlotKind::Node, optional: false },
             Slot { name: "ExplicitInterfaceSpecifier", kind: SlotKind::Node, optional: true },
             Slot { name: "Identifier", kind: SlotKind::Token, optional: false },
+            Slot { name: "AccessorList", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2560,6 +2599,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "ExplicitInterfaceSpecifier", kind: SlotKind::Node, optional: true },
             Slot { name: "ThisKeyword", kind: SlotKind::Token, optional: false },
             Slot { name: "ParameterList", kind: SlotKind::Node, optional: false },
+            Slot { name: "AccessorList", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -2591,6 +2633,9 @@ pub static NODE_TYPES: [NodeTypeInfo; 250] = [
             Slot { name: "AttributeLists", kind: SlotKind::List, optional: false },
             Slot { name: "Modifiers", kind: SlotKind::List, optional: false },
             Slot { name: "Keyword", kind: SlotKind::Token, optional: false },
+            Slot { name: "Body", kind: SlotKind::Node, optional: true },
+            Slot { name: "ExpressionBody", kind: SlotKind::Node, optional: true },
+            Slot { name: "SemicolonToken", kind: SlotKind::Token, optional: true },
         ],
         bools: &[],
         is_directive: false,
@@ -3750,6 +3795,8 @@ pub mod types {
         pub const MODIFIERS: usize = 1;
         pub const PARAMETER: usize = 2;
         pub const ARROW_TOKEN: usize = 3;
+        pub const BLOCK: usize = 4;
+        pub const EXPRESSION_BODY: usize = 5;
     }
     /// `RefExpressionSyntax`: kinds RefExpression.
     pub struct RefExpressionSyntax;
@@ -3769,6 +3816,8 @@ pub mod types {
         pub const RETURN_TYPE: usize = 2;
         pub const PARAMETER_LIST: usize = 3;
         pub const ARROW_TOKEN: usize = 4;
+        pub const BLOCK: usize = 5;
+        pub const EXPRESSION_BODY: usize = 6;
     }
     /// `InitializerExpressionSyntax`: kinds ObjectInitializerExpression, CollectionInitializerExpression, ArrayInitializerExpression, ComplexElementInitializerExpression, WithInitializerExpression.
     pub struct InitializerExpressionSyntax;
@@ -4240,6 +4289,9 @@ pub mod types {
         pub const TYPE_PARAMETER_LIST: usize = 4;
         pub const PARAMETER_LIST: usize = 5;
         pub const CONSTRAINT_CLAUSES: usize = 6;
+        pub const BODY: usize = 7;
+        pub const EXPRESSION_BODY: usize = 8;
+        pub const SEMICOLON_TOKEN: usize = 9;
     }
     /// `LocalDeclarationStatementSyntax`: kinds LocalDeclarationStatement.
     pub struct LocalDeclarationStatementSyntax;
@@ -4424,12 +4476,14 @@ pub mod types {
         pub const ATTRIBUTE_LISTS: usize = 0;
         pub const FOR_KEYWORD: usize = 1;
         pub const OPEN_PAREN_TOKEN: usize = 2;
-        pub const FIRST_SEMICOLON_TOKEN: usize = 3;
-        pub const CONDITION: usize = 4;
-        pub const SECOND_SEMICOLON_TOKEN: usize = 5;
-        pub const INCREMENTORS: usize = 6;
-        pub const CLOSE_PAREN_TOKEN: usize = 7;
-        pub const STATEMENT: usize = 8;
+        pub const DECLARATION: usize = 3;
+        pub const INITIALIZERS: usize = 4;
+        pub const FIRST_SEMICOLON_TOKEN: usize = 5;
+        pub const CONDITION: usize = 6;
+        pub const SECOND_SEMICOLON_TOKEN: usize = 7;
+        pub const INCREMENTORS: usize = 8;
+        pub const CLOSE_PAREN_TOKEN: usize = 9;
+        pub const STATEMENT: usize = 10;
     }
     /// `ForEachStatementSyntax`: kinds ForEachStatement.
     pub struct ForEachStatementSyntax;
@@ -4471,8 +4525,10 @@ pub mod types {
         pub const AWAIT_KEYWORD: usize = 1;
         pub const USING_KEYWORD: usize = 2;
         pub const OPEN_PAREN_TOKEN: usize = 3;
-        pub const CLOSE_PAREN_TOKEN: usize = 4;
-        pub const STATEMENT: usize = 5;
+        pub const DECLARATION: usize = 4;
+        pub const EXPRESSION: usize = 5;
+        pub const CLOSE_PAREN_TOKEN: usize = 6;
+        pub const STATEMENT: usize = 7;
     }
     /// `FixedStatementSyntax`: kinds FixedStatement.
     pub struct FixedStatementSyntax;
@@ -4684,8 +4740,11 @@ pub mod types {
         pub const NODE_TYPE: usize = 154;
         pub const GLOBAL_KEYWORD: usize = 0;
         pub const USING_KEYWORD: usize = 1;
-        pub const NAMESPACE_OR_TYPE: usize = 2;
-        pub const SEMICOLON_TOKEN: usize = 3;
+        pub const STATIC_KEYWORD: usize = 2;
+        pub const UNSAFE_KEYWORD: usize = 3;
+        pub const ALIAS: usize = 4;
+        pub const NAMESPACE_OR_TYPE: usize = 5;
+        pub const SEMICOLON_TOKEN: usize = 6;
     }
     /// `NamespaceDeclarationSyntax`: kinds NamespaceDeclaration.
     pub struct NamespaceDeclarationSyntax;
@@ -4757,7 +4816,9 @@ pub mod types {
     impl AttributeArgumentSyntax {
         /// Its index in `NODE_TYPES`.
         pub const NODE_TYPE: usize = 161;
-        pub const EXPRESSION: usize = 0;
+        pub const NAME_EQUALS: usize = 0;
+        pub const NAME_COLON: usize = 1;
+        pub const EXPRESSION: usize = 2;
     }
     /// `NameEqualsSyntax`: kinds NameEquals.
     pub struct NameEqualsSyntax;
@@ -5054,6 +5115,9 @@ pub mod types {
         pub const TYPE_PARAMETER_LIST: usize = 5;
         pub const PARAMETER_LIST: usize = 6;
         pub const CONSTRAINT_CLAUSES: usize = 7;
+        pub const BODY: usize = 8;
+        pub const EXPRESSION_BODY: usize = 9;
+        pub const SEMICOLON_TOKEN: usize = 10;
     }
     /// `OperatorDeclarationSyntax`: kinds OperatorDeclaration.
     pub struct OperatorDeclarationSyntax;
@@ -5068,6 +5132,9 @@ pub mod types {
         pub const CHECKED_KEYWORD: usize = 5;
         pub const OPERATOR_TOKEN: usize = 6;
         pub const PARAMETER_LIST: usize = 7;
+        pub const BODY: usize = 8;
+        pub const EXPRESSION_BODY: usize = 9;
+        pub const SEMICOLON_TOKEN: usize = 10;
     }
     /// `ConversionOperatorDeclarationSyntax`: kinds ConversionOperatorDeclaration.
     pub struct ConversionOperatorDeclarationSyntax;
@@ -5082,6 +5149,9 @@ pub mod types {
         pub const CHECKED_KEYWORD: usize = 5;
         pub const TYPE: usize = 6;
         pub const PARAMETER_LIST: usize = 7;
+        pub const BODY: usize = 8;
+        pub const EXPRESSION_BODY: usize = 9;
+        pub const SEMICOLON_TOKEN: usize = 10;
     }
     /// `ConstructorDeclarationSyntax`: kinds ConstructorDeclaration.
     pub struct ConstructorDeclarationSyntax;
@@ -5093,6 +5163,9 @@ pub mod types {
         pub const IDENTIFIER: usize = 2;
         pub const PARAMETER_LIST: usize = 3;
         pub const INITIALIZER: usize = 4;
+        pub const BODY: usize = 5;
+        pub const EXPRESSION_BODY: usize = 6;
+        pub const SEMICOLON_TOKEN: usize = 7;
     }
     /// `ConstructorInitializerSyntax`: kinds BaseConstructorInitializer, ThisConstructorInitializer.
     pub struct ConstructorInitializerSyntax;
@@ -5113,6 +5186,9 @@ pub mod types {
         pub const TILDE_TOKEN: usize = 2;
         pub const IDENTIFIER: usize = 3;
         pub const PARAMETER_LIST: usize = 4;
+        pub const BODY: usize = 5;
+        pub const EXPRESSION_BODY: usize = 6;
+        pub const SEMICOLON_TOKEN: usize = 7;
     }
     /// `PropertyDeclarationSyntax`: kinds PropertyDeclaration.
     pub struct PropertyDeclarationSyntax;
@@ -5124,6 +5200,10 @@ pub mod types {
         pub const TYPE: usize = 2;
         pub const EXPLICIT_INTERFACE_SPECIFIER: usize = 3;
         pub const IDENTIFIER: usize = 4;
+        pub const ACCESSOR_LIST: usize = 5;
+        pub const EXPRESSION_BODY: usize = 6;
+        pub const INITIALIZER: usize = 7;
+        pub const SEMICOLON_TOKEN: usize = 8;
     }
     /// `ArrowExpressionClauseSyntax`: kinds ArrowExpressionClause.
     pub struct ArrowExpressionClauseSyntax;
@@ -5144,6 +5224,8 @@ pub mod types {
         pub const TYPE: usize = 3;
         pub const EXPLICIT_INTERFACE_SPECIFIER: usize = 4;
         pub const IDENTIFIER: usize = 5;
+        pub const ACCESSOR_LIST: usize = 6;
+        pub const SEMICOLON_TOKEN: usize = 7;
     }
     /// `IndexerDeclarationSyntax`: kinds IndexerDeclaration.
     pub struct IndexerDeclarationSyntax;
@@ -5156,6 +5238,9 @@ pub mod types {
         pub const EXPLICIT_INTERFACE_SPECIFIER: usize = 3;
         pub const THIS_KEYWORD: usize = 4;
         pub const PARAMETER_LIST: usize = 5;
+        pub const ACCESSOR_LIST: usize = 6;
+        pub const EXPRESSION_BODY: usize = 7;
+        pub const SEMICOLON_TOKEN: usize = 8;
     }
     /// `AccessorListSyntax`: kinds AccessorList.
     pub struct AccessorListSyntax;
@@ -5174,6 +5259,9 @@ pub mod types {
         pub const ATTRIBUTE_LISTS: usize = 0;
         pub const MODIFIERS: usize = 1;
         pub const KEYWORD: usize = 2;
+        pub const BODY: usize = 3;
+        pub const EXPRESSION_BODY: usize = 4;
+        pub const SEMICOLON_TOKEN: usize = 5;
     }
     /// `ParameterListSyntax`: kinds ParameterList.
     pub struct ParameterListSyntax;
@@ -6074,8 +6162,14 @@ impl GreenArena {
         modifiers: Green,
         parameter: Green,
         arrow_token: Green,
+        block: Green,
+        expression_body: Green,
     ) -> Green {
-        self.create_node(SyntaxKind::SimpleLambdaExpression, &[attribute_lists, modifiers, parameter, arrow_token], 0)
+        self.create_node(
+            SyntaxKind::SimpleLambdaExpression,
+            &[attribute_lists, modifiers, parameter, arrow_token, block, expression_body],
+            0,
+        )
     }
     /// `SyntaxFactory.RefExpression`: a `RefExpressionSyntax` (RefExpression).
     pub fn ref_expression(&mut self, ref_keyword: Green, expression: Green) -> Green {
@@ -6089,10 +6183,12 @@ impl GreenArena {
         return_type: Green,
         parameter_list: Green,
         arrow_token: Green,
+        block: Green,
+        expression_body: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::ParenthesizedLambdaExpression,
-            &[attribute_lists, modifiers, return_type, parameter_list, arrow_token],
+            &[attribute_lists, modifiers, return_type, parameter_list, arrow_token, block, expression_body],
             0,
         )
     }
@@ -6471,6 +6567,9 @@ impl GreenArena {
         type_parameter_list: Green,
         parameter_list: Green,
         constraint_clauses: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::LocalFunctionStatement,
@@ -6482,6 +6581,9 @@ impl GreenArena {
                 type_parameter_list,
                 parameter_list,
                 constraint_clauses,
+                body,
+                expression_body,
+                semicolon_token,
             ],
             0,
         )
@@ -6678,6 +6780,8 @@ impl GreenArena {
         attribute_lists: Green,
         for_keyword: Green,
         open_paren_token: Green,
+        declaration: Green,
+        initializers: Green,
         first_semicolon_token: Green,
         condition: Green,
         second_semicolon_token: Green,
@@ -6691,6 +6795,8 @@ impl GreenArena {
                 attribute_lists,
                 for_keyword,
                 open_paren_token,
+                declaration,
+                initializers,
                 first_semicolon_token,
                 condition,
                 second_semicolon_token,
@@ -6768,12 +6874,23 @@ impl GreenArena {
         await_keyword: Green,
         using_keyword: Green,
         open_paren_token: Green,
+        declaration: Green,
+        expression: Green,
         close_paren_token: Green,
         statement: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::UsingStatement,
-            &[attribute_lists, await_keyword, using_keyword, open_paren_token, close_paren_token, statement],
+            &[
+                attribute_lists,
+                await_keyword,
+                using_keyword,
+                open_paren_token,
+                declaration,
+                expression,
+                close_paren_token,
+                statement,
+            ],
             0,
         )
     }
@@ -6999,12 +7116,15 @@ impl GreenArena {
         &mut self,
         global_keyword: Green,
         using_keyword: Green,
+        static_keyword: Green,
+        unsafe_keyword: Green,
+        alias: Green,
         namespace_or_type: Green,
         semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::UsingDirective,
-            &[global_keyword, using_keyword, namespace_or_type, semicolon_token],
+            &[global_keyword, using_keyword, static_keyword, unsafe_keyword, alias, namespace_or_type, semicolon_token],
             0,
         )
     }
@@ -7085,8 +7205,8 @@ impl GreenArena {
         self.create_node(SyntaxKind::AttributeArgumentList, &[open_paren_token, arguments, close_paren_token], 0)
     }
     /// `SyntaxFactory.AttributeArgument`: a `AttributeArgumentSyntax` (AttributeArgument).
-    pub fn attribute_argument(&mut self, expression: Green) -> Green {
-        self.create_node(SyntaxKind::AttributeArgument, &[expression], 0)
+    pub fn attribute_argument(&mut self, name_equals: Green, name_colon: Green, expression: Green) -> Green {
+        self.create_node(SyntaxKind::AttributeArgument, &[name_equals, name_colon, expression], 0)
     }
     /// `SyntaxFactory.NameEquals`: a `NameEqualsSyntax` (NameEquals).
     pub fn name_equals(&mut self, name: Green, equals_token: Green) -> Green {
@@ -7478,6 +7598,9 @@ impl GreenArena {
         type_parameter_list: Green,
         parameter_list: Green,
         constraint_clauses: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::MethodDeclaration,
@@ -7490,6 +7613,9 @@ impl GreenArena {
                 type_parameter_list,
                 parameter_list,
                 constraint_clauses,
+                body,
+                expression_body,
+                semicolon_token,
             ],
             0,
         )
@@ -7505,6 +7631,9 @@ impl GreenArena {
         checked_keyword: Green,
         operator_token: Green,
         parameter_list: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::OperatorDeclaration,
@@ -7517,6 +7646,9 @@ impl GreenArena {
                 checked_keyword,
                 operator_token,
                 parameter_list,
+                body,
+                expression_body,
+                semicolon_token,
             ],
             0,
         )
@@ -7532,6 +7664,9 @@ impl GreenArena {
         checked_keyword: Green,
         type_: Green,
         parameter_list: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::ConversionOperatorDeclaration,
@@ -7544,6 +7679,9 @@ impl GreenArena {
                 checked_keyword,
                 type_,
                 parameter_list,
+                body,
+                expression_body,
+                semicolon_token,
             ],
             0,
         )
@@ -7556,10 +7694,22 @@ impl GreenArena {
         identifier: Green,
         parameter_list: Green,
         initializer: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::ConstructorDeclaration,
-            &[attribute_lists, modifiers, identifier, parameter_list, initializer],
+            &[
+                attribute_lists,
+                modifiers,
+                identifier,
+                parameter_list,
+                initializer,
+                body,
+                expression_body,
+                semicolon_token,
+            ],
             0,
         )
     }
@@ -7581,10 +7731,22 @@ impl GreenArena {
         tilde_token: Green,
         identifier: Green,
         parameter_list: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::DestructorDeclaration,
-            &[attribute_lists, modifiers, tilde_token, identifier, parameter_list],
+            &[
+                attribute_lists,
+                modifiers,
+                tilde_token,
+                identifier,
+                parameter_list,
+                body,
+                expression_body,
+                semicolon_token,
+            ],
             0,
         )
     }
@@ -7596,10 +7758,24 @@ impl GreenArena {
         type_: Green,
         explicit_interface_specifier: Green,
         identifier: Green,
+        accessor_list: Green,
+        expression_body: Green,
+        initializer: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::PropertyDeclaration,
-            &[attribute_lists, modifiers, type_, explicit_interface_specifier, identifier],
+            &[
+                attribute_lists,
+                modifiers,
+                type_,
+                explicit_interface_specifier,
+                identifier,
+                accessor_list,
+                expression_body,
+                initializer,
+                semicolon_token,
+            ],
             0,
         )
     }
@@ -7616,10 +7792,21 @@ impl GreenArena {
         type_: Green,
         explicit_interface_specifier: Green,
         identifier: Green,
+        accessor_list: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::EventDeclaration,
-            &[attribute_lists, modifiers, event_keyword, type_, explicit_interface_specifier, identifier],
+            &[
+                attribute_lists,
+                modifiers,
+                event_keyword,
+                type_,
+                explicit_interface_specifier,
+                identifier,
+                accessor_list,
+                semicolon_token,
+            ],
             0,
         )
     }
@@ -7632,10 +7819,23 @@ impl GreenArena {
         explicit_interface_specifier: Green,
         this_keyword: Green,
         parameter_list: Green,
+        accessor_list: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
         self.create_node(
             SyntaxKind::IndexerDeclaration,
-            &[attribute_lists, modifiers, type_, explicit_interface_specifier, this_keyword, parameter_list],
+            &[
+                attribute_lists,
+                modifiers,
+                type_,
+                explicit_interface_specifier,
+                this_keyword,
+                parameter_list,
+                accessor_list,
+                expression_body,
+                semicolon_token,
+            ],
             0,
         )
     }
@@ -7650,8 +7850,11 @@ impl GreenArena {
         attribute_lists: Green,
         modifiers: Green,
         keyword: Green,
+        body: Green,
+        expression_body: Green,
+        semicolon_token: Green,
     ) -> Green {
-        self.create_node(kind, &[attribute_lists, modifiers, keyword], 0)
+        self.create_node(kind, &[attribute_lists, modifiers, keyword, body, expression_body, semicolon_token], 0)
     }
     /// `SyntaxFactory.ParameterList`: a `ParameterListSyntax` (ParameterList).
     pub fn parameter_list(&mut self, open_paren_token: Green, parameters: Green, close_paren_token: Green) -> Green {

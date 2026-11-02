@@ -121,12 +121,29 @@ class Field:
         return "Node"
 
 
+def flatten_fields(e, make_optional: bool) -> list[Field]:
+    """`TreeFlattening.FlattenChildren` of Roslyn's syntax generator: the fields of a node in document order, those
+    of a `Choice` (and of a `Sequence` inside one) optional, a list never."""
+    fields = []
+    for c in e:
+        if c.tag == "Field":
+            f = Field(c)
+            if make_optional and f.slot_kind not in ("List", "SeparatedList"):
+                f.optional = True
+            fields.append(f)
+        elif c.tag == "Choice":
+            fields.extend(flatten_fields(c, True))
+        elif c.tag == "Sequence":
+            fields.extend(flatten_fields(c, make_optional))
+    return fields
+
+
 class NodeType:
     def __init__(self, e):
         self.name = e.get("Name")
         self.base = e.get("Base")
         self.kinds = [k.get("Name") for k in e.findall("Kind")]
-        self.fields = [Field(f) for f in e.findall("Field")]
+        self.fields = flatten_fields(e, False)
         self.slots = [f for f in self.fields if not f.is_bool]
         self.bools = [f for f in self.fields if f.is_bool]
 
