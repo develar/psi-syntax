@@ -1,0 +1,12 @@
+<Project>
+  <!-- Build products and restored packages live in the cache, never in the checkout:
+       $HOME/.cache/psi-syntax/csharp-oracle/{nuget,build/<key>}; oracle.sh sets CSHARP_ORACLE_BUILD per source hash. -->
+  <PropertyGroup>
+    <CSharpOracleCache>$([System.Environment]::GetFolderPath(SpecialFolder.UserProfile))/.cache/psi-syntax/csharp-oracle</CSharpOracleCache>
+    <CSharpOracleBuild Condition="'$(CSHARP_ORACLE_BUILD)' != ''">$(CSHARP_ORACLE_BUILD)</CSharpOracleBuild>
+    <CSharpOracleBuild Condition="'$(CSharpOracleBuild)' == ''">$(CSharpOracleCache)/build/dev</CSharpOracleBuild>
+    <BaseIntermediateOutputPath>$(CSharpOracleBuild)/obj/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(CSharpOracleBuild)/bin/</BaseOutputPath>
+    <RestorePackagesPath>$(CSharpOracleCache)/nuget/</RestorePackagesPath>
+  </PropertyGroup>
+</Project>
