@@ -777,6 +777,15 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.lex_starts[cur as usize] as i32
     }
 
+    /// The raw tokens before the current lexeme, the starts of all tokens (relative to this builder's text, the text
+    /// length past the last) and this builder's text (not in the Java): what `rawLookup(-i)` and
+    /// `rawTokenTypeStart(-i)` read for i = 1, 2, …, for a layer that walks back over them.
+    #[inline]
+    pub fn raw_tokens_before(&self) -> (&[L::Token], &[u32], &[u8]) {
+        let current = self.current_lexeme.min(self.lexeme_count);
+        (&self.lex_types[..current], &self.lex_starts, &self.text[self.base..self.base + self.len])
+    }
+
     /// `rawTokenIndex()`.
     pub fn raw_token_index(&self) -> i32 {
         self.current_lexeme as i32
@@ -881,6 +890,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `getTokenText()` as bytes.
+    #[inline(always)]
     pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
         add(Counter::TokenText, 1);
         if self.eof() {
@@ -902,12 +912,14 @@ impl<L: Language> PsiBuilderImpl<L> {
         marker
     }
 
+    #[inline(always)]
     fn create_marker(&mut self, lexeme_index: i32) -> Marker {
         let id = self.allocate(MarkerKind::Start);
         self.markers[id as usize].lexeme_index = lexeme_index;
         Marker(id)
     }
 
+    #[inline(always)]
     fn allocate(&mut self, kind: MarkerKind) -> u32 {
         let free = match kind {
             MarkerKind::Start => self.free_start_markers.pop(),
@@ -924,6 +936,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
+    #[inline(always)]
     fn free_marker(&mut self, id: u32) {
         let kind = self.markers[id as usize].kind;
         self.markers[id as usize] = MarkerData::new(kind);
@@ -933,6 +946,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
+    #[inline(always)]
     fn marker(&self, id: u32) -> &MarkerData<L::Token, L::Node, L::Binder> {
         &self.markers[id as usize]
     }

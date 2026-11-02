@@ -233,8 +233,13 @@ pub(crate) fn joined_token_type(
 /// `PsiBuilderImpl`. The adapters live here as a stack; a `SemanticWhitespaceAwarePsiBuilder` handle sees a prefix.
 pub struct SemanticWhitespaceAwarePsiBuilderImpl {
     pub delegate: PsiBuilderImpl,
+    /// `joinComplexTokens` below its top, which is `join_top` (not in the Java: every `getTokenType()` reads the top,
+    /// so it is a field, updated where the stack is pushed or popped).
     join_complex_tokens: Vec<bool>,
+    join_top: bool,
+    /// `newlinesEnabled` below its top, which is `newlines_top`.
     newlines_enabled: Vec<bool>,
+    newlines_top: bool,
     adapters: Vec<Adapter>,
 }
 
@@ -253,13 +258,18 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     pub(crate) fn new(delegate: PsiBuilderImpl, bufs: &mut BuilderBuffers) -> Self {
         let mut join_complex_tokens = std::mem::take(&mut bufs.layer.join_complex_tokens);
         join_complex_tokens.clear();
-        join_complex_tokens.push(true);
         let mut newlines_enabled = std::mem::take(&mut bufs.layer.newlines_enabled);
         newlines_enabled.clear();
-        newlines_enabled.push(true);
         let mut adapters = std::mem::take(&mut bufs.layer.adapters);
         adapters.clear();
-        SemanticWhitespaceAwarePsiBuilderImpl { delegate, join_complex_tokens, newlines_enabled, adapters }
+        SemanticWhitespaceAwarePsiBuilderImpl {
+            delegate,
+            join_complex_tokens,
+            join_top: true,
+            newlines_enabled,
+            newlines_top: true,
+            adapters,
+        }
     }
 
     /// Gives this layer's buffers back to `bufs` and returns the delegate, which builds the tree.
@@ -283,73 +293,69 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     /// `newlineBeforeCurrentToken()`: whether the whitespace before the current token (comments skipped) has a newline.
     pub fn newline_before_current_token(&mut self) -> bool {
         crate::counters::add(crate::counters::Counter::NewlineBefore, 1);
-        if !self.newlines_enabled.last().copied().unwrap_or(true) {
+        if !self.newlines_top {
             return false;
         }
         if self.delegate.eof() {
             return true;
         }
-        let current_offset = self.delegate.get_current_offset();
-        let mut i = 1;
-        while i <= current_offset {
-            let previous_token = self.delegate.raw_lookup(-i);
-            if matches!(
-                previous_token,
-                Some(
-                    TokenKind::BLOCK_COMMENT
-                        | TokenKind::DOC_COMMENT
-                        | TokenKind::EOL_COMMENT
-                        | TokenKind::SHEBANG_COMMENT
-                )
-            ) {
-                i += 1;
-                continue;
+        // The Java's loop over `rawLookup(-i)` for i up to the current offset, over the token list: the tokens it
+        // passes, comments and whitespace, are never empty, so the bound on i never ends it first.
+        let (before, starts, text) = self.delegate.raw_tokens_before();
+        for (k, &previous_token) in before.iter().enumerate().rev() {
+            match previous_token {
+                TokenKind::BLOCK_COMMENT
+                | TokenKind::DOC_COMMENT
+                | TokenKind::EOL_COMMENT
+                | TokenKind::SHEBANG_COMMENT => {}
+                TokenKind::WHITE_SPACE => {
+                    let (start, end) = (starts[k] as usize, starts[k + 1] as usize);
+                    if text[start..end.min(text.len())].contains(&b'\n') {
+                        return true;
+                    }
+                }
+                _ => break,
             }
-            if previous_token != TokenKind::WHITE_SPACE {
-                break;
-            }
-            let previous_token_start = self.delegate.raw_token_type_start(-i).max(0) as usize;
-            let previous_token_end = self.delegate.raw_token_type_start(-i + 1).max(0) as usize;
-            let text = self.delegate.get_original_text();
-            if text[previous_token_start..previous_token_end.min(text.len())].contains(&b'\n') {
-                return true;
-            }
-            i += 1;
         }
         false
     }
 
     pub fn disable_newlines(&mut self) {
-        self.newlines_enabled.push(false);
+        self.newlines_enabled.push(self.newlines_top);
+        self.newlines_top = false;
     }
 
     pub fn enable_newlines(&mut self) {
-        self.newlines_enabled.push(true);
+        self.newlines_enabled.push(self.newlines_top);
+        self.newlines_top = true;
     }
 
     /// `restoreNewlinesState()`; the initial state is never popped (Java asserts).
     pub fn restore_newlines_state(&mut self) {
-        if self.newlines_enabled.len() > 1 {
-            self.newlines_enabled.pop();
+        if let Some(top) = self.newlines_enabled.pop() {
+            self.newlines_top = top;
         }
     }
 
+    #[inline(always)]
     fn join_complex_tokens(&self) -> bool {
-        self.join_complex_tokens.last().copied().unwrap_or(true)
+        self.join_top
     }
 
     pub fn restore_joining_complex_tokens_state(&mut self) {
-        if self.join_complex_tokens.len() > 1 {
-            self.join_complex_tokens.pop();
+        if let Some(top) = self.join_complex_tokens.pop() {
+            self.join_top = top;
         }
     }
 
     pub fn enable_joining_complex_tokens(&mut self) {
-        self.join_complex_tokens.push(true);
+        self.join_complex_tokens.push(self.join_top);
+        self.join_top = true;
     }
 
     pub fn disable_joining_complex_tokens(&mut self) {
-        self.join_complex_tokens.push(false);
+        self.join_complex_tokens.push(self.join_top);
+        self.join_top = false;
     }
 
     /// `getTokenType()`: `?` before `.` is `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
