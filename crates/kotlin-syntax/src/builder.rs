@@ -251,6 +251,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     pub(crate) fn reset_layer(&mut self) {
         self.join_complex_tokens.clear();
         self.join_top = true;
+        self.delegate.set_joined(true);
         self.newlines_enabled.clear();
         self.newlines_top = true;
         self.adapters.clear();
@@ -321,28 +322,28 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     pub fn restore_joining_complex_tokens_state(&mut self) {
         if let Some(top) = self.join_complex_tokens.pop() {
             self.join_top = top;
+            self.delegate.set_joined(top);
         }
     }
 
     pub fn enable_joining_complex_tokens(&mut self) {
         self.join_complex_tokens.push(self.join_top);
         self.join_top = true;
+        self.delegate.set_joined(true);
     }
 
     pub fn disable_joining_complex_tokens(&mut self) {
         self.join_complex_tokens.push(self.join_top);
         self.join_top = false;
+        self.delegate.set_joined(false);
     }
 
     /// `getTokenType()`: `?` before `.` is `SAFE_ACCESS`, before `:` `ELVIS`; `!` before `!` is `EXCLEXCL`.
-    /// The raw type and `getJoinedTokenType(raw, 1)` come from the delegate's per-position cache (`current_types`).
+    /// The raw type or, while complex tokens are joined, `getJoinedTokenType(raw, 1)` come from the delegate's
+    /// per-position cache (`current_token`, told the join state on every push and pop of the stack).
     #[inline(always)]
     pub fn get_token_type(&mut self) -> Option<TokenKind> {
-        let (raw, joined) = self.delegate.current_types();
-        if !self.join_complex_tokens() {
-            return raw;
-        }
-        joined
+        self.delegate.current_token()
     }
 
     /// `getJoinedTokenType(rawTokenType, rawLookupSteps)`.

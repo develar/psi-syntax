@@ -127,7 +127,7 @@ pub trait Language: Sized + 'static {
     fn is_body(kind: Self::Lazy) -> bool;
 
     /// The cursor's derived token type (not in the Java): what a builder layer computes from the raw current token
-    /// once per cursor position, e.g. Kotlin's `getJoinedTokenType(raw, 1)`; `PsiBuilderImpl::current_types` caches
+    /// once per cursor position, e.g. Kotlin's `getJoinedTokenType(raw, 1)`; `PsiBuilderImpl::current_token` caches
     /// it. The raw type by default.
     #[inline]
     fn joined_token_type(

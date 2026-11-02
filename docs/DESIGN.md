@@ -104,14 +104,15 @@ What the port adds to the hot path:
 - **A current-token cache** in `PsiBuilderImpl`, computed at every move rather than at the first read: `sig` (where
   `eof()` puts the cursor: past whitespace and comments after a move, the cursor itself after `rollbackTo`, which sets
   `myTokenTypeChecked`), `tt_raw` and `tt_joined` (`Language::joined_token_type`, Kotlin's `getJoinedTokenType` body).
-  - `eof()`, `getTokenType()` and `current_types` are a store of `sig` into the cursor and a read, without a branch;
+  - `eof()`, `getTokenType()` and `current_token` (the layer's type: joined while Kotlin joins complex tokens, told
+    on every push and pop of that stack, `set_joined`) are a store of `sig` into the cursor and a read, without a branch;
     the cursor itself moves over whitespace only where the Java's does (`eof()`, `mark()`), so `rawTokenIndex`,
     `rawLookup` and the lexemes markers record are the Java's.
   - It is recomputed wherever the cursor moves or `lex_types` changes: `advance_lexer`, `raw_advance_lexer` (and
     `advance_to_eof`), `rollback_to` (which also restores remapped tokens), `remap_current_token`, `remap_tokens`,
     `skip_balanced_block`, and `mark()` when it steps over whitespace `eof()` would not (after a rollback).
   - `myTokenTypeChecked` is kept as `checked` only for a remap: a token at the cursor remapped into whitespace or a
-    comment is skipped only while it is false. `current_types` does not record it (a store on the hottest path), so
+    comment is skipped only while it is false. `current_token` does not record it (a store on the hottest path), so
     a layer reading the cursor through it never remaps into whitespace (Kotlin remaps to soft keywords and
     identifiers only).
   - The cache lives in `PsiBuilderImpl`, not in the semantic-whitespace layer, because `Marker` methods mutate

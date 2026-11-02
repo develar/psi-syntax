@@ -425,6 +425,10 @@ pub struct PsiBuilderImpl<L: Language> {
     /// directly.
     tt_raw: Option<L::Token>,
     tt_joined: Option<L::Token>,
+    /// What the language's layer reads as the current token (`current_token`): `tt_joined` while it joins tokens
+    /// (`set_joined`, Kotlin's `joinComplexTokens` top), `tt_raw` otherwise, kept with them.
+    joins: bool,
+    tt_layer: Option<L::Token>,
     /// `MarkerPool.list`; id 0 is no marker.
     markers: Vec<MarkerData<L::Token, L::Node, L::Binder>>,
     free_start_markers: Vec<u32>,
@@ -517,6 +521,8 @@ impl<L: Language> Default for PsiBuilderImpl<L> {
             checked: false,
             tt_raw: None,
             tt_joined: None,
+            joins: false,
+            tt_layer: None,
             markers: Vec::new(),
             free_start_markers: Vec::new(),
             free_error_items: Vec::new(),
@@ -637,6 +643,28 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.tt_joined = L::joined_token_type(self, raw, 1);
         self.current_lexeme = current;
         self.tt_raw = raw;
+        self.tt_layer = if self.joins { self.tt_joined } else { raw };
+    }
+
+    /// Whether the language's layer reads the joined type as the current token (`current_token`).
+    #[inline(always)]
+    pub fn set_joined(&mut self, joins: bool) {
+        self.joins = joins;
+        self.tt_layer = if joins { self.tt_joined } else { self.tt_raw };
+    }
+
+    /// `get_token_type()`, or `Language::joined_token_type(raw, 1)` while the layer joins tokens (`set_joined`): what
+    /// Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` returns (`getJoinedTokenType(raw, 1)` when it
+    /// joins complex tokens), one read of the per-position cache (see `sig`).
+    ///
+    /// Unlike `get_token_type` it does not record `myTokenTypeChecked` (`checked`), a store on the hottest path (0.6 G
+    /// instructions per Kotlin round): the flag decides only whether a token at the cursor remapped into whitespace or a
+    /// comment is skipped, so a layer that reads the cursor through this never remaps a token into one (Kotlin remaps
+    /// only to soft keywords and identifiers).
+    #[inline(always)]
+    pub fn current_token(&mut self) -> Option<L::Token> {
+        self.current_lexeme = self.sig;
+        self.tt_layer
     }
 
     /// Starts the nesting at `nesting`, with `limit` instead of `NESTING_LIMIT` (and no more than `limit` for the
@@ -872,20 +900,6 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.current_lexeme = self.sig;
         self.checked = true;
         self.tt_raw
-    }
-
-    /// `get_token_type()` and `Language::joined_token_type(raw, 1)` (for Kotlin's
-    /// `SemanticWhitespaceAwarePsiBuilderImpl.getTokenType()` when it joins complex tokens, `getJoinedTokenType(raw,
-    /// 1)`), computed once per cursor position (see `sig`).
-    ///
-    /// Unlike `get_token_type` it does not record `myTokenTypeChecked` (`checked`), a store on the hottest path (0.6 G
-    /// instructions per Kotlin round): the flag decides only whether a token at the cursor remapped into whitespace or a
-    /// comment is skipped, so a layer that reads the cursor through this never remaps a token into one (Kotlin remaps
-    /// only to soft keywords and identifiers).
-    #[inline(always)]
-    pub fn current_types(&mut self) -> (Option<L::Token>, Option<L::Token>) {
-        self.current_lexeme = self.sig;
-        (self.tt_raw, self.tt_joined)
     }
 
     /// `remapCurrentToken(type)`.
