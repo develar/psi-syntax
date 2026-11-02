@@ -105,3 +105,17 @@ fn lexed_tokens_dump_at_depth_zero() {
     );
     assert_eq!(csharp_syntax::dump::lexed_tokens(&tree), 2);
 }
+
+#[test]
+fn a_dump_past_its_limit_is_none() {
+    let mut arena = GreenArena::new();
+    let root = build(&mut arena);
+    let tree = Tree::from_green(&arena, root, TEXT, FileKind::default());
+    assert!(csharp_syntax::dump::tree_to_string_within(&tree, 10).is_none());
+    // the check runs before each line: a dump whose last line passes the limit is printed whole
+    let full = tree_to_string(&tree);
+    let before_last_line = full[..full.find("Diagnostics:").unwrap()].trim_end_matches('\n');
+    let limit = before_last_line[..before_last_line.rfind('\n').unwrap() + 1].len();
+    assert!(csharp_syntax::dump::tree_to_string_within(&tree, limit).is_some());
+    assert!(csharp_syntax::dump::tree_to_string_within(&tree, limit - 1).is_none());
+}

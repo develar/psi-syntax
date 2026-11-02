@@ -33,9 +33,10 @@
 //! - C# (`crates/csharp-syntax`): a list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle`
 //!   reads it (`latest`/`preview`/`7.3`, `compilation-unit`/`expression`/..., `parse`/`none`); the text is the file's
 //!   bytes as they are (no line-separator conversion) and must be UTF-8. `--out` writes `OUT/<path>.tree.txt` and
-//!   `OUT/index.jsonl` as the oracle does; `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the
-//!   lexer dump) per file and with `--full` writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files.
-//!   `--check-bodies` and `--nesting-limit` do not apply (C# has no lazily parsed bodies).
+//!   `OUT/index.jsonl` as the oracle does (a dump past 2^29 UTF-16 code units is the failure `dump over 512 MB`);
+//!   `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the lexer dump) per file and with `--full`
+//!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files. `--check-bodies` and `--nesting-limit` do not
+//!   apply (C# has no lazily parsed bodies).
 //! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
 //!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
@@ -394,11 +395,14 @@ fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, out: &Path, line
     if tree.has_no_result() {
         return dump::failure_line(path, &format!("no {}", kind.entry.name()));
     }
+    let Some(text) = dump::tree_to_string_within(&tree, dump::MAX_CHARS) else {
+        return dump::failure_line(path, "dump over 512 MB");
+    };
     let target = out.join(format!("{path}.tree.txt"));
     if let Some(parent) = target.parent() {
         let _ = std::fs::create_dir_all(parent);
     }
-    if let Err(e) = std::fs::write(&target, dump::tree_to_string(&tree)) {
+    if let Err(e) = std::fs::write(&target, text) {
         eprintln!("cannot write {}: {e}", target.display());
     }
     dump::index_line(path, &tree)
@@ -414,7 +418,9 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
         Err(failure) => return format!("{path}\tfailure\t{failure}"),
     };
     let tree = parser.lex(&text, kind);
-    let dump = csharp_syntax::dump::lex_to_string(&tree);
+    let Some(dump) = csharp_syntax::dump::lex_to_string_within(&tree, csharp_syntax::dump::MAX_CHARS) else {
+        return format!("{path}\tfailure\tdump over 512 MB");
+    };
     let mut hash = Fnv(0xcbf29ce484222325);
     hash.feed(dump.as_bytes());
     if let Some(full) = full {

@@ -9,25 +9,67 @@ use crate::syntax::node_type;
 use crate::syntax_kind::TokenKind;
 use crate::tree::{NodeId, Tree};
 
+/// The longest dump the oracle prints, in UTF-16 code units (`Printer.MaxChars`, 2^29): past it a file is a failure,
+/// `dump over 512 MB`.
+pub const MAX_CHARS: usize = 1 << 29;
+
 /// The dump of a parsed tree, ending with one `\n`.
 pub fn tree_to_string(tree: &Tree) -> String {
+    tree_to_string_within(tree, usize::MAX).unwrap_or_default()
+}
+
+/// `tree_to_string`, or `None` when the dump passes `max_chars` UTF-16 code units before a line is printed, where the
+/// oracle gives up (`dump over 512 MB` with `MAX_CHARS`).
+pub fn tree_to_string_within(tree: &Tree, max_chars: usize) -> Option<String> {
     let mut out = String::with_capacity(tree.source().len() * 8);
+    let mut chars = 0usize;
     for (id, depth) in tree.preorder(tree.root()) {
+        if chars > max_chars {
+            return None;
+        }
+        let before = out.len();
         line(tree, id, depth, &mut out);
+        chars += utf16_len(&out[before..]);
     }
     diagnostics(tree, &mut out);
-    out
+    Some(out)
 }
 
 /// The dump of a lexed text (`Parser::lex`): the tokens at depth 0 (their trivia beside them, a structured trivia's
 /// children from depth 1), then the diagnostics.
 pub fn lex_to_string(tree: &Tree) -> String {
+    lex_to_string_within(tree, usize::MAX).unwrap_or_default()
+}
+
+/// `lex_to_string`, or `None` past `max_chars` as `tree_to_string_within`.
+pub fn lex_to_string_within(tree: &Tree, max_chars: usize) -> Option<String> {
     let mut out = String::with_capacity(tree.source().len() * 8);
+    let mut chars = 0usize;
     for (id, depth) in tree.preorder(tree.root()).skip(1) {
+        if chars > max_chars {
+            return None;
+        }
+        let before = out.len();
         line(tree, id, depth - 1, &mut out);
+        chars += utf16_len(&out[before..]);
     }
     diagnostics(tree, &mut out);
-    out
+    Some(out)
+}
+
+/// The length of `text` in UTF-16 code units.
+fn utf16_len(text: &str) -> usize {
+    text.bytes()
+        .map(|b| {
+            if b & 0xC0 == 0x80 {
+                0
+            } else if b >= 0xF0 {
+                2
+            } else {
+                1
+            }
+        })
+        .sum()
 }
 
 /// The number of tokens a lexed tree holds (the root's token children).
