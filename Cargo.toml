@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/psi-builder", "crates/kotlin-syntax", "crates/java-syntax", "crates/ksdump"]
+members = ["crates/psi-builder", "crates/kotlin-syntax", "crates/java-syntax", "crates/csharp-syntax", "crates/ksdump"]
 
 [workspace.package]
 version = "0.1.0"
@@ -14,6 +14,7 @@ publish = false
 psi-builder = { path = "crates/psi-builder" }
 kotlin-syntax = { path = "crates/kotlin-syntax" }
 java-syntax = { path = "crates/java-syntax" }
+csharp-syntax = { path = "crates/csharp-syntax" }
 
 [profile.release]
 debug = true

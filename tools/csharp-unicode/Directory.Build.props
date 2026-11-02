@@ -1,0 +1,8 @@
+<Project>
+  <!-- Build products live in the cache, never in the checkout: $HOME/.cache/psi-syntax/csharp-unicode/build. -->
+  <PropertyGroup>
+    <CSharpUnicodeBuild>$([System.Environment]::GetFolderPath(SpecialFolder.UserProfile))/.cache/psi-syntax/csharp-unicode/build</CSharpUnicodeBuild>
+    <BaseIntermediateOutputPath>$(CSharpUnicodeBuild)/obj/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(CSharpUnicodeBuild)/bin/</BaseOutputPath>
+  </PropertyGroup>
+</Project>
