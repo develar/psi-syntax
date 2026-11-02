@@ -655,6 +655,43 @@ impl<L: TreeLanguage> Tree<L> {
         &self.text[self.range(id)]
     }
 
+    /// The node's text as a string, None when it is not UTF-8.
+    pub fn utf8_text(&self, id: NodeId) -> Option<&str> {
+        std::str::from_utf8(self.text(id)).ok()
+    }
+
+    /// A declaration's own range, without what the language's binders put inside it at its edges: the doc comment and
+    /// comments before its first token and after its last one (`is_trivia`), and a separator its last child may be
+    /// (`separator`: Kotlin's enum entry `A,`, Java's enum constant). From its first token to its last; an empty
+    /// element (an error marked at a position) is none of its text. A node with no such token is its whole range.
+    pub fn own_range(
+        &self,
+        id: NodeId,
+        is_trivia: impl Fn(NodeId) -> bool,
+        separator: impl Fn(L::Token) -> bool,
+    ) -> Range<usize> {
+        let edge = |n: NodeId, last: bool, top: bool| -> Option<NodeId> {
+            let mut kids = self.children(n).filter(|&c| !is_trivia(c) && !self.range(c).is_empty());
+            if last {
+                kids.filter(|&c| !top || !self.token_kind(c).is_some_and(&separator)).last()
+            } else {
+                kids.next()
+            }
+        };
+        let token = |last: bool| -> Option<NodeId> {
+            let mut n = edge(id, last, true)?;
+            while let Some(c) = edge(n, last, false) {
+                n = c;
+            }
+            Some(n)
+        };
+        match (token(false), token(true)) {
+            (Some(first), Some(last)) => self.range(first).start..self.range(last).end,
+            (Some(first), None) => self.range(first),
+            _ => self.range(id),
+        }
+    }
+
     pub fn parent(&self, id: NodeId) -> Option<NodeId> {
         let parent = self.data.links[id.0 as usize][0];
         (parent != NONE).then_some(NodeId(parent))
@@ -695,6 +732,42 @@ impl<L: TreeLanguage> Tree<L> {
         (next < self.data.links[parent as usize][1]).then_some(NodeId(next))
     }
 
+    /// The sibling before `id`, None for a first child and the root: the child of `id`'s parent whose subtree holds the
+    /// id just before `id` (ids are preorder), found by a climb from that id, so a step costs the depth of the previous
+    /// sibling's last node and never a scan of the children before it.
+    pub fn previous_sibling(&self, id: NodeId) -> Option<NodeId> {
+        let parent = self.parent(id)?;
+        let mut n = NodeId(id.0 - 1);
+        while n != parent {
+            let up = self.parent(n)?;
+            if up == parent {
+                return Some(n);
+            }
+            n = up;
+        }
+        None
+    }
+
+    /// The innermost of `id` and its ancestors that `accept` takes, `id` first, the root last.
+    pub fn ancestor_or_self(&self, id: NodeId, accept: impl Fn(NodeId) -> bool) -> Option<NodeId> {
+        let mut n = id;
+        loop {
+            if accept(n) {
+                return Some(n);
+            }
+            n = self.parent(n)?;
+        }
+    }
+
+    /// The deepest node whose range holds `range`: the last such in preorder, so an empty range between two nodes is
+    /// held by the one that starts there. None for a range past the text.
+    pub fn deepest_covering(&self, range: Range<usize>) -> Option<NodeId> {
+        self.descendants(self.root()).rev().find(|&n| {
+            let r = self.range(n);
+            r.start <= range.start && range.end <= r.end
+        })
+    }
+
     /// The children in order.
     pub fn children(&self, id: NodeId) -> Children<'_> {
         Children { links: &self.data.links, next: id.0 + 1, end: self.data.links[id.0 as usize][1] }
@@ -712,6 +785,11 @@ impl<L: TreeLanguage> Tree<L> {
         Some(&self.data.errors[i].1)
     }
 
+    /// The error elements in document order, each with its message: a scan of the error list, not of the tree.
+    pub fn errors(&self) -> impl ExactSizeIterator<Item = (NodeId, &str)> + '_ {
+        self.data.errors.iter().map(|(node, message)| (NodeId(*node), message.as_ref()))
+    }
+
     /// The nodes of the subtree at `id` in document order (preorder), with their depth below `id`: a scan of the ids
     /// `id..subtree_end(id)`.
     pub fn preorder(&self, id: NodeId) -> Preorder<'_> {
@@ -727,6 +805,34 @@ impl<L: TreeLanguage> Tree<L> {
     /// under X" is a pass over one column (`descendants(x).filter(|&n| tree.node_kind(n) == Some(CALL_EXPRESSION))`).
     pub fn descendants(&self, id: NodeId) -> impl DoubleEndedIterator<Item = NodeId> + ExactSizeIterator + use<L> {
         (id.0..self.data.links[id.0 as usize][1]).map(NodeId)
+    }
+
+    /// `descendants(id)` without the subtree of each node below `id` that `prune` takes, that node included: a
+    /// declaration's own nodes without its nested declarations, a type's names without its arguments.
+    pub fn descendants_pruned<'t>(
+        &'t self,
+        id: NodeId,
+        prune: impl Fn(NodeId) -> bool + 't,
+    ) -> impl Iterator<Item = NodeId> + 't {
+        let end = self.data.links[id.0 as usize][1];
+        let mut next = id.0;
+        std::iter::from_fn(move || {
+            while next < end {
+                let n = NodeId(next);
+                if n != id && prune(n) {
+                    next = self.data.links[next as usize][1];
+                    continue;
+                }
+                next += 1;
+                return Some(n);
+            }
+            None
+        })
+    }
+
+    /// The leaves in document order, indexed for the leaf at an offset.
+    pub fn leaf_index(&self) -> LeafIndex<'_, L> {
+        LeafIndex { tree: self, leaves: self.tokens().collect() }
     }
 
     /// Each token leaf's type and byte range, in document order: a scan of the columns. Their ranges tile the text,
@@ -822,6 +928,22 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         let data = self.data.take_exact();
         self.data.clear();
         Tree { text, file_kind, data, root: 0, language: PhantomData }
+    }
+}
+
+/// The leaves of a tree (tokens, whitespace, comments) by offset (`Tree::leaf_index`). The leaves of a tree are in
+/// offset order and tile its text, but for the ranges of unexpanded bodies, which hold none.
+pub struct LeafIndex<'t, L: TreeLanguage> {
+    tree: &'t Tree<L>,
+    leaves: Vec<NodeId>,
+}
+
+impl<L: TreeLanguage> LeafIndex<'_, L> {
+    /// The leaf whose range holds the byte at `offset` (a binary search), None past the text and inside an unexpanded
+    /// body. An empty leaf holds no byte.
+    pub fn at(&self, offset: usize) -> Option<NodeId> {
+        let i = self.leaves.partition_point(|&leaf| self.tree.range(leaf).end <= offset);
+        self.leaves.get(i).copied().filter(|&leaf| self.tree.range(leaf).start <= offset)
     }
 }
 
@@ -985,5 +1107,112 @@ mod tests {
             let leaves: Vec<_> = tree.leaves().map(|(t, r)| (t.0, r)).collect();
             assert_eq!(leaves, [(299, 0..1), (3, 1..2), (256, 2..3), (4, 3..4), (4, 4..4)]);
         }
+    }
+
+    const SPACE: Tok = Tok(3);
+    const COMMA: Tok = Tok(4);
+    const COMMENT: Tok = Tok(10);
+    const NAME: Tok = Tok(20);
+    const FILE: Node = Node(1);
+    const DECL: Node = Node(2);
+    const ARGS: Node = Node(3);
+
+    /// `/*d*/ f(g) ,/*t*/;x`: a declaration `f(g)` with its comments and separator inside it, a nested declaration `g`,
+    /// an empty error element, an error element over `;`.
+    fn reading_tree() -> Tree<Toy> {
+        let text: Arc<[u8]> = Arc::from(&b"/*d*/ f(g) ,/*t*/;x"[..]);
+        let mut b = TreeBuilder::<Toy>::new();
+        let root = b.open(None, ElementType::Node(FILE), 0); // 0
+        let decl = b.open(Some(root), ElementType::Node(DECL), 0); // 1
+        b.leaf(decl, COMMENT, 0, 5); // 2
+        b.leaf(decl, SPACE, 5, 6); // 3
+        b.leaf(decl, NAME, 6, 7); // 4
+        let args = b.open(Some(decl), ElementType::Node(ARGS), 7); // 5
+        b.leaf(args, Tok(7), 7, 8); // 6
+        let inner = b.open(Some(args), ElementType::Node(DECL), 8); // 7
+        b.leaf(inner, NAME, 8, 9); // 8
+        b.close(inner, 9);
+        b.leaf(args, Tok(8), 9, 10); // 9
+        b.close(args, 10);
+        b.leaf(decl, SPACE, 10, 11); // 10
+        b.leaf(decl, COMMA, 11, 12); // 11
+        let empty = b.open(Some(decl), ElementType::Node(Node(0)), 12); // 12
+        b.close(empty, 12);
+        b.set_error(empty, Cow::Borrowed("empty"));
+        b.leaf(decl, COMMENT, 12, 17); // 13
+        b.close(decl, 17);
+        let error = b.open(Some(root), ElementType::Node(Node(0)), 17); // 14
+        b.leaf(error, Tok(5), 17, 18); // 15
+        b.close(error, 18);
+        b.set_error(error, Cow::Borrowed("expected"));
+        b.leaf(root, NAME, 18, 19); // 16
+        b.close(root, 19);
+        b.finish(text, ())
+    }
+
+    #[test]
+    fn previous_sibling_climbs_from_the_id_before() {
+        let tree = reading_tree();
+        let previous = |i: u32| tree.previous_sibling(NodeId(i)).map(|n| n.0);
+        assert_eq!(
+            [0, 1, 14, 16, 5, 10, 7, 9, 2].map(previous),
+            [None, None, Some(1), Some(14), Some(4), Some(5), Some(6), Some(7), None]
+        );
+        for i in 0..tree.len() as u32 {
+            if let Some(next) = tree.next_sibling(NodeId(i)) {
+                assert_eq!(tree.previous_sibling(next), Some(NodeId(i)));
+            }
+        }
+    }
+
+    #[test]
+    fn own_range_leaves_out_the_trivia_the_separator_and_empty_elements() {
+        let tree = reading_tree();
+        let trivia = |n: NodeId| matches!(tree.token_kind(n), Some(SPACE | COMMENT));
+        assert_eq!(tree.own_range(NodeId(1), trivia, |t| t == COMMA), 6..10);
+        assert_eq!(tree.own_range(NodeId(1), trivia, |_| false), 6..12);
+        assert_eq!(tree.own_range(NodeId(4), trivia, |t| t == COMMA), 6..7);
+        assert_eq!(tree.own_range(NodeId(12), trivia, |t| t == COMMA), 12..12);
+        assert_eq!(tree.utf8_text(NodeId(5)), Some("(g)"));
+    }
+
+    #[test]
+    fn descendants_pruned_skips_the_subtrees_it_takes() {
+        let tree = reading_tree();
+        let own: Vec<u32> =
+            tree.descendants_pruned(NodeId(1), |n| tree.node_kind(n) == Some(DECL)).map(|n| n.0).collect();
+        assert_eq!(own, [1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13]);
+        let names: Vec<u32> = tree
+            .descendants_pruned(NodeId(1), |n| tree.node_kind(n) == Some(ARGS))
+            .filter(|&n| tree.token_kind(n) == Some(NAME))
+            .map(|n| n.0)
+            .collect();
+        assert_eq!(names, [4]);
+        let all: Vec<u32> = tree.descendants_pruned(NodeId(7), |_| true).map(|n| n.0).collect();
+        assert_eq!(all, [7]);
+    }
+
+    #[test]
+    fn covering_ancestors_errors_and_leaves_by_offset() {
+        let tree = reading_tree();
+        let covering = |r: Range<usize>| tree.deepest_covering(r).map(|n| n.0);
+        assert_eq!(
+            [8..9, 6..10, 7..10, 12..12, 19..19, 0..19, 20..20].map(covering),
+            [Some(8), Some(1), Some(5), Some(13), Some(16), Some(0), None]
+        );
+        let around =
+            |i: u32, kind: Node| tree.ancestor_or_self(NodeId(i), |n| tree.node_kind(n) == Some(kind)).map(|n| n.0);
+        assert_eq!(
+            [around(8, DECL), around(7, DECL), around(8, FILE), around(4, ARGS)],
+            [Some(7), Some(7), Some(0), None]
+        );
+        let errors: Vec<(u32, &str)> = tree.errors().map(|(n, m)| (n.0, m)).collect();
+        assert_eq!(errors, [(12, "empty"), (14, "expected")]);
+        let leaves = tree.leaf_index();
+        let at = |offset: usize| leaves.at(offset).map(|n| n.0);
+        assert_eq!(
+            [0, 4, 5, 6, 12, 17, 18, 19].map(at),
+            [Some(2), Some(2), Some(3), Some(4), Some(13), Some(15), Some(16), None]
+        );
     }
 }

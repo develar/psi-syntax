@@ -86,6 +86,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `psi-builder` `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback (the production a linked list, so `precede` and the other middle edits take constant time), the `WhitespacesAndCommentsBinder` contract, edge balancing, the nesting limits (a language's own through `Language` constants), the balanced-block and too-deep skips, block ends in amortized constant time (`balanced_block_end`); binds the tree |
 | `psi-builder` `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf, unexpanded, trailing and missing bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser<L>` drives the builders: the file's, then a stack of chameleon builders, each expanding its chameleon in place where `bind` meets it (heap, not recursion), through `Language::parse_chameleon` and its `Chameleon` (the body's file tokens when reusable, else relexed). `TreeBuilder<L>` builds a tree in preorder for a language whose parser does not run on `PsiBuilderImpl`. The consumer API: see "The consumer contract" |
 | `psi-builder` `src/dump.rs`, `src/token_set.rs`, `src/lexer.rs`, `src/counters.rs` | the dump's layout (`psi_to_string_with`, a language labels each node; `fix_white_spaces`); `ElementTypeSet`, a `TokenSet`'s bits; `Lexed<T>` (types, starts, plain bits), `char_at`, `in_ranges`; the builder's and driver's event counters |
+| `psi-builder` `src/document.rs` | a file's text as IntelliJ's document holds it: the byte order mark (`has_byte_order_mark`, `blank_byte_order_mark`), `Lines` (the line of an offset); each language's `document_text` (`tree.rs` of `kotlin-syntax`, `java-syntax`) builds on it |
 | `src/tokens.rs` | `TokenKind` (every Kotlin and KDoc token, plus WHITE_SPACE, BAD_CHARACTER), its debug name as the dump prints it, the keyword sets (hard, soft, modifier) |
 | `src/unicode.rs` | `[:letter:]`, `[:digit:]` (Kotlin.flex) and `[:jletter:]` (KDoc.flex) above ASCII, decoded from the character maps of `_JetLexer.java` / `_KDocLexer.java`; generated, do not edit |
 | `src/lexer.rs`, `src/kdoc/lexer.rs` | the ports of Kotlin.flex and KDoc.flex (states, string templates, raw strings, `$$` prefixes, nested block comments, shebang) |
@@ -121,6 +122,19 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `token_kind`, `node_kind`, `is_leaf`, `range`, `text`, `parent`, `first_child`, `last_child`, `next_sibling`,
   `children`, `first_child_of_kind`, `preorder` (with depth), `tokens`, `error_message`; `descendants(id)` is the
   id range, so "every `CALL_EXPRESSION` under X" is a scan of one column.
+- What both consumers read the tree with, the same for every language: `previous_sibling` (a climb from the id
+  before, never a scan of the siblings), `ancestor_or_self(id, accept)`, `deepest_covering(range)` (the last node in
+  preorder that holds it), `descendants_pruned(id, prune)` (a declaration's own nodes, a type's names without its
+  arguments), `own_range(id, is_trivia, separator)` (a declaration without the comments and separator its language's
+  binders put inside it), `utf8_text`, `errors()` (the error elements in document order with their messages), and
+  `leaf_index().at(offset)`, a binary search that relies on the leaves being in offset order and tiling the text
+  but for unexpanded bodies (`tests/robustness.rs` checks it on every tree). What a consumer makes of them
+  (symbols, call sites, scopes, the text of an error) stays in the consumer.
+- The text to parse is the file as IntelliJ's document holds it, at the file's offsets: `kotlin_syntax::document_text`
+  (a byte order mark as spaces, a `\r` as the line end the compiler reads) and `java_syntax::document_text` (the mark
+  only: the Java lexer reads every line terminator), over `psi_builder::document`, which also has `Lines`, the
+  1-based line of an offset by its `\n`s. The parsers read the bytes they are given: a file parsed as it is has a
+  mark as a bad character and, in Kotlin, a `\r` as no line end.
 - Highlighting reads `leaves()`: each token leaf's `(TokenKind, range)` in document order. Not the lexer: soft keywords
   are remapped by the parser (`IDENTIFIER` becomes `by`, `get`, `data`, ...) and `?.`, `?:`, `!!` are joined by the
   parser from two lexer tokens, so only the tree's leaves are exact.

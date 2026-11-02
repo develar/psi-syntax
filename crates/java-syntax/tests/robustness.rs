@@ -162,6 +162,7 @@ fn check_tree(tree: &Tree, text: &[u8]) {
                 None => assert_eq!(tree.first_child(parent), Some(id)),
                 Some(previous) => assert_eq!(tree.next_sibling(previous), Some(id)),
             }
+            assert_eq!(tree.previous_sibling(id), last_child[parent.0 as usize]);
             last_child[parent.0 as usize] = Some(id);
         }
     }

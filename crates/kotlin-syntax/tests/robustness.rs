@@ -31,9 +31,10 @@ fn check_lossless(text: &[u8], kind: FileKind) {
     let _ = psi_to_string(&tree, "a.kt");
 }
 
-/// The children, first/last child and next sibling of each node agree with its parent links, and each child's range
-/// is inside its parent's.
+/// The children, first/last child and next and previous sibling of each node agree with its parent links, and each
+/// child's range is inside its parent's.
 fn check_navigation(tree: &Tree) {
+    assert_eq!(tree.previous_sibling(tree.root()), None);
     let mut children: Vec<Vec<NodeId>> = vec![Vec::new(); tree.len()];
     for i in 0..tree.len() as u32 {
         if let Some(parent) = tree.parent(NodeId(i)) {
@@ -50,6 +51,10 @@ fn check_navigation(tree: &Tree) {
         assert_eq!(tree.last_child(id), expected.last().copied());
         for pair in expected.windows(2) {
             assert_eq!(tree.next_sibling(pair[0]), Some(pair[1]));
+            assert_eq!(tree.previous_sibling(pair[1]), Some(pair[0]));
+        }
+        if let Some(&first) = expected.first() {
+            assert_eq!(tree.previous_sibling(first), None);
         }
         if let Some(&last) = expected.last() {
             assert_eq!(tree.next_sibling(last), None);

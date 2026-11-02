@@ -2,10 +2,25 @@
 //! file is parsed (`FileKind`: its language level and the parser entry) and what each lazily parsed element is
 //! reparsed with (`LazyKind`).
 
+use std::borrow::Cow;
+
 use crate::Java;
 use crate::language_level::LanguageLevel;
+use psi_builder::document::{blank_byte_order_mark, has_byte_order_mark};
 
-pub use psi_builder::tree::{Children, NodeId, ParseOptions, Preorder};
+pub use psi_builder::tree::{Children, LeafIndex, NodeId, ParseOptions, Preorder};
+
+/// The text IntelliJ parses of a file's bytes, byte for byte at the same offsets (`psi_builder::document`): a UTF-8
+/// byte order mark as three spaces. A `\r` needs no rewriting: the Java lexer reads `\r`, `\n` and `\r\n` as line
+/// terminators itself. `src` itself when it holds no mark.
+pub fn document_text(src: &[u8]) -> Cow<'_, [u8]> {
+    if !has_byte_order_mark(src) {
+        return Cow::Borrowed(src);
+    }
+    let mut text = src.to_vec();
+    blank_byte_order_mark(&mut text);
+    Cow::Owned(text)
+}
 
 /// A parsed Java file.
 pub type Tree = psi_builder::Tree<Java>;
@@ -120,3 +135,31 @@ const _: () = {
     send_sync::<Tree>();
     send::<Parser>();
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn kinds(tree: &Tree) -> Vec<Option<crate::NodeKind>> {
+        tree.descendants(tree.root()).map(|id| tree.node_kind(id)).collect()
+    }
+
+    #[test]
+    fn the_document_text_reads_a_mark_as_intellij_and_carriage_returns_as_they_are() {
+        let src = "package a;\n/** doc */\nclass C {\n  // c\n  String s = \"\"\"\n    t\n    \"\"\";\n  int f() { return 1; }\n}\n";
+        let lf = Tree::parse(src, FileKind::default());
+        assert_eq!(lf.errors().len(), 0);
+        let marked = [b"\xEF\xBB\xBF", src.as_bytes()].concat();
+        assert!(Tree::parse(&marked, FileKind::default()).errors().len() > 0, "a mark parsed as it is");
+        let text = document_text(&marked);
+        assert_eq!(&text[..3], b"   ");
+        assert_eq!(Tree::parse(&*text, FileKind::default()).errors().len(), 0);
+        for line_end in ["\r\n", "\r"] {
+            let text = src.replace('\n', line_end);
+            assert!(matches!(document_text(text.as_bytes()), Cow::Borrowed(_)));
+            let tree = Tree::parse(&text, FileKind::default());
+            assert_eq!(tree.errors().len(), 0, "{line_end:?}");
+            assert_eq!(kinds(&tree), kinds(&lf), "{line_end:?}");
+        }
+    }
+}

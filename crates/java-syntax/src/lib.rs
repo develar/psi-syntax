@@ -23,4 +23,4 @@ pub use node_kind::NodeKind;
 /// The builder, tree and driver this crate is built on, for generic code over languages.
 pub use psi_builder;
 pub use tokens::{ElementType, TokenKind, TokenSet};
-pub use tree::{Entry, FileKind, LazyKind, NodeId, ParseOptions, Parser, Tree};
+pub use tree::{Entry, FileKind, LazyKind, LeafIndex, NodeId, ParseOptions, Parser, Tree, document_text};

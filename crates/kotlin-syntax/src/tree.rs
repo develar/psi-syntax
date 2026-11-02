@@ -3,11 +3,32 @@
 //! lexer and parser, a markdown link inside it with the Kotlin lexer and `KDocLinkParser`, a collapsed block or lambda
 //! with `KotlinParser.parseBlockExpression` / `parseLambdaExpression` over its text.
 
+use std::borrow::Cow;
+
 use crate::Kotlin;
 #[cfg(test)]
 use crate::builder::SemanticWhitespaceAwarePsiBuilderImpl;
+use psi_builder::document::{blank_byte_order_mark, has_byte_order_mark};
 
-pub use psi_builder::tree::{Children, NodeId, ParseOptions, Preorder};
+pub use psi_builder::tree::{Children, LeafIndex, NodeId, ParseOptions, Preorder};
+
+/// The text the compiler and IntelliJ parse of a file's bytes, at the same offsets (`psi_builder::document`): a UTF-8
+/// byte order mark as three spaces, the `\r` of a `\r\n` as a space and a lone `\r` as the `\n` it stands for. The
+/// lexer reads a `\r` as no line end, so a CRLF file parsed as it is loses every newline-sensitive construct
+/// (`val x =⏎ f()` its initializer); `src` itself when it holds neither.
+pub fn document_text(src: &[u8]) -> Cow<'_, [u8]> {
+    if !has_byte_order_mark(src) && !src.contains(&b'\r') {
+        return Cow::Borrowed(src);
+    }
+    let mut text = src.to_vec();
+    blank_byte_order_mark(&mut text);
+    for (i, &b) in src.iter().enumerate() {
+        if b == b'\r' {
+            text[i] = if src.get(i + 1) == Some(&b'\n') { b' ' } else { b'\n' };
+        }
+    }
+    Cow::Owned(text)
+}
 
 /// A parsed Kotlin file.
 pub type Tree = psi_builder::Tree<Kotlin>;
@@ -71,3 +92,37 @@ const _: () = {
     send_sync::<Tree>();
     send::<Parser>();
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn kinds(tree: &Tree) -> Vec<Option<crate::NodeKind>> {
+        tree.descendants(tree.root()).map(|id| tree.node_kind(id)).collect()
+    }
+
+    #[test]
+    fn the_document_text_reads_a_mark_and_carriage_returns_as_the_compiler() {
+        let cases: [(&[u8], &[u8]); 3] = [
+            (b"\xEF\xBB\xBFpackage a\nval x =\n  f()\n", b"   package a\nval x =\n  f()\n"),
+            (b"package a\r\nval x =\r\n  f()\r\n", b"package a \nval x = \n  f() \n"),
+            (b"package a\rval x =\r  f()\r", b"package a\nval x =\n  f()\n"),
+        ];
+        let lf = Tree::parse("package a\nval x =\n  f()\n", FileKind::Kt);
+        for (src, expected) in cases {
+            assert_ne!(
+                kinds(&Tree::parse(src, FileKind::Kt)),
+                kinds(&lf),
+                "{src:?} parsed as it is reads as the compiler"
+            );
+            let text = document_text(src);
+            assert_eq!(&*text, expected);
+            let tree = Tree::parse(&*text, FileKind::Kt);
+            assert_eq!(tree.errors().len(), 0, "{src:?}");
+            if !has_byte_order_mark(src) {
+                assert_eq!(kinds(&tree), kinds(&lf), "{src:?}");
+            }
+        }
+        assert!(matches!(document_text(b"val x = 1\n"), Cow::Borrowed(_)));
+    }
+}
