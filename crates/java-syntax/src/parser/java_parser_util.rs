@@ -17,6 +17,7 @@ use crate::tokens::{ElementType, TokenKind, TokenSet};
 /// `done(marker, type, languageLevel)`: `marker.done(type)`, then the preceding comment binder on the left of a
 /// member, module or implicit class and the trailing one on the right of a statement, an import, the package statement
 /// or a member.
+#[inline(always)]
 pub fn done(
     builder: &mut SyntaxTreeBuilder<'_>,
     marker: Marker,
@@ -41,11 +42,13 @@ pub fn expr_type(builder: &SyntaxTreeBuilder<'_>, marker: Option<Marker>) -> Opt
 }
 
 /// `error(builder, message)`: used instead of `SyntaxTreeBuilder.error()` as it keeps all subsequent error messages.
+#[cold]
 pub fn error(builder: &mut SyntaxTreeBuilder<'_>, message: impl Into<Cow<'static, str>>) {
     builder.mark().error(builder, message);
 }
 
 /// `error(builder, message, before)`: an error before the marker `before`, or at the current token without one.
+#[cold]
 pub fn error_with(builder: &mut SyntaxTreeBuilder<'_>, message: impl Into<Cow<'static, str>>, before: Option<Marker>) {
     match before {
         None => error(builder, message),

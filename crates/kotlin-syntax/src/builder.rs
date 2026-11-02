@@ -383,6 +383,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
 
     /// `getTokenText()` as bytes, with no UTF-8 check: what the parser compares with keyword and word texts (invalid
     /// UTF-8, which `get_token_text` shows as U+FFFD, matches none of them either way).
+    #[inline(always)]
     pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
         if self.join_complex_tokens() {
             match self.get_token_type() {
@@ -395,6 +396,7 @@ impl SemanticWhitespaceAwarePsiBuilderImpl {
     }
 
     /// `lookAhead(steps)`.
+    #[inline(always)]
     pub fn look_ahead(&mut self, steps: i32) -> Option<TokenKind> {
         if !self.join_complex_tokens() {
             return self.delegate.look_ahead(steps);
@@ -559,6 +561,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     }
 
     /// `getTokenText()` as bytes (see `SemanticWhitespaceAwarePsiBuilderImpl::get_token_bytes`).
+    #[inline(always)]
     pub fn get_token_bytes(&mut self) -> Option<&[u8]> {
         if self.top_truncated().is_some() && self.eof() {
             return None;
@@ -567,6 +570,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     }
 
     /// `lookAhead(steps)`.
+    #[inline(always)]
     pub fn look_ahead(&mut self, steps: i32) -> Option<TokenKind> {
         let Some(eof_position) = self.top_truncated() else { return self.imp.look_ahead(steps) };
         if self.eof() {
@@ -608,6 +612,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     }
 
     /// `error(message)`.
+    #[cold]
     pub fn error(&mut self, message: impl Into<Cow<'static, str>>) {
         self.imp.delegate.error(message);
     }
@@ -655,6 +660,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     }
 
     /// `getCurrentOffset()`.
+    #[inline(always)]
     pub fn get_current_offset(&mut self) -> i32 {
         self.imp.delegate.get_current_offset()
     }
@@ -668,6 +674,7 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
     /// first that closes a bracket opened before it (`PsiBuilderImpl::skip_too_deeply_nested`), or to the stream's end; over
     /// one token at least unless at the end, so that the callers' loops go on. The tokens stay raw: a `?.` inside is
     /// `?` and `.`.
+    #[cold]
     pub fn skip_too_deeply_nested(&mut self) {
         if self.eof() {
             return;

@@ -41,6 +41,7 @@ impl<'t> JavaDocLexer<'t> {
     }
 
     /// The current token and moves past it: `(type, start, end)`, `None` at the end.
+    #[inline]
     pub fn next_token(&mut self) -> Option<(TokenKind, usize, usize)> {
         self.locate_token();
         let (kind, start) = self.my_token?;

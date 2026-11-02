@@ -745,6 +745,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// asked once (a chameleon with one nested block) scans only that block, and one asked for every level of nested
     /// blocks costs O(tokens). A token remapped from or to `open` or `close` makes the table stale up to it
     /// (`block_valid_from`): before it the tokens are counted. A builder asks for one pair only.
+    #[inline]
     pub fn balanced_block_end_at(&mut self, from: usize, open: L::Token, close: L::Token) -> usize {
         debug_assert!(self.block_pair.is_none_or(|pair| pair == (open, close)), "one pair per builder");
         self.block_pair = Some((open, close));
@@ -922,6 +923,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `lookAhead(steps)`: the token `steps` non-whitespace tokens ahead of the current one.
+    #[inline(always)]
     pub fn look_ahead(&self, mut steps: i32) -> Option<L::Token> {
         add(Counter::LookAhead, 1);
         add(Counter::LookAheadSteps, steps.max(0) as u64);
@@ -933,6 +935,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         if cur < self.lexeme_count { Some(self.lex_types[cur]) } else { None }
     }
 
+    #[inline]
     fn shift_over_whitespace_forward(&self, mut lex_index: usize) -> usize {
         while lex_index < self.lexeme_count && self.is_whitespace_or_comment(self.lex_types[lex_index]) {
             lex_index += 1;
@@ -1036,6 +1039,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// starting at `eof_offset` or later when a layer ends the stream there (Kotlin's truncation); over one token at
     /// least, so that the callers' loops go on. The tokens stay raw (no layer joins them). The caller checks `eof()`
     /// first.
+    #[cold]
     pub fn skip_too_deeply_nested(&mut self, eof_offset: Option<u32>) {
         let current = self.current_lexeme;
         let mut end = self.unmatched_closer(current).max(current + 1);
@@ -1085,6 +1089,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `getCurrentOffset()`: the start of the current token, the text length at the end.
+    #[inline(always)]
     pub fn get_current_offset(&mut self) -> i32 {
         if self.eof() {
             return self.len as i32;
@@ -1111,6 +1116,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `mark()`.
+    #[inline(always)]
     pub fn mark(&mut self) -> Marker {
         add(Counter::Mark, 1);
         if self.production_len != 0 {
@@ -1180,6 +1186,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `error(messageText)`: an error element at the current token, unless the last production is an error item there.
+    #[cold]
     pub fn error(&mut self, message_text: impl Into<Cow<'static, str>>) {
         let last = self.node_id(self.link(HEAD)[0]);
         if last > 0 {
@@ -1517,6 +1524,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     // StartMarker
 
     /// `Marker.precede()`.
+    #[inline(always)]
     pub fn precede(&mut self, marker: Marker) -> Marker {
         add(Counter::Precede, 1);
         let lexeme_index = self.marker(marker.0).lexeme_index.max(0);
@@ -1553,6 +1561,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `Marker.done(type)`.
+    #[inline]
     pub fn done(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>) {
         self.markers[marker.0 as usize].element_type = Some(element_type.into());
         self.process_done(marker.0, None);
@@ -1573,6 +1582,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `Marker.doneBefore(type, before, errorMessage)`: also an error element right before `before`.
+    #[cold]
     pub fn done_before_with_error(
         &mut self,
         marker: Marker,
@@ -1588,6 +1598,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `Marker.error(message)`: done as an error element.
+    #[cold]
     pub fn error_marker(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>) {
         self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
         self.set_message(marker.0, message.into());
@@ -1595,6 +1606,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// `Marker.errorBefore(message, before)`.
+    #[cold]
     pub fn error_before(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>, before: Marker) {
         self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
         self.set_message(marker.0, message.into());
@@ -1614,6 +1626,7 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     /// `processDone`; an error marker's message is set before (`error` and `errorBefore` pass it to the Java's, which
     /// sets it first), so the common `done` passes none.
+    #[inline(always)]
     fn process_done(&mut self, marker_id: u32, before: Option<u32>) {
         add(Counter::Done, 1);
         // doValidityChecks: "Marker already done." is only logged in Java.

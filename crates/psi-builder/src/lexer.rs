@@ -126,12 +126,19 @@ impl<T: Copy> LexedWriter<'_, T> {
 
 /// The decoded character at `pos`: its code point and its length in bytes. A byte that does not start a valid UTF-8
 /// sequence is U+FFFD of length 1, as a decoder replaces it.
-#[inline]
+#[inline(always)]
 pub fn char_at(text: &[u8], pos: usize) -> (u32, usize) {
     let b0 = text[pos];
     if b0 < 0x80 {
         return (b0 as u32, 1);
     }
+    char_at_multibyte(text, pos, b0)
+}
+
+/// `char_at` of a byte above ASCII, out of line: source text is mostly ASCII.
+#[cold]
+#[inline(never)]
+fn char_at_multibyte(text: &[u8], pos: usize, b0: u8) -> (u32, usize) {
     let cont = |i: usize| -> Option<u32> {
         let b = *text.get(pos + i)?;
         if b & 0xC0 == 0x80 { Some((b & 0x3F) as u32) } else { None }

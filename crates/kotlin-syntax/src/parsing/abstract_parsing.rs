@@ -46,6 +46,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `error(message)`.
+    #[cold]
     fn error(&mut self, message: impl Into<Cow<'static, str>>) {
         self.my_builder().error(message);
     }
@@ -91,6 +92,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `errorWithRecovery(message, recoverySet)`.
+    #[cold]
     fn error_with_recovery(&mut self, message: impl Into<Cow<'static, str>>, recovery_set: Option<&TokenSet>) {
         let tt = self.tt();
         let at_recovery = match recovery_set {
@@ -111,6 +113,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `errorAndAdvance(message)`.
+    #[cold]
     fn error_and_advance(&mut self, message: impl Into<Cow<'static, str>>) {
         self.error_and_advance_n(message, 1);
     }
@@ -126,6 +129,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `errorAndAdvance(message, advanceTokenCount)`.
+    #[cold]
     fn error_and_advance_n(&mut self, message: impl Into<Cow<'static, str>>, advance_token_count: i32) {
         let err = self.mark();
         self.advance_n(advance_token_count);
@@ -294,6 +298,7 @@ pub trait AbstractKotlinParsing<'b>: Sized {
     }
 
     /// `errorUntil(message, tokenSet)`.
+    #[cold]
     fn error_until(&mut self, message: impl Into<Cow<'static, str>>, token_set: &TokenSet) {
         debug_assert!(token_set.contains(LBRACE), "Cannot include LBRACE into error element!");
         debug_assert!(token_set.contains(RBRACE), "Cannot include RBRACE into error element!");

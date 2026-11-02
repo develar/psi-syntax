@@ -677,26 +677,33 @@ impl FlexJavaLexer {
 }
 
 /// `[:jletter:]`: `Character.isJavaIdentifierStart` as JFlex's tables have it.
-#[inline]
+#[inline(always)]
 pub(crate) fn is_java_letter(cp: u32) -> bool {
     if cp < 0x80 {
         let b = cp as u8;
         b.is_ascii_alphabetic() || b == b'$' || b == b'_'
     } else {
-        in_ranges(&JAVA_LETTER, cp)
+        in_ranges_cold(&JAVA_LETTER, cp)
     }
 }
 
 /// `[:jletterdigit:]`: `Character.isJavaIdentifierPart` as JFlex's tables have it (in ASCII also the identifier-ignorable
 /// controls 0x00-0x08, 0x0E-0x1B and 0x7F).
-#[inline]
+#[inline(always)]
 pub(crate) fn is_java_letter_digit(cp: u32) -> bool {
     if cp < 0x80 {
         let b = cp as u8;
         b.is_ascii_alphanumeric() || b == b'$' || b == b'_' || b <= 0x08 || (0x0E..=0x1B).contains(&b) || b == 0x7F
     } else {
-        in_ranges(&JAVA_LETTER_DIGIT, cp)
+        in_ranges_cold(&JAVA_LETTER_DIGIT, cp)
     }
+}
+
+/// `in_ranges` above ASCII, out of line: the ASCII tests stay inlined in the per-character loops.
+#[cold]
+#[inline(never)]
+fn in_ranges_cold(ranges: &[(u32, u32)], cp: u32) -> bool {
+    in_ranges(ranges, cp)
 }
 
 /// The end of `[:jletterdigit:]*` from `pos`: ASCII through `ASCII_JAVA_LETTER_DIGIT`, other characters decoded.

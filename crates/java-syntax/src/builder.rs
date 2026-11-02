@@ -236,11 +236,13 @@ impl<'b> SyntaxTreeBuilder<'b> {
     }
 
     /// `error(message)`.
+    #[cold]
     pub fn error(&mut self, message: impl Into<Cow<'static, str>>) {
         self.b.error(message);
     }
 
     /// `tokenText`: the current token's text as bytes, `None` at the end (the builder's: not stopped).
+    #[inline(always)]
     pub fn token_text(&mut self) -> Option<&[u8]> {
         self.b.get_token_bytes()
     }
@@ -261,6 +263,7 @@ impl<'b> SyntaxTreeBuilder<'b> {
     /// the first that closes a bracket opened before it (`PsiBuilderImpl::skip_too_deeply_nested`; Java's `(`, `[`,
     /// `{`, a template's begin, an inline doc tag's `{@`), not past the stopping offset; over one token at least unless
     /// at the end, so that the callers' loops go on.
+    #[cold]
     pub fn skip_too_deeply_nested(&mut self) {
         if self.eof() {
             return;
@@ -283,21 +286,25 @@ impl<'b> SyntaxTreeBuilder<'b> {
     }
 
     /// `currentOffset`.
+    #[inline(always)]
     pub fn current_offset(&mut self) -> i32 {
         self.b.get_current_offset()
     }
 
     /// `lookAhead(steps)`.
+    #[inline(always)]
     pub fn look_ahead(&self, steps: i32) -> Option<TokenKind> {
         self.b.look_ahead(steps)
     }
 
     /// `rawLookup(steps)`.
+    #[inline]
     pub fn raw_lookup(&self, steps: i32) -> Option<TokenKind> {
         self.b.raw_lookup(steps)
     }
 
     /// `rawTokenTypeStart(steps)`.
+    #[inline]
     pub fn raw_token_type_start(&self, steps: i32) -> i32 {
         self.b.raw_token_type_start(steps)
     }
@@ -374,6 +381,7 @@ impl<'b> SyntaxTreeBuilder<'b> {
     }
 
     /// `SyntaxBuilderUtil.expect(expectedType)`: advances over the current token if it is `expected_type`.
+    #[inline(always)]
     pub fn expect(&mut self, expected_type: Option<TokenKind>) -> bool {
         if self.token_type() == expected_type {
             self.advance_lexer();
@@ -383,6 +391,7 @@ impl<'b> SyntaxTreeBuilder<'b> {
     }
 
     /// `SyntaxBuilderUtil.expect(expectedTypes)`.
+    #[inline(always)]
     pub fn expect_set(&mut self, expected_types: TokenSet) -> bool {
         if expected_types.contains(self.token_type()) {
             self.advance_lexer();
@@ -392,6 +401,7 @@ impl<'b> SyntaxTreeBuilder<'b> {
     }
 
     /// `SyntaxBuilderUtil.rawTokenText(index)`: the text of the raw token `index` steps from the current one.
+    #[inline]
     pub fn raw_token_text(&self, index: i32) -> &[u8] {
         let text = self.b.get_original_text();
         let start = self.raw_token_type_start(index).clamp(0, text.len() as i32) as usize;

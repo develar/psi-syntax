@@ -59,6 +59,18 @@ be instantiated differently from another crate: `skip_whitespace`, inlined befor
 after the split and cost 0.8 %, so it is `#[inline(always)]`; Kotlin's `getJoinedTokenType`, a call before, is again
 not forced inline. The split's measurements are under "Measurements".
 
+The inlining hints follow what a profile-guided build (`-Cprofile-use`) inlines, so that a plain build gets part of
+it. `#[inline(always)]`: the small builder methods the parsers call at hundreds of sites (`mark`, `precede`,
+`get_current_offset`, `look_ahead`, `get_token_bytes`, `process_done` into `done`), Java's `expect`, `expect_set`,
+`current_offset`, `look_ahead`, `token_text` and `java_parser_util::done`, Kotlin's `look_ahead`, `get_token_bytes`,
+`get_current_offset` and `join_complex_tokens`. `#[inline]`: `allocate`, `create_marker`, `free_marker`, `done`,
+`balanced_block_end_at`, `shift_over_whitespace_forward` and the Java builder's raw lookups. `char_at` and Java's
+`[:jletter:]`/`[:jletterdigit:]` inline their ASCII test and call out of line, `#[cold]`, above ASCII. Every method
+that reports an error, and the too-deep skips, are `#[cold]`: a profile knows those branches are rare, LLVM's
+default weights do not. Forcing `done` or `allocate` inline as well cost 1.5 % more instructions on both languages;
+outlining `current_types`' recompute cost 0.6 %; hints on the Kotlin lexer's helpers changed nothing (measured in
+"Inlining as a profile does it").
+
 ## Pipeline
 
 ```
@@ -618,6 +630,28 @@ Kotlin, +0.8 G Java), a per-builder table of whitespace runs for the default edg
 collapsed bodies' tokens too), more `inline(always)` on marker operations (+0.2 G, 165 KB of code), a specialized
 end-of-production link (no change).
 
+### Inlining as a profile does it (child of 9b8c26f), 2026-11-02
+
+Instructions retired is the primary metric here: the machine ran at load 8-22 throughout, which moves wall time by
+±15 % between runs but instructions by under 0.2 %. Each parse was wrapped in `thread_selfcounts` (instructions and
+core cycles of the parsing thread alone, summed per round; a patch to the bench under `/tmp`, not committed: it needs
+`unsafe`). Per round, one thread, master 9b8c26f → this change:
+
+| | Kotlin (172.91 MB) | Java (215.75 MB) |
+|---|---|---|
+| instructions | 54.27 → 52.13 G (−3.9 %) | 75.47 → 68.92 G (−8.7 %) |
+| core cycles, median of 5 alternating pairs | 10.60 → 9.97 G (−6 %) | 14.19 → 12.80 G (−10 %) |
+| `scripts/ab.sh` wall | 62.5 → 62.2 MB/s (9 rounds, B/A 0.995, noise) | 56.9 → 63.2 MB/s (7 rounds, B/A 1.111) |
+
+Where the instructions went, step by step (each against the step before; a step that gained nothing was dropped):
+`char_at` split and the Java letter tests inlined, Java −4.1 G, Kotlin −0.5 G; the marker and lookahead methods,
+Kotlin −0.75 G, Java −1.0 G, then `#[inline(always)]` on the ones still called, −0.7 / −0.8 G; the Java builder's
+wrappers, Java −0.6 G; Kotlin's wrappers, Kotlin −0.3 G; `#[cold]` on errors, Java −0.2 G. Dropped: `#[inline]` on
+the Kotlin lexer's helpers (0), `soft_keyword_by_text` (0), a `match` for `token_to_binary_precedence` (0), a `match`
+for `LanguageLevel::is_preview` (−0.05 G), `#[inline(always)]` on `done` (+0.8 G on both), `current_types`' recompute
+out of line (+0.3 G Kotlin). Every hint is also kept by a profile-guided build: PGO on top measures 44.73 G Kotlin and
+57.05 G Java, against 45.07 and 57.37 G for PGO on master. Binary 1384 → 1666 KB. The gate passed.
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -636,6 +670,7 @@ end-of-production link (no change).
 | 36b3b17 | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
 | child of 36b3b17 | linked production list | 72.7 → 74.2 (11 rounds, load 4.7-10.3) | | `a+a+…` × 100 000: 4.67 s → 22 ms; 18 chains 14-45 ms |
 | 9b8c26f → the builder core batch | balanced entries, eager cursor, frames in place, brace pairs, stackless bind (10 commits) | 76.6 → 100.1 (5 rounds, load 1.6-2.2); Java 69.4 → 89.9 | 972 → 1278; Java 916 → 1163 | instructions per round 54.21 → 40.76 G, Java 75.40 → 59.13 G |
+| child of 9b8c26f | inline and cold hints where a profile inlines | Kotlin 62.5 → 62.2 (9 rounds, load 9.5-13, noise); Java 56.9 → 63.2 (7 rounds, load 8-12) | | instructions per round Kotlin −3.9 %, Java −8.7 %; core cycles −6 %, −10 %; binary 1384 → 1666 KB |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
 (×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
