@@ -234,7 +234,7 @@ pub struct GreenArena {
     values: Vec<(u32, u32)>,
     /// Scratch of the walks (`enumerate_nodes`, the token replacers), kept to reuse its buffer.
     stack: Vec<Green>,
-    /// The most bytes the buffers may hold for one parse (`set_budget`; 0: no bound).
+    /// The most bytes of records one parse may hold (`set_budget`; 0: no bound).
     budget: usize,
     /// Whether the buffers grew past `budget`: the parser then abandons the parse (`SyntaxParser::current_token`).
     over_budget: bool,
@@ -265,11 +265,12 @@ impl GreenArena {
         self.over_budget
     }
 
-    /// Checks the budget when a buffer is about to grow (the only time the bytes held change).
+    /// Checks the budget when a buffer is about to grow. It counts the records of this parse (`record_bytes`), not the
+    /// capacity the buffers kept from a bigger file before (`clear`), which would abandon every later file.
     #[cold]
     #[inline(never)]
     fn check_budget(&mut self) {
-        if self.budget != 0 && self.heap_bytes() > self.budget {
+        if self.budget != 0 && self.record_bytes() > self.budget {
             self.over_budget = true;
         }
     }
@@ -290,18 +291,30 @@ impl GreenArena {
         self.stack.clear();
     }
 
+    /// Each buffer's record count, capacity and record size.
+    fn buffers(&self) -> [(usize, usize, usize); 10] {
+        [
+            (self.tokens.len(), self.tokens.capacity(), size_of::<TokenData>()),
+            (self.nodes.len(), self.nodes.capacity(), size_of::<NodeData>()),
+            (self.trivia.len(), self.trivia.capacity(), size_of::<TriviaData>()),
+            (self.slots.len(), self.slots.capacity(), size_of::<Green>()),
+            (self.trivia_refs.len(), self.trivia_refs.capacity(), size_of::<Trivia>()),
+            (self.diag_refs.len(), self.diag_refs.capacity(), size_of::<u32>()),
+            (self.diagnostics.len(), self.diagnostics.capacity(), size_of::<DiagnosticInfo>()),
+            (self.args.len(), self.args.capacity(), size_of::<DiagArg>()),
+            (self.strings.len(), self.strings.capacity(), 1),
+            (self.values.len(), self.values.capacity(), size_of::<(u32, u32)>()),
+        ]
+    }
+
     /// The bytes the arena's buffers hold (by capacity): garbage included, what a parse costs beyond its tree.
     pub fn heap_bytes(&self) -> usize {
-        self.tokens.capacity() * size_of::<TokenData>()
-            + self.nodes.capacity() * size_of::<NodeData>()
-            + self.trivia.capacity() * size_of::<TriviaData>()
-            + self.slots.capacity() * size_of::<Green>()
-            + self.trivia_refs.capacity() * size_of::<Trivia>()
-            + self.diag_refs.capacity() * size_of::<u32>()
-            + self.diagnostics.capacity() * size_of::<DiagnosticInfo>()
-            + self.args.capacity() * size_of::<DiagArg>()
-            + self.strings.capacity()
-            + self.values.capacity() * size_of::<(u32, u32)>()
+        self.buffers().iter().map(|&(_, capacity, size)| capacity * size).sum()
+    }
+
+    /// The bytes of the records since the last `clear`, garbage included (the budget's measure).
+    fn record_bytes(&self) -> usize {
+        self.buffers().iter().map(|&(len, _, size)| len * size).sum()
     }
 
     /// The number of records of each kind (tokens, nodes and lists, trivia) so far, garbage included.
