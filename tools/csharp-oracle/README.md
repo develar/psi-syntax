@@ -250,8 +250,11 @@ included; `__2` on a clash, also one of case), VERSION `latest` for every versio
 | `fuzz/csharp-mut/` | the mutants, `original/`, `origins.json` and the full `list` (`mutate.py`, seed `csharp-mut`) |
 | `fuzz/csharp-mut.list` | the oracle list: `list` without the mutants their entry cannot parse (`no member`) |
 | `fuzz/csharp-mut.oracle/` | its dumps |
+| `fuzz/csharp-mut-latest.list`, `fuzz/csharp-mut-preview.list` | the oracle list with every version `latest`, `preview` |
+| `fuzz/csharp-mut-latest.oracle/`, `fuzz/csharp-mut-preview.oracle/` | their dumps; those equal to `csharp-mut.oracle`'s are hard links to them |
 | `fuzz/csharp-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `csharp-lex`) |
 | `fuzz/csharp-lex.oracle/` | their dumps (compilation units at Latest, Parse) |
+| `fuzz/csharp-lex-preview.oracle/` | their dumps at Preview; those equal to Latest's are hard links to them |
 | `lex/csharp-mut{,.doc,.diag}.oracle.txt`, `lex/csharp-lex{,.doc,.diag}.oracle.txt` | the lexer lines of both, at `--doc none`, `--doc parse` and `--doc diagnose`, with the defaults for every file (the lists' paths only) |
 
 Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz`, any subset in that

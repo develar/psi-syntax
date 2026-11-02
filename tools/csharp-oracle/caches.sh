@@ -5,7 +5,8 @@
 # dumps: oracle/csharp-REPO-SHA7/ (Latest, Parse) and oracle/csharp-REPO-SHA7-preview/ (Preview, Parse, files equal
 # to Latest's hard-linked); lex: lex/csharp-REPO-SHA7.oracle.txt (--doc none), .doc.oracle.txt (--doc parse) and
 # .diag.oracle.txt (--doc diagnose);
-# fuzz: the golden mutations and the lexer fuzz with their dumps and lexer lines. Keeps at least 200 GB free.
+# fuzz: the golden mutations (their dumps at their goldens' versions, at Latest and at Preview) and the lexer fuzz
+# (dumps at Latest and at Preview) with their lexer lines. Keeps at least 200 GB free.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../.." && pwd)
@@ -63,7 +64,8 @@ lex() {
 fuzz() {
   need_space
   F=$S/fuzz
-  rm -rf "$F/csharp-mut" "$F/csharp-mut.oracle" "$F/csharp-lex" "$F/csharp-lex.oracle"
+  rm -rf "$F/csharp-mut" "$F/csharp-mut.oracle" "$F/csharp-mut-latest.oracle" "$F/csharp-mut-preview.oracle" \
+    "$F/csharp-lex" "$F/csharp-lex.oracle" "$F/csharp-lex-preview.oracle"
   "$here/mutate.py" "$F/csharp-mut"
   "$O" dump --list "$F/csharp-mut/list" --root "$F/csharp-mut" --out "$F/csharp-mut.oracle"
   # A mutant its entry cannot parse (ParseMemberDeclaration returns null) has no dump: not in the oracle list.
@@ -74,11 +76,19 @@ sys.stdout.write("".join(l for l in open(sys.argv[1], encoding="utf-8") if l.spl
 PY
   rm -rf "$F/csharp-mut.oracle"
   "$O" dump --list "$F/csharp-mut.list" --root "$F/csharp-mut" --out "$F/csharp-mut.oracle"
+  # the same mutants at Latest and at Preview, each dump equal to its goldens' version's a hard link to it
+  for v in latest preview; do
+    awk -F '\t' -v v=$v 'BEGIN { OFS = "\t" } { $2 = v; print }' "$F/csharp-mut.list" > "$F/csharp-mut-$v.list"
+    "$O" dump --list "$F/csharp-mut-$v.list" --root "$F/csharp-mut" --out "$F/csharp-mut-$v.oracle"
+    "$here/link_same.py" "$F/csharp-mut.oracle" "$F/csharp-mut-$v.oracle"
+  done
   "$here/lex_fuzz.py" "$repo/testdata/csharp" "$F/csharp-lex" 20000 csharp-lex
   "$O" dump --list "$F/csharp-lex/list" --root "$F/csharp-lex" --out "$F/csharp-lex.oracle"
+  "$O" dump --list "$F/csharp-lex/list" --root "$F/csharp-lex" --out "$F/csharp-lex-preview.oracle" --version preview
+  "$here/link_same.py" "$F/csharp-lex.oracle" "$F/csharp-lex-preview.oracle"
   cut -f1 "$F/csharp-mut.list" > "$F/csharp-mut.paths"
   for doc in none parse diagnose; do
-    suffix=$(case $doc in parse) echo .doc ;; diagnose) echo .diag ;; esac)
+    suffix=$(case $doc in (parse) echo .doc ;; (diagnose) echo .diag ;; esac)
     "$O" lex --list "$F/csharp-mut.paths" --root "$F/csharp-mut" --doc $doc > "$S/lex/csharp-mut$suffix.oracle.txt"
     "$O" lex --list "$F/csharp-lex/list" --root "$F/csharp-lex" --doc $doc > "$S/lex/csharp-lex$suffix.oracle.txt"
   done

@@ -22,7 +22,13 @@
 #      dotnet/aspnetcore, Avalonia), its golden mutations and its lexer fuzz against the cached lines of
 #      `tools/csharp-oracle/oracle.sh lex --doc none`, and the same with `--doc parse` (documentation comments
 #      parsed into structured trivia by the documentation comment parser) and `--doc diagnose` (with its XML errors)
-#      against `lex --doc parse`'s and `lex --doc diagnose`'s, 0 differing lines.
+#      against `lex --doc parse`'s and `lex --doc diagnose`'s, 0 differing lines;
+#  10. C#'s parser against Roslyn 5.9.0's trees (`tools/csharp-oracle/oracle.sh dump`): the 7051 goldens of
+#      testdata/csharp and the reduced cases of crates/csharp-syntax/tests/oracle (step 1, strict), and `diff -rq` of
+#      our dumps against the cached oracle dumps of the four corpora at Latest and at Preview, of the golden
+#      mutations at their goldens' versions, at Latest and at Preview, and of the lexer fuzz at Latest and at Preview,
+#      0 lines; the 6 runtime files whose dump is over 512 MB (no oracle dump) parse without a panic into a tree
+#      whose leaves are the text (`ksdump --check-bodies --lang csharp`).
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings).
 # Our dumps go to a fresh directory per run under ~/.cache/psi-syntax/ours/ (concurrent sessions share the machine),
 # removed on PASS and kept, with its path printed, on FAIL.
@@ -104,4 +110,35 @@ for corpus in "corpus/csharp-roslyn-35d9211.list $C/csharp-src/roslyn csharp-ros
     echo "csharp lex --doc $doc $3: $n differing lines of $(wc -l < "$lines" | tr -d ' ')"; [ "$n" = 0 ] || fail=1
   done
 done
+# C#: the parser's dumps against tools/csharp-oracle's cached `dump` trees. A corpus's dumps are removed once equal
+# (runtime's are 6.9 GB).
+for v in latest preview; do
+  sfx=$([ $v = preview ] && echo -preview)
+  for corpus in "csharp-roslyn-35d9211 roslyn" "csharp-runtime-6aa72da runtime" "csharp-aspnetcore-0ef4bbf aspnetcore" \
+    "csharp-avalonia-2d79ba5 avalonia"; do
+    set -- $corpus
+    $B --lang csharp --version $v --list "$C/corpus/$1.list" --root "$C/csharp-src/$2" --out "$O/$1$sfx" > /dev/null 2>&1
+    n=$(diff -rq -x index.jsonl "$C/oracle/$1$sfx" "$O/$1$sfx" | wc -l | tr -d ' ')
+    echo "csharp parse $1$sfx: $n differing of $(wc -l < "$C/corpus/$1.list" | tr -d ' ')"
+    if [ "$n" = 0 ]; then rm -rf "$O/$1$sfx"; else diff -rq -x index.jsonl "$C/oracle/$1$sfx" "$O/$1$sfx" | head -5; fail=1; fi
+  done
+done
+# the golden mutations at their goldens' versions (the list's column), at Latest and at Preview (the same mutants)
+for m in csharp-mut csharp-mut-latest csharp-mut-preview; do
+  $B --lang csharp --list "$C/fuzz/$m.list" --root "$C/fuzz/csharp-mut" --out "$O/$m" > /dev/null 2>&1
+  n=$(diff -rq -x index.jsonl "$C/fuzz/$m.oracle" "$O/$m" | wc -l | tr -d ' ')
+  echo "csharp parse $m: $n differing of $(wc -l < "$C/fuzz/$m.list" | tr -d ' ')"
+  [ "$n" = 0 ] || { diff -rq -x index.jsonl "$C/fuzz/$m.oracle" "$O/$m" | head -5; fail=1; }
+done
+for v in latest preview; do
+  sfx=$([ $v = preview ] && echo -preview)
+  $B --lang csharp --version $v --list "$C/fuzz/csharp-lex/list" --root "$C/fuzz/csharp-lex" --out "$O/csharp-lex$sfx" > /dev/null 2>&1
+  n=$(diff -rq -x index.jsonl "$C/fuzz/csharp-lex$sfx.oracle" "$O/csharp-lex$sfx" | wc -l | tr -d ' ')
+  echo "csharp parse csharp-lex$sfx: $n differing of 20000"
+  [ "$n" = 0 ] || { diff -rq -x index.jsonl "$C/fuzz/csharp-lex$sfx.oracle" "$O/csharp-lex$sfx" | head -5; fail=1; }
+done
+grep '"failure":"dump over 512 MB"' "$C/oracle/csharp-runtime-6aa72da/index.jsonl" | sed 's/^{"path":"\([^"]*\)".*/\1/' \
+  > "$O/csharp-huge.list"
+huge=$($B --check-bodies --lang csharp --list "$O/csharp-huge.list" --root "$C/csharp-src/runtime" | tail -1)
+echo "csharp lossless, the runtime files without a dump: $huge"; [ "$huge" = "differing 0  files 6" ] || fail=1
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (our dumps: $O)"; exit 1; }

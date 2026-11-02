@@ -3,17 +3,16 @@
 //! `NAME.tree.txt`. Prints the pass count and the first differing line of the first failures. The same for the reduced
 //! corpus cases of `tests/oracle`, which must all pass.
 //!
-//! Failures are allowed while the lexer and the parser are being ported (phases 2 and 3 of the C# port): `KS_STRICT=1`
-//! fails on a difference only once phase 4 sets `STRICT_ENABLED`. Without `testdata/csharp/manifest.tsv` the test
-//! passes and says so.
+//! `KS_STRICT=1` (as `scripts/gate.sh` runs it) fails on any differing golden. Without `testdata/csharp/manifest.tsv`
+//! the test passes and says so.
 
 use std::path::PathBuf;
 
 use csharp_syntax::dump::tree_to_string;
 use csharp_syntax::{DocumentationMode, Entry, FileKind, LanguageVersion, Parser};
 
-/// Whether `KS_STRICT=1` fails on a differing golden: false until the parser is ported (phase 4 turns it on).
-const STRICT_ENABLED: bool = false;
+/// Whether `KS_STRICT=1` fails on a differing golden: on since the parser is ported (phase 4 of the C# port).
+const STRICT_ENABLED: bool = true;
 
 /// How many failures print their first differing line.
 const SHOWN: usize = 20;

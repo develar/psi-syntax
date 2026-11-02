@@ -35,8 +35,8 @@
 //!   bytes as they are (no line-separator conversion) and must be UTF-8. `--out` writes `OUT/<path>.tree.txt` and
 //!   `OUT/index.jsonl` as the oracle does (a dump past 2^29 UTF-16 code units is the failure `dump over 512 MB`);
 //!   `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the lexer dump) per file and with `--full`
-//!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files. `--check-bodies` and `--nesting-limit` do not
-//!   apply (C# has no lazily parsed bodies).
+//!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files; `--check-bodies` (C# has no lazily parsed
+//!   bodies) only checks that each tree's leaves are its file's text. `--nesting-limit` does not apply.
 //! - `--nesting-limit N` (with `--check-bodies`, `--bench` or `--out`): parses with the nesting limit N instead of
 //!   `NESTING_LIMIT` (`Parser::set_nesting_limit`), so that ordinary files take the too-deep paths.
 //!
@@ -435,6 +435,29 @@ fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, out: &Path, line
     dump::index_line(path, &tree)
 }
 
+/// `--check-bodies` of C# files (C# has no lazily parsed bodies): each file parses, without a panic, into a tree whose
+/// leaves are its text; prints the differing ones and a last line `differing N  files M`, returns N. A file that is
+/// not UTF-8 or that its entry cannot parse is not checked.
+fn csharp_check_lossless(root: &Path, lines: &[String], stdout: &mut impl Write) -> usize {
+    let mut parser = csharp_syntax::Parser::new();
+    let mut differing = 0usize;
+    for line in lines {
+        let Some((path, kind)) = csharp_line(line) else { continue };
+        let Ok(text) = csharp_source(root, path) else { continue };
+        let tree = parser.parse(&text, kind);
+        if tree.has_no_result() {
+            continue;
+        }
+        let covered: Vec<u8> = tree.tokens().flat_map(|id| tree.text(id).iter().copied()).collect();
+        if covered != text {
+            let _ = writeln!(stdout, "{path}: the leaves are not the text");
+            differing += 1;
+        }
+    }
+    let _ = writeln!(stdout, "differing {differing}  files {}", lines.len());
+    differing
+}
+
 /// `--lex` of a C# file: `PATH<TAB>TOKENS<TAB>HASH` as `tools/csharp-oracle lex` prints it; with `--full OUT` the
 /// dump goes to `OUT/<path>.lex.txt`.
 fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full: Option<&Path>) -> String {
@@ -503,12 +526,13 @@ fn main() {
         eprintln!("the list mixes languages ({java_files} Java and {csharp_files} C# files of {})", paths.len());
         std::process::exit(2);
     }
-    if args.check_bodies && csharp_files != 0 {
-        eprintln!("--check-bodies: C# has no lazily parsed bodies");
-        std::process::exit(2);
-    }
     let stdout = std::io::stdout();
     let mut stdout = std::io::BufWriter::new(stdout.lock());
+    if args.check_bodies && csharp_files != 0 {
+        let differing = csharp_check_lossless(root, &paths, &mut stdout);
+        let _ = stdout.flush();
+        std::process::exit(if differing == 0 { 0 } else { 1 });
+    }
 
     if args.lex && args.bench {
         if csharp_files != 0 {
