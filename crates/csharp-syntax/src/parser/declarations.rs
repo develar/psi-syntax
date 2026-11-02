@@ -758,8 +758,21 @@ impl<'l, 't> LanguageParser<'l, 't> {
         expected: SyntaxKind,
         close_kind: SyntaxKind,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4529
-        Default::default()
+        // We're going to cheat here and pass the underlying SyntaxListBuilder of "list" to the helper method so that
+        // it can append skipped trivia to the last element, regardless of whether that element is a node or a token.
+        let mut trailing_trivia = Green::NULL;
+        let action = self.skip_bad_list_tokens_with_expected_kind_helper(
+            list,
+            is_not_expected_function,
+            abort_function,
+            expected,
+            close_kind,
+            &mut trailing_trivia,
+        );
+        if !trailing_trivia.is_null() {
+            *start_token = self.add_trailing_skipped_syntax(*start_token, trailing_trivia);
+        }
+        action
     }
 
     /// `private PostSkipAction SkipBadListTokensWithErrorCode<T, TNode>( ref T startToken, SyntaxListBuilder<TNode> list, Func<LanguageParser, bool> isNotExpectedFunction, Func<LanguageParser, bool> abortFunction, ErrorCode error) where T : CSharpSyntaxNode where TNode : CSharpSyntaxNode` (LanguageParser.cs:4550).
@@ -771,8 +784,18 @@ impl<'l, 't> LanguageParser<'l, 't> {
         abort_function: fn(&mut LanguageParser<'_, '_>) -> bool,
         error: ErrorCode,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4550
-        Default::default()
+        let mut trailing_trivia = Green::NULL;
+        let action = self.skip_bad_list_tokens_with_error_code_helper(
+            list,
+            is_not_expected_function,
+            abort_function,
+            error,
+            &mut trailing_trivia,
+        );
+        if !trailing_trivia.is_null() {
+            *start_token = self.add_trailing_skipped_syntax(*start_token, trailing_trivia);
+        }
+        action
     }
 
     /// `private PostSkipAction SkipBadListTokensWithExpectedKindHelper( SyntaxListBuilder list, Func<LanguageParser, bool> isNotExpectedFunction, Func<LanguageParser, SyntaxKind, bool> abortFunction, SyntaxKind expected, SyntaxKind closeKind, out GreenNode trailingTrivia)` (LanguageParser.cs:4572).
@@ -785,8 +808,29 @@ impl<'l, 't> LanguageParser<'l, 't> {
         close_kind: SyntaxKind,
         trailing_trivia: &mut Green,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4572
-        Default::default()
+        if list.is_empty() {
+            self.skip_bad_tokens_with_expected_kind(
+                is_not_expected_function,
+                abort_function,
+                expected,
+                close_kind,
+                trailing_trivia,
+            )
+        } else {
+            let mut last_item_trailing_trivia = Green::NULL;
+            let action = self.skip_bad_tokens_with_expected_kind(
+                is_not_expected_function,
+                abort_function,
+                expected,
+                close_kind,
+                &mut last_item_trailing_trivia,
+            );
+            if !last_item_trailing_trivia.is_null() {
+                self.add_trailing_skipped_syntax_to_list(list, last_item_trailing_trivia);
+            }
+            *trailing_trivia = Green::NULL;
+            action
+        }
     }
 
     /// `private PostSkipAction SkipBadListTokensWithErrorCodeHelper<TNode>( SyntaxListBuilder<TNode> list, Func<LanguageParser, bool> isNotExpectedFunction, Func<LanguageParser, bool> abortFunction, ErrorCode error, out GreenNode trailingTrivia) where TNode : CSharpSyntaxNode` (LanguageParser.cs:4597).
@@ -798,8 +842,22 @@ impl<'l, 't> LanguageParser<'l, 't> {
         error: ErrorCode,
         trailing_trivia: &mut Green,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4597
-        Default::default()
+        if list.is_empty() {
+            self.skip_bad_tokens_with_error_code(is_not_expected_function, abort_function, error, trailing_trivia)
+        } else {
+            let mut last_item_trailing_trivia = Green::NULL;
+            let action = self.skip_bad_tokens_with_error_code(
+                is_not_expected_function,
+                abort_function,
+                error,
+                &mut last_item_trailing_trivia,
+            );
+            if !last_item_trailing_trivia.is_null() {
+                self.add_trailing_skipped_syntax_to_list(list, last_item_trailing_trivia);
+            }
+            *trailing_trivia = Green::NULL;
+            action
+        }
     }
 
     /// `private PostSkipAction SkipBadTokensWithExpectedKind( Func<LanguageParser, bool> isNotExpectedFunction, Func<LanguageParser, SyntaxKind, bool> abortFunction, SyntaxKind expected, SyntaxKind closeKind, out GreenNode trailingTrivia)` (LanguageParser.cs:4621).
@@ -811,8 +869,28 @@ impl<'l, 't> LanguageParser<'l, 't> {
         close_kind: SyntaxKind,
         trailing_trivia: &mut Green,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4621
-        Default::default()
+        let mut nodes = self.pool.allocate();
+        let mut first = true;
+        let mut action = PostSkipAction::Continue;
+        while is_not_expected_function(self) {
+            if abort_function(self, close_kind) || self.is_terminator() {
+                action = PostSkipAction::Abort;
+                break;
+            }
+
+            let current = self.current_token();
+            let token = if first && !self.arena_ref().contains_diagnostics(current) {
+                self.eat_token_even_with_incorrect_kind(expected)
+            } else {
+                self.eat_token()
+            };
+            first = false;
+            nodes.push(token);
+        }
+
+        *trailing_trivia = self.base.arena().list(&nodes);
+        self.pool.free(nodes);
+        action
     }
 
     /// `private PostSkipAction SkipBadTokensWithErrorCode( Func<LanguageParser, bool> isNotExpectedFunction, Func<LanguageParser, bool> abortFunction, ErrorCode errorCode, out GreenNode trailingTrivia)` (LanguageParser.cs:4648).
@@ -823,8 +901,28 @@ impl<'l, 't> LanguageParser<'l, 't> {
         error_code: ErrorCode,
         trailing_trivia: &mut Green,
     ) -> PostSkipAction {
-        // TODO(port): LanguageParser.cs:4648
-        Default::default()
+        let mut nodes = self.pool.allocate();
+        let mut first = true;
+        let mut action = PostSkipAction::Continue;
+        while is_not_expected_function(self) {
+            if abort_function(self) {
+                action = PostSkipAction::Abort;
+                break;
+            }
+
+            let current = self.current_token();
+            let token = if first && !self.arena_ref().contains_diagnostics(current) {
+                self.eat_token_with_prejudice(error_code, &[])
+            } else {
+                self.eat_token()
+            };
+            first = false;
+            nodes.push(token);
+        }
+
+        *trailing_trivia = self.base.arena().list(&nodes);
+        self.pool.free(nodes);
+        action
     }
 
     /// `private AccessorDeclarationSyntax ParseAccessorDeclaration(AccessorDeclaringKind declaringKind)` (LanguageParser.cs:4674).
@@ -907,13 +1005,13 @@ impl<'l, 't> LanguageParser<'l, 't> {
     }
 
     /// `internal static bool NoTriviaBetween(SyntaxToken token1, SyntaxToken token2)` (LanguageParser.cs:5033).
-    pub(crate) fn no_trivia_between(token1: Green, token2: Green) -> bool {
+    pub(crate) fn no_trivia_between(&mut self, token1: Green, token2: Green) -> bool {
         // TODO(port): LanguageParser.cs:5033
         Default::default()
     }
 
     /// `private static bool IsParameterModifierIncludingScoped(SyntaxToken token)` (LanguageParser.cs:5038).
-    pub(crate) fn is_parameter_modifier_including_scoped(token: Green) -> bool {
+    pub(crate) fn is_parameter_modifier_including_scoped(&mut self, token: Green) -> bool {
         // TODO(port): LanguageParser.cs:5038
         Default::default()
     }
@@ -1206,7 +1304,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
     }
 
     /// `private static SyntaxToken CreateMissingIdentifierToken()` (LanguageParser.cs:6042).
-    pub(crate) fn create_missing_identifier_token() -> Green {
+    pub(crate) fn create_missing_identifier_token(&mut self) -> Green {
         // TODO(port): LanguageParser.cs:6042
         Default::default()
     }
