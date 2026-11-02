@@ -59,8 +59,8 @@ be instantiated differently from another crate: `skip_whitespace`, inlined befor
 after the split and cost 0.8 %, so it is `#[inline(always)]`; Kotlin's `getJoinedTokenType`, a call before, is again
 not forced inline. The split's measurements are under "Measurements".
 
-The inlining hints follow what a profile-guided build (`-Cprofile-use`) inlines, so that a plain build gets part of
-it. `#[inline(always)]`: the small builder methods the parsers call at hundreds of sites (`mark`, `precede`,
+The inlining hints follow what a profile-guided build (`-Cprofile-use`, "Build and toolchain") inlines, so that a
+plain build gets part of it. `#[inline(always)]`: the small builder methods the parsers call at hundreds of sites (`mark`, `precede`,
 `get_current_offset`, `look_ahead`, `get_token_bytes`, `process_done` into `done`), Java's `expect`, `expect_set`,
 `current_offset`, `look_ahead`, `token_text` and `java_parser_util::done`, Kotlin's `look_ahead`, `get_token_bytes`,
 `get_current_offset` and `join_complex_tokens`. `#[inline]`: `allocate`, `create_marker`, `free_marker`, `done`,
@@ -443,8 +443,51 @@ byte-identical. None qualified. The measurements are from the survey prototypes 
 | smallvec | rejected | reusing buffers in the `Parser` removes the same allocations |
 | lasso, rustc-hash, foldhash | rejected | no crate has a hash map, no per-leaf `String`; interning is the consumer's choice |
 | bitflags, fixedbitset | rejected | `TokenSet { [u64; 8] }` with const constructors covers tokens and node types; the `at_set` cost was the keyword loop and `from_utf8` |
-| mimalloc 0.1.52 | consumer-side only | needs C. Before buffer reuse: +12 % at 8 threads, +15 % at 16. After it (a99fb45): +3.8 % at 8, +3.1 % at 16 (load 8-15); 1 thread not measured |
+| mimalloc 0.1.52 | consumer-side only | needs C. Before buffer reuse: +12 % at 8 threads, +15 % at 16. After it (a99fb45): +3.8 % at 8, +3.1 % at 16 (load 8-15). On the inline hints commit: no change in instructions, wall within noise at 1 and 16 threads ("Build and toolchain") |
 | stats_alloc 0.1.10 | kept, optional | the `alloc-stats` feature, profiling only |
+
+### Build and toolchain
+
+psi-syntax is a library: its consumers' release profiles and flags decide how it is compiled, so the source carries
+the inlining a profile finds (see "Pipeline") and the rest is guidance. The workspace's own release profile (fat LTO,
+one codegen unit, unwinding) is the one the measurements use. Per parse round, one thread, instructions of the parsing
+thread, on the inline hints commit ("Inlining as a profile does it"; the flags were measured on 9b8c26f):
+
+| build | Kotlin | Java | verdict |
+|---|---|---|---|
+| plain release | 52.13 G | 68.92 G | the baseline |
+| PGO, trained on other real code (Exposed's 768 `.kt`, commons-lang's and gson's 793 `.java`) | 44.73 G (−14 %) | 57.05 G (−17 %) | for consumers' binaries: `scripts/pgo.sh` |
+| PGO, trained on the vendored goldens (the script's default) | 45.31 G (−13 %) | 59.92 G (−13 %) | |
+| PGO, trained on the benchmark corpus itself | 45.19 G | 57.62 G | no better than other real code |
+| `-Cllvm-args=-inline-threshold=1000` | 51.74 G (−0.8 %) | 63.61 G (−7.7 %) | a consumer's choice; on master −3.7 % / −11.2 %, 500: −2.3 / −8.2 %, 100: +2.5 / +2.1 % |
+| `panic = "abort"` | −1.6 % | −1.2 % | a consumer's choice (no unwinding to catch a panic, which the contract rules out) |
+| `-Ctarget-cpu=native` (apple-m5; the target's default is apple-m1) | −1.0 % | −1.1 % | not portable, not worth it |
+| mimalloc 0.1.52 | 52.07 G (0) | 68.97 G (0) | see below |
+
+PGO in wall time, `scripts/ab.sh`, master against the hints commit built by `scripts/pgo.sh` (goldens), load 8-16:
+Kotlin 73.1 → 81.3 MB/s (5 rounds, ×1.11), Java 60.6 → 76.6 MB/s (5 rounds, ×1.26), Kotlin 16 threads 866 → 898 MB/s
+(3 rounds, ×1.04, the machine's other load shares those cores); core cycles, alternating, Kotlin 10.60 → 8.63 G and
+Java 14.19 → 10.55 G (the held-out profile). Its dumps of the community files (Kotlin and Java), both parse fuzz
+seeds and the Java golden mutations are byte-identical to the oracles. Applied to one crate at a time (a `RUSTC_WRAPPER`
+adding `-Cprofile-use` by crate name), the profile's gain is almost all in the language crate, where the parsers,
+the lexers and the builder's instances for that language are compiled: Kotlin 54.21 → 46.26 G with it on
+`kotlin-syntax` alone, Java 75.42 → 58.14 G on `java-syntax` alone, −2.5 % on `ksdump` (the bind's instances), under 1 % on
+`psi-builder`. Within the language crate (a profile filtered to some functions), the parsers' functions take −4.5 G
+Kotlin and −8.4 G Java, the builder's −3.0 / −6.8 G, the lexers' −1.0 / −7.1 G; the hints recover the lexers' part and
+some of the builder's. The rest is branch weights and code layout in the parser ports, thousands of call sites.
+
+A profile is tied to rustc's LLVM version and to the code it was trained on (functions whose code changed lose their
+profile, with a warning, not a wrong result), and its function names carry Cargo's crate hashes, so a committed
+`.profdata` would not match a consumer's build; `scripts/pgo.sh` is the recipe instead. A consumer runs it, or the same
+three steps in its own build: `RUSTFLAGS=-Cprofile-generate=DIR cargo build --release`, run the binary over a few MB
+of Kotlin and Java, `llvm-profdata merge -o merged.profdata DIR`, `RUSTFLAGS=-Cprofile-use=merged.profdata cargo build
+--release`. `llvm-profdata` must be of rustc's LLVM major version (rustup's `llvm-tools`, or Homebrew's `llvm@23` for
+rustc 1.99); the instrumented run warns about value-profiling counters running out, which is harmless.
+
+mimalloc, re-measured on the hints commit: no change in instructions (about 5 allocations per file), and wall time
+within the noise at load 15-18 (1 thread B/A 1.078, 16 threads Kotlin 1.000, Java 1.057). The parse allocates too
+little for the allocator to matter; it stays the consumer's choice. BOLT is not available: Homebrew's LLVM 23 ships no
+`llvm-bolt` on macOS, and BOLT's Mach-O support is experimental.
 
 ## Measurements
 
@@ -712,8 +755,6 @@ There is no line-level profile of the current code: `atos` returned no line info
   drop what they have bound). Nested chameleons over T tokens copy O(depth · T): 100 000 nested `{ fun g() ` (250
   frames at the limit) take 99 ms on 36b3b17, 2026-11-01. Sharing the file's tokens would remove it (see "Remaining
   copies").
-- **mimalloc for consumers.** Re-measure on the current code, 1 thread included, before recommending it. It was +3-4 %
-  at 8 and 16 threads on a99fb45.
 - **Remaining copies.** `lex_types` is copied into each chameleon builder (remap mutates it), and the text is copied
   into the tree's `Arc` per file. Sharing the file's token starts measured 0.999× and was reverted; revisit it
   together with frame memory.

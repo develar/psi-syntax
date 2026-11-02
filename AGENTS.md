@@ -124,11 +124,13 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   statements, declarations, array initializers, types, type argument lists, annotations, patterns and inline doc tags;
   a code block adds 4 to where it sits. Below the limits the tree is PSI's (the deepest community file,
   `Parenth2.java`, reaches 1010 levels, 4 type argument lists, 4 annotations). See DESIGN, "Java nesting".
-- Allocator: psi-syntax uses the system allocator and builds no C. Consumers that already build C (tree-sitter)
-  should set `#[global_allocator] static A: mimalloc::MiMalloc` (mimalloc 0.1.52): measured before batch 2's buffer
-  reuse at 243.2 -> 272.5 MB/s with 8 threads (+12%) and 460.1 -> 528.5 with 16 (+15%), no change on one thread;
-  batch 2 (the per-thread `Parser`) itself measured 69.1 MB/s one thread and 917 MB/s with 16. Re-measure mimalloc
-  on the current code before relying on the number.
+- Allocator: psi-syntax uses the system allocator and builds no C. mimalloc 0.1.52 was +12-15 % at 8 and 16
+  threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
+  noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.
+- Build: the consumer's release profile compiles psi-syntax. Fat LTO and one codegen unit, as here; a profile-guided
+  build (`scripts/pgo.sh` is the recipe: instrument, run over a few MB of Kotlin and Java, merge, rebuild) cuts 13-14 %
+  of Kotlin's and 13-17 % of Java's instructions (×1.11 and ×1.26 wall on one thread) with byte-identical trees;
+  `panic = "abort"` another 1-2 %. Measured in DESIGN, "Build and toolchain".
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
 
@@ -202,6 +204,8 @@ otherwise.
   input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes) and never panics.
 - Speed is a goal: no allocation per token beyond the arena, no `String` per leaf (texts are ranges), no recursion
   depth that a 4 MB file of nested expressions can overflow without a guard (PSI's own limits apply).
+- `scripts/pgo.sh OUT_DIR [KOTLIN_LIST KOTLIN_ROOT JAVA_LIST JAVA_ROOT]` builds a profile-guided ksdump (training on
+  the vendored goldens by default) and leaves the merged profile for a consumer's build.
 - Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
   the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
