@@ -428,25 +428,128 @@ impl<'l, 't> LanguageParser<'l, 't> {
         require_one_element: bool,
         allow_semicolon_as_separator: bool,
     ) -> Green {
-        // TODO(port): LanguageParser.cs:14508
-        Default::default()
+        self.parse_comma_separated_syntax_list_with_allow_semicolon_as_separator(
+            open_token,
+            close_token_kind,
+            is_possible_element,
+            parse_element,
+            None,
+            skip_bad_tokens,
+            allow_trailing_separator,
+            require_one_element,
+            allow_semicolon_as_separator,
+        )
     }
 
     /// `private SeparatedSyntaxList<TNode> ParseCommaSeparatedSyntaxList<TNode>( ref SyntaxToken openToken, SyntaxKind closeTokenKind, Func<LanguageParser, bool> isPossibleElement, Func<LanguageParser, TNode> parseElement, Func<TNode, bool>? immediatelyAbort, SkipBadTokens<TNode> skipBadTokens, bool allowTrailingSeparator, bool requireOneElement, bool allowSemicolonAsSeparator) where TNode : GreenNode` (LanguageParser.cs:14530).
+    /// `immediatelyAbort` also takes the parser, to read the arena.
     pub(crate) fn parse_comma_separated_syntax_list_with_allow_semicolon_as_separator(
         &mut self,
         open_token: &mut Green,
         close_token_kind: SyntaxKind,
         is_possible_element: fn(&mut LanguageParser<'_, '_>) -> bool,
         parse_element: fn(&mut LanguageParser<'_, '_>) -> Green,
-        immediately_abort: Option<fn(Green) -> bool>,
+        immediately_abort: Option<fn(&mut LanguageParser<'_, '_>, Green) -> bool>,
         skip_bad_tokens: SkipBadTokens,
         allow_trailing_separator: bool,
         require_one_element: bool,
         allow_semicolon_as_separator: bool,
     ) -> Green {
-        // TODO(port): LanguageParser.cs:14530
-        Default::default()
+        // If we ever want this function to parse out separated lists with a different separator, we can
+        // parameterize this method on this value.
+        let separator_token_kind = SyntaxKind::CommaToken;
+        let mut nodes = self.pool.allocate();
+        let mut require_one_element = require_one_element;
+
+        // shouldParseSeparatorOrElement
+        let should_parse_separator_or_element = |this: &mut LanguageParser<'_, '_>| -> bool {
+            // if we're on a separator, we def should parse it out as such.
+            if this.current_kind() == separator_token_kind {
+                return true;
+            }
+            // We're not on a valid separator, but we want to be resilient for the user accidentally using the wrong
+            // one in common cases.
+            if allow_semicolon_as_separator && this.current_kind() == SyntaxKind::SemicolonToken {
+                return true;
+            }
+            if is_possible_element(this) {
+                return true;
+            }
+            false
+        };
+
+        'try_again: loop {
+            if require_one_element || self.current_kind() != close_token_kind {
+                if require_one_element || should_parse_separator_or_element(self) {
+                    // first argument
+                    let mut node = parse_element(self);
+                    nodes.push(node);
+
+                    // now that we've gotten one element, we don't require any more.
+                    require_one_element = false;
+
+                    // Ensure that if parsing separators/elements doesn't move us forward, that we always bail out from
+                    // parsing this list.
+                    let mut last_token_position = -1;
+
+                    while immediately_abort.map(|f| f(self, node)) != Some(true)
+                        && self.is_making_progress(&mut last_token_position, true)
+                    {
+                        if self.current_kind() == close_token_kind {
+                            break;
+                        }
+
+                        if should_parse_separator_or_element(self) {
+                            // If we got a semicolon instead of comma, consume it with error and act as if it were a
+                            // comma. Note: we do not change the kind of the token, so we can end up with a separated
+                            // syntax list whose separators are a mix of commas and semicolons.  That is ok and is part
+                            // of the expected contract of separated lists.  There will still be a diagnostic on the
+                            // token letting the user know there is an error.  This allows us to recover gracefully,
+                            // especially for higher levels like the IDE.
+                            let separator = if self.current_kind() == SyntaxKind::SemicolonToken {
+                                self.eat_token_even_with_incorrect_kind(separator_token_kind)
+                            } else {
+                                self.eat_token_kind(separator_token_kind)
+                            };
+                            nodes.push(separator);
+
+                            if allow_trailing_separator {
+                                // check for exit case after legal trailing comma
+                                if self.current_kind() == close_token_kind {
+                                    break;
+                                } else if !is_possible_element(self) {
+                                    continue 'try_again;
+                                }
+                            }
+
+                            node = parse_element(self);
+                            nodes.push(node);
+                            continue;
+                        }
+
+                        // Something we didn't recognize, try to skip tokens, reporting that we expected a separator here.
+                        if skip_bad_tokens(self, open_token, &mut nodes, separator_token_kind, close_token_kind)
+                            == PostSkipAction::Abort
+                        {
+                            break;
+                        }
+                    }
+                } else if skip_bad_tokens(self, open_token, &mut nodes, SyntaxKind::IdentifierToken, close_token_kind)
+                    == PostSkipAction::Continue
+                {
+                    // Something we didn't recognize, try to skip tokens, reporting that we expected an identifier here.
+                    // While 'identifier' may not be completely accurate in terms of what the list needs, it's a
+                    // generally good 'catch all' indicating that some name/expr was needed, where something else
+                    // invalid was found.
+                    continue 'try_again;
+                }
+            }
+            break;
+        }
+
+        let list = self.base.arena().list(&nodes);
+        self.pool.free(nodes);
+        list
     }
 
     /// `private DisposableResetPoint GetDisposableResetPoint(bool resetOnDispose)` (LanguageParser.cs:14634).
