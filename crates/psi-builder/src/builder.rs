@@ -1287,17 +1287,27 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// start entries they are, from the last entry back (the free lists' order).
     fn production_rollback_to(&mut self, marker_id: u32) {
         let Some(first) = self.index_of(marker_id) else { return };
+        // The tail from `first` on is cut off at once; its nodes are unlinked from the last back.
+        let before = self.link(first)[0];
+        let mut node = self.link(HEAD)[0];
         loop {
-            let node = self.link(HEAD)[0];
+            let prev = self.link(node)[0];
             let id = self.node_id(node);
-            self.unlink(node);
+            *self.link_mut(node) = [UNLINKED, UNLINKED];
+            self.production_len -= 1;
+            if node & EXTRA != 0 {
+                self.extras_linked -= 1;
+            }
             if id > 0 {
                 self.free_marker(id as u32);
             }
             if node == first {
                 break;
             }
+            node = prev;
         }
+        self.link_mut(before)[1] = HEAD;
+        self.link_mut(HEAD)[0] = before;
     }
 
     /// `MarkerProduction.dropMarker`: removes the last done entry of the marker (when done) and its start entry.
