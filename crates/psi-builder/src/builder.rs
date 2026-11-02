@@ -241,6 +241,24 @@ enum BindStep {
     Done,
 }
 
+/// A production entry as `bind` reads it (`PsiBuilderImpl::entries`): the entry, its balanced lexeme
+/// (`getLexemeIndexAt` after `balanceWhiteSpaces`) and, for a start entry, what `bind` needs of its marker.
+#[derive(Copy, Clone, Debug)]
+struct Entry {
+    /// A start marker's or error item's id, or the negated id of a done marker.
+    id: i32,
+    lex: i32,
+    /// A start marker's element type (`ElementType::index`; `ERROR_ELEMENT`'s for none, as `bind` builds it).
+    ty: u16,
+    /// `ENTRY_ERROR_ITEM`, `ENTRY_COLLAPSED`.
+    flags: u16,
+}
+
+/// `Entry::flags` of an error item.
+const ENTRY_ERROR_ITEM: u16 = 1;
+/// `Entry::flags` of a collapsed start marker.
+const ENTRY_COLLAPSED: u16 = 2;
+
 /// The buffers builders work in, kept by a `Parser` from one builder to the next (cleared, not freed): the token
 /// types a builder parses (filled by its caller), the marker pool with its free lists, the production, and the
 /// buffers of the language's builder layers (`layer`). A builder takes them in `new` and gives them back in `release`.
@@ -254,8 +272,7 @@ pub struct BuilderBuffers<L: Language> {
     links: Vec<[u32; 2]>,
     extra_links: Vec<[u32; 2]>,
     extra_ids: Vec<i32>,
-    production: Vec<i32>,
-    production_lexemes: Vec<i32>,
+    entries: Vec<Entry>,
     messages: Vec<Cow<'static, str>>,
     bind_stack: Vec<(u32, u32)>,
     closers: Vec<u32>,
@@ -275,8 +292,7 @@ impl<L: Language> Default for BuilderBuffers<L> {
             links: Vec::new(),
             extra_links: Vec::new(),
             extra_ids: Vec::new(),
-            production: Vec::new(),
-            production_lexemes: Vec::new(),
+            entries: Vec::new(),
             messages: Vec::new(),
             bind_stack: Vec::new(),
             closers: Vec::new(),
@@ -344,13 +360,9 @@ pub struct PsiBuilderImpl<L: Language> {
     extras_linked: u32,
     /// How many entries are linked.
     production_len: usize,
-    /// The production as an array, made from the list by `prepare_light_tree` for `balance_white_spaces` and `bind`:
-    /// a start marker's id, or the negated id of a done marker.
-    production: Vec<i32>,
-    /// `getLexemeIndexAt(i)` for every production index (not in the Java, which reads it from the marker): the
-    /// marker's `getLexemeIndex(done)` when the list is made into `production`, rewritten by `balance_white_spaces`,
-    /// so its walk reads one contiguous array.
-    production_lexemes: Vec<i32>,
+    /// The production as an array, made from the list by `prepare_light_tree` and balanced in the same walk
+    /// (`flatten_and_balance`), with what `bind` reads of each entry's marker, so `bind` reads one contiguous array.
+    entries: Vec<Entry>,
     /// The error messages markers refer to (`MarkerData::message`).
     messages: Vec<Cow<'static, str>>,
     /// `bind`'s open composites below the root: (marker, node) of each one's parent.
@@ -415,10 +427,8 @@ impl<L: Language> PsiBuilderImpl<L> {
         extra_links.clear();
         let mut extra_ids = std::mem::take(&mut bufs.extra_ids);
         extra_ids.clear();
-        let mut production = std::mem::take(&mut bufs.production);
-        production.clear();
-        let mut production_lexemes = std::mem::take(&mut bufs.production_lexemes);
-        production_lexemes.clear();
+        let mut entries = std::mem::take(&mut bufs.entries);
+        entries.clear();
         let mut messages = std::mem::take(&mut bufs.messages);
         messages.clear();
         let bind_stack = std::mem::take(&mut bufs.bind_stack);
@@ -458,8 +468,7 @@ impl<L: Language> PsiBuilderImpl<L> {
             extra_ids,
             extras_linked: 0,
             production_len: 0,
-            production,
-            production_lexemes,
+            entries,
             messages,
             bind_stack,
             bind: BindState::default(),
@@ -663,8 +672,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         bufs.links = self.links;
         bufs.extra_links = self.extra_links;
         bufs.extra_ids = self.extra_ids;
-        bufs.production = self.production;
-        bufs.production_lexemes = self.production_lexemes;
+        bufs.entries = self.entries;
         bufs.messages = self.messages;
         bufs.bind_stack = self.bind_stack;
         bufs.closers = self.closers;
@@ -1162,24 +1170,123 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
-    /// The production in order as `production` and `production_lexemes`, each entry's lexeme read from its marker
-    /// (`getLexemeIndexAt`).
-    fn flatten_production(&mut self) {
-        self.production.clear();
-        self.production_lexemes.clear();
-        self.production.reserve(self.production_len);
-        self.production_lexemes.reserve(self.production_len);
+    /// The production in order as `entries`, balanced (`balanceWhiteSpaces`) and with what `bind` reads of each
+    /// entry's marker. `balance` is false when the first entry is not a start marker's: `bind` then reads none.
+    ///
+    /// The Java balances after making the production an array, reading each entry's lexeme from its marker
+    /// (`getLexemeIndexAt`) before any is balanced. One walk does both when no extra done node is linked: then each
+    /// lexeme field of a marker belongs to one entry (a start marker's `lexeme_index` to its start entry, its
+    /// `done_lexeme` to its done node, an error item's to its start entry), so the entry reads it before balancing
+    /// writes it. With an extra node linked, two done entries share a `done_lexeme`, and the array is made first.
+    fn flatten_and_balance(&mut self, balance: bool) {
+        let size = self.production_len;
+        let mut entries = std::mem::take(&mut self.entries);
+        entries.clear();
+        entries.reserve(size);
+        let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
+        let fused = balance && self.extras_linked == 0;
+        // `balanceWhiteSpaces`' `lastIndex` and the balanced lexeme of the entry before.
+        let (mut last_index, mut prev) = (0i32, 0i32);
         let mut node = self.link(HEAD)[1];
         while node != HEAD {
             let id = self.node_id(node);
-            self.production.push(id);
-            self.production_lexemes.push(self.marker(id.unsigned_abs()).get_lexeme_index(id < 0));
+            let done = id < 0;
+            let item_id = id.unsigned_abs();
+            let m = &self.markers[item_id as usize];
+            let mut lex = m.get_lexeme_index(done);
+            let (mut ty, mut flags) = (0u16, 0u16);
+            let binder = if m.kind == MarkerKind::Error {
+                flags = ENTRY_ERROR_ITEM;
+                L::Binder::DEFAULT_RIGHT_BINDER
+            } else if done {
+                m.right_binder
+            } else {
+                ty = m.element_type.map_or(error_index, |t| t.index() as u16);
+                if m.collapsed {
+                    flags = ENTRY_COLLAPSED;
+                }
+                m.left_binder
+            };
+            let i = entries.len();
+            if fused && i >= 1 && i + 1 < size {
+                let balanced = self.balanced_lexeme(binder, lex, last_index, prev);
+                if balanced != lex {
+                    lex = balanced;
+                    self.markers[item_id as usize].set_lexeme_index(lex, done);
+                }
+                last_index = lex;
+            }
+            prev = lex;
+            entries.push(Entry { id, lex, ty, flags });
             node = self.link(node)[1];
         }
+        if balance && !fused && size >= 2 {
+            for i in 1..size - 1 {
+                let Entry { id, lex, flags, .. } = entries[i];
+                let done = id < 0;
+                let item = self.marker(id.unsigned_abs());
+                let binder = if flags & ENTRY_ERROR_ITEM != 0 {
+                    L::Binder::DEFAULT_RIGHT_BINDER
+                } else if done {
+                    item.right_binder
+                } else {
+                    item.left_binder
+                };
+                let balanced = self.balanced_lexeme(binder, lex, last_index, entries[i - 1].lex);
+                if balanced != lex {
+                    self.markers[id.unsigned_abs() as usize].set_lexeme_index(balanced, done);
+                    entries[i].lex = balanced;
+                }
+                last_index = balanced;
+            }
+        }
+        self.entries = entries;
     }
 
-    fn get_lexeme_index_at(&self, production_index: usize) -> i32 {
-        self.production_lexemes[production_index]
+    /// `balanceWhiteSpaces()`' step for one production entry: its lexeme moved over the whitespace and comments
+    /// around it as `binder` says, given `lastIndex` and the balanced lexeme of the entry before (`prev`).
+    ///
+    /// The two default binders take a shortcut, exact by their contract (`WhitespacesAndCommentsBinder`):
+    /// `DEFAULT_LEFT_BINDER` answers `tokens.size()` for every view, so the edge is the whitespace's end (`wsEndIndex`)
+    /// in all three of the Java's cases (a view of positive, negative or zero size); `DEFAULT_RIGHT_BINDER` answers 0,
+    /// so the edge is `wsStartIndex` in all three.
+    #[inline(always)]
+    fn balanced_lexeme(&self, binder: L::Binder, lexeme_index: i32, last_index: i32, prev: i32) -> i32 {
+        if binder == L::Binder::DEFAULT_LEFT_BINDER {
+            return self.shift_over_whitespace_forward(lexeme_index.max(0) as usize) as i32;
+        }
+        let recursive = binder.is_recursive();
+        let prev_production_lex_index = if recursive { 0 } else { prev };
+        let mut ws_start_index = lexeme_index.max(last_index);
+        while ws_start_index > prev_production_lex_index
+            && (ws_start_index as usize) <= self.lexeme_count
+            && self.is_whitespace_or_comment(self.lex_types[ws_start_index as usize - 1])
+        {
+            ws_start_index -= 1;
+        }
+        if binder == L::Binder::DEFAULT_RIGHT_BINDER {
+            return ws_start_index;
+        }
+        let ws_end_index = self.shift_over_whitespace_forward(lexeme_index.max(0) as usize) as i32;
+        if ws_start_index < ws_end_index {
+            let start = ws_start_index as usize;
+            let end = ws_end_index as usize;
+            let at_end = ws_start_index == 0 || end == self.lexeme_count;
+            let tokens = &self.lex_types[start..end];
+            let text = &self.text[self.base..self.base + self.len];
+            let starts = &self.lex_starts;
+            let getter = |k: usize| -> &[u8] { &text[starts[start + k] as usize..starts[start + k + 1] as usize] };
+            let edge = binder.get_edge_position(tokens, at_end, &getter).min(end - start);
+            ws_start_index + edge as i32
+        } else if ws_start_index > ws_end_index {
+            // An earlier edge moved past this marker's whitespace: Java configures the token view with a negative
+            // size and the binder still answers.
+            ws_start_index + self.negative_size_edge(binder, ws_start_index, ws_end_index)
+        } else if lexeme_index < ws_start_index {
+            ws_start_index
+        } else {
+            lexeme_index
+        }
     }
 
     // StartMarker
@@ -1294,7 +1401,7 @@ impl<L: Language> PsiBuilderImpl<L> {
             self.set_custom_edge_token_binders(Marker(marker_id), Some(L::Binder::DEFAULT_RIGHT_BINDER), None);
         }
         // Done twice (Java only logs it): the earlier done entry reads the new done lexeme too, as Java's does, since
-        // `flatten_production` reads every entry's lexeme from its marker.
+        // `flatten_and_balance` reads every entry's lexeme from its marker.
         self.markers[marker_id as usize].done_lexeme = done_lexeme;
         self.add_done(marker_id, before);
     }
@@ -1324,7 +1431,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         };
         self.bind_stack.clear();
         // At most a leaf per token and a node per production entry (a start or an error).
-        tree.reserve(self.lexeme_count + self.production.len());
+        tree.reserve(self.lexeme_count + self.entries.len());
         self.bind = if root_marker == NONE {
             // "Parser produced no markers": keep the tree lossless.
             BindState {
@@ -1362,78 +1469,17 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.resume_bind_steps(tree)
     }
 
-    /// `prepareLightTree()`: balances the edges; returns the root marker (0 if there are no markers). The Java then
-    /// links the markers into a tree, which `bind` instead reads straight from the production.
+    /// `prepareLightTree()`: balances the edges (`balanceWhiteSpaces`, in `flatten_and_balance`); returns the root
+    /// marker (0 if there are no markers). The Java then links the markers into a tree, which `bind` instead reads
+    /// straight from the production.
     fn prepare_light_tree(&mut self) -> u32 {
-        self.flatten_production();
-        let Some(&first) = self.production.first() else { return NONE };
-        if first <= 0 {
-            return NONE;
+        let first = self.link(HEAD)[1];
+        let root_marker = if first == HEAD { NONE } else { self.node_id(first).max(0) as u32 };
+        self.flatten_and_balance(root_marker != NONE);
+        if root_marker != NONE {
+            self.token_type_checked = true;
         }
-        let root_marker = first as u32;
-        self.token_type_checked = true;
-        self.balance_white_spaces();
         root_marker
-    }
-
-    /// `balanceWhiteSpaces()`: moves each marker edge over the whitespace and comments around it as its binder says.
-    fn balance_white_spaces(&mut self) {
-        let mut last_index: i32 = 0;
-        let size = self.production.len();
-        if size < 2 {
-            return;
-        }
-        for i in 1..size - 1 {
-            let id = self.production[i];
-            let done = id < 0;
-            let item_id = id.unsigned_abs();
-            let item = self.marker(item_id);
-            let binder = if item.kind == MarkerKind::Error {
-                L::Binder::DEFAULT_RIGHT_BINDER
-            } else if done {
-                item.right_binder
-            } else {
-                item.left_binder
-            };
-            let mut lexeme_index = self.get_lexeme_index_at(i);
-
-            let recursive = binder.is_recursive();
-            let prev_production_lex_index = if recursive { 0 } else { self.get_lexeme_index_at(i - 1) };
-            let mut ws_start_index = lexeme_index.max(last_index);
-            while ws_start_index > prev_production_lex_index
-                && (ws_start_index as usize) <= self.lexeme_count
-                && self.is_whitespace_or_comment(self.lex_types[ws_start_index as usize - 1])
-            {
-                ws_start_index -= 1;
-            }
-            let ws_end_index = self.shift_over_whitespace_forward(lexeme_index.max(0) as usize) as i32;
-
-            if ws_start_index < ws_end_index {
-                let start = ws_start_index as usize;
-                let end = ws_end_index as usize;
-                let at_end = ws_start_index == 0 || end == self.lexeme_count;
-                let tokens = &self.lex_types[start..end];
-                let text = &self.text[self.base..self.base + self.len];
-                let starts = &self.lex_starts;
-                let getter = |k: usize| -> &[u8] { &text[starts[start + k] as usize..starts[start + k + 1] as usize] };
-                let edge = binder.get_edge_position(tokens, at_end, &getter).min(end - start);
-                lexeme_index = ws_start_index + edge as i32;
-                self.markers[item_id as usize].set_lexeme_index(lexeme_index, done);
-                self.production_lexemes[i] = lexeme_index;
-            } else if ws_start_index > ws_end_index {
-                // An earlier edge moved past this marker's whitespace: Java configures the token view with a negative
-                // size and the binder still answers.
-                lexeme_index = ws_start_index + self.negative_size_edge(binder, ws_start_index, ws_end_index);
-                self.markers[item_id as usize].set_lexeme_index(lexeme_index, done);
-                self.production_lexemes[i] = lexeme_index;
-            } else if lexeme_index < ws_start_index {
-                lexeme_index = ws_start_index;
-                self.markers[item_id as usize].set_lexeme_index(ws_start_index, done);
-                self.production_lexemes[i] = ws_start_index;
-            }
-
-            last_index = lexeme_index;
-        }
     }
 
     /// What `binder.getEdgePosition` returns on `RelativeTokenTypesView.configure(start, end)` with `start > end`
@@ -1495,10 +1541,10 @@ impl<L: Language> PsiBuilderImpl<L> {
             return;
         }
         let mut keep = lex_index;
-        let ahead = self.bind.i.min(self.production.len());
-        for (&id, &lexeme) in self.production[ahead..].iter().zip(&self.production_lexemes[ahead..]) {
-            if id > 0 {
-                keep = keep.min(lexeme.max(0) as usize);
+        let ahead = self.bind.i.min(self.entries.len());
+        for e in &self.entries[ahead..] {
+            if e.id > 0 {
+                keep = keep.min(e.lex.max(0) as usize);
             }
         }
         let k = keep.saturating_sub(self.token_shift).min(held);
@@ -1516,6 +1562,7 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     #[inline(always)]
     fn bind_steps(&mut self, st: &mut BindState, tree: &mut TreeData) -> Option<Pending<L::Lazy>> {
+        let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
         loop {
             while st.lex_index < st.insert_to {
                 let to = st.insert_to;
@@ -1532,30 +1579,66 @@ impl<L: Language> PsiBuilderImpl<L> {
             }
             match st.then {
                 BindStep::Next => {
-                    let Some(&id) = self.production.get(st.i) else {
-                        st.then = BindStep::CloseOpen;
-                        continue;
-                    };
-                    st.i += 1;
-                    if id < 0 {
-                        // done marker; an unbalanced one is only reported in Java
-                        if !self.bind_stack.is_empty() {
-                            st.insert_to = self.leaf_end(self.marker(st.cur_marker).done_lexeme);
-                            st.then = BindStep::Close;
+                    // The entries in one loop: each inserts the leaves before it and opens or closes a composite, or
+                    // appends an error element. A chameleon leaf on the way, a collapsed marker and the end go
+                    // through `then`.
+                    let done_own = self.extras_linked == 0;
+                    loop {
+                        let Some(&e) = self.entries.get(st.i) else {
+                            st.then = BindStep::CloseOpen;
+                            break;
+                        };
+                        st.i += 1;
+                        if e.id < 0 {
+                            // done marker; an unbalanced one is only reported in Java
+                            if self.bind_stack.is_empty() {
+                                continue;
+                            }
+                            // It closes the current marker at that marker's done lexeme: the entry's own, when it is
+                            // that marker's only done entry.
+                            let done_lexeme = if done_own && e.id.unsigned_abs() == st.cur_marker {
+                                e.lex
+                            } else {
+                                self.marker(st.cur_marker).done_lexeme
+                            };
+                            let to = self.leaf_end(done_lexeme);
+                            if !self.insert_leaves_to(st, to, BindStep::Close, tree) {
+                                break;
+                            }
+                            tree.set_end(st.cur_node, self.offset_of(st.lex_index));
+                            if let Some((parent_marker, parent_node)) = self.bind_stack.pop() {
+                                st.cur_marker = parent_marker;
+                                st.cur_node = parent_node;
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    let id = id as u32;
-                    let m = self.marker(id);
-                    let (kind, lexeme_index) = (m.kind, m.lexeme_index);
-                    if kind == MarkerKind::Start {
-                        st.insert_to = self.leaf_end(lexeme_index);
-                        st.then = BindStep::Open(id);
-                    } else if lexeme_index != st.last_error_index {
-                        // adding only the first (deepest) error from the same lexeme offset
-                        st.last_error_index = lexeme_index;
-                        st.insert_to = self.leaf_end(lexeme_index);
-                        st.then = BindStep::Error(id);
+                        let id = e.id as u32;
+                        if e.flags == 0 {
+                            let to = self.leaf_end(e.lex);
+                            if !self.insert_leaves_to(st, to, BindStep::Open(id), tree) {
+                                break;
+                            }
+                            self.bind_stack.push((st.cur_marker, st.cur_node));
+                            let node = tree.push_composite(st.cur_node, e.ty, self.offset_of(st.lex_index));
+                            if e.ty == error_index {
+                                let message = self.take_message(id);
+                                tree.set_error(node, message);
+                            }
+                            st.cur_node = node;
+                            st.cur_marker = id;
+                        } else if e.flags & ENTRY_COLLAPSED != 0 {
+                            st.insert_to = self.leaf_end(e.lex);
+                            st.then = BindStep::Open(id);
+                            break;
+                        } else if e.lex != st.last_error_index {
+                            // adding only the first (deepest) error from the same lexeme offset
+                            st.last_error_index = e.lex;
+                            let to = self.leaf_end(e.lex);
+                            if !self.insert_leaves_to(st, to, BindStep::Error(id), tree) {
+                                break;
+                            }
+                            self.append_error_item(id, st.cur_node, st.lex_index, tree);
+                        }
                     }
                 }
                 BindStep::Close => {
@@ -1575,17 +1658,17 @@ impl<L: Language> PsiBuilderImpl<L> {
                         continue;
                     }
                     // collapseLeaves; the collapsed marker's own entries are skipped
-                    let size = self.production.len();
+                    let size = self.entries.len();
                     let mut depth = 1;
                     while st.i < size && depth > 0 {
-                        let inner = self.production[st.i];
+                        let inner = self.entries[st.i];
                         st.i += 1;
-                        if inner < 0 {
+                        if inner.id < 0 {
                             depth -= 1;
-                        } else if self.marker(inner as u32).kind == MarkerKind::Start {
+                        } else if inner.flags & ENTRY_ERROR_ITEM == 0 {
                             depth += 1;
                         } else {
-                            st.last_error_index = self.marker(inner as u32).lexeme_index;
+                            st.last_error_index = inner.lex;
                         }
                     }
                     let m = self.marker(id);
@@ -1602,11 +1685,7 @@ impl<L: Language> PsiBuilderImpl<L> {
                 }
                 BindStep::Error(id) => {
                     st.then = BindStep::Next;
-                    let start = self.offset_of(st.lex_index);
-                    let error = tree.add_composite(st.cur_node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), start);
-                    tree.set_end(error, start);
-                    let message = self.take_message(id);
-                    tree.set_error(error, message);
+                    self.append_error_item(id, st.cur_node, st.lex_index, tree);
                 }
                 BindStep::CloseOpen => {
                     if self.bind_stack.is_empty() {
@@ -1640,6 +1719,32 @@ impl<L: Language> PsiBuilderImpl<L> {
                 BindStep::Done => return None,
             }
         }
+    }
+
+    /// Inserts the tokens from `st.lex_index` to `to` as leaves of the current node; true when all are. At a
+    /// chameleon leaf it stops there and leaves the rest and `then` to `bind_steps`' leaf loop, which appends the
+    /// chameleon and stops the walk.
+    #[inline(always)]
+    fn insert_leaves_to(&self, st: &mut BindState, to: usize, then: BindStep, tree: &mut TreeData) -> bool {
+        if st.lex_index < to {
+            let stop = self.insert_plain_leaves(st.lex_index, to, st.cur_node, tree);
+            st.lex_index = stop;
+            if stop != to {
+                st.insert_to = to;
+                st.then = then;
+                return false;
+            }
+        }
+        true
+    }
+
+    /// An error item's element: empty, at `lex_index`, a child of `cur_node`.
+    fn append_error_item(&mut self, id: u32, cur_node: u32, lex_index: usize, tree: &mut TreeData) {
+        let start = self.offset_of(lex_index);
+        let error = tree.add_composite(cur_node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), start);
+        tree.set_end(error, start);
+        let message = self.take_message(id);
+        tree.set_error(error, message);
     }
 
     /// `insertLeaves(curToken, lastIdx, curNode)` up to the first token that is a chameleon (a doc comment or a

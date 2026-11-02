@@ -139,10 +139,17 @@ Marker storage:
   the same far-back marker at every operator, quadratic: 4.67 s for 100 000 operators on c796e73. The order of entries,
   and so the tree, is the array's. A marker done twice (Java only logs it) gets an extra done node; while one is
   linked, `drop` finds a marker's last done entry by walking back, as `lastIndexOf` does.
-- **`production` and `production_lexemes`** are the list made into arrays by `prepare_light_tree`, each entry's
-  lexeme read from its marker; `balance_white_spaces` rewrites the lexemes and `bind` walks the arrays.
-- **`bind` walks the production directly**, with an explicit stack and no `prepareLightTree` links. It reproduces
-  `prepareLightTree`'s rules:
+- **`entries`** is the list made into one array by `prepare_light_tree` and balanced in the same walk
+  (`flatten_and_balance`): each entry's id, its balanced lexeme and, for a start entry, its element type and whether
+  it is collapsed, so `bind` reads one contiguous array and no marker on its common path. The walk reads each lexeme
+  from its marker before balancing writes it, as the Java's array does, because while no extra done node is linked
+  each lexeme field belongs to one entry; with one linked, the array is made first and balanced after. The default
+  binders take a shortcut exact by their contract: `DEFAULT_LEFT_BINDER`'s edge is the whitespace's end and
+  `DEFAULT_RIGHT_BINDER`'s its start, whichever of the Java's three cases (a token view of positive, negative or
+  zero size) applies, so neither builds a view.
+- **`bind` walks the production directly**, with an explicit stack and no `prepareLightTree` links, in one loop over
+  the entries (leaves, then open or close a composite or append an error), leaving its state machine only at a
+  chameleon leaf, a collapsed marker and the end. It reproduces `prepareLightTree`'s rules:
   - any done closes the current marker at its own done lexeme;
   - the stack starts as `[root]`, so entries after the root's done become root children;
   - error items inside collapsed markers count for the global dedup, although their entries are skipped;
@@ -323,8 +330,8 @@ allocated only when the file has errors.
 
 - **Navigation.** The subtree of `id` is `id..subtree_end`, the first child is `id + 1` when the subtree is not empty,
   and the next sibling is `subtree_end` while that is inside the parent's subtree. `last_child` walks the children.
-- **Building.** The tree is built in the `Parser`'s columns and copied into exactly sized `Vec`s, so there is no slack.
-  The pair columns cost 3 pushes per node; 5 separate columns cost 5.
+- **Building.** The tree is built in the `Parser`'s buffer, one record per node (one push), and copied into exactly
+  sized columns, so there is no slack.
 - **Leaves.** Whitespace and comments are leaves wherever PSI's binders put them. No string is stored per leaf: a
   leaf's text is its range.
 

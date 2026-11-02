@@ -32,9 +32,10 @@ const UNEXPANDED: u16 = 0x4000;
 /// `kinds` bits of the element type's `ElementType::index`.
 const KIND_INDEX: u16 = 0x3FFF;
 
-/// The arena a builder appends to, three columns (kinds, ranges, links), nodes in preorder: a node's subtree is the ids
-/// `id..subtree_end[id]`, so its first child is `id + 1` when it has one and the next sibling of a child is its
-/// `subtree_end` while that is inside the parent's.
+/// The arena a builder appends to, nodes in preorder: a node's subtree is the ids `id..subtree_end[id]`, so its first
+/// child is `id + 1` when it has one and the next sibling of a child is its `subtree_end` while that is inside the
+/// parent's. While building, a node is one record (`nodes`: one push per node); a finished tree (`take_exact`) is three
+/// columns (kinds, ranges, links), exactly sized.
 #[derive(Default, Debug)]
 pub(crate) struct TreeData {
     /// `ElementType::index` of each node, with `LEAF` on a leaf.
@@ -48,15 +49,25 @@ pub(crate) struct TreeData {
     /// The nesting (`Pending::depth`) of each unexpanded body sitting at a nonzero one, sorted by node id, for
     /// `parse_body` to start where the full parse would.
     body_depths: Vec<(u32, u32)>,
+    /// The nodes being built (empty in a finished tree).
+    nodes: Vec<BuildNode>,
+}
+
+/// A node being built: what the three columns of a finished tree hold of it.
+#[derive(Copy, Clone, Debug)]
+struct BuildNode {
+    kind: u16,
+    start: u32,
+    end: u32,
+    parent: u32,
+    subtree_end: u32,
 }
 
 impl TreeData {
     #[inline(always)]
     fn push(&mut self, parent: u32, kind: u16, start: u32, end: u32) -> u32 {
-        let id = self.kinds.len() as u32;
-        self.kinds.push(kind);
-        self.ranges.push([start, end]);
-        self.links.push([parent, id + 1]);
+        let id = self.nodes.len() as u32;
+        self.nodes.push(BuildNode { kind, start, end, parent, subtree_end: id + 1 });
         id
     }
 
@@ -69,6 +80,12 @@ impl TreeData {
         start: u32,
     ) -> u32 {
         self.push(parent, kind.index() as u16, start, start)
+    }
+
+    /// `add_composite` of the element type whose `ElementType::index` is `kind`.
+    #[inline(always)]
+    pub(crate) fn push_composite(&mut self, parent: u32, kind: u16, start: u32) -> u32 {
+        self.push(parent, kind, start, start)
     }
 
     /// A leaf as the next node, a child of `parent`.
@@ -89,23 +106,22 @@ impl TreeData {
     }
 
     /// Closes a composite: its byte end, and its subtree ends at the last node appended.
+    #[inline(always)]
     pub(crate) fn set_end(&mut self, node: u32, end: u32) {
-        let n = node as usize;
-        let range = &mut self.ranges[n];
-        range[1] = end.max(range[0]);
-        self.links[n][1] = self.kinds.len() as u32;
+        let len = self.nodes.len() as u32;
+        let n = &mut self.nodes[node as usize];
+        n.end = end.max(n.start);
+        n.subtree_end = len;
     }
 
     /// Marks a chameleon block or lambda as left unexpanded.
     fn set_unexpanded(&mut self, node: u32) {
-        self.kinds[node as usize] |= UNEXPANDED;
+        self.nodes[node as usize].kind |= UNEXPANDED;
     }
 
-    /// Room for `additional` more nodes in every column.
+    /// Room for `additional` more nodes.
     pub(crate) fn reserve(&mut self, additional: usize) {
-        self.kinds.reserve(additional);
-        self.ranges.reserve(additional);
-        self.links.reserve(additional);
+        self.nodes.reserve(additional);
     }
 
     pub(crate) fn set_error(&mut self, node: u32, message: Cow<'static, str>) {
@@ -113,24 +129,23 @@ impl TreeData {
     }
 
     fn clear(&mut self) {
-        self.kinds.clear();
-        self.ranges.clear();
-        self.links.clear();
+        self.nodes.clear();
         self.errors.clear();
         self.body_depths.clear();
     }
 
-    /// A copy in exactly sized buffers; the errors are taken (most files have none: their list never allocates; the
-    /// others' is shrunk to fit).
+    /// The finished tree: the nodes as three exactly sized columns; the errors are taken (most files have none: their
+    /// list never allocates; the others' is shrunk to fit).
     fn take_exact(&mut self) -> TreeData {
         let mut errors = std::mem::take(&mut self.errors);
         errors.shrink_to_fit();
         TreeData {
-            kinds: self.kinds.as_slice().to_vec(),
-            ranges: self.ranges.as_slice().to_vec(),
-            links: self.links.as_slice().to_vec(),
+            kinds: self.nodes.iter().map(|n| n.kind).collect(),
+            ranges: self.nodes.iter().map(|n| [n.start, n.end]).collect(),
+            links: self.nodes.iter().map(|n| [n.parent, n.subtree_end]).collect(),
             errors,
             body_depths: self.body_depths.as_slice().to_vec(),
+            nodes: Vec::new(),
         }
     }
 }
