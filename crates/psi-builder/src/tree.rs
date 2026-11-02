@@ -9,7 +9,7 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::Arc;
 
-use crate::builder::{NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED, closers_table};
+use crate::builder::{NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NESTED, brace_pairs, closers_table};
 
 /// The nesting from which a body reparsed from the file's tokens shares the file's table of block ends
 /// (`Language::BLOCK_BRACES`): below it, each frame counts its own blocks (most files never reach it, and pay for no
@@ -197,6 +197,11 @@ pub struct Parser<L: Language> {
     /// The table of block ends of the file's tokens (`PsiBuilderImpl::balanced_block_end` over `self.file`), made for
     /// the first body deeper than `SHARED_BLOCK_DEPTH` and shared by every such body of the file.
     file_block_closers: Option<Arc<[u32]>>,
+    /// The file's brace pairs (`builder::brace_pairs` over `self.file` for `Language::BLOCK_BRACES`), made once per
+    /// file and shared by every builder over a slice of the file's tokens; its buffer is refilled in place once no
+    /// builder holds it. `pair_stack` is the scratch of the pass.
+    file_brace_pairs: Arc<Vec<u32>>,
+    pair_stack: Vec<u32>,
 }
 
 impl<L: Language> Default for Parser<L> {
@@ -210,6 +215,8 @@ impl<L: Language> Default for Parser<L> {
             options: ParseOptions::default(),
             nesting_limit: None,
             file_block_closers: None,
+            file_brace_pairs: Arc::new(Vec::new()),
+            pair_stack: Vec::new(),
         }
     }
 }
@@ -222,6 +229,8 @@ pub struct Chameleon<'a, L: Language> {
     relexed: &'a mut Lexed<L::Token>,
     /// `Parser::file_block_closers`.
     file_block_closers: &'a mut Option<Arc<[u32]>>,
+    /// `Parser::file_brace_pairs`, when the language has `BLOCK_BRACES`.
+    file_brace_pairs: Option<&'a Arc<Vec<u32>>>,
     /// The frame it is parsed on: one of the methods below makes its builder.
     pub frame: &'a mut L::Frame,
     /// Its nesting (`NESTING_CHAMELEON` over where it sits) and the parser's limit.
@@ -300,6 +309,9 @@ impl<'a, L: Language> Chameleon<'a, L> {
         let delegate = L::frame_builder(self.frame);
         delegate.reset(self.text.clone(), p.start, p.end - p.start, file_token);
         delegate.set_nesting(self.nesting, self.limit);
+        if let (Some(first), Some(pairs)) = (file_token, self.file_brace_pairs) {
+            delegate.share_brace_pairs(pairs.clone(), first);
+        }
         if let (Some(first), Some((open, close))) = (file_token, L::BLOCK_BRACES)
             && p.depth >= SHARED_BLOCK_DEPTH
         {
@@ -384,6 +396,17 @@ impl<L: Language> Parser<L> {
         let text: Arc<[u8]> = Arc::from(&text[..text.len().min(u32::MAX as usize - 1)]);
         L::tokenize_into(&text, file_kind, &mut self.file);
         self.file_block_closers = None;
+        if let Some((open, close)) = L::BLOCK_BRACES {
+            // Refilled in place: the builders of the file before let go of it in `finish`.
+            match Arc::get_mut(&mut self.file_brace_pairs) {
+                Some(pairs) => brace_pairs(&self.file.types, open, close, pairs, &mut self.pair_stack),
+                None => {
+                    let mut pairs = Vec::new();
+                    brace_pairs(&self.file.types, open, close, &mut pairs, &mut self.pair_stack);
+                    self.file_brace_pairs = Arc::new(pairs);
+                }
+            }
+        }
         add(Counter::FileTokens, self.file.len() as u64);
         let mut data = std::mem::take(&mut self.data);
         data.clear();
@@ -401,6 +424,9 @@ impl<L: Language> Parser<L> {
         starts.extend_from_slice(&self.file.starts);
         file.reset(text.clone(), 0, text.len(), Some(0));
         file.set_nesting(0, limit);
+        if L::BLOCK_BRACES.is_some() {
+            file.share_brace_pairs(self.file_brace_pairs.clone(), 0);
+        }
         parse(frame);
         let root = L::frame_builder(frame).begin_bind(&mut data, None);
         self.depth = 1;
@@ -454,6 +480,7 @@ impl<L: Language> Parser<L> {
             file: &self.file,
             relexed: &mut self.relexed,
             file_block_closers: &mut self.file_block_closers,
+            file_brace_pairs: L::BLOCK_BRACES.map(|_| &self.file_brace_pairs),
             frame,
             nesting,
             limit,

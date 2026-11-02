@@ -452,6 +452,33 @@ pub struct PsiBuilderImpl<L: Language> {
     /// The file's `block_closers` for `Language::BLOCK_BRACES` and where token 0 is in the file's tokens, when the
     /// builder's tokens are a slice of the file's and it was given the table (`share_block_closers`).
     shared_block_closers: Option<(Arc<[u32]>, usize)>,
+    /// The file's brace pairs for `Language::BLOCK_BRACES` (`Parser`'s `brace_pairs`: for each opening brace of the
+    /// file's tokens the index of the one that closes it, `NO_PAIR` if none does) and where token 0 is in the file's
+    /// tokens, when the builder's tokens are a slice of the file's (`share_brace_pairs`).
+    brace_pairs: Option<(Arc<Vec<u32>>, usize)>,
+    /// Whether a token of this builder was remapped from or to a brace of `Language::BLOCK_BRACES` (the pairs, made
+    /// from the lexer's tokens, may then be wrong for it).
+    brace_remapped: bool,
+}
+
+/// `PsiBuilderImpl::brace_pairs` of an opening brace that no brace closes.
+pub(crate) const NO_PAIR: u32 = u32::MAX;
+
+/// For each token of `types` that is `open`, the index of the `close` that closes it (the first after it where as
+/// many have closed as opened since), `NO_PAIR` if none does; `NO_PAIR` for every other token.
+pub(crate) fn brace_pairs<T: Copy + Eq>(types: &[T], open: T, close: T, pairs: &mut Vec<u32>, stack: &mut Vec<u32>) {
+    pairs.clear();
+    pairs.resize(types.len(), NO_PAIR);
+    stack.clear();
+    for (i, &t) in types.iter().enumerate() {
+        if t == open {
+            stack.push(i as u32);
+        } else if t == close
+            && let Some(o) = stack.pop()
+        {
+            pairs[o as usize] = i as u32;
+        }
+    }
 }
 
 impl<L: Language> Default for PsiBuilderImpl<L> {
@@ -497,6 +524,8 @@ impl<L: Language> Default for PsiBuilderImpl<L> {
             block_scanned: 0,
             block_valid_from: 0,
             shared_block_closers: None,
+            brace_pairs: None,
+            brace_remapped: false,
         };
         builder.reset(Arc::from(&[][..]), 0, 0, None);
         builder
@@ -563,6 +592,8 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.block_scanned = 0;
         self.block_valid_from = 0;
         self.shared_block_closers = None;
+        self.brace_pairs = None;
+        self.brace_remapped = false;
         self.refresh(true);
     }
 
@@ -575,6 +606,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     pub(crate) fn finish(&mut self) {
         self.text = Arc::from(&[][..]);
         self.shared_block_closers = None;
+        self.brace_pairs = None;
     }
 
     /// Computes `sig` and the token there after `current_lexeme` moved or a token was remapped: past whitespace and
@@ -680,6 +712,22 @@ impl<L: Language> PsiBuilderImpl<L> {
         debug_assert!(self.block_pair.is_none_or(|pair| pair == (open, close)), "one pair per builder");
         self.block_pair = Some((open, close));
         let (from, n) = (from.min(self.lexeme_count), self.lexeme_count);
+        if let Some((pairs, first)) = &self.brace_pairs
+            && !self.brace_remapped
+            && L::BLOCK_BRACES == Some((open, close))
+        {
+            // Right after an `open` (whitespace and comments, never braces, between): the loop counting from there
+            // stops at the brace that closes it, the file's pair when inside this builder's tokens. Both of Java's
+            // callers ask there (`parseBlockLazy` and `braceMatchingBuilder`, after consuming the `{`).
+            let mut q = from;
+            while q > 0 && L::is_whitespace_or_comment(self.lex_types[q - 1]) {
+                q -= 1;
+            }
+            if q > 0 && self.lex_types[q - 1] == open {
+                let pair = pairs[first + q - 1];
+                return if pair == NO_PAIR { n } else { (pair as usize - first).min(n) };
+            }
+        }
         if let Some((table, first)) = &self.shared_block_closers
             && L::BLOCK_BRACES == Some((open, close))
         {
@@ -741,6 +789,11 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// up to it.
     #[inline(always)]
     fn note_remap(&mut self, index: usize, old: L::Token, new: L::Token) {
+        if let Some((open, close)) = L::BLOCK_BRACES
+            && (old == open || old == close || new == open || new == close)
+        {
+            self.brace_remapped = true;
+        }
         if let Some((open, close)) = self.block_pair
             && (old == open || old == close || new == open || new == close)
         {
@@ -765,6 +818,13 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.raw_advance_lexer((at_stop - current) as i32);
         self.eof();
         false
+    }
+
+    /// Gives the builder the file's brace pairs for `Language::BLOCK_BRACES` (`brace_pairs`); its token 0 is the file's
+    /// token `first`, and its tokens are a slice of the file's.
+    pub(crate) fn share_brace_pairs(&mut self, pairs: Arc<Vec<u32>>, first: usize) {
+        debug_assert!(first + self.lexeme_count <= pairs.len());
+        self.brace_pairs = Some((pairs, first));
     }
 
     /// Gives the builder the file's table of `balanced_block_end` answers for `Language::BLOCK_BRACES`

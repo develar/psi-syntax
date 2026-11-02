@@ -309,7 +309,10 @@ error's marker as the construct the caller parsed).
 - **Block ends in constant time.** `braceMatchingBuilder` (every class body) and `parseBlockLazy` (every code block)
   find the `}` that closes a block with a loop over the tokens, which nested class bodies in one builder and nested
   bodies across frames ran once per level: 16 000 nested classes took 2.3 s, anonymous classes 5.8 s.
-  `PsiBuilderImpl::balanced_block_end` answers what that loop finds: it counts the raw tokens while the builder has
+  `PsiBuilderImpl::balanced_block_end` answers what that loop finds. Both callers ask right after consuming the `{`,
+  so a builder over a slice of the file's tokens reads the `}` that closes it from the file's brace pairs (one stack
+  pass over the file's tokens per file, `builder::brace_pairs`, shared by every such builder; not when a brace of
+  the builder was remapped). Otherwise it counts the raw tokens while the builder has
   counted fewer than it has tokens, then makes a table of every token's answer in one pass (the stack pass of the
   too-deep closers); a body deeper than `SHARED_BLOCK_DEPTH` (64) takes the file's table, made once per file
   (`Language::BLOCK_BRACES`), instead of counting its own tokens again in every frame. A remapped bracket makes the
