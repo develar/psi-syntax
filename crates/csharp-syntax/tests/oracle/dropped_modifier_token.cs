@@ -1,0 +1,1 @@
+short required implicit operator C(S s) {}

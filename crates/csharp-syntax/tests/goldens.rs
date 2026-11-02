@@ -1,6 +1,7 @@
 //! The goldens of Roslyn's own parsing tests (`testdata/csharp`, vendored by `tools/csharp-oracle`'s `goldens` mode):
 //! each `NAME.cs` parsed at its manifest line's version, entry and documentation mode, its dump against
-//! `NAME.tree.txt`. Prints the pass count and the first differing line of the first failures.
+//! `NAME.tree.txt`. Prints the pass count and the first differing line of the first failures. The same for the reduced
+//! corpus cases of `tests/oracle`, which must all pass.
 //!
 //! Failures are allowed while the lexer and the parser are being ported (phases 2 and 3 of the C# port): `KS_STRICT=1`
 //! fails on a difference only once phase 4 sets `STRICT_ENABLED`. Without `testdata/csharp/manifest.tsv` the test
@@ -34,13 +35,10 @@ fn file_kind(columns: &[&str]) -> Option<FileKind> {
     })
 }
 
-#[test]
-fn goldens() {
-    let dir = testdata();
-    let Ok(manifest) = std::fs::read_to_string(dir.join("manifest.tsv")) else {
-        println!("goldens: no testdata/csharp/manifest.tsv, nothing to compare");
-        return;
-    };
+/// Parses every file of `dir`'s `manifest.tsv` and compares its dump: the pass count, the total and each failure's
+/// first differing line; `None` without a manifest.
+fn compare(dir: &std::path::Path) -> Option<(usize, usize, Vec<String>)> {
+    let manifest = std::fs::read_to_string(dir.join("manifest.tsv")).ok()?;
     let mut parser = Parser::new();
     let (mut passed, mut total) = (0usize, 0usize);
     let mut failures: Vec<String> = Vec::new();
@@ -82,10 +80,29 @@ fn goldens() {
         };
         failures.push(format!("{name}: {first}"));
     }
+    Some((passed, total, failures))
+}
+
+#[test]
+fn goldens() {
+    let Some((passed, total, failures)) = compare(&testdata()) else {
+        println!("goldens: no testdata/csharp/manifest.tsv, nothing to compare");
+        return;
+    };
     println!("goldens: {passed} of {total} pass");
     for f in failures.iter().take(SHOWN) {
         println!("  {f}");
     }
     let strict = std::env::var("KS_STRICT").is_ok_and(|v| v == "1");
     assert!(!(STRICT_ENABLED && strict) || failures.is_empty(), "{} goldens differ", failures.len());
+}
+
+/// The cases a corpus found, reduced (`tests/oracle`: `NAME.cs` and the oracle's `NAME.tree.txt`, made with
+/// `tools/csharp-oracle/oracle.sh dump` at its `manifest.tsv` line): each must equal Roslyn's dump.
+#[test]
+fn regressions() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/oracle");
+    let (passed, total, failures) = compare(&dir).expect("tests/oracle/manifest.tsv");
+    println!("regressions: {passed} of {total} pass");
+    assert!(failures.is_empty(), "{failures:#?}");
 }

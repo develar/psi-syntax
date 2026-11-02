@@ -1,0 +1,33 @@
+CompilationUnit [0..42)
+  IncompleteMember [0..18)
+    IdentifierName [0..18)
+      L:SkippedTokensTrivia [0..6)
+        PublicKeyword [0..6) 'public'
+      L:WhitespaceTrivia [6..7) ' '
+      L:SkippedTokensTrivia [7..9)
+        IdentifierToken [7..9) 'sa'
+      L:SkippedTokensTrivia [9..15)
+        BadToken [9..15) '\\u0022'
+      IdentifierToken [15..17) 'fe'
+      T:WhitespaceTrivia [17..18) ' '
+  PropertyDeclaration [18..42)
+    ExternKeyword [18..24) 'extern'
+    T:WhitespaceTrivia [24..25) ' '
+    IdentifierName [25..32)
+      IdentifierToken [25..31) 'i\u{FEFF}nt'
+      T:WhitespaceTrivia [31..32) ' '
+    IdentifierToken [32..33) 'P'
+    T:WhitespaceTrivia [33..34) ' '
+    AccessorList [34..42)
+      OpenBraceToken [34..35) '{'
+      T:WhitespaceTrivia [35..36) ' '
+      GetAccessorDeclaration [36..41)
+        GetKeyword [36..39) 'get'
+        SemicolonToken [39..40) ';'
+        T:WhitespaceTrivia [40..41) ' '
+      CloseBraceToken [41..42) '}'
+  EndOfFileToken [42..42) ''
+Diagnostics:
+  CS1585 [35..41) Member modifier \'extern\' must precede the member type and name
+  CS1056 [9..9) Unexpected character \'\\u0022\'
+  CS0116 [7..9) A namespace cannot directly contain members such as fields, methods or statements

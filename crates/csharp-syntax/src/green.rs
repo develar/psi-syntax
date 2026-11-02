@@ -119,6 +119,14 @@ pub struct DiagnosticInfo {
     pub xml: Option<XmlParseErrorCode>,
     pub offset: i32,
     pub width: i32,
+    /// The part of `offset` that `SyntaxFirstTokenReplacer`'s `diagnosticOffsetDelta` added: the width of skipped
+    /// text put before the element's first token, added although the element's start did not move. Roslyn measures
+    /// that width in UTF-16 code units over the skipped text and the rest of the offset over the text from the start,
+    /// so where either holds a character outside ASCII its location is not the byte sum (`flatten` redoes it in
+    /// UTF-16). 0 for every other diagnostic.
+    pub shift: i32,
+    /// Where the skipped text of `shift` starts, relative to the element's start (its full start when shifted).
+    pub shift_from: i32,
     args_start: u32,
     args_len: u32,
 }
@@ -971,14 +979,37 @@ impl GreenArena {
         let args_start = self.args.len() as u32;
         self.args.extend_from_slice(args);
         let id = DiagnosticId(self.diagnostics.len() as u32);
-        self.diagnostics.push(DiagnosticInfo { code, xml, offset, width, args_start, args_len: args.len() as u32 });
+        self.diagnostics.push(DiagnosticInfo {
+            code,
+            xml,
+            offset,
+            width,
+            shift: 0,
+            shift_from: 0,
+            args_start,
+            args_len: args.len() as u32,
+        });
         id
     }
 
-    /// A diagnostic as `info` with another offset (`SyntaxDiagnosticInfo.WithOffset`, the replacers' shifts).
+    /// A diagnostic as `info` with another offset (`SyntaxDiagnosticInfo.WithOffset`): the same text, now at `offset`
+    /// from the start of the element it moves to (so `shift_from` moves with it).
     pub fn diagnostic_with_offset(&mut self, info: DiagnosticId, offset: i32) -> DiagnosticId {
         let mut d = self.diagnostics[info.0 as usize];
+        d.shift_from = d.shift_from.wrapping_add(offset.wrapping_sub(d.offset));
         d.offset = offset;
+        let id = DiagnosticId(self.diagnostics.len() as u32);
+        self.diagnostics.push(d);
+        id
+    }
+
+    /// A diagnostic as `info` with `delta` added to its offset by `SyntaxFirstTokenReplacer` (`shift`): `delta` is the
+    /// width of the text from `from`, relative to the element's start, placed before what the offset measured.
+    fn diagnostic_with_shift(&mut self, info: DiagnosticId, delta: i32, from: i32) -> DiagnosticId {
+        let mut d = self.diagnostics[info.0 as usize];
+        d.offset = d.offset.wrapping_add(delta);
+        d.shift = d.shift.wrapping_add(delta);
+        d.shift_from = from;
         let id = DiagnosticId(self.diagnostics.len() as u32);
         self.diagnostics.push(d);
         id
@@ -1092,13 +1123,9 @@ impl GreenArena {
         if ids.is_empty() {
             return element;
         }
-        let shifted: Vec<DiagnosticId> = ids
-            .into_iter()
-            .map(|d| {
-                let offset = self.diagnostic(d).offset.wrapping_add(delta);
-                self.diagnostic_with_offset(d, offset)
-            })
-            .collect();
+        // the skipped text is the start of the element's leading trivia, its first token's
+        let from = -(self.leading_trivia_width(element) as i32);
+        let shifted: Vec<DiagnosticId> = ids.into_iter().map(|d| self.diagnostic_with_shift(d, delta, from)).collect();
         self.with_diagnostics(element, &shifted)
     }
 

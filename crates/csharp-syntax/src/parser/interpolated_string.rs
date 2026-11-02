@@ -12,7 +12,8 @@
 //! The `ValueText` of the string texts is not kept, as the lexer keeps no string literal's value (no tree shows it):
 //! `ParseRawStringToken`'s `getTokenValue` and the content `makeContent` builds are computed only as far as the
 //! diagnostics need them. `MakeInterpolatedStringTextToken` lexes a text as a string literal only when that literal
-//! could have a diagnostic (an escape of a regular text, a quote of a verbatim one); the others lex without one.
+//! could have a diagnostic (an escape or a new line of a regular text, a quote of a verbatim one); the others lex
+//! without one.
 //!
 //! Nesting: a hole's parser starts at the hole's parser's `_recursionDepth` plus `INTERPOLATION_RECURSION_DEPTH`, and
 //! when it runs out (`ERR_InsufficientStack`) the outer parse is abandoned too, as Roslyn's exception unwinds through
@@ -815,8 +816,13 @@ impl<'l, 't> LanguageParser<'l, 't> {
         let source = self.source();
         let content = source.get(text.start as usize..text.end as usize).unwrap_or(b"");
         let prefix: &[u8] = if kind == InterpolatedStringKind::Verbatim { b"@\"" } else { b"\"" };
-        let may_have_diagnostics =
-            if kind == InterpolatedStringKind::Verbatim { content.contains(&b'"') } else { content.contains(&b'\\') };
+        // A regular text's diagnostics come from an escape or a new line (`ERR_NewlineInConst`, a format clause
+        // spanning lines); the bytes 0x85, 0xA8 and 0xA9 end the UTF-8 forms of U+0085, U+2028 and U+2029.
+        let may_have_diagnostics = if kind == InterpolatedStringKind::Verbatim {
+            content.contains(&b'"')
+        } else {
+            content.iter().any(|&b| matches!(b, b'\\' | b'\r' | b'\n' | 0x85 | 0xA8 | 0xA9))
+        };
         if !may_have_diagnostics {
             return token;
         }
