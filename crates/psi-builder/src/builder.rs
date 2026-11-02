@@ -1480,7 +1480,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// `Marker.done(type)`.
     pub fn done(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>) {
         self.markers[marker.0 as usize].element_type = Some(element_type.into());
-        self.process_done(marker.0, None, None);
+        self.process_done(marker.0, None);
     }
 
     /// `Marker.collapse(type)`: done, and the tree gets one leaf of `type` over the marker's tokens.
@@ -1494,7 +1494,7 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// `Marker.doneBefore(type, before)`.
     pub fn done_before(&mut self, marker: Marker, element_type: impl Into<ElementTypeOf<L>>, before: Marker) {
         self.markers[marker.0 as usize].element_type = Some(element_type.into());
-        self.process_done(marker.0, None, Some(before.0));
+        self.process_done(marker.0, Some(before.0));
     }
 
     /// `Marker.doneBefore(type, before, errorMessage)`: also an error element right before `before`.
@@ -1515,13 +1515,15 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// `Marker.error(message)`: done as an error element.
     pub fn error_marker(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>) {
         self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
-        self.process_done(marker.0, Some(message.into()), None);
+        self.set_message(marker.0, message.into());
+        self.process_done(marker.0, None);
     }
 
     /// `Marker.errorBefore(message, before)`.
     pub fn error_before(&mut self, marker: Marker, message: impl Into<Cow<'static, str>>, before: Marker) {
         self.markers[marker.0 as usize].element_type = Some(ElementType::Node(L::ERROR_ELEMENT));
-        self.process_done(marker.0, Some(message.into()), Some(before.0));
+        self.set_message(marker.0, message.into());
+        self.process_done(marker.0, Some(before.0));
     }
 
     /// `Marker.setCustomEdgeTokenBinders(left, right)`; `None` keeps the current binder.
@@ -1535,12 +1537,11 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
     }
 
-    fn process_done(&mut self, marker_id: u32, error_message: Option<Cow<'static, str>>, before: Option<u32>) {
+    /// `processDone`; an error marker's message is set before (`error` and `errorBefore` pass it to the Java's, which
+    /// sets it first), so the common `done` passes none.
+    fn process_done(&mut self, marker_id: u32, before: Option<u32>) {
         add(Counter::Done, 1);
         // doValidityChecks: "Marker already done." is only logged in Java.
-        if let Some(message) = error_message {
-            self.set_message(marker_id, message);
-        }
         let done_lexeme = match before {
             None => self.current_lexeme as i32,
             Some(before) => self.marker(before).lexeme_index,
