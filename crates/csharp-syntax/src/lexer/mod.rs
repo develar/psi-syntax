@@ -1756,7 +1756,9 @@ impl<'t> Lexer<'t> {
                                 return;
                             }
 
-                            self.lex_xml_doc_comment_or_comment(XmlDocCommentStyle::SingleLine, trivia_list);
+                            let doc_comment = self.lex_xml_doc_comment(XmlDocCommentStyle::SingleLine);
+                            let trivia = self.arena.structured_trivia(doc_comment);
+                            self.add_trivia(trivia, trivia_list);
                             continue;
                         }
 
@@ -1775,7 +1777,9 @@ impl<'t> Lexer<'t> {
                                 return;
                             }
 
-                            self.lex_xml_doc_comment_or_comment(XmlDocCommentStyle::Delimited, trivia_list);
+                            let doc_comment = self.lex_xml_doc_comment(XmlDocCommentStyle::Delimited);
+                            let trivia = self.arena.structured_trivia(doc_comment);
+                            self.add_trivia(trivia, trivia_list);
                             continue;
                         }
 
@@ -2478,14 +2482,6 @@ impl<'t> Lexer<'t> {
                 None
             }
         }
-    }
-
-    /// `this.AddTrivia(this.LexXmlDocComment(style), ref triviaList)` (in `LexSyntaxTrivia`): the documentation comment
-    /// at the position as a structured trivia.
-    fn lex_xml_doc_comment_or_comment(&mut self, style: XmlDocCommentStyle, trivia_list: &mut Vec<Trivia>) {
-        let doc_comment = self.lex_xml_doc_comment(style);
-        let trivia = self.arena.structured_trivia(doc_comment);
-        self.add_trivia(trivia, trivia_list);
     }
 
     /// `LexXmlDocComment(style)`.
