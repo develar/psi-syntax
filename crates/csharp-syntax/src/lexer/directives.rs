@@ -45,6 +45,21 @@ pub(crate) enum DefineState {
 struct Cell {
     head: Directive,
     tail: u32,
+    /// The closest cell below this one that `IsDefined` reads (a `#define`, `#undef`, `#elif` or `#else`), or empty.
+    below_define: u32,
+    /// The closest `#if` cell below this one, or empty.
+    below_if: u32,
+}
+
+/// Whether `IsDefined` reads a directive of `kind`.
+fn defines(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        SyntaxKind::DefineDirectiveTrivia
+            | SyntaxKind::UndefDirectiveTrivia
+            | SyntaxKind::ElifDirectiveTrivia
+            | SyntaxKind::ElseDirectiveTrivia
+    )
 }
 
 /// The cons cells of every `DirectiveStack` of a file, and the names of its `#define`s and `#undef`s.
@@ -73,7 +88,7 @@ impl DirectiveStore {
         self.scratch.clear();
         let none =
             Directive { kind: SyntaxKind::None, is_active: false, branch_taken: false, name_start: 0, name_len: 0 };
-        self.cells.push(Cell { head: none, tail: EMPTY });
+        self.cells.push(Cell { head: none, tail: EMPTY, below_define: EMPTY, below_if: EMPTY });
     }
 
     /// `new Directive(node)` of a directive trivia `node` of `arena` (whose tokens index `source`).
@@ -102,7 +117,14 @@ impl DirectiveStore {
     }
 
     fn cons(&mut self, head: Directive, tail: u32) -> u32 {
-        self.cells.push(Cell { head, tail });
+        let (below_define, below_if) = match self.cell(tail) {
+            None => (EMPTY, EMPTY),
+            Some(c) => (
+                if defines(c.head.kind) { tail } else { c.below_define },
+                if c.head.kind == SyntaxKind::IfDirectiveTrivia { tail } else { c.below_if },
+            ),
+        };
+        self.cells.push(Cell { head, tail, below_define, below_if });
         self.cells.len() as u32 - 1
     }
 
@@ -228,9 +250,14 @@ impl DirectiveStack {
         self.seen_any_if_directives
     }
 
-    /// `IsDefined(id)`.
+    /// `IsDefined(id)`. Roslyn walks every cell; this one steps over the cells the walk does nothing with
+    /// (`Cell::below_define`, `Cell::below_if`), so `#if` nested n deep costs n, not n² (100 000 nested excluded
+    /// `#if A` took 3.4 s).
     pub(crate) fn is_defined(self, store: &DirectiveStore, id: &[u8]) -> DefineState {
-        let mut current = self.head;
+        let mut current = match store.cell(self.head) {
+            Some(c) if !defines(c.head.kind) => c.below_define,
+            _ => self.head,
+        };
         while let Some(c) = store.cell(current) {
             match c.head.kind {
                 SyntaxKind::DefineDirectiveTrivia => {
@@ -245,18 +272,14 @@ impl DirectiveStack {
                 }
                 SyntaxKind::ElifDirectiveTrivia | SyntaxKind::ElseDirectiveTrivia => {
                     // Skip directives from previous branches of the same #if.
-                    loop {
-                        current = store.cell(current).map_or(EMPTY, |c| c.tail);
-                        match store.cell(current) {
-                            None => return DefineState::Unspecified,
-                            Some(c) if c.head.kind == SyntaxKind::IfDirectiveTrivia => break,
-                            Some(_) => {}
-                        }
+                    current = c.below_if;
+                    if store.cell(current).is_none() {
+                        return DefineState::Unspecified;
                     }
                 }
                 _ => {}
             }
-            current = store.cell(current).map_or(EMPTY, |c| c.tail);
+            current = store.cell(current).map_or(EMPTY, |c| c.below_define);
         }
         DefineState::Unspecified
     }

@@ -244,9 +244,29 @@ pub struct GreenArena {
     stack: Vec<Green>,
     /// The most bytes of records one parse may hold (`set_budget`; 0: no bound).
     budget: usize,
-    /// Whether the buffers grew past `budget`: the parser then abandons the parse (`SyntaxParser::current_token`).
+    /// Whether the buffers grew past `budget`, or the parsers' work past `work_budget`: the parser then abandons the
+    /// parse (`SyntaxParser::current_token`).
     over_budget: bool,
+    /// The tokens the parsers of this parse consumed so far (`SyntaxParser::charge_work`), again after each reset.
+    work: u64,
+    /// The most tokens one parse may consume (`set_work_budget`; 0: no bound).
+    work_budget: u64,
+    /// The trivia lists that `append_trailing_trivia` grows in place, by their start in `trivia_refs`.
+    growable: std::collections::HashMap<u32, GrowableTrivia>,
 }
+
+/// A trivia list of `trivia_refs` with room after it (`GreenArena::append_trailing_trivia`): the end of its longest
+/// list, the end of its room, and the width and flags of the longest list.
+#[derive(Copy, Clone, Debug)]
+struct GrowableTrivia {
+    filled: u32,
+    room: u32,
+    width: u32,
+    flags: u16,
+}
+
+/// The length from which a trailing trivia list that grows gets room to grow in place (`append_trailing_trivia`).
+const GROWABLE_TRIVIA: u32 = 8;
 
 /// The budget of a parse of `text_len` bytes (`GreenArena::set_budget`): 256 bytes of arena per source byte, at least
 /// 256 MiB. Not in Roslyn, whose green nodes the garbage collector frees: here a parse keeps every record, including
@@ -257,6 +277,18 @@ pub fn budget_for(text_len: usize) -> usize {
     text_len.saturating_mul(256).max(256 << 20)
 }
 
+/// The work budget of a parse of `text_len` bytes (`GreenArena::set_work_budget`): 16 consumed tokens per source byte,
+/// at least 2^20. Not in Roslyn. Roslyn speculates (a reset point, a scan or a trial parse, a rollback), and nested
+/// speculation repeats the work of the levels inside it: `[[[…` parses an attribute list over the rest of the text at
+/// every level, `a?[a?[…` the rest twice at every level, so a few kilobytes take minutes (Roslyn did not finish 900
+/// levels of `a?[` in 25 minutes). Every consumed token counts, again after each reset (`SyntaxParser::charge_work`);
+/// past the budget the parse is abandoned as Roslyn abandons one whose stack runs out, so time stays linear in the
+/// input. The corpora of tools/csharp-oracle consume at most 1.0 token per byte in a file of a kilobyte or more (0.14
+/// to 0.27 per corpus), and 250 in a 16-byte mutation (4 000 tokens).
+pub fn work_budget_for(text_len: usize) -> u64 {
+    (text_len as u64).saturating_mul(16).max(1 << 20)
+}
+
 impl GreenArena {
     pub fn new() -> GreenArena {
         GreenArena::default()
@@ -265,6 +297,25 @@ impl GreenArena {
     /// At most `bytes` in the buffers from now on (`budget_for`); past it `is_over_budget` turns true.
     pub fn set_budget(&mut self, bytes: usize) {
         self.budget = bytes;
+    }
+
+    /// At most `tokens` consumed by the parsers from now on (`work_budget_for`); past it `is_over_budget` turns true.
+    pub fn set_work_budget(&mut self, tokens: u64) {
+        self.work_budget = tokens;
+    }
+
+    /// The tokens this parse's parsers consumed so far (as last charged).
+    pub fn work(&self) -> u64 {
+        self.work
+    }
+
+    /// Counts `tokens` consumed by a parser (`SyntaxParser::charge_work`) against the work budget.
+    #[inline]
+    pub fn charge_work(&mut self, tokens: u64) {
+        self.work += tokens;
+        if self.work_budget != 0 && self.work > self.work_budget {
+            self.over_budget = true;
+        }
     }
 
     /// Whether the buffers grew past the budget.
@@ -286,11 +337,13 @@ impl GreenArena {
     /// Forgets every record, keeping the buffers.
     pub fn clear(&mut self) {
         self.over_budget = false;
+        self.work = 0;
         self.tokens.clear();
         self.nodes.clear();
         self.trivia.clear();
         self.slots.clear();
         self.trivia_refs.clear();
+        self.growable.clear();
         self.diag_refs.clear();
         self.diagnostics.clear();
         self.args.clear();
@@ -446,8 +499,12 @@ impl GreenArena {
     }
 
     fn trivia_list_width_and_flags(&self, list: TriviaList) -> (u32, u16) {
+        self.trivia_items_width_and_flags(self.trivia_items(list))
+    }
+
+    fn trivia_items_width_and_flags(&self, items: &[Trivia]) -> (u32, u16) {
         let (mut width, mut flags) = (0u32, 0u16);
-        for t in self.trivia_items(list) {
+        for t in items {
             let d = &self.trivia[t.0 as usize];
             width = width.wrapping_add(d.width);
             flags |= d.flags & INHERIT_MASK;
@@ -547,8 +604,13 @@ impl GreenArena {
         }
         let mut data = *self.token_data(token);
         f(&mut data);
+        let trailing = self.trivia_list_width_and_flags(data.trailing);
+        self.push_copied_token(data, trailing)
+    }
+
+    /// A token record of `data` (from `copy_token`), its trailing trivia of `trailing` width and flags.
+    fn push_copied_token(&mut self, mut data: TokenData, (trailing_width, trailing_flags): (u32, u16)) -> Green {
         let (leading_width, leading_flags) = self.trivia_list_width_and_flags(data.leading);
-        let (trailing_width, trailing_flags) = self.trivia_list_width_and_flags(data.trailing);
         data.leading_width = leading_width;
         data.trailing_width = trailing_width;
         let own = data.flags & (IS_NOT_MISSING | OWNED_TEXT | FIXED_TEXT);
@@ -573,6 +635,58 @@ impl GreenArena {
     /// `TokenWithTrailingTrivia`.
     pub fn token_with_trailing_trivia(&mut self, token: Green, trailing: TriviaList) -> Green {
         self.copy_token(token, |d| d.trailing = trailing)
+    }
+
+    /// `TokenWithTrailingTrivia(token.TrailingTrivia + items)` in amortized time of `items` (not in Roslyn, whose
+    /// green lists are copied: `AddSkippedSyntax` of each of n stray tokens after a member copies the trivia the ones
+    /// before it left, so n `}` after a class took the square of n, 3.7 s for 100 000). A list of `GROWABLE_TRIVIA` or
+    /// more gets room after it, twice its length, and grows into it while it is the longest list there; the shorter
+    /// lists of the room stay as they were, since records never change.
+    pub fn append_trailing_trivia(&mut self, token: Green, items: &[Trivia]) -> Green {
+        if !token.is_token() {
+            return token;
+        }
+        let old = self.token_data(token).trailing;
+        if items.is_empty() {
+            return self.token_with_trailing_trivia(token, old);
+        }
+        let (items_width, items_flags) = self.trivia_items_width_and_flags(items);
+        let end = old.start + old.len;
+        let mut data = *self.token_data(token);
+        let n = items.len() as u32;
+        if let Some(room) = self.growable.get_mut(&old.start)
+            && !old.is_empty()
+            && room.filled == end
+            && end + n <= room.room
+        {
+            room.filled += n;
+            room.width = room.width.wrapping_add(items_width);
+            room.flags |= items_flags;
+            let (width, flags) = (room.width, room.flags);
+            self.trivia_refs[end as usize..(end + n) as usize].copy_from_slice(items);
+            data.trailing = TriviaList { start: old.start, len: old.len + n };
+            return self.push_copied_token(data, (width, flags));
+        }
+        let len = old.len + n;
+        if len < GROWABLE_TRIVIA {
+            let start = self.trivia_refs.len() as u32;
+            self.trivia_refs.extend_from_within(old.start as usize..end as usize);
+            self.trivia_refs.extend_from_slice(items);
+            data.trailing = TriviaList { start, len };
+            let trailing = self.trivia_list_width_and_flags(data.trailing);
+            return self.push_copied_token(data, trailing);
+        }
+        let start = self.trivia_refs.len() as u32;
+        self.trivia_refs.extend_from_within(old.start as usize..end as usize);
+        self.trivia_refs.extend_from_slice(items);
+        data.trailing = TriviaList { start, len };
+        let (width, flags) = self.trivia_list_width_and_flags(data.trailing);
+        // the room: placeholders no list refers to until the list grows into them
+        let filler = items[0];
+        self.trivia_refs.resize((start + 2 * len) as usize, filler);
+        self.growable.insert(start, GrowableTrivia { filled: start + len, room: start + 2 * len, width, flags });
+        self.check_budget();
+        self.push_copied_token(data, (width, flags))
     }
 
     /// A copy of `token` of another kind and contextual kind (what `ConvertToKeyword` and `ConvertToIdentifier` make),

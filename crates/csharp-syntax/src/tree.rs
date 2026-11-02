@@ -269,6 +269,12 @@ impl Parser {
         self.arena_budget = Some(bytes);
     }
 
+    /// The tokens the parsers of the last parse consumed, again after every reset (measurements).
+    #[doc(hidden)]
+    pub fn work_tokens(&self) -> u64 {
+        self.arena.work()
+    }
+
     /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`).
     pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
         if file_kind.entry == Entry::Tokens {
@@ -278,6 +284,7 @@ impl Parser {
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
         arena.set_budget(self.arena_budget.unwrap_or_else(|| crate::green::budget_for(source.len())));
+        arena.set_work_budget(crate::green::work_budget_for(source.len()));
         let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
         let buffers = std::mem::take(&mut self.syntax_parser);
         let pool = std::mem::take(&mut self.pool);

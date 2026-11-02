@@ -88,6 +88,8 @@ pub struct SyntaxParser<'l, 't> {
     forced_eof: Green,
     /// Where the parse was abandoned because the arena outgrew its budget (`abandon_over_budget`).
     pub budget_exhausted_at: Option<u32>,
+    /// The tokens consumed (`MoveToNextToken`) since the arena was last charged with them (`charge_work`).
+    eaten: u64,
 }
 
 impl<'l, 't> SyntaxParser<'l, 't> {
@@ -123,6 +125,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             node_scratch: buffers.nodes,
             forced_eof: Green::NULL,
             budget_exhausted_at: None,
+            eaten: 0,
         };
         // PreLex is not cancellable: Roslyn prelexes unless a cancellation token can cancel, so always here.
         if pre_lex_if_not_incremental && !parser.allow_mode_reset {
@@ -132,7 +135,8 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     }
 
     /// `Dispose()`: the buffers back for reuse.
-    pub fn into_buffers(self) -> SyntaxParserBuffers {
+    pub fn into_buffers(mut self) -> SyntaxParserBuffers {
+        self.charge_work();
         SyntaxParserBuffers { tokens: self.tokens, trivia: self.trivia_scratch, nodes: self.node_scratch }
     }
 
@@ -200,6 +204,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
 
     /// `Reset(ref point)`.
     pub fn reset(&mut self, point: &ResetPoint) {
+        self.charge_work();
         let mut offset = point.position - self.first_token;
         debug_assert!(offset >= 0);
         if offset >= self.token_count {
@@ -212,6 +217,13 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.token_offset = offset.clamp(0, self.token_count);
         self.current_token = Green::NULL;
         self.prev_token_trailing_trivia = point.prev_token_trailing_trivia;
+    }
+
+    /// Charges the arena's work budget with the tokens consumed since the last charge (not in Roslyn): at every reset,
+    /// so the work of speculation counts as it is rolled back, and when the parser is done (`into_buffers`).
+    pub fn charge_work(&mut self) {
+        let eaten = std::mem::take(&mut self.eaten);
+        self.lexer.arena().charge_work(eaten);
     }
 
     /// `Release(ref point)`.
@@ -413,6 +425,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
 
     /// `MoveToNextToken()`.
     fn move_to_next_token(&mut self) {
+        self.eaten += 1;
         self.prev_token_trailing_trivia = self.arena_ref().trailing_trivia(self.current_token);
         self.current_token = Green::NULL;
         self.token_offset += 1;
@@ -806,7 +819,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
                 // syntax at the end of the trivia, then the offset relative to the node/token start will be adjusted
                 // forward by the width of the node/token plus the existing trailing trivia.
                 current_offset = (a.width(target) + a.trailing_trivia_width(target)) as i32;
-                builder.extend_from_slice(a.trivia_items(a.trailing_trivia(target)));
+                // the target's own trailing trivia stays where it is (`append_trailing_trivia`)
             } else {
                 // The normal offset for a node/token is its start (not full start). So if we're placing the skipped
                 // syntax at the start of the trivia, then the offset relative to the node/token start will be adjusted
@@ -871,9 +884,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         // If we were adding the skipped token as trailing trivia, then at this point we're done.  Otherwise, we
         // were adding it as leading trivia, so we need to tack on the existing leading trivia of the target.
         let result = if trailing {
-            let a = self.arena();
-            let list = a.trivia_list(&builder);
-            a.token_with_trailing_trivia(target, list)
+            self.arena().append_trailing_trivia(target, &builder)
         } else {
             let a = self.lexer.arena();
             let leading = a.leading_trivia(target);

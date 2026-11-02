@@ -49,9 +49,18 @@ use crate::syntax_parser::{ParserKind, SyntaxParserBuffers};
 use crate::tree::Entry;
 
 /// How deep `_recursionDepth` may go before the parse is abandoned as Roslyn abandons it when
-/// `EnsureSufficientExecutionStack` throws. Roslyn's limit is its thread's stack; this one keeps a parse within a 1 MB
-/// stack. TODO: measure against the oracle and the deepest corpus file once the parser is ported (phase 4).
+/// `EnsureSufficientExecutionStack` throws. Roslyn's limit is its thread's stack (64 MB in the oracle); this one keeps
+/// a parse within a 1 MB stack: a level takes at most 760 bytes of stack in a release build (129 for a unary operator,
+/// 418 for parentheses, 687 for a type argument list, 757 for a namespace; measured with a stack pointer probe over
+/// 150 forms 900 levels deep), and a local function's 1.9 KB counts as 3 levels (`LOCAL_FUNCTION_BODY_DEPTH`). The
+/// corpora of tools/csharp-oracle reach 678 (`hugeexpr1.cs` of dotnet/runtime); DESIGN.md, "C# nesting", compares
+/// the limit with Roslyn's.
 pub(crate) const MAX_RECURSION_DEPTH: i32 = 1000;
+
+/// The levels a local function's body adds to `_recursionDepth` (not in Roslyn): a level of nested local functions
+/// takes 1.9 KB of stack (eight frames from `ParseStatementCore` through the declarator to the body's statements), and
+/// 1000 of them overflowed a 1 MB stack.
+pub(crate) const LOCAL_FUNCTION_BODY_DEPTH: i32 = 2;
 
 /// `LanguageParser`: the C# parser over a `SyntaxParser` (`Deref` reaches its methods: `self.eat_token()`,
 /// `self.current_kind()`, `self.arena()`, ...).
@@ -75,6 +84,9 @@ pub struct LanguageParser<'l, 't> {
     pub(crate) stack_exhausted_at: Option<u32>,
     /// The finished tuple type scans of this parse (`scan_tuple_type`), not in Roslyn.
     pub(crate) scanned_tuples: ScannedTuples,
+    /// The `primary ?` pairs of a conditional access chain still to be built
+    /// (`try_parse_conditional_access_expression`), not in Roslyn.
+    pub(crate) pending_conditional_accesses: Vec<(Green, Green)>,
 }
 
 impl<'l, 't> Deref for LanguageParser<'l, 't> {
@@ -112,6 +124,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             term_state: TerminatorState::END_OF_FILE,
             stack_exhausted_at: None,
             scanned_tuples: ScannedTuples::default(),
+            pending_conditional_accesses: Vec::new(),
         }
     }
 

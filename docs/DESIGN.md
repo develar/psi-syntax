@@ -382,6 +382,57 @@ mixes of 26 expression forms 3000 deep, random bytes and fragments, and every go
 `parse_body` equal to the full parse's subtree); the gate runs `--check-bodies` on the Java corpora at the default
 limit and at 3.
 
+### C# nesting and work (`csharp-syntax`; `parser::MAX_RECURSION_DEPTH`, `green::work_budget_for`)
+
+Roslyn bounds its parser by its thread's stack: `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` at
+namespaces, members, statements and sub-expressions throws past a fixed reserve, and `ParseWithStackGuard` then turns
+the whole text into one skipped `BadToken` with `ERR_InsufficientStack` (CS8078, "An expression is too long or
+complex to compile") at the lexer's position. The port has no stack to measure, so a count replaces it, and the same
+failure is its only answer to an input it will not parse.
+
+- **What is counted.** `_recursionDepth` where Roslyn counts it, and the cycles it leaves unguarded with the same
+  counter: `ParseType` and `ScanType`, initializers, query bodies, designations, negated patterns. A local function's
+  body adds 2 more (`LOCAL_FUNCTION_BODY_DEPTH`), a hole of an interpolated string 16
+  (`INTERPOLATION_RECURSION_DEPTH`). `a?.b?.c…` (`parseWhenNotNull` calls `TryParseConditionalAccessExpression` for
+  each `?`, unguarded) is a loop over a stack of the pending `primary ?` pairs, built innermost first.
+- **The limit.** 1000 levels. A level takes at most 760 bytes of stack in a release build (129 for a unary operator,
+  418 for parentheses, 687 for a type argument list, 757 for a namespace: a stack pointer probe over 150 forms 900 deep
+  on 93d30b1a); nested local functions took 1.9 KB a level and overflowed 1 MB at 1000 levels, hence their weight.
+  The corpora reach 678 (dotnet/runtime's `hugeexpr1.cs`), the deepest other files 118 (aspnetcore), 50 (roslyn), 45
+  (Avalonia).
+- **Against Roslyn on its 64 MB stack** (the oracle, `--stack-mb 64`, the 153 forms of `tests/robustness.rs`): at 300
+  levels 142 forms are Roslyn's tree byte for byte; the others are the four interpolated string forms (a hole counts
+  16, so about 60 nested holes reach the limit) and six forms of the lexer (doc comment elements and crefs, directive
+  expressions: `MAX_NESTED_SCAN_DEPTH`, 128). At 900 levels 121 are equal: 25 more reach the port's limit because a
+  level counts more than once (initializers, lambda blocks, queries, `with`, slice patterns, attributes, local
+  functions), where Roslyn's stack still holds. At 100 000 levels every form compared fails in both with the same
+  tree, CS8078 at the same offset (26 forms so far; Roslyn needs minutes for others); Roslyn's process itself dies of a
+  stack overflow on 100 000 nested array initializers (`ParseArrayInitializer` and `ParseVariableInitializer`,
+  unguarded, 82 249 frames in 64 MB) and on 100 000 nested interpolated strings (its lexer's
+  `ScanInterpolatedStringLiteralHoleBalancedText`, 58 263 frames).
+- **Work.** Speculation (a reset point, a scan or a trial parse, a rollback) repeats the work of what it covers, and
+  nested it multiplies: `[[[…` parses an attribute list over the rest at every level (10.8 s for 100 000 levels),
+  `a?[a?[…` parses the rest twice at every level (1.3 s for 400; Roslyn did not finish 900 in 25 minutes). Every token
+  a parser consumes counts against `work_budget_for(len)`, 16 tokens a byte and at least 2^20, again after each reset
+  (`SyntaxParser::charge_work`); past it the parse fails as an exhausted stack does. The corpora consume 0.14-0.27
+  tokens a byte, at most 1.0 in a file of a kilobyte or more, and 250 in a 16-byte mutation; the gate proves no corpus,
+  mutation or fuzz tree reaches the budget. A chain of 17 `?[0]` reaches it (20 reached the depth limit before);
+  Roslyn parses 16 in 0.38 s, 20 in 0.54 s, 24 in 4.0 s.
+- **Linear where Roslyn is not, with Roslyn's tree.** A finished tuple type scan that starts with `(` is replayed from a
+  memo keyed by its token and context (`scan_tuple_type`): nested parentheses rescanned the tuples inside each level,
+  21.7 s for `hugeexpr1.cs`, now 1.1 s. A stray token after a member adds itself to the trailing trivia of the
+  member's last token, which Roslyn copies each time (n `}` after a class: 3.7 s for 100 000); a list of 8 or more grows
+  in place into room of twice its length (`GreenArena::append_trailing_trivia`). `IsDefined` walked every directive
+  of the stack, so excluded `#if` nested n deep took n² (3.4 s for 100 000); its cells skip to the next `#define`,
+  `#undef`, `#elif` or `#else` and to the next `#if`.
+- **Known deviations.** 100 000 `a < a < …` fail as too deep (`ScanType` recurses at each `<`; Roslyn's does too,
+  without a guard); the 17 `?[` above; the lexer's `MAX_NESTED_SCAN_DEPTH`.
+
+`tests/robustness.rs` (C#) parses 153 recursive forms nested 100 000 deep on a 1 MB stack (each under 220 ms), 101
+chains and lists of 100 000 (each under 120 ms), 20 speculative forms at 250, 1000 and 100 000 levels (each under
+225 ms), 40 random mixes of 38 forms 3000 deep, the lexer's deep forms, and random bytes and fragments at every entry,
+language version and documentation mode; each tree is lossless, in preorder, and the same on a second parse.
+
 ### Tree (`psi-builder` `src/tree.rs`)
 
 A tree is three columns over the node ids, in preorder:

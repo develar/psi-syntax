@@ -1321,9 +1321,26 @@ impl<'l, 't> LanguageParser<'l, 't> {
             return false;
         }
 
-        let when_not_null = parse_when_not_null(self, binding_expression);
-        *conditional_access_expression =
-            self.arena().conditional_access_expression(primary_expression, question_token, when_not_null);
+        // Not in Roslyn: `parseWhenNotNull` of `a?.b?.c…` ends in this method again for each `?`, a recursion Roslyn
+        // does not guard (100 000 of them overflowed a 1 MB stack). The loop keeps each pending `primary ?` on
+        // `pending_conditional_accesses` and builds the nodes from the innermost out, as the recursion returns.
+        let base = self.pending_conditional_accesses.len();
+        self.pending_conditional_accesses.push((primary_expression, question_token));
+        let mut binding_expression = binding_expression;
+        let mut when_not_null = loop {
+            match parse_when_not_null(self, binding_expression) {
+                WhenNotNull::End(expression) => break expression,
+                WhenNotNull::ConditionalAccess { primary_expression, question_token, binding } => {
+                    self.pending_conditional_accesses.push((primary_expression, question_token));
+                    binding_expression = binding;
+                }
+            }
+        };
+        while self.pending_conditional_accesses.len() > base {
+            let Some((primary, question)) = self.pending_conditional_accesses.pop() else { break };
+            when_not_null = self.arena().conditional_access_expression(primary, question, when_not_null);
+        }
+        *conditional_access_expression = when_not_null;
         true
     }
 }
@@ -1386,7 +1403,14 @@ fn is_start_of_element_binding_expression(p: &mut LanguageParser<'_, '_>, next_t
 }
 
 /// `parseWhenNotNull` of `TryParseConditionalAccessExpression`.
-fn parse_when_not_null(p: &mut LanguageParser<'_, '_>, expr: Green) -> Green {
+/// What `parseWhenNotNull` ends with: its expression, or `TryParseConditionalAccessExpression` of it, whose `?` and
+/// binding it has eaten (`try_parse_conditional_access_expression` continues with them).
+enum WhenNotNull {
+    End(Green),
+    ConditionalAccess { primary_expression: Green, question_token: Green, binding: Green },
+}
+
+fn parse_when_not_null(p: &mut LanguageParser<'_, '_>, expr: Green) -> WhenNotNull {
     let mut expr = expr;
     loop {
         // We should consume suppression '!'s which are in the middle of the 'whenNotNull', but not at the end.
@@ -1415,10 +1439,10 @@ fn parse_when_not_null(p: &mut LanguageParser<'_, '_>, expr: Green) -> Green {
 
         // a?.b?.c
         // a?.b!?.c
-        let mut conditional_access = Green::NULL;
-        if p.try_parse_conditional_access_expression(expr, &mut conditional_access) {
+        let (question_token, binding) = try_eat_question_and_binding_expression(p);
+        if !question_token.is_null() && !binding.is_null() {
             p.dispose_reset_point(before_suppressions_reset_point);
-            return conditional_access;
+            return WhenNotNull::ConditionalAccess { primary_expression: expr, question_token, binding };
         }
 
         // a?.b = c
@@ -1428,14 +1452,14 @@ fn parse_when_not_null(p: &mut LanguageParser<'_, '_>, expr: Green) -> Green {
             let operator_token = p.eat_expression_operator_token(operator_token_kind);
             let result = p.parse_assignment_expression(operator_expression_kind, expr, operator_token);
             p.dispose_reset_point(before_suppressions_reset_point);
-            return result;
+            return WhenNotNull::End(result);
         }
 
         // End of the cond-access.
         // Any '!' suppressions which followed this are a parent of the cond-access, not a child of it.
         p.reset_disposable(&mut before_suppressions_reset_point);
         p.dispose_reset_point(before_suppressions_reset_point);
-        return expression_before_suppressions;
+        return WhenNotNull::End(expression_before_suppressions);
     }
 }
 

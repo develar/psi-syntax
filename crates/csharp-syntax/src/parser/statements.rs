@@ -2859,12 +2859,17 @@ impl<'l, 't> LanguageParser<'l, 't> {
         let mut block_body = Green::NULL;
         let mut expression_body = Green::NULL;
         let mut semicolon = Green::NULL;
+        // Not in Roslyn: a local function's body counts `LOCAL_FUNCTION_BODY_DEPTH` levels more, as a level of nested
+        // local functions takes about three times the stack of a block's (see `MAX_RECURSION_DEPTH`).
+        self.recursion_depth += LOCAL_FUNCTION_BODY_DEPTH;
+        self.ensure_sufficient_execution_stack();
         self.parse_block_and_expression_bodies_with_semicolon(
             &mut block_body,
             &mut expression_body,
             &mut semicolon,
             false,
         );
+        self.recursion_depth -= LOCAL_FUNCTION_BODY_DEPTH;
 
         let constraints_list = match constraints {
             Some(clauses) => self.pool.to_list_and_free(self.base.arena(), clauses),

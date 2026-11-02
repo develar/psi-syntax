@@ -160,6 +160,11 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   statements, declarations, array initializers, types, type argument lists, annotations, patterns and inline doc tags;
   a code block adds 4 to where it sits. Below the limits the tree is PSI's (the deepest community file,
   `Parenth2.java`, reaches 1010 levels, 4 type argument lists, 4 annotations). See DESIGN, "Java nesting".
+  C# (`csharp_syntax::Parser`) runs in a 1 MB stack too: it counts Roslyn's `_recursionDepth` (and the cycles Roslyn
+  leaves unguarded) to 1000 and every consumed token against `green::work_budget_for` (16 a byte, at least 2^20);
+  past either, or past the arena budget, the tree is Roslyn's for an exhausted stack: the whole text one skipped
+  `BadToken` with `ERR_InsufficientStack`, as Roslyn returns at 100 000 levels. Below them the tree is Roslyn's (the
+  corpora reach 678 levels and 1.0 token a byte). See DESIGN, "C# nesting and work".
 - Allocator: psi-syntax uses the system allocator and builds no C. mimalloc 0.1.52 was +12-15 % at 8 and 16
   threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
   noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.
