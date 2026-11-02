@@ -451,7 +451,9 @@ byte-identical. None qualified. The measurements are from the survey prototypes 
 psi-syntax is a library: its consumers' release profiles and flags decide how it is compiled, so the source carries
 the inlining a profile finds (see "Pipeline") and the rest is guidance. The workspace's own release profile (fat LTO,
 one codegen unit, unwinding) is the one the measurements use. Per parse round, one thread, instructions of the parsing
-thread, on the inline hints commit ("Inlining as a profile does it"; the flags were measured on 9b8c26f):
+thread, on the inline hints commit as first measured ("Inlining as a profile does it"; the flags were measured on
+9b8c26f; on the integrated 7ce233e, `scripts/pgo.sh` with the goldens takes Kotlin 35.40 → 31.07 G and Java 43.48 →
+37.7 G, see "The radical batch integrated"):
 
 | build | Kotlin | Java | verdict |
 |---|---|---|---|
@@ -673,7 +675,7 @@ Kotlin, +0.8 G Java), a per-builder table of whitespace runs for the default edg
 collapsed bodies' tokens too), more `inline(always)` on marker operations (+0.2 G, 165 KB of code), a specialized
 end-of-production link (no change).
 
-### Inlining as a profile does it (child of 9b8c26f), 2026-11-02
+### Inlining as a profile does it (measured as a child of 9b8c26f), 2026-11-02
 
 Instructions retired is the primary metric here: the machine ran at load 8-22 throughout, which moves wall time by
 ±15 % between runs but instructions by under 0.2 %. Each parse was wrapped in `thread_selfcounts` (instructions and
@@ -695,6 +697,45 @@ for `LanguageLevel::is_preview` (−0.05 G), `#[inline(always)]` on `done` (+0.8
 out of line (+0.3 G Kotlin). Every hint is also kept by a profile-guided build: PGO on top measures 44.73 G Kotlin and
 57.05 G Java, against 45.07 and 57.37 G for PGO on master. Binary 1384 → 1666 KB. The gate passed.
 
+It landed on the builder core and lexer batches, where it measured Kotlin 36.00 → 35.40 G (−1.7 %) and Java
+44.23 → 43.48 G (−1.7 %), binary 1140 → 1338 KB (see "The radical batch integrated").
+
+### The radical batch integrated (9b8c26f → a49adb7), 2026-11-02
+
+Four branches, each measured against 9b8c26f alone and then landed one at a time, re-measured on what was already in:
+the builder core batch (12 commits through ca327ce), the lexers (be86ab9 tooling, dd84487 file lexers, 194a628 doc
+lexers), the inline and cold hints (7ce233e) and `scripts/pgo.sh` (a49adb7). The gate passed on every code commit's
+own tree. Instructions and cycles per parse round are the difference of `ksdump --bench --repeat 4` and `--repeat 1`
+under `/usr/bin/time -l`, divided by 3; the binaries alternate, two passes at load 1.4-2.6 (a quiet machine), so a
+value repeats within about 0.4 G; MB/s is the bench's own last round in the same runs:
+
+| step | Kotlin instructions | Kotlin cycles | Kotlin MB/s | Java instructions | Java cycles | Java MB/s |
+|---|---|---|---|---|---|---|
+| 9b8c26f | 54.19 G | 9.89-10.07 G | 75.8 | 75.09-75.40 G | 13.76-13.77 G | 69.7 |
+| builder core batch (ca327ce) | 40.74 G (−24.8 %) | 7.66-7.76 G | 99.5 | 58.82-59.12 G (−21.6 %) | 10.63-10.72 G | 89.9 |
+| file lexers (dd84487) | 38.04 G (−6.6 %) | 7.27-7.29 G | 105.0 | 45.29 G (−23.4 %) | 8.13-8.15 G | 117.6 |
+| doc lexers (194a628) | 36.00 G (−5.4 %) | 7.01-7.05 G | 108.7 | 44.23 G (−2.3 %) | 8.00-8.04 G | 119.9 |
+| inline and cold hints (7ce233e) | 35.40 G (−1.7 %) | 6.78-6.80 G | 112.4 | 43.48 G (−1.7 %) | 7.85-7.88 G | 121.6 |
+| the same through `scripts/pgo.sh` (goldens) | 31.07 G (−12.2 %) | 6.16-6.17 G | 124.3 | 37.68-37.79 G (−13.2 %) | 6.88-6.96 G | 137.9 |
+
+In all, 9b8c26f → 7ce233e: Kotlin −34.7 % instructions and −32.6 % cycles, Java −42.3 % and −43.0 %. Wall,
+`scripts/ab.sh` 9b8c26f against 7ce233e at load 1.2-2.9, B faster in every round: one thread Kotlin 77.4 → 114.4
+MB/s (5 rounds, ×1.48), Java 70.5 → 122.7 MB/s (×1.74); 16 threads Kotlin 972 → 1419 MB/s (3 rounds, ×1.46), Java
+922 → 1492 MB/s (×1.62). Java now parses faster per byte than Kotlin.
+
+Not landed, from the same round of branches:
+
+- **One record per node in the finished tree** (kinds beside a `[u32; 4]` of start, end, parent and subtree end) and
+  **opening and closing composites in one bind loop, open markers stashed in the tree**: the builder core batch has
+  both ideas (one build record per node split in the copy-out, a stackless bind), and the branch's own measurement
+  found the split and the two-column layout equal in instructions (53.22 against 53.29 G). The two-column tree walked
+  2.09 against 2.15 ns per node (`--walk`, two runs each, load 1.5), 4 ms a round, 0.2 % of a parse; not worth the
+  conflict with the batch's tree builder.
+- **`Parser::parse_parallel`**, one file's chameleons parsed on scoped threads and stitched in preorder, the file
+  lexed in parts from 64 KB: exact on every gate file and 1.5-1.6× lower latency on the 40 largest files of each list
+  (4-8 threads), but no throughput, since consumers parse files in parallel already, and its driver code was written
+  against the frames the builder core batch replaced. See "Rejected".
+
 ### History (1 thread / 16 threads, alternating A/B medians at each step)
 
 | commit | change | 1 thread MB/s | 16 threads MB/s | other |
@@ -713,7 +754,9 @@ out of line (+0.3 G Kotlin). Every hint is also kept by a profile-guided build: 
 | 36b3b17 | the nesting limit, frames dropping bound tokens | 74.4 → 75.0 (9 rounds, load 3.4-5.1) | | 0 trees changed; 100 000 levels of 22 forms parse on 1 MB |
 | child of 36b3b17 | linked production list | 72.7 → 74.2 (11 rounds, load 4.7-10.3) | | `a+a+…` × 100 000: 4.67 s → 22 ms; 18 chains 14-45 ms |
 | 9b8c26f → the builder core batch | balanced entries, eager cursor, frames in place, brace pairs, stackless bind (10 commits) | 76.6 → 100.1 (5 rounds, load 1.6-2.2); Java 69.4 → 89.9 | 972 → 1278; Java 916 → 1163 | instructions per round 54.21 → 40.76 G, Java 75.40 → 59.13 G |
-| child of 9b8c26f | inline and cold hints where a profile inlines | Kotlin 62.5 → 62.2 (9 rounds, load 9.5-13, noise); Java 56.9 → 63.2 (7 rounds, load 8-12) | | instructions per round Kotlin −3.9 %, Java −8.7 %; core cycles −6 %, −10 %; binary 1384 → 1666 KB |
+| be86ab9 … 194a628 | byte-class lexing loops, keyword hashes, doc-comment runs (on the builder core batch) | 99.5 → 108.7; Java 89.9 → 119.9 (bench, alternating, load 1.4-2.6) | | instructions per round 40.74 → 36.00 G, Java 59.12 → 44.23 G |
+| 7ce233e (measured first as a child of 9b8c26f) | inline and cold hints where a profile inlines | Kotlin 62.5 → 62.2 (9 rounds, load 9.5-13, noise); Java 56.9 → 63.2 (7 rounds, load 8-12) | | instructions per round Kotlin −3.9 %, Java −8.7 %; core cycles −6 %, −10 %; binary 1384 → 1666 KB; on the lexer batch −1.7 % both |
+| 9b8c26f → 7ce233e | the radical batch integrated | 77.4 → 114.4 (5 rounds, load 1.2-1.7); Java 70.5 → 122.7 | 972 → 1419; Java 922 → 1492 | instructions per round 54.19 → 35.40 G, Java 75.40 → 43.48 G |
 
 End to end: 1c8bcfa → f3aa172 measured 39.0 → 63.4 MB/s (×1.63), and f3aa172 → a99fb45 measured 60.8 → 69.1 MB/s
 (×1.14, with 16 threads 684.2 → 917.0). Today's 75.3 MB/s on one thread and 951 MB/s on 16 are about 1.9× and 2.1× the
@@ -737,10 +780,8 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **Java speed.** One thread at 54.5 MB/s (load 14-37; 60.4 at load 12-20 after the nesting guard) against Kotlin's
-  75.3 (load 4-24): Java has 395 nodes per source KB against Kotlin's 369 and no profile yet. Take one
-  (`scripts/profile.py`) and a quiet round before speed work; the Java builder path has no `--features counters`
-  output.
+- **Java speed.** One thread at 122.7 MB/s against Kotlin's 114.4 on 7ce233e (load 1.2-1.7, see "The radical batch
+  integrated"); the Java builder path still has no `--features counters` output.
 - **Java's rolled-back lambda parameters.** `(a<b>c(…` looks like a typed lambda: its parameter list is parsed, with
   PSI's error recovery to the `)` that ends it, then rolled back, at every level. So each level inside the nesting
   limit scans the rest of the text: 10 000 levels of `(a<b>c(` with `)) + 1` or `)) - 1` after take 0.8 s, 100 000
@@ -776,6 +817,6 @@ There is no line-level profile of the current code: `atos` returned no line info
 | oxc's 256-entry byte-handler table and pointer `byte_search` | Need `unsafe`; the safe part (the ASCII table) is built |
 | Exact highlighting from the lexer alone | Soft keywords and `?.`/`?:`/`!!` come from the parser; a lexer-only pass is approximate only |
 | Lazy expansion through interior mutability (`expand(&self)`) | Conflicts with `Send + Sync` and the preorder arena; `parse_body` returns separate trees instead |
-| Parsing one file's chameleons in parallel | Files take milliseconds and consumers already parallelize across files; it breaks preorder construction |
+| Parsing one file's chameleons in parallel | Files take milliseconds and consumers already parallelize across files. Built once (`parse_parallel`, a branch on 9b8c26f: chameleons on scoped threads into their own buffers, stitched in preorder, gate-exact): 1.5-1.6× lower latency on the largest files, no throughput; not landed over the builder core batch's frames (see "The radical batch integrated") |
 | mimalloc inside the crate | Needs a C toolchain; it is the consumer's choice |
 | Shared token starts for chameleons | Measured 0.999× (1 thread) and 0.995× (16 threads); a copy into a warm buffer costs as much as the extra arithmetic on each access |
