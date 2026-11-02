@@ -415,7 +415,9 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
         let mut text_tokens = self.pool.allocate();
         while matches!(
             self.current_kind(),
-            SyntaxKind::XmlTextLiteralToken | SyntaxKind::XmlTextLiteralNewLineToken | SyntaxKind::XmlEntityLiteralToken
+            SyntaxKind::XmlTextLiteralToken
+                | SyntaxKind::XmlTextLiteralNewLineToken
+                | SyntaxKind::XmlEntityLiteralToken
         ) {
             let token = self.eat_token();
             text_tokens.push(token);
@@ -563,7 +565,11 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
             at = seen.previous;
         }
         let previous = self.seen_index.insert(hash, self.attributes_seen.len() as u32).unwrap_or(u32::MAX);
-        self.attributes_seen.push(SeenAttribute { start: self.seen_text.len() as u32, len: name.len() as u32, previous });
+        self.attributes_seen.push(SeenAttribute {
+            start: self.seen_text.len() as u32,
+            len: name.len() as u32,
+            previous,
+        });
         self.seen_text.extend_from_slice(name);
         true
     }
@@ -1049,8 +1055,12 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
         self.reset_mode(save_mode);
         let a = self.base.arena();
         let list = a.list(&text_tokens);
-        let result =
-            a.xml_processing_instruction(start_processing_instruction_token, name, list, end_processing_instruction_token);
+        let result = a.xml_processing_instruction(
+            start_processing_instruction_token,
+            name,
+            list,
+            end_processing_instruction_token,
+        );
         self.pool.free(text_tokens);
         result
     }
@@ -1178,8 +1188,11 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
         debug_assert!(self.current_contextual_kind() == SyntaxKind::ExtensionKeyword);
 
         let identifier_token = self.eat_token();
-        let type_arguments =
-            if self.current_kind() == SyntaxKind::LessThanToken { self.parse_type_arguments(true) } else { Green::NULL };
+        let type_arguments = if self.current_kind() == SyntaxKind::LessThanToken {
+            self.parse_type_arguments(true)
+        } else {
+            Green::NULL
+        };
         let parameters = if self.current_kind() == SyntaxKind::OpenParenToken {
             self.parse_cref_parameter_list()
         } else {
@@ -1226,7 +1239,8 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
             let (offset, width) = self.get_diagnostic_span_for_missing_node_or_token(operator_token);
 
             let current = self.current_kind();
-            if facts::is_unary_operator_declaration_token(current) || facts::is_binary_expression_operator_token(current)
+            if facts::is_unary_operator_declaration_token(current)
+                || facts::is_binary_expression_operator_token(current)
             {
                 let token = self.eat_token();
                 operator_token = self.add_trailing_skipped_syntax(operator_token, token);
@@ -1588,7 +1602,11 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
     }
 
     /// `private TypeSyntax ParseCrefType(bool typeArgumentsMustBeIdentifiers, bool checkForMember = false)` (DocumentationCommentParser.cs:1420).
-    pub(crate) fn parse_cref_type(&mut self, type_arguments_must_be_identifiers: bool, check_for_member: bool) -> Green {
+    pub(crate) fn parse_cref_type(
+        &mut self,
+        type_arguments_must_be_identifiers: bool,
+        check_for_member: bool,
+    ) -> Green {
         let type_without_suffix = self.parse_cref_type_helper(type_arguments_must_be_identifiers, check_for_member);
         if type_arguments_must_be_identifiers {
             type_without_suffix
@@ -1740,7 +1758,8 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
                 // If it's a real '<' (not &lt;, etc), then we assume it's the beginning
                 // of the next XML element.
                 let current = self.current_token();
-                self.arena_ref().token_text(current, self.src()) == facts::get_text(SyntaxKind::LessThanToken).as_bytes()
+                self.arena_ref().token_text(current, self.src())
+                    == facts::get_text(SyntaxKind::LessThanToken).as_bytes()
                     || self.is_non_ascii_quotation_mark(current)
             }
             _ => false,
@@ -1783,7 +1802,8 @@ impl<'l, 't> DocumentationCommentParser<'l, 't> {
                 // If it's a real '<' (not &lt;, etc), then we assume it's the beginning
                 // of the next XML element.
                 let current = self.current_token();
-                self.arena_ref().token_text(current, self.src()) == facts::get_text(SyntaxKind::LessThanToken).as_bytes()
+                self.arena_ref().token_text(current, self.src())
+                    == facts::get_text(SyntaxKind::LessThanToken).as_bytes()
                     || self.is_non_ascii_quotation_mark(current)
             }
             _ => false,
