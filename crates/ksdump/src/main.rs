@@ -2,8 +2,7 @@
 //!
 //! Each file's language is `--lang kotlin|java` when given, else its extension: `.java` is Java, anything else Kotlin.
 //! `--lex`, `--out`, `--bench` and `--check-bodies` take Java files (`crates/java-syntax`); a `--bench` or
-//! `--check-bodies` list is of one language, and `--lex --bench` refuses a Java file with exit status 2 before anything
-//! runs (the lexer bench is Kotlin's).
+//! `--check-bodies` list (`--lex --bench` too) is of one language, else ksdump exits with status 2 before anything runs.
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -24,7 +23,8 @@
 //!   `/usr/bin/time -l` (the sources stay loaded: subtract their MB).
 //! - `ksdump --lex --list LIST --root ROOT [--dump]`: one line per file as `scripts/LexOracle.java` (Kotlin) or
 //!   `tools/java-oracle/JavaLexOracle.java` (Java; a list line may carry the level: `PATH<TAB>LEVEL`) prints it;
-//!   with `--bench [--repeat K]`, the MB/s of the Kotlin lexer alone instead.
+//!   with `--bench [--repeat K] [--docs]`, the MB/s of the file lexer alone instead (Kotlin's or Java's), and with
+//!   `--docs` also of the doc-comment lexer over every doc comment, timed apart.
 //! - `ksdump --check-bodies --list LIST --root ROOT`: parses each file in full and body-less and checks that the full
 //!   tree's leaves are the text and `parse_body` of every unexpanded body is the full tree's subtree there (the same
 //!   kinds, ranges, error messages and shape); prints the bodies, the differing ones (their paths and ranges) and
@@ -43,8 +43,6 @@ use std::time::Instant;
 
 use kotlin_syntax::counters::{self, AnyCounter};
 use kotlin_syntax::dump::psi_to_string;
-use kotlin_syntax::kdoc::lexer::KDocLexer;
-use kotlin_syntax::lexer::KotlinLexer;
 use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
 use kotlin_syntax::psi_builder::{self, Language};
 use kotlin_syntax::tokens::TokenKind;
@@ -64,7 +62,7 @@ fn usage() -> ! {
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
          (--nesting-limit N: parse with that nesting limit)\n  \
          ksdump --lex --list LIST --root ROOT [--dump]       lexer hash lines as scripts/LexOracle.java prints them\n  \
-         ksdump --lex --bench --list LIST --root ROOT [--repeat K]   lexer throughput\n  \
+         ksdump --lex --bench --list LIST --root ROOT [--repeat K] [--docs]   lexer throughput (--docs: doc comments too)\n  \
          (--lang kotlin|java: the files' language; by default `.java` is Java, anything else Kotlin)"
     );
     std::process::exit(2)
@@ -102,6 +100,7 @@ struct Args {
     nesting_limit: Option<u32>,
     lang: Option<Lang>,
     node: bool,
+    docs: bool,
 }
 
 fn parse_args() -> Args {
@@ -119,6 +118,7 @@ fn parse_args() -> Args {
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
             "--node" => args.node = true,
+            "--docs" => args.docs = true,
             "--threads" => args.threads = count(it.next()),
             "--walk" => args.walk = true,
             "--no-bodies" => args.no_bodies = true,
@@ -202,25 +202,27 @@ fn escape(text: &[u8]) -> String {
     String::from_utf8_lossy(text).replace('\\', "\\\\").replace('\n', "\\n").replace('\t', "\\t")
 }
 
-/// The hash and token count `LexOracle.java` prints (KDoc tokens hashed inside `[` `]` after their doc comment).
+/// The hash and token count `LexOracle.java` prints (KDoc tokens hashed inside `[` `]` after their doc comment), of the
+/// tokens a parse lexes: `lexer::tokenize_into` and, in each doc comment, `kdoc::lexer::tokenize_into`.
 fn lex_line(text: &[u8], dump: bool, out: &mut String) -> (u64, usize) {
     let mut hash = Fnv(0xcbf29ce484222325);
     let mut count = 0;
-    let mut lexer = KotlinLexer::new(text);
-    while let Some(t) = lexer.advance() {
-        let token_text = &text[t.start..t.end];
-        hash.feed(format!("{}:{};", t.kind.debug_name(), token_text.len()).as_bytes());
+    let lexed = kotlin_syntax::lexer::tokenize(text);
+    let (mut kdoc_types, mut kdoc_starts) = (Vec::new(), Vec::new());
+    for (i, kind) in lexed.types.iter().enumerate() {
+        let token_text = &text[lexed.starts[i] as usize..lexed.starts[i + 1] as usize];
+        hash.feed(format!("{}:{};", kind.debug_name(), token_text.len()).as_bytes());
         if dump {
-            out.push_str(&format!("  {} {}\n", t.kind.debug_name(), escape(token_text)));
+            out.push_str(&format!("  {} {}\n", kind.debug_name(), escape(token_text)));
         }
-        if t.kind == TokenKind::DOC_COMMENT {
+        if *kind == TokenKind::DOC_COMMENT {
             hash.feed(b"[");
-            let mut kdoc = KDocLexer::new(token_text);
-            while let Some(k) = kdoc.advance() {
-                let k_text = &token_text[k.start..k.end];
-                hash.feed(format!("{}:{};", k.kind.debug_name(), k_text.len()).as_bytes());
+            kotlin_syntax::kdoc::lexer::tokenize_into(token_text, &mut kdoc_types, &mut kdoc_starts);
+            for (k, kind) in kdoc_types.iter().enumerate() {
+                let k_text = &token_text[kdoc_starts[k] as usize..kdoc_starts[k + 1] as usize];
+                hash.feed(format!("{}:{};", kind.debug_name(), k_text.len()).as_bytes());
                 if dump {
-                    out.push_str(&format!("    {} {}\n", k.kind.debug_name(), escape(k_text)));
+                    out.push_str(&format!("    {} {}\n", kind.debug_name(), escape(k_text)));
                 }
                 count += 1;
             }
@@ -233,26 +235,27 @@ fn lex_line(text: &[u8], dump: bool, out: &mut String) -> (u64, usize) {
 
 /// The hash and token count `tools/java-oracle/JavaLexOracle.java` prints: `JavaLexer` at `level`, the
 /// `JavaDocLexer` tokens of each doc comment (at `LanguageLevel.HIGHEST`, as `JavaDocCommentParser` lexes it) hashed
-/// inside `[` `]` after it.
+/// inside `[` `]` after it; of the tokens a parse lexes (`lexer::tokenize_into`, `doc_lexer::tokenize_into`).
 fn java_lex_line(text: &[u8], level: java_syntax::LanguageLevel, dump: bool, out: &mut String) -> (u64, usize) {
     use java_syntax::TokenKind as JavaToken;
     let mut hash = Fnv(0xcbf29ce484222325);
     let mut count = 0;
-    let mut lexer = java_syntax::lexer::JavaLexer::new(level, text);
-    while let Some((kind, start, end)) = lexer.next_token() {
-        let token_text = &text[start..end];
+    let lexed = java_syntax::lexer::tokenize(text, level);
+    let (mut doc_types, mut doc_starts) = (Vec::new(), Vec::new());
+    for (i, kind) in lexed.types.iter().enumerate() {
+        let token_text = &text[lexed.starts[i] as usize..lexed.starts[i + 1] as usize];
         hash.feed(format!("{}:{};", kind.debug_name(), token_text.len()).as_bytes());
         if dump {
             out.push_str(&format!("  {} {}\n", kind.debug_name(), escape(token_text)));
         }
         if matches!(kind, JavaToken::DOC_COMMENT | JavaToken::DOC_MARKDOWN_COMMENT) {
             hash.feed(b"[");
-            let mut doc = java_syntax::doc_lexer::JavaDocLexer::new(true, token_text);
-            while let Some((k, s, e)) = doc.next_token() {
-                let k_text = &token_text[s..e];
-                hash.feed(format!("{}:{};", k.debug_name(), k_text.len()).as_bytes());
+            java_syntax::doc_lexer::tokenize_into(token_text, true, &mut doc_types, &mut doc_starts);
+            for (k, kind) in doc_types.iter().enumerate() {
+                let k_text = &token_text[doc_starts[k] as usize..doc_starts[k + 1] as usize];
+                hash.feed(format!("{}:{};", kind.debug_name(), k_text.len()).as_bytes());
                 if dump {
-                    out.push_str(&format!("    {} {}\n", k.debug_name(), escape(k_text)));
+                    out.push_str(&format!("    {} {}\n", kind.debug_name(), escape(k_text)));
                 }
                 count += 1;
             }
@@ -359,12 +362,6 @@ fn main() {
     // A Java list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
     let is_java = |line: &&String| Lang::of(line.split('\t').next().unwrap_or(line), args.lang) == Lang::Java;
     let java_files = paths.iter().filter(is_java).count();
-    if args.lex
-        && let Some(java) = paths.iter().find(is_java)
-    {
-        eprintln!("{java}: the Java lexer is not benchmarked yet");
-        std::process::exit(2);
-    }
     if (args.bench || args.check_bodies) && java_files != 0 && java_files != paths.len() {
         eprintln!("the list mixes Java and Kotlin files ({java_files} of {} are Java)", paths.len());
         std::process::exit(2);
@@ -373,7 +370,7 @@ fn main() {
     let mut stdout = std::io::BufWriter::new(stdout.lock());
 
     if args.lex && args.bench {
-        lex_bench(&args, root, &paths, &mut stdout);
+        lex_bench(&args, root, &paths, java_files != 0, &mut stdout);
         return;
     }
 
@@ -684,19 +681,61 @@ fn percentile(sorted: &[u64], p: f64) -> u64 {
     if sorted.is_empty() { 0 } else { sorted[((sorted.len() - 1) as f64 * p).round() as usize] }
 }
 
-/// `--bench --lex`: the Kotlin lexer alone (`lexer::tokenize_into`, one buffer reused), one thread, per round.
-fn lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {
-    let sources: Vec<Vec<u8>> = paths.iter().filter_map(|p| read_source(root, p, args.trim)).collect();
-    let mb = sources.iter().map(Vec::len).sum::<usize>() as f64 / 1e6;
-    let mut lexed = kotlin_syntax::lexer::Lexed::default();
+/// `--bench --lex`: the file lexer alone (Kotlin's `lexer::tokenize_into`, Java's at the line's level; one buffer
+/// reused), one thread, per round; with `--docs` also the doc-comment lexer (`KDocLexer`, `JavaDocLexer`) over every
+/// doc comment the file lexer found, as a parse lexes its doc chameleons, timed apart.
+fn lex_bench(args: &Args, root: &Path, paths: &[String], java: bool, stdout: &mut impl Write) {
+    use java_syntax::TokenKind as JavaToken;
+    let sources: Vec<(Vec<u8>, java_syntax::LanguageLevel)> = paths
+        .iter()
+        .filter_map(|line| {
+            let mut columns = line.split('\t');
+            let path = columns.next().unwrap_or(line);
+            let level = columns
+                .next()
+                .and_then(java_syntax::LanguageLevel::from_name)
+                .unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+            read_source(root, path, args.trim).map(|text| (text, level))
+        })
+        .collect();
+    let mb = sources.iter().map(|s| s.0.len()).sum::<usize>() as f64 / 1e6;
+    let mut kotlin = kotlin_syntax::lexer::Lexed::default();
+    let mut java_lexed = java_syntax::lexer::Lexed::default();
+    // The doc comments of every file (file index, range), found once before the rounds.
+    let mut docs: Vec<(usize, std::ops::Range<usize>)> = Vec::new();
+    if args.docs {
+        for (i, (text, level)) in sources.iter().enumerate() {
+            if java {
+                java_syntax::lexer::tokenize_into(text, *level, &mut java_lexed);
+                for (t, kind) in java_lexed.types.iter().enumerate() {
+                    if matches!(kind, JavaToken::DOC_COMMENT | JavaToken::DOC_MARKDOWN_COMMENT) {
+                        docs.push((i, java_lexed.starts[t] as usize..java_lexed.starts[t + 1] as usize));
+                    }
+                }
+            } else {
+                kotlin_syntax::lexer::tokenize_into(text, &mut kotlin);
+                for (t, kind) in kotlin.types.iter().enumerate() {
+                    if *kind == TokenKind::DOC_COMMENT {
+                        docs.push((i, kotlin.starts[t] as usize..kotlin.starts[t + 1] as usize));
+                    }
+                }
+            }
+        }
+    }
+    let doc_mb = docs.iter().map(|d| d.1.len()).sum::<usize>() as f64 / 1e6;
+    let (mut kdoc_types, mut java_doc_types, mut doc_starts) = (Vec::new(), Vec::new(), Vec::new());
     let mut round_mbs = Vec::new();
     for round in 1..=args.repeat {
         let (mut tokens, mut seconds) = (0usize, 0.0);
-        for text in &sources {
+        for (text, level) in &sources {
             let start = Instant::now();
-            kotlin_syntax::lexer::tokenize_into(text, &mut lexed);
+            if java {
+                java_syntax::lexer::tokenize_into(text, *level, &mut java_lexed);
+            } else {
+                kotlin_syntax::lexer::tokenize_into(text, &mut kotlin);
+            }
             seconds += start.elapsed().as_secs_f64();
-            tokens += lexed.len();
+            tokens += if java { java_lexed.len() } else { kotlin.len() };
         }
         let mbs = mb / seconds.max(1e-9);
         round_mbs.push(mbs);
@@ -706,6 +745,26 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write
             "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
             sources.len()
         );
+        if args.docs {
+            let (mut doc_tokens, start) = (0usize, Instant::now());
+            for (i, range) in &docs {
+                let text = &sources[*i].0[range.clone()];
+                if java {
+                    java_syntax::doc_lexer::tokenize_into(text, true, &mut java_doc_types, &mut doc_starts);
+                    doc_tokens += java_doc_types.len();
+                } else {
+                    kotlin_syntax::kdoc::lexer::tokenize_into(text, &mut kdoc_types, &mut doc_starts);
+                    doc_tokens += kdoc_types.len();
+                }
+            }
+            let doc_seconds = start.elapsed().as_secs_f64();
+            let _ = writeln!(
+                stdout,
+                "{prefix}docs {}  MB {doc_mb:.2}  seconds {doc_seconds:.3}  MB/s {:.1}  tokens {doc_tokens}",
+                docs.len(),
+                doc_mb / doc_seconds.max(1e-9)
+            );
+        }
     }
     if args.repeat > 1 {
         let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
