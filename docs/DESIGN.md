@@ -408,8 +408,9 @@ failure is its only answer to an input it will not parse.
   functions), where Roslyn's stack still holds. At 100 000 levels every form compared fails in both with the same
   tree, CS8078 at the same offset (26 forms so far; Roslyn needs minutes for others); Roslyn's process itself dies of a
   stack overflow on 100 000 nested array initializers (`ParseArrayInitializer` and `ParseVariableInitializer`,
-  unguarded, 82 249 frames in 64 MB) and on 100 000 nested interpolated strings (its lexer's
-  `ScanInterpolatedStringLiteralHoleBalancedText`, 58 263 frames).
+  unguarded, 82 249 frames in 64 MB), on 100 000 nested interpolated strings (its lexer's
+  `ScanInterpolatedStringLiteralHoleBalancedText`, 58 263 frames) and on 100 000 nested patterns (`ParsePattern`,
+  `ParsePatternContinued`, `ParsePrimaryPattern`, 68 765 frames).
 - **Work.** Speculation (a reset point, a scan or a trial parse, a rollback) repeats the work of what it covers, and
   nested it multiplies: `[[[…` parses an attribute list over the rest at every level (10.8 s for 100 000 levels),
   `a?[a?[…` parses the rest twice at every level (1.3 s for 400; Roslyn did not finish 900 in 25 minutes). Every token
@@ -556,6 +557,49 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### C# parse throughput and robustness (43ed5b13), 2026-11-02
+
+`ksdump --bench --lang csharp` (parse and flatten, files read before timing) over the four corpora of
+tools/csharp-oracle, alternating in each round with tree-sitter-c-sharp 0.23.5 on tree-sitter 0.25.10 (C core, outside
+the workspace as for Java: one `tree_sitter::Parser` per thread, the same bytes, `parse(text, None)`, fat LTO). Each
+run is `--repeat 3` and gives its median; one thread reports the summed parse time, 16 threads the wall time. 3
+rounds; the 5-minute load at the start of the runs was 5-39, so the figures are lower bounds and the rounds vary by up
+to 1.5×. Medians over the rounds, MB/s, with the median of the per-round ratios:
+
+| corpus (files, MB) | ours, 1 thread | tree-sitter, 1 thread | ratio | ours, 16 threads | tree-sitter, 16 threads | ratio |
+|---|---|---|---|---|---|---|
+| dotnet/roslyn (17 075, 249.94) | 113.4 | 16.5 | 5.77× | 1245.1 | 167.6 | 8.53× |
+| dotnet/runtime (31 267, 426.88) | 59.2 | 11.7 | 5.52× | 443.0 | 58.6 | 5.44× |
+| dotnet/aspnetcore (10 188, 62.04) | 65.3 | 12.5 | 5.29× | 1027.7 | 111.6 | 9.21× |
+| Avalonia (4 085, 23.59) | 83.2 | 14.5 | 5.52× | 1016.7 | 115.3 | 8.80× |
+
+The runtime corpus at 16 threads waits for its largest files: `hugeexpr1.cs` (24.12 MB, lines 600 parentheses deep)
+parses in 1.1 s alone (21.3 MB/s). On 93d30b1a, before "Replay finished tuple type scans", it took 21.7 s and the
+corpus ran at 6.7 MB/s on one thread (load 20); instructions per parse round (one thread, the difference of
+`--repeat 2` and `--repeat 1` under `/usr/bin/time -l`) went 649 → 155 G on runtime, 56.5 → 55.9 G on roslyn,
+18.2 → 17.2 G on aspnetcore and 6.85 → 6.39 G on Avalonia, all trees unchanged (the gate; the 6 runtime files without
+an oracle dump byte-identical to 93d30b1a's dumps). That is 0.22-0.36 G instructions per source MB, against Kotlin's
+0.205 and Java's 0.201 ("Current").
+
+The trees (deterministic): roslyn 55 559 618 nodes, 5.00 MB of tree per source MB, 22.5 bytes a node; runtime
+162 757 775, 7.86 MB, 20.6 (the largest tree 248.2 MB); aspnetcore 20 660 580, 6.99 MB, 21.0; Avalonia 8 001 383,
+7.11 MB, 20.9. tree-sitter-c-sharp reports an error (`has_error`) in 927, 1152, 151 and 96 files; Roslyn in 41, 29,
+16 and 2.
+
+Robustness, `tests/robustness.rs` at load 15-40 on 43ed5b13 (see "C# nesting and work"): before that commit nested
+local functions overflowed a 1 MB stack at 1000 levels and `a?.b?.…` at 100 000; 100 000 levels of `[[[…` took
+10.8 s, of `[..` 12.0 s, of `a?[` 2.9 s (161 ms at 100), of stray `}` after a class 3.7 s, of excluded `#if` 3.4 s,
+and 800 nested parentheses 22.7 ms (quadratic). Now the slowest of the 153 forms at 100 000 levels is `a?[` at
+210 ms, of the 101 chains `join` clauses at 118 ms.
+
+A first profile of the roslyn corpus (`scripts/profile.py`, one thread, 43ed5b13's parent): flattening the green tree
+13.6 % self (`Flattener::run`, with `Walk` 3.5 %), the lexer about 25 % (`lex`, identifiers, trivia, whitespace),
+`current_kind` 9.1 %, `push_node` 5.8 % plus its `memmove`. Bounding `PreLex`'s UTF-16 count of the window, 3.8 % of
+`SyntaxParser::new` in that profile, moved no instructions beyond noise (−1.8 % to +0.6 % per corpus) and was not
+kept.
+
+The gate passed on 43ed5b13.
 
 ### Current, 72c8c11 (the code of 7ce233e), 2026-11-02
 
@@ -889,6 +933,12 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
+- **C# speed.** 59-113 MB/s on one thread against Kotlin's and Java's 111-120 on a quiet machine, at 0.22-0.36 G
+  instructions per source MB; no line-level profile yet. Flattening (about 18 %) and the token window (`current_kind`, 9 %)
+  are the first candidates. A quiet-machine run of the table in "C# parse throughput and robustness" is open.
+- **C# speculation below the budget.** `a?[0]?[0]…` (17 or more) and 100 000 `a < a < …` fail as too deep; Roslyn
+  parses the former in seconds and would recurse 100 000 deep for the latter. A memo of `?[`'s speculation, as of
+  tuple scans, would make the first polynomial.
 - **Java speed.** One thread at 120.0 MB/s against Kotlin's 111.3 on 72c8c11 (load 1.5-1.7, "Current"): 0.201 G
   instructions per source MB against Kotlin's 0.205 G. The Java builder path still has no `--features counters`
   output.
