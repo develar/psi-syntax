@@ -55,6 +55,27 @@ verbatim. `java-syntax` implements `psi_builder::Language` as `kotlin-syntax` do
 | Parsers | `parser/*.kt` | `parser/*.rs`, one file per Kotlin file; `JavaParser` wires them; the one unported method, `JavaParserUtil.stoppingBuilder(builder, condition)` (JavaParserUtil.kt:133), has no caller in intellij-community and no stub (`java_parser_util.rs` says why) |
 | Messages, levels | `resources/messages/JavaSyntaxBundle.properties`, `pom/java/LanguageLevel.kt`, `JavaFeature.kt` | `bundle.rs`, `language_level.rs` |
 
+### C# (pins and oracle)
+
+dotnet/roslyn at 35d9211b841e7613c1d2f8f5af6d628ace696c4c (branch release/insiders, no tag contains it), the commit
+NuGet `Microsoft.CodeAnalysis.CSharp` 5.9.0 is built from: the lexer and parser under
+`src/Compilers/CSharp/Portable/Parser/`, the kinds and node shapes under `src/Compilers/CSharp/Portable/Syntax/`
+(`SyntaxKind.cs`, `Syntax.xml`), messages in `src/Compilers/CSharp/Portable/CSharpResources.resx`. Read them with
+`git -C ~/.cache/psi-syntax/roslyn show 35d9211b841e7613c1d2f8f5af6d628ace696c4c:<path>` (a blobless clone), never
+from a working tree. Scope: full parses of `.cs` files at `LanguageVersion.Latest` (gated at Preview too),
+`DocumentationMode.Parse`, diagnostics included; no scripts, preprocessor symbols, incremental parsing or node cache.
+
+The oracle is that package on .NET SDK 10.0.403 (`~/.cache/psi-syntax/dotnet`, pinned by `global.json`, packages by
+`packages.lock.json`): `tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version latest|preview]
+[--doc parse|none]` writes `OUT/<path>.tree.txt` and `index.jsonl`; `oracle.sh lex --list LIST --root ROOT [--doc ...]`
+prints the lexer hash lines. `tools/csharp-oracle/README.md` is the normative dump format, the goldens' extraction and
+the caches: `testdata/csharp/` (7051 goldens of Roslyn's parser and lexer tests, `manifest.tsv` with version, entry
+and documentation mode), the corpora dotnet/roslyn at the pin, dotnet/runtime and dotnet/aspnetcore v10.0.14,
+AvaloniaUI/Avalonia 12.1.4 under `~/.cache/psi-syntax/csharp-src/` with lists in `corpus/csharp-*.list`, dumps in
+`oracle/csharp-*` (and `-preview`), lexer lines in `lex/csharp-*`, mutations and lexer fuzz in `fuzz/csharp-*`;
+`tools/csharp-oracle/caches.sh` rebuilds them, `vendor-goldens.sh` the goldens. `scripts/compare.py` compares
+`.tree.txt` dumps as it does `.psi.txt`.
+
 ## Layout
 
 Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` under `crates/psi-builder/`.
