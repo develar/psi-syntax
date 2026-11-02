@@ -13,7 +13,7 @@ pub mod token_set;
 pub mod tree;
 
 pub use builder::{AsPsiBuilder, Marker, Nesting, PsiBuilderImpl, WhitespacesAndCommentsBinder};
-pub use language::{ElementType, ElementTypeOf, Language, NodeType, TokenType};
+pub use language::{ElementType, ElementTypeOf, Language, NodeType, TokenType, TreeLanguage};
 pub use lexer::Lexed;
 pub use token_set::ElementTypeSet;
-pub use tree::{Chameleon, NodeId, ParseOptions, Parser, Tree};
+pub use tree::{Chameleon, NodeId, ParseOptions, Parser, Tree, TreeBuilder};

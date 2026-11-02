@@ -5,13 +5,13 @@
 //! when it has no children; a leaf prints its label and `('<text>')`. In texts only `\n`, `\r` and `\t` are escaped
 //! (`DebugUtil.fixWhiteSpaces`). The whole dump is trimmed (`String.trim()`).
 
-use crate::language::Language;
+use crate::language::TreeLanguage;
 use crate::tree::{NodeId, Tree};
 
 /// The dump of the subtree at `node`, indented from 0. `label(tree, id, out)` appends what PSI's `toString()` prints
 /// for the node: for Kotlin `PsiElement(<type>)`, `PsiWhiteSpace` or `PsiComment(<type>)` for a leaf, the element
 /// type, `KtFile: <name>` or `PsiErrorElement:<message>` for a composite.
-pub fn psi_to_string_with<L: Language>(
+pub fn psi_to_string_with<L: TreeLanguage>(
     tree: &Tree<L>,
     node: NodeId,
     mut label: impl FnMut(&Tree<L>, NodeId, &mut String),

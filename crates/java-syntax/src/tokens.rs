@@ -303,8 +303,8 @@ pub type ElementType = psi_builder::ElementType<TokenKind, NodeKind>;
 
 impl psi_builder::TokenType for TokenKind {
     #[inline(always)]
-    fn index(self) -> u8 {
-        self as u8
+    fn index(self) -> u16 {
+        self as u16
     }
 
     #[inline(always)]
@@ -423,7 +423,7 @@ impl TokenSet {
         let mut bits = ElementTypeSet::EMPTY;
         let mut i = 0;
         while i < nodes.len() {
-            bits = bits.with(256 + nodes[i] as usize);
+            bits = bits.with(<TokenKind as psi_builder::TokenType>::NODE_BASE + nodes[i] as usize);
             i += 1;
         }
         TokenSet { bits }

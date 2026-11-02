@@ -161,8 +161,8 @@ nodes! {
 
 impl psi_builder::NodeType for NodeKind {
     #[inline(always)]
-    fn index(self) -> u8 {
-        self as u8
+    fn index(self) -> u16 {
+        self as u16
     }
 
     #[inline(always)]

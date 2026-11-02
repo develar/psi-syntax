@@ -17,12 +17,16 @@ use crate::tree::{FileKind, LazyKind};
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Kotlin;
 
-impl psi_builder::Language for Kotlin {
+impl psi_builder::TreeLanguage for Kotlin {
     type Token = TokenKind;
     type Node = NodeKind;
+    type FileKind = FileKind;
+    const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
+}
+
+impl psi_builder::Language for Kotlin {
     type Binder = Binder;
     type Lazy = LazyKind;
-    type FileKind = FileKind;
     type Frame = SemanticWhitespaceAwarePsiBuilderImpl;
 
     #[inline(always)]
@@ -32,7 +36,6 @@ impl psi_builder::Language for Kotlin {
 
     /// `KtNodeTypes.KT_FILE` (printed as "KtFile: <name>").
     const FILE: NodeKind = NodeKind::KT_FILE;
-    const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
 
     /// `KtTokens.WHITESPACES` or `KtTokens.COMMENTS`.
     #[inline(always)]

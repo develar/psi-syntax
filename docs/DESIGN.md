@@ -44,7 +44,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 | `ksdump` | the binary | `kotlin-syntax`, `java-syntax` |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
-`ParserDefinition` and from element types: `Token`, `Node` (each with a dense index below 256 and a debug name),
+`ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),
 `Binder`, `Lazy` (what a chameleon is reparsed with), `FileKind`, `Frame` (a builder with the language layers' state over it, `frame_builder`),
 `FILE`, `ERROR_ELEMENT`, `is_whitespace_or_comment`, `is_left_bound`, `is_chameleon_token`, `chameleon`, `is_body`,
 `joined_token_type` (the cursor cache's derived token), `bracket_depth_change` (the too-deep skip), `tokenize_into`,
@@ -53,6 +53,12 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 ways to a builder (the body's file tokens when they lex alone the same, else relexed; relexed; the caller's own tokens).
 `kotlin_syntax::{Tree, Parser, PsiBuilderImpl, ElementType}` are aliases of the generic types for `Kotlin`, so the
 Kotlin parsers and consumers name them as before.
+
+`Token`, `Node`, `FileKind` and `ERROR_ELEMENT` form the supertrait `TreeLanguage`: all that `Tree<L>`, its consumer
+API and the dump's layout need. A language whose parser does not run on `PsiBuilderImpl` (C#, ported from Roslyn,
+which builds green nodes bottom-up and hangs trivia on tokens) implements only `TreeLanguage` and fills a tree in
+preorder through `TreeBuilder<L>` (`open`, `leaf`, `close`, `set_trailing`, `set_missing`, `set_error`, `finish`).
+The split changed none of the 25 counters on Kotlin or Java.
 
 Everything is monomorphized per language; nothing is `dyn`. A function the Kotlin crate's own code used to inline may
 be instantiated differently from another crate: `skip_whitespace`, inlined before, became a call on every cursor move
@@ -382,7 +388,7 @@ A tree is three columns over the node ids, in preorder:
 
 | column | type | holds |
 |---|---|---|
-| `kinds` | `u16` | `ElementType::index` (tokens below 256, composite types from 256), `LEAF` bit, `UNEXPANDED` bit |
+| `kinds` | `u16` | `ElementType::index` (12 bits: tokens below `NODE_BASE`, composite types from it), `LEAF` bit, `UNEXPANDED` bit, `TRAILING` and `MISSING` bits (Roslyn's trailing trivia and missing tokens; Kotlin and Java never set them) |
 | `ranges` | `[u32; 2]` | start and end byte |
 | `links` | `[u32; 2]` | parent and subtree end |
 

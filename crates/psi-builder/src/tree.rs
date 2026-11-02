@@ -16,7 +16,7 @@ use crate::builder::{NESTING_CHAMELEON, Pending, PsiBuilderImpl, TOO_DEEPLY_NEST
 /// table); above it, every frame of a deep chain of bodies would count again the tokens the frame around it counted.
 pub const SHARED_BLOCK_DEPTH: u32 = 64;
 use crate::counters::{Counter, add};
-use crate::language::{ElementType, ElementTypeOf, Language, NodeType, TokenType};
+use crate::language::{ElementType, ElementTypeOf, Language, NodeType, TokenType, TreeLanguage};
 use crate::lexer::Lexed;
 
 /// A node of a `Tree`.
@@ -29,8 +29,14 @@ const NONE: u32 = u32::MAX;
 const LEAF: u16 = 0x8000;
 /// `kinds` bit of a block or lambda left unexpanded (`ParseOptions::expand_bodies`).
 const UNEXPANDED: u16 = 0x4000;
+/// `kinds` bit of a node that belongs to the token before it rather than to the one after it: Roslyn's trailing trivia
+/// (`TreeBuilder::set_trailing`). Languages whose whitespace and comments PSI places by binders never set it.
+const TRAILING: u16 = 0x2000;
+/// `kinds` bit of a token the parser inserted where one was expected (Roslyn's `IsMissing`): an empty leaf
+/// (`TreeBuilder::set_missing`). Kotlin and Java never set it (PSI reports an error element instead).
+const MISSING: u16 = 0x1000;
 /// `kinds` bits of the element type's `ElementType::index`.
-const KIND_INDEX: u16 = 0x3FFF;
+const KIND_INDEX: u16 = 0x0FFF;
 
 /// The arena a builder appends to, nodes in preorder: a node's subtree is the ids `id..subtree_end[id]`, so its first
 /// child is `id + 1` when it has one and the next sibling of a child is its `subtree_end` while that is inside the
@@ -102,7 +108,7 @@ impl TreeData {
     /// A token leaf as the next node, a child of `parent`.
     #[inline(always)]
     pub(crate) fn add_token_leaf<T: TokenType>(&mut self, parent: u32, token: T, start: u32, end: u32) {
-        self.push(parent, token.index() as u16 | LEAF, start, end);
+        self.push(parent, token.index() | LEAF, start, end);
     }
 
     /// Closes a composite: its byte end, and its subtree ends at the last node appended.
@@ -170,7 +176,7 @@ impl TreeData {
 }
 
 /// A parsed file of language `L`.
-pub struct Tree<L: Language> {
+pub struct Tree<L: TreeLanguage> {
     text: Arc<[u8]>,
     file_kind: L::FileKind,
     data: TreeData,
@@ -541,6 +547,13 @@ impl<L: Language> Tree<L> {
         Parser::new().parse(text, file_kind)
     }
 
+    /// `Parser::parse_body` on a fresh parser, every body inside expanded.
+    pub fn parse_body(&self, id: NodeId) -> Option<Tree<L>> {
+        Parser::new().parse_body(self, id, ParseOptions::default())
+    }
+}
+
+impl<L: TreeLanguage> Tree<L> {
     /// The parsed text.
     pub fn source(&self) -> &[u8] {
         &self.text
@@ -609,15 +622,24 @@ impl<L: Language> Tree<L> {
         self.data.kinds[id.0 as usize] & UNEXPANDED != 0
     }
 
-    /// `Parser::parse_body` on a fresh parser, every body inside expanded.
-    pub fn parse_body(&self, id: NodeId) -> Option<Tree<L>> {
-        Parser::new().parse_body(self, id, ParseOptions::default())
-    }
-
     /// Whether the node is a leaf (a token; it has no children).
     #[inline]
     pub fn is_leaf(&self, id: NodeId) -> bool {
         self.data.kinds[id.0 as usize] & LEAF != 0
+    }
+
+    /// Whether the node belongs to the token before it (Roslyn's trailing trivia of the token before it, structured
+    /// or not), not to the one after it. Always false for Kotlin and Java.
+    #[inline]
+    pub fn is_trailing(&self, id: NodeId) -> bool {
+        self.data.kinds[id.0 as usize] & TRAILING != 0
+    }
+
+    /// Whether the leaf is a token the parser inserted where one was expected (Roslyn's `IsMissing`); its range is
+    /// empty. Always false for Kotlin and Java.
+    #[inline]
+    pub fn is_missing(&self, id: NodeId) -> bool {
+        self.data.kinds[id.0 as usize] & MISSING != 0
     }
 
     /// The byte range in `source()`.
@@ -723,6 +745,86 @@ impl<L: Language> Tree<L> {
     }
 }
 
+/// Builds a `Tree` in preorder for a language whose parser does not run on `PsiBuilderImpl` (C#'s, which builds
+/// Roslyn's green nodes and flattens them): each node is opened before its descendants and closed after them, leaves
+/// in document order. Keep one per thread and reuse it: `finish` copies the tree out and keeps the buffers.
+pub struct TreeBuilder<L: TreeLanguage> {
+    data: TreeData,
+    language: PhantomData<fn() -> L>,
+}
+
+impl<L: TreeLanguage> Default for TreeBuilder<L> {
+    fn default() -> Self {
+        TreeBuilder { data: TreeData::default(), language: PhantomData }
+    }
+}
+
+impl<L: TreeLanguage> TreeBuilder<L> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Room for `additional` more nodes.
+    pub fn reserve(&mut self, additional: usize) {
+        self.data.reserve(additional);
+    }
+
+    /// The number of nodes so far; the next node's id.
+    pub fn len(&self) -> u32 {
+        self.data.nodes.len() as u32
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.nodes.is_empty()
+    }
+
+    /// Opens a composite of `kind` starting at `start`, a child of `parent` (`None`: the root, the first node).
+    #[inline]
+    pub fn open(&mut self, parent: Option<NodeId>, kind: ElementTypeOf<L>, start: u32) -> NodeId {
+        NodeId(self.data.add_composite(parent.map_or(NONE, |p| p.0), kind, start))
+    }
+
+    /// Closes a composite opened with `open`: it ends at byte `end`, its subtree at the last node added.
+    #[inline]
+    pub fn close(&mut self, node: NodeId, end: u32) {
+        self.data.set_end(node.0, end);
+    }
+
+    /// A leaf of `token` over `start..end`, a child of `parent`.
+    #[inline]
+    pub fn leaf(&mut self, parent: NodeId, token: L::Token, start: u32, end: u32) -> NodeId {
+        NodeId(self.data.push(parent.0, token.index() | LEAF, start, end))
+    }
+
+    /// Marks a node added so far as belonging to the token before it (`Tree::is_trailing`).
+    #[inline]
+    pub fn set_trailing(&mut self, node: NodeId) {
+        self.data.nodes[node.0 as usize].kind |= TRAILING;
+    }
+
+    /// Marks a leaf added so far as a missing token (`Tree::is_missing`).
+    #[inline]
+    pub fn set_missing(&mut self, node: NodeId) {
+        debug_assert!(self.data.nodes[node.0 as usize].kind & LEAF != 0);
+        self.data.nodes[node.0 as usize].kind |= MISSING;
+    }
+
+    /// The message `Tree::error_message` gives for `node`. Nodes must get their messages in id order, one each.
+    pub fn set_error(&mut self, node: NodeId, message: Cow<'static, str>) {
+        debug_assert!(self.data.errors.last().is_none_or(|&(last, _)| last < node.0));
+        self.data.set_error(node.0, message);
+    }
+
+    /// The tree of the nodes added since the last `finish`, over `text` (whose bytes their ranges index), its root
+    /// node 0. The builder is empty again, its buffers kept.
+    pub fn finish(&mut self, text: Arc<[u8]>, file_kind: L::FileKind) -> Tree<L> {
+        debug_assert!(!self.data.nodes.is_empty(), "a tree has a root");
+        let data = self.data.take_exact();
+        self.data.clear();
+        Tree { text, file_kind, data, root: 0, language: PhantomData }
+    }
+}
+
 /// The children of a node.
 pub struct Children<'t> {
     links: &'t [[u32; 2]],
@@ -805,4 +907,83 @@ fn reusable_tokens<T, K>(file_tokens: &Lexed<T>, p: &Pending<K>) -> Option<(usiz
         return None;
     }
     Some((first, last))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A language past Kotlin's and Java's bounds: 300 token types, so node types start at 1024.
+    #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+    struct Tok(u16);
+    #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+    struct Node(u16);
+    struct Toy;
+
+    impl TokenType for Tok {
+        const NODE_BASE: usize = 1024;
+        fn index(self) -> u16 {
+            self.0
+        }
+        fn from_index(index: usize) -> Option<Tok> {
+            (index < 300).then_some(Tok(index as u16))
+        }
+        fn debug_name(self) -> &'static str {
+            "tok"
+        }
+    }
+
+    impl NodeType for Node {
+        fn index(self) -> u16 {
+            self.0
+        }
+        fn from_index(index: usize) -> Option<Node> {
+            (index < 400).then_some(Node(index as u16))
+        }
+        fn debug_name(self) -> &'static str {
+            "node"
+        }
+    }
+
+    impl TreeLanguage for Toy {
+        type Token = Tok;
+        type Node = Node;
+        type FileKind = ();
+        const ERROR_ELEMENT: Node = Node(0);
+    }
+
+    #[test]
+    fn tree_builder_builds_preorder_with_wide_kinds_and_trailing_leaves() {
+        let text: Arc<[u8]> = Arc::from(&b"a b;"[..]);
+        let mut b = TreeBuilder::<Toy>::new();
+        for _ in 0..2 {
+            let root = b.open(None, ElementType::Node(Node(399)), 0);
+            let inner = b.open(Some(root), ElementType::Node(Node(7)), 0);
+            b.leaf(inner, Tok(299), 0, 1);
+            let space = b.leaf(inner, Tok(3), 1, 2);
+            b.set_trailing(space);
+            b.close(inner, 2);
+            b.leaf(root, Tok(256), 2, 3);
+            let semi = b.leaf(root, Tok(4), 3, 4);
+            let missing = b.leaf(root, Tok(4), 4, 4);
+            b.set_missing(missing);
+            b.set_error(semi, Cow::Borrowed("expected"));
+            b.close(root, 4);
+            let tree = b.finish(text.clone(), ());
+            assert!(b.is_empty());
+            assert_eq!(tree.len(), 7);
+            assert!(tree.is_missing(NodeId(6)) && !tree.is_missing(NodeId(5)));
+            assert_eq!(tree.kind(NodeId(0)), ElementType::Node(Node(399)));
+            assert_eq!(tree.node_kind(NodeId(1)), Some(Node(7)));
+            assert_eq!(tree.token_kind(NodeId(2)), Some(Tok(299)));
+            assert!(!tree.is_trailing(NodeId(2)) && tree.is_trailing(NodeId(3)));
+            assert_eq!(tree.token_kind(NodeId(4)), Some(Tok(256)));
+            assert_eq!(tree.children(NodeId(0)).collect::<Vec<_>>(), [NodeId(1), NodeId(4), NodeId(5), NodeId(6)]);
+            assert_eq!(tree.range(NodeId(1)), 0..2);
+            assert_eq!(tree.parent(NodeId(3)), Some(NodeId(1)));
+            assert_eq!(tree.error_message(NodeId(5)), Some("expected"));
+            let leaves: Vec<_> = tree.leaves().map(|(t, r)| (t.0, r)).collect();
+            assert_eq!(leaves, [(299, 0..1), (3, 1..2), (256, 2..3), (4, 3..4), (4, 4..4)]);
+        }
+    }
 }

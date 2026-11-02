@@ -10,19 +10,23 @@ use crate::builder::{PsiBuilderImpl, WhitespacesAndCommentsBinder};
 use crate::lexer::Lexed;
 use crate::tree::Chameleon;
 
-/// A token type: what the lexer emits, a leaf of the tree. Its `index` is below 256.
+/// A token type: what the lexer emits, a leaf of the tree. Its `index` is below `NODE_BASE`.
 pub trait TokenType: Copy + Eq + Hash + Debug + Send + Sync + 'static {
-    /// A dense number below 256 (the tree's `kinds` column and `ElementTypeSet` store it).
-    fn index(self) -> u8;
+    /// Where the node types' numbers start in `ElementType::index`: above every token's `index`. 256 for Kotlin and
+    /// Java, whose `TokenSet`s (`ElementTypeSet`, 512 bits) hold both; a language with more token types (C#'s
+    /// `SyntaxKind`s) sets it higher, `ElementType::index` staying below the tree's `KIND_INDEX` (4096).
+    const NODE_BASE: usize = 256;
+    /// A dense number below `NODE_BASE` (the tree's `kinds` column and `ElementTypeSet` store it).
+    fn index(self) -> u16;
     /// The token type of `index()`, `None` for a number that is none.
     fn from_index(index: usize) -> Option<Self>;
     /// `IElementType.toString()`: what the PSI dump prints.
     fn debug_name(self) -> &'static str;
 }
 
-/// A composite node type. Its `index` is below 256 (the tree stores it as 256 + index).
+/// A composite node type. The tree stores its `index` as `TokenType::NODE_BASE` + index.
 pub trait NodeType: Copy + Eq + Hash + Debug + Send + Sync + 'static {
-    fn index(self) -> u8;
+    fn index(self) -> u16;
     fn from_index(index: usize) -> Option<Self>;
     fn debug_name(self) -> &'static str;
 }
@@ -35,7 +39,7 @@ pub enum ElementType<T, N> {
 }
 
 /// The element type of a language.
-pub type ElementTypeOf<L> = ElementType<<L as Language>::Token, <L as Language>::Node>;
+pub type ElementTypeOf<L> = ElementType<<L as TreeLanguage>::Token, <L as TreeLanguage>::Node>;
 
 impl<T: TokenType, N: NodeType> ElementType<T, N> {
     /// `IElementType.toString()`.
@@ -63,38 +67,46 @@ impl<T: TokenType, N: NodeType> ElementType<T, N> {
         }
     }
 
-    /// A dense number: a token's index (below 256), 256 + a node type's.
+    /// A dense number: a token's index (below `TokenType::NODE_BASE`), `NODE_BASE` + a node type's.
     #[inline]
     pub fn index(self) -> usize {
         match self {
             ElementType::Token(t) => t.index() as usize,
-            ElementType::Node(n) => 256 + n.index() as usize,
+            ElementType::Node(n) => T::NODE_BASE + n.index() as usize,
         }
     }
 
     /// The element type of `index()` (`None` for a number that is none).
     #[inline]
     pub fn from_index(index: usize) -> Option<Self> {
-        if index < 256 {
+        if index < T::NODE_BASE {
             T::from_index(index).map(ElementType::Token)
         } else {
-            N::from_index(index - 256).map(ElementType::Node)
+            N::from_index(index - T::NODE_BASE).map(ElementType::Node)
         }
     }
+}
+
+/// What a `Tree` and its consumer API need of a language: its token and node types, how its files are parsed and its
+/// error element. A language whose parser does not run on `PsiBuilderImpl` (C#, ported from Roslyn, builds its tree
+/// with `TreeBuilder`) implements only this; `Language` adds what the builder and the parse driver read.
+pub trait TreeLanguage: Sized + 'static {
+    type Token: TokenType;
+    type Node: NodeType;
+    /// How a file is parsed (e.g. a Kotlin file or a script); the tree keeps it.
+    type FileKind: Copy + Eq + Debug + Send + Sync + 'static;
+    /// `TokenType.ERROR_ELEMENT`: what a `kinds` entry that is no element type reads as.
+    const ERROR_ELEMENT: Self::Node;
 }
 
 /// A language: a marker type (`kotlin_syntax::Kotlin`) whose associated types and functions are what the platform
 /// reads from its `ParserDefinition`, its element types and its lazy element types. The builder, the tree and the
 /// parse driver are generic over it, so each language's parse is compiled for its own types.
-pub trait Language: Sized + 'static {
-    type Token: TokenType;
-    type Node: NodeType;
+pub trait Language: TreeLanguage {
     /// The language's `WhitespacesAndCommentsBinder`s (the platform's two defaults among them).
     type Binder: WhitespacesAndCommentsBinder<Self::Token>;
     /// What a chameleon (an `ILazyParseableElementType` the tree expands) is reparsed with.
     type Lazy: Copy + Eq + Debug + Send + Sync + 'static;
-    /// How a file is parsed (e.g. a Kotlin file or a script); the tree keeps it.
-    type FileKind: Copy + Eq + Debug + Send + Sync + 'static;
     /// What a parse of the language runs on: a `PsiBuilderImpl` (`frame_builder`) with the state of the language's
     /// layers over it (Kotlin's `SemanticWhitespaceAwarePsiBuilderImpl`). A `Parser` keeps one per nested builder and
     /// reuses it in place, from one file and chameleon to the next.
@@ -105,8 +117,6 @@ pub trait Language: Sized + 'static {
 
     /// `ParserDefinition.getFileNodeType()`: the root's type when the parser produced no markers.
     const FILE: Self::Node;
-    /// `TokenType.ERROR_ELEMENT`.
-    const ERROR_ELEMENT: Self::Node;
 
     /// `PsiBuilderImpl.whitespaceOrComment(type)`: the parser definition's whitespace or comment tokens.
     fn is_whitespace_or_comment(token: Self::Token) -> bool;

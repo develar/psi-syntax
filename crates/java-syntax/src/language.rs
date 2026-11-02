@@ -22,12 +22,16 @@ use crate::tree::{Entry, FileKind, LazyKind};
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct Java;
 
-impl psi_builder::Language for Java {
+impl psi_builder::TreeLanguage for Java {
     type Token = TokenKind;
     type Node = NodeKind;
+    type FileKind = FileKind;
+    const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
+}
+
+impl psi_builder::Language for Java {
     type Binder = crate::builder::Binder;
     type Lazy = LazyKind;
-    type FileKind = FileKind;
     type Frame = PsiBuilderImpl;
 
     #[inline(always)]
@@ -37,7 +41,6 @@ impl psi_builder::Language for Java {
 
     /// `JavaSyntaxElementType.JAVA_FILE` (printed as "PsiJavaFile:<name>").
     const FILE: NodeKind = NodeKind::JAVA_FILE;
-    const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
 
     /// Not in the Kotlin: IntelliJ's own test `Parenth2.java` nests 1001 parenthesized expressions (1010 levels), and a
     /// level takes at most 652 bytes of stack in a release build (a typed lambda's body, an enum constant's body), so
