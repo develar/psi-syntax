@@ -144,12 +144,23 @@ fn diagnostics(tree: &Tree, out: &mut String) {
     }
 }
 
-/// `CSnnnn [s..e) message`, the message escaped.
+/// `CSnnnn [s..e) message`, the message escaped, its lone surrogates `\u{XXXX}`.
 fn diagnostic_line(d: &crate::tree::Diagnostic, out: &mut String) {
     out.push_str(&d.id());
     span(d.start as usize, d.end as usize, out);
     out.push(' ');
-    escape(&d.message, out);
+    let mut at = 0;
+    for &(offset, unit) in &d.lone_surrogates {
+        // each is a U+FFFD of the message, in order
+        let offset = offset as usize;
+        if offset < at || d.message.get(offset..offset + 3) != Some("\u{FFFD}") {
+            continue;
+        }
+        escape(&d.message[at..offset], out);
+        out.push_str(&format!("\\u{{{unit:04X}}}"));
+        at = offset + 3;
+    }
+    escape(&d.message[at..], out);
 }
 
 /// The text escapes: `\\ \' \n \r \t`, `\u{XXXX}` for the other controls below U+0020, U+007F, U+0085, U+2028, U+2029
@@ -173,27 +184,44 @@ pub fn escape(text: &str, out: &mut String) {
 /// `escape` of the source's text `start..end`, whose ends may be inside a supplementary character (a token of half a
 /// surrogate pair, as the lexer makes in a directive): such a half is a lone surrogate, `\u{XXXX}`.
 pub fn escape_source(source: &[u8], start: usize, end: usize, out: &mut String) {
-    let (mut start, mut end) = (start.min(source.len()), end.min(source.len()));
-    let mut high = None;
-    if start < end {
-        // the text starts with the low half of the character 2 bytes before
-        if let Some(cp) = start.checked_sub(2).and_then(|lead| four_byte_char(source, lead)) {
-            out.push_str(&format!("\\u{{{:04X}}}", 0xDC00 + ((cp - 0x10000) & 0x3FF)));
-            start += 2;
-        }
-        // it ends with the high half of a character that goes on 2 bytes after it
-        if end >= start + 2
-            && let Some(cp) = four_byte_char(source, end - 2)
-        {
-            high = Some(0xD800 + ((cp - 0x10000) >> 10));
-            end -= 2;
-        }
+    let halves = SourceHalves::of(source, start, end);
+    if let Some(low) = halves.low {
+        out.push_str(&format!("\\u{{{low:04X}}}"));
     }
-    if start < end {
-        escape(&String::from_utf8_lossy(&source[start..end]), out);
+    if !halves.middle.is_empty() {
+        escape(&String::from_utf8_lossy(&source[halves.middle]), out);
     }
-    if let Some(high) = high {
+    if let Some(high) = halves.high {
         out.push_str(&format!("\\u{{{high:04X}}}"));
+    }
+}
+
+/// The source's text `start..end` as UTF-16 reads it when its ends may be inside a supplementary character: the low
+/// surrogate it starts with (the character began 2 bytes before), the bytes between, the high surrogate it ends with
+/// (the character goes on 2 bytes after).
+pub(crate) struct SourceHalves {
+    pub low: Option<u16>,
+    pub middle: std::ops::Range<usize>,
+    pub high: Option<u16>,
+}
+
+impl SourceHalves {
+    pub(crate) fn of(source: &[u8], start: usize, end: usize) -> SourceHalves {
+        let (mut start, mut end) = (start.min(source.len()), end.min(source.len()));
+        let (mut low, mut high) = (None, None);
+        if start < end {
+            if let Some(cp) = start.checked_sub(2).and_then(|lead| four_byte_char(source, lead)) {
+                low = Some((0xDC00 + ((cp - 0x10000) & 0x3FF)) as u16);
+                start += 2;
+            }
+            if end >= start + 2
+                && let Some(cp) = four_byte_char(source, end - 2)
+            {
+                high = Some((0xD800 + ((cp - 0x10000) >> 10)) as u16);
+                end -= 2;
+            }
+        }
+        SourceHalves { low, middle: start..end.max(start), high }
     }
 }
 

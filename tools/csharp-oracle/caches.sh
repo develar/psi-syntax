@@ -3,7 +3,8 @@
 #   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz]     (no step: all, in this order)
 # clones: the pinned corpora under csharp-src/ (shallow, checked out); lists: corpus/csharp-REPO-SHA7.list;
 # dumps: oracle/csharp-REPO-SHA7/ (Latest, Parse) and oracle/csharp-REPO-SHA7-preview/ (Preview, Parse, files equal
-# to Latest's hard-linked); lex: lex/csharp-REPO-SHA7.oracle.txt (--doc none) and .doc.oracle.txt (--doc parse);
+# to Latest's hard-linked); lex: lex/csharp-REPO-SHA7.oracle.txt (--doc none), .doc.oracle.txt (--doc parse) and
+# .diag.oracle.txt (--doc diagnose);
 # fuzz: the golden mutations and the lexer fuzz with their dumps and lexer lines. Keeps at least 200 GB free.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
@@ -56,6 +57,7 @@ lex() {
   k=$(key "$1")
   "$O" lex --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --doc none > "$S/lex/$k.oracle.txt"
   "$O" lex --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --doc parse > "$S/lex/$k.doc.oracle.txt"
+  "$O" lex --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --doc diagnose > "$S/lex/$k.diag.oracle.txt"
 }
 
 fuzz() {
@@ -75,8 +77,8 @@ PY
   "$here/lex_fuzz.py" "$repo/testdata/csharp" "$F/csharp-lex" 20000 csharp-lex
   "$O" dump --list "$F/csharp-lex/list" --root "$F/csharp-lex" --out "$F/csharp-lex.oracle"
   cut -f1 "$F/csharp-mut.list" > "$F/csharp-mut.paths"
-  for doc in none parse; do
-    suffix=$([ $doc = parse ] && echo .doc || true)
+  for doc in none parse diagnose; do
+    suffix=$(case $doc in parse) echo .doc ;; diagnose) echo .diag ;; esac)
     "$O" lex --list "$F/csharp-mut.paths" --root "$F/csharp-mut" --doc $doc > "$S/lex/csharp-mut$suffix.oracle.txt"
     "$O" lex --list "$F/csharp-lex/list" --root "$F/csharp-lex" --doc $doc > "$S/lex/csharp-lex$suffix.oracle.txt"
   done

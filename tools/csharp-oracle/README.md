@@ -246,13 +246,13 @@ included; `__2` on a clash, also one of case), VERSION `latest` for every versio
 | `corpus/csharp-REPO-SHA7.list` | each corpus list (`corpus.py`) |
 | `oracle/csharp-REPO-SHA7/` | its dumps at Latest, Parse (`.tree.txt`, `index.jsonl`) |
 | `oracle/csharp-REPO-SHA7-preview/` | its dumps at Preview, Parse; those equal to Latest's are hard links to them |
-| `lex/csharp-REPO-SHA7.oracle.txt`, `lex/csharp-REPO-SHA7.doc.oracle.txt` | its lexer lines at `--doc none` and `--doc parse` |
+| `lex/csharp-REPO-SHA7.oracle.txt`, `lex/csharp-REPO-SHA7.doc.oracle.txt`, `lex/csharp-REPO-SHA7.diag.oracle.txt` | its lexer lines at `--doc none`, `--doc parse` and `--doc diagnose` |
 | `fuzz/csharp-mut/` | the mutants, `original/`, `origins.json` and the full `list` (`mutate.py`, seed `csharp-mut`) |
 | `fuzz/csharp-mut.list` | the oracle list: `list` without the mutants their entry cannot parse (`no member`) |
 | `fuzz/csharp-mut.oracle/` | its dumps |
 | `fuzz/csharp-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `csharp-lex`) |
 | `fuzz/csharp-lex.oracle/` | their dumps (compilation units at Latest, Parse) |
-| `lex/csharp-mut{,.doc}.oracle.txt`, `lex/csharp-lex{,.doc}.oracle.txt` | the lexer lines of both, at `--doc none` and `--doc parse`, with the defaults for every file (the lists' paths only) |
+| `lex/csharp-mut{,.doc,.diag}.oracle.txt`, `lex/csharp-lex{,.doc,.diag}.oracle.txt` | the lexer lines of both, at `--doc none`, `--doc parse` and `--doc diagnose`, with the defaults for every file (the lists' paths only) |
 
 Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz`, any subset in that
 order; it stops when less than 220 GB would be free), the goldens with `tools/csharp-oracle/vendor-goldens.sh`.

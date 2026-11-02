@@ -151,8 +151,12 @@ pub struct Diagnostic {
     /// The location's `SourceSpan`, UTF-8 byte offsets.
     pub start: u32,
     pub end: u32,
-    /// `GetMessage(CultureInfo.InvariantCulture)`.
+    /// `GetMessage(CultureInfo.InvariantCulture)`, a lone surrogate (half of a supplementary character, from a token
+    /// of one or a code unit the lexer reports) as U+FFFD.
     pub message: String,
+    /// The lone surrogates of `message`: the byte offset of their U+FFFD and the UTF-16 code unit, in order (the dump
+    /// prints them as `\u{XXXX}`, as the oracle prints .NET's string).
+    pub lone_surrogates: Vec<(u32, u16)>,
 }
 
 impl Diagnostic {

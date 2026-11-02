@@ -2720,7 +2720,7 @@ impl<'t> Lexer<'t> {
             }
         } else if error.is_none() {
             error = Some(XmlParseErrorCode::XML_InvalidToken);
-            error_arg = Some(self.char_arg(ch));
+            error_arg = Some(DiagArg::Char(ch));
         }
 
         ch = self.text_window.peek_char();
@@ -2728,7 +2728,7 @@ impl<'t> Lexer<'t> {
             self.text_window.advance_char();
         } else if error.is_none() {
             error = Some(XmlParseErrorCode::XML_InvalidToken);
-            error_arg = Some(self.char_arg(ch));
+            error_arg = Some(DiagArg::Char(ch));
         }
 
         // If we don't have a value computed from above, then we don't recognize the entity, in which case we will
@@ -2751,13 +2751,6 @@ impl<'t> Lexer<'t> {
                 None => self.add_xml_error(error, &[]),
             }
         }
-    }
-
-    /// `ch.ToString()` as a diagnostic argument.
-    fn char_arg(&mut self, ch: u16) -> DiagArg {
-        let text = String::from_utf16_lossy(&[ch]);
-        let (start, len) = self.arena.intern(&text);
-        DiagArg::Owned { start, len }
     }
 
     /// `ScanXmlText(ref info)`.

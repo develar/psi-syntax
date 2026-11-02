@@ -128,10 +128,13 @@ pub struct DiagnosticInfo {
 pub enum DiagArg {
     /// A string constant (`SyntaxFacts.GetText(kind)`, `"..."`).
     Str(&'static str),
-    /// `token.Text` (`token.ToString()`): the text of a token of the arena.
+    /// `token.Text` (`token.ToString()`): the text of a token of the arena (a source text that starts or ends inside a
+    /// supplementary character has that half as a lone surrogate).
     TokenText(Green),
     /// A string the arena keeps (`GreenArena::intern`).
     Owned { start: u32, len: u32 },
+    /// `ch.ToString()`: one UTF-16 code unit, a lone surrogate too.
+    Char(u16),
     /// An integer (`(int)code`, a count).
     Int(i64),
     /// `MessageID.Localize()`: the feature's English name.

@@ -240,8 +240,9 @@ otherwise.
   against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz, and both Java
   dumps (`.psi.txt`, `.node.txt`) of the same three corpora against the Java PSI oracle's, and `ksdump --check-bodies`
   on the community `.java` files and with `--nesting-limit 3` on them and the golden mutations, and the C# lexer
-  (`--doc none`, and `--doc parse` with the documentation comment parser) against `tools/csharp-oracle`'s cached lexer
-  lines on its four corpora, mutations and lexer fuzz. A faster change that fails it is not a change.
+  (`--doc none`, and `--doc parse` and `--doc diagnose` with the documentation comment parser) against
+  `tools/csharp-oracle`'s cached lexer lines on its four corpora, mutations and lexer fuzz. A faster change that fails
+  it is not a change.
 - Java speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list scripts/ab.sh OLD NEW` (the community
   `.java` files); DESIGN, "Java parse throughput", has the numbers and how tree-sitter-java was compared.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the

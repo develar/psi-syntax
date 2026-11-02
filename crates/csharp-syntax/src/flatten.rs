@@ -249,12 +249,13 @@ impl Walk<'_> {
             let info = self.arena.diagnostic(d);
             let s = (start as i64 + info.offset as i64).clamp(0, self.length as i64) as u32;
             let e = (s as i64 + info.width.max(0) as i64).min(self.length as i64) as u32;
-            let message = diagnostic::message(self.arena, self.source, d);
+            let diagnostic::Message { text: message, lone_surrogates } =
+                diagnostic::message(self.arena, self.source, d);
             if self.last_error_node != Some(node) {
                 self.builder.set_error(node, Cow::Owned(message.clone()));
                 self.last_error_node = Some(node);
             }
-            self.diagnostics.push(Diagnostic { node, code: info.code, start: s, end: e, message });
+            self.diagnostics.push(Diagnostic { node, code: info.code, start: s, end: e, message, lone_surrogates });
         }
     }
 }
