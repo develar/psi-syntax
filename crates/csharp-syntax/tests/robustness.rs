@@ -1,10 +1,11 @@
 //! Any bytes parse without a panic into a lossless tree: random bytes, random fragments of C#, deep nesting and long
 //! chains, on a 1 MB stack; the leaves tile the text, ids are in preorder and the links agree, the lexer dump and the
-//! tree dump run. The lexer and the parser are still placeholders and stubs (phase 2): these hold for them, and must
-//! keep holding as they are ported (phase 4 adds the deep forms against the oracle).
+//! tree dump run. The lexer is Roslyn's (its recursive scanners nest to `MAX_NESTED_SCAN_DEPTH`), the parser is still
+//! stubs (phase 2): these hold for them, and must keep holding as the parser is ported (phase 4 adds the deep forms
+//! against the oracle).
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
-use csharp_syntax::{Entry, FileKind, NodeId, Parser, Tree};
+use csharp_syntax::{DocumentationMode, Entry, FileKind, NodeId, Parser, Tree};
 
 /// A deterministic generator (xorshift64*), so a failure reproduces.
 struct Rng(u64);
@@ -101,6 +102,24 @@ const FRAGMENTS: &[&str] = &[
     "\u{85}",
     "\0",
     "\u{FFFF}",
+    "\\U0001F600",
+    "\\u",
+    "1e400",
+    "1.5m",
+    "0b_1",
+    "#define A",
+    "#elif",
+    "#line (1, 2) - (3, 4) 5 \"f\"",
+    "#pragma warning disable CS1",
+    "#error version",
+    "$$\"\"\"",
+    "{{",
+    "}}",
+    "<<<<<<< ",
+    "=======",
+    ">>>>>>> ",
+    "&lt;",
+    "@@",
 ];
 
 fn run_on_small_stack(f: impl FnOnce() + Send + 'static) {
@@ -128,9 +147,11 @@ fn random_bytes_and_fragments_parse_losslessly() {
             if entry == Entry::CompilationUnit {
                 check(&tree, &text);
             }
-            let lexed = parser.lex(&text, FileKind::default());
-            check(&lexed, &text);
-            let _ = lex_to_string(&lexed);
+            for doc_mode in [DocumentationMode::Parse, DocumentationMode::None, DocumentationMode::Diagnose] {
+                let lexed = parser.lex(&text, FileKind { doc_mode, ..FileKind::default() });
+                check(&lexed, &text);
+                let _ = lex_to_string(&lexed);
+            }
         }
     });
 }
@@ -147,5 +168,31 @@ fn deep_nesting_and_long_chains_parse_losslessly() {
         let chain = format!("x = {};", vec!["a"; 100_000].join(" + "));
         let tree = parser.parse(&chain, FileKind::default());
         check(&tree, chain.as_bytes());
+    });
+}
+
+/// The lexer's own recursion: holes of interpolated strings and brackets in them, directive expressions, nested
+/// excluded `#if` sections, 100 000 deep.
+#[test]
+fn deep_lexer_forms_lex_losslessly() {
+    run_on_small_stack(|| {
+        let mut parser = Parser::new();
+        let n = 100_000;
+        let texts = [
+            format!("{}x{}", "$\"{".repeat(n), "}\"".repeat(n)),
+            format!("$\"{{{}x{}}}\"", "(".repeat(n), ")".repeat(n)),
+            format!("$$\"\"\"{{{{{}x{}}}}}\"\"\"", "[".repeat(n), "]".repeat(n)),
+            format!("#if {}A{}\n#endif\n", "(".repeat(n), ")".repeat(n)),
+            format!("#if {}A\n#endif\n", "!".repeat(n)),
+            format!("#if {}\n#endif\n", vec!["A"; n].join(" == ")),
+            format!("#if B\n{}{}#endif\n", "#if A\n".repeat(n), "#endif\n".repeat(n)),
+            format!("#region\n{}", "#region\n#endregion\n".repeat(n)),
+        ];
+        for text in &texts {
+            let lexed = parser.lex(text, FileKind::default());
+            check(&lexed, text.as_bytes());
+            let tree = parser.parse(text, FileKind::default());
+            check(&tree, text.as_bytes());
+        }
     });
 }

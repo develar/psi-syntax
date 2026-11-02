@@ -8,7 +8,9 @@
 //! `facts` (`SyntaxKindFacts.cs`), `language_version` (`LanguageVersion.cs`), `green` (`GreenNode` and the internal
 //! syntax's copy semantics), `flatten` (green to `psi_builder::Tree<CSharp>`, as Roslyn's red tree), `tree`, `dump`
 //! (`tools/csharp-oracle`'s format), `diagnostic` (`DiagnosticInfo.GetMessage`), `syntax_parser` (`SyntaxParser.cs`),
-//! `parser` (`LanguageParser*.cs`, `DocumentationCommentParser.cs`) and `lexer` (the lexer interface the parsers run on).
+//! `parser` (`LanguageParser*.cs`, `DocumentationCommentParser.cs`) and `lexer` (`Lexer.cs` and its partial files,
+//! `SlidingTextWindow.cs`, `CharacterInfo.cs`, `Directives.cs`, `DirectiveParser.cs`). Also generated: `xml_char_type`
+//! (`XmlCharType.cs`'s tables).
 
 pub mod diagnostic;
 pub mod dump;
@@ -24,8 +26,8 @@ pub mod syntax;
 pub mod syntax_kind;
 pub mod syntax_parser;
 pub mod tree;
-// The lexer's character classes; the lexer port reads them.
-#[allow(dead_code)]
+mod xml_char_type;
+// The lexer's character classes.
 mod unicode;
 
 pub use error_code::{ErrorCode, MessageID, Severity, XmlParseErrorCode};

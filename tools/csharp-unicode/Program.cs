@@ -39,6 +39,25 @@ static class Program
         o.Append("];\n\n");
     }
 
+    // Code points (supplementary ones included, as CharUnicodeInfo.GetUnicodeCategory(int) answers them; the surrogate
+    // code units left out) whose category is in `member`.
+    static void CodePointRanges(StringBuilder o, string name, string doc, Func<UnicodeCategory, bool> member)
+    {
+        var ranges = new List<(int, int)>();
+        int start = -1;
+        for (int cp = 0; cp <= 0x110000; cp++)
+        {
+            bool m = cp <= 0x10FFFF && !(cp >= 0xD800 && cp <= 0xDFFF) && member(CharUnicodeInfo.GetUnicodeCategory(cp));
+            if (m && start < 0) start = cp;
+            if (!m && start >= 0) { ranges.Add((start, cp - 1)); start = -1; }
+        }
+        o.Append($"/// {doc}\n");
+        o.Append("#[rustfmt::skip]\n");
+        o.Append($"pub(crate) static {name}: [(u32, u32); {ranges.Count}] = [\n");
+        foreach (var (s, e) in ranges) o.Append($"    (0x{s:X4}, 0x{e:X4}),\n");
+        o.Append("];\n\n");
+    }
+
     static void Ascii(StringBuilder o, string name, string doc, Func<char, bool> member)
     {
         o.Append($"/// {doc}\n");
@@ -73,6 +92,10 @@ static class Program
             c => c == UnicodeCategory.Format);
         Ranges(o, "SPACE_SEPARATOR", "`UnicodeCategory.SpaceSeparator` (Zs) above ASCII: `IsWhitespace` asks it for a char above 255.",
             c => c == UnicodeCategory.SpaceSeparator);
+        CodePointRanges(o, "NEEDS_ESCAPING",
+            "`ObjectDisplay.NeedsEscaping` of a code point (Cc, Cn, Zl, Zp; surrogate code units left out): what `FormatLiteral` writes as `\\u` or `\\U` escapes.",
+            c => c is UnicodeCategory.Control or UnicodeCategory.OtherNotAssigned or UnicodeCategory.LineSeparator
+                or UnicodeCategory.ParagraphSeparator);
         Console.Out.Write(o.ToString().TrimEnd('\n') + "\n");
         return 0;
     }

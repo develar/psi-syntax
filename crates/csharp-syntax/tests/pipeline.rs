@@ -1,5 +1,5 @@
-//! The pipeline end to end while the lexer and the parser are placeholders and stubs: a file parses into a compilation
-//! unit whose end of file carries every token as skipped trivia, losslessly; the entries and the lexer dump run.
+//! The pipeline end to end while the parser is stubs: a file parses into a compilation unit whose end of file carries
+//! every token (Roslyn's lexer's) as skipped trivia, losslessly; the entries and the lexer dump run.
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
 use csharp_syntax::{Entry, FileKind, NodeKind, Parser, Tree};
@@ -14,9 +14,7 @@ fn a_file_parses_losslessly() {
     assert_eq!(leaves, text.as_bytes());
     let dump = tree_to_string(&tree);
     assert!(
-        dump.starts_with(
-            "CompilationUnit [0..27)\n  L:SkippedTokensTrivia [0..5)\n    IdentifierToken [0..5) 'class'\n"
-        ),
+        dump.starts_with("CompilationUnit [0..27)\n  L:SkippedTokensTrivia [0..5)\n    ClassKeyword [0..5) 'class'\n"),
         "{dump}"
     );
     assert!(dump.ends_with("  EndOfFileToken [27..27) ''\n"), "{dump}");

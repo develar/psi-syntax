@@ -108,7 +108,7 @@ fn line(tree: &Tree, id: NodeId, depth: usize, out: &mut String) {
             out.push_str(" missing");
         } else {
             out.push_str(" '");
-            escape(&String::from_utf8_lossy(tree.text(id)), out);
+            escape_source(tree.source(), range.start, range.end, out);
             out.push('\'');
         }
     } else if let Some(kind) = tree.node_kind(id) {
@@ -167,6 +167,41 @@ pub fn escape(text: &str, out: &mut String) {
     }
 }
 
+/// `escape` of the source's text `start..end`, whose ends may be inside a supplementary character (a token of half a
+/// surrogate pair, as the lexer makes in a directive): such a half is a lone surrogate, `\u{XXXX}`.
+pub fn escape_source(source: &[u8], start: usize, end: usize, out: &mut String) {
+    let (mut start, mut end) = (start.min(source.len()), end.min(source.len()));
+    let mut high = None;
+    if start < end {
+        // the text starts with the low half of the character 2 bytes before
+        if let Some(cp) = start.checked_sub(2).and_then(|lead| four_byte_char(source, lead)) {
+            out.push_str(&format!("\\u{{{:04X}}}", 0xDC00 + ((cp - 0x10000) & 0x3FF)));
+            start += 2;
+        }
+        // it ends with the high half of a character that goes on 2 bytes after it
+        if end >= start + 2
+            && let Some(cp) = four_byte_char(source, end - 2)
+        {
+            high = Some(0xD800 + ((cp - 0x10000) >> 10));
+            end -= 2;
+        }
+    }
+    if start < end {
+        escape(&String::from_utf8_lossy(&source[start..end]), out);
+    }
+    if let Some(high) = high {
+        out.push_str(&format!("\\u{{{high:04X}}}"));
+    }
+}
+
+/// The code point of a valid 4-byte UTF-8 sequence at `at`.
+fn four_byte_char(source: &[u8], at: usize) -> Option<u32> {
+    let bytes = source.get(at..at + 4)?;
+    let text = std::str::from_utf8(bytes).ok()?;
+    let c = text.chars().next()?;
+    (c.len_utf8() == 4).then_some(c as u32)
+}
+
 /// The `index.jsonl` line of a dumped file: `{"path":…,"errors":N,"firstError":"CSnnnn [s..e) message"|null}`.
 pub fn index_line(path: &str, tree: &Tree) -> String {
     let mut out = String::from("{\"path\":");
@@ -222,6 +257,12 @@ mod tests {
         let mut out = String::new();
         escape("a'\\\n\r\t\u{0B}\u{7F}\u{85}\u{FEFF}é😀", &mut out);
         assert_eq!(out, "a\\'\\\\\\n\\r\\t\\u{000B}\\u{007F}\\u{0085}\\u{FEFF}é😀");
+        let source = "a😀b".as_bytes();
+        let mut halves = String::new();
+        escape_source(source, 1, 3, &mut halves);
+        halves.push('|');
+        escape_source(source, 3, 6, &mut halves);
+        assert_eq!(halves, "\\u{D83D}|\\u{DE00}b");
         let mut json = String::new();
         json_string("a\"\u{1}\\", &mut json);
         assert_eq!(json, "\"a\\\"\\u0001\\\\\"");

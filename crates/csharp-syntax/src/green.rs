@@ -569,6 +569,16 @@ impl GreenArena {
         source.get(range).unwrap_or(b"")
     }
 
+    /// Where a token's text is in the source (`start`, `width`): `None` for a missing token and for one whose text is
+    /// not the source's (`TokenText::Fixed`, `TokenText::Owned`).
+    pub fn token_source_range(&self, token: Green) -> Option<(u32, u32)> {
+        if !token.is_token() {
+            return None;
+        }
+        let d = self.token_data(token);
+        (d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) == IS_NOT_MISSING).then_some((d.start, d.width))
+    }
+
     /// `SyntaxToken.ValueText` as bytes: the value the lexer set, else the text.
     pub fn token_value_text<'s>(&'s self, token: Green, source: &'s [u8]) -> &'s [u8] {
         if token.is_token() {
