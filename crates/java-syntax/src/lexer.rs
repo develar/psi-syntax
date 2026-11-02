@@ -8,7 +8,7 @@
 //! The code only compares characters with ASCII ones, and a backslash never occurs inside a multi-byte sequence, so the
 //! token boundaries are the same.
 
-use psi_builder::lexer::{char_at, in_ranges};
+use psi_builder::lexer::{Keyword, char_at, find_any3, find_either, in_ranges};
 
 use crate::language_level::LanguageLevel;
 use crate::tokens::TokenKind;
@@ -331,9 +331,22 @@ impl<'t> JavaLexer<'t> {
         }
     }
 
-    /// `getWhitespaces(offset)`.
+    /// `getWhitespaces(offset)`. The run of plain whitespace bytes is skipped first (each is one character);
+    /// `get_chars` goes on only where a backslash (a unicode escape) or `\u001a` could continue it.
+    #[inline(always)]
     fn get_whitespaces(&mut self, offset: usize) -> usize {
-        self.get_chars(offset, b" \t\n\r\x0C", Some(0x1A))
+        let buffer = &self.my_buffer[..self.my_buffer_end_offset];
+        let mut pos = offset;
+        while let Some(&b) = buffer.get(pos) {
+            if !ASCII_WHITE_SPACE[b as usize] {
+                if b == b'\\' || b == 0x1A {
+                    return self.get_chars(pos, b" \t\n\r\x0C", Some(0x1A));
+                }
+                break;
+            }
+            pos += 1;
+        }
+        pos
     }
 
     /// `getSimpleWhitespaces(offset)`.
@@ -379,10 +392,18 @@ impl<'t> JavaLexer<'t> {
     }
 
     /// `locateLiteralEnd(offset, literalType)`: sets the token end; `true` if this is a string template fragment.
+    /// Bytes that are not a backslash, a quote, CR or LF are skipped without decoding (see `get_closing_comment`).
     fn locate_literal_end(&mut self, offset: usize, literal_type: LiteralType) -> bool {
         let mut pos = offset;
 
         while pos < self.my_buffer_end_offset {
+            let buffer = &self.my_buffer[..self.my_buffer_end_offset];
+            while buffer.get(pos).is_some_and(|&b| !LITERAL_STOP[b as usize]) {
+                pos += 1;
+            }
+            if pos >= self.my_buffer_end_offset {
+                break;
+            }
             let c = self.locate_char_at(pos);
 
             if c == b'\\' as u32 {
@@ -448,11 +469,16 @@ impl<'t> JavaLexer<'t> {
         pos
     }
 
-    /// `getClosingComment(offset)`.
+    /// `getClosingComment(offset)`. Bytes other than `*` and a backslash are skipped without decoding: such a byte is
+    /// not `*` and starts no unicode escape, and an ASCII byte is never inside a multi-byte character.
     fn get_closing_comment(&mut self, offset: usize) -> usize {
         let mut pos = offset;
 
         while pos < self.my_buffer_end_offset {
+            pos = find_either(&self.my_buffer[..self.my_buffer_end_offset], pos, b'*', b'\\');
+            if pos >= self.my_buffer_end_offset {
+                break;
+            }
             let c = self.locate_char_at(pos);
             pos += self.my_symbol_length;
             if c == b'*' as u32 && pos < self.my_buffer_end_offset && self.locate_char_at(pos) == b'/' as u32 {
@@ -463,11 +489,16 @@ impl<'t> JavaLexer<'t> {
         pos + self.my_symbol_length
     }
 
-    /// `getLineTerminator(offset)`.
+    /// `getLineTerminator(offset)`. Bytes other than CR, LF and a backslash are skipped without decoding (see
+    /// `get_closing_comment`).
     fn get_line_terminator(&mut self, offset: usize) -> usize {
         let mut pos = offset;
 
         while pos < self.my_buffer_end_offset {
+            pos = find_any3(&self.my_buffer[..self.my_buffer_end_offset], pos, b'\n', b'\r', b'\\');
+            if pos >= self.my_buffer_end_offset {
+                break;
+            }
             let c = self.locate_char_at(pos);
             if c == b'\r' as u32 || c == b'\n' as u32 {
                 break;
@@ -501,8 +532,23 @@ impl<'t> JavaLexer<'t> {
     }
 
     /// `locateCharAt(offset)`: the character at `offset`, a unicode escape (`\uXXXX`, any number of `u`) decoded;
-    /// `my_symbol_length` becomes its length.
+    /// `my_symbol_length` becomes its length. An ASCII byte other than a backslash is itself (inline); the rest is
+    /// `locate_char_at_slow`.
+    #[inline(always)]
     fn locate_char_at(&mut self, offset: usize) -> u32 {
+        if let Some(&b) = self.my_buffer.get(offset)
+            && b < 0x80
+            && b != b'\\'
+        {
+            self.my_symbol_length = 1;
+            return b as u32;
+        }
+        self.locate_char_at_slow(offset)
+    }
+
+    /// `locate_char_at` of a backslash, a non-ASCII byte or an offset past the buffer.
+    #[inline(never)]
+    fn locate_char_at_slow(&mut self, offset: usize) -> u32 {
         let (first, len) = if offset < self.my_buffer.len() { char_at(self.my_buffer, offset) } else { (0, 1) };
         self.my_symbol_length = len;
         if first != b'\\' as u32 {
@@ -588,17 +634,44 @@ impl FlexJavaLexer {
     }
 
     /// `goTo(pos)` + `advance()`: the token at `pos < text.len()` and its end.
+    #[inline(always)]
     pub(crate) fn advance(&self, text: &[u8], pos: usize) -> (TokenKind, usize) {
         let b = text[pos];
+        if ASCII_JAVA_LETTER[b as usize] {
+            let end = identifier_end(text, pos + 1);
+            return (self.keyword_or_identifier_at(text, pos, end), end);
+        }
         if b.is_ascii_digit() || (b == b'.' && text.get(pos + 1).is_some_and(u8::is_ascii_digit)) {
             return number(text, pos);
         }
-        let (cp, len) = char_at(text, pos);
-        if is_java_letter(cp) {
-            let end = identifier_end(text, pos + len);
-            return (self.keyword_or_identifier(&text[pos..end]), end);
+        if b >= 0x80 {
+            let (cp, len) = char_at(text, pos);
+            if is_java_letter(cp) {
+                let end = identifier_end(text, pos + len);
+                return (self.keyword_or_identifier(&text[pos..end]), end);
+            }
+            return (TokenKind::BAD_CHARACTER, pos + len);
         }
-        operator(text, pos).unwrap_or((TokenKind::BAD_CHARACTER, pos + len))
+        operator(text, pos).unwrap_or((TokenKind::BAD_CHARACTER, pos + 1))
+    }
+
+    /// `keyword_or_identifier(&text[start..end])` through `KEYWORDS`, a perfect hash of the keywords: one candidate,
+    /// compared as one or two words read from `text`.
+    #[inline(always)]
+    fn keyword_or_identifier_at(&self, text: &[u8], start: usize, end: usize) -> TokenKind {
+        let len = end - start;
+        if !(2..=12).contains(&len) || !text[start].is_ascii_lowercase() {
+            return TokenKind::IDENTIFIER;
+        }
+        let entry = &KEYWORDS[keyword_hash(text[start], text[start + 1], text[end - 1], len)];
+        if !entry.matches(text, start, end) {
+            return TokenKind::IDENTIFIER;
+        }
+        match entry.kind {
+            TokenKind::ASSERT_KEYWORD if !self.my_assert_keyword => TokenKind::IDENTIFIER,
+            TokenKind::ENUM_KEYWORD if !self.my_enum_keyword => TokenKind::IDENTIFIER,
+            kind => kind,
+        }
     }
 
     /// The keyword rules before `{IDENTIFIER}`: a keyword of exactly this text, else IDENTIFIER.
@@ -698,17 +771,153 @@ pub(crate) fn is_java_letter_digit(cp: u32) -> bool {
     }
 }
 
-/// The end of `[:jletterdigit:]*` from `pos`.
+/// The end of `[:jletterdigit:]*` from `pos`: ASCII through `ASCII_JAVA_LETTER_DIGIT`, other characters decoded.
+#[inline(always)]
 fn identifier_end(text: &[u8], mut pos: usize) -> usize {
-    while pos < text.len() {
+    loop {
+        while let Some(&b) = text.get(pos) {
+            if !ASCII_JAVA_LETTER_DIGIT[b as usize] {
+                break;
+            }
+            pos += 1;
+        }
+        if text.get(pos).is_none_or(|&b| b < 0x80) {
+            return pos;
+        }
         let (cp, len) = char_at(text, pos);
         if !is_java_letter_digit(cp) {
-            break;
+            return pos;
         }
         pos += len;
     }
-    pos
 }
+
+/// `is_java_letter` of each ASCII byte; false at 0x80 and above.
+const ASCII_JAVA_LETTER: [bool; 256] = {
+    let mut table = [false; 256];
+    let mut b = 0;
+    while b < 0x80 {
+        let c = b as u8;
+        table[b] = c.is_ascii_alphabetic() || c == b'$' || c == b'_';
+        b += 1;
+    }
+    table
+};
+
+/// `is_java_letter_digit` of each ASCII byte; false at 0x80 and above.
+const ASCII_JAVA_LETTER_DIGIT: [bool; 256] = {
+    let mut table = [false; 256];
+    let mut b = 0;
+    while b < 0x80 {
+        let c = b as u8;
+        table[b] = c.is_ascii_alphanumeric() || c == b'$' || c == b'_' || c <= 0x08 || (c >= 0x0E && c <= 0x1B) || c == 0x7F;
+        b += 1;
+    }
+    table
+};
+
+/// The bytes `getWhitespaces` detects: ` `, `\t`, `\n`, `\r`, `\f`.
+const ASCII_WHITE_SPACE: [bool; 256] = {
+    let mut table = [false; 256];
+    table[b' ' as usize] = true;
+    table[b'\t' as usize] = true;
+    table[b'\n' as usize] = true;
+    table[b'\r' as usize] = true;
+    table[0x0C] = true;
+    table
+};
+
+/// The bytes at which `locate_literal_end` decodes: a backslash, the quotes, CR and LF.
+const LITERAL_STOP: [bool; 256] = {
+    let mut table = [false; 256];
+    table[b'\\' as usize] = true;
+    table[b'"' as usize] = true;
+    table[b'\'' as usize] = true;
+    table[b'\n' as usize] = true;
+    table[b'\r' as usize] = true;
+    table
+};
+
+/// The keyword rules of `_JavaLexer.flex` (`assert` and `enum` are identifiers below their levels).
+const KEYWORD_LIST: [(&[u8], TokenKind); 53] = {
+    use TokenKind::*;
+    [
+        (b"true", TRUE_KEYWORD),
+        (b"false", FALSE_KEYWORD),
+        (b"null", NULL_KEYWORD),
+        (b"abstract", ABSTRACT_KEYWORD),
+        (b"assert", ASSERT_KEYWORD),
+        (b"boolean", BOOLEAN_KEYWORD),
+        (b"break", BREAK_KEYWORD),
+        (b"byte", BYTE_KEYWORD),
+        (b"case", CASE_KEYWORD),
+        (b"catch", CATCH_KEYWORD),
+        (b"char", CHAR_KEYWORD),
+        (b"class", CLASS_KEYWORD),
+        (b"const", CONST_KEYWORD),
+        (b"continue", CONTINUE_KEYWORD),
+        (b"default", DEFAULT_KEYWORD),
+        (b"do", DO_KEYWORD),
+        (b"double", DOUBLE_KEYWORD),
+        (b"else", ELSE_KEYWORD),
+        (b"enum", ENUM_KEYWORD),
+        (b"extends", EXTENDS_KEYWORD),
+        (b"final", FINAL_KEYWORD),
+        (b"finally", FINALLY_KEYWORD),
+        (b"float", FLOAT_KEYWORD),
+        (b"for", FOR_KEYWORD),
+        (b"goto", GOTO_KEYWORD),
+        (b"if", IF_KEYWORD),
+        (b"implements", IMPLEMENTS_KEYWORD),
+        (b"import", IMPORT_KEYWORD),
+        (b"instanceof", INSTANCEOF_KEYWORD),
+        (b"int", INT_KEYWORD),
+        (b"interface", INTERFACE_KEYWORD),
+        (b"long", LONG_KEYWORD),
+        (b"native", NATIVE_KEYWORD),
+        (b"new", NEW_KEYWORD),
+        (b"package", PACKAGE_KEYWORD),
+        (b"private", PRIVATE_KEYWORD),
+        (b"public", PUBLIC_KEYWORD),
+        (b"short", SHORT_KEYWORD),
+        (b"super", SUPER_KEYWORD),
+        (b"switch", SWITCH_KEYWORD),
+        (b"synchronized", SYNCHRONIZED_KEYWORD),
+        (b"this", THIS_KEYWORD),
+        (b"throw", THROW_KEYWORD),
+        (b"protected", PROTECTED_KEYWORD),
+        (b"transient", TRANSIENT_KEYWORD),
+        (b"return", RETURN_KEYWORD),
+        (b"void", VOID_KEYWORD),
+        (b"static", STATIC_KEYWORD),
+        (b"strictfp", STRICTFP_KEYWORD),
+        (b"while", WHILE_KEYWORD),
+        (b"try", TRY_KEYWORD),
+        (b"volatile", VOLATILE_KEYWORD),
+        (b"throws", THROWS_KEYWORD),
+    ]
+};
+
+/// The slot of a keyword candidate in `KEYWORDS`: its first, second and last byte and its length.
+#[inline(always)]
+const fn keyword_hash(first: u8, second: u8, last: u8, len: usize) -> usize {
+    (first as usize * 2 + second as usize * 18 + last as usize * 19 + len * 20) & 127
+}
+
+/// `KEYWORD_LIST` by `keyword_hash`; an empty slot has length 0. Building it fails to compile on a collision.
+const KEYWORDS: [Keyword<TokenKind>; 128] = {
+    let mut table = [Keyword::empty(TokenKind::IDENTIFIER); 128];
+    let mut i = 0;
+    while i < KEYWORD_LIST.len() {
+        let (text, kind) = KEYWORD_LIST[i];
+        let len = text.len();
+        let slot = keyword_hash(text[0], text[1], text[len - 1], len);
+        assert!(table[slot].len == 0, "keyword_hash collides");
+        table[slot] = Keyword::new(text, kind);
+        i += 1;
+    }
+    table
+};
 
 /// The end of `[_0-9]*` from `pos`.
 fn digits_or_underscores(text: &[u8], mut pos: usize) -> usize {
@@ -917,15 +1126,110 @@ pub fn tokenize(text: &[u8], level: LanguageLevel) -> Lexed {
 /// `tokenize` into `lexed`, which is cleared first (its buffers are reused).
 pub fn tokenize_into(text: &[u8], level: LanguageLevel, lexed: &mut Lexed) {
     let text = &text[..text.len().min(u32::MAX as usize)];
-    lexed.begin(text.len());
+    let mut out = lexed.writer(text.len(), TokenKind::BAD_CHARACTER);
     let mut lexer = JavaLexer::new(level, text);
-    while let Some(kind) = lexer.get_token_type() {
-        let plain = lexer.token_is_plain();
-        lexed.push(kind, lexer.get_token_start() as u32, plain);
-        lexer.advance();
+    let flex = FlexJavaLexer::new(level);
+    let end = text.len();
+    let mut pos = 0;
+    // What the state stack says at a token start, which only `locate_token` changes: whether it is `[STATE_DEFAULT]`
+    // (a plain token), and whether its top counts no template braces (`{` and `}` are then LBRACE and RBRACE).
+    let mut plain = true;
+    let mut braces_plain = true;
+    while pos < end {
+        let b = text[pos];
+        let (kind, token_end) = match BYTE_CLASS[b as usize] {
+            ByteClass::Letter => {
+                let token_end = identifier_end(text, pos + 1);
+                (flex.keyword_or_identifier_at(text, pos, token_end), token_end)
+            }
+            ByteClass::Space => {
+                let mut token_end = pos + 1;
+                while text.get(token_end).is_some_and(|&b| ASCII_WHITE_SPACE[b as usize]) {
+                    token_end += 1;
+                }
+                if text.get(token_end).is_some_and(|&b| b == b'\\' || b == 0x1A) {
+                    token_end = lexer.get_chars(token_end, b" \t\n\r\x0C", Some(0x1A));
+                }
+                (TokenKind::WHITE_SPACE, token_end)
+            }
+            ByteClass::Single(kind) => (kind, pos + 1),
+            ByteClass::Brace(kind) if braces_plain => (kind, pos + 1),
+            ByteClass::Operator => flex.advance(text, pos),
+            ByteClass::Digit => number(text, pos),
+            _ => {
+                // `locateToken` from `pos` (and the backslash rule of `token_is_plain`)
+                lexer.my_token_end_offset = pos;
+                lexer.located = false;
+                let kind = lexer.get_token_type().unwrap_or(TokenKind::BAD_CHARACTER);
+                out.push(kind, pos as u32, lexer.token_is_plain());
+                pos = lexer.my_token_end_offset;
+                let top = lexer.top_int();
+                plain = lexer.my_state_stack.len() == 1 && top == STATE_DEFAULT;
+                braces_plain = top >> 16 == 0;
+                continue;
+            }
+        };
+        out.push(kind, pos as u32, plain);
+        pos = token_end;
     }
-    lexed.end(text.len() as u32);
+    out.end(text.len() as u32);
 }
+
+/// How `tokenize_into` lexes a token by its first byte without `locate_token`: what `locateCharAt` returns for an
+/// ASCII byte other than a backslash is that byte, so `locateToken`'s own rules (whitespace, braces, comments,
+/// literals, `#`, `\u001a`) see it as it is and the rest go to `FlexJavaLexer`.
+#[derive(Copy, Clone)]
+enum ByteClass {
+    /// `locate_token`: a backslash, a byte at 0x80 or above, `/`, the quotes, `#`, `\u001a`, the controls.
+    Slow,
+    /// `[:jletter:]` in ASCII: an identifier or keyword.
+    Letter,
+    /// A digit: `number`.
+    Digit,
+    /// Whitespace: the run `getWhitespaces` takes.
+    Space,
+    /// A one-character token of `FlexJavaLexer` that starts no longer one.
+    Single(TokenKind),
+    /// `{` or `}`, which `locateToken` counts when the state's top counts template braces.
+    Brace(TokenKind),
+    /// The other operators and `.`: `FlexJavaLexer::advance`.
+    Operator,
+}
+
+const BYTE_CLASS: [ByteClass; 256] = {
+    use TokenKind::*;
+    let mut table = [ByteClass::Slow; 256];
+    let mut b = 0;
+    while b < 0x80 {
+        let c = b as u8;
+        table[b] = if c.is_ascii_alphabetic() || c == b'$' || c == b'_' {
+            ByteClass::Letter
+        } else if c.is_ascii_digit() {
+            ByteClass::Digit
+        } else {
+            match c {
+                b' ' | b'\t' | b'\n' | b'\r' | 0x0C => ByteClass::Space,
+                b'(' => ByteClass::Single(LPARENTH),
+                b')' => ByteClass::Single(RPARENTH),
+                b'[' => ByteClass::Single(LBRACKET),
+                b']' => ByteClass::Single(RBRACKET),
+                b';' => ByteClass::Single(SEMICOLON),
+                b',' => ByteClass::Single(COMMA),
+                b'@' => ByteClass::Single(AT),
+                b'~' => ByteClass::Single(TILDE),
+                b'?' => ByteClass::Single(QUEST),
+                b'{' => ByteClass::Brace(LBRACE),
+                b'}' => ByteClass::Brace(RBRACE),
+                b'.' | b'=' | b'!' | b'|' | b'+' | b'-' | b'<' | b'>' | b'&' | b'*' | b'^' | b'%' | b':' => {
+                    ByteClass::Operator
+                }
+                _ => ByteClass::Slow,
+            }
+        };
+        b += 1;
+    }
+    table
+};
 
 /// `JavaTypeEscapeLexer(JavaLexer(level))` over `text` into `lexed`: a BAD_CHARACTER followed by `[` or `]` is
 /// merged into that bracket (escaped array brackets of markdown JavaDoc reference links, `char\[\]`).
@@ -990,6 +1294,21 @@ mod tests {
         assert_eq!(lex("1e5L"), vec![(DOUBLE_LITERAL, "1e5"), (IDENTIFIER, "L")]);
         assert_eq!(lex("0x."), vec![(INTEGER_LITERAL, "0x"), (DOT, ".")]);
         assert_eq!(lex("1.2.3"), vec![(DOUBLE_LITERAL, "1.2"), (DOUBLE_LITERAL, ".3")]);
+    }
+
+    #[test]
+    fn keywords() {
+        for (text, kind) in KEYWORD_LIST {
+            let text = std::str::from_utf8(text).unwrap();
+            assert_eq!(lex(text), vec![(kind, text)]);
+            let lexed = tokenize(text.as_bytes(), LanguageLevel::HIGHEST);
+            assert_eq!(lexed.types, [kind], "{text}");
+        }
+        let low = tokenize(b"assert enum", LanguageLevel::JDK_1_3);
+        assert_eq!(low.types, [TokenKind::IDENTIFIER, TokenKind::WHITE_SPACE, TokenKind::IDENTIFIER]);
+        for word in ["a", "Class", "synchronizedx", "implement", "instanceOf", "nul", "ifx", "x_if", "$if"] {
+            assert_eq!(tokenize(word.as_bytes(), LanguageLevel::HIGHEST).types, [TokenKind::IDENTIFIER], "{word}");
+        }
     }
 
     #[test]

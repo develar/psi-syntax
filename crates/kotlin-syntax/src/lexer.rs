@@ -6,7 +6,7 @@
 //! Rules are matched per state in the order of the spec; the comments name the spec rule each branch implements.
 
 pub(crate) use psi_builder::lexer::char_at;
-use psi_builder::lexer::in_ranges;
+use psi_builder::lexer::{Keyword, in_ranges};
 
 use crate::tokens::TokenKind;
 use crate::tokens::TokenKind::*;
@@ -82,39 +82,97 @@ const ASCII_IDENTIFIER_PART: [bool; 256] = {
     table
 };
 
-/// The hard keywords Kotlin.flex lists as literal rules (before `{IDENTIFIER}`).
-fn hard_keyword(text: &[u8]) -> Option<TokenKind> {
-    Some(match text {
-        b"typealias" => TYPE_ALIAS_KEYWORD,
-        b"interface" => INTERFACE_KEYWORD,
-        b"continue" => CONTINUE_KEYWORD,
-        b"package" => PACKAGE_KEYWORD,
-        b"return" => RETURN_KEYWORD,
-        b"object" => OBJECT_KEYWORD,
-        b"while" => WHILE_KEYWORD,
-        b"break" => BREAK_KEYWORD,
-        b"class" => CLASS_KEYWORD,
-        b"throw" => THROW_KEYWORD,
-        b"false" => FALSE_KEYWORD,
-        b"super" => SUPER_KEYWORD,
-        b"typeof" => TYPEOF_KEYWORD,
-        b"when" => WHEN_KEYWORD,
-        b"true" => TRUE_KEYWORD,
-        b"this" => THIS_KEYWORD,
-        b"null" => NULL_KEYWORD,
-        b"else" => ELSE_KEYWORD,
-        b"try" => TRY_KEYWORD,
-        b"val" => VAL_KEYWORD,
-        b"var" => VAR_KEYWORD,
-        b"fun" => FUN_KEYWORD,
-        b"for" => FOR_KEYWORD,
-        b"is" => IS_KEYWORD,
-        b"in" => IN_KEYWORD,
-        b"if" => IF_KEYWORD,
-        b"do" => DO_KEYWORD,
-        b"as" => AS_KEYWORD,
-        _ => return None,
-    })
+/// The end of `[^\\\"\n\$]*` in `text` from `start`.
+#[inline(always)]
+fn regular_string_part_end(text: &[u8], start: usize) -> usize {
+    let mut j = start;
+    while text.get(j).is_some_and(|&b| !matches!(b, b'\\' | b'"' | b'\n' | b'$')) {
+        j += 1;
+    }
+    j
+}
+
+/// The end of `{IDENTIFIER_PART}*` in `text` from `j`: ASCII through `ASCII_IDENTIFIER_PART`, other characters
+/// decoded.
+#[inline(always)]
+fn identifier_part_end(text: &[u8], mut j: usize) -> usize {
+    loop {
+        while text.get(j).is_some_and(|&b| ASCII_IDENTIFIER_PART[b as usize]) {
+            j += 1;
+        }
+        if text.get(j).is_none_or(|&b| b < 0x80) {
+            return j;
+        }
+        let (cp, len) = char_at(text, j);
+        if !is_identifier_part(cp) {
+            return j;
+        }
+        j += len;
+    }
+}
+
+/// The hard keywords Kotlin.flex lists as literal rules (before `{IDENTIFIER}`), as `HARD_KEYWORDS` holds them.
+const HARD_KEYWORD_LIST: [(&[u8], TokenKind); 28] = [
+    (b"typealias", TYPE_ALIAS_KEYWORD),
+    (b"interface", INTERFACE_KEYWORD),
+    (b"continue", CONTINUE_KEYWORD),
+    (b"package", PACKAGE_KEYWORD),
+    (b"return", RETURN_KEYWORD),
+    (b"object", OBJECT_KEYWORD),
+    (b"while", WHILE_KEYWORD),
+    (b"break", BREAK_KEYWORD),
+    (b"class", CLASS_KEYWORD),
+    (b"throw", THROW_KEYWORD),
+    (b"false", FALSE_KEYWORD),
+    (b"super", SUPER_KEYWORD),
+    (b"typeof", TYPEOF_KEYWORD),
+    (b"when", WHEN_KEYWORD),
+    (b"true", TRUE_KEYWORD),
+    (b"this", THIS_KEYWORD),
+    (b"null", NULL_KEYWORD),
+    (b"else", ELSE_KEYWORD),
+    (b"try", TRY_KEYWORD),
+    (b"val", VAL_KEYWORD),
+    (b"var", VAR_KEYWORD),
+    (b"fun", FUN_KEYWORD),
+    (b"for", FOR_KEYWORD),
+    (b"is", IS_KEYWORD),
+    (b"in", IN_KEYWORD),
+    (b"if", IF_KEYWORD),
+    (b"do", DO_KEYWORD),
+    (b"as", AS_KEYWORD),
+];
+
+/// The slot of a hard keyword candidate in `HARD_KEYWORDS`: its first and last byte and its length.
+#[inline(always)]
+const fn hard_keyword_hash(first: u8, last: u8, len: usize) -> usize {
+    (first as usize + last as usize * 31 + len * 53) & 63
+}
+
+/// `HARD_KEYWORD_LIST` by `hard_keyword_hash`; an empty slot has length 0. Building it fails to compile on a collision.
+const HARD_KEYWORDS: [Keyword<TokenKind>; 64] = {
+    let mut table = [Keyword::empty(IDENTIFIER); 64];
+    let mut i = 0;
+    while i < HARD_KEYWORD_LIST.len() {
+        let (text, kind) = HARD_KEYWORD_LIST[i];
+        let slot = hard_keyword_hash(text[0], text[text.len() - 1], text.len());
+        assert!(table[slot].len == 0, "hard_keyword_hash collides");
+        table[slot] = Keyword::new(text, kind);
+        i += 1;
+    }
+    table
+};
+
+/// `hard_keyword(&text[start..end]).unwrap_or(IDENTIFIER)` through `HARD_KEYWORDS`: one candidate, compared a word
+/// at a time.
+#[inline(always)]
+fn hard_keyword_at(text: &[u8], start: usize, end: usize) -> TokenKind {
+    let len = end - start;
+    if !(2..=9).contains(&len) || !text[start].is_ascii_lowercase() {
+        return IDENTIFIER;
+    }
+    let entry = &HARD_KEYWORDS[hard_keyword_hash(text[start], text[end - 1], len)];
+    if entry.matches(text, start, end) { entry.kind } else { IDENTIFIER }
 }
 
 impl<'a> KotlinLexer<'a> {
@@ -209,20 +267,7 @@ impl<'a> KotlinLexer<'a> {
         if !is_letter(cp) {
             return None;
         }
-        let mut j = i + len;
-        loop {
-            let rest = &self.text[j..];
-            j += rest.iter().position(|&b| !ASCII_IDENTIFIER_PART[b as usize]).unwrap_or(rest.len());
-            if j >= self.text.len() || self.text[j] < 0x80 {
-                break;
-            }
-            let (cp, len) = char_at(self.text, j);
-            if !is_identifier_part(cp) {
-                break;
-            }
-            j += len;
-        }
-        Some(j)
+        Some(identifier_part_end(self.text, i + len))
     }
 
     /// The next token (`FlexAdapter.advance` + `getTokenType`), or `None` at the end of the text.
@@ -269,6 +314,7 @@ impl<'a> KotlinLexer<'a> {
 
     /// The rules of the initial state and of the inclusive states (`%state LONG_TEMPLATE_ENTRY UNMATCHED_BACKTICK`).
     /// Returns `None` when a rule matched without returning a token (a comment opener, a bare `"`).
+    #[inline(always)]
     fn lex_inclusive(&mut self, start: usize) -> Option<TokenKind> {
         let text = self.text;
         let c = text[start];
@@ -467,7 +513,7 @@ impl<'a> KotlinLexer<'a> {
                         (AS_SAFE, 3)
                     } else {
                         // the keyword rules win the tie with {IDENTIFIER}
-                        (hard_keyword(word).unwrap_or(IDENTIFIER), end - start)
+                        (hard_keyword_at(text, start, end), end - start)
                     }
                 }
                 // error fallback [\s\S]: one character
@@ -700,10 +746,7 @@ impl<'a> KotlinLexer<'a> {
 
     /// The end of `REGULAR_STRING_PART=[^\\\"\n\$]+` at `start`.
     fn regular_string_part_end(&self, start: usize) -> usize {
-        match self.text[start..].iter().position(|&b| matches!(b, b'\\' | b'"' | b'\n' | b'$')) {
-            Some(p) => start + p.max(1),
-            None => self.text.len(),
-        }
+        regular_string_part_end(self.text, start).max(start + 1)
     }
 
     /// `<STRING, RAW_STRING>` at a `$`: `{SHORT_TEMPLATE_ENTRY}`, `{LONELY_DOLLAR}`, `{LONG_TEMPLATE_ENTRY_START}`.
@@ -804,15 +847,122 @@ pub fn tokenize(text: &[u8]) -> Lexed {
 }
 
 /// `tokenize` into `lexed`, which is cleared first (its buffers are reused).
+///
+/// In the states whose rules are `lex_inclusive`'s, a token whose first byte cannot change the state (any but `"`, `$`
+/// and a backtick, and a brace in LONG_TEMPLATE_ENTRY) is lexed without `advance`: identifiers, keywords, whitespace and
+/// one-byte tokens inline, the rest by `lex_inclusive`.
 pub fn tokenize_into(text: &[u8], lexed: &mut Lexed) {
     let text = &text[..text.len().min(u32::MAX as usize)];
-    lexed.begin(text.len());
+    let len = text.len();
+    let mut out = lexed.writer(len, BAD_CHARACTER);
     let mut lexer = KotlinLexer::new(text);
-    while let Some(token) = lexer.advance() {
-        lexed.push(token.kind, token.start as u32, lexer.last_token_was_plain());
+    let mut pos = 0;
+    // What the state says at a token start, which only `advance` changes: whether `lex_inclusive` lexes it, whether
+    // a token starting there is plain, and whether a brace is LBRACE or RBRACE (not counted by LONG_TEMPLATE_ENTRY).
+    let (mut inclusive, mut plain, mut braces) = (true, true, true);
+    while pos < len {
+        let start = pos;
+        if inclusive {
+            let b = text[start];
+            let token = match BYTE_CLASS[b as usize] {
+                ByteClass::Letter => {
+                    let end = identifier_part_end(text, start + 1);
+                    if end == start + 2 && b == b'a' && text[start + 1] == b's' && text.get(end) == Some(&b'?') {
+                        Some((AS_SAFE, start + 3))
+                    } else {
+                        Some((hard_keyword_at(text, start, end), end))
+                    }
+                }
+                ByteClass::Space => {
+                    let mut end = start + 1;
+                    while text.get(end).is_some_and(|&b| matches!(b, b' ' | b'\n' | b'\t' | 0x0C)) {
+                        end += 1;
+                    }
+                    Some((WHITE_SPACE, end))
+                }
+                ByteClass::Single(kind) => Some((kind, start + 1)),
+                ByteClass::Brace(kind) if braces => Some((kind, start + 1)),
+                ByteClass::Inclusive => lexer.lex_inclusive(start).map(|kind| (kind, lexer.pos)),
+                ByteClass::Advance if b == b'"' && text.get(start + 1..start + 3) != Some(b"\"\"") => {
+                    // `"` REGULAR_STRING_PART? `"`: the string `advance` would lex in STRING_PREFIX and STRING, its
+                    // state pushed by `\"` and popped by the closing quote (so the state is as before); none of
+                    // its tokens is plain
+                    let close = regular_string_part_end(text, start + 1);
+                    if text.get(close) == Some(&b'"') {
+                        out.push(OPEN_QUOTE, start as u32, false);
+                        if close > start + 1 {
+                            out.push(REGULAR_STRING_PART, start as u32 + 1, false);
+                        }
+                        out.push(CLOSING_QUOTE, close as u32, false);
+                        pos = close + 1;
+                        continue;
+                    }
+                    None
+                }
+                _ => None,
+            };
+            if let Some((kind, end)) = token {
+                out.push(kind, start as u32, plain);
+                pos = end;
+                continue;
+            }
+        }
+        lexer.pos = start;
+        let Some(token) = lexer.advance() else { break };
+        out.push(token.kind, token.start as u32, lexer.last_token_was_plain());
+        pos = lexer.pos;
+        inclusive = matches!(lexer.state, State::Initial | State::UnmatchedBacktick | State::LongTemplateEntry);
+        plain = lexer.state == State::Initial && lexer.states.is_empty();
+        braces = lexer.state != State::LongTemplateEntry;
     }
-    lexed.end(text.len() as u32);
+    out.end(len as u32);
 }
+
+/// How `tokenize_into` lexes a token in a `lex_inclusive` state by its first byte.
+#[derive(Copy, Clone)]
+enum ByteClass {
+    /// `advance`: `"`, `$` and a backtick (their rules can push a state).
+    Advance,
+    /// An ASCII `{LETTER}`: an identifier, a hard keyword or `as?`.
+    Letter,
+    /// `({WHITE_SPACE_CHAR})+`.
+    Space,
+    /// A one-byte token that starts no longer one.
+    Single(TokenKind),
+    /// `{` or `}`: LONG_TEMPLATE_ENTRY counts them.
+    Brace(TokenKind),
+    /// The rest of `lex_inclusive`, which changes no state there: operators, numbers, comments, character literals,
+    /// non-ASCII identifiers and BAD_CHARACTER.
+    Inclusive,
+}
+
+const BYTE_CLASS: [ByteClass; 256] = {
+    let mut table = [ByteClass::Inclusive; 256];
+    let mut b = 0;
+    while b < 0x80 {
+        let c = b as u8;
+        table[b] = if c.is_ascii_alphabetic() || c == b'_' {
+            ByteClass::Letter
+        } else {
+            match c {
+                b'"' | b'$' | b'`' => ByteClass::Advance,
+                b' ' | b'\n' | b'\t' | 0x0C => ByteClass::Space,
+                b'?' => ByteClass::Single(QUEST),
+                b',' => ByteClass::Single(COMMA),
+                b'@' => ByteClass::Single(AT),
+                b'[' => ByteClass::Single(LBRACKET),
+                b']' => ByteClass::Single(RBRACKET),
+                b'(' => ByteClass::Single(LPAR),
+                b')' => ByteClass::Single(RPAR),
+                b'{' => ByteClass::Brace(LBRACE),
+                b'}' => ByteClass::Brace(RBRACE),
+                _ => ByteClass::Inclusive,
+            }
+        };
+        b += 1;
+    }
+    table
+};
 
 #[cfg(test)]
 mod tests {
@@ -967,6 +1117,16 @@ mod tests {
             [(FIELD_IDENTIFIER, "$x"), (WHITE_SPACE, " "), (BAD_CHARACTER, "\r"), (BAD_CHARACTER, "|")]
         );
         assert_eq!(lex("Жx1 €"), [(IDENTIFIER, "Жx1"), (WHITE_SPACE, " "), (BAD_CHARACTER, "€")]);
+    }
+
+    #[test]
+    fn hard_keywords() {
+        for (text, kind) in HARD_KEYWORD_LIST {
+            assert_eq!(lex(std::str::from_utf8(text).unwrap()), [(kind, std::str::from_utf8(text).unwrap())]);
+        }
+        for word in ["a", "ass", "Fun", "typealiases", "interfacE", "iff", "xs", "_if", "nul", "This"] {
+            assert_eq!(lex(word), [(IDENTIFIER, word)], "{word}");
+        }
     }
 
     #[test]

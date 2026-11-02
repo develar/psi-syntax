@@ -79,12 +79,23 @@ The lexers are hand ports of `Kotlin.flex` and `KDoc.flex`, not generated code:
 
 Offsets are bytes. A byte that does not start valid UTF-8 counts as one character. Character classes above ASCII come
 from tables decoded out of the generated Java lexers' character maps (`src/unicode.rs`), so `[:letter:]` is Java's
-own. ASCII is handled by byte tables and byte `match`es:
+own. ASCII is handled by byte tables:
 
-- `hard_keyword` and `TokenKind::soft_keyword_by_text` / `keyword_by_debug_name` are byte matches;
-- `plain_identifier_end` scans a `const ASCII_IDENTIFIER_PART: [bool; 128]` table.
+- `tokenize_into` (what a parse lexes) dispatches on a 256-entry class of a token's first byte while the state is one
+  of `lex_inclusive`'s and the byte cannot change it (all but `"`, `$`, a backtick, and a brace in
+  LONG_TEMPLATE_ENTRY): identifiers, hard keywords, whitespace and one-byte tokens are lexed inline, a complete
+  `"…"` without escapes or templates as its two or three tokens, the rest by `lex_inclusive`; anything else goes
+  through `advance`. The plain bit of such a token is the one `advance` left, since none of them changes the state.
+- Hard keywords are a perfect hash (`hard_keyword_hash` of the first and last byte and the length into 64 slots, a
+  collision fails to compile), one candidate compared as a masked word read from the text (`psi_builder::lexer::
+  Keyword`); `TokenKind::soft_keyword_by_text` / `keyword_by_debug_name` are byte matches.
+- Identifier parts scan `ASCII_IDENTIFIER_PART`; a byte at 0x80 or above is decoded and asked `is_identifier_part`.
+- Tokens go to `Lexed` through `LexedWriter`, a batch of 64 on the stack (two stores and a bit a token), appended
+  when full.
 
-Lexing takes under 10 % of a parse, so it is optimized only where that is cheap and safe.
+Java's `tokenize_into` does the same over `JavaLexer` (see "Java"). The lexers' tokens and plain bits were compared
+with the previous code's on every gate corpus before the change; the gate's lexer oracles hash `tokenize_into`'s
+tokens.
 
 ### Builder (`psi-builder` `src/builder.rs`, Kotlin's layer in `kotlin-syntax` `src/builder.rs`)
 
@@ -181,6 +192,15 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
   UTF-16 original. `[:jletter:]` and `[:jletterdigit:]` above ASCII are decoded from the generated lexers' DFA tables by
   running them (`tools/java-unicode.py`), JFlex's `.` excludes `\n\r\u000B\u000C\u0085\u2028\u2029` (read off the
   same tables).
+- **Lexer fast paths.** `locateCharAt` of an ASCII byte other than a backslash is that byte (inline; the decoding is
+  `locate_char_at_slow`), and an ASCII byte is never inside a multi-byte character, so the scans of comments, line
+  comments, literals and whitespace skip the bytes that cannot end them (eight at a time for comments:
+  `psi_builder::lexer::find_either`, `find_any3`) and decode only at a backslash or a byte above ASCII.
+  `tokenize_into` dispatches on the class of a token's first byte (`BYTE_CLASS`): an ASCII letter, digit, whitespace,
+  one-byte token or operator is lexed without `locateToken` (what it would do with that byte: the state stack is
+  only read by `{` and `}`, which take the fast path while its top counts no template braces); a backslash, a byte
+  above ASCII, `/`, the quotes, `#`, `\u001a` and the controls go through `locate_token`. Keywords are a perfect hash
+  of the first, second and last byte and the length into 128 slots (`keyword_hash`), compared as one or two words.
 - **Builder.** The Java parsers run on platform/syntax's `SyntaxTreeBuilder`; the port runs them on `psi_builder`'s
   `PsiBuilderImpl` seen through `SyntaxTreeBuilder<'b>`, a handle with the `stopAt` offset of
   `JavaParserUtil.stoppingBuilder` (nested ones stop at the nearest), so no adapter is a type of its own and
