@@ -7,10 +7,13 @@ Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI,
 | `crates/psi-builder` | the language-neutral half: IntelliJ's `PsiBuilderImpl` (markers, production, edge binders), the preorder column tree and its consumer API, the parse driver that expands chameleons in place, the dump's layout, token-set storage and lexer helpers, all generic over `psi_builder::Language` |
 | `crates/kotlin-syntax` | Kotlin (package `kotlin-syntax` for consumers): tokens, lexers, node kinds, binders, the `SemanticWhitespaceAwarePsiBuilder` layer, the parsers, KDoc, and `Kotlin: Language` |
 | `crates/java-syntax` | Java (package `java-syntax`): tokens, node types, the Java and JavaDoc lexers (complete), the binders, `Java: Language`, the dumps, and the parsers (see "Java") |
-| `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java`, else by extension) |
+| `crates/csharp-syntax` | C# (package `csharp-syntax`): Roslyn's lexer, directive parser, `LanguageParser` and `DocumentationCommentParser` over a green arena, flattened into `psi_builder`'s tree; `CSharp: TreeLanguage`, the dump, the diagnostics (see "C#") |
+| `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java\|csharp`, else by extension) |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
-`DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte. Consumers: accio (code search; declarations,
+`DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
+Java PSI, and `csharp_syntax::dump::tree_to_string` prints Roslyn 5.9.0's syntax tree as `tools/csharp-oracle` dumps
+it (nodes, tokens, trivia, diagnostics). Consumers: accio (code search; declarations,
 call sites, imports) and Branch Deck's `code-symbols` (diff highlighting, navigation, file summaries). Both read the
 tree directly: there is no tree-sitter compatibility layer and there must never be one. `docs/DESIGN.md` describes the
 architecture as built, its decisions, the measured numbers and the open items.
@@ -55,26 +58,115 @@ verbatim. `java-syntax` implements `psi_builder::Language` as `kotlin-syntax` do
 | Parsers | `parser/*.kt` | `parser/*.rs`, one file per Kotlin file; `JavaParser` wires them; the one unported method, `JavaParserUtil.stoppingBuilder(builder, condition)` (JavaParserUtil.kt:133), has no caller in intellij-community and no stub (`java_parser_util.rs` says why) |
 | Messages, levels | `resources/messages/JavaSyntaxBundle.properties`, `pom/java/LanguageLevel.kt`, `JavaFeature.kt` | `bundle.rs`, `language_level.rs` |
 
-### C# (pins and oracle)
+### C# (Roslyn's lexer and parser ported)
 
 dotnet/roslyn at 35d9211b841e7613c1d2f8f5af6d628ace696c4c (branch release/insiders, no tag contains it), the commit
-NuGet `Microsoft.CodeAnalysis.CSharp` 5.9.0 is built from: the lexer and parser under
-`src/Compilers/CSharp/Portable/Parser/`, the kinds and node shapes under `src/Compilers/CSharp/Portable/Syntax/`
-(`SyntaxKind.cs`, `Syntax.xml`), messages in `src/Compilers/CSharp/Portable/CSharpResources.resx`. Read them with
+NuGet `Microsoft.CodeAnalysis.CSharp` 5.9.0 is built from (its nuspec names it): the lexer and parsers under
+`src/Compilers/CSharp/Portable/Parser/`, the kinds, node shapes and green semantics under
+`src/Compilers/CSharp/Portable/Syntax/` (`SyntaxKind.cs`, `SyntaxKindFacts.cs`, `Syntax.xml`, `InternalSyntax/`),
+the diagnostics under `Errors/` with their messages in `CSharpResources.resx`. Read them with
 `git -C ~/.cache/psi-syntax/roslyn show 35d9211b841e7613c1d2f8f5af6d628ace696c4c:<path>` (a blobless clone), never
-from a working tree. Scope: full parses of `.cs` files at `LanguageVersion.Latest` (gated at Preview too),
-`DocumentationMode.Parse`, diagnostics included; no scripts, preprocessor symbols, incremental parsing or node cache.
+from a working tree. Scope, what accio needs: full parses of `.cs` files at any `LanguageVersion` (`Latest` by
+default, the gate also runs Preview), any `DocumentationMode` (`Parse` by default), diagnostics with their English
+messages; no scripts (`.csx`), preprocessor symbols, `Features`, incremental parsing, node cache or body-less parsing
+(Roslyn reparses no block on its own).
+
+The rules of the Kotlin and Java ports hold: one Rust function per C# method, the same name in snake_case, the same
+order, so a diff against the C# reads line by line; error codes and their arguments, recovery, speculation with reset
+points and feature checks (`LanguageVersion`, `CheckFeatureAvailability`) exactly as Roslyn has them. C# overloads
+take a suffix after the first (`_with_<last parameter>`), `ref`/`out` parameters are `&mut`, a C# local function is a
+nested or module-private `fn` right after its method, a call's arguments are evaluated into locals left to right as
+C# evaluates them, `ParserSyntaxContextResetter` and disposable reset points are a save and restore where the `using`
+scope ends (`parser/mod.rs`, `statements.rs`, `expressions.rs` say it at the top). A green factory is the
+`GreenArena` method of `InternalSyntax.SyntaxFactory`'s name (`self.arena().class_declaration(...)`).
+`StackGuard.EnsureSufficientExecutionStack` is a depth counter (see the consumer contract, "Nesting", and DESIGN,
+"C# nesting and work"); a recursion Roslyn leaves unguarded gets the same counter. Every deviation from Roslyn is
+named at its place and listed in DESIGN, "C# deviations".
+
+| source (under `src/Compilers/CSharp/Portable/` unless rooted) | port (`crates/csharp-syntax/src/`) |
+|---|---|
+| `Syntax/SyntaxKind.cs`, `Syntax/Syntax.xml` | `syntax_kind.rs`: `SyntaxKind` with Roslyn's numbers, `TokenKind` (the 244 `IsAnyToken` kinds and the 8 unstructured trivia), `NodeKind` (the 322 node kinds of Syntax.xml, structured trivia among them), dense, `NODE_BASE` 252; generated |
+| `Syntax/Syntax.xml` (`TreeFlattening.FlattenChildren` for its `Choice` and `Sequence` fields) | `syntax.rs`: per node type its kinds, slots in field order and boolean fields, and `InternalSyntax.SyntaxFactory`'s factories as `GreenArena` methods; generated |
+| `Errors/ErrorCode.cs`, `Errors/MessageID.cs`, `Errors/XmlParseErrorCode.cs`, `CSharpResources.resx` | `error_code.rs`: the 175 codes `Parser/*.cs` reports and the feature diagnostics, with numbers, severities and English formats, `MessageID` with `RequiredVersion`, `XmlParseErrorCode`; generated |
+| `src/Compilers/Core/Portable/Xml/XmlCharType.cs` | `xml_char_type.rs`: its character property tables; generated |
+| `CharUnicodeInfo.GetUnicodeCategory` of the oracle's .NET 10.0.x | `unicode.rs`: the lexer's classes of a UTF-16 code unit above ASCII; generated by `tools/csharp-unicode` |
+| `Syntax/SyntaxKindFacts.cs` | `facts.rs` (not `GetOperatorKind`, `IsCheckedOperator`: metadata names for the binder) |
+| `LanguageVersion.cs`, `CSharpParseOptions.IsFeatureEnabled` | `language_version.rs` |
+| `Syntax/InternalSyntax/` (`CSharpSyntaxNode`, `SyntaxToken*`, `SyntaxTrivia`, `SyntaxFirstTokenReplacer`, `SyntaxLastTokenReplacer`), `Errors/SyntaxDiagnosticInfo.cs`, `Errors/XmlSyntaxDiagnosticInfo.cs`, `SyntaxListBuilder`, `SyntaxListPool` | `green.rs`: the green tree as an arena with Roslyn's copy semantics and flags |
+| the red tree's positions, `ChildNodesAndTokens()`, `Syntax/SyntaxTreeDiagnosticEnumerator.cs` | `flatten.rs`: green to `psi_builder::Tree<CSharp>` and the diagnostics in Roslyn's order |
+| `src/Compilers/Core/Portable/Diagnostic/DiagnosticInfo.cs` (`GetMessage`), `XmlSyntaxDiagnosticInfo` | `diagnostic.rs`: a message as `string.Format` of the English format formats Roslyn's arguments |
+| `tools/csharp-oracle/Dump.cs` | `dump.rs`: `tree_to_string`, `lex_to_string`, `index_line` |
+| `CSharpSyntaxTree.ParseText`, `SyntaxFactory.Parse*`, `CSharpParseOptions` | `tree.rs` (`Parser`, `Tree`, `FileKind`, `Entry`, `DocumentationMode`, `Diagnostic`), `language.rs` (`CSharp: TreeLanguage`) |
+| `Parser/SyntaxParser.cs`, `Parser/SyntaxParser.ResetPoint.cs` | `syntax_parser.rs`: the token window, lexer modes, reset points, `EatToken`, the error helpers, skipped syntax, keyword conversions, feature checks |
+| `Parser/Lexer.cs`, `AbstractLexer.cs`, `Lexer_StringLiteral.cs`, `Lexer_RawStringLiteral.cs`, `Lexer.Interpolation.cs`, `SlidingTextWindow.cs`, `CharacterInfo.cs` (with `UnicodeCharacterUtilities`), `DocumentationCommentXmlTokens.cs` | `lexer/mod.rs`, `abstract_lexer.rs`, `string_literal.rs`, `raw_string_literal.rs`, `interpolation.rs`, `sliding_text_window.rs`, `character_info.rs`, the XML tokens in `lexer/mod.rs` |
+| `Parser/Directives.cs`, `Parser/DirectiveParser.cs` | `lexer/directives.rs`, `lexer/directive_parser.rs` |
+| `Parser/LanguageParser.cs` 1-235 and 14420- (state, entry points, `ParseWithStackGuard`, `CreateForGlobalFailure`, `IsTerminator`, reset points, `ParseCommaSeparatedSyntaxList`, `ConsumeUnexpectedTokens`), `SyntaxFactoryContext.cs` (four flags) | `parser/mod.rs` |
+| `Parser/LanguageParser.cs` 236-6162: namespaces, usings, attributes, type and member declarations, accessors, parameters, fields, variables, enums, names | `parser/declarations.rs` |
+| `Parser/LanguageParser.cs` 6163-8247: type parameters and arguments, `ScanType`, `ParseType`, tuples, function pointers | `parser/types.rs` |
+| `Parser/LanguageParser.cs` 8248-11122: statements, blocks, local declarations and functions | `parser/statements.rs` |
+| `Parser/LanguageParser.cs` 11123-14419: expressions, lambdas, initializers, queries | `parser/expressions.rs` |
+| `Parser/LanguageParser_Patterns.cs` | `parser/patterns.rs` |
+| `Parser/LanguageParser_InterpolatedString.cs` | `parser/interpolated_string.rs` (each hole's lexer and parser over a window of the file) |
+| `Parser/DocumentationCommentParser.cs` | `parser/doc_comment_parser.rs` (run by the lexer on each documentation comment) |
+
+Not ported, as they change no tree: `Blender*.cs` and `BlendedNode.cs` (incremental parsing), `QuickScanner.cs` and
+`LexerCache.cs` (caches of what the lexer makes the same way; keywords are a perfect hash), the node cache. The
+generated files are never edited by hand: `tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV]` writes
+`syntax_kind.rs`, `syntax.rs`, `error_code.rs` and `xml_char_type.rs` from `git show`; `DOTNET_ROOT=$HOME/.cache/psi-syntax/dotnet
+$HOME/.cache/psi-syntax/dotnet/dotnet run --project tools/csharp-unicode > crates/csharp-syntax/src/unicode.rs` writes
+`unicode.rs`. Tests (`crates/csharp-syntax/tests/`): `goldens.rs` (the 7051 goldens of `testdata/csharp` and the
+reduced cases of `tests/oracle/`, `NAME.cs` with the oracle's `NAME.tree.txt` and a `manifest.tsv` line, strict under
+`KS_STRICT=1`; `CSHARP_TESTDATA` names another directory), `robustness.rs` (see DESIGN, "C# nesting and work"),
+`kinds.rs` (the generated tables against each other and `facts`), `flatten.rs` (hand-built green trees dumped),
+`pipeline.rs` (files and entries end to end), `memory.rs` (the arena budget).
 
 The oracle is that package on .NET SDK 10.0.403 (`~/.cache/psi-syntax/dotnet`, pinned by `global.json`, packages by
-`packages.lock.json`): `tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version latest|preview]
-[--doc parse|none]` writes `OUT/<path>.tree.txt` and `index.jsonl`; `oracle.sh lex --list LIST --root ROOT [--doc ...]`
-prints the lexer hash lines. `tools/csharp-oracle/README.md` is the normative dump format, the goldens' extraction and
-the caches: `testdata/csharp/` (7051 goldens of Roslyn's parser and lexer tests, `manifest.tsv` with version, entry
-and documentation mode), the corpora dotnet/roslyn at the pin, dotnet/runtime and dotnet/aspnetcore v10.0.14,
+`packages.lock.json`), run with `DOTNET_ROOT=~/.cache/psi-syntax/dotnet DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1`
+(`oracle.sh` sets the first): `tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version
+latest|preview|N] [--doc parse|none|diagnose] [--entry NAME] [--stack-mb M]` writes `OUT/<path>.tree.txt` and
+`index.jsonl`; `oracle.sh lex --list LIST --root ROOT [--doc ...]` prints the lexer hash lines. Ours:
+`target/release/ksdump --lang csharp --list LIST --root ROOT --out OUT [--version V] [--doc D]` (a list line
+`PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, the flags filling empty columns), `--lex` for the lexer lines, `--check
+ORACLE` and `--lex --check LINES` for the gate's in-memory comparisons, `--bench` for throughput, `--check-bodies` for
+losslessness alone; `scripts/compare.py ORACLE_DIR OURS_DIR` buckets differing `.tree.txt` dumps by their first
+differing line. `tools/csharp-oracle/README.md` is the normative dump format, the goldens' extraction and the caches:
+`testdata/csharp/` (7051 goldens of Roslyn's parser and lexer tests, `manifest.tsv` with version, entry and
+documentation mode), the corpora dotnet/roslyn at the pin, dotnet/runtime and dotnet/aspnetcore v10.0.14,
 AvaloniaUI/Avalonia 12.1.4 under `~/.cache/psi-syntax/csharp-src/` with lists in `corpus/csharp-*.list`, dumps in
-`oracle/csharp-*` (and `-preview`), lexer lines in `lex/csharp-*`, mutations and lexer fuzz in `fuzz/csharp-*`;
-`tools/csharp-oracle/caches.sh` rebuilds them, `vendor-goldens.sh` the goldens. `scripts/compare.py` compares
-`.tree.txt` dumps as it does `.psi.txt`.
+`oracle/csharp-*` (and `-preview`), lexer lines in `lex/csharp-*`, mutations and lexer fuzz in `fuzz/csharp-*` (with
+`-latest` and `-preview` dumps); `tools/csharp-oracle/caches.sh` rebuilds them, `vendor-goldens.sh` the goldens. A
+difference found on a corpus is reduced to a small input, which goes to `crates/csharp-syntax/tests/oracle/` with the
+oracle's dump once fixed. The gate's C# steps are 9 (the lexer at `--doc none`, `parse` and `diagnose` against the
+cached lines) and 10 (the dumps of every corpus at Latest and Preview, the mutations at their goldens' versions, Latest
+and Preview, the fuzz at Latest and Preview; the 6 runtime files without an oracle dump only lossless); see
+`scripts/gate.sh`'s header. While iterating: `cargo test --release -p csharp-syntax --test goldens` (the pass count and
+the first differing lines), then one corpus with `ksdump --check`.
+
+Updating Roslyn (a new `Microsoft.CodeAnalysis.CSharp` release):
+
+1. Find the new commit in the package's nuspec (`<repository commit=...>`), fetch it into the blobless clone
+   (`git -C ~/.cache/psi-syntax/roslyn fetch origin <commit>`), and record the tag that contains it, if any.
+2. Read what changed between the two commits:
+   `git -C ~/.cache/psi-syntax/roslyn diff OLD NEW -- src/Compilers/CSharp/Portable/Parser/ src/Compilers/CSharp/Portable/Syntax/SyntaxKind*.cs src/Compilers/CSharp/Portable/Syntax/Syntax.xml`,
+   and the same for the other sources of the table (`Syntax/InternalSyntax/`, `Errors/`, `LanguageVersion.cs`,
+   `CSharpParseOptions.cs`, `CSharpResources.resx`) and for the tests the goldens come from
+   (`src/Compilers/CSharp/Test/Syntax/Parsing/`, `LexicalAndXml/`).
+3. Move the pin everywhere it is written (`git grep -e <old commit> -e <old version>`, outside `testdata/`): this
+   section, NOTICE, `tools/csharp-gen/gen.py` (`PIN`), `tools/csharp-oracle/CSharpOracle.csproj` (the exact version;
+   then restore once with `CSHARP_ORACLE_UNLOCK=1` to rewrite `packages.lock.json`), `vendor-goldens.sh`, `caches.sh`
+   (the roslyn corpus), the oracle's README, `lexer/directive_parser.rs` (`PRODUCT_VERSION`, what `#error version`
+   prints: take it from the new oracle's dump of `#error version`), the crate's doc comments that name the version, and
+   `global.json` with `tools/csharp-unicode` when the package needs a newer SDK.
+4. Rerun the generators (`gen.py`; `tools/csharp-unicode` when the .NET runtime changed) and `cargo test --release -p
+   csharp-syntax --test kinds`; a new kind, node type or error code shows up in the generated files' diff.
+5. Port the diff method by method into the files of the table, in C# order, with new deviations named at their place
+   and in DESIGN.
+6. Regenerate the oracle's answers: `tools/csharp-oracle/vendor-goldens.sh` (the goldens; read its printed counts
+   against the README's), then `tools/csharp-oracle/caches.sh` (a roslyn corpus at the new pin gets a new list and
+   key, so `scripts/gate.sh`'s corpus names move with it; the mutations and fuzz are regenerated from the new goldens).
+   Never edit a dump to make a test pass.
+7. `cargo test --release -p csharp-syntax`, then `scripts/gate.sh` PASS; record the new counts and any moved
+   measurement in DESIGN with the commit and the date.
 
 ## Layout
 
@@ -104,7 +196,8 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `java-syntax` `src/parser/*.rs` | `java_parser.rs` (`JavaParser`, `JavaSyntaxDefinition.parse`), `java_parser_util.rs` and `java_keywords.rs` (ported), `file_parser.rs`, `module_parser.rs`, `declaration_parser.rs`, `statement_parser.rs`, `expression_parser.rs` (ported: delegates), `pratt_expression_parser.rs`, `reference_parser.rs`, `pattern_parser.rs`, `java_doc_parser.rs`, `jshell_parser.rs`: every method a function, all ported but `JavaParserUtil.stoppingBuilder(builder, condition)`, which nothing calls (`java_parser_util.rs` says why) |
 | `java-syntax` `src/dump.rs` | `psi_to_string` (`DebugUtil.psiToString`: PSI class names and their `toString()`, the labels the goldens show) and `node_tree_to_string` (`DebugUtil.nodeTreeAsElementTypeToString`, the `_node.txt` goldens) |
 | `java-syntax` `tests/lexer.rs`, `tests/goldens.rs`, `tests/doc_comments.rs`, `tests/robustness.rs` | the leaf texts of all 1036 Java goldens against our tokens (adjacent tokens joined where the parser collapses them, reference and type holders relexed); every golden parsed at its level through its entry, both dumps against `NAME.txt` and `NAME_node.txt`; `JavaDocParser` alone, each golden parsed flat and its `PsiDocComment` subtrees compared with the golden's (`JAVA_STRICT=1` or `KS_STRICT=1` fails on any difference); 80 recursive forms nested 100 000 deep, 44 chains and lists of 100 000 and 40 random mixes on a 1 MB stack, random bytes and fragments, every golden under nesting limits 1 to 13 (lossless, `parse_body` exact) |
-| `crates/ksdump/src/main.rs`, `check.rs`, `pool.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench [--docs]` times the file lexer alone (Kotlin's or Java's, a list of one language), with `--docs` also the doc-comment lexer over every doc comment; `--lex` hashes the tokens `tokenize_into` makes, as a parse lexes them; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java` (else `.java` is Java, anything else Kotlin); `--lex` lexes Java files (a list line may be `PATH<TAB>LEVEL`), `--out` dumps them (a list line as `JavaPsiOracle.java` reads it, `--node` adds `.node.txt`), `--bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, never mixed with Kotlin), `--check-bodies` takes one as `--out` does; C# (`--lang csharp` or `.cs`): `--out` and `--lex` take list lines as `tools/csharp-oracle` reads them, `--version V` and `--doc parse|none|diagnose` fill their empty columns, `--lex --bench` times the lexer alone, `--check-bodies` only checks that the leaves are the text. `ksdump --check ORACLE` makes the dumps `--out` would write in memory and compares them byte for byte with the oracle's directory (a dump that differs or that one side lacks; `index.jsonl` aside), writing only the differing ones to `--out`; `--lex --check LINES` compares the `--lex` lines with the oracle's cached ones; both print `N differing of M` and exit nonzero on any (the gate's comparisons). `--out`, `--check`, `--lex` and `--check-bodies` parse on every core (`--threads N`), one `Parser` per thread, the files largest first, the output in list order. Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
+| `csharp-syntax` `src/`, `tests/` | every module with the Roslyn file it ports, and every test: "C#" above |
+| `crates/ksdump/src/main.rs`, `check.rs`, `pool.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing; `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench [--docs]` times the file lexer alone (Kotlin's or Java's, a list of one language), with `--docs` also the doc-comment lexer over every doc comment; `--lex` hashes the tokens `tokenize_into` makes, as a parse lexes them; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java|csharp` (else `.java` is Java, `.cs` C#, anything else Kotlin); `--lex` lexes Java files (a list line may be `PATH<TAB>LEVEL`), `--out` dumps them (a list line as `JavaPsiOracle.java` reads it, `--node` adds `.node.txt`), `--bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, never mixed with Kotlin), `--check-bodies` takes one as `--out` does; C# (`--lang csharp` or `.cs`): `--out` and `--lex` take list lines as `tools/csharp-oracle` reads them, `--version V` and `--doc parse|none|diagnose` fill their empty columns, `--bench` takes a list of C# files (parse and flatten), `--lex --bench` times the lexer alone, `--check-bodies` only checks that the leaves are the text (C# has no lazily parsed bodies). `ksdump --check ORACLE` makes the dumps `--out` would write in memory and compares them byte for byte with the oracle's directory (a dump that differs or that one side lacks; `index.jsonl` aside), writing only the differing ones to `--out`; `--lex --check LINES` compares the `--lex` lines with the oracle's cached ones; both print `N differing of M` and exit nonzero on any (the gate's comparisons). `--out`, `--check`, `--lex` and `--check-bodies` parse on every core (`--threads N`), one `Parser` per thread, the files largest first, the output in list order. Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep and 18 left-associative chains of 100 000 operators on a 1 MB stack, each well under a second; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
@@ -146,6 +239,29 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   a pass over call sites parses in full. Measured on the community files, one thread, 72c8c11: Kotlin
   111.3 -> 231.8 MB/s, nodes 63.7M -> 31.2M, tree 7.64 -> 4.26 bytes per source byte; Java 120.0 -> 265.2 MB/s,
   nodes 85.3M -> 38.6M, tree 8.12 -> 4.24.
+- C# (`csharp_syntax::{Parser, Tree, FileKind}`, `src/tree.rs`): the same `Parser` per thread (`Parser::new()`, then
+  `parser.parse(text, FileKind::default())`, or `FileKind::file(LanguageVersion::CSharp12)`, with `doc_mode` for
+  `DocumentationMode::None` or `Diagnose`; `entry` is for Roslyn's tests and hidden). `Parser` is `Send`, `Tree` is
+  `Send + Sync` with its own `Arc<[u8]>` (the const assertion is in `tree.rs`), and derefs to `psi_builder::Tree<CSharp>`,
+  so every method above applies, with `TokenKind` and `NodeKind` of Roslyn's names (`IdentifierToken`,
+  `ClassDeclaration`). The tree is Roslyn's red tree: a node's range is its full span (with the trivia of its
+  tokens); a token is a leaf over its span, between its leading trivia's leaves and its trailing trivia's, all
+  children of the token's parent; `is_trailing(id)` says a trivia leaf, or the root of a structured trivia, belongs to
+  the token before it, otherwise it leads the token after it; `is_missing(id)` marks an empty token the parser
+  inserted. Unstructured trivia (whitespace, end of line, comments, disabled text, ...) are leaves of `TokenKind`s;
+  structured trivia (directives, documentation comments in `Parse` and `Diagnose` modes, skipped tokens) are subtrees
+  whose root is the trivia's `NodeKind`. `leaves()` is exact for highlighting: contextual keywords the parser converts
+  (`partial`, `async`, `record`, ...) carry their keyword kind, `>>` and `>>>` are the parser's merged tokens.
+  `tree.diagnostics()` is `GetDiagnostics()` in Roslyn's order, errors and warnings alike (`#warning` is CS1030),
+  duplicates included: each with its `node`, `code` (`id()` is `CS1002`, `severity()`), byte span `start..end` and
+  English `message`; `errors()` and `error_message(id)` give the first message on each node. The text to parse is
+  the file's bytes as they are (no `document_text`: a byte order mark is `WhitespaceTrivia`, every line terminator is
+  Roslyn's); valid UTF-8 is Roslyn's tree with UTF-16 positions mapped to bytes, other bytes are one U+FFFD each,
+  lossless. The tree's text is the source but where Roslyn's tree drops a token so that its positions no longer
+  spell the source (one of the 122 741 mutations, a member entry; no corpus file): from there it is the green tree's
+  own text, as `ToFullString()` is. No body-less parsing. A `Parser` keeps
+  its arena's capacity from file to file: the largest file seen sets it (733 MB after dotnet/runtime's 24 MB
+  `hugeexpr1.cs`, 58 MB after the roslyn corpus; DESIGN, "C# memory").
 - Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
   levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
   parenthesized types; a lazy block or lambda adds 4 to where it sits) up to `builder::NESTING_LIMIT` (1000), at most
@@ -209,8 +325,13 @@ the 68 263 community `.java` files, 19 116 golden mutations and 20 000 lexer fuz
 the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
 `tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
 
-Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java says
-otherwise.
+C#: `testdata/csharp/` (7051 goldens of Roslyn's parsing and lexing tests) and `tools/csharp-oracle` (Roslyn 5.9.0
+itself: `oracle.sh dump` and `oracle.sh lex`, the cached dumps and lexer lines of four corpora, 122 741 golden
+mutations and 20 000 lexer fuzz inputs); "C#" above has the commands, `tools/csharp-oracle/README.md` the format.
+Reduced cases go to `crates/csharp-syntax/tests/oracle/`.
+
+Never edit a golden or an oracle dump to make a test pass. A difference is a bug in the port until the Java (or
+Roslyn) says otherwise.
 
 ## Porting conventions (the builder and parser API)
 
@@ -232,7 +353,8 @@ otherwise.
   type or an `Option`. Composite types are `NodeKind`; an `IElementType` result is `Option<NodeKind>`.
 - Overloads get suffixed names: the fewest-argument form keeps the name, the others `_with` (or a descriptive suffix,
   e.g. `expect_with_recovery`, `parse_type_ref_with_intersections`), documented on each function.
-- Every stub says `TODO(port): <File>.java:<line>` (Java: `<File>.kt:<line>`); port the method there, keep the order.
+- Every stub says `TODO(port): <File>.java:<line>` (Java: `<File>.kt:<line>`, C#: `<File>.cs:<line>`); port the method
+  there, keep the order.
 - Java: a parser method's `builder: SyntaxTreeBuilder` is `builder: &mut SyntaxTreeBuilder<'_>`
   (`java_syntax::builder`), its sub-parsers views reached through `self.my_parser` (`JavaParser`); a parameter named
   `type` is `element_type`; a Kotlin method that reaches the builder only through a marker takes the builder first
@@ -245,7 +367,8 @@ otherwise.
 - Dependencies: a well-maintained crate is better than a reinvented one when it is measurably as fast or faster
   and keeps the output byte-identical; each one is justified in its commit (what it replaces, the measured effect,
   its maintenance). Nothing that needs a C toolchain or pulls a large tree. No `unsafe` of our own, no `unwrap` on
-  input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes) and never panics.
+  input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes, in C# as one U+FFFD
+  code unit a byte) and never panics.
 - Speed is a goal: no allocation per token beyond the arena, no `String` per leaf (texts are ranges), no recursion
   depth that a 4 MB file of nested expressions can overflow without a guard (PSI's own limits apply).
 - `scripts/pgo.sh OUT_DIR [KOTLIN_LIST KOTLIN_ROOT JAVA_LIST JAVA_ROOT]` builds a profile-guided ksdump (training on
@@ -266,5 +389,8 @@ otherwise.
   A faster change that fails it is not a change.
 - Java speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list scripts/ab.sh OLD NEW` (the community
   `.java` files); DESIGN, "Java parse throughput", has the numbers and how tree-sitter-java was compared.
+- C# speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/csharp-roslyn-35d9211.list KS_ROOT=$HOME/.cache/psi-syntax/csharp-src/roslyn
+  scripts/ab.sh OLD NEW` (any of the four corpora; dotnet/runtime's time is bound by `hugeexpr1.cs`); DESIGN, "C# parse
+  throughput and robustness", has the numbers and how tree-sitter-c-sharp was compared.
 - The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
   change does, its measured effect and that the gate passed.

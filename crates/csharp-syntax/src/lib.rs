@@ -1,6 +1,35 @@
-//! A lossless C# lexer and parser, ported from Roslyn's (`Microsoft.CodeAnalysis.CSharp` 5.9.0, see AGENTS.md), whose
-//! tree is byte-equal to Roslyn's syntax tree. The parsers build Roslyn's green tree in an arena (`green`), which is
+//! A lossless C# lexer and parser, ported from Roslyn's (`Microsoft.CodeAnalysis.CSharp` 5.9.0, dotnet/roslyn
+//! 35d9211b, see AGENTS.md, "C#"), whose tree is byte-equal to Roslyn's syntax tree: its nodes, tokens, trivia, missing
+//! tokens and diagnostics, at UTF-8 byte offsets. The parsers build Roslyn's green tree in an arena (`green`), which is
 //! flattened into `psi_builder`'s preorder column tree over the `CSharp` language.
+//!
+//! ```
+//! use csharp_syntax::{FileKind, LanguageVersion, NodeKind, Parser, TokenKind};
+//!
+//! let mut parser = Parser::new(); // one per thread: it reuses its buffers from file to file
+//! let tree = parser.parse("class C { int x = 1_000 }", FileKind::default()); // Latest, doc comments parsed
+//! let class = tree.descendants(tree.root()).find(|&n| tree.node_kind(n) == Some(NodeKind::ClassDeclaration));
+//! assert!(class.is_some());
+//! // a token, its trivia beside it: `is_trailing` says which token a trivia leaf belongs to
+//! let space = tree.tokens().find(|&t| tree.token_kind(t) == Some(TokenKind::WhitespaceTrivia)).unwrap();
+//! assert!(tree.is_trailing(space)); // the space after `class`
+//! // the parser inserted the missing `;`: an empty leaf, and Roslyn's diagnostic with its English message
+//! assert!(tree.tokens().any(|t| tree.is_missing(t) && tree.token_kind(t) == Some(TokenKind::SemicolonToken)));
+//! assert_eq!(tree.diagnostics()[0].id(), "CS1002");
+//! assert_eq!(tree.diagnostics()[0].message, "; expected");
+//! // the language version decides the feature checks, as `CSharpParseOptions.LanguageVersion` does
+//! let old = parser.parse("class C { int x = 1_000; }", FileKind::file(LanguageVersion::CSharp6));
+//! assert_eq!(old.diagnostics()[0].id(), "CS8059");
+//! ```
+//!
+//! The consumer contract (AGENTS.md): a `Parser` per thread (`Send`), a `Tree` that is `Send + Sync`, owns its text and
+//! derefs to `psi_builder::Tree<CSharp>` (ids in preorder, `kind`, `range`, `children`, `leaves`, `descendants`, ...);
+//! a node's range is its full span, a token a leaf between its leading and trailing trivia, structured trivia
+//! (directives, documentation comments, skipped tokens) a subtree; `Tree::diagnostics` is `GetDiagnostics()` in
+//! Roslyn's order. Any bytes parse without a panic on a 1 MB stack; past Roslyn's nesting, which a fixed depth counter
+//! replaces, and past the work and memory budgets, the tree is the one Roslyn returns on an exhausted stack
+//! (`ERR_InsufficientStack`). docs/DESIGN.md, "C#", "C# nesting and work" and "C# deviations", says how and where it
+//! differs from Roslyn.
 //!
 //! Generated from Roslyn's sources (`tools/csharp-gen/gen.py`, `tools/csharp-unicode`): `syntax_kind` (`SyntaxKind`,
 //! `TokenKind`, `NodeKind`), `syntax` (the node types of `Syntax.xml` and their green factories), `error_code` (the

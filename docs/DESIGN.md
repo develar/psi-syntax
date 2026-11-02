@@ -24,6 +24,15 @@ the 20 000 lexer fuzz inputs, and the Java lexers' token lines on the same corpo
 `ksdump --check-bodies` on the community `.java` files (443 161 code blocks), and with `--nesting-limit 3` on them and
 on the golden mutations.
 
+For C# the contract is the same against Roslyn 5.9.0 (`Microsoft.CodeAnalysis.CSharp`, dotnet/roslyn 35d9211b):
+`csharp_syntax::dump::tree_to_string` prints what `tools/csharp-oracle` prints of the syntax tree Roslyn returns, its
+nodes, tokens, trivia, missing tokens and diagnostics with their messages, at UTF-8 byte offsets. The gate checks it
+on the 7051 goldens of Roslyn's own parsing and lexing tests and 4 reduced cases (strict), on the 62 615 valid UTF-8
+`.cs` files of dotnet/roslyn, dotnet/runtime, dotnet/aspnetcore and Avalonia at Latest and at Preview, on 122 741
+golden mutations at their goldens' versions, at Latest and at Preview, and on 20 000 lexer fuzz inputs at Latest and
+at Preview; the lexer's tokens alone at the three documentation modes on the same inputs; the 6 runtime files whose
+dump is too large for the oracle only lossless (see "C#").
+
 Speed work therefore changes only three things, none of which changes a parser decision:
 
 - how the cursor and the markers are represented;
@@ -41,7 +50,8 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 | `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters | nothing |
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
 | `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers | `psi-builder` |
-| `ksdump` | the binary | `kotlin-syntax`, `java-syntax` |
+| `csharp-syntax` | `SyntaxKind`, `TokenKind`, `NodeKind`, the generated node types and diagnostics, the lexer and directive parser, `SyntaxParser`, `LanguageParser`, `DocumentationCommentParser`, the green arena, `flatten`, `CSharp: TreeLanguage`, `Tree` with diagnostics, the dump | `psi-builder` |
+| `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax` |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),
@@ -382,6 +392,110 @@ mixes of 26 expression forms 3000 deep, random bytes and fragments, and every go
 `parse_body` equal to the full parse's subtree); the gate runs `--check-bodies` on the Java corpora at the default
 limit and at 3.
 
+### C# (`csharp-syntax`)
+
+The sources are Roslyn's at 35d9211b (AGENTS.md, "C#", has the table of each Rust file and the C# file it ports).
+
+```
+text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> green tokens with trivia   (GreenArena)
+     ─ SyntaxParser + LanguageParser (one Rust fn per C# method) ─> green nodes, bottom up         (GreenArena)
+         ├─ each directive: DirectiveParser over the lexer in Directive mode
+         ├─ each documentation comment: DocumentationCommentParser over the lexer in its XML modes
+         └─ each hole of an interpolated string: a lexer and a LanguageParser over a window of the file
+     ─ flatten: one walk, no recursion ─> TreeBuilder<CSharp> ─> Tree {psi_builder::Tree<CSharp>, diagnostics}
+```
+
+- **Not on `PsiBuilderImpl`.** Roslyn builds green nodes bottom up from children already made, copies them to add a
+  diagnostic or skipped text (`WithDiagnosticsGreen`, `AddLeadingSkippedSyntax`, `SyntaxFirstTokenReplacer`), and
+  hangs trivia on tokens. A marker production expresses none of that, so C# implements only `TreeLanguage` and fills
+  `psi_builder`'s tree in preorder through `TreeBuilder` (see "Workspace"); the consumer API and the dump's layout
+  are the same code as Kotlin's and Java's.
+- **The green arena (`green.rs`).** A `Green` is a `u32`, a 2-bit tag (null, token, node, list) over a 30-bit index;
+  a null slot is stored as `Green::NULL`, so slots are where Syntax.xml puts them (the generator flattens its
+  `Choice` and `Sequence` fields as `TreeFlattening.FlattenChildren` does). A token record holds its kind and
+  contextual kind, flags, its text, its leading and trailing trivia (runs of `Trivia` in a shared array) with their
+  widths, its diagnostics and an optional value; a node or list record its kind, flags, slots (a run of a shared
+  `Vec<Green>`), full width, diagnostics and the node type's boolean fields; a trivia record its kind and text, or the
+  node of its structure (a directive, a documentation comment, skipped tokens). A token's text is a range of the
+  source, `SyntaxFacts.GetText(kind)` for a token made by kind (`SyntaxFactory.Token`, a merged `>>`), or a string the
+  arena keeps; `ValueText` is kept only where it is not the text (an escaped identifier, `@`, a directive's string,
+  an XML entity). Flags are Roslyn's (`IsNotMissing`, contains diagnostics, directives, skipped text, structured
+  trivia), inherited from the children as `GreenNode`'s are.
+- **Copies, never changes.** What Roslyn does by making a new green node (a diagnostic added, a token with other
+  trivia, a first or last token replaced) appends a new record; the old one stays, garbage, until the file ends. So a
+  node a reset point or a scan saved is valid after any rollback without reference counts, exactly as Roslyn's
+  immutable nodes are. The garbage is bounded: the corpora make 1.04-1.07 records per node of the finished tree and
+  10-17 bytes of records per source byte ("C# memory"); past `green::budget_for` (256 bytes a source byte, at least
+  256 MiB) the parse is abandoned as on an exhausted stack ("C# nesting and work").
+- **Buffers.** The arena, the token window, the trivia and list builders (`SyntaxListPool`), the directive store, the
+  interpolated string buffers and the flattener's stack belong to the `Parser` and are cleared, not freed, per file;
+  `Tree` is copied out exactly sized. A tree owns its text (`Arc<[u8]>`), nothing of the arena.
+- **Lexer.** `Lexer.cs` and its partial files ported method by method. Keywords are a perfect hash of the first eight
+  bytes and the length into 1024 slots, built and checked at compile time, which is what `LexerCache` and
+  `QuickScanner` cache (neither ported). Each token keeps the lexer state after it (position, directives, the
+  lexer-driven mode), what Roslyn keeps per blended token, so a parser that changes the lexer mode re-lexes from the
+  last kept token. `DirectiveStack` is an index into immutable cons cells (`Directives.cs`' `ConsList`), shared by the
+  lexer and every reset; `CompleteIf` and `CompleteRegion`, recursive in Roslyn, rebuild the cells in a loop, and
+  `IsDefined` steps over the cells it would only walk through. Excluded `#if` sections are lexed in a loop.
+- **UTF-16 semantics over bytes.** Roslyn's positions and widths are UTF-16 code units of a `SourceText`; the port
+  reads the file's UTF-8 bytes as those code units (`SlidingTextWindow`): a character below U+0080 is 1 byte, below
+  U+0800 2, any other BMP character 3, each one code unit; a supplementary character is two code units, a high and a
+  low surrogate of 2 bytes each; a byte that starts no valid UTF-8 is one U+FFFD code unit of 1 byte. Widths are
+  bytes, so every position, a sum of widths, is the byte offset the oracle maps Roslyn's UTF-16 position to (between
+  the halves of a pair, the character's offset + 2), with no second pass and no UTF-16 copy of the text. What Roslyn
+  asks of characters it asks of code units here: the character classes (`unicode.rs`, from the oracle runtime's
+  `CharUnicodeInfo.GetUnicodeCategory`; a surrogate is in none), `PeekChar(n)`, a raw string's dedentation (which
+  walks characters, so its errors are at Roslyn's characters). Two things are not sums of widths and are computed in
+  UTF-16: `SyntaxFirstTokenReplacer` adds the width of skipped text to the offsets of the diagnostics of the node it
+  copies although that node's start does not move, so such a diagnostic remembers the shift and where its text
+  starts and `flatten` sums it in UTF-16 and maps it back (10 fuzz files differed before, 43519b4f); and a message
+  may hold half of a supplementary character (a token's text, a code unit the lexer reports), which a Rust `String`
+  cannot, so `Diagnostic::message` has U+FFFD there and `lone_surrogates` the code unit, which the dump prints as
+  `\u{XXXX}` as the oracle prints .NET's string.
+- **Nested parsers.** A directive is parsed by `DirectiveParser`, a `SyntaxParser` in Directive mode over the lexer
+  that met the `#` (its token window is the lexer's buffer); a documentation comment, in Parse and Diagnose modes, by
+  `DocumentationCommentParser` over the same lexer in the XML modes, into structured trivia (in None mode it is
+  comment trivia). An interpolated string's holes are parsed as Roslyn parses them, by a temporary lexer and
+  `LanguageParser` each, but over a window of the file (`Lexer::with_window`) rather than a string cut out of the
+  token's text: every range is a file offset, the tokens have the source's text and Roslyn's red positions, and the
+  temporary parsers borrow the arena and take their buffers from `InterpolatedStringBuffers` (one level of nesting
+  each), so no hole allocates per token once warm.
+- **Flatten (`flatten.rs`).** One walk over an explicit stack (the children of a node at a slot and element; a
+  token in its phases: leading trivia, the token, trailing trivia) in `ChildNodesAndTokens()` order: a list's
+  elements are its parent's children, a null slot is skipped, a node is a composite over its full span, a token a
+  leaf over its span (`set_missing` when missing), its trivia leaves before and after it in the token's parent,
+  `set_trailing` on the trailing ones, a structured trivia a subtree whose root has the trivia's kind. Positions are
+  running sums of full widths, as the red tree computes them, so missing tokens, merged tokens and nested lexers'
+  tokens land where Roslyn puts them. The tree's text is the source; where Roslyn's tree drops a token (once in the
+  corpora, mutations and fuzz: `ParseConversionOperatorDeclaration` replacing a modifier by a skipped one) its
+  positions no longer spell the source, and from the first leaf whose text differs the tree's text is the green
+  tree's own (`ToFullString()`), so every element shows its text at its red position as Roslyn's does.
+- **Trivia ownership bits.** `kinds` has two bits for C#, `TRAILING` (0x2000) and `MISSING` (0x1000), and 12 bits of
+  kind index (574 C# kinds: 252 token and trivia kinds below `NODE_BASE`, 322 node kinds). Which token a trivia leaf
+  belongs to cannot be read off positions: the end of a line does not end trailing trivia in a directive, skipped
+  tokens become trivia of the token before or after them, a missing token can have trivia of its own. `is_trailing(id)`
+  says it: a trailing leaf (or structured trivia root) belongs to the nearest token before it, any other trivia to
+  the nearest token after it. Kotlin and Java never set either bit; the split changed none of their 25 counters
+  (30d40a2f).
+- **Diagnostics.** Each green element keeps its `SyntaxDiagnosticInfo`s: a code, its arguments, an offset from the
+  element's start (not its full start) and a width. `flatten` collects them in `SyntaxTreeDiagnosticEnumerator`'s
+  order (a node's before its children's, a token's after its leading trivia's), each at its element's start plus its
+  offset, clamped to the tree's length, and formats each message as `DiagnosticInfo.GetMessage(InvariantCulture)`
+  does (`diagnostic.rs`: composite formatting of the English format, the arguments as .NET formats the objects
+  Roslyn passes: token texts, kinds by name, feature names, versions, embedded infos, an XML error inside
+  `WRN_XMLParseError`). `Tree::diagnostics()` has them all, in that order with their codes and byte spans; the psi
+  tree's error table has the first message of each node, which `errors()` and `error_message` read.
+- **Versions and entries.** `FileKind { version, entry, doc_mode }`: the feature checks (`CheckFeatureAvailability`,
+  `IsFeatureEnabled`) read `version`; on the four corpora every Preview tree equals the Latest one (the oracle's
+  Preview dumps are all hard links), so Preview's own paths run on the goldens, mutations and fuzz. The entries
+  besides `CompilationUnit` are `SyntaxFactory.Parse*` for Roslyn's tests (hidden from the docs); `Entry::Name`
+  parses at the defaults as `ParseName` takes no options; `Entry::Tokens` is `ParseTokens`, the lexer alone.
+- **Oracle.** `tools/csharp-oracle` runs Roslyn itself and walks the red tree it returns (`ChildNodesAndTokens()` with
+  each token's trivia, the order of Roslyn's own `ParsingTests.EnumerateNodes`): the dump is not imitated. Its
+  goldens are the inputs of Roslyn's parsing and lexing tests, found and constant-folded by Roslyn compiling those
+  tests (7051 of 7214 constant inputs, with each test's version, entry and documentation mode); a difference on a
+  corpus is reduced to `crates/csharp-syntax/tests/oracle/`.
+
 ### C# nesting and work (`csharp-syntax`; `parser::MAX_RECURSION_DEPTH`, `green::work_budget_for`)
 
 Roslyn bounds its parser by its thread's stack: `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` at
@@ -434,6 +548,40 @@ chains and lists of 100 000 (each under 120 ms), 20 speculative forms at 250, 10
 225 ms), 40 random mixes of 38 forms 3000 deep, the lexer's deep forms, and random bytes and fragments at every entry,
 language version and documentation mode; each tree is lossless, in preorder, and the same on a second parse.
 
+### C# deviations
+
+Every place the port does not do what Roslyn does, each named in a comment at its place ("not in Roslyn"). None
+changes a tree of the gate's inputs; the first three apply only past limits no corpus file comes near.
+
+- **Stack, work and memory bounds** ("C# nesting and work"): a depth counter of 1000 in place of the stack; the
+  recursions Roslyn leaves unguarded counted on it (`ParseType`, `ScanType` through type argument lists, tuples and
+  function pointers, initializers, query bodies, designations, negated patterns); a local function's body as 3
+  levels, a hole of an interpolated string as 16; the work budget and the arena budget. Past any of them the tree is
+  Roslyn's for an exhausted stack. Known cases where Roslyn would still parse: `?[` chains of 17 or more, 100 000
+  `a < a < …`, and the forms at 300-900 levels that count a level more than once.
+- **The lexer's and the documentation comment parser's recursion** stops at `MAX_NESTED_SCAN_DEPTH` (128) where
+  Roslyn has no guard: a hole of an interpolated string inside another's and a bracket inside a hole are scanned as
+  plain content past it, a directive expression's operand is a missing identifier with `ERR_InvalidPreprocExpr` and
+  the rest of the line skipped, an XML element is not started (the rest of the comment is text), a cref name takes no
+  type argument list, `extension` is a plain member name. Roslyn's own process overflows its 64 MB stack on 100 000
+  nested interpolated strings.
+- **Loops for recursions with the same nodes**: `a?.b?.…` (a stack of the pending `primary ?` pairs),
+  `ConvertExpressionToType`/`ConvertTypeToExpression` over a name chain, `CompleteIf`/`CompleteRegion`, excluded
+  `#if` sections.
+- **Linear algorithms with Roslyn's decisions**: the replayed tuple type scans, trailing trivia grown in place,
+  `IsDefined` stepping over cells, a run of `@` scanned once (`TryScanAtStringToken`).
+- **Values not kept**: the `ValueText` of string literals and of interpolated and raw string texts (no tree shows
+  them); `MakeInterpolatedStringTextToken` lexes a text as a string literal only when that could report a diagnostic
+  (an escape or a line break in a regular text, a quote in a verbatim one).
+- **Where Roslyn throws `ExceptionUtilities.UnexpectedValue`** on a value no input reaches (a designation kind in
+  `ParseForEachStatement`, the precedence of a kind `GetPrecedence` does not list, a lexer mode no parser asks), the
+  port takes a plain path (the `ForEachVariableStatement` form, `Primary`, an end of file) instead of a panic.
+- **Text Roslyn never sees**: a byte that starts no valid UTF-8 is one U+FFFD code unit of 1 byte (the oracle dumps
+  only valid UTF-8); a lone surrogate of a message is U+FFFD with `Diagnostic::lone_surrogates` beside it; a tree
+  whose token Roslyn dropped takes its text from the green tree past the drop.
+- **Not ported**: incremental parsing (`Blender`, `BlendedNode`, the old tree), `QuickScanner`, `LexerCache`, the node
+  cache, scripts, preprocessor symbols from options, `Features`.
+
 ### Tree (`psi-builder` `src/tree.rs`)
 
 A tree is three columns over the node ids, in preorder:
@@ -467,6 +615,10 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 - `ParseOptions { expand_bodies: false }` leaves each block and lambda as a childless node marked `is_unexpanded`. Doc
   comments are still expanded. `parse_body(id)` returns that body's exact subtree as its own `Tree`; the gate checks
   this on every community body.
+- C#: `csharp_syntax::Tree` derefs to the same `psi_builder::Tree` and adds `diagnostics()` (codes, byte spans,
+  messages, in Roslyn's order). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`
+  telling which token they belong to; an inserted token is an empty leaf with `is_missing`. There is no body-less
+  parsing: Roslyn parses no block on its own.
 
 ## Decisions
 
@@ -486,6 +638,13 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | Pair columns `ranges`/`links`, not five `u32` columns | Same 18 B/node, 3 pushes instead of 5 | parse 70.0 → 71.5 MB/s (9 of 9 rounds), linear walk 1.68 → 1.59 ns/node |
 | `psi-builder` generic over a `Language` trait, monomorphized; not `dyn`, not language-neutral numeric ids | The Java port reuses the builder, tree and driver; Kotlin keeps its enums and every parser call site (`kotlin_syntax` aliases the generic types), and the compiled Kotlin parse is the one it was | gate unchanged, all 25 counters identical; 1 thread B/A 0.985 before forcing `skip_whitespace` inline and leaving `getJoinedTokenType` outlined, after it paired-round medians 0.991 and 0.997 at load 6-14 (see the split's measurement) |
 | No `unsafe`, no C toolchain, no large dependency tree | Consumers build it on every platform; any byte sequence must parse | `unsafe_code = "forbid"`; the only dependency is the optional `stats_alloc` |
+| C#: Roslyn's own lexer and parsers ported method by method, the oracle Roslyn itself | accio needs Roslyn's tree and its diagnostics' messages; a faithful port reproduces error recovery and speculation, which no grammar rewrite would | 7051 of 7051 goldens; 0 differing dumps on the four corpora at Latest and Preview, the 122 741 mutations at three versions and the 20 000 fuzz inputs at two (43519b4f, gated since 174ecb80) |
+| C#: a green arena flattened into `psi_builder`'s tree, not Roslyn's parser on `PsiBuilderImpl` | Roslyn builds bottom up, copies nodes and hangs trivia on tokens; flattening once keeps one consumer API for the three languages | the `TreeLanguage`/`TreeBuilder` split moved none of the 25 counters, `scripts/ab.sh` Kotlin B/A 1.017, Java 1.047 at load 16-20 (noise; 30d40a2f); flatten 13.6 % of a C# parse ("C# parse throughput and robustness") |
+| C#: records never change, a copy appends, garbage kept to the file's end | Roslyn's copy semantics exactly: a saved node stays valid after any reset, with no reference counts or collector | 1.04-1.07 records per tree node, 10-17 bytes of records per source byte on the corpora ("C# memory") |
+| C#: widths in bytes over a UTF-16 reading of the text | positions are the oracle's byte offsets with no second pass or UTF-16 copy; only the one sum Roslyn mixes is redone in UTF-16 | 0 differing lexer lines on every corpus since 7d7af22e; the last 10 fuzz differences were that sum (43519b4f) |
+| C#: TRAILING and MISSING bits in the shared `kinds` column | the token a trivia belongs to and an inserted token cannot be read off positions; two bits cost nothing per node | Kotlin and Java counters unchanged (30d40a2f); 12 bits of kind index hold C#'s 574 kinds |
+| C#: a depth counter, a work budget and an arena budget, failing as Roslyn's exhausted stack does | deterministic on any stack and machine, with the answer Roslyn itself gives at 100 000 levels; time and memory linear in the input | 153 forms 100 000 deep on 1 MB each under 220 ms; 26 forms compared at 100 000 levels equal Roslyn's tree (43ed5b13); no corpus tree reaches a bound (the gate) |
+| C#: an interpolated string's holes lexed and parsed over windows of the file | Roslyn cuts strings out of the token's text; windows give the source's texts and Roslyn's positions with no allocation per token | the interpolation goldens, the corpora and the fuzz at 0 differences (43519b4f) |
 
 ### Libraries
 
@@ -506,6 +665,7 @@ byte-identical. None qualified. The measurements are from the survey prototypes 
 | bitflags, fixedbitset | rejected | `TokenSet { [u64; 8] }` with const constructors covers tokens and node types; the `at_set` cost was the keyword loop and `from_utf8` |
 | mimalloc 0.1.52 | consumer-side only | needs C. Before buffer reuse: +12 % at 8 threads, +15 % at 16. After it (a99fb45): +3.8 % at 8, +3.1 % at 16 (load 8-15). On the inline hints commit: no change in instructions, wall within noise at 1 and 16 threads ("Build and toolchain") |
 | stats_alloc 0.1.10 | kept, optional | the `alloc-stats` feature, profiling only |
+| tree-sitter-c-sharp 0.23.5 | not a dependency: the parser the C# port replaces in accio | 5.3-5.8× slower than the port on one thread, 5.4-9.2× at 16 threads; an error in 927 of the 17 075 roslyn files, where Roslyn reports one in 41 ("C# parse throughput and robustness") |
 
 ### Build and toolchain
 
@@ -557,6 +717,46 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### C# memory (19b40696), 2026-11-02
+
+A probe (a test that was not committed, reading `GreenArena::record_bytes`, `record_counts` and `heap_bytes` after
+each file) parsed each corpus of tools/csharp-oracle in list order with one `Parser` on one thread, at Latest with
+documentation comments parsed and the default budgets. Arena records count every record made, the garbage of copies
+and rolled-back speculation included; the capacity is what the `Parser` keeps after the corpus, set by its largest
+file:
+
+| corpus (MB) | tree nodes | green tokens / nodes and lists / trivia | records per tree node | record bytes per source byte | most in a file of 1 KB or more | arena capacity kept |
+|---|---|---|---|---|---|---|
+| dotnet/roslyn (249.94) | 55 559 618 | 23.63M / 22.89M / 12.95M | 1.070 | 9.85 | 34.7 | 57.8 MB |
+| dotnet/runtime (426.88) | 162 757 775 | 70.42M / 62.64M / 36.88M | 1.044 | 16.57 | 54.7 | 733.2 MB |
+| dotnet/aspnetcore (62.04) | 20 660 580 | 8.85M / 8.32M / 4.73M | 1.060 | 14.67 | 28.2 | 50.0 MB |
+| Avalonia (23.59) | 8 001 383 | 3.33M / 3.05M / 2.01M | 1.049 | 14.68 | 26.4 | 7.7 MB |
+
+A tree node is a token, a trivia or a node, and a list's elements are its parent's children, so a garbage-free
+parse would make about one record per tree node: the copies and speculation add 4-7 %. The budget
+(`green::budget_for`, 256 bytes a source byte) is 4.7 times the most any file needs. The trees are 5.00-7.86 MB per
+source MB ("C# parse throughput and robustness"). The 733 MB of capacity are kept from dotnet/runtime's
+`hugeexpr1.cs` (24.12 MB of source; buffers grow by doubling, so capacity exceeds the records).
+
+### The C# port, step by step (bb0fe20b → 174ecb80), 2026-11-02
+
+Goldens passing of 7051 (`cargo test --release -p csharp-syntax --test goldens`) and differing files on the gate's
+inputs, as each step's commit measured them:
+
+| step | goldens | differences |
+|---|---|---|
+| kinds, node types, messages and the arena generated; flatten and the dump (bb0fe20b, d9994f56) | — | — |
+| `SyntaxParser` and `LanguageParser` as 470 stubs (cd76bb18) | 2 | — |
+| the lexer, directives and directive parser (7d7af22e) | 254 | lexer lines at `--doc none`: 0 on the four corpora, the mutations and the fuzz |
+| the expression and pattern parsers (6b2e8472), statements (cdd344e0), documentation comments and interpolated strings (1adb25e9) | 564, 616, 1393 | lexer lines at `--doc parse` and `--doc diagnose` 0 (were 12 142, 13 832, 7 482, 3 410, 2 078 and 5 032 at `parse` on roslyn, runtime, aspnetcore, Avalonia, the mutations and the fuzz before the documentation comment parser) |
+| declarations, members and types (4610df50) | 7051 | 0 of 17 075, 31 261, 10 188 and 4 085 corpus files; 4 of 122 741 mutations, 8 of 20 000 fuzz inputs |
+| the last three causes, each reduced to `tests/oracle/` (43519b4f) | 7051 | 0 everywhere, at Latest and at Preview |
+| the dumps in the gate, strict goldens (174ecb80) | 7051 | the gate's step 10; the gate took 20-23 minutes, up from 9 |
+
+The lexer alone (`ksdump --lex --bench`, one thread, `--doc none`, a7434734) at load 30-57: medians 47-237 MB/s per
+corpus, the best rounds 68-298 MB/s; at the quietest moment 236 MB/s on Avalonia and 426 MB/s on roslyn's largest
+file (6.6 MB).
 
 ### C# parse throughput and robustness (43ed5b13), 2026-11-02
 
@@ -936,6 +1136,9 @@ There is no line-level profile of the current code: `atos` returned no line info
 - **C# speed.** 59-113 MB/s on one thread against Kotlin's and Java's 111-120 on a quiet machine, at 0.22-0.36 G
   instructions per source MB; no line-level profile yet. Flattening (about 18 %) and the token window (`current_kind`, 9 %)
   are the first candidates. A quiet-machine run of the table in "C# parse throughput and robustness" is open.
+- **C# arena capacity.** A `Parser` keeps the capacity of its largest file (733 MB after dotnet/runtime's
+  `hugeexpr1.cs`, "C# memory"); a long-lived consumer thread would want the arena shrunk after a file far above the
+  usual size. Not measured yet what a shrink costs the next file.
 - **C# speculation below the budget.** `a?[0]?[0]…` (17 or more) and 100 000 `a < a < …` fail as too deep; Roslyn
   parses the former in seconds and would recurse 100 000 deep for the latter. A memo of `?[`'s speculation, as of
   tuple scans, would make the first polynomial.
