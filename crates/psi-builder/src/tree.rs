@@ -942,15 +942,30 @@ impl<L: TreeLanguage> Tree<L> {
 
 /// Builds a `Tree` in preorder for a language whose parser does not run on `PsiBuilderImpl` (C#'s, which builds
 /// Roslyn's green nodes and flattens them): each node is opened before its descendants and closed after them, leaves
-/// in document order. Keep one per thread and reuse it: `finish` copies the tree out and keeps the buffers.
+/// in document order. The builder writes the tree's three columns in place, so `finish` moves them into the tree
+/// (shrunk to fit) instead of copying a buffer of build records out; the next tree starts with empty columns. A
+/// builder that knows each node's id when it meets it writes them by id (`writer`), without a length or capacity
+/// update per node.
 pub struct TreeBuilder<L: TreeLanguage> {
-    data: TreeData,
+    /// The columns of the tree being built: a node's kind, start and parent when it is opened, its end and subtree end
+    /// when it is closed.
+    kinds: Vec<u16>,
+    ranges: Vec<[u32; 2]>,
+    links: Vec<[u32; 2]>,
+    /// The message of each error node, sorted by node id.
+    errors: Vec<(u32, Cow<'static, str>)>,
     language: PhantomData<fn() -> L>,
 }
 
 impl<L: TreeLanguage> Default for TreeBuilder<L> {
     fn default() -> Self {
-        TreeBuilder { data: TreeData::default(), language: PhantomData }
+        TreeBuilder {
+            kinds: Vec::new(),
+            ranges: Vec::new(),
+            links: Vec::new(),
+            errors: Vec::new(),
+            language: PhantomData,
+        }
     }
 }
 
@@ -961,72 +976,215 @@ impl<L: TreeLanguage> TreeBuilder<L> {
 
     /// Room for `additional` more nodes.
     pub fn reserve(&mut self, additional: usize) {
-        self.data.reserve(additional);
+        self.kinds.reserve(additional);
+        self.ranges.reserve(additional);
+        self.links.reserve(additional);
     }
 
-    /// The heap bytes of the builder's buffers, by capacity (kept from one `finish` to the next).
+    /// The heap bytes of the builder's buffers, by capacity: the columns of a tree being built (`finish` hands them to
+    /// the tree, so between trees they hold nothing).
     pub fn heap_bytes(&self) -> usize {
-        self.data.build_bytes()
+        use crate::buffers::vec_bytes;
+        vec_bytes(&self.kinds) + vec_bytes(&self.ranges) + vec_bytes(&self.links) + vec_bytes(&self.errors)
     }
 
     /// Empties the builder, each buffer shrunk to its share of `shrink` (a language parser's `shrink_to`).
     pub fn shrink(&mut self, shrink: crate::buffers::Shrink) {
-        self.data.shrink(shrink);
+        shrink.vec(&mut self.kinds);
+        shrink.vec(&mut self.ranges);
+        shrink.vec(&mut self.links);
+        shrink.vec(&mut self.errors);
     }
 
     /// The number of nodes so far; the next node's id.
+    #[inline(always)]
     pub fn len(&self) -> u32 {
-        self.data.nodes.len() as u32
+        self.kinds.len() as u32
     }
 
     pub fn is_empty(&self) -> bool {
-        self.data.nodes.is_empty()
+        self.kinds.is_empty()
+    }
+
+    #[inline(always)]
+    fn push(&mut self, parent: u32, kind: u16, start: u32, end: u32) -> u32 {
+        let id = self.kinds.len() as u32;
+        self.kinds.push(kind);
+        self.ranges.push([start, end]);
+        self.links.push([parent, id + 1]);
+        id
     }
 
     /// Opens a composite of `kind` starting at `start`, a child of `parent` (`None`: the root, the first node).
     #[inline]
     pub fn open(&mut self, parent: Option<NodeId>, kind: ElementTypeOf<L>, start: u32) -> NodeId {
-        NodeId(self.data.add_composite(parent.map_or(NONE, |p| p.0), kind, start))
+        NodeId(self.push(parent.map_or(NONE, |p| p.0), kind.index() as u16, start, start))
     }
 
     /// Closes a composite opened with `open`: it ends at byte `end`, its subtree at the last node added.
     #[inline]
     pub fn close(&mut self, node: NodeId, end: u32) {
-        self.data.set_end(node.0, end);
+        let len = self.kinds.len() as u32;
+        let r = &mut self.ranges[node.0 as usize];
+        r[1] = end.max(r[0]);
+        self.links[node.0 as usize][1] = len;
     }
 
     /// A leaf of `token` over `start..end`, a child of `parent`.
     #[inline]
     pub fn leaf(&mut self, parent: NodeId, token: L::Token, start: u32, end: u32) -> NodeId {
-        NodeId(self.data.push(parent.0, token.index() | LEAF, start, end))
+        NodeId(self.push(parent.0, token.index() | LEAF, start, end))
+    }
+
+    /// `leaf` and then `set_trailing` when `trailing`, `set_missing` when `missing`, in one push.
+    #[inline]
+    pub fn leaf_with(
+        &mut self,
+        parent: NodeId,
+        token: L::Token,
+        start: u32,
+        end: u32,
+        trailing: bool,
+        missing: bool,
+    ) -> NodeId {
+        NodeId(self.push(parent.0, token.index() | leaf_bits(trailing, missing), start, end))
     }
 
     /// Marks a node added so far as belonging to the token before it (`Tree::is_trailing`).
     #[inline]
     pub fn set_trailing(&mut self, node: NodeId) {
-        self.data.nodes[node.0 as usize].kind |= TRAILING;
+        self.kinds[node.0 as usize] |= TRAILING;
     }
 
     /// Marks a leaf added so far as a missing token (`Tree::is_missing`).
     #[inline]
     pub fn set_missing(&mut self, node: NodeId) {
-        debug_assert!(self.data.nodes[node.0 as usize].kind & LEAF != 0);
-        self.data.nodes[node.0 as usize].kind |= MISSING;
+        debug_assert!(self.kinds[node.0 as usize] & LEAF != 0);
+        self.kinds[node.0 as usize] |= MISSING;
     }
 
     /// The message `Tree::error_message` gives for `node`. Nodes must get their messages in id order, one each.
     pub fn set_error(&mut self, node: NodeId, message: Cow<'static, str>) {
-        debug_assert!(self.data.errors.last().is_none_or(|&(last, _)| last < node.0));
-        self.data.set_error(node.0, message);
+        debug_assert!(self.errors.last().is_none_or(|&(last, _)| last < node.0));
+        self.errors.push((node.0, message));
+    }
+
+    /// A writer of the nodes `len()..len() + capacity` by id (`ColumnWriter`): the columns grow to `len() + capacity`
+    /// nodes, which `truncate` cuts back to the nodes written. Writing a node by id updates no length, so a walk keeps
+    /// its whole state in registers; a write past the columns is dropped, and the walk that made it can tell from the
+    /// ids it gave out.
+    pub fn writer(&mut self, capacity: usize) -> ColumnWriter<'_, L> {
+        let len = self.kinds.len() + capacity;
+        self.kinds.resize(len, 0);
+        self.ranges.resize(len, [0, 0]);
+        self.links.resize(len, [0, 0]);
+        ColumnWriter {
+            kinds: &mut self.kinds,
+            ranges: &mut self.ranges,
+            links: &mut self.links,
+            errors: &mut self.errors,
+            language: PhantomData,
+        }
+    }
+
+    /// Keeps the first `len` nodes (after a `writer`: the ones it wrote) and their error messages.
+    pub fn truncate(&mut self, len: u32) {
+        let errors = self.errors.partition_point(|&(id, _)| id < len);
+        self.errors.truncate(errors);
+        self.kinds.truncate(len as usize);
+        self.ranges.truncate(len as usize);
+        self.links.truncate(len as usize);
     }
 
     /// The tree of the nodes added since the last `finish`, over `text` (whose bytes their ranges index), its root
-    /// node 0. The builder is empty again, its buffers kept.
+    /// node 0: the columns themselves, shrunk to fit. The builder is empty again.
     pub fn finish(&mut self, text: Arc<[u8]>, file_kind: L::FileKind) -> Tree<L> {
-        debug_assert!(!self.data.nodes.is_empty(), "a tree has a root");
-        let data = self.data.take_exact();
-        self.data.clear();
+        debug_assert!(!self.kinds.is_empty(), "a tree has a root");
+        let mut kinds = std::mem::take(&mut self.kinds);
+        let mut ranges = std::mem::take(&mut self.ranges);
+        let mut links = std::mem::take(&mut self.links);
+        let mut errors = std::mem::take(&mut self.errors);
+        kinds.shrink_to_fit();
+        ranges.shrink_to_fit();
+        links.shrink_to_fit();
+        errors.shrink_to_fit();
+        let data = TreeData { kinds, ranges, links, errors, body_depths: Vec::new(), nodes: Vec::new() };
         Tree { text, file_kind, data, root: 0, language: PhantomData }
+    }
+}
+
+/// The `kinds` bits of a leaf, `Tree::is_trailing` and `Tree::is_missing` as given.
+#[inline(always)]
+fn leaf_bits(trailing: bool, missing: bool) -> u16 {
+    LEAF | if trailing { TRAILING } else { 0 } | if missing { MISSING } else { 0 }
+}
+
+/// Writes a tree's nodes by id into the columns a `TreeBuilder` sized (`TreeBuilder::writer`): a composite when it is
+/// opened (`open`) and again when it is closed (`close`), a leaf once. A write past the columns is dropped.
+pub struct ColumnWriter<'a, L: TreeLanguage> {
+    kinds: &'a mut [u16],
+    ranges: &'a mut [[u32; 2]],
+    links: &'a mut [[u32; 2]],
+    errors: &'a mut Vec<(u32, Cow<'static, str>)>,
+    language: PhantomData<fn() -> L>,
+}
+
+impl<L: TreeLanguage> ColumnWriter<'_, L> {
+    /// The number of nodes the columns hold.
+    #[inline(always)]
+    pub fn capacity(&self) -> u32 {
+        self.kinds.len() as u32
+    }
+
+    #[inline(always)]
+    fn write(&mut self, id: u32, kind: u16, start: u32, end: u32, parent: u32) {
+        let i = id as usize;
+        if let (Some(k), Some(r), Some(l)) = (self.kinds.get_mut(i), self.ranges.get_mut(i), self.links.get_mut(i)) {
+            *k = kind;
+            *r = [start, end];
+            *l = [parent, id + 1];
+        }
+    }
+
+    /// The composite `id` of `kind` starting at `start`, a child of `parent` (`None`: the root), `Tree::is_trailing`
+    /// when `trailing`; `close` ends it.
+    #[inline(always)]
+    pub fn open(&mut self, id: u32, parent: Option<NodeId>, kind: ElementTypeOf<L>, start: u32, trailing: bool) {
+        let bits = if trailing { TRAILING } else { 0 };
+        self.write(id, kind.index() as u16 | bits, start, start, parent.map_or(NONE, |p| p.0));
+    }
+
+    /// Closes the composite `id`: it ends at byte `end` (at least its start), its subtree before node `subtree_end`.
+    #[inline(always)]
+    pub fn close(&mut self, id: u32, end: u32, subtree_end: u32) {
+        let i = id as usize;
+        if let (Some(r), Some(l)) = (self.ranges.get_mut(i), self.links.get_mut(i)) {
+            r[1] = end.max(r[0]);
+            l[1] = subtree_end;
+        }
+    }
+
+    /// The leaf `id` of `token` over `start..end`, a child of `parent`, `Tree::is_trailing` and `Tree::is_missing` as
+    /// given.
+    #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
+    pub fn leaf(
+        &mut self,
+        id: u32,
+        parent: NodeId,
+        token: L::Token,
+        start: u32,
+        end: u32,
+        trailing: bool,
+        missing: bool,
+    ) {
+        self.write(id, token.index() | leaf_bits(trailing, missing), start, end, parent.0);
+    }
+
+    /// `TreeBuilder::set_error`.
+    pub fn set_error(&mut self, node: NodeId, message: Cow<'static, str>) {
+        debug_assert!(self.errors.last().is_none_or(|&(last, _)| last < node.0));
+        self.errors.push((node.0, message));
     }
 }
 

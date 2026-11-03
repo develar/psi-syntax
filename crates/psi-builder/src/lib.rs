@@ -20,4 +20,4 @@ pub use builder::{AsPsiBuilder, Marker, Nesting, PsiBuilderImpl, WhitespacesAndC
 pub use language::{ElementType, ElementTypeOf, Language, NodeType, TokenType, TreeLanguage};
 pub use lexer::Lexed;
 pub use token_set::ElementTypeSet;
-pub use tree::{Chameleon, LeafIndex, NodeId, ParseOptions, Parser, Tree, TreeBuilder};
+pub use tree::{Chameleon, ColumnWriter, LeafIndex, NodeId, ParseOptions, Parser, Tree, TreeBuilder};
