@@ -379,6 +379,11 @@ impl GreenArena {
         self.work
     }
 
+    /// Whether `tokens` more consumed tokens keep the work within its budget.
+    pub(crate) fn work_fits(&self, tokens: u64) -> bool {
+        self.work_budget == 0 || self.work.saturating_add(tokens) <= self.work_budget
+    }
+
     /// Counts `tokens` consumed by a parser (`SyntaxParser::charge_work`) against the work budget.
     #[inline]
     pub fn charge_work(&mut self, tokens: u64) {

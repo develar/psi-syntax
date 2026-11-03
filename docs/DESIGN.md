@@ -576,14 +576,24 @@ failure is its only answer to an input it will not parse.
   member's last token, which Roslyn copies each time (n `}` after a class: 3.7 s for 100 000); a list of 8 or more grows
   in place into room of twice its length (`GreenArena::append_trailing_trivia`). `IsDefined` walked every directive
   of the stack, so excluded `#if` nested n deep took n² (3.4 s for 100 000); its cells skip to the next `#define`,
-  `#undef`, `#elif` or `#else` and to the next `#if`.
+  `#undef`, `#elif` or `#else` and to the next `#if`. An interpolated or raw string token a parser makes into an
+  expression is made again from a memo of that parser (`ParsedStrings`, keyed by the token's record and the context
+  its holes' parsers start from): Roslyn scans the literal and parses each hole with a new lexer and parser every time
+  it meets the token, so a literal under speculation at every level of nested literals was made 2ⁿ times, its text
+  scanned each time, uncounted by the work budget (a 37 KB random mix of `tests/robustness.rs`, 9.9 G instructions,
+  now 0.08 G; `$"{a ? [` 16 deep around a 20 KB string, 5.2 s, now 2 ms). A replay charges the tokens the holes'
+  parsers consumed, so the work budget is crossed where it was, and serves any `_recursionDepth` from which the levels
+  the parse went below its start stay within the limit; the records it does not make no longer count against the
+  arena budget, so a parse they would have abandoned goes on (1 of 700 random mixes of nested literals, its tree now
+  the one a budget large enough gives).
 - **Known deviations.** 100 000 `a < a < …` fail as too deep (`ScanType` recurses at each `<`; Roslyn's does too,
   without a guard); the 17 `?[` above; the lexer's `MAX_NESTED_SCAN_DEPTH`.
 
 `tests/robustness.rs` (C#) parses 153 recursive forms nested 100 000 deep on a 1 MB stack (each under 220 ms), 101
 chains and lists of 100 000 (each under 120 ms), 20 speculative forms at 250, 1000 and 100 000 levels (each under
-225 ms), 40 random mixes of 38 forms 3000 deep, the lexer's deep forms, and random bytes and fragments at every entry,
-language version and documentation mode; each tree is lossless, in preorder, and the same on a second parse.
+225 ms), literals nested in speculative forms at 8, 16 and 24 levels (each under 250 ms), 40 random mixes of 38 forms
+3000 deep, the lexer's deep forms, and random bytes and fragments at every entry, language version and documentation
+mode; each tree is lossless, in preorder, and the same on a second parse.
 
 ### C# deviations
 
@@ -606,7 +616,8 @@ changes a tree of the gate's inputs; the first three apply only past limits no c
   `ConvertExpressionToType`/`ConvertTypeToExpression` over a name chain, `CompleteIf`/`CompleteRegion`, excluded
   `#if` sections.
 - **Linear algorithms with Roslyn's decisions**: the replayed tuple type scans, trailing trivia grown in place,
-  `IsDefined` stepping over cells, a run of `@` scanned once (`TryScanAtStringToken`).
+  `IsDefined` stepping over cells, a run of `@` scanned once (`TryScanAtStringToken`), an interpolated or raw string
+  token made into an expression once per parser and context (`ParsedStrings`).
 - **Values not kept**: the `ValueText` of numeric literals (in directives too), of character literals, of string
   literals outside directives and of interpolated and raw string texts (no tree shows them; `Tree::value_text` is
   `None` there, a missing token's empty text aside); `MakeInterpolatedStringTextToken` lexes a text as a string literal only when that could report a diagnostic
@@ -775,6 +786,22 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### C# literals made once (child of "the C# parse speed after its six speedups"), 2026-11-03
+
+`random_mixes_parse_on_a_small_stack` failed on the Mac Studio after the six speedups and passed before. Per round
+(a scratch probe, the test's 40 texts, one fresh `Parser` each, instructions from `proc_pid_rusage`), the six speedups
+changed no round by more than their usual -1 to -3 %: round 22 (37 KB) took 9.86 G instructions before and 9.66 after,
+0.91 and 0.90 s on the Studio, the rest 0.01-0.51 G each, so the test sat at 0.96-0.99 s of its 1 s on both and failed
+with load. A profile of round 22 had 86 % in the scanner of interpolated string literals: 4 240 parses of 62 literals
+(a 24 KB one 384 times) and 8 259 scans by the holes' lexers, 280 MB scanned. With each token made into an expression
+once per parser and context (`ParsedStrings`, "C# nesting and work"), round 22 takes 0.083 G (7.7 ms on the Studio),
+the 40 rounds 13.4 → 2.2 G; the 40 dumps, 700 random mixes of nested literals in speculative forms and `$"{a ? [`
+4-20 deep around a 20 KB string (5.5 s → 7 ms at 20, abandoned at the work budget in both) dump as before, but for one
+mix the arena budget no longer abandons. dotnet/runtime's files up to 4 MiB, `ksdump --bench --doc none --retain 32`,
+one thread on the Studio, 5 alternating rounds: 76.00 → 76.10 G instructions a round (+0.1 %; the rounds spread
+75.4-76.2 on both), 71.9 → 72.0 MB/s; against bc41ac3a 109.9 → 76.1 G, 52.0 → 72.3 MB/s. Keeping a token only while
+a reset point is held took the memo's cost from +0.7 % (3 rounds before it) to this.
 
 ### C# parse speed, the six commits after 25dac59f, 2026-11-03
 

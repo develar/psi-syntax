@@ -33,6 +33,57 @@ use crate::syntax_parser::SyntaxParserBuffers;
 /// expression.
 const INTERPOLATION_RECURSION_DEPTH: i32 = 16;
 
+/// The interpolated and raw string tokens a parser made into expressions (`parse_interpolated_or_raw_string_token`), not
+/// in Roslyn. Roslyn makes a token into an expression each time the parser meets it: it scans the literal again to
+/// find its interpolations and parses each hole with a new lexer and parser, which do the same for the literals nested
+/// in the hole. Speculation meets a token again at every level that rolls back over it, so a literal nested in a few
+/// such levels was made hundreds of times, its text scanned and its holes lexed each time, while the work budget
+/// counted only the tokens the holes' parsers consumed: a 37 KB mix of `tests/robustness.rs` made a 24 KB literal 384
+/// times (280 MB scanned, 9.9 G instructions, at half the budget), `$"{a ? [` nested 16 deep around a 20 KB string
+/// took 137 G instructions (5.2 s) short of the budget.
+///
+/// The expression is a function of the token and of the context its holes' parsers start from, which is the key (a
+/// token record is the same text and trivia wherever it is met; a hole's parser makes its own tokens and memo), and of
+/// `_recursionDepth` only through the depth limit: the levels a parse went below its start are the same from any
+/// start, so the memo serves every start from which they stay within the limit (speculation meets a token a level
+/// deeper or shallower). A made expression is immutable, as Roslyn's green nodes are, so it is valid after any
+/// rollback; a token is kept only while a reset point is held, as no other can be met again. A replay charges the
+/// work budget with the tokens the holes' parsers consumed, so the budget is crossed where it was without the memo; a
+/// replay that would cross it parses instead. The tree is the same, but where the records a replay does not make would
+/// have crossed the arena budget (`green::budget_for`): such a parse now goes on.
+pub(crate) type ParsedStrings =
+    std::collections::HashMap<ParsedStringKey, ParsedString, std::hash::BuildHasherDefault<super::types::WordHasher>>;
+
+/// Where `parse_interpolated_or_raw_string_token` made a token into an expression, in one word: the token's record, and
+/// what the holes' parsers start from besides `_recursionDepth` (`IsInAsync`, `IsInFieldKeywordContext`) with whether
+/// the literal is interpolated.
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub(crate) struct ParsedStringKey(u64);
+
+impl ParsedStringKey {
+    fn new(token: Green, is_interpolated_string: bool, is_in_async: bool, is_in_field_keyword_context: bool) -> Self {
+        let context = (u64::from(is_interpolated_string) << 2)
+            | (u64::from(is_in_async) << 1)
+            | u64::from(is_in_field_keyword_context);
+        ParsedStringKey(((token.index() as u64) << 3) | context)
+    }
+}
+
+impl std::hash::Hash for ParsedStringKey {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u64(self.0);
+    }
+}
+
+/// What `parse_interpolated_or_raw_string_token` made: the expression, the tokens its holes' parsers consumed, and the
+/// levels of `_recursionDepth` its stack checks went below the parser's.
+#[derive(Copy, Clone, Debug)]
+pub(crate) struct ParsedString {
+    expression: Green,
+    work: u64,
+    depth: i32,
+}
+
 /// The buffers the parser of an interpolated or raw string token reuses, kept by its lexer (`LexerBuffers`).
 #[derive(Default)]
 pub(crate) struct InterpolatedStringBuffers {
@@ -166,7 +217,51 @@ impl<'l, 't> LanguageParser<'l, 't> {
     /// interpolated string, this will now contain all the holes parsed out as well. For a raw string this will
     /// contain a single `InterpolatedStringTextSyntax` for the contents of the raw string. Its local functions follow
     /// it, `rescan_interpolation` to `get_interpolation_indentation_error`.
+    ///
+    /// A token this parser made into an expression before, in the same context, is made again from its memo
+    /// (`ParsedStrings`, not in Roslyn).
     pub(crate) fn parse_interpolated_or_raw_string_token(
+        &mut self,
+        original_token: Green,
+        is_interpolated_string: bool,
+    ) -> Green {
+        if self.base.is_abandoned() || self.arena_ref().is_over_budget() {
+            return self.parse_interpolated_or_raw_string_token_core(original_token, is_interpolated_string);
+        }
+        let key = ParsedStringKey::new(
+            original_token,
+            is_interpolated_string,
+            self.is_in_async,
+            self.is_in_field_keyword_context,
+        );
+        if !self.parsed_strings.is_empty()
+            && let Some(parsed) = self.parsed_strings.get(&key).copied()
+            && self.recursion_depth + parsed.depth <= MAX_RECURSION_DEPTH
+            && self.arena_ref().work_fits(parsed.work)
+        {
+            self.peak_recursion_depth = self.peak_recursion_depth.max(self.recursion_depth + parsed.depth);
+            self.base.arena().charge_work(parsed.work);
+            return parsed.expression;
+        }
+        let (work, peak) = (self.arena_ref().work(), self.peak_recursion_depth);
+        self.peak_recursion_depth = self.recursion_depth;
+        let expression = self.parse_interpolated_or_raw_string_token_core(original_token, is_interpolated_string);
+        let depth = self.peak_recursion_depth - self.recursion_depth;
+        self.peak_recursion_depth = self.peak_recursion_depth.max(peak);
+        // a token met with no reset point held is not met again
+        if self.base.holds_reset_point()
+            && !self.base.is_abandoned()
+            && !self.arena_ref().is_over_budget()
+            && self.stack_exhausted_at.is_none()
+        {
+            let work = self.arena_ref().work() - work;
+            self.parsed_strings.insert(key, ParsedString { expression, work, depth });
+        }
+        expression
+    }
+
+    /// `ParseInterpolatedOrRawStringToken` itself (see `parse_interpolated_or_raw_string_token`).
+    fn parse_interpolated_or_raw_string_token_core(
         &mut self,
         original_token: Green,
         is_interpolated_string: bool,
@@ -744,6 +839,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             );
             let result = temp_parser.parse_interpolation_with_open_brace_token(interpolation, kind, open_brace_token);
             let exhausted = temp_parser.stack_exhausted_at.is_some();
+            self.peak_recursion_depth = self.peak_recursion_depth.max(temp_parser.peak_recursion_depth);
             let (parser_buffers, pool) = temp_parser.into_buffers();
             (result, exhausted, parser_buffers, pool)
         };

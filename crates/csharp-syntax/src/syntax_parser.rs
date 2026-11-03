@@ -504,6 +504,13 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.token_offset += 1;
     }
 
+    /// Whether a reset point is held (`GetResetPoint` not yet released): only then can the parser come back to the
+    /// current token (not in Roslyn).
+    #[inline]
+    pub fn holds_reset_point(&self) -> bool {
+        self.reset_count > 0
+    }
+
     /// Whether the parse was abandoned (`abandon`): every token reads as the end of file.
     #[inline]
     pub fn is_abandoned(&self) -> bool {

@@ -78,12 +78,17 @@ pub struct LanguageParser<'l, 't> {
     pub(crate) is_in_field_keyword_context: bool,
     /// `_recursionDepth`.
     pub(crate) recursion_depth: i32,
+    /// The deepest `_recursionDepth` a stack check saw, its holes' parsers' included (`ParsedStrings`), not in Roslyn.
+    pub(crate) peak_recursion_depth: i32,
     /// `_termState`.
     pub(crate) term_state: TerminatorState,
     /// The lexer's position when the recursion limit was hit (the `InsufficientExecutionStackException`), if it was.
     pub(crate) stack_exhausted_at: Option<u32>,
     /// The finished tuple type scans of this parse (`scan_tuple_type`), not in Roslyn.
     pub(crate) scanned_tuples: ScannedTuples,
+    /// The interpolated and raw string tokens this parser made into expressions
+    /// (`parse_interpolated_or_raw_string_token`), not in Roslyn.
+    pub(crate) parsed_strings: interpolated_string::ParsedStrings,
     /// The `primary ?` pairs of a conditional access chain still to be built
     /// (`try_parse_conditional_access_expression`), not in Roslyn.
     pub(crate) pending_conditional_accesses: Vec<(Green, Green)>,
@@ -121,9 +126,11 @@ impl<'l, 't> LanguageParser<'l, 't> {
             is_in_query: false,
             is_in_field_keyword_context: false,
             recursion_depth: 0,
+            peak_recursion_depth: 0,
             term_state: TerminatorState::END_OF_FILE,
             stack_exhausted_at: None,
             scanned_tuples: ScannedTuples::default(),
+            parsed_strings: interpolated_string::ParsedStrings::default(),
             pending_conditional_accesses: Vec::new(),
         }
     }
@@ -171,6 +178,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
     /// `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` after `_recursionDepth++`: past the limit the parse
     /// is abandoned (see the module's documentation).
     pub(crate) fn ensure_sufficient_execution_stack(&mut self) {
+        self.peak_recursion_depth = self.peak_recursion_depth.max(self.recursion_depth);
         if self.recursion_depth > MAX_RECURSION_DEPTH && self.stack_exhausted_at.is_none() {
             self.stack_exhausted_at = Some(self.lexer.position());
             self.base.abandon();

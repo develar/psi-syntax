@@ -535,6 +535,27 @@ fn speculation_is_bounded() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
+/// A literal in the holes of literals each in a speculative form (`a ? [` parses what follows twice) is met twice as
+/// often at every level: it is made into an expression once (`ParsedStrings`), where it was made, scanned and its holes
+/// lexed at every meeting (16 levels around a 20 KB string took 5.2 s, each level doubling). Each form at 8, 16 and 24
+/// levels parses in under a quarter of a second.
+#[test]
+fn literals_nested_in_speculation_are_made_once() {
+    let forms = [("$\"{a ? [", "]}\""), ("$\"\"\"{[(", ")]}\"\"\""), ("$@\"{f(a = ", ")}\"")];
+    let mut failures = Vec::new();
+    for (open, close) in forms {
+        for n in [8, 16, 24] {
+            let text = field(&format!("{}\"{}\"{}", open.repeat(n), "x".repeat(20_000), close.repeat(n)));
+            let parsed = parse_on_small_stack(open, text, FileKind::default());
+            println!("{open} {n} levels: {:.2} ms", parsed.elapsed.as_secs_f64() * 1e3);
+            if parsed.elapsed >= limit(Duration::from_millis(250)) {
+                failures.push(format!("{open} at {n} levels: {:?}", parsed.elapsed));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
 /// Random mixes of the recursive expression and statement forms nested past the limit parse on a 1 MB stack: the
 /// stack a level takes depends on the path, and a mix takes paths no single form does.
 #[test]
