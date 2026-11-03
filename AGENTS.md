@@ -239,7 +239,8 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   before, never a scan of the siblings), `ancestor_or_self(id, accept)`, `deepest_covering(range)` (the last node in
   preorder that holds it), `descendants_pruned(id, prune)` (a declaration's own nodes, a type's names without its
   arguments), `own_range(id, is_trivia, separator)` (a declaration without the comments and separator its language's
-  binders put inside it), `utf8_text`, `errors()` (the error elements in document order with their messages), and
+  binders put inside it; `own_end` its end alone, without the descent to the first token, which a left-deep chain
+  makes as long as the chain), `utf8_text`, `errors()` (the error elements in document order with their messages), and
   `leaf_index().at(offset)`, a binary search that relies on the leaves being in offset order and tiling the text
   but for unexpanded bodies (`tests/robustness.rs` checks it on every tree). What a consumer makes of them
   (symbols, call sites, scopes, the text of an error) stays in the consumer.

@@ -589,8 +589,9 @@ failure is its only answer to an input it will not parse.
 - **Known deviations.** 100 000 `a < a < …` fail as too deep (`ScanType` recurses at each `<`; Roslyn's does too,
   without a guard); the 17 `?[` above; the lexer's `MAX_NESTED_SCAN_DEPTH`.
 
-`tests/robustness.rs` (C#) parses 153 recursive forms nested 100 000 deep on a 1 MB stack (each under 220 ms), 101
-chains and lists of 100 000 (each under 120 ms), 20 speculative forms at 250, 1000 and 100 000 levels (each under
+`tests/robustness.rs` (C#) parses 153 recursive forms nested 100 000 deep on a 1 MB stack (each under 220 ms), 135
+chains and lists of 100 000 (each under 120 ms; a qualified name or a member access of 100 000 parts in each place a
+name is parsed, directive conditions of 100 000 operands, whose branch is the one Roslyn's evaluation takes), 20 speculative forms at 250, 1000 and 100 000 levels (each under
 225 ms), literals nested in speculative forms at 8, 16 and 24 levels (each under 250 ms), 40 random mixes of 38 forms
 3000 deep, the lexer's deep forms, and random bytes and fragments at every entry, language version and documentation
 mode; each tree is lossless, in preorder, and the same on a second parse.
@@ -614,7 +615,9 @@ changes a tree of the gate's inputs; the first three apply only past limits no c
   nested interpolated strings.
 - **Loops for recursions with the same nodes**: `a?.b?.…` (a stack of the pending `primary ?` pairs),
   `ConvertExpressionToType`/`ConvertTypeToExpression` over a name chain, `CompleteIf`/`CompleteRegion`, excluded
-  `#if` sections.
+  `#if` sections, a directive condition's `Evaluate` (post order on a stack of its own: `#if A || A || …`, a
+  left-deep chain of 100 000, overflowed a 1 MB stack at 10 000 operands; no case has an effect, so the right
+  operand of a `&&` or `||` Roslyn short-circuits changes nothing).
 - **Linear algorithms with Roslyn's decisions**: the replayed tuple type scans, trailing trivia grown in place,
   `IsDefined` stepping over cells, a run of `@` scanned once (`TryScanAtStringToken`), an interpolated or raw string
   token made into an expression once per parser and context (`ParsedStrings`).
@@ -786,6 +789,27 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### Long qualified names and directive conditions (JetBrains/accio#143, child of "a nested C# string literal is parsed once"), 2026-11-03
+
+A review saw accio crash on C# qualified names of 45 000-60 000 parts and its parse grow faster than linear past
+20 000 (0.04 s at 20 000, 0.24 s at 40 000). The parser was not it: Roslyn's `ParseQualifiedName`,
+`ParseQualifiedNameRight` and member access (`ParsePostFixExpression`) loop, building a left-deep tree, and the port
+parses `A.A.…` of 100 000 parts in 6-30 ms on a 1 MB stack in every place a name is read (a field's, a local's, a
+parameter's and a return type, a base, a constraint, a type argument, an explicit interface, `typeof`, a cast, `is`,
+`new`, `nameof`, `global::`, `X::`, `A<B>.`, a using of each kind, both namespaces, an attribute, a `cref`), 35
+forms now among the chains of `tests/robustness.rs`; Roslyn's own tree of 28 of them at 5000 parts and of all at 3 and
+1000 (`oracle.sh dump --stack-mb 64`; a dump of 20 000 parts is over its 512 MB) equals the port's byte for byte, but
+the known `==` chain (`MAX_NESTED_SCAN_DEPTH`). The crashes were accio's walks over the tree
+(`crates/extract/src/csharp`): `nav::qualified_name` recursed per part (a 1 MB thread overflowed between 5000 and
+10 000 parts, the 8 MB main thread of `accio parse` between 40 000 and 60 000) and copied the name so far at each level
+(quadratic), `symbols::is_tuple` recursed per pointer of `int***…`. One crash was the parser's: a directive condition
+of 10 000 `||` or `&&` operands (`Evaluate`, "C# deviations"). Superlinear walks found on the way, every fact of a
+file (`file_facts`) at 100 000: a call chain `a.f().f()…` 24.2 s (each call's end read through `own_range`, whose
+descent to the first token is the chain's depth; now `own_end`, 0.5 s), a class of 100 000 fields or methods and an
+enum of 100 000 members 16.8, 29.0 and > 30 s (the primary parameter list looked up among all members for each name;
+now read only up to its slot, 0.13-0.40 s). A doc comment of 100 000 attributes or nested elements still takes 18.8 s
+and > 30 s (`sites::comment_kind` reads its line back from each word: all languages, open).
 
 ### C# literals made once (child of "the C# parse speed after its six speedups"), 2026-11-03
 

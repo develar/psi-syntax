@@ -6,7 +6,8 @@
 //! Recursion: a condition's `!`, parentheses and `==`/`!=` chains recurse (`ParseLogicalNot`, `ParsePrimary`,
 //! `ParseEquality`) up to `MAX_NESTED_SCAN_DEPTH` levels; an operand deeper is a missing identifier with
 //! `ERR_InvalidPreprocExpr`, and the rest of the line is skipped as `ParseEndOfDirective` skips extra tokens (Roslyn
-//! has no limit there).
+//! has no limit there). `||` and `&&` chains are loops, left-deep, of any length; `Evaluate`, recursive in Roslyn,
+//! walks them on a stack of its own.
 
 use super::directives::{DefineState, DirectiveStack};
 use super::{Lexer, MAX_NESTED_SCAN_DEPTH, parse_int32};
@@ -964,36 +965,74 @@ impl<'l, 't> DirectiveParser<'l, 't> {
         self.evaluate(expr)
     }
 
-    /// `Evaluate(expr)`: every case is a `bool`.
+    /// `Evaluate(expr)`: every case is a `bool`. Roslyn recurses into each operand; `ParseLogicalOr`,
+    /// `ParseLogicalAnd` and `ParseEquality` build their chains in a loop, left-deep, so `#if A || A || …` of 100 000
+    /// operands is 100 000 frames (a 1 MB stack overflowed at 10 000). Here the same evaluation runs on a stack of its
+    /// own, post order (not in Roslyn): an operand's value is what Roslyn's recursion returns for it, and since no
+    /// case has an effect, evaluating the right operand of a `&&` or `||` that Roslyn short-circuits changes no result.
     fn evaluate(&self, expr: Green) -> bool {
-        let a = self.arena_ref();
-        match a.kind(expr) {
-            SyntaxKind::ParenthesizedExpression => self.evaluate(a.slot(expr, 1)),
-            SyntaxKind::TrueLiteralExpression => true,
-            SyntaxKind::FalseLiteralExpression => false,
-            SyntaxKind::LogicalAndExpression | SyntaxKind::BitwiseAndExpression => {
-                self.evaluate_bool(a.slot(expr, 0)) && self.evaluate_bool(a.slot(expr, 2))
-            }
-            SyntaxKind::LogicalOrExpression | SyntaxKind::BitwiseOrExpression => {
-                self.evaluate_bool(a.slot(expr, 0)) || self.evaluate_bool(a.slot(expr, 2))
-            }
-            SyntaxKind::EqualsExpression => self.evaluate(a.slot(expr, 0)) == self.evaluate(a.slot(expr, 2)),
-            SyntaxKind::NotEqualsExpression => self.evaluate(a.slot(expr, 0)) != self.evaluate(a.slot(expr, 2)),
-            SyntaxKind::LogicalNotExpression => !self.evaluate_bool(a.slot(expr, 1)),
-            SyntaxKind::IdentifierName => {
-                // For backwards compatibility, we want to evaluate any unicode escape sequences in the identifier name
-                // and then check again for boolean literals.  (This actually seems like a bug that we're retaining for
-                // back-compat, because section 2.4.1 of the spec says that escape sequences can only appear in
-                // identifiers, character literals, and regular string literals - not boolean literals.  In
-                // (non-directive) C#, true is equivalent to the identifier @true, not the boolean literal true.)
-                let id = a.token_value_text(a.slot(expr, 0), self.source());
-                if let Some(constant_value) = bool_try_parse(id) {
-                    return constant_value;
-                }
-                self.is_defined(id)
-            }
-            _ => false,
+        /// What is left to do for a node: evaluate it, or combine the values of its operands, which are on `values`.
+        enum Step {
+            Evaluate(Green),
+            Combine(SyntaxKind),
         }
+        let a = self.arena_ref();
+        let mut steps = vec![Step::Evaluate(expr)];
+        let mut values: Vec<bool> = Vec::new();
+        while let Some(step) = steps.pop() {
+            match step {
+                Step::Evaluate(expr) => match a.kind(expr) {
+                    SyntaxKind::ParenthesizedExpression => steps.push(Step::Evaluate(a.slot(expr, 1))),
+                    SyntaxKind::TrueLiteralExpression => values.push(true),
+                    SyntaxKind::FalseLiteralExpression => values.push(false),
+                    kind @ (SyntaxKind::LogicalAndExpression
+                    | SyntaxKind::BitwiseAndExpression
+                    | SyntaxKind::LogicalOrExpression
+                    | SyntaxKind::BitwiseOrExpression
+                    | SyntaxKind::EqualsExpression
+                    | SyntaxKind::NotEqualsExpression) => {
+                        // `EvaluateBool(Left) && EvaluateBool(Right)`, `object.Equals(Evaluate(Left), Evaluate(Right))`:
+                        // the left operand first
+                        steps.push(Step::Combine(kind));
+                        steps.push(Step::Evaluate(a.slot(expr, 2)));
+                        steps.push(Step::Evaluate(a.slot(expr, 0)));
+                    }
+                    SyntaxKind::LogicalNotExpression => {
+                        steps.push(Step::Combine(SyntaxKind::LogicalNotExpression));
+                        steps.push(Step::Evaluate(a.slot(expr, 1)));
+                    }
+                    SyntaxKind::IdentifierName => {
+                        // For backwards compatibility, we want to evaluate any unicode escape sequences in the
+                        // identifier name and then check again for boolean literals.  (This actually seems like a bug
+                        // that we're retaining for back-compat, because section 2.4.1 of the spec says that escape
+                        // sequences can only appear in identifiers, character literals, and regular string literals -
+                        // not boolean literals.  In (non-directive) C#, true is equivalent to the identifier @true,
+                        // not the boolean literal true.)
+                        let id = a.token_value_text(a.slot(expr, 0), self.source());
+                        values.push(match bool_try_parse(id) {
+                            Some(constant_value) => constant_value,
+                            None => self.is_defined(id),
+                        });
+                    }
+                    _ => values.push(false),
+                },
+                Step::Combine(SyntaxKind::LogicalNotExpression) => {
+                    let operand = values.pop().unwrap_or(false);
+                    values.push(!operand);
+                }
+                Step::Combine(kind) => {
+                    let right = values.pop().unwrap_or(false);
+                    let left = values.pop().unwrap_or(false);
+                    values.push(match kind {
+                        SyntaxKind::LogicalAndExpression | SyntaxKind::BitwiseAndExpression => left && right,
+                        SyntaxKind::LogicalOrExpression | SyntaxKind::BitwiseOrExpression => left || right,
+                        SyntaxKind::EqualsExpression => left == right,
+                        _ => left != right,
+                    });
+                }
+            }
+        }
+        values.pop().unwrap_or(false)
     }
 
     /// `IsDefined(id)`: no preprocessor symbols but the file's own.

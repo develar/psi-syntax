@@ -759,26 +759,50 @@ impl<L: TreeLanguage> Tree<L> {
         is_trivia: impl Fn(NodeId) -> bool,
         separator: impl Fn(L::Token) -> bool,
     ) -> Range<usize> {
-        let edge = |n: NodeId, last: bool, top: bool| -> Option<NodeId> {
-            let mut kids = self.children(n).filter(|&c| !is_trivia(c) && !self.range(c).is_empty());
-            if last {
-                kids.filter(|&c| !top || !self.token_kind(c).is_some_and(&separator)).last()
-            } else {
-                kids.next()
-            }
-        };
-        let token = |last: bool| -> Option<NodeId> {
-            let mut n = edge(id, last, true)?;
-            while let Some(c) = edge(n, last, false) {
-                n = c;
-            }
-            Some(n)
-        };
-        match (token(false), token(true)) {
+        match (self.own_edge(id, false, &is_trivia, &separator), self.own_edge(id, true, &is_trivia, &separator)) {
             (Some(first), Some(last)) => self.range(first).start..self.range(last).end,
             (Some(first), None) => self.range(first),
             _ => self.range(id),
         }
+    }
+
+    /// `own_range(id, is_trivia, separator).end`, from the descent to the last token alone: the descent to the first
+    /// one takes a level per node on the left edge, so a node over a left-deep chain (C#'s `a.f().f()…`, 100 000 calls
+    /// each a level below the next) costs its depth there, and the end of every call of the chain the square of it.
+    pub fn own_end(
+        &self,
+        id: NodeId,
+        is_trivia: impl Fn(NodeId) -> bool,
+        separator: impl Fn(L::Token) -> bool,
+    ) -> usize {
+        // `own_range` ends at its last token, else at the end of its first one, else at the node's end
+        match self
+            .own_edge(id, true, &is_trivia, &separator)
+            .or_else(|| self.own_edge(id, false, &is_trivia, &separator))
+        {
+            Some(token) => self.range(token).end,
+            None => self.range(id).end,
+        }
+    }
+
+    /// The first (or `last`) token of `own_range`: from `id` down, at each level the first (last) child that is neither
+    /// trivia nor empty, at the top no separator either; None when `id` has no such child.
+    fn own_edge(
+        &self,
+        id: NodeId,
+        last: bool,
+        is_trivia: &impl Fn(NodeId) -> bool,
+        separator: &impl Fn(L::Token) -> bool,
+    ) -> Option<NodeId> {
+        let edge = |n: NodeId, top: bool| -> Option<NodeId> {
+            let mut kids = self.children(n).filter(|&c| !is_trivia(c) && !self.range(c).is_empty());
+            if last { kids.filter(|&c| !top || !self.token_kind(c).is_some_and(separator)).last() } else { kids.next() }
+        };
+        let mut n = edge(id, true)?;
+        while let Some(c) = edge(n, false) {
+            n = c;
+        }
+        Some(n)
     }
 
     pub fn parent(&self, id: NodeId) -> Option<NodeId> {

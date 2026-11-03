@@ -368,6 +368,42 @@ fn chains(n: usize) -> Vec<(&'static str, String)> {
         ("base types list", format!("class C : A{} {{}}\n", r(", A"))),
         ("qualified names", format!("class C {{ A{} x; }}\n", r(".A"))),
         ("alias qualified names", format!("class C {{ A::A{} x; }}\n", r(".A"))),
+        // `ParseQualifiedName` and `ParseQualifiedNameRight` loop (a left-deep `QualifiedName`), in every place a name
+        // or a member access is parsed, and `ParseLogicalOr`, `ParseLogicalAnd`, `ParseEquality` of a directive
+        ("global qualified names", format!("class C {{ global::A{} x; }}\n", r(".A"))),
+        ("qualified generic names", format!("class C {{ A<B>{} x; }}\n", r(".A<B>"))),
+        ("qualified names with ::", format!("class C {{ A{} x; }}\n", r("::A"))),
+        ("qualified names with ..", format!("class C {{ A{} x; }}\n", r("..A"))),
+        ("qualified local types", method(&format!("A{} x;", r(".A")))),
+        ("qualified parameter types", format!("class C {{ void M(A{} p) {{ }} }}\n", r(".A"))),
+        ("qualified return types", format!("class C {{ A{} M() {{ }} }}\n", r(".A"))),
+        ("qualified base types", format!("class C : A{} {{ }}\n", r(".A"))),
+        ("qualified constraints", format!("class C<T> where T : A{} {{ }}\n", r(".A"))),
+        ("qualified type arguments", format!("class C {{ X<A{}> x; }}\n", r(".A"))),
+        ("qualified explicit interfaces", format!("class C {{ void A{}.M() {{ }} }}\n", r(".A"))),
+        ("qualified typeof", field(&format!("typeof(A{})", r(".A")))),
+        ("qualified casts", field(&format!("(A{})b", r(".A")))),
+        ("qualified is", field(&format!("b is A{}", r(".A")))),
+        ("qualified new", field(&format!("new A{}()", r(".A")))),
+        ("qualified nameof", field(&format!("nameof(a{})", r(".b")))),
+        ("global member accesses", field(&format!("global::a{}", r(".b")))),
+        ("member access statements", method(&format!("a{};", r(".b")))),
+        ("member access calls", method(&format!("a{}();", r(".b")))),
+        ("member access assignments", method(&format!("a{} = 1;", r(".b")))),
+        ("top-level member accesses", format!("a{}();\n", r(".b"))),
+        ("qualified usings", format!("using A{};\n", r(".A"))),
+        ("qualified static usings", format!("using static A{};\n", r(".A"))),
+        ("qualified alias usings", format!("using X = A{};\n", r(".A"))),
+        ("qualified global usings", format!("global using A{};\n", r(".A"))),
+        ("qualified namespaces", format!("namespace A{} {{ }}\n", r(".A"))),
+        ("qualified file-scoped namespaces", format!("namespace A{};\n", r(".A"))),
+        ("qualified attributes", format!("[A{}] class C {{ }}\n", r(".A"))),
+        ("qualified attributes with arguments", format!("[A{}(1)] class C {{ }}\n", r(".A"))),
+        ("qualified crefs", format!("/// <see cref=\"A{}\"/>\nclass C {{ }}\n", r(".A"))),
+        ("directive ||", format!("#if A{}\n#endif\n", r(" || A"))),
+        ("directive &&", format!("#if A{}\n#endif\n", r(" && A"))),
+        ("directive mixed", format!("#if A{}\n#endif\n", r(" || !A && A == true"))),
+        ("directive elif ||", format!("#if B\n#elif A{}\n#endif\n", r(" || A"))),
         ("array ranks", format!("class C {{ int{} x; }}\n", r("[]"))),
         ("array rank commas", format!("class C {{ int[{}] x; }}\n", r(","))),
         ("pointers", format!("class C {{ int{} x; }}\n", r("*"))),
@@ -499,6 +535,36 @@ fn long_chains_parse_in_linear_time() {
         }
     }
     assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// A directive's condition of 100 000 operands is evaluated as Roslyn's `Evaluate` evaluates it (its recursion, one
+/// frame an operand, on a stack of its own): the branch it takes is the one the operators' truth takes. (A chain of
+/// `==` nests to the right, `ParseEquality`, up to `MAX_NESTED_SCAN_DEPTH`: "deep lexer forms".)
+#[test]
+fn long_directive_conditions_evaluate_on_a_small_stack() {
+    let n = 100_000;
+    let chain = |first: &str, op: &str| format!("{first}{}", format!(" {op} {first}").repeat(n - 1));
+    let cases = [
+        (format!("#define B\n#if {} || B\n", chain("A", "||")), true),
+        (format!("#if {}\n", chain("A", "||")), false),
+        (format!("#define A\n#if {}\n", chain("A", "&&")), true),
+        (format!("#define A\n#if {} && B\n", chain("A", "&&")), false),
+        (format!("#define B\n#if A{}\n", " || !A && B == true".repeat(n - 1)), true),
+        (format!("#if A{}\n", " || !A && B == true".repeat(n - 1)), false),
+        (format!("#define B\n#if A\n#elif {}\n", chain("A", "||").replacen('A', "B", 1)), true),
+    ];
+    for (i, (condition, active)) in cases.into_iter().enumerate() {
+        let text = format!("{condition}class Active {{ }}\n#endif\n");
+        let name = format!("condition {i}");
+        let classes = on_stack(&name, move || {
+            let tree = Parser::new().parse(text.as_bytes(), FileKind::default());
+            check(&tree, text.as_bytes());
+            tree.descendants(tree.root())
+                .filter(|&n| tree.node_kind(n) == Some(csharp_syntax::NodeKind::ClassDeclaration))
+                .count()
+        });
+        assert_eq!(classes, usize::from(active), "{name}: the branch is taken {}", classes == 1);
+    }
 }
 
 /// Where Roslyn speculates, each level of a nested form may scan or parse what follows it before it is rolled back:
