@@ -370,6 +370,26 @@ fn instanceof_patterns_and_lambdas() {
     assert_eq!(text(&tree, lambda_expression::get_body(&tree, lambda).unwrap()), "x");
 }
 
+#[test]
+fn a_deconstruction_variable_a_label_and_a_module_have_their_psi_getters() {
+    // `R(int a) r`: the variable `r` has the pattern's type element `R` (`getPattern().getTypeElement()`).
+    let tree =
+        parse("class C { void m(Object o) { if (o instanceof R(int a) r) {} outer: for (;;) { break outer; } } }");
+    let r = all(&tree, NodeKind::DECONSTRUCTION_PATTERN_VARIABLE)[0];
+    assert_eq!(text(&tree, get_name_identifier(&tree, r).unwrap()), "r");
+    let r_type = get_type_element(&tree, r).unwrap();
+    assert_eq!(tree.parent(r_type), tree.parent(r));
+    assert_eq!(text(&tree, r_type), "R");
+    assert!(get_initializer(&tree, r).is_none() && get_modifier_list(&tree, r).is_none());
+    // A labeled statement and a module are `PsiNameIdentifierOwner`s too: the label, the module reference.
+    let label = all(&tree, NodeKind::LABELED_STATEMENT)[0];
+    assert_eq!(text(&tree, get_name_identifier(&tree, label).unwrap()), "outer");
+    let tree = parse("module a.b { requires c; }");
+    let module = all(&tree, NodeKind::MODULE)[0];
+    let name = get_name_identifier(&tree, module).unwrap();
+    assert_eq!((tree.node_kind(name), text(&tree, name)), (Some(NodeKind::MODULE_REFERENCE), "a.b"));
+}
+
 /// The goldens of `testdata/java`: each line of the manifest is `PATH<TAB>LEVEL<TAB>ENTRY<TAB>TRIM`.
 fn goldens() -> Vec<(String, Tree)> {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/java");

@@ -278,7 +278,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   (`java_source_util::get_reference_text`, the tree-pure part of `getQualifiedName`). Free functions over `&Tree` and
   the element's `NodeId`, named after the method, `None` where PSI returns `null`, a light element or throws; no
   allocation but the texts, no panic, no recursion. Each is checked against the real PSI on every node of the gate's
-  Java inputs (`ksdump --getters --check`, 77.5 million lines, 0 differing). What a consumer makes of the answers
+  Java inputs (`ksdump --getters --check`, 81.9 million lines, 0 differing). What a consumer makes of the answers
   (its symbols, scopes, spellings, a rule it keeps on purpose) stays in the consumer.
 - Highlighting reads `leaves()`: each token leaf's `(TokenKind, range)` in document order. Not the lexer: soft keywords
   are remapped by the parser (`IDENTIFIER` becomes `by`, `get`, `data`, ...) and `?.`, `?:`, `!!` are joined by the
@@ -392,7 +392,7 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 Java: `testdata/java/` (1036 goldens of IntelliJ's Java parsing tests, `manifest.tsv` with level, entry and trim per
 test) and the Java PSI oracle `tools/java-oracle/JavaPsiOracle.java` (see `tools/java-oracle/README.md`: cached dumps of
 the 68 263 community `.java` files, 19 116 golden mutations and 20 000 lexer fuzz inputs; with `--getters` the answers
-of the PSI getters `java_syntax::psi` ports, cached in `$HOME/.cache/psi-syntax/getters/`). The Java lexer oracle
+of the PSI getters `java_syntax::psi` ports, cached in `$HOME/.cache/psi-syntax/getters/2/`). The Java lexer oracle
 `java -cp "$(tools/java-oracle/fetch-jars.sh)/*" tools/java-oracle/JavaLexOracle.java --list LIST --root ROOT` prints
 the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
 `tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.

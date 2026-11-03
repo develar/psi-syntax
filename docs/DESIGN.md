@@ -757,6 +757,16 @@ error) is that element's type (`createDisjunction` of one), and the field walk o
 quadratic when asked of every field (37.8 s), so a pass takes `field::declaration_heads` (0.1 s for the test's
 inputs together).
 
+A review against the sources then asked the oracle what the first lines left out (line format 2, `getters/2/`): a
+type's deep component with its reference element or primitive name (the first lines named only the outer class), a
+`DIAMOND_TYPE`'s type, a class's keyword, `isValueClass` and own fields, methods and inner classes, an argument
+list's count, a module import's reference, and the name identifier and type element of every
+`PsiNameIdentifierOwner` and `PsiVariable`. Three interface getters had missed a class: a deconstruction pattern
+variable's type element is its pattern's (`R(int a) r`), a labeled statement's name identifier its label, a module's
+its module reference; all three answered `None`. With them: 0 differing on the four inputs (81.9 million lines,
+70 s for the oracle), on the JDK 26 sources (15 413 files) and on the 66 305 Java files of the monorepo outside
+`community/` (149.4 million lines for the two; one generated 4.5 MB file IntelliJ fails to load).
+
 ### Value texts (child of "(csharp) Shrink a parser's buffers past its retained bytes"), 2026-11-02
 
 `Tree::value_text` against Roslyn's `SyntaxToken.ValueText`: `tools/csharp-oracle/oracle.sh values --kept` prints

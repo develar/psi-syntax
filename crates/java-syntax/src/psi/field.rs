@@ -103,7 +103,7 @@ pub fn get_initializer(tree: &Tree, field: NodeId) -> Option<NodeId> {
     find_child_by_set(tree, field, EXPRESSION_BIT_SET)
 }
 
-/// `getType().getArrayDimensions()` (`PsiFieldImpl.java:146`, `JavaSharedImplUtil.getType(typeElement,
+/// `getType().getArrayDimensions()` (`PsiFieldImpl.java:145`, `JavaSharedImplUtil.getType(typeElement,
 /// getNameIdentifier())`): the dimensions of the type element's type (`type_element::calculate_type`) and one for each
 /// bracket after the name (`int a, b[];` gives `b` one). `None` without a type element or a name.
 pub fn get_type_array_dimensions(tree: &Tree, field: NodeId) -> Option<u32> {

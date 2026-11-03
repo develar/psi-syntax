@@ -21,7 +21,10 @@ pub enum TypeKind {
     Primitive(NodeId),
     /// A `PsiClassReferenceType`: the `JAVA_CODE_REFERENCE`.
     ClassReference(NodeId),
-    /// `var`: the type IntelliJ infers from the initializer or the iterated value (`inferVarType`); the leaf.
+    /// `var`, the leaf: what `inferVarType` (`PsiTypeElementImpl.java:298`) makes of it, which this does not decide.
+    /// IntelliJ resolves the initializer, the iterated value, the lambda's target or the record component, and gets
+    /// `PsiTypes.nullType()` where there is none to resolve: a method or catch parameter, a variable without an
+    /// initializer or with an array initializer, a `var` that is no variable's type (`List<var>`, `var[] a`).
     Inferred(NodeId),
     /// A `PsiWildcardType`: `?`, `? extends T`, `? super T`.
     Wildcard,

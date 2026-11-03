@@ -26,7 +26,7 @@ pub fn is_var_args(tree: &Tree, parameter: NodeId) -> bool {
     get_type_element(tree, parameter).is_some_and(|t| find_child_by_type(tree, t, TokenKind::ELLIPSIS).is_some())
 }
 
-/// `getType().getArrayDimensions()` (`PsiParameterImpl.java:172`, `JavaSharedImplUtil.getType(typeElement,
+/// `getType().getArrayDimensions()` (`PsiParameterImpl.java:171`, `JavaSharedImplUtil.getType(typeElement,
 /// getNameIdentifier())`): the written dimensions of the type element and the brackets after the name
 /// (`String... a[]` has 2). `None` without a type element (an untyped lambda parameter, whose type IntelliJ infers) or
 /// a name, and for `var`.

@@ -139,6 +139,11 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
             l.node("typeParameterList", class::get_type_parameter_list(tree, id));
             l.node("containingClass", get_containing_class(tree, id));
             l.owner(tree, id);
+            l.bool("isValueClass", class::is_value_class(tree, id));
+            l.node("keyword", class::class_or_interface_keyword(tree, id));
+            l.list("ownFields", class::get_own_fields(tree, id));
+            l.list("ownMethods", class::get_own_methods(tree, id));
+            l.list("ownInnerClasses", class::get_own_inner_classes(tree, id));
             if kind == NodeKind::ANONYMOUS_CLASS {
                 l.node("baseClassReference", anonymous_class::get_base_class_reference(tree, id));
                 l.node("argumentList", anonymous_class::get_argument_list(tree, id));
@@ -228,12 +233,20 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
         NodeKind::DECONSTRUCTION_PATTERN_VARIABLE | NodeKind::TYPE_PARAMETER => {
             l.node("nameIdentifier", get_name_identifier(tree, id));
             l.owner(tree, id);
+            if kind == NodeKind::DECONSTRUCTION_PATTERN_VARIABLE {
+                l.node("typeElement", get_type_element(tree, id));
+            }
         }
         NodeKind::CLASS_INITIALIZER => {
             l.node("containingClass", get_containing_class(tree, id));
             l.owner(tree, id);
         }
-        NodeKind::MODULE | NodeKind::REQUIRES_STATEMENT => l.owner(tree, id),
+        NodeKind::MODULE => {
+            l.owner(tree, id);
+            l.node("nameIdentifier", get_name_identifier(tree, id));
+        }
+        NodeKind::REQUIRES_STATEMENT => l.owner(tree, id),
+        NodeKind::LABELED_STATEMENT => l.node("nameIdentifier", get_name_identifier(tree, id)),
         NodeKind::MODIFIER_LIST => {
             let explicit = Modifier::ALL
                 .into_iter()
@@ -269,7 +282,18 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
                     TypeKind::Diamond => "diamond",
                 };
                 l.raw("type", format_args!("{kind} {}", ty.array_dimensions));
+                match ty.kind {
+                    TypeKind::ClassReference(reference) => l.raw("component", format_args!("class {}", reference.0)),
+                    TypeKind::Primitive(keyword) => {
+                        l.raw("component", format_args!("primitive {}", String::from_utf8_lossy(tree.text(keyword))));
+                    }
+                    kind => l.raw("component", format_args!("{}", type_kind_name(kind))),
+                }
             }
+        }
+        NodeKind::DIAMOND_TYPE => {
+            let ty = type_element::calculate_type(tree, id);
+            l.raw("type", format_args!("{} {}", type_kind_name(ty.kind), ty.array_dimensions));
         }
         NodeKind::JAVA_CODE_REFERENCE => {
             l.node("name", code_reference::get_reference_name_element(tree, id));
@@ -299,7 +323,10 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
             l.node("methodExpression", method_call_expression::get_method_expression(tree, id));
             l.node("argumentList", method_call_expression::get_argument_list(tree, id));
         }
-        NodeKind::EXPRESSION_LIST => l.list("expressions", expression_list::get_expressions(tree, id)),
+        NodeKind::EXPRESSION_LIST => {
+            l.list("expressions", expression_list::get_expressions(tree, id));
+            l.raw("count", format_args!("{}", expression_list::get_expression_count(tree, id)));
+        }
         NodeKind::NEW_EXPRESSION => {
             l.node("qualifier", new_expression::get_qualifier(tree, id));
             l.node("classReference", new_expression::get_class_reference(tree, id));
@@ -315,7 +342,10 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
             l.bool("isOnDemand", import_statement::is_on_demand(tree, id));
             l.node("importReference", import_statement::get_import_reference(tree, id));
         }
-        NodeKind::IMPORT_MODULE_STATEMENT => l.bool("isOnDemand", import_statement::is_on_demand(tree, id)),
+        NodeKind::IMPORT_MODULE_STATEMENT => {
+            l.bool("isOnDemand", import_statement::is_on_demand(tree, id));
+            l.node("moduleReference", import_statement::get_module_reference(tree, id));
+        }
         NodeKind::PACKAGE_STATEMENT => {
             l.node("packageReference", package_statement::get_package_reference(tree, id));
             l.text("packageName", &package_statement::get_package_name(tree, id));
@@ -346,6 +376,20 @@ fn node_getters(tree: &Tree, id: NodeId, in_package_info: bool, head: Option<Nod
         NodeKind::RECORD_HEADER => l.list("components", record_header::get_record_components(tree, id)),
         NodeKind::TYPE_PARAMETER_LIST => l.list("typeParameters", type_parameter_list::get_type_parameters(tree, id)),
         _ => {}
+    }
+}
+
+/// The name the oracle's `shape` gives the class of a type that is no array.
+fn type_kind_name(kind: TypeKind) -> &'static str {
+    match kind {
+        TypeKind::Null => "null",
+        TypeKind::Primitive(_) => "primitive",
+        TypeKind::ClassReference(_) => "class",
+        TypeKind::Inferred(_) => "inferred",
+        TypeKind::Wildcard => "wildcard",
+        TypeKind::Intersection => "intersection",
+        TypeKind::Disjunction => "disjunction",
+        TypeKind::Diamond => "diamond",
     }
 }
 

@@ -87,7 +87,7 @@ separators are converted to `\n`, as the IDE does when it loads a file.
 | `fuzz/java-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `java-lex`) |
 | `fuzz/java-lex.oracle/` | their dumps (17 604 with a `PsiErrorElement`, 5.8 s) |
 | `lex/java-community-3caa0bf.oracle.txt`, `lex/java-mut.oracle.txt`, `lex/java-lex.oracle.txt` | `JavaLexOracle.java`'s lines for the three corpora |
-| `getters/java-goldens/`, `getters/java-community-3caa0bf/`, `getters/java-mut/`, `getters/java-lex/` | `--getters` of `testdata/java/manifest.tsv` and the three corpora (77.5 million lines, 1.7 GB; 51 s for the four at once) |
+| `getters/2/java-goldens/`, `getters/2/java-community-3caa0bf/`, `getters/2/java-mut/`, `getters/2/java-lex/` | `--getters` of `testdata/java/manifest.tsv` and the three corpora (81.9 million lines, 1.8 GB; 70 s for the four at once). `2` is the line format: a change of the lines a getter prints writes a new number, so a tree before it keeps its own (`getters/` holds the first) |
 
 Rebuild them:
 
@@ -109,10 +109,10 @@ The getter lines, which `scripts/gate.sh` compares `ksdump --getters` with (the 
 ```sh
 S=$HOME/.cache/psi-syntax C=$HOME/.cache/accio-bench/intellij-community LIB=$(tools/java-oracle/fetch-jars.sh)
 g() { java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --getters "$@"; }
-g --list testdata/java/manifest.tsv --root testdata/java --out $S/getters/java-goldens
-g --list $S/corpus/java-community-3caa0bf.list --root $C --out $S/getters/java-community-3caa0bf
-g --list $S/fuzz/java-mut.list --root $S/fuzz/java-mut --out $S/getters/java-mut
-g --list $S/fuzz/java-lex/list --root $S/fuzz/java-lex --out $S/getters/java-lex
+g --list testdata/java/manifest.tsv --root testdata/java --out $S/getters/2/java-goldens
+g --list $S/corpus/java-community-3caa0bf.list --root $C --out $S/getters/2/java-community-3caa0bf
+g --list $S/fuzz/java-mut.list --root $S/fuzz/java-mut --out $S/getters/2/java-mut
+g --list $S/fuzz/java-lex/list --root $S/fuzz/java-lex --out $S/getters/2/java-lex
 ```
 
 The lexer oracle's cached lines, which `scripts/gate.sh` compares `ksdump --lex` with:

@@ -38,7 +38,7 @@ pub fn is_var_args(tree: &Tree, component: NodeId) -> bool {
     type_element::calculate_type(tree, type_element).ellipsis
 }
 
-/// `getType().getArrayDimensions()` (`PsiRecordComponentImpl.java:80`): the type element's and the brackets after the
+/// `getType().getArrayDimensions()` (`PsiRecordComponentImpl.java:79`): the type element's and the brackets after the
 /// name; `None` without a type element or a name.
 pub fn get_type_array_dimensions(tree: &Tree, component: NodeId) -> Option<u32> {
     let type_element = get_type_element(tree, component)?;

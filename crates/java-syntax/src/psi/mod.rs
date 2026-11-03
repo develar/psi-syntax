@@ -206,13 +206,17 @@ pub fn has_modifier_property(tree: &Tree, owner: NodeId, name: Modifier) -> bool
 /// enum constant (`PsiEnumConstantImpl.java:185`), a local or resource variable (`PsiLocalVariableImpl.java:83`), a
 /// parameter (`PsiParameterImpl.java:162`), a record component (`PsiRecordComponentImpl.java:114`), a pattern variable
 /// (`PsiPatternVariableImpl.java:46`), a deconstruction pattern variable (`PsiDeconstructionPatternVariableImpl.java:98`)
-/// and a type parameter (`PsiTypeParameterImpl.java:183`); `None` without one (IntelliJ asserts or throws for most of
-/// them), for an anonymous class, an enum constant's body, an implicit class and a receiver parameter
-/// (`PsiAnonymousClassImpl.java:123`, `PsiEnumConstantInitializerImpl.java:92`, `PsiImplicitClassImpl.java:224`,
-/// `PsiReceiverParameterImpl.java:65`), and for any other node. Java has no backticks: the name is the identifier's
-/// text as written, unicode escapes included.
+/// and a type parameter (`PsiTypeParameterImpl.java:183`); the first child of a labeled statement when it is an
+/// `IDENTIFIER` (`PsiLabeledStatementImpl.java:124`, its `LABEL_NAME` role `:53`); the first `MODULE_REFERENCE` child
+/// of a module (`PsiJavaModuleImpl.java:113`, a `PsiJavaModuleReferenceElement`, not an identifier); `None` without
+/// one (IntelliJ asserts or throws for most of them), for an anonymous class, an enum constant's body, an implicit
+/// class and a receiver parameter (`PsiAnonymousClassImpl.java:123`, `PsiEnumConstantInitializerImpl.java:92`,
+/// `PsiImplicitClassImpl.java:224`, `PsiReceiverParameterImpl.java:65`), and for any other node. Java has no
+/// backticks: the name is the identifier's text as written, unicode escapes included.
 pub fn get_name_identifier(tree: &Tree, owner: NodeId) -> Option<NodeId> {
     match tree.node_kind(owner)? {
+        NodeKind::LABELED_STATEMENT => tree.first_child(owner).filter(|&c| is_token(tree, c, TokenKind::IDENTIFIER)),
+        NodeKind::MODULE => find_child_by_type(tree, owner, NodeKind::MODULE_REFERENCE),
         NodeKind::CLASS
         | NodeKind::METHOD
         | NodeKind::ANNOTATION_METHOD
@@ -234,9 +238,11 @@ pub fn get_name_identifier(tree: &Tree, owner: NodeId) -> Option<NodeId> {
 /// (`local_variable::get_type_element`), and the first `TYPE` child of a resource variable
 /// (`PsiResourceVariableImpl.java:36`), a parameter (`PsiParameterImpl.java:201`; none for an untyped lambda
 /// parameter), a record component (`PsiRecordComponentImpl.java:98`), a pattern variable
-/// (`PsiPatternVariableImpl.java:95`) and a receiver parameter (`PsiReceiverParameterImpl.java:50`); `None` for an
-/// enum constant (`PsiEnumConstantImpl.java:141`) and any other node. (`PsiTypeElement` is also the class of a
-/// `DIAMOND_TYPE`, which no variable holds.)
+/// (`PsiPatternVariableImpl.java:95`) and a receiver parameter (`PsiReceiverParameterImpl.java:50`), the pattern's
+/// type of a deconstruction pattern variable (the `R` of `R(int a) r`, `PsiDeconstructionPatternVariableImpl.java:73`:
+/// `getPattern().getTypeElement()`, the first `TYPE` child of the parent `DECONSTRUCTION_PATTERN`,
+/// `PsiDeconstructionPatternImpl.java:45`); `None` for an enum constant (`PsiEnumConstantImpl.java:141`) and any other
+/// node. (`PsiTypeElement` is also the class of a `DIAMOND_TYPE`, which no variable holds.)
 pub fn get_type_element(tree: &Tree, variable: NodeId) -> Option<NodeId> {
     match tree.node_kind(variable)? {
         NodeKind::FIELD => field::get_type_element(tree, variable),
@@ -246,6 +252,10 @@ pub fn get_type_element(tree: &Tree, variable: NodeId) -> Option<NodeId> {
         | NodeKind::RECORD_COMPONENT
         | NodeKind::PATTERN_VARIABLE
         | NodeKind::RECEIVER_PARAMETER => type_element_child(tree, variable),
+        NodeKind::DECONSTRUCTION_PATTERN_VARIABLE => tree
+            .parent(variable)
+            .filter(|&p| tree.node_kind(p) == Some(NodeKind::DECONSTRUCTION_PATTERN))
+            .and_then(|pattern| find_child_by_type(tree, pattern, NodeKind::TYPE)),
         _ => None,
     }
 }

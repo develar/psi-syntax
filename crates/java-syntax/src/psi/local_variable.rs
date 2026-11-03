@@ -42,7 +42,7 @@ pub fn get_modifier_list(tree: &Tree, variable: NodeId) -> Option<NodeId> {
     find_child_by_type(tree, first, NodeKind::MODIFIER_LIST)
 }
 
-/// `hasModifierProperty(name)` (`PsiLocalVariableImpl.java:136`): `get_modifier_list`'s, false without one.
+/// `hasModifierProperty(name)` (`PsiLocalVariableImpl.java:137`): `get_modifier_list`'s, false without one.
 pub fn has_modifier_property(tree: &Tree, variable: NodeId, name: Modifier) -> bool {
     get_modifier_list(tree, variable).is_some_and(|list| super::modifier_list::has_modifier_property(tree, list, name))
 }
@@ -53,7 +53,7 @@ pub fn get_initializer(tree: &Tree, variable: NodeId) -> Option<NodeId> {
     find_child_by_set(tree, variable, EXPRESSION_BIT_SET)
 }
 
-/// `getType().getArrayDimensions()` (`PsiLocalVariableImpl.java:111`, `JavaSharedImplUtil.getType`): the written
+/// `getType().getArrayDimensions()` (`PsiLocalVariableImpl.java:110`, `JavaSharedImplUtil.getType`): the written
 /// dimensions of the type element and the brackets after the name. `None` without a type element or a name, and for
 /// `var`, whose type IntelliJ infers from the initializer (`type_element::is_inferred_type`).
 pub fn get_type_array_dimensions(tree: &Tree, variable: NodeId) -> Option<u32> {

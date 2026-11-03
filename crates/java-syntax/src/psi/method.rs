@@ -23,7 +23,7 @@ pub fn get_return_type_element(tree: &Tree, method: NodeId) -> Option<NodeId> {
     find_child_by_type(tree, method, NodeKind::TYPE)
 }
 
-/// `getReturnType().getArrayDimensions()` (`PsiMethodImpl.java:202`, `JavaSharedImplUtil.getType(typeElement,
+/// `getReturnType().getArrayDimensions()` (`PsiMethodImpl.java:201`, `JavaSharedImplUtil.getType(typeElement,
 /// getParameterList())`): the written dimensions of the return type element and the brackets after the parameter list
 /// (`String n()[]` returns `String[]`). `None` for a constructor; a method without a parameter list has no brackets
 /// after it.

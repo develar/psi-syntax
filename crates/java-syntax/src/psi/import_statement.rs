@@ -30,3 +30,13 @@ pub fn get_import_reference(tree: &Tree, statement: NodeId) -> Option<NodeId> {
         _ => None,
     }
 }
+
+/// `PsiImportModuleStatementImpl.getModuleReference()`
+/// (`java/java-psi-impl/src/com/intellij/psi/impl/source/tree/java/PsiImportModuleStatementImpl.java:71`): of a module
+/// import (`import module java.base;`) the first `MODULE_REFERENCE` child; `None` for any other statement.
+pub fn get_module_reference(tree: &Tree, statement: NodeId) -> Option<NodeId> {
+    if tree.node_kind(statement) != Some(NodeKind::IMPORT_MODULE_STATEMENT) {
+        return None;
+    }
+    find_child_by_type(tree, statement, NodeKind::MODULE_REFERENCE)
+}

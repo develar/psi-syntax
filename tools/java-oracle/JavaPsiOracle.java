@@ -435,6 +435,11 @@ public class JavaPsiOracle {
       out.append(id).append(' ').append(getter).append(' ').append(text).append('\n');
     }
 
+    String id(ASTNode node) {
+      Integer id = node == null ? null : ids.get(node);
+      return id == null ? "-" : id.toString();
+    }
+
     String id(PsiElement element) {
       if (element == null) return "-";
       ASTNode node = element.getNode();
@@ -492,6 +497,14 @@ public class JavaPsiOracle {
           line("typeParameterList", () -> id(c.getTypeParameterList()));
           line("containingClass", () -> id(c.getContainingClass()));
           owner(c);
+          line("isValueClass", () -> String.valueOf(c.isValueClass()));
+          line("keyword", () -> node instanceof com.intellij.psi.impl.source.tree.java.ClassElement e
+            ? id(e.findChildByRole(com.intellij.psi.impl.source.tree.ChildRole.CLASS_OR_INTERFACE_KEYWORD)) : "-");
+          if (psi instanceof com.intellij.psi.impl.source.PsiExtensibleClass e) {
+            line("ownFields", () -> list(e.getOwnFields().toArray(PsiElement.EMPTY_ARRAY)));
+            line("ownMethods", () -> list(e.getOwnMethods().toArray(PsiElement.EMPTY_ARRAY)));
+            line("ownInnerClasses", () -> list(e.getOwnInnerClasses().toArray(PsiElement.EMPTY_ARRAY)));
+          }
           if (psi instanceof com.intellij.psi.PsiAnonymousClass a && node.getElementType().toString().equals("ANONYMOUS_CLASS")) {
             line("baseClassReference", () -> id(a.getBaseClassReference()));
             line("argumentList", () -> id(a.getArgumentList()));
@@ -572,13 +585,19 @@ public class JavaPsiOracle {
         case "DECONSTRUCTION_PATTERN_VARIABLE", "TYPE_PARAMETER" -> {
           line("nameIdentifier", () -> id(((com.intellij.psi.PsiNameIdentifierOwner) psi).getNameIdentifier()));
           owner((PsiModifierListOwner) psi);
+          if (psi instanceof com.intellij.psi.PsiVariable v) line("typeElement", () -> id(v.getTypeElement()));
         }
         case "CLASS_INITIALIZER" -> {
           com.intellij.psi.PsiClassInitializer i = (com.intellij.psi.PsiClassInitializer) psi;
           line("containingClass", () -> id(i.getContainingClass()));
           owner(i);
         }
-        case "MODULE", "REQUIRES_STATEMENT" -> owner((PsiModifierListOwner) psi);
+        case "MODULE" -> {
+          owner((PsiModifierListOwner) psi);
+          line("nameIdentifier", () -> id(((com.intellij.psi.PsiNameIdentifierOwner) psi).getNameIdentifier()));
+        }
+        case "REQUIRES_STATEMENT" -> owner((PsiModifierListOwner) psi);
+        case "LABELED_STATEMENT" -> line("nameIdentifier", () -> id(((com.intellij.psi.PsiNameIdentifierOwner) psi).getNameIdentifier()));
         case "MODIFIER_LIST" -> {
           com.intellij.psi.PsiModifierList l = (com.intellij.psi.PsiModifierList) psi;
           line("explicit", () -> modifiers(l::hasExplicitModifier));
@@ -590,8 +609,12 @@ public class JavaPsiOracle {
           line("innermost", () -> id(t.getInnermostComponentReferenceElement()));
           line("inferred", () -> String.valueOf(t.isInferredType()));
           boolean unnamedPattern = t.getFirstChild() == null && t.getParent() instanceof com.intellij.psi.PsiUnnamedPattern;
-          if (!t.isInferredType() && !unnamedPattern) line("type", () -> shape(t.getType()));
+          if (!t.isInferredType() && !unnamedPattern) {
+            line("type", () -> shape(t.getType()));
+            line("component", () -> component(t.getType().getDeepComponentType()));
+          }
         }
+        case "DIAMOND_TYPE" -> line("type", () -> shape(((com.intellij.psi.PsiTypeElement) psi).getType()));
         case "JAVA_CODE_REFERENCE" -> {
           com.intellij.psi.impl.source.PsiJavaCodeReferenceElementImpl r = (com.intellij.psi.impl.source.PsiJavaCodeReferenceElementImpl) psi;
           line("name", () -> id(r.getReferenceNameElement()));
@@ -624,7 +647,11 @@ public class JavaPsiOracle {
           line("methodExpression", () -> id(c.getMethodExpression()));
           line("argumentList", () -> id(c.getArgumentList()));
         }
-        case "EXPRESSION_LIST" -> line("expressions", () -> list(((com.intellij.psi.PsiExpressionList) psi).getExpressions()));
+        case "EXPRESSION_LIST" -> {
+          com.intellij.psi.PsiExpressionList l = (com.intellij.psi.PsiExpressionList) psi;
+          line("expressions", () -> list(l.getExpressions()));
+          line("count", () -> String.valueOf(l.getExpressionCount()));
+        }
         case "NEW_EXPRESSION" -> {
           com.intellij.psi.PsiNewExpression n = (com.intellij.psi.PsiNewExpression) psi;
           line("qualifier", () -> id(n.getQualifier()));
@@ -642,7 +669,11 @@ public class JavaPsiOracle {
           line("isOnDemand", () -> String.valueOf(i.isOnDemand()));
           line("importReference", () -> id(i.getImportReference()));
         }
-        case "IMPORT_MODULE_STATEMENT" -> line("isOnDemand", () -> String.valueOf(((com.intellij.psi.PsiImportStatementBase) psi).isOnDemand()));
+        case "IMPORT_MODULE_STATEMENT" -> {
+          com.intellij.psi.PsiImportModuleStatement i = (com.intellij.psi.PsiImportModuleStatement) psi;
+          line("isOnDemand", () -> String.valueOf(i.isOnDemand()));
+          line("moduleReference", () -> id(i.getModuleReference()));
+        }
         case "PACKAGE_STATEMENT" -> {
           com.intellij.psi.PsiPackageStatement p = (com.intellij.psi.PsiPackageStatement) psi;
           line("packageReference", () -> id(p.getPackageReference()));
@@ -707,6 +738,16 @@ public class JavaPsiOracle {
       else if (t instanceof com.intellij.psi.PsiDiamondType) kind = "diamond";
       else kind = t.getClass().getSimpleName();
       return kind + " " + t.getArrayDimensions();
+    }
+
+    // The deep component type (getDeepComponentType()): its class as `shape` names it, with the
+    // reference element of a class type and the name of a primitive.
+    String component(com.intellij.psi.PsiType t) {
+      String kind = shape(t);
+      kind = kind.substring(0, kind.indexOf(' '));
+      if (t instanceof com.intellij.psi.impl.source.PsiClassReferenceType r) return kind + " " + id(r.getReference());
+      if (t instanceof com.intellij.psi.PsiPrimitiveType p && t != com.intellij.psi.PsiTypes.nullType()) return kind + " " + p.getName();
+      return kind;
     }
   }
 

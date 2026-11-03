@@ -127,7 +127,7 @@ pub fn calc_implicit_modifiers(tree: &Tree, list: NodeId, explicit: Modifiers) -
     implicit
 }
 
-/// `parameter.getType() instanceof PsiDisjunctionType` (`PsiParameterImpl.java:172`): the type element's type is a
+/// `parameter.getType() instanceof PsiDisjunctionType` (`PsiParameterImpl.java:171`): the type element's type is a
 /// disjunction and no C-style bracket follows the name, which would make it an array of one. A parameter without a
 /// type element or a name has none (IntelliJ asserts or throws).
 fn is_disjunction_type(tree: &Tree, parameter: NodeId) -> bool {
