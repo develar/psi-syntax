@@ -565,6 +565,11 @@ failure is its only answer to an input it will not parse.
   tokens a byte, at most 1.0 in a file of a kilobyte or more, and 250 in a 16-byte mutation; the gate proves no corpus,
   mutation or fuzz tree reaches the budget. A chain of 17 `?[0]` reaches it (20 reached the depth limit before);
   Roslyn parses 16 in 0.38 s, 20 in 0.54 s, 24 in 4.0 s.
+- **Abandoning.** Past a bound every token a parser sees, current or peeked, is the end of its lexer's input
+  (`SyntaxParser::abandon`), so its loops end and it returns, as Roslyn's unwind on the exception: an end of file, and
+  for the documentation comment parser the end of the comment, since its lexer gives no end of file and
+  `SkipBadTokens` in an end tag stops only at the comment's end. An end of file there was eaten without end, the list
+  growing until memory ran out (a budget sweep over runtime files found it, 2026-11-03; `memory.rs` keeps the case).
 - **Linear where Roslyn is not, with Roslyn's tree.** A finished tuple type scan that starts with `(` is replayed from a
   memo keyed by its token and context (`scan_tuple_type`): nested parentheses rescanned the tuples inside each level,
   21.7 s for `hugeexpr1.cs`, now 1.1 s. A stray token after a member adds itself to the trailing trivia of the

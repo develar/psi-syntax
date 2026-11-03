@@ -349,10 +349,19 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     }
 
     /// Abandons the parse (not in Roslyn: what its `InsufficientExecutionStackException` does by unwinding): from now
-    /// on every token, current or peeked, is one end of file, so every loop of the parsers ends and they return.
+    /// on every token, current or peeked, is one end of its lexer's input, so every loop of the parsers ends and they
+    /// return. For the documentation comment parser that is the end of the comment: its lexer never gives an end of
+    /// file, and `SkipBadTokens` in an end tag stops only at the end of the comment (it ate end of file tokens without
+    /// end, growing its list until memory ran out). The parse past its budget is Roslyn's for an exhausted stack all
+    /// the same (`LanguageParser::parse_with_stack_guard`).
     pub fn abandon(&mut self) {
         if self.forced_eof.is_null() {
-            self.forced_eof = self.arena().token(SyntaxKind::EndOfFileToken);
+            let end = if self.kind == ParserKind::DocumentationComment {
+                SyntaxKind::EndOfDocumentationCommentToken
+            } else {
+                SyntaxKind::EndOfFileToken
+            };
+            self.forced_eof = self.arena().token(end);
         }
         self.set_current_token(self.forced_eof);
     }

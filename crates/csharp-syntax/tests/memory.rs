@@ -133,3 +133,20 @@ fn the_default_bound_keeps_an_ordinary_file_buffers() {
     assert_eq!(parser.heap_bytes(), parser.grown_bytes());
     assert!(parser.heap_bytes() <= csharp_syntax::psi_builder::buffers::RETAINED_BYTES);
 }
+
+/// A parse abandoned inside a documentation comment ends: the comment's parser sees the end of the comment from then
+/// on, as its lexer gives it (`SyntaxParser::abandon`), and stops where Roslyn's would. Before, it saw an end of file,
+/// which `SkipBadTokens` in an end tag does not stop at, and ate end of file tokens until memory ran out.
+#[test]
+fn a_parse_abandoned_in_a_documentation_comment_ends() {
+    for shift in 0..12 {
+        // `shift` comments of a few tokens before, so that the budget is checked at other tokens of the elements
+        let text = format!("{}{}class C {{ }}\n", "/// <c/>\n".repeat(shift), "/// <a>b</a> <a>b</a>\n".repeat(200));
+        for budget in (1 << 10..64 << 10).step_by(512) {
+            let mut parser = Parser::new();
+            parser.set_arena_budget(budget);
+            let tree = parser.parse(&text, FileKind::default());
+            assert!(tree.diagnostics().iter().any(|d| d.code == ErrorCode::ERR_InsufficientStack), "budget {budget}");
+        }
+    }
+}
