@@ -38,6 +38,10 @@ pub struct LexerState {
 #[derive(Copy, Clone, Debug)]
 struct BufferedToken {
     token: Green,
+    /// The token's `Kind` and `ContextualKind`, read from the arena once when it is buffered: the parser's lookahead
+    /// reads them here, beside the token, instead of in the token's record.
+    kind: SyntaxKind,
+    contextual: SyntaxKind,
     after: LexerState,
 }
 
@@ -69,7 +73,8 @@ pub struct ResetPoint {
     pub(crate) reset_count: i32,
     pub(crate) mode: LexerMode,
     pub(crate) position: i32,
-    pub(crate) prev_token_trailing_trivia: TriviaList,
+    /// The token before the current one, whose trailing trivia are `_prevTokenTrailingTrivia` (null: none).
+    pub(crate) prev_token: Green,
 }
 
 /// `CachedTokenArraySize`: the token window's initial size.
@@ -84,13 +89,19 @@ pub struct SyntaxParser<'l, 't> {
     mode: LexerMode,
     /// `_firstBlender`: the lexer state before `tokens[0]`.
     first_state: LexerState,
-    /// `_currentToken` (null: not fetched).
+    /// `_currentToken` (null: not fetched). Set only through `fetch_current_token` and `set_current_token`, or
+    /// cleared, so `current_kind` and `current_contextual` are its kinds whenever it is not null.
     current_token: Green,
+    /// `_currentToken.Kind` and `.ContextualKind` once fetched.
+    current_kind: SyntaxKind,
+    current_contextual: SyntaxKind,
     /// `_lexedTokens` / `_blendedTokens`, `token_count` long.
     tokens: Vec<BufferedToken>,
     /// The C# array's length (`CachedTokenArraySize`, doubled when full): when the window shifts.
     window_length: usize,
-    prev_token_trailing_trivia: TriviaList,
+    /// The token `_prevTokenTrailingTrivia` is the trailing trivia of (null: none). Its record never changes, so its
+    /// trailing trivia are the list Roslyn's field holds.
+    prev_token: Green,
     /// The position of `tokens[0]`.
     first_token: i32,
     /// The index of the current token in `tokens`.
@@ -129,9 +140,11 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             mode,
             first_state,
             current_token: Green::NULL,
+            current_kind: SyntaxKind::None,
+            current_contextual: SyntaxKind::None,
             tokens,
             window_length: CACHED_TOKEN_ARRAY_SIZE,
-            prev_token_trailing_trivia: TriviaList::EMPTY,
+            prev_token: Green::NULL,
             first_token: 0,
             token_offset: 0,
             token_count: 0,
@@ -165,7 +178,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.reset_count = 0;
         self.reset_start = 0;
         self.current_token = Green::NULL;
-        self.prev_token_trailing_trivia = TriviaList::EMPTY;
+        self.prev_token = Green::NULL;
         if self.allow_mode_reset {
             self.first_state = LexerState {
                 position: self.lexer.position(),
@@ -210,12 +223,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             self.reset_start = pos; // low water mark
         }
         self.reset_count += 1;
-        ResetPoint {
-            reset_count: self.reset_count,
-            mode: self.mode,
-            position: pos,
-            prev_token_trailing_trivia: self.prev_token_trailing_trivia,
-        }
+        ResetPoint { reset_count: self.reset_count, mode: self.mode, position: pos, prev_token: self.prev_token }
     }
 
     /// `Reset(ref point)`.
@@ -232,7 +240,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.mode = point.mode;
         self.token_offset = offset.clamp(0, self.token_count);
         self.current_token = Green::NULL;
-        self.prev_token_trailing_trivia = point.prev_token_trailing_trivia;
+        self.prev_token = point.prev_token;
     }
 
     /// Charges the arena's work budget with the tokens consumed since the last charge (not in Roslyn): at every reset,
@@ -298,13 +306,21 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     /// `CurrentToken`.
     #[inline]
     pub fn current_token(&mut self) -> Green {
+        self.ensure_current();
+        self.current_token
+    }
+
+    /// Fetches the current token when it is not (`CurrentToken`'s getter), and abandons an over-budget parse.
+    #[inline(always)]
+    fn ensure_current(&mut self) {
         if self.current_token.is_null() {
-            self.current_token = self.fetch_current_token();
+            self.fetch_current_token();
         }
         if self.lexer.arena_ref().is_over_budget() {
             self.abandon_over_budget();
         }
-        self.current_token
+        debug_assert_eq!(self.current_kind, self.lexer.arena_ref().kind(self.current_token));
+        debug_assert_eq!(self.current_contextual, self.lexer.arena_ref().contextual_kind(self.current_token));
     }
 
     /// The arena outgrew its budget (`green::budget_for`, not in Roslyn): the parse is abandoned (`abandon`), and
@@ -321,15 +337,15 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     /// `CurrentToken.Kind`.
     #[inline]
     pub fn current_kind(&mut self) -> SyntaxKind {
-        let t = self.current_token();
-        self.arena_ref().kind(t)
+        self.ensure_current();
+        self.current_kind
     }
 
     /// `CurrentToken.ContextualKind`.
     #[inline]
     pub fn current_contextual_kind(&mut self) -> SyntaxKind {
-        let t = self.current_token();
-        self.arena_ref().contextual_kind(t)
+        self.ensure_current();
+        self.current_contextual
     }
 
     /// Abandons the parse (not in Roslyn: what its `InsufficientExecutionStackException` does by unwinding): from now
@@ -338,18 +354,35 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         if self.forced_eof.is_null() {
             self.forced_eof = self.arena().token(SyntaxKind::EndOfFileToken);
         }
-        self.current_token = self.forced_eof;
+        self.set_current_token(self.forced_eof);
     }
 
-    /// `FetchCurrentToken()`.
-    fn fetch_current_token(&mut self) -> Green {
+    /// Makes `token` the current token, its kinds read from the arena.
+    fn set_current_token(&mut self, token: Green) {
+        let a = self.lexer.arena_ref();
+        self.current_kind = a.kind(token);
+        self.current_contextual = a.contextual_kind(token);
+        self.current_token = token;
+    }
+
+    /// `FetchCurrentToken()`: sets the current token and its kinds.
+    #[inline]
+    fn fetch_current_token(&mut self) {
         if !self.forced_eof.is_null() {
-            return self.forced_eof;
+            self.set_current_token(self.forced_eof);
+            return;
         }
         if self.token_offset >= self.token_count {
             self.add_new_token();
         }
-        self.tokens.get(self.token_offset as usize).map_or(Green::NULL, |t| t.token)
+        match self.tokens.get(self.token_offset as usize) {
+            Some(t) => {
+                self.current_token = t.token;
+                self.current_kind = t.kind;
+                self.current_contextual = t.contextual;
+            }
+            None => self.set_current_token(Green::NULL),
+        }
     }
 
     /// `AddNewToken()`: lexes the next token from the state after the last buffered one.
@@ -375,7 +408,9 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             self.add_lexed_token_slot();
         }
         self.tokens.truncate(self.token_count as usize);
-        self.tokens.push(BufferedToken { token, after });
+        let a = self.lexer.arena_ref();
+        let (kind, contextual) = (a.kind(token), a.contextual_kind(token));
+        self.tokens.push(BufferedToken { token, kind, contextual, after });
         self.token_count += 1;
     }
 
@@ -420,10 +455,23 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.tokens.get((self.token_offset + n).max(0) as usize).map_or(Green::NULL, |t| t.token)
     }
 
-    /// `PeekToken(n).Kind`.
+    /// `PeekToken(n).Kind`, from the window.
     pub fn peek_kind(&mut self, n: i32) -> SyntaxKind {
         let t = self.peek_token(n);
-        self.arena_ref().kind(t)
+        match self.tokens.get((self.token_offset + n).max(0) as usize) {
+            Some(b) if b.token == t => b.kind,
+            _ => self.arena_ref().kind(t),
+        }
+    }
+
+    /// `PeekToken(n).ContextualKind` (not a method of Roslyn's: its `is { ContextualKind: ... }` patterns), from the
+    /// window.
+    pub fn peek_contextual_kind(&mut self, n: i32) -> SyntaxKind {
+        let t = self.peek_token(n);
+        match self.tokens.get((self.token_offset + n).max(0) as usize) {
+            Some(b) if b.token == t => b.contextual,
+            _ => self.arena_ref().contextual_kind(t),
+        }
     }
 
     /// `EatToken()`.
@@ -442,7 +490,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     /// `MoveToNextToken()`.
     fn move_to_next_token(&mut self) {
         self.eaten += 1;
-        self.prev_token_trailing_trivia = self.arena_ref().trailing_trivia(self.current_token);
+        self.prev_token = self.current_token;
         self.current_token = Green::NULL;
         self.token_offset += 1;
     }
@@ -461,14 +509,15 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             return;
         }
         let last = self.peek_token(delta - 1);
-        self.prev_token_trailing_trivia = self.arena_ref().trailing_trivia(last);
+        self.prev_token = last;
         self.current_token = Green::NULL;
         self.token_offset += delta;
     }
 
     /// `ForceEndOfFile()`.
     pub fn force_end_of_file(&mut self) {
-        self.current_token = self.arena().token(SyntaxKind::EndOfFileToken);
+        let eof = self.arena().token(SyntaxKind::EndOfFileToken);
+        self.set_current_token(eof);
     }
 
     /// `EatToken(kind)`: the current token when it is of `kind`, else a missing one with an error.
@@ -476,7 +525,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     pub fn eat_token_kind(&mut self, kind: SyntaxKind) -> Green {
         debug_assert!(facts::is_any_token(kind));
         let ct = self.current_token();
-        if self.arena_ref().kind(ct) == kind {
+        if self.current_kind == kind {
             self.move_to_next_token();
             return ct;
         }
@@ -490,7 +539,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     pub fn eat_token_as_kind(&mut self, expected: SyntaxKind) -> Green {
         debug_assert!(facts::is_any_token(expected));
         let ct = self.current_token();
-        if self.arena_ref().kind(ct) == expected {
+        if self.current_kind == expected {
             self.move_to_next_token();
             return ct;
         }
@@ -547,7 +596,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         if actual != kind {
             // getDiagnosticSpan: on the next line, squiggle the end of the previous token, zero wide
             let (offset, width) = if self.prev_trailing_has_end_of_line() {
-                let trivia_width = self.trivia_list_full_width(self.prev_token_trailing_trivia);
+                let trivia_width = self.trivia_list_full_width(self.prev_token_trailing_trivia());
                 let leading = self.arena_ref().leading_trivia_width(token);
                 (-((trivia_width + leading) as i32), 0)
             } else {
@@ -697,7 +746,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
             // getOffsetAndWidthBasedOnPriorAndNextTokens
             if self.prev_trailing_has_end_of_line() {
                 let leading = self.arena_ref().leading_trivia_width(missing_node_or_token) as i32;
-                let trivia = self.trivia_list_full_width(self.prev_token_trailing_trivia) as i32;
+                let trivia = self.trivia_list_full_width(self.prev_token_trailing_trivia()) as i32;
                 return (-leading - trivia, 0);
             }
             let token = self.current_token();
@@ -997,13 +1046,15 @@ impl<'l, 't> SyntaxParser<'l, 't> {
 
     /// `_prevTokenTrailingTrivia`.
     pub fn prev_token_trailing_trivia(&self) -> TriviaList {
-        self.prev_token_trailing_trivia
+        self.arena_ref().trailing_trivia(self.prev_token)
     }
 
     /// `new SyntaxList<CSharpSyntaxNode>(_prevTokenTrailingTrivia).Any(SyntaxKind.EndOfLineTrivia)`.
     fn prev_trailing_has_end_of_line(&self) -> bool {
         let a = self.arena_ref();
-        a.trivia_items(self.prev_token_trailing_trivia).iter().any(|&t| a.trivia_kind(t) == SyntaxKind::EndOfLineTrivia)
+        a.trivia_items(a.trailing_trivia(self.prev_token))
+            .iter()
+            .any(|&t| a.trivia_kind(t) == SyntaxKind::EndOfLineTrivia)
     }
 
     fn trivia_list_full_width(&self, list: TriviaList) -> u32 {

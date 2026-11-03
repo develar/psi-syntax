@@ -6325,8 +6325,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
 
     /// `PeekToken(n).ContextualKind` (not a method of Roslyn's: its `is { ContextualKind: ... }` patterns).
     pub(crate) fn peek_contextual_kind(&mut self, n: i32) -> SyntaxKind {
-        let token = self.peek_token(n);
-        self.base.arena_ref().contextual_kind(token)
+        self.base.peek_contextual_kind(n)
     }
 
     /// `token.TrailingTrivia.Any((int)SyntaxKind.EndOfLineTrivia)` (not a method of Roslyn's).
