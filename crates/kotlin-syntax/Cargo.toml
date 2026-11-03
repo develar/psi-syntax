@@ -1,19 +1,22 @@
 [package]
 name = "kotlin-syntax"
 description = "A lossless Kotlin lexer and parser in Rust, ported from the Kotlin compiler's own (Kotlin.flex, KotlinParsing, KotlinExpressionParsing); prints PSI's debug dump"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-repository.workspace = true
-publish.workspace = true
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
 
 [dependencies]
-psi-builder.workspace = true
+psi-builder = { path = "../psi-builder" }
 
 [features]
 # `counters::add` counts the parser's and the builder's events per thread (`ksdump --bench` prints them).
 counters = ["psi-builder/counters"]
 
-[lints]
-workspace = true
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

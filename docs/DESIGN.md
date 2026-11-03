@@ -45,6 +45,10 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 
 ## Workspace
 
+The crates are members of accio's Cargo workspace (`psi-syntax/crates/*`, since 2026-11-03; before, the repository
+github.com/develar/psi-syntax), with their own package fields and lints; accio's `crates/extract` depends on them by
+path.
+
 | crate | holds | depends on |
 |---|---|---|
 | `psi-builder` | `PsiBuilderImpl<L>`, `Marker`, the `WhitespacesAndCommentsBinder` contract, `Tree<L>` and `Parser<L>` (the driver), `TreeData`, the dump's layout, `ElementTypeSet`, `Lexed<T>`, `char_at`, `in_ranges`, the builder's counters, the retained buffers (`buffers`: `Shrink`, `RETAINED_BYTES`) | nothing |
@@ -695,8 +699,8 @@ byte-identical. None qualified. The measurements are from the survey prototypes 
 ### Build and toolchain
 
 psi-syntax is a library: its consumers' release profiles and flags decide how it is compiled, so the source carries
-the inlining a profile finds (see "Pipeline") and the rest is guidance. The workspace's own release profile (fat LTO,
-one codegen unit, unwinding) is the one the measurements use. Per parse round, one thread, instructions of the parsing
+the inlining a profile finds (see "Pipeline") and the rest is guidance. psi-syntax's own release profile (fat LTO,
+one codegen unit, unwinding; in accio the `psi` profile) is the one the measurements use. Per parse round, one thread, instructions of the parsing
 thread, on the inline hints commit as first measured ("Inlining as a profile does it"; the flags were measured on
 9b8c26f; on the integrated 7ce233e, `scripts/pgo.sh` with the goldens takes Kotlin 35.40 → 31.07 G and Java 43.48 →
 37.7 G, see "The radical batch integrated"):

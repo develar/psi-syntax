@@ -1,4 +1,4 @@
-psi-syntax (https://github.com/develar/psi-syntax)
+psi-syntax (https://github.com/JetBrains/accio/tree/main/psi-syntax)
 Copyright 2026 Vladimir Krivosheev
 
 This product is a Rust port of the Kotlin compiler's lexer and parser (crates/kotlin-syntax):

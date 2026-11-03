@@ -1,7 +1,7 @@
 #!/bin/sh
 # The correctness gate every change must pass, byte for byte against Kotlin 2.4.21's PSI and IntelliJ 271's Java PSI:
-#   1. clippy over the workspace (default and with ksdump's opt-in `counters,alloc-stats` features) and
-#      KS_STRICT=1 cargo test --release over the workspace (goldens, lexer, kdoc, robustness);
+#   1. clippy over psi-syntax's crates (default and with ksdump's opt-in `counters,alloc-stats` features) and
+#      KS_STRICT=1 cargo test --release over them (goldens, lexer, kdoc, robustness);
 #   2. the 55 501 community files: our dumps against the cached oracle dumps, 0 differing;
 #   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each, and the 16 724 one-place mutations of
 #      psi-tools 4d21cba's tools/psi-gate/mutate.js over crates/kotlin-syntax/testdata/psi) against their cached oracle answers;
@@ -52,14 +52,19 @@ C=$HOME/.cache/psi-syntax
 ROOT=/Users/develar/.cache/accio-bench/intellij-community
 mkdir -p "$C/ours"
 O=$(mktemp -d "$C/ours/gate.XXXXXX") || exit 1
+# psi-syntax's crates of accio's workspace; ksdump built with the `psi` profile into accio's target directory.
+P="-p psi-builder -p kotlin-syntax -p java-syntax -p csharp-syntax -p ksdump"
 fail=0
-cargo clippy --release --workspace --all-targets -q -- -D warnings || fail=1
-cargo clippy --release --workspace --all-targets --features ksdump/counters,ksdump/alloc-stats -q -- -D warnings || fail=1
-KS_STRICT=1 cargo test --release --workspace -q > "$O/tests.log" 2>&1 || { tests=FAIL; fail=1; }
+# shellcheck disable=SC2086 # one argument per package
+cargo clippy --release $P --all-targets -q -- -D warnings || fail=1
+# shellcheck disable=SC2086
+cargo clippy --release $P --all-targets --features ksdump/counters,ksdump/alloc-stats -q -- -D warnings || fail=1
+# shellcheck disable=SC2086
+KS_STRICT=1 cargo test --release $P -q > "$O/tests.log" 2>&1 || { tests=FAIL; fail=1; }
 grep -E "^test result|goldens:|FAILED|panicked" "$O/tests.log"
 [ "${tests:-}" = FAIL ] && echo "FAIL tests"
-cargo build --release --workspace -q || exit 1
-B=target/release/ksdump
+cargo build --profile psi -p ksdump -q || exit 1
+B=${CARGO_TARGET_DIR:-../target}/psi/ksdump
 
 # report NAME STATUS: the last line of $O/NAME.log after NAME, and the first lines before it when STATUS is not 0.
 report() {

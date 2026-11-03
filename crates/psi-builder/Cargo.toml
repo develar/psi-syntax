@@ -1,16 +1,19 @@
 [package]
 name = "psi-builder"
 description = "The language-neutral half of psi-syntax: IntelliJ's PsiBuilderImpl ported to Rust (markers, production, edge binders), the preorder column tree it binds and the parse driver that expands chameleons in place"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-repository.workspace = true
-publish.workspace = true
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
 
 [features]
 # `counters::add` counts the builder's cursor calls, markers and lexed tokens per thread (`ksdump --bench` prints them).
 counters = []
 
-[lints]
-workspace = true
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

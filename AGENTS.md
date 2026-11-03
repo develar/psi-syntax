@@ -1,6 +1,8 @@
 # psi-syntax: what an agent must know
 
-Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI, a Cargo workspace:
+Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI: `psi-syntax/` of the accio repository,
+its crates members of accio's Cargo workspace with their own package fields, lints (`[lints]` of each manifest) and
+`clippy.toml`; run cargo with `-p <crate>` (decision 2026-11-03-psi-syntax-lives-in-accio in `../docs/decisions/`):
 
 | crate | holds |
 |---|---|
@@ -13,8 +15,8 @@ Lossless lexers and parsers in Rust, ported from the ones behind IntelliJ's PSI,
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
 Java PSI, and `csharp_syntax::dump::tree_to_string` prints Roslyn 5.9.0's syntax tree as `tools/csharp-oracle` dumps
-it (nodes, tokens, trivia, diagnostics). Consumers: accio (code search; declarations,
-call sites, imports) and Branch Deck's `code-symbols` (diff highlighting, navigation, file summaries). Both read the
+it (nodes, tokens, trivia, diagnostics). Consumers: accio's `crates/extract` (code search; declarations,
+call sites, imports; path dependencies) and Branch Deck's `code-symbols` (a revision of JetBrains/accio) (diff highlighting, navigation, file summaries). Both read the
 tree directly: there is no tree-sitter compatibility layer and there must never be one. `docs/DESIGN.md` describes the
 architecture as built, its decisions, the measured numbers and the open items.
 
@@ -348,7 +350,8 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
 - Allocator: psi-syntax uses the system allocator and builds no C. mimalloc 0.1.52 was +12-15 % at 8 and 16
   threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
   noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.
-- Build: the consumer's release profile compiles psi-syntax. Fat LTO and one codegen unit, as here; a profile-guided
+- Build: the consumer's release profile compiles psi-syntax. Fat LTO and one codegen unit, as accio's `psi` profile
+  (`cargo build --profile psi -p ksdump`, the binary `../target/psi/ksdump`) that every measurement here uses; a profile-guided
   build (`scripts/pgo.sh` is the recipe: instrument, run over a few MB of Kotlin and Java, merge, rebuild with the
   same rustc; in a consumer's own build `RUSTFLAGS=-Cprofile-generate=DIR`, a run, `llvm-profdata merge`,
   `RUSTFLAGS=-Cprofile-use=merged.profdata`) cuts 12 % of Kotlin's and 13 % of Java's instructions on 72c8c11
@@ -448,7 +451,7 @@ Roslyn) says otherwise.
 - Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
   the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
-- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over the workspace, byte equality of
+- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over psi-syntax's crates, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
   community files, and again with `--nesting-limit 3` on the community files and the mutations, and the Java lexers
   against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz, and both Java
@@ -466,5 +469,8 @@ Roslyn) says otherwise.
 - C# speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/csharp-roslyn-35d9211.list KS_ROOT=$HOME/.cache/psi-syntax/csharp-src/roslyn
   scripts/ab.sh OLD NEW` (any of the four corpora; dotnet/runtime's time is bound by `hugeexpr1.cs`); DESIGN, "C# parse
   throughput and robustness", has the numbers and how tree-sitter-c-sharp was compared.
-- The default branch is `master`. Commit messages: imperative subject ≤ 72 characters, a body that says what the
-  change does, its measured effect and that the gate passed.
+- A change lands as any accio change does: a pull request to accio's `main`, a conventional subject
+  (`fix(psi): …`, `perf(psi): …`; `../AGENTS.md`, "Writing a change down"), a body that says what the change does,
+  its measured effect and that the gate passed. A parser change that moves what accio extracts carries accio's version
+  bump and snapshots in the same pull request. Its commits before the move came from develar/psi-syntax (archived),
+  replayed as a line under `psi-syntax/`.

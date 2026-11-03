@@ -2,7 +2,7 @@
 """Shrinks a file whose dump differs from the PSI oracle's: `psi-reduce.py FILE OUT`.
 
 Deletes chunks of lines, then of characters (halving the chunk down to one), keeping a candidate while
-`target/release/ksdump` and PsiOracle.java still print different trees for it; each round runs the oracle once
+`../target/psi/ksdump` and PsiOracle.java still print different trees for it; each round runs the oracle once
 over every candidate. Writes the smallest input to OUT and prints it. The result shows one cause of the
 difference, not necessarily the one of the original file: rerun the original after fixing it.
 """
@@ -13,7 +13,7 @@ import sys
 import tempfile
 
 here = os.path.dirname(os.path.abspath(__file__))
-ksdump = os.path.join(here, "..", "target", "release", "ksdump")
+ksdump = os.path.join(here, "..", "..", "target", "psi", "ksdump")
 tools = os.path.expanduser("~/.cache/psi-syntax/psi-tools/tools/psi-oracle")
 source, out = sys.argv[1], sys.argv[2]
 ext = os.path.splitext(source)[1]

@@ -3,8 +3,9 @@
 # over the community corpus and prints every run with the 1-minute load average, then the median MB/s of each and
 # the ratio B/A. Extra arguments go to `ksdump --bench` (e.g. `--threads 8`, `--walk`).
 #   scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS=5] [BENCH ARGS...]
-# A baseline binary of a commit: `git archive REV | tar -xm -C DIR && (cd DIR && CARGO_TARGET_DIR=DIR/target cargo
-# build --release --bin ksdump)` (`-m`: fresh mtimes, so cargo does not reuse a stale build).
+# A baseline binary of an accio commit: `git archive REV | tar -xm -C DIR && (cd DIR && CARGO_TARGET_DIR=DIR/target
+# cargo build --profile psi --bin ksdump)`, the binary DIR/target/psi/ksdump (`-m`: fresh mtimes, so cargo does not
+# reuse a stale build).
 # Peak RSS of one run: `/usr/bin/time -l ksdump --bench ...` ("maximum resident set size"; the loaded sources count).
 set -u
 [ $# -ge 2 ] || { sed -n 2,8p "$0"; exit 2; }

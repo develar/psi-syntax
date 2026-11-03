@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Profiles `ksdump --bench` with macOS `sample` (1 ms) and prints where the time goes, inline-aware.
 
-    scripts/profile.py [--bin target/release/ksdump] [--seconds 12] [--warmup 4] [--top 30] [--lines 40] [--inclusive 60]
+    scripts/profile.py [--bin ../target/psi/ksdump] [--seconds 12] [--warmup 4] [--top 30] [--lines 40] [--inclusive 60]
                        [--sample FILE] [-- BENCH ARGS...]
 
 Starts the bench over the community corpus (KS_LIST, KS_ROOT override it) with many rounds, waits `--warmup`
@@ -120,7 +120,7 @@ def main():
         i = argv.index("--")
         argv, bench_args = argv[:i], argv[i + 1:]
     p = argparse.ArgumentParser()
-    p.add_argument("--bin", default="target/release/ksdump")
+    p.add_argument("--bin", default="../target/psi/ksdump")
     p.add_argument("--seconds", type=int, default=12)
     p.add_argument("--warmup", type=float, default=4)
     p.add_argument("--top", type=int, default=30)

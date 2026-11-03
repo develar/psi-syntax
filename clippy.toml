@@ -1,0 +1,4 @@
+# Clippy reads the nearest clippy.toml above a crate's manifest: this one, not accio's, for psi-syntax's crates.
+# accio's disallowed methods and macros say which accio module may parse, print or spawn (`Tree::parse` is
+# `extract`'s alone, an answer goes through `out!`); inside the parsers that own `Tree::parse` and their tests and
+# `ksdump`, which print, those rules have no meaning. psi-syntax's lints are its manifests' `[lints]`.

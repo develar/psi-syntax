@@ -1,17 +1,17 @@
 [package]
 name = "ksdump"
 description = "Dumps, benchmarks and lexes listed files with the psi-syntax parsers, like the PSI and Roslyn oracles"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-repository.workspace = true
-publish.workspace = true
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
 
 [dependencies]
-kotlin-syntax.workspace = true
-java-syntax.workspace = true
-csharp-syntax.workspace = true
+kotlin-syntax = { path = "../kotlin-syntax" }
+java-syntax = { path = "../java-syntax" }
+csharp-syntax = { path = "../csharp-syntax" }
 # Only `ksdump --bench` with `--features alloc-stats`: a counting global allocator (allocations per file); it is
 # opt-in because its atomic counters slow the parse and contend across threads.
 stats_alloc = { version = "0.1.10", optional = true }
@@ -21,5 +21,8 @@ alloc-stats = ["dep:stats_alloc"]
 # The parser's and the builder's event counters (`kotlin-syntax/counters`), printed per file token.
 counters = ["kotlin-syntax/counters"]
 
-[lints]
-workspace = true
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

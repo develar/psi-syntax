@@ -5,7 +5,7 @@ Writes COUNT (3000) files cut and mutated from the listed ones (string, template
 fragments, odd code points) to OUT_DIR as f<N>.kt and OUT_DIR/list. Then compare the two lexers:
 
   java -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list OUT/list --root OUT | cut -f1,2 > a
-  target/release/ksdump --lex --list OUT/list --root OUT | cut -f1,2 > b && diff a b
+  ../target/psi/ksdump --lex --list OUT/list --root OUT | cut -f1,2 > b && diff a b
 """
 import os
 import random
