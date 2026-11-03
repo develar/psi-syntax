@@ -800,7 +800,11 @@ impl GreenArena {
 
     /// A node of `kind` over `slots` (null slots included) with the boolean fields `extra`: what the generated
     /// factories (`syntax.rs`) call; its full width and flags are its children's (`AdjustFlagsAndWidth`).
-    pub fn create_node(&mut self, kind: SyntaxKind, slots: &[Green], extra: u32) -> Green {
+    ///
+    /// One copy per slot count `N`, so the slots' flags and widths are summed and the slots
+    /// copied with no loop over a length and no call to `memmove`.
+    #[inline(never)]
+    pub fn create_node<const N: usize>(&mut self, kind: SyntaxKind, slots: &[Green; N], extra: u32) -> Green {
         let own = self.own_node_flags(kind);
         self.push_node(TAG_NODE, kind, own, slots, extra, DiagList::default())
     }
@@ -814,6 +818,7 @@ impl GreenArena {
         }
     }
 
+    #[inline(always)]
     fn push_node(
         &mut self,
         tag: u32,
