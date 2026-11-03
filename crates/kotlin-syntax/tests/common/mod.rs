@@ -2,6 +2,8 @@
 
 #![allow(dead_code)]
 
+pub mod getters;
+
 use std::path::{Path, PathBuf};
 
 pub struct Golden {

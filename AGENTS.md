@@ -194,6 +194,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `src/tree.rs` | `Tree`, `Parser` (`psi_builder`'s over `Kotlin`), `FileKind`, `LazyKind` |
 | `src/parsing/*.rs` | `abstract_parsing.rs`, `kotlin_parsing.rs`, `expression_parsing.rs`, `patterns.rs`: the parser ports; `kotlin_parser.rs`: the `KotlinParser` entry points |
 | `src/dump.rs` | `psi_to_string(&Tree, file_name) -> String`: the exact PSI debug format (Kotlin's labels over `psi_builder::dump`) |
+| `src/psi.rs` | `kotlin_syntax::psi`: the getters of Kotlin's PSI classes (`compiler/psi/psi-api/.../psi/`) as free functions over `&Tree` and `NodeId`, one per Java or Kotlin method, its source in the doc comment: modifiers and visibility (`KtModifierListOwner`, `KtModifierList`, `ktPsiUtil.kt`), annotation entries, use-site targets and short names, names and name identifiers, classes and objects, super type entries, receivers and declared types, parameters, type parameters and constraints, properties and accessors, destructuring entries, type references through nullable and parenthesized wrappers, user types, function types, simple names, imports, qualified and call expressions, value and lambda arguments |
 | `src/counters.rs` | the parser's own event counters (semantic layer, chameleons, KDoc tokens, soft keywords) and `ALL`, every counter of a parse in the order `ksdump` prints them |
 | `java-syntax` `src/lexer.rs`, `src/doc_lexer.rs`, `src/unicode.rs` | `JavaLexer` (by hand: whitespace, comments, literals, text blocks, string templates, unicode escapes) over `FlexJavaLexer` (the rules of `_JavaLexer.flex`), `JavaTypeEscapeLexer`; `JavaDocLexer` (merging adapter, `AsteriskStripperLexer`) over `FlexJavaDocLexer` (every state of `_JavaDocLexer.flex`, longest match, earlier rule on a tie); `[:jletter:]`, `[:jletterdigit:]` above ASCII, generated |
 | `java-syntax` `src/builder.rs` | `SyntaxTreeBuilder` (the builder as a Java parser method receives it, with `JavaParserUtil.stoppingBuilder`'s stop offset), the `SyntaxBuilderUtil` helpers (`advance`, `expect`, `expect_set`, `drop`, `raw_token_text`, `parse_block_lazy`), Java's `Binder`s and `WhiteSpaceAndCommentSetHolder` |
@@ -206,6 +207,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep and 18 left-associative chains of 100 000 operators on a 1 MB stack, each well under a second; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
+| `tests/psi_getters.rs`, `tests/common/getters.rs`, `examples/psi_getters.rs` | `kotlin_syntax::psi` against the live PSI's getters: the cases of `tests/psi/` (`NAME.kt` and the oracle's `NAME.kt.getters.txt`), every golden against the oracle's hashes in `tests/psi/goldens.hash`, and every getter on every node of random bytes, fragments and cut goldens without a panic; the printer of the oracle's lines, which the example writes for a list (`--out`) or hashes (`--hash`) |
 | `tests/bodies.rs` | body-less parsing on every golden: the full tree minus each body's interior, `parse_body` equal to the full subtree; `leaves()` and `descendants()` |
 
 ## The consumer contract
@@ -235,6 +237,24 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `leaf_index().at(offset)`, a binary search that relies on the leaves being in offset order and tiling the text
   but for unexpanded bodies (`tests/robustness.rs` checks it on every tree). What a consumer makes of them
   (symbols, call sites, scopes, the text of an error) stays in the consumer.
+- What a declaration is, as PSI reads it: `kotlin_syntax::psi` (`src/psi.rs`), the getters of Kotlin's PSI classes
+  ported method by method, so a consumer asks the compiler's question instead of walking `NodeKind`s: `has_modifier`,
+  `visibility_modifier_type` (the set's order, `private internal` is private), `get_annotation_entries` (with the
+  entries of `@[A B]`), `kt_annotation_entry_get_short_name` (backticks removed) and its use-site target,
+  `get_name_identifier` and `get_name` (unquoted; `Companion`, constructors, `<anonymous>`), the class and object
+  tests, `kt_class_or_object_get_super_type_list_entries` (an enum entry's initializer list),
+  `get_receiver_type_reference`, `get_type_reference`, `kt_type_reference_get_type_element`, `unwrap_nullability`
+  (`Foo??`, `(@A Foo)?`), `kt_user_type_*`, `get_referenced_name`, `kt_property_is_local`, `get_initializer` (an error
+  element is none), `kt_destructuring_declaration_get_entries` (inside the error element of a top-level one), the
+  parameter, import, qualified, call and argument getters. A method shared by several classes (an interface's,
+  `KtCallableDeclaration`'s, an extension of `ktPsiUtil.kt`) has the bare name and dispatches on the node's kind as
+  the virtual call does; a method of one class carries the class (`kt_class_is_interface`). They answer PSI's tree
+  branch (no stubs), `None` where the Java throws, iterators where it returns a list, and allocate nothing but
+  `kt_import_directive_get_imported_fq_name`. `tools/kotlin-psi-getters/GetterOracle.java` prints Kotlin 2.4.21's own
+  answers for every element (`--out`, `--hash`, `--classes` for the PSI classes of each element type); on 26e6333
+  (2026-11-03) the port printed the same lines for the 789 goldens (388 995 lines), the 55 501 community files
+  (108 853 451 lines), the 12 000 parse and lexer fuzz inputs and the 16 724 golden mutations (19.9M lines). What a consumer makes of the answers
+  (symbols, scopes, a JVM name) stays in the consumer.
 - The text to parse is the file as IntelliJ's document holds it, at the file's offsets: `kotlin_syntax::document_text`
   (a byte order mark as spaces, a `\r` as the line end the compiler reads) and `java_syntax::document_text` (the mark
   only: the Java lexer reads every line terminator), over `psi_builder::document`, which also has `Lines`, the
@@ -336,7 +356,14 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 3. The lexer oracle: `java -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" scripts/LexOracle.java --list LIST
    --root ROOT` prints a hash of each file's tokens (Kotlin, and KDoc inside each doc comment) as `ksdump --lex` does;
    `diff` the `cut -f1,2` of both. `scripts/lex-fuzz.py` makes mutated inputs for it.
-4. Error recovery: `scripts/parse-fuzz.py LIST ROOT OUT [SEED]` mutates files at token boundaries (punctuation,
+4. The getter oracle: `java -Xss512m -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*"
+   tools/kotlin-psi-getters/GetterOracle.java --list LIST --root ROOT (--out OUT | --hash FILE)` prints what Kotlin's PSI
+   getters answer for every element of each file (the lines of `tests/common/getters.rs`);
+   `target/release/examples/psi_getters` (`cargo build --release -p kotlin-syntax --example psi_getters`) prints ours
+   with the same flags: `diff` the hash files, then `diff -r` the `--out` lines of a differing file. A reduced case
+   goes to `crates/kotlin-syntax/tests/psi/` with the oracle's `NAME.kt.getters.txt`; a changed golden regenerates
+   `tests/psi/goldens.hash` (`--hash` over the goldens' list, paths relative to `testdata/`).
+5. Error recovery: `scripts/parse-fuzz.py LIST ROOT OUT [SEED]` mutates files at token boundaries (punctuation,
    keywords, modifiers) for the PSI oracle and `scripts/compare.py`; `scripts/lex-fuzz.py`'s inputs serve it too.
    `scripts/psi-reduce.py FILE OUT` shrinks a differing file to a small input; a fixed case goes to
    `crates/kotlin-syntax/tests/oracle/`

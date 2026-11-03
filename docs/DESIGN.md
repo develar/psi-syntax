@@ -632,6 +632,13 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
   "Value texts"). Trivia are leaves, or subtrees when structured, beside their token, `is_trailing`
   telling which token they belong to; an inserted token is an empty leaf with `is_missing`. There is no body-less
   parsing: Roslyn parses no block on its own.
+- Kotlin: `kotlin_syntax::psi` answers what Kotlin's PSI getters answer (`hasModifier`, `getName`,
+  `getTypeElement`, `unwrapNullability`, `isLocal`, ...), so accio and Branch Deck stop reimplementing them on raw
+  kinds, where their walks had drifted (`Int??` peeled one level, `` `JvmName` `` with its backticks, `(@A Foo)?`
+  read as its modifier list). Free functions over `&Tree` and `NodeId`, not typed wrappers: the consumers hold
+  `NodeId`s already, and a wrapper per class would add a conversion at every call without catching a mistake the
+  kind dispatch does not (a call on a node of the wrong class answers `None`, as the PSI method of a class that lacks
+  it). `tools/kotlin-psi-getters/GetterOracle.java` checks them method by method against the live PSI.
 
 ## Decisions
 

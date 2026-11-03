@@ -10,6 +10,7 @@ mod language;
 pub mod lexer;
 pub mod node_kind;
 pub mod parsing;
+pub mod psi;
 pub mod tokens;
 pub mod tree;
 mod unicode;
