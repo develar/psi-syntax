@@ -454,7 +454,8 @@ Roslyn) says otherwise.
 - `scripts/pgo.sh OUT_DIR [KOTLIN_LIST KOTLIN_ROOT JAVA_LIST JAVA_ROOT]` builds a profile-guided ksdump (training on
   the vendored goldens by default) and leaves the merged profile for a consumer's build.
 - Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
-  the machine is shared) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
+  the machine is shared; `KS_INSTR=1` adds the instructions and cycles of a round, which move far less than MB/s on a
+  loaded machine) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over psi-syntax's crates, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the

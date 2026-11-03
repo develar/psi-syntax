@@ -776,6 +776,72 @@ The machine is an Apple M5 Max shared with other sessions. Every comparison alte
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
 
+### C# parse speed, the six commits after 25dac59f, 2026-11-03
+
+What accio (JetBrains/accio#143) runs: dotnet/runtime's files up to 4 MiB (31 261 files, 353.55 MB), `ksdump --bench
+--lang csharp --doc none --retain 32`, one `Parser` per thread. On this Mac the instructions and cycles of a round are
+`KS_INSTR=1 scripts/ab.sh`'s (a `--repeat 3` and a `--repeat 1` run under `/usr/bin/time -l`, their difference
+halved). Other sessions shared it (load 13-60), so its cycles and MB/s moved by up to 1.5× between rounds and only
+its instructions, steady within about 2 %, are evidence here; the speed is the Mac Studio's, below. A sampled profile
+of 25dac59f had flattening and tree building at 28.9 % of the time, the lexer 27.4 %, `LanguageParser` 22.1 %, the
+arena 10.2 %, the token window 7.1 %, `memmove` 3.6 % (most of it `push_node`).
+
+Each step against the commit before it, both values from one alternating run of 3-5 rounds (medians; one thread but
+the last). Each run measured its own pair at its own load, so a step's "before" is not the row above's "after" and
+the product of the steps (-30.0 %) is not the stack's change:
+
+| step | G instructions a round, before → after | change |
+|---|---|---|
+| `create_node` over `&[Green; N]` (no `memmove` per node) | 109.9 → 108.2 | -1.5 % |
+| token kinds in the token window | 108.2 → 102.4 | -5.4 % |
+| `TreeBuilder` writes the columns, no `take_exact` | 101.8 → 104.8 | +2.9 % (columns grow by doubling) |
+| flatten writes the tree's columns by id, in place | 104.8 → 86.4 | -17.6 % |
+| Roslyn's `QuickScanner` and `LexerCache` token map | 85.5 → 75.4 | -11.8 % |
+| rare fields in a side table (records 52/28/24 → 44/20/16 bytes) | 76.0 → 76.3, 18 threads summed | +0.4 % |
+
+The side table is kept for memory, its speed effect unresolved: a parser's buffers for a file over 100 KB went 25.2 →
+20.9 bytes a source byte (median, each file from empty buffers; p90 41.2 → 33.9), while its +1.3 % per-thread MB/s
+and -1.4 % cycles (18 threads, 5 rounds at load 13-17) are inside the noise: 8 pairs at load 37-52 later spread from
+-12 % to +18 % per pair (median +2 %), with instructions 0.2-0.5 % higher in each.
+
+The whole stack against 25dac59f, 5 alternating rounds, one thread: 110.3 → 75.6 G instructions (-31.5 %, 0.312 →
+0.214 G a source MB), 20.4 → 14.8 G cycles; 18 threads, cycles of all threads 21.6 → 16.1 G (-25.5 %), instructions
+110.2 → 76.2 G. A review then made the arena budget charge the records' 25dac59f sizes and check where buffers grown
+from empty would grow, and bounded flatten's first columns (both amended into their steps): one thread, 5 rounds
+against the stack before them, 75.2 → 75.9 G instructions (+1.0 %; the rounds spread 74.3-75.6 against 74.5-76.0), and
+110.3 → 75.9 (-31.2 %, 0.312 → 0.215 G a source MB) against 25dac59f. The trees are byte-identical (`scripts/gate.sh`
+on each commit; 2 560 535 099 tree bytes and 122 593 031 nodes of the same files at `--doc parse`). A parser's buffers
+for a file over 100 KB went 32.8 → 20.9 bytes a source byte (median, each file from empty buffers): the tree builder
+keeps no buffer and the records shrank; the quick scanner's map adds 288 KB a thread (and one per nesting level of
+interpolated string holes).
+
+Where the budget abandons a parse is 25dac59f's on 31 pathological files (2.2 MB each but one of 86 KB: `a?[0]` chains
+of 3-16 links in 5-100 % of the lines, `a?[a?[…`, `[` repeated, nested tuples, generic-looking calls; each file alone,
+so from fresh buffers): the same dump each, where the side table before the review parsed 3 of them in full (a chain
+of 5 at 100 %, of 6 at 25 % and 50 %). A sweep of budgets from 16 KiB by 6 % over 24 runtime files of 5-150 KB and 7
+pathological texts of 30-60 KB, each parse from fresh buffers, gives the same dumps and the same smallest budget that
+keeps each file as 25dac59f does (with the end of comment of "C# nesting and work", "Abandoning", applied to both,
+without which 25dac59f ran out of memory in the sweep). Before the bound flatten sized its columns to the arena's
+records, garbage included: 2.2 MB of `[` peaked at 547 MB, 343 MB a commit earlier; with it 287 MB (25dac59f
+326 MB), and none of the 31 files peaks higher than on 25dac59f.
+
+On the Mac Studio (M1 Ultra, 16 P and 4 E cores; the stack before the review, 3be66ee8, built there from 25dac59f and the stack's
+diff, its source digest checked; default retained bytes), per-thread parse MB/s, medians of the rounds; pass 1
+alternated 25dac59f first, pass 2 the stack first:
+
+| corpus, threads, `--doc` | pass 1 (load) | pass 2 (load) | both passes |
+|---|---|---|---|
+| runtime, 1, none | 53.4 → 82.5 (12-15) | 54.9 → 82.7 (6-7) | 54.3 → 82.6 (×1.52) |
+| runtime, 1, default | 52.9 → 79.1 (8-10) | 52.9 → 79.1 (5) | 52.9 → 79.1 (×1.50) |
+| runtime, 20, none | 42.7 → 62.6 (7) | 41.1 → 46.7 (13) | 42.0 → 55.4 |
+| runtime, 20, default | 40.5 → 60.7 (7-8) | 30.5 → 44.2 (17) | 35.6 → 55.1 |
+| roslyn, 20, none | 58.3 → 81.1 (6) | 54.2 → 75.2 (14-15) | 56.9 → 79.0 |
+
+accio's bar, 50 MB/s a thread at 20 threads on runtime, is cleared on the quieter pass (62.6, rounds 62.5-64.5) and
+missed at load 12-17 (46.7); a second quiet 20-thread pass is still owed. The Studio measured the stack as a whole:
+the side table alone, and the map's 4096 slots against 2048 (77.6 against 77.9 MB/s at 18 threads on this Mac in a
+run whose output was not kept, +0.4 % instructions), were not measured there.
+
 ### Java PSI getters (child of 18211728), 2026-11-03
 
 `java_syntax::psi` ports the PSI getters both consumers reimplemented on raw kinds (accio's `extract/src/java`,
@@ -1299,9 +1365,12 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 ### Open items
 
-- **C# speed.** 59-113 MB/s on one thread against Kotlin's and Java's 111-120 on a quiet machine, at 0.22-0.36 G
-  instructions per source MB; no line-level profile yet. Flattening (about 18 %) and the token window (`current_kind`, 9 %)
-  are the first candidates. A quiet-machine run of the table in "C# parse throughput and robustness" is open.
+- **C# speed.** 0.215 G instructions per source MB on dotnet/runtime's files up to 4 MiB after "C# parse speed, the
+  six commits after 25dac59f" (0.312 before), against Kotlin's 0.205 and Java's 0.201. On the Mac Studio at 20
+  threads the stack measured 62.6 MB/s a thread on one quieter pass and 46.7 at load 12-17 (accio's target is 50):
+  open are a second quiet 20-thread pass there, the side table and the token map's size measured there on their own,
+  a new profile of the lexer and `LanguageParser` (now most of the time), and a quiet-machine run of the table in "C#
+  parse throughput and robustness".
 - **C# speculation below the budget.** `a?[0]?[0]…` (17 or more) and 100 000 `a < a < …` fail as too deep; Roslyn
   parses the former in seconds and would recurse 100 000 deep for the latter. A memo of `?[`'s speculation, as of
   tuple scans, would make the first polynomial.
@@ -1345,4 +1414,7 @@ There is no line-level profile of the current code: `atos` returned no line info
 | Lazy expansion through interior mutability (`expand(&self)`) | Conflicts with `Send + Sync` and the preorder arena; `parse_body` returns separate trees instead |
 | Parsing one file's chameleons in parallel | Files take milliseconds and consumers already parallelize across files. Built once (`parse_parallel`, a branch on 9b8c26f: chameleons on scoped threads into their own buffers, stitched in preorder, gate-exact): 1.5-1.6× lower latency on the largest files, no throughput; not landed over the builder core batch's frames (see "The radical batch integrated") |
 | mimalloc inside the crate | Needs a C toolchain; it is the consumer's choice |
+| C#: quick-scanned tokens sharing one record, as Roslyn's map shares its green token | Slower on one thread in the prototype, and flatten would have to guess where a shared token's text is; the map holds the token's shape and a hit pushes new records instead |
+| C#: both trivia lists of a token packed into one run of `trivia_refs` (36-byte token records) | +4 % instructions (the split on every access) |
+| C#: exact subtree node counts in the green records, so flatten sizes the tree exactly | Estimated under 1 %: `tree_node_estimate` overshoots by the garbage and the second walk is rare (14 runtime files) |
 | Shared token starts for chameleons | Measured 0.999× (1 thread) and 0.995× (16 threads); a copy into a warm buffer costs as much as the extra arithmetic on each access |
