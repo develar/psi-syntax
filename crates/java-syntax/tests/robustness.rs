@@ -3,6 +3,12 @@
 
 use java_syntax::{FileKind, LanguageLevel, NodeId, Tree};
 
+/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
+/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
+fn limit(limit: std::time::Duration) -> std::time::Duration {
+    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
+}
+
 /// The stack a parse is promised to fit (AGENTS.md, "The consumer contract"): 1 MB in a release build; a debug build's
 /// frames are several times larger.
 const STACK: usize = if cfg!(debug_assertions) { 16 << 20 } else { 1 << 20 };
@@ -240,7 +246,7 @@ fn deeply_nested_forms_parse_on_a_small_stack() {
         let (elapsed, errors, _) = parse_on_small_stack(text);
         println!("{name}: {:.1} ms, {errors} too-deep errors", elapsed.as_secs_f64() * 1000.0);
         assert!(errors > 0 || flat.contains(&name), "{name}: no error at the limit");
-        assert!(elapsed.as_millis() < 2000, "{name}: {elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(2000)), "{name}: {elapsed:?}");
     }
 }
 
@@ -258,7 +264,7 @@ fn long_chains_parse_in_linear_time() {
         let (elapsed, _, depth) = parse_on_small_stack(text);
         println!("{name}: {:.1} ms, depth {depth}", elapsed.as_secs_f64() * 1000.0);
         assert!(depth > n || !nested.contains(&name), "{name}: depth {depth}");
-        assert!(elapsed.as_millis() < 1000, "{name}: {elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(1000)), "{name}: {elapsed:?}");
     }
 }
 
@@ -272,7 +278,7 @@ fn lambda_parameter_recovery_is_bounded() {
         let (elapsed, errors, _) = parse_on_small_stack(text);
         println!("{name}: {:.1} ms at 10 000 levels, {errors} too-deep errors", elapsed.as_secs_f64() * 1000.0);
         assert!(errors > 0, "{name}: no error at the limit");
-        assert!(elapsed.as_millis() < 10_000, "{name}: {elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(10_000)), "{name}: {elapsed:?}");
     }
 }
 
@@ -331,7 +337,7 @@ fn random_mixes_parse_on_a_small_stack() {
         let text = field(&format!("{open}1{}", close.concat()));
         let (elapsed, errors, _) = parse_on_small_stack(text);
         assert!(errors > 0, "no error at the limit");
-        assert!(elapsed.as_millis() < 2000, "{elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(2000)), "{elapsed:?}");
     }
 }
 

@@ -6,6 +6,12 @@ mod common;
 use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::{FileKind, NodeId, Tree};
 
+/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
+/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
+fn limit(limit: std::time::Duration) -> std::time::Duration {
+    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
+}
+
 struct XorShift(u64);
 
 impl XorShift {
@@ -196,7 +202,7 @@ fn deeply_nested_forms_parse_on_a_small_stack() {
         });
         // A doc comment's `/**` nests in the lexer, not the parser.
         assert!(errors > 0 || name == "doc comments", "{name}: no error at the limit");
-        assert!(elapsed.as_millis() < 2000, "{name}: {elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(2000)), "{name}: {elapsed:?}");
     }
 }
 
@@ -277,7 +283,7 @@ fn long_left_associative_chains_parse_in_linear_time() {
         });
         println!("{name}: {} ms, depth {depth}", elapsed.as_millis());
         assert!(depth > n, "{name}: depth {depth}");
-        assert!(elapsed.as_millis() < 1000, "{name}: {elapsed:?}");
+        assert!(elapsed < limit(std::time::Duration::from_millis(1000)), "{name}: {elapsed:?}");
     }
 }
 

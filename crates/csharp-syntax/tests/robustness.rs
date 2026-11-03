@@ -9,6 +9,12 @@
 
 use std::time::{Duration, Instant};
 
+/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
+/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
+fn limit(limit: std::time::Duration) -> std::time::Duration {
+    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
+}
+
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
 use csharp_syntax::{DocumentationMode, Entry, ErrorCode, FileKind, LanguageVersion, NodeId, Parser, Tree};
 
@@ -453,7 +459,7 @@ fn deeply_nested_forms_parse_on_a_small_stack() {
         if !parsed.too_deep && !flat.contains(&name) {
             failures.push(format!("{name}: no failure at the limit"));
         }
-        if parsed.elapsed >= Duration::from_secs(1) {
+        if parsed.elapsed >= limit(Duration::from_secs(1)) {
             failures.push(format!("{name}: {:?}", parsed.elapsed));
         }
         slowest = slowest.max((parsed.elapsed, name));
@@ -488,7 +494,7 @@ fn long_chains_parse_in_linear_time() {
         if parsed.too_deep != TOO_DEEP_CHAINS.contains(&name) {
             failures.push(format!("{name}: too deep {}", parsed.too_deep));
         }
-        if parsed.elapsed >= Duration::from_secs(1) {
+        if parsed.elapsed >= limit(Duration::from_secs(1)) {
             failures.push(format!("{name}: {:?}", parsed.elapsed));
         }
     }
@@ -508,7 +514,7 @@ fn speculation_is_bounded() {
         for n in [250, 1000, 100_000] {
             let text = nested_forms(n).into_iter().find(|(f, _)| *f == name).unwrap().1;
             let parsed = parse_on_small_stack(name, text, FileKind::default());
-            if parsed.elapsed >= Duration::from_secs(1) {
+            if parsed.elapsed >= limit(Duration::from_secs(1)) {
                 failures.push(format!("{name} at {n} levels: {:?}", parsed.elapsed));
             }
             times.push((n, parsed.elapsed, parsed.too_deep));
@@ -585,7 +591,7 @@ fn random_mixes_parse_on_a_small_stack() {
         close.reverse();
         let text = field(&format!("{open}1{}", close.concat()));
         let parsed = parse_on_small_stack(&format!("mix {round}"), text, FileKind::default());
-        assert!(parsed.elapsed < Duration::from_secs(1), "round {round}: {:?}", parsed.elapsed);
+        assert!(parsed.elapsed < limit(Duration::from_secs(1)), "round {round}: {:?}", parsed.elapsed);
         too_deep += usize::from(parsed.too_deep);
     }
     // an interpolated string past the lexer's `MAX_NESTED_SCAN_DEPTH` takes the rest of the line as its text, short of

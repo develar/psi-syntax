@@ -9,6 +9,12 @@ use java_syntax::psi::type_element::TypeKind;
 use java_syntax::psi::*;
 use java_syntax::{FileKind, LanguageLevel, NodeId, NodeKind, TokenKind, Tree};
 
+/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
+/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
+fn limit(limit: std::time::Duration) -> std::time::Duration {
+    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
+}
+
 fn parse(text: &str) -> Tree {
     Tree::parse(text, FileKind::default())
 }
@@ -531,6 +537,6 @@ fn deep_and_long_inputs_take_linear_time() {
             .map(|t| type_element::calculate_type(&tree, t).array_dimensions)
             .max();
         let _ = getters::getters_to_string(&tree, false);
-        assert!(start.elapsed().as_secs() < 30, "{heads} fields, deepest type {types:?}: {:?}", start.elapsed());
+        assert!(start.elapsed() < limit(std::time::Duration::from_secs(30)), "{heads} fields, deepest type {types:?}: {:?}", start.elapsed());
     }
 }
