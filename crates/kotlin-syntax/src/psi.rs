@@ -10,7 +10,8 @@
 //! `KtSimpleNameExpression`, and the extensions of `psiUtil/ktPsiUtil.kt`) has the bare name and dispatches on the
 //! node's kind as the virtual call does on its class (`get_type_reference` answers `KtNamedFunction`'s rule for a
 //! `FUN`, `KtParameter`'s for a `VALUE_PARAMETER`); a method of one class carries the class (`kt_class_is_interface`,
-//! `kt_nullable_type_get_inner_type`). A node whose class has no such method answers `None`, `false` or nothing.
+//! `kt_nullable_type_get_inner_type`). A node whose class has no such method answers `None`, `false` or nothing: a
+//! `kt_<class>_` function checks that the node is of its class (what Java's types check), a bare one dispatches.
 //!
 //! The PSI's own answers, not the stub's: these are the "by tree" branches (`getStubOrPsiChild` is the first child of
 //! the type, `findChildByClass(KtExpression)` the first child whose PSI is a `KtExpression`, `is_kt_expression`).
@@ -69,6 +70,13 @@ fn next_sibling_expression(tree: &Tree, element: Option<NodeId>) -> Option<NodeI
 
 fn is_kind(tree: &Tree, id: NodeId, kind: NodeKind) -> bool {
     tree.node_kind(id) == Some(kind)
+}
+
+/// The node when it is of one of the kinds: the receiver of a `kt_<class>_` method, which answers `None`, `false` or
+/// nothing for a node of another class, as Java's types would not let it be called there.
+#[inline]
+fn class_of(tree: &Tree, id: NodeId, kinds: &[NodeKind]) -> Option<NodeId> {
+    tree.node_kind(id).is_some_and(|k| kinds.contains(&k)).then_some(id)
 }
 
 /// `psiUtil/ktPsiUtil.kt:903 isKtFile`: the element is the file.
@@ -192,12 +200,43 @@ pub const ANONYMOUS_STRING: &str = "<anonymous>";
 
 // ---- KtModifierListOwner, KtModifierList --------------------------------------------------------------------------
 
-/// `KtModifierListOwnerStub.getModifierList` (KtModifierListOwnerStub.java:42): the first `MODIFIER_LIST` child. The
-/// same rule is `KtDeclarationImpl.getModifierList`, `KtTypeReference`'s, `KtTypeProjection`'s and
-/// `KtNullableType.getModifierList` (KtNullableType.java:63): a type reference, a nullable type `(@A Foo)?`, a primary
-/// constructor, an accessor, a parameter and a type parameter each have their own list.
+/// `instanceof KtDeclaration`: the node types whose PSI class is a declaration (`GetterOracle.java --classes`).
+fn is_kt_declaration(tree: &Tree, id: NodeId) -> bool {
+    matches!(
+        tree.node_kind(id),
+        Some(
+            BACKING_FIELD
+                | CLASS
+                | CLASS_INITIALIZER
+                | DESTRUCTURING_DECLARATION
+                | DESTRUCTURING_DECLARATION_ENTRY
+                | ENUM_ENTRY
+                | FUN
+                | FUNCTION_LITERAL
+                | OBJECT_DECLARATION
+                | PRIMARY_CONSTRUCTOR
+                | PROPERTY
+                | PROPERTY_ACCESSOR
+                | SCRIPT
+                | SCRIPT_INITIALIZER
+                | SECONDARY_CONSTRUCTOR
+                | TYPEALIAS
+                | TYPE_PARAMETER
+                | VALUE_PARAMETER
+        )
+    )
+}
+
+/// `KtModifierListOwnerStub.getModifierList` (KtModifierListOwnerStub.java:42): the first `MODIFIER_LIST` child of a
+/// `KtModifierListOwner` (a declaration, a package directive, a type reference, a type projection) or of a nullable
+/// type (`KtNullableType.getModifierList`, KtNullableType.java:63, `(@A Foo)?`); `KtDeclarationImpl`'s, `KtTypeReference`'s
+/// and `KtTypeProjection`'s are the same rule. None for any other node: the dangling modifier list a class body, a
+/// companion block or the file holds in `class C { private }` belongs to no owner, and their PSI classes have no
+/// modifier list.
 pub fn get_modifier_list(tree: &Tree, owner: NodeId) -> Option<NodeId> {
-    child(tree, owner, MODIFIER_LIST)
+    let owns = is_kt_declaration(tree, owner)
+        || matches!(tree.node_kind(owner), Some(PACKAGE_DIRECTIVE | TYPE_REFERENCE | TYPE_PROJECTION | NULLABLE_TYPE));
+    if owns { child(tree, owner, MODIFIER_LIST) } else { None }
 }
 
 /// `KtModifierListOwnerStub.hasModifier` (KtModifierListOwnerStub.java:47): the owner's modifier list has the keyword
@@ -208,17 +247,19 @@ pub fn has_modifier(tree: &Tree, owner: NodeId, modifier: TokenKind) -> bool {
 
 /// `KtModifierList.hasModifier` (KtModifierList.java:103).
 pub fn kt_modifier_list_has_modifier(tree: &Tree, list: NodeId, modifier: TokenKind) -> bool {
+    let Some(list) = class_of(tree, list, &[MODIFIER_LIST]) else { return false };
     kt_modifier_list_get_modifier(tree, list, modifier).is_some()
 }
 
 /// `KtModifierList.getModifier(KtModifierKeywordToken)` (KtModifierList.java:112): the first child of that token type.
 pub fn kt_modifier_list_get_modifier(tree: &Tree, list: NodeId, modifier: TokenKind) -> Option<NodeId> {
+    let list = class_of(tree, list, &[MODIFIER_LIST])?;
     child(tree, list, modifier)
 }
 
 /// `KtModifierList.getAnnotations` (KtModifierList.java:42): the `ANNOTATION` children (`@[A B]`, `@get:[A B]`).
 pub fn kt_modifier_list_get_annotations(tree: &Tree, list: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    children_of(tree, Some(list), ANNOTATION)
+    children_of(tree, class_of(tree, list, &[MODIFIER_LIST]), ANNOTATION)
 }
 
 /// `KtModifierList.getAnnotationEntries` (KtModifierList.java:99), `collectAnnotationEntriesFromPsi`
@@ -226,7 +267,7 @@ pub fn kt_modifier_list_get_annotations(tree: &Tree, list: NodeId) -> impl Itera
 /// order. The same for every `KtAnnotationsContainer`: a `FILE_ANNOTATION_LIST`, an `ANNOTATED_EXPRESSION`, a
 /// `TYPE_CONSTRAINT`.
 pub fn kt_modifier_list_get_annotation_entries(tree: &Tree, list: NodeId) -> AnnotationEntries<'_> {
-    AnnotationEntries::of(tree, Some(list))
+    AnnotationEntries::of(tree, class_of(tree, list, &[MODIFIER_LIST]))
 }
 
 /// The entries of an annotations container: its `ANNOTATION_ENTRY` children and the entries of its `ANNOTATION`
@@ -280,6 +321,7 @@ pub fn get_annotation_entries(tree: &Tree, annotated: NodeId) -> AnnotationEntri
 /// `KtCommonFile.fileAnnotationList` (KtCommonFile.kt:69, `findChildBeforeFirstDeclarationInclusiveByType` :157): the
 /// file's `FILE_ANNOTATION_LIST` child, looked for only before the first declaration or script.
 pub fn kt_file_get_file_annotation_list(tree: &Tree, file: NodeId) -> Option<NodeId> {
+    let file = class_of(tree, file, &[KT_FILE])?;
     for c in tree.children(file) {
         match tree.node_kind(c) {
             Some(FILE_ANNOTATION_LIST) => return Some(c),
@@ -317,6 +359,7 @@ fn modifier_from_token_set(tree: &Tree, list: NodeId, set: &[TokenKind]) -> Opti
 /// `KtModifierList.visibilityModifier` (psiUtil/ktPsiUtil.kt:496): the visibility keyword of the list, `private`
 /// before `public`, `internal` and `protected` whatever their order in the text.
 pub fn kt_modifier_list_visibility_modifier(tree: &Tree, list: NodeId) -> Option<NodeId> {
+    let list = class_of(tree, list, &[MODIFIER_LIST])?;
     modifier_from_token_set(tree, list, &VISIBILITY_MODIFIERS_TYPES)
 }
 
@@ -336,8 +379,12 @@ pub fn visibility_modifier_type(tree: &Tree, owner: NodeId) -> Option<TokenKind>
     visibility_modifier(tree, owner).and_then(|m| tree.token_kind(m))
 }
 
-/// `KtDeclaration.modalityModifier` (psiUtil/ktPsiUtil.kt:517): `abstract`, `open`, `sealed`, `final`, in that order.
+/// `KtDeclaration.modalityModifier` (psiUtil/ktPsiUtil.kt:517): `abstract`, `open`, `sealed`, `final`, in that order;
+/// None for a node that is not a declaration.
 pub fn modality_modifier(tree: &Tree, declaration: NodeId) -> Option<NodeId> {
+    if !is_kt_declaration(tree, declaration) {
+        return None;
+    }
     modifier_from_token_set(tree, get_modifier_list(tree, declaration)?, &MODALITY_MODIFIERS_TYPES)
 }
 
@@ -360,27 +407,31 @@ pub fn is_protected(tree: &Tree, owner: NodeId) -> bool {
 
 /// `KtAnnotation.getEntries` (KtAnnotation.java:53): the `ANNOTATION_ENTRY` children of `@[A B]`.
 pub fn kt_annotation_get_entries(tree: &Tree, annotation: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    children_of(tree, Some(annotation), ANNOTATION_ENTRY)
+    children_of(tree, class_of(tree, annotation, &[ANNOTATION]), ANNOTATION_ENTRY)
 }
 
 /// `KtAnnotation.getUseSiteTarget` (KtAnnotation.java:59): the `ANNOTATION_TARGET` child of `@get:[A B]`.
 pub fn kt_annotation_get_use_site_target(tree: &Tree, annotation: NodeId) -> Option<NodeId> {
+    let annotation = class_of(tree, annotation, &[ANNOTATION])?;
     child(tree, annotation, ANNOTATION_TARGET)
 }
 
 /// `KtAnnotationEntry.getTypeReference` (KtAnnotationEntry.java:49): the `TYPE_REFERENCE` of its `CONSTRUCTOR_CALLEE`.
 pub fn kt_annotation_entry_get_type_reference(tree: &Tree, entry: NodeId) -> Option<NodeId> {
+    let entry = class_of(tree, entry, &[ANNOTATION_ENTRY])?;
     child(tree, child(tree, entry, CONSTRUCTOR_CALLEE)?, TYPE_REFERENCE)
 }
 
 /// `KtAnnotationEntry.getAtSymbol` (KtAnnotationEntry.java:109): the `AT` child (an entry inside `@[...]` has none).
 pub fn kt_annotation_entry_get_at_symbol(tree: &Tree, entry: NodeId) -> Option<NodeId> {
+    let entry = class_of(tree, entry, &[ANNOTATION_ENTRY])?;
     child(tree, entry, AT)
 }
 
 /// `KtAnnotationEntry.getUseSiteTarget` (KtAnnotationEntry.java:118): the entry's own `ANNOTATION_TARGET` child, else
 /// the target of the `ANNOTATION` it is in (`@get:[A B]`).
 pub fn kt_annotation_entry_get_use_site_target(tree: &Tree, entry: NodeId) -> Option<NodeId> {
+    let entry = class_of(tree, entry, &[ANNOTATION_ENTRY])?;
     child(tree, entry, ANNOTATION_TARGET).or_else(|| {
         let parent = tree.parent(entry)?;
         if is_kind(tree, parent, ANNOTATION) { kt_annotation_get_use_site_target(tree, parent) } else { None }
@@ -449,6 +500,7 @@ pub fn kt_annotation_use_site_target_get_annotation_use_site_target(
     tree: &Tree,
     target: NodeId,
 ) -> Option<AnnotationUseSiteTarget> {
+    let target = class_of(tree, target, &[ANNOTATION_TARGET])?;
     Some(match tree.kind(tree.first_child(target)?).token()? {
         ALL_KEYWORD => AnnotationUseSiteTarget::All,
         FIELD_KEYWORD => AnnotationUseSiteTarget::Field,
@@ -525,8 +577,11 @@ pub fn kt_constructor_get_containing_class_or_object(tree: &Tree, constructor: N
 
 /// `KtDeclaration.containingClassOrObject` (psiUtil/ktPsiUtil.kt:526): the class or object a member is declared in,
 /// through a class body (and a companion block), a primary constructor's parameter list, a destructuring declaration;
-/// None for a local, a parameter of a function, an accessor.
+/// None for a local, a parameter of a function, an accessor, and for a node that is not a declaration.
 pub fn containing_class_or_object(tree: &Tree, declaration: NodeId) -> Option<NodeId> {
+    if !is_kt_declaration(tree, declaration) {
+        return None;
+    }
     let parent = tree.parent(declaration)?;
     match tree.node_kind(parent)? {
         CLASS_BODY => kt_class_body_containing_class_or_object(tree, parent),
@@ -545,6 +600,7 @@ pub fn containing_class_or_object(tree: &Tree, declaration: NodeId) -> Option<No
 /// `KtClassBody.containingClassOrObject` (psiUtil/ktPsiUtil.kt:618): the body's class or object, through a companion
 /// block (KtCompanionBlock.containingClassOrObject :627).
 pub fn kt_class_body_containing_class_or_object(tree: &Tree, body: NodeId) -> Option<NodeId> {
+    let body = class_of(tree, body, &[CLASS_BODY])?;
     let parent = tree.parent(body)?;
     match tree.node_kind(parent)? {
         CLASS | ENUM_ENTRY | OBJECT_DECLARATION => Some(parent),
@@ -557,8 +613,12 @@ pub fn kt_class_body_containing_class_or_object(tree: &Tree, body: NodeId) -> Op
 }
 
 /// `KtDeclaration.containingScript` (psiUtil/ktPsiUtil.kt:568): the script of a top-level declaration of a `.kts`
-/// (its parent is the script's `BLOCK`), through a destructuring declaration for its entry.
+/// (its parent is the script's `BLOCK`), through a destructuring declaration for its entry; None for a node that is
+/// not a declaration (a statement of the script).
 pub fn containing_script(tree: &Tree, declaration: NodeId) -> Option<NodeId> {
+    if !is_kt_declaration(tree, declaration) {
+        return None;
+    }
     let parent = tree.parent(declaration)?;
     match tree.node_kind(parent)? {
         BLOCK => tree.parent(parent).filter(|&s| is_kind(tree, s, SCRIPT)),
@@ -578,27 +638,32 @@ pub fn containing_class_or_script(tree: &Tree, declaration: NodeId) -> Option<No
 
 /// `KtClassOrObject.isTopLevel` (KtClassOrObject.kt:85): the parent is the file (in a script it is the script's block).
 pub fn kt_class_or_object_is_top_level(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION]) else { return false };
     is_kt_file(tree, tree.parent(class))
 }
 
 /// `KtClassOrObject.isData` (KtClassOrObject.kt:108).
 pub fn kt_class_or_object_is_data(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION]) else { return false };
     has_modifier(tree, class, DATA_KEYWORD)
 }
 
 /// `KtClassOrObject.isAnnotation` (KtClassOrObject.kt:132).
 pub fn kt_class_or_object_is_annotation(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION]) else { return false };
     has_modifier(tree, class, ANNOTATION_KEYWORD)
 }
 
 /// `KtClassOrObject.getDeclarationKeyword` (KtClassOrObject.kt:134): the first `class`, `interface` or `object` child.
 pub fn kt_class_or_object_get_declaration_keyword(tree: &Tree, class: NodeId) -> Option<NodeId> {
+    let class = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION])?;
     const CLASS_INTERFACE_OBJECT: TokenSet = TokenSet::create(&[CLASS_KEYWORD, INTERFACE_KEYWORD, OBJECT_KEYWORD]);
     child_in(tree, class, &CLASS_INTERFACE_OBJECT)
 }
 
 /// `KtClassOrObject.getSuperTypeList` (KtClassOrObject.kt:31).
 pub fn kt_class_or_object_get_super_type_list(tree: &Tree, class: NodeId) -> Option<NodeId> {
+    let class = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION])?;
     child(tree, class, SUPER_TYPE_LIST)
 }
 
@@ -610,7 +675,10 @@ fn is_super_type_list_entry(tree: &Tree, id: NodeId) -> bool {
 /// (KtInitializerList.java:44): the `SUPER_TYPE_ENTRY`, `SUPER_TYPE_CALL_ENTRY` and `DELEGATED_SUPER_TYPE_ENTRY`
 /// children.
 pub fn kt_super_type_list_get_entries(tree: &Tree, list: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    tree.children(list).filter(move |&c| is_super_type_list_entry(tree, c))
+    class_of(tree, list, &[SUPER_TYPE_LIST, INITIALIZER_LIST])
+        .into_iter()
+        .flat_map(move |l| tree.children(l))
+        .filter(move |&c| is_super_type_list_entry(tree, c))
 }
 
 /// `KtClassOrObject.getSuperTypeListEntries` (KtClassOrObject.kt:35): the entries of the super type list; an enum
@@ -626,11 +694,13 @@ pub fn kt_class_or_object_get_super_type_list_entries(tree: &Tree, class: NodeId
 
 /// `KtClassOrObject.getBody` (KtClassOrObject.kt:54): the `CLASS_BODY` child.
 pub fn kt_class_or_object_get_body(tree: &Tree, class: NodeId) -> Option<NodeId> {
+    let class = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION])?;
     child(tree, class, CLASS_BODY)
 }
 
 /// `KtClassOrObject.getPrimaryConstructor` (KtClassOrObject.kt:114).
 pub fn kt_class_or_object_get_primary_constructor(tree: &Tree, class: NodeId) -> Option<NodeId> {
+    let class = class_of(tree, class, &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION])?;
     child(tree, class, PRIMARY_CONSTRUCTOR)
 }
 
@@ -656,57 +726,68 @@ pub fn kt_class_or_object_get_secondary_constructors(tree: &Tree, class: NodeId)
 /// `KtClass.isInterface` (KtClass.kt:45): an `interface` keyword child, independent of the modifiers (`enum interface`
 /// is both an enum and an interface).
 pub fn kt_class_is_interface(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     child(tree, class, INTERFACE_KEYWORD).is_some()
 }
 
 /// `KtClass.isEnum` (KtClass.kt:48).
 pub fn kt_class_is_enum(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     has_modifier(tree, class, ENUM_KEYWORD)
 }
 
 /// `KtClass.isSealed` (KtClass.kt:49).
 pub fn kt_class_is_sealed(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     has_modifier(tree, class, SEALED_KEYWORD)
 }
 
 /// `KtClass.isInner` (KtClass.kt:50).
 pub fn kt_class_is_inner(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     has_modifier(tree, class, INNER_KEYWORD)
 }
 
 /// `KtClass.isInline` (KtClass.kt:51).
 pub fn kt_class_is_inline(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     has_modifier(tree, class, INLINE_KEYWORD)
 }
 
 /// `KtClass.isValue` (KtClass.kt:52).
 pub fn kt_class_is_value(tree: &Tree, class: NodeId) -> bool {
+    let Some(class) = class_of(tree, class, &[CLASS, ENUM_ENTRY]) else { return false };
     has_modifier(tree, class, VALUE_KEYWORD)
 }
 
 /// `KtClass.getFunKeyword` (KtClass.kt:60): the `fun` of `fun interface`, in the modifier list.
 pub fn kt_class_get_fun_keyword(tree: &Tree, class: NodeId) -> Option<NodeId> {
+    let class = class_of(tree, class, &[CLASS, ENUM_ENTRY])?;
     kt_modifier_list_get_modifier(tree, get_modifier_list(tree, class)?, FUN_KEYWORD)
 }
 
 /// `KtObjectDeclaration.isCompanion` (KtObjectDeclaration.kt:50).
 pub fn kt_object_declaration_is_companion(tree: &Tree, object: NodeId) -> bool {
+    let Some(object) = class_of(tree, object, &[OBJECT_DECLARATION]) else { return false };
     has_modifier(tree, object, COMPANION_KEYWORD)
 }
 
 /// `KtObjectDeclaration.isObjectLiteral` (KtObjectDeclaration.kt:59): the parent is an `OBJECT_LITERAL`.
 pub fn kt_object_declaration_is_object_literal(tree: &Tree, object: NodeId) -> bool {
+    let Some(object) = class_of(tree, object, &[OBJECT_DECLARATION]) else { return false };
     tree.parent(object).is_some_and(|p| is_kind(tree, p, OBJECT_LITERAL))
 }
 
 /// `KtObjectDeclaration.getObjectKeyword` (KtObjectDeclaration.kt:61).
 pub fn kt_object_declaration_get_object_keyword(tree: &Tree, object: NodeId) -> Option<NodeId> {
+    let object = class_of(tree, object, &[OBJECT_DECLARATION])?;
     child(tree, object, OBJECT_KEYWORD)
 }
 
 /// `KtSuperTypeListEntry.getTypeAsUserType` (KtSuperTypeListEntry.java:53): the entry's type element when it is a
 /// `USER_TYPE`; None for `Base?` and `(Int) -> Unit`.
 pub fn kt_super_type_list_entry_get_type_as_user_type(tree: &Tree, entry: NodeId) -> Option<NodeId> {
+    let entry = class_of(tree, entry, &[DELEGATED_SUPER_TYPE_ENTRY, SUPER_TYPE_CALL_ENTRY, SUPER_TYPE_ENTRY])?;
     let element = kt_type_reference_get_type_element(tree, get_type_reference(tree, entry)?)?;
     is_kind(tree, element, USER_TYPE).then_some(element)
 }
@@ -750,13 +831,17 @@ fn type_reference_after_colon(tree: &Tree, declaration: NodeId) -> Option<NodeId
 /// receiver's and constructor callee's is its first `TYPE_REFERENCE` child (KtParameter.java:91, KtTypeAlias.kt:42,
 /// KtPropertyAccessor.kt:102, KtTypeProjection.java:60, KtFunctionTypeReceiver.java, KtConstructorCalleeExpression.java);
 /// a super type entry's is its `TYPE_REFERENCE` child (KtSuperTypeListEntry.java:48), a super type call entry's and an
-/// annotation entry's the one of their `CONSTRUCTOR_CALLEE` (KtSuperTypeCallEntry.java:68, KtAnnotationEntry.java:49).
-/// Constructors, enum entries and function literals have none.
+/// annotation entry's the one of their `CONSTRUCTOR_CALLEE` (KtSuperTypeCallEntry.java:68, KtAnnotationEntry.java:49);
+/// an explicit backing field's (`field: MutableList<Int> = ...`, KtBackingField.kt:38) and an `is` expression's
+/// (KtIsExpression.java:41) are their first `TYPE_REFERENCE` child. Constructors, enum entries, destructuring
+/// declarations and function literals have none.
 pub fn get_type_reference(tree: &Tree, element: NodeId) -> Option<NodeId> {
     match tree.node_kind(element)? {
         FUN | PROPERTY | DESTRUCTURING_DECLARATION_ENTRY => type_reference_after_colon(tree, element),
         VALUE_PARAMETER
         | TYPEALIAS
+        | BACKING_FIELD
+        | IS_EXPRESSION
         | PROPERTY_ACCESSOR
         | TYPE_PROJECTION
         | FUNCTION_TYPE_RECEIVER
@@ -846,6 +931,7 @@ pub fn is_extension_declaration(tree: &Tree, element: NodeId) -> bool {
 /// `KtNamedFunction.isLocal` (KtNamedFunction.kt:154): false when the parent is the file, a class body, or the
 /// parent's parent is a script (a top-level function of a `.kts`), true otherwise.
 pub fn kt_named_function_is_local(tree: &Tree, function: NodeId) -> bool {
+    let Some(function) = class_of(tree, function, &[FUN]) else { return false };
     let Some(parent) = tree.parent(function) else { return false };
     if is_kt_file(tree, Some(parent)) || is_kind(tree, parent, CLASS_BODY) {
         return false;
@@ -855,27 +941,32 @@ pub fn kt_named_function_is_local(tree: &Tree, function: NodeId) -> bool {
 
 /// `KtNamedFunction.isAnonymous` (KtNamedFunction.kt:168): no name and local, `fun() {}` in an expression.
 pub fn kt_named_function_is_anonymous(tree: &Tree, function: NodeId) -> bool {
+    let Some(function) = class_of(tree, function, &[FUN]) else { return false };
     get_name(tree, function).is_none() && kt_named_function_is_local(tree, function)
 }
 
 /// `KtNamedFunction.isTopLevel` (KtNamedFunction.kt:171): the parent is the file.
 pub fn kt_named_function_is_top_level(tree: &Tree, function: NodeId) -> bool {
+    let Some(function) = class_of(tree, function, &[FUN]) else { return false };
     is_kt_file(tree, tree.parent(function))
 }
 
 /// `KtProperty.isTopLevel` (KtProperty.java:82): the parent is the file.
 pub fn kt_property_is_top_level(tree: &Tree, property: NodeId) -> bool {
+    let Some(property) = class_of(tree, property, &[PROPERTY]) else { return false };
     is_kt_file(tree, tree.parent(property))
 }
 
 /// `KtProperty.isMember` (KtProperty.java:78): it has a containing class, object or script
 /// (`containing_class_or_script`); a member of a local class is a member.
 pub fn kt_property_is_member(tree: &Tree, property: NodeId) -> bool {
+    let Some(property) = class_of(tree, property, &[PROPERTY]) else { return false };
     containing_class_or_script(tree, property).is_some()
 }
 
 /// `KtProperty.isLocal` (KtProperty.java:74): neither top-level nor a member.
 pub fn kt_property_is_local(tree: &Tree, property: NodeId) -> bool {
+    let Some(property) = class_of(tree, property, &[PROPERTY]) else { return false };
     !kt_property_is_top_level(tree, property) && !kt_property_is_member(tree, property)
 }
 
@@ -916,12 +1007,13 @@ pub fn get_val_or_var_keyword(tree: &Tree, declaration: NodeId) -> Option<NodeId
 }
 
 /// `KtDeclarationWithInitializer.getInitializer`: the first `KtExpression` sibling after the `EQ` child of a property
-/// (KtProperty.java:265), function (KtNamedFunction.kt:66), accessor (KtPropertyAccessor.kt:109) or destructuring
-/// declaration (KtDestructuringDeclaration.java:75), so an error element is skipped and `val w =` has none; a
-/// destructuring entry's is the next `REFERENCE_EXPRESSION` after its `EQ` (KtDestructuringDeclarationEntry.java:120).
+/// (KtProperty.java:265), function (KtNamedFunction.kt:66), accessor (KtPropertyAccessor.kt:109), explicit backing
+/// field (KtBackingField.kt:45) or destructuring declaration (KtDestructuringDeclaration.java:75), so an error element
+/// is skipped and `val w =` has none; a destructuring entry's is the next `REFERENCE_EXPRESSION` after its `EQ`
+/// (KtDestructuringDeclarationEntry.java:120).
 pub fn get_initializer(tree: &Tree, declaration: NodeId) -> Option<NodeId> {
     match tree.node_kind(declaration)? {
-        PROPERTY | FUN | PROPERTY_ACCESSOR | DESTRUCTURING_DECLARATION => {
+        PROPERTY | FUN | PROPERTY_ACCESSOR | BACKING_FIELD | DESTRUCTURING_DECLARATION => {
             next_sibling_expression(tree, child(tree, declaration, EQ))
         }
         DESTRUCTURING_DECLARATION_ENTRY => {
@@ -940,6 +1032,7 @@ pub fn get_initializer(tree: &Tree, declaration: NodeId) -> Option<NodeId> {
 
 /// `KtProperty.getDelegate` (KtProperty.java:220): the `PROPERTY_DELEGATE` child.
 pub fn kt_property_get_delegate(tree: &Tree, property: NodeId) -> Option<NodeId> {
+    let property = class_of(tree, property, &[PROPERTY])?;
     child(tree, property, PROPERTY_DELEGATE)
 }
 
@@ -956,7 +1049,7 @@ pub fn kt_property_get_delegate_expression(tree: &Tree, property: NodeId) -> Opt
 
 /// `KtProperty.getAccessors` (KtProperty.java:179): the `PROPERTY_ACCESSOR` children.
 pub fn kt_property_get_accessors(tree: &Tree, property: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    children_of(tree, Some(property), PROPERTY_ACCESSOR)
+    children_of(tree, class_of(tree, property, &[PROPERTY]), PROPERTY_ACCESSOR)
 }
 
 /// `KtProperty.getGetter` (KtProperty.java:184): the first accessor that is a getter.
@@ -971,17 +1064,20 @@ pub fn kt_property_get_setter(tree: &Tree, property: NodeId) -> Option<NodeId> {
 
 /// `KtPropertyAccessor.isGetter` (KtPropertyAccessor.kt:36): a `get` child.
 pub fn kt_property_accessor_is_getter(tree: &Tree, accessor: NodeId) -> bool {
+    let Some(accessor) = class_of(tree, accessor, &[PROPERTY_ACCESSOR]) else { return false };
     child(tree, accessor, GET_KEYWORD).is_some()
 }
 
 /// `KtPropertyAccessor.isSetter` (KtPropertyAccessor.kt:44): a `set` child.
 pub fn kt_property_accessor_is_setter(tree: &Tree, accessor: NodeId) -> bool {
+    let Some(accessor) = class_of(tree, accessor, &[PROPERTY_ACCESSOR]) else { return false };
     child(tree, accessor, SET_KEYWORD).is_some()
 }
 
 /// `KtParameter.getDefaultValue` (KtParameter.java:126): the first `KtExpression` sibling after the `EQ` child, so
 /// `fun f(x: Int = )` has none.
 pub fn kt_parameter_get_default_value(tree: &Tree, parameter: NodeId) -> Option<NodeId> {
+    let parameter = class_of(tree, parameter, &[VALUE_PARAMETER])?;
     next_sibling_expression(tree, Some(child(tree, parameter, EQ)?))
 }
 
@@ -992,27 +1088,32 @@ pub fn kt_parameter_has_default_value(tree: &Tree, parameter: NodeId) -> bool {
 
 /// `KtParameter.isMutable` (KtParameter.java:138): a `var` child.
 pub fn kt_parameter_is_mutable(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     child(tree, parameter, VAR_KEYWORD).is_some()
 }
 
 /// `KtParameter.isVarArg` (KtParameter.java:147): the `vararg` modifier.
 pub fn kt_parameter_is_var_arg(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     has_modifier(tree, parameter, VARARG_KEYWORD)
 }
 
 /// `KtParameter.hasValOrVar` (KtParameter.java:152): a `val` or `var` child (a property declared in a constructor).
 pub fn kt_parameter_has_val_or_var(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     get_val_or_var_keyword(tree, parameter).is_some()
 }
 
 /// `KtParameter.getDestructuringDeclaration` (KtParameter.java:171): the `DESTRUCTURING_DECLARATION` child of a lambda
 /// parameter `{ (a, b) -> }`.
 pub fn kt_parameter_get_destructuring_declaration(tree: &Tree, parameter: NodeId) -> Option<NodeId> {
+    let parameter = class_of(tree, parameter, &[VALUE_PARAMETER])?;
     child(tree, parameter, DESTRUCTURING_DECLARATION)
 }
 
 /// `KtParameter.isLoopParameter` (KtParameter.java:189): the parent is a `FOR`.
 pub fn kt_parameter_is_loop_parameter(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     tree.parent(parameter).is_some_and(|p| is_kind(tree, p, FOR))
 }
 
@@ -1023,48 +1124,58 @@ fn parameter_list_owner_is(tree: &Tree, parameter: NodeId, kind: NodeKind) -> bo
 
 /// `KtParameter.isCatchParameter` (KtParameter.java:202): the list's parent is a `CATCH`.
 pub fn kt_parameter_is_catch_parameter(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     parameter_list_owner_is(tree, parameter, CATCH)
 }
 
 /// `KtParameter.isContextParameter` (KtParameter.java:216): the parent is a `CONTEXT_PARAMETER_LIST`.
 pub fn kt_parameter_is_context_parameter(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     tree.parent(parameter).is_some_and(|p| is_kind(tree, p, CONTEXT_PARAMETER_LIST))
 }
 
 /// `KtParameter.isLambdaParameter` (KtParameter.java:228): the list's parent is a `FUNCTION_LITERAL`.
 pub fn kt_parameter_is_lambda_parameter(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     parameter_list_owner_is(tree, parameter, FUNCTION_LITERAL)
 }
 
 /// `KtParameter.isFunctionTypeParameter` (KtParameter.java:238): the list's parent is a `FUNCTION_TYPE`.
 pub fn kt_parameter_is_function_type_parameter(tree: &Tree, parameter: NodeId) -> bool {
+    let Some(parameter) = class_of(tree, parameter, &[VALUE_PARAMETER]) else { return false };
     parameter_list_owner_is(tree, parameter, FUNCTION_TYPE)
 }
 
 /// `KtTypeAlias.isTopLevel` (KtTypeAlias.kt:35): the parent is the file.
 pub fn kt_type_alias_is_top_level(tree: &Tree, alias: NodeId) -> bool {
+    let Some(alias) = class_of(tree, alias, &[TYPEALIAS]) else { return false };
     is_kt_file(tree, tree.parent(alias))
 }
 
 /// `KtTypeParameter.getExtendsBound` (KtTypeParameter.java:65): the `TYPE_REFERENCE` child of `T : Bound`.
 pub fn kt_type_parameter_get_extends_bound(tree: &Tree, parameter: NodeId) -> Option<NodeId> {
+    let parameter = class_of(tree, parameter, &[TYPE_PARAMETER])?;
     child(tree, parameter, TYPE_REFERENCE)
 }
 
 /// `KtTypeConstraint.getSubjectTypeParameterName` (KtTypeConstraint.java:43): the `REFERENCE_EXPRESSION` child.
 pub fn kt_type_constraint_get_subject_type_parameter_name(tree: &Tree, constraint: NodeId) -> Option<NodeId> {
+    let constraint = class_of(tree, constraint, &[TYPE_CONSTRAINT])?;
     child(tree, constraint, REFERENCE_EXPRESSION)
 }
 
 /// `KtTypeConstraint.getBoundTypeReference` (KtTypeConstraint.java:49): the `TYPE_REFERENCE` child.
 pub fn kt_type_constraint_get_bound_type_reference(tree: &Tree, constraint: NodeId) -> Option<NodeId> {
+    let constraint = class_of(tree, constraint, &[TYPE_CONSTRAINT])?;
     child(tree, constraint, TYPE_REFERENCE)
 }
 
 /// `KtDestructuringDeclaration.getEntries` (KtDestructuringDeclaration.java:54): the `DESTRUCTURING_DECLARATION_ENTRY`
 /// children and those inside an `ERROR_ELEMENT` child, where the parser wraps a top-level `val (a, b) = p` (KT-58563).
 pub fn kt_destructuring_declaration_get_entries(tree: &Tree, declaration: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    tree.children(declaration)
+    class_of(tree, declaration, &[DESTRUCTURING_DECLARATION])
+        .into_iter()
+        .flat_map(move |d| tree.children(d))
         .flat_map(move |c| {
             let (inner, own) = match tree.node_kind(c) {
                 Some(ERROR_ELEMENT) => (Some(c), None),
@@ -1086,23 +1197,30 @@ fn is_type_element(tree: &Tree, id: NodeId) -> bool {
 /// `DYNAMIC_TYPE` or `INTERSECTION_TYPE` child, past the reference's modifier list, the parentheses of `(Foo)` and an
 /// error element; None for `fun h(): @A`.
 pub fn kt_type_reference_get_type_element(tree: &Tree, reference: NodeId) -> Option<NodeId> {
+    let reference = class_of(tree, reference, &[TYPE_REFERENCE])?;
     tree.children(reference).find(|&c| is_type_element(tree, c))
 }
 
 /// `KtTypeReference.hasParentheses` (KtTypeReference.kt:52): an `LPAR` and an `RPAR` child.
 pub fn kt_type_reference_has_parentheses(tree: &Tree, reference: NodeId) -> bool {
+    let Some(reference) = class_of(tree, reference, &[TYPE_REFERENCE]) else { return false };
     child(tree, reference, LPAR).is_some() && child(tree, reference, RPAR).is_some()
 }
 
 /// `KtNullableType.getInnerType` (KtNullableType.java:57): the first type element child, past `(`, `)` and the
 /// nullable type's own modifier list (`(@A Foo)?`).
 pub fn kt_nullable_type_get_inner_type(tree: &Tree, nullable: NodeId) -> Option<NodeId> {
+    let nullable = class_of(tree, nullable, &[NULLABLE_TYPE])?;
     tree.children(nullable).find(|&c| is_type_element(tree, c))
 }
 
 /// `KtTypeElement.unwrapNullability` (psiUtil/ktPsiUtil.kt:895): the type element under every nullable wrapper:
-/// `Foo` for `Foo??` and `(Foo?)?`; None when a nullable type has no inner type.
+/// `Foo` for `Foo??` and `(Foo?)?`; None when a nullable type has no inner type, and for a node that is no type
+/// element.
 pub fn unwrap_nullability(tree: &Tree, type_element: NodeId) -> Option<NodeId> {
+    if !is_type_element(tree, type_element) {
+        return None;
+    }
     let mut element = type_element;
     while is_kind(tree, element, NULLABLE_TYPE) {
         element = kt_nullable_type_get_inner_type(tree, element)?;
@@ -1113,28 +1231,33 @@ pub fn unwrap_nullability(tree: &Tree, type_element: NodeId) -> Option<NodeId> {
 /// `KtUserType.getReferenceExpression` (KtUserType.java:91): the `REFERENCE_EXPRESSION` child, else the
 /// `ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION` of an enum entry's `A(1)`.
 pub fn kt_user_type_get_reference_expression(tree: &Tree, user_type: NodeId) -> Option<NodeId> {
+    let user_type = class_of(tree, user_type, &[USER_TYPE])?;
     child(tree, user_type, REFERENCE_EXPRESSION)
         .or_else(|| child(tree, user_type, ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION))
 }
 
 /// `KtUserType.getQualifier` (KtUserType.java:98): the `USER_TYPE` child, `a.b` of `a.b.C`.
 pub fn kt_user_type_get_qualifier(tree: &Tree, user_type: NodeId) -> Option<NodeId> {
+    let user_type = class_of(tree, user_type, &[USER_TYPE])?;
     child(tree, user_type, USER_TYPE)
 }
 
 /// `KtUserType.getTypeArguments` (KtUserType.java:73): the `TYPE_PROJECTION` children of its own type argument list
 /// (each segment of `Outer<A>.Inner<B>` has its own).
 pub fn kt_user_type_get_type_arguments(tree: &Tree, user_type: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-    children_of(tree, child(tree, user_type, TYPE_ARGUMENT_LIST), TYPE_PROJECTION)
+    let list = class_of(tree, user_type, &[USER_TYPE]).and_then(|u| child(tree, u, TYPE_ARGUMENT_LIST));
+    children_of(tree, list, TYPE_PROJECTION)
 }
 
 /// `KtFunctionType.getReceiver` (KtFunctionType.java:82): the `FUNCTION_TYPE_RECEIVER` child of `B.() -> Unit`.
 pub fn kt_function_type_get_receiver(tree: &Tree, function_type: NodeId) -> Option<NodeId> {
+    let function_type = class_of(tree, function_type, &[FUNCTION_TYPE])?;
     child(tree, function_type, FUNCTION_TYPE_RECEIVER)
 }
 
 /// `KtFunctionType.getParameterList` (KtFunctionType.java:70): the `VALUE_PARAMETER_LIST` child.
 pub fn kt_function_type_get_parameter_list(tree: &Tree, function_type: NodeId) -> Option<NodeId> {
+    let function_type = class_of(tree, function_type, &[FUNCTION_TYPE])?;
     child(tree, function_type, VALUE_PARAMETER_LIST)
 }
 
@@ -1145,19 +1268,66 @@ pub fn kt_function_type_get_parameters(tree: &Tree, function_type: NodeId) -> im
 
 /// `KtFunctionType.getReturnTypeReference` (KtFunctionType.java:119): the first `TYPE_REFERENCE` child.
 pub fn kt_function_type_get_return_type_reference(tree: &Tree, function_type: NodeId) -> Option<NodeId> {
+    let function_type = class_of(tree, function_type, &[FUNCTION_TYPE])?;
     child(tree, function_type, TYPE_REFERENCE)
 }
 
 // ---- KtSimpleNameExpression ---------------------------------------------------------------------------------------
 
-/// `KtSimpleNameExpression.getReferencedNameElement`: a name reference's first `IDENTIFIER`, `this` or `super` child,
-/// else the reference itself (KtNameReferenceExpression.kt:83); an enum entry's superclass reference's is the enum
-/// class (`KtEnumEntrySuperclassReferenceExpression.getReferencedNameElement` :62: the nearest `ENUM_ENTRY` ancestor's
-/// parent's parent, when it is a `CLASS` or `ENUM_ENTRY`; None where the Java's `!!` throws).
+/// `KtOperationReferenceExpression.OPERATION_TOKENS` (KtOperationReferenceExpression.kt:76): the postfix and prefix
+/// operations (stubs/elements/KtTokenSets.java:30) and the tokens of every `BinaryOperationPrecedence`
+/// (lang/BinaryOperationPrecedence.kt:14), the `IDENTIFIER` of an infix call among them.
+const OPERATION_TOKENS: TokenSet = TokenSet::or_set(&[
+    crate::tokens::POSTFIX_OPERATIONS,
+    crate::tokens::PREFIX_OPERATIONS,
+    TokenSet::create(&[
+        AS_KEYWORD,
+        AS_SAFE,
+        MUL,
+        DIV,
+        PERC,
+        PLUS,
+        MINUS,
+        RANGE,
+        RANGE_UNTIL,
+        IDENTIFIER,
+        ELVIS,
+        IN_KEYWORD,
+        NOT_IN,
+        IS_KEYWORD,
+        NOT_IS,
+        LT,
+        GT,
+        LTEQ,
+        GTEQ,
+        EQEQ,
+        EXCLEQ,
+        EQEQEQ,
+        EXCLEQEQEQ,
+        ANDAND,
+        OROR,
+        EQ,
+        PLUSEQ,
+        MINUSEQ,
+        MULTEQ,
+        DIVEQ,
+        PERCEQ,
+    ]),
+]);
+
+/// `KtSimpleNameExpression.getReferencedNameElement`, as each of its classes answers: a name reference's first
+/// `IDENTIFIER`, `this` or `super` child, else the reference itself (KtNameReferenceExpression.kt:84); an operation
+/// reference's first operation token child (`+=`, `!in`, `?:`, the `to` of an infix call), else itself
+/// (KtOperationReferenceExpression.kt:85); a label's `IDENTIFIER` child, else itself (KtLabelReferenceExpression.kt:23:
+/// the `foo` of `foo@` and of `return@foo`); an enum entry's superclass reference's is the enum class
+/// (KtEnumEntrySuperclassReferenceExpression.kt:62: the nearest `ENUM_ENTRY` ancestor's parent's parent, when it is a
+/// `CLASS` or `ENUM_ENTRY`; None where the Java's `!!` throws).
 pub fn get_referenced_name_element(tree: &Tree, expression: NodeId) -> Option<NodeId> {
     const NAME_REFERENCE_EXPRESSIONS: TokenSet = TokenSet::create(&[IDENTIFIER, THIS_KEYWORD, SUPER_KEYWORD]);
     match tree.node_kind(expression)? {
         REFERENCE_EXPRESSION => Some(child_in(tree, expression, &NAME_REFERENCE_EXPRESSIONS).unwrap_or(expression)),
+        OPERATION_REFERENCE => Some(child_in(tree, expression, &OPERATION_TOKENS).unwrap_or(expression)),
+        LABEL => Some(child(tree, expression, IDENTIFIER).unwrap_or(expression)),
         ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION => {
             let entry = tree.ancestor_or_self(tree.parent(expression)?, |n| is_kind(tree, n, ENUM_ENTRY))?;
             let class = tree.parent(tree.parent(entry)?)?;
@@ -1167,14 +1337,15 @@ pub fn get_referenced_name_element(tree: &Tree, expression: NodeId) -> Option<No
     }
 }
 
-/// `getReferencedName`: a name reference's referenced name element's text without its backticks
-/// (`KtSimpleNameExpressionImpl.getReferencedNameImpl`, KtSimpleNameExpression.kt:62, KtPsiUtil.java:152); an enum
-/// entry's superclass reference's is the enum class's name or `<no name provided>`
-/// (KtEnumEntrySuperclassReferenceExpression.kt:49); a user type's is its reference expression's
-/// (KtUserType.java:112): `` b c `` for the middle segment of `` a.`b c`.D ``.
+/// `getReferencedName`: a name reference's, operation reference's and label's referenced name element's text
+/// without its backticks (`KtSimpleNameExpressionImpl.getReferencedNameImpl`, KtSimpleNameExpression.kt:62,
+/// KtPsiUtil.java:152: `+=`, `!in`, the `to` of `a to b`, the `foo` of `return@foo`); an enum entry's superclass
+/// reference's is the enum class's name or `<no name provided>` (KtEnumEntrySuperclassReferenceExpression.kt:49); a
+/// user type's is its reference expression's (KtUserType.java:112): `` b c `` for the middle segment of
+/// `` a.`b c`.D ``.
 pub fn get_referenced_name<'t>(tree: &'t Tree, element: NodeId) -> Option<Cow<'t, str>> {
     match tree.node_kind(element)? {
-        REFERENCE_EXPRESSION => {
+        REFERENCE_EXPRESSION | OPERATION_REFERENCE | LABEL => {
             Some(unquote_identifier_or_field_reference(tree.utf8_text(get_referenced_name_element(tree, element)?)?))
         }
         ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION => {
@@ -1191,12 +1362,14 @@ pub fn get_referenced_name<'t>(tree: &'t Tree, element: NodeId) -> Option<Cow<'t
 /// `KtImportDirective.getImportedReference` (KtImportDirective.java:49): the first `REFERENCE_EXPRESSION` or
 /// `DOT_QUALIFIED_EXPRESSION` child.
 pub fn kt_import_directive_get_imported_reference(tree: &Tree, directive: NodeId) -> Option<NodeId> {
+    let directive = class_of(tree, directive, &[IMPORT_DIRECTIVE])?;
     tree.children(directive)
         .find(|&c| matches!(tree.node_kind(c), Some(REFERENCE_EXPRESSION | DOT_QUALIFIED_EXPRESSION)))
 }
 
 /// `KtImportDirective.getAlias` (KtImportDirective.java:59): the `IMPORT_ALIAS` child.
 pub fn kt_import_directive_get_alias(tree: &Tree, directive: NodeId) -> Option<NodeId> {
+    let directive = class_of(tree, directive, &[IMPORT_DIRECTIVE])?;
     child(tree, directive, IMPORT_ALIAS)
 }
 
@@ -1207,6 +1380,7 @@ pub fn kt_import_directive_get_alias_name(tree: &Tree, directive: NodeId) -> Opt
 
 /// `KtImportDirective.isAllUnder` (KtImportDirective.java:71): a `*` child.
 pub fn kt_import_directive_is_all_under(tree: &Tree, directive: NodeId) -> bool {
+    let Some(directive) = class_of(tree, directive, &[IMPORT_DIRECTIVE]) else { return false };
     child(tree, directive, MUL).is_some()
 }
 
@@ -1254,6 +1428,7 @@ fn operation_token_node(tree: &Tree, qualified: NodeId) -> Option<NodeId> {
 /// `KtQualifiedExpression.receiverExpressionOrNull` (KtQualifiedExpression.kt:53, `getExpression(false)` :70): the
 /// nearest `KtExpression` before the operation token.
 pub fn kt_qualified_expression_get_receiver_expression(tree: &Tree, qualified: NodeId) -> Option<NodeId> {
+    let qualified = class_of(tree, qualified, &[DOT_QUALIFIED_EXPRESSION, SAFE_ACCESS_EXPRESSION])?;
     let mut sibling = tree.previous_sibling(operation_token_node(tree, qualified)?);
     while let Some(s) = sibling {
         if is_kt_expression(tree, s) {
@@ -1267,6 +1442,7 @@ pub fn kt_qualified_expression_get_receiver_expression(tree: &Tree, qualified: N
 /// `KtQualifiedExpression.selectorExpression` (KtQualifiedExpression.kt:56): the first `KtExpression` after the
 /// operation token, so the error element of an incomplete `a.` is none.
 pub fn kt_qualified_expression_get_selector_expression(tree: &Tree, qualified: NodeId) -> Option<NodeId> {
+    let qualified = class_of(tree, qualified, &[DOT_QUALIFIED_EXPRESSION, SAFE_ACCESS_EXPRESSION])?;
     next_sibling_expression(tree, operation_token_node(tree, qualified))
 }
 
@@ -1326,11 +1502,13 @@ pub fn get_type_argument_list(tree: &Tree, element: NodeId) -> Option<NodeId> {
 /// `KtValueArgument.getArgumentExpression` (KtValueArgument.java:55): the first `KtExpression` child of a value or
 /// lambda argument.
 pub fn kt_value_argument_get_argument_expression(tree: &Tree, argument: NodeId) -> Option<NodeId> {
+    let argument = class_of(tree, argument, &[VALUE_ARGUMENT, LAMBDA_ARGUMENT])?;
     child_expression(tree, argument)
 }
 
 /// `KtValueArgument.getArgumentName` (KtValueArgument.java:85): the `VALUE_ARGUMENT_NAME` child of `name = value`.
 pub fn kt_value_argument_get_argument_name(tree: &Tree, argument: NodeId) -> Option<NodeId> {
+    let argument = class_of(tree, argument, &[VALUE_ARGUMENT, LAMBDA_ARGUMENT])?;
     child(tree, argument, VALUE_ARGUMENT_NAME)
 }
 
@@ -1341,6 +1519,7 @@ pub fn kt_value_argument_is_named(tree: &Tree, argument: NodeId) -> bool {
 
 /// `KtValueArgument.isSpread` (KtValueArgument.java:117): a `*` child.
 pub fn kt_value_argument_is_spread(tree: &Tree, argument: NodeId) -> bool {
+    let Some(argument) = class_of(tree, argument, &[VALUE_ARGUMENT, LAMBDA_ARGUMENT]) else { return false };
     child(tree, argument, MUL).is_some()
 }
 
@@ -1348,6 +1527,7 @@ pub fn kt_value_argument_is_spread(tree: &Tree, argument: NodeId) -> bool {
 /// `unpackFunctionLiteral` (ktElementUtils.kt:19): a lambda itself, the base of a labeled (`l@ { }`) or annotated
 /// (`@A { }`) expression; a parenthesized one is none.
 pub fn kt_lambda_argument_get_lambda_expression(tree: &Tree, argument: NodeId) -> Option<NodeId> {
+    let argument = class_of(tree, argument, &[LAMBDA_ARGUMENT])?;
     let mut e = kt_value_argument_get_argument_expression(tree, argument)?;
     loop {
         match tree.node_kind(e)? {
@@ -1360,6 +1540,7 @@ pub fn kt_lambda_argument_get_lambda_expression(tree: &Tree, argument: NodeId) -
 
 /// `KtLambdaExpression.getFunctionLiteral` (KtLambdaExpression.java:42): the `FUNCTION_LITERAL` child.
 pub fn kt_lambda_expression_get_function_literal(tree: &Tree, lambda: NodeId) -> Option<NodeId> {
+    let lambda = class_of(tree, lambda, &[LAMBDA_EXPRESSION])?;
     child(tree, lambda, FUNCTION_LITERAL)
 }
 

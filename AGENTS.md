@@ -246,17 +246,20 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `get_name_identifier` and `get_name` (unquoted; `Companion`, constructors, `<anonymous>`), the class and object
   tests, `kt_class_or_object_get_super_type_list_entries` (an enum entry's initializer list),
   `get_receiver_type_reference`, `get_type_reference`, `kt_type_reference_get_type_element`, `unwrap_nullability`
-  (`Foo??`, `(@A Foo)?`), `kt_user_type_*`, `get_referenced_name`, `kt_property_is_local`, `get_initializer` (an error
-  element is none), `kt_destructuring_declaration_get_entries` (inside the error element of a top-level one), the
-  parameter, import, qualified, call and argument getters. A method shared by several classes (an interface's,
-  `KtCallableDeclaration`'s, an extension of `ktPsiUtil.kt`) has the bare name and dispatches on the node's kind as
-  the virtual call does; a method of one class carries the class (`kt_class_is_interface`). They answer PSI's tree
-  branch (no stubs), `None` where the Java throws, iterators where it returns a list, and allocate nothing but
-  `kt_import_directive_get_imported_fq_name`. `tools/kotlin-psi-getters/GetterOracle.java` prints Kotlin 2.4.21's own
-  answers for every element (`--out`, `--hash`, `--classes` for the PSI classes of each element type); on 26e6333
-  (2026-11-03) the port printed the same lines for the 789 goldens (388 995 lines), the 55 501 community files
-  (108 853 451 lines), the 12 000 parse and lexer fuzz inputs and the 16 724 golden mutations (19.9M lines). What a consumer makes of the answers
-  (symbols, scopes, a JVM name) stays in the consumer.
+  (`Foo??`, `(@A Foo)?`), `kt_user_type_*`, `get_referenced_name` (of every simple name: a label's `foo`, an
+  operation reference's `+=` or infix `to`), `kt_property_is_local`, `get_initializer` (an error element is none; an
+  explicit backing field's too), `kt_destructuring_declaration_get_entries` (inside the error element of a top-level
+  one), the parameter, import, qualified, call and argument getters. A method shared by several classes (an
+  interface's, `KtCallableDeclaration`'s, an extension of `ktPsiUtil.kt`) has the bare name and dispatches on the
+  node's kind as the virtual call does; a method of one class carries the class (`kt_class_is_interface`) and checks
+  the node's kind, as Java's types do; a node whose class lacks the method answers `None` (the dangling modifier list
+  of `class C { private }` has no owner, so `has_modifier` of the class body is false). They answer PSI's tree branch (no stubs), `None` where the Java throws,
+  iterators where it returns a list, and allocate nothing but `kt_import_directive_get_imported_fq_name`.
+  `tools/kotlin-psi-getters/GetterOracle.java` prints Kotlin 2.4.21's own answers for every element (`--out`,
+  `--hash`, `--classes` for the PSI classes of each element type); on 18211728 plus the review's fixes (2026-11-03)
+  the port printed the same lines for the 789 goldens (480 601 lines), the 55 501 community files (126 353 205
+  lines), the 12 000 parse and lexer fuzz inputs and the 16 724 golden mutations (23.8M lines). What a consumer
+  makes of the answers (symbols, scopes, a JVM name) stays in the consumer.
 - The text to parse is the file as IntelliJ's document holds it, at the file's offsets: `kotlin_syntax::document_text`
   (a byte order mark as spaces, a `\r` as the line end the compiler reads) and `java_syntax::document_text` (the mark
   only: the Java lexer reads every line terminator), over `psi_builder::document`, which also has `Lines`, the

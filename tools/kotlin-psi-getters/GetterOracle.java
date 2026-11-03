@@ -309,8 +309,18 @@ public class GetterOracle {
         });
         line("visibilityModifier", () -> el(KtPsiUtilKt.visibilityModifier(m)));
         line("visibilityModifierType", () -> str(KtPsiUtilKt.visibilityModifierType(m)));
+        line("isPrivate", () -> "" + KtPsiUtilKt.isPrivate(m));
+        line("isProtected", () -> "" + KtPsiUtilKt.isProtected(m));
       }
-      if (e instanceof KtDeclaration d) line("modalityModifierType", () -> str(KtPsiUtilKt.modalityModifierType(d)));
+      if (e instanceof KtDeclaration d) {
+        line("modalityModifier", () -> el(KtPsiUtilKt.modalityModifier(d)));
+        line("modalityModifierType", () -> str(KtPsiUtilKt.modalityModifierType(d)));
+        line("containingClassOrObject", () -> el(KtPsiUtilKt.getContainingClassOrObject(d)));
+        line("containingScript", () -> el(KtPsiUtilKt.getContainingScript(d)));
+        line("containingClassOrScript", () -> el(KtPsiUtilKt.getContainingClassOrScript(d)));
+      }
+      if (e instanceof KtClassBody b) line("containingClassOrObject", () -> el(KtPsiUtilKt.getContainingClassOrObject(b)));
+      if (e instanceof KtConstructor<?> c) line("containingClassOrObject", () -> el(c.getContainingClassOrObject()));
       if (e instanceof KtAnnotated a) line("annotationEntries", () -> els(a.getAnnotationEntries()));
       if (e instanceof KtModifierList ml) line("annotationEntries", () -> els(ml.getAnnotationEntries()));
       if (e instanceof KtAnnotation an) {
@@ -343,6 +353,7 @@ public class GetterOracle {
         line("superTypeListEntries", () -> els(co.getSuperTypeListEntries()));
         line("body", () -> el(co.getBody()));
         line("primaryConstructor", () -> el(co.getPrimaryConstructor()));
+        line("primaryConstructorParameterList", () -> el(co.getPrimaryConstructorParameterList()));
         line("primaryConstructorParameters", () -> els(co.getPrimaryConstructorParameters()));
         line("secondaryConstructors", () -> els(co.getSecondaryConstructors()));
       }
@@ -358,6 +369,7 @@ public class GetterOracle {
       if (e instanceof KtObjectDeclaration o) {
         line("isCompanion", () -> "" + o.isCompanion());
         line("isObjectLiteral", () -> "" + o.isObjectLiteral());
+        line("objectKeyword", () -> el(o.getObjectKeyword()));
       }
       if (e instanceof KtSuperTypeListEntry s) {
         line("typeReference", () -> el(s.getTypeReference()));
@@ -404,6 +416,11 @@ public class GetterOracle {
         line("valueParameters", () -> els(pa.getValueParameters()));
         line("initializer", () -> el(pa.getInitializer()));
       }
+      if (e instanceof KtBackingField bf) {
+        line("typeReference", () -> el(bf.getTypeReference()));
+        line("initializer", () -> el(bf.getInitializer()));
+      }
+      if (e instanceof KtIsExpression is) line("typeReference", () -> el(is.getTypeReference()));
       if (e instanceof KtTypeProjection p) line("typeReference", () -> el(p.getTypeReference()));
       if (e instanceof KtConstructorCalleeExpression c) line("typeReference", () -> el(c.getTypeReference()));
       if (e instanceof KtFunctionTypeReceiver r) line("typeReference", () -> el(r.getTypeReference()));
@@ -417,6 +434,9 @@ public class GetterOracle {
         line("destructuringDeclaration", () -> el(p.getDestructuringDeclaration()));
         line("isLoopParameter", () -> "" + p.isLoopParameter());
         line("isCatchParameter", () -> "" + p.isCatchParameter());
+        line("isContextParameter", () -> "" + p.isContextParameter());
+        line("isLambdaParameter", () -> "" + p.isLambdaParameter());
+        line("isFunctionTypeParameter", () -> "" + p.isFunctionTypeParameter());
       }
       if (e instanceof KtTypeAlias ta) {
         line("typeReference", () -> el(ta.getTypeReference()));
@@ -453,15 +473,16 @@ public class GetterOracle {
         line("qualifier", () -> el(ut.getQualifier()));
         line("referencedName", () -> str(ut.getReferencedName()));
         line("typeArgumentList", () -> el(ut.getTypeArgumentList()));
+        line("typeArguments", () -> els(ut.getTypeArguments()));
       }
       if (e instanceof KtFunctionType ft) {
         line("receiver", () -> el(ft.getReceiver()));
         line("receiverTypeReference", () -> el(ft.getReceiverTypeReference()));
         line("parameterList", () -> el(ft.getParameterList()));
+        line("parameters", () -> els(ft.getParameters()));
         line("returnTypeReference", () -> el(ft.getReturnTypeReference()));
       }
-      if (e instanceof KtNameReferenceExpression || e instanceof KtEnumEntrySuperclassReferenceExpression) {
-        KtSimpleNameExpression s = (KtSimpleNameExpression) e;
+      if (e instanceof KtSimpleNameExpression s) {
         line("referencedName", () -> str(s.getReferencedName()));
         line("referencedNameElement", () -> el(s.getReferencedNameElement()));
       }
@@ -493,6 +514,7 @@ public class GetterOracle {
       if (e instanceof KtValueArgument va) {
         line("argumentExpression", () -> el(va.getArgumentExpression()));
         line("argumentName", () -> el(va.getArgumentName()));
+        line("isNamed", () -> "" + va.isNamed());
         line("isSpread", () -> "" + va.isSpread());
       }
       if (e instanceof KtLambdaArgument la) line("lambdaExpression", () -> el(la.getLambdaExpression()));

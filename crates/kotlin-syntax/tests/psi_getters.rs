@@ -291,3 +291,286 @@ fn every_getter(tree: &Tree, e: kotlin_syntax::NodeId) {
     node(kt_lambda_argument_get_lambda_expression(tree, e));
     node(kt_lambda_expression_get_function_literal(tree, e));
 }
+
+/// A modifier list whose parent is no `KtModifierListOwner` belongs to no owner: the dangling `private @A` left in a
+/// class body or at the end of the file, and the `companion` of a companion block (`KtClassBody`, `KtCompanionBlock`
+/// and `KtFile` have no modifier list), so the modifier getters of the node that holds it answer nothing. The oracle
+/// prints those getters only for owners, so this is checked here.
+#[test]
+fn a_dangling_modifier_list_has_no_owner() {
+    use kotlin_syntax::NodeKind::{CLASS_BODY, COMPANION_BLOCK, KT_FILE, MODIFIER_LIST};
+    use kotlin_syntax::psi::*;
+    use kotlin_syntax::tokens::TokenKind::{COMPANION_KEYWORD, PRIVATE_KEYWORD};
+    let text = "class C {\n    companion {\n        private @A\n    }\n    private @B\n}\nprivate @C\n";
+    let tree = Tree::parse(text, FileKind::Kt);
+    let mut holders = Vec::new();
+    for id in tree.descendants(tree.root()) {
+        if tree.node_kind(id) != Some(MODIFIER_LIST) {
+            continue;
+        }
+        let parent = tree.parent(id).expect("a modifier list has a parent");
+        holders.push(tree.node_kind(parent));
+        assert_eq!(get_modifier_list(&tree, parent), None);
+        assert!(!has_modifier(&tree, parent, PRIVATE_KEYWORD));
+        assert!(!has_modifier(&tree, parent, COMPANION_KEYWORD));
+        assert!(!is_private(&tree, parent));
+        assert_eq!(visibility_modifier_type(&tree, parent), None);
+        assert_eq!(modality_modifier(&tree, parent), None);
+        if tree.node_kind(parent) != Some(KT_FILE) {
+            assert_eq!(get_annotation_entries(&tree, parent).count(), 0);
+        }
+        // The list itself still answers as a `KtModifierList`.
+        let companion = tree.node_kind(parent) == Some(COMPANION_BLOCK);
+        assert!(kt_modifier_list_has_modifier(&tree, id, if companion { COMPANION_KEYWORD } else { PRIVATE_KEYWORD }));
+        assert_eq!(kt_modifier_list_get_annotation_entries(&tree, id).count(), usize::from(!companion));
+    }
+    assert_eq!(holders, [Some(COMPANION_BLOCK), Some(CLASS_BODY), Some(CLASS_BODY), Some(KT_FILE)]);
+}
+
+/// A `kt_<class>_` method answers nothing for a node of another class (Java's types would not let it be called
+/// there), on every node of every golden: `kt_parameter_get_default_value` of a property is not its initializer,
+/// `kt_property_accessor_is_getter` of the `get` of `@get:A` is false. Each also answers on a node of its own class
+/// somewhere, so the check is not vacuous.
+#[test]
+fn a_class_method_answers_nothing_on_another_class() {
+    use kotlin_syntax::NodeKind::{self, *};
+    use kotlin_syntax::psi::*;
+    use kotlin_syntax::tokens::TokenKind::{DATA_KEYWORD, PRIVATE_KEYWORD};
+    type Check = (&'static str, &'static [NodeKind], fn(&Tree, kotlin_syntax::NodeId) -> bool);
+    const CO: &[NodeKind] = &[CLASS, ENUM_ENTRY, OBJECT_DECLARATION];
+    const KT_CLASS: &[NodeKind] = &[CLASS, ENUM_ENTRY];
+    const ENTRY: &[NodeKind] = &[DELEGATED_SUPER_TYPE_ENTRY, SUPER_TYPE_CALL_ENTRY, SUPER_TYPE_ENTRY];
+    const ARGUMENT: &[NodeKind] = &[VALUE_ARGUMENT, LAMBDA_ARGUMENT];
+    const QUALIFIED: &[NodeKind] = &[DOT_QUALIFIED_EXPRESSION, SAFE_ACCESS_EXPRESSION];
+    let checks: &[Check] = &[
+        ("kt_modifier_list_has_modifier", &[MODIFIER_LIST], |t, e| {
+            kt_modifier_list_has_modifier(t, e, PRIVATE_KEYWORD)
+        }),
+        ("kt_modifier_list_get_modifier", &[MODIFIER_LIST], |t, e| {
+            kt_modifier_list_get_modifier(t, e, DATA_KEYWORD).is_some()
+        }),
+        ("kt_modifier_list_get_annotations", &[MODIFIER_LIST], |t, e| {
+            kt_modifier_list_get_annotations(t, e).next().is_some()
+        }),
+        ("kt_modifier_list_get_annotation_entries", &[MODIFIER_LIST], |t, e| {
+            kt_modifier_list_get_annotation_entries(t, e).next().is_some()
+        }),
+        ("kt_modifier_list_visibility_modifier", &[MODIFIER_LIST], |t, e| {
+            kt_modifier_list_visibility_modifier(t, e).is_some()
+        }),
+        ("kt_file_get_file_annotation_list", &[KT_FILE], |t, e| kt_file_get_file_annotation_list(t, e).is_some()),
+        ("kt_annotation_get_entries", &[ANNOTATION], |t, e| kt_annotation_get_entries(t, e).next().is_some()),
+        ("kt_annotation_get_use_site_target", &[ANNOTATION], |t, e| kt_annotation_get_use_site_target(t, e).is_some()),
+        ("kt_annotation_entry_get_type_reference", &[ANNOTATION_ENTRY], |t, e| {
+            kt_annotation_entry_get_type_reference(t, e).is_some()
+        }),
+        ("kt_annotation_entry_get_at_symbol", &[ANNOTATION_ENTRY], |t, e| {
+            kt_annotation_entry_get_at_symbol(t, e).is_some()
+        }),
+        ("kt_annotation_entry_get_use_site_target", &[ANNOTATION_ENTRY], |t, e| {
+            kt_annotation_entry_get_use_site_target(t, e).is_some()
+        }),
+        ("kt_annotation_entry_get_short_name", &[ANNOTATION_ENTRY], |t, e| {
+            kt_annotation_entry_get_short_name(t, e).is_some()
+        }),
+        ("kt_annotation_use_site_target_get_annotation_use_site_target", &[ANNOTATION_TARGET], |t, e| {
+            kt_annotation_use_site_target_get_annotation_use_site_target(t, e).is_some()
+        }),
+        ("kt_constructor_get_containing_class_or_object", &[PRIMARY_CONSTRUCTOR, SECONDARY_CONSTRUCTOR], |t, e| {
+            kt_constructor_get_containing_class_or_object(t, e).is_some()
+        }),
+        ("kt_class_body_containing_class_or_object", &[CLASS_BODY], |t, e| {
+            kt_class_body_containing_class_or_object(t, e).is_some()
+        }),
+        ("kt_class_or_object_is_top_level", CO, kt_class_or_object_is_top_level),
+        ("kt_class_or_object_is_data", CO, kt_class_or_object_is_data),
+        ("kt_class_or_object_is_annotation", CO, kt_class_or_object_is_annotation),
+        ("kt_class_or_object_get_declaration_keyword", CO, |t, e| {
+            kt_class_or_object_get_declaration_keyword(t, e).is_some()
+        }),
+        ("kt_class_or_object_get_super_type_list", CO, |t, e| kt_class_or_object_get_super_type_list(t, e).is_some()),
+        ("kt_class_or_object_get_super_type_list_entries", CO, |t, e| {
+            kt_class_or_object_get_super_type_list_entries(t, e).next().is_some()
+        }),
+        ("kt_class_or_object_get_body", CO, |t, e| kt_class_or_object_get_body(t, e).is_some()),
+        ("kt_class_or_object_get_primary_constructor", CO, |t, e| {
+            kt_class_or_object_get_primary_constructor(t, e).is_some()
+        }),
+        ("kt_class_or_object_get_primary_constructor_parameters", CO, |t, e| {
+            kt_class_or_object_get_primary_constructor_parameters(t, e).next().is_some()
+        }),
+        ("kt_class_or_object_get_secondary_constructors", CO, |t, e| {
+            kt_class_or_object_get_secondary_constructors(t, e).next().is_some()
+        }),
+        ("kt_super_type_list_get_entries", &[SUPER_TYPE_LIST, INITIALIZER_LIST], |t, e| {
+            kt_super_type_list_get_entries(t, e).next().is_some()
+        }),
+        ("kt_class_is_interface", KT_CLASS, kt_class_is_interface),
+        ("kt_class_is_enum", KT_CLASS, kt_class_is_enum),
+        ("kt_class_is_sealed", KT_CLASS, kt_class_is_sealed),
+        ("kt_class_is_inner", KT_CLASS, kt_class_is_inner),
+        ("kt_class_is_inline", KT_CLASS, kt_class_is_inline),
+        ("kt_class_is_value", KT_CLASS, kt_class_is_value),
+        ("kt_class_get_fun_keyword", KT_CLASS, |t, e| kt_class_get_fun_keyword(t, e).is_some()),
+        ("kt_object_declaration_is_companion", &[OBJECT_DECLARATION], kt_object_declaration_is_companion),
+        ("kt_object_declaration_is_object_literal", &[OBJECT_DECLARATION], kt_object_declaration_is_object_literal),
+        ("kt_object_declaration_get_object_keyword", &[OBJECT_DECLARATION], |t, e| {
+            kt_object_declaration_get_object_keyword(t, e).is_some()
+        }),
+        ("kt_super_type_list_entry_get_type_as_user_type", ENTRY, |t, e| {
+            kt_super_type_list_entry_get_type_as_user_type(t, e).is_some()
+        }),
+        ("kt_named_function_is_local", &[FUN], kt_named_function_is_local),
+        ("kt_named_function_is_anonymous", &[FUN], kt_named_function_is_anonymous),
+        ("kt_named_function_is_top_level", &[FUN], kt_named_function_is_top_level),
+        ("kt_property_is_top_level", &[PROPERTY], kt_property_is_top_level),
+        ("kt_property_is_member", &[PROPERTY], kt_property_is_member),
+        ("kt_property_is_local", &[PROPERTY], kt_property_is_local),
+        ("kt_property_get_delegate_expression", &[PROPERTY], |t, e| {
+            kt_property_get_delegate_expression(t, e).is_some()
+        }),
+        ("kt_property_get_accessors", &[PROPERTY], |t, e| kt_property_get_accessors(t, e).next().is_some()),
+        ("kt_property_accessor_is_getter", &[PROPERTY_ACCESSOR], kt_property_accessor_is_getter),
+        ("kt_property_accessor_is_setter", &[PROPERTY_ACCESSOR], kt_property_accessor_is_setter),
+        ("kt_parameter_get_default_value", &[VALUE_PARAMETER], |t, e| kt_parameter_get_default_value(t, e).is_some()),
+        ("kt_parameter_is_mutable", &[VALUE_PARAMETER], kt_parameter_is_mutable),
+        ("kt_parameter_is_var_arg", &[VALUE_PARAMETER], kt_parameter_is_var_arg),
+        ("kt_parameter_has_val_or_var", &[VALUE_PARAMETER], kt_parameter_has_val_or_var),
+        ("kt_parameter_get_destructuring_declaration", &[VALUE_PARAMETER], |t, e| {
+            kt_parameter_get_destructuring_declaration(t, e).is_some()
+        }),
+        ("kt_parameter_is_loop_parameter", &[VALUE_PARAMETER], kt_parameter_is_loop_parameter),
+        ("kt_parameter_is_catch_parameter", &[VALUE_PARAMETER], kt_parameter_is_catch_parameter),
+        ("kt_parameter_is_context_parameter", &[VALUE_PARAMETER], kt_parameter_is_context_parameter),
+        ("kt_parameter_is_lambda_parameter", &[VALUE_PARAMETER], kt_parameter_is_lambda_parameter),
+        ("kt_parameter_is_function_type_parameter", &[VALUE_PARAMETER], kt_parameter_is_function_type_parameter),
+        ("kt_type_alias_is_top_level", &[TYPEALIAS], kt_type_alias_is_top_level),
+        ("kt_type_parameter_get_extends_bound", &[TYPE_PARAMETER], |t, e| {
+            kt_type_parameter_get_extends_bound(t, e).is_some()
+        }),
+        ("kt_type_constraint_get_subject_type_parameter_name", &[TYPE_CONSTRAINT], |t, e| {
+            kt_type_constraint_get_subject_type_parameter_name(t, e).is_some()
+        }),
+        ("kt_type_constraint_get_bound_type_reference", &[TYPE_CONSTRAINT], |t, e| {
+            kt_type_constraint_get_bound_type_reference(t, e).is_some()
+        }),
+        ("kt_destructuring_declaration_get_entries", &[DESTRUCTURING_DECLARATION], |t, e| {
+            kt_destructuring_declaration_get_entries(t, e).next().is_some()
+        }),
+        ("kt_type_reference_get_type_element", &[TYPE_REFERENCE], |t, e| {
+            kt_type_reference_get_type_element(t, e).is_some()
+        }),
+        ("kt_type_reference_has_parentheses", &[TYPE_REFERENCE], kt_type_reference_has_parentheses),
+        ("kt_nullable_type_get_inner_type", &[NULLABLE_TYPE], |t, e| kt_nullable_type_get_inner_type(t, e).is_some()),
+        ("unwrap_nullability", &[USER_TYPE, NULLABLE_TYPE, FUNCTION_TYPE, DYNAMIC_TYPE, INTERSECTION_TYPE], |t, e| {
+            unwrap_nullability(t, e).is_some()
+        }),
+        ("kt_user_type_get_reference_expression", &[USER_TYPE], |t, e| {
+            kt_user_type_get_reference_expression(t, e).is_some()
+        }),
+        ("kt_user_type_get_qualifier", &[USER_TYPE], |t, e| kt_user_type_get_qualifier(t, e).is_some()),
+        ("kt_user_type_get_type_arguments", &[USER_TYPE], |t, e| {
+            kt_user_type_get_type_arguments(t, e).next().is_some()
+        }),
+        ("kt_function_type_get_receiver", &[FUNCTION_TYPE], |t, e| kt_function_type_get_receiver(t, e).is_some()),
+        ("kt_function_type_get_parameters", &[FUNCTION_TYPE], |t, e| {
+            kt_function_type_get_parameters(t, e).next().is_some()
+        }),
+        ("kt_function_type_get_return_type_reference", &[FUNCTION_TYPE], |t, e| {
+            kt_function_type_get_return_type_reference(t, e).is_some()
+        }),
+        ("kt_import_directive_get_imported_reference", &[IMPORT_DIRECTIVE], |t, e| {
+            kt_import_directive_get_imported_reference(t, e).is_some()
+        }),
+        ("kt_import_directive_get_alias_name", &[IMPORT_DIRECTIVE], |t, e| {
+            kt_import_directive_get_alias_name(t, e).is_some()
+        }),
+        ("kt_import_directive_is_all_under", &[IMPORT_DIRECTIVE], kt_import_directive_is_all_under),
+        ("kt_import_directive_get_imported_fq_name", &[IMPORT_DIRECTIVE], |t, e| {
+            kt_import_directive_get_imported_fq_name(t, e).is_some()
+        }),
+        ("kt_qualified_expression_get_receiver_expression", QUALIFIED, |t, e| {
+            kt_qualified_expression_get_receiver_expression(t, e).is_some()
+        }),
+        ("kt_qualified_expression_get_selector_expression", QUALIFIED, |t, e| {
+            kt_qualified_expression_get_selector_expression(t, e).is_some()
+        }),
+        ("kt_value_argument_get_argument_expression", ARGUMENT, |t, e| {
+            kt_value_argument_get_argument_expression(t, e).is_some()
+        }),
+        ("kt_value_argument_is_named", ARGUMENT, kt_value_argument_is_named),
+        ("kt_value_argument_is_spread", ARGUMENT, kt_value_argument_is_spread),
+        ("kt_lambda_argument_get_lambda_expression", &[LAMBDA_ARGUMENT], |t, e| {
+            kt_lambda_argument_get_lambda_expression(t, e).is_some()
+        }),
+        ("kt_lambda_expression_get_function_literal", &[LAMBDA_EXPRESSION], |t, e| {
+            kt_lambda_expression_get_function_literal(t, e).is_some()
+        }),
+        (
+            "containing_class_or_object",
+            &[
+                BACKING_FIELD,
+                CLASS,
+                CLASS_INITIALIZER,
+                DESTRUCTURING_DECLARATION,
+                DESTRUCTURING_DECLARATION_ENTRY,
+                ENUM_ENTRY,
+                FUN,
+                FUNCTION_LITERAL,
+                OBJECT_DECLARATION,
+                PRIMARY_CONSTRUCTOR,
+                PROPERTY,
+                PROPERTY_ACCESSOR,
+                SCRIPT,
+                SCRIPT_INITIALIZER,
+                SECONDARY_CONSTRUCTOR,
+                TYPEALIAS,
+                TYPE_PARAMETER,
+                VALUE_PARAMETER,
+            ],
+            |t, e| containing_class_or_object(t, e).is_some(),
+        ),
+        (
+            "containing_script",
+            &[
+                BACKING_FIELD,
+                CLASS,
+                CLASS_INITIALIZER,
+                DESTRUCTURING_DECLARATION,
+                DESTRUCTURING_DECLARATION_ENTRY,
+                ENUM_ENTRY,
+                FUN,
+                FUNCTION_LITERAL,
+                OBJECT_DECLARATION,
+                PRIMARY_CONSTRUCTOR,
+                PROPERTY,
+                PROPERTY_ACCESSOR,
+                SCRIPT,
+                SCRIPT_INITIALIZER,
+                SECONDARY_CONSTRUCTOR,
+                TYPEALIAS,
+                TYPE_PARAMETER,
+                VALUE_PARAMETER,
+            ],
+            |t, e| containing_script(t, e).is_some(),
+        ),
+    ];
+    let mut answered = vec![false; checks.len()];
+    for golden in common::goldens() {
+        let text = std::fs::read(&golden.source).expect("read the golden");
+        let tree = Tree::parse(&text, FileKind::from_file_name(&golden.name));
+        for id in tree.descendants(tree.root()) {
+            let Some(kind) = tree.node_kind(id) else { continue };
+            for (i, (name, kinds, answers)) in checks.iter().enumerate() {
+                let answer = answers(&tree, id);
+                if kinds.contains(&kind) {
+                    answered[i] |= answer;
+                } else {
+                    assert!(!answer, "{name} answers on a {kind:?} of {}", golden.name);
+                }
+            }
+        }
+    }
+    let silent: Vec<&str> = checks.iter().zip(&answered).filter(|(_, a)| !**a).map(|(c, _)| c.0).collect();
+    assert!(silent.is_empty(), "never answer on their own class in the goldens: {silent:?}");
+}

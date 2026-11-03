@@ -4,6 +4,8 @@
 0..0 PACKAGE_DIRECTIVE modifiers=[]
 0..0 PACKAGE_DIRECTIVE visibilityModifier=null
 0..0 PACKAGE_DIRECTIVE visibilityModifierType=null
+0..0 PACKAGE_DIRECTIVE isPrivate=false
+0..0 PACKAGE_DIRECTIVE isProtected=false
 0..0 PACKAGE_DIRECTIVE annotationEntries=[]
 0..21 IMPORT_DIRECTIVE importedReference=DOT_QUALIFIED_EXPRESSION@7..16
 0..21 IMPORT_DIRECTIVE alias=IMPORT_ALIAS@17..21

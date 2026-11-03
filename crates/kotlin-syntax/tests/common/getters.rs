@@ -93,6 +93,8 @@ const TYPE_PARAMETER_LIST_OWNER: &[NodeKind] = &[
 const TYPE_ELEMENT: &[NodeKind] = &[DYNAMIC_TYPE, FUNCTION_TYPE, INTERSECTION_TYPE, NULLABLE_TYPE, USER_TYPE];
 const CALL_ELEMENT: &[NodeKind] =
     &[ANNOTATION_ENTRY, CALL_EXPRESSION, CONSTRUCTOR_DELEGATION_CALL, SUPER_TYPE_CALL_ENTRY];
+const SIMPLE_NAME_EXPRESSION: &[NodeKind] =
+    &[ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION, LABEL, OPERATION_REFERENCE, REFERENCE_EXPRESSION];
 const QUALIFIED: &[NodeKind] = &[DOT_QUALIFIED_EXPRESSION, SAFE_ACCESS_EXPRESSION];
 const VALUE_ARGUMENT_KINDS: &[NodeKind] = &[VALUE_ARGUMENT, LAMBDA_ARGUMENT];
 
@@ -165,9 +167,21 @@ impl Printer<'_> {
             self.line("modifiers", format!("[{}]", modifiers.join(",")));
             self.line("visibilityModifier", self.el(visibility_modifier(t, e)));
             self.line("visibilityModifierType", Self::str(visibility_modifier_type(t, e).map(|k| k.debug_name())));
+            self.line("isPrivate", is_private(t, e));
+            self.line("isProtected", is_protected(t, e));
         }
         if is(DECLARATION) {
+            self.line("modalityModifier", self.el(modality_modifier(t, e)));
             self.line("modalityModifierType", Self::str(modality_modifier_type(t, e).map(|k| k.debug_name())));
+            self.line("containingClassOrObject", self.el(containing_class_or_object(t, e)));
+            self.line("containingScript", self.el(containing_script(t, e)));
+            self.line("containingClassOrScript", self.el(containing_class_or_script(t, e)));
+        }
+        if kind == Some(CLASS_BODY) {
+            self.line("containingClassOrObject", self.el(kt_class_body_containing_class_or_object(t, e)));
+        }
+        if matches!(kind, Some(PRIMARY_CONSTRUCTOR | SECONDARY_CONSTRUCTOR)) {
+            self.line("containingClassOrObject", self.el(kt_constructor_get_containing_class_or_object(t, e)));
         }
         if owner || is(ANNOTATED_EXTRA) {
             self.line("annotationEntries", self.els(get_annotation_entries(t, e)));
@@ -207,6 +221,10 @@ impl Printer<'_> {
             self.line("body", self.el(kt_class_or_object_get_body(t, e)));
             self.line("primaryConstructor", self.el(kt_class_or_object_get_primary_constructor(t, e)));
             self.line(
+                "primaryConstructorParameterList",
+                self.el(kt_class_or_object_get_primary_constructor_parameter_list(t, e)),
+            );
+            self.line(
                 "primaryConstructorParameters",
                 self.els(kt_class_or_object_get_primary_constructor_parameters(t, e)),
             );
@@ -224,6 +242,7 @@ impl Printer<'_> {
         if kind == Some(OBJECT_DECLARATION) {
             self.line("isCompanion", kt_object_declaration_is_companion(t, e));
             self.line("isObjectLiteral", kt_object_declaration_is_object_literal(t, e));
+            self.line("objectKeyword", self.el(kt_object_declaration_get_object_keyword(t, e)));
         }
         if is(SUPER_TYPE_LIST_ENTRY) {
             self.line("typeReference", self.el(get_type_reference(t, e)));
@@ -270,6 +289,13 @@ impl Printer<'_> {
             self.line("valueParameters", self.els(get_value_parameters(t, e)));
             self.line("initializer", self.el(get_initializer(t, e)));
         }
+        if kind == Some(BACKING_FIELD) {
+            self.line("typeReference", self.el(get_type_reference(t, e)));
+            self.line("initializer", self.el(get_initializer(t, e)));
+        }
+        if kind == Some(IS_EXPRESSION) {
+            self.line("typeReference", self.el(get_type_reference(t, e)));
+        }
         if matches!(kind, Some(TYPE_PROJECTION | CONSTRUCTOR_CALLEE | FUNCTION_TYPE_RECEIVER)) {
             self.line("typeReference", self.el(get_type_reference(t, e)));
         }
@@ -283,6 +309,9 @@ impl Printer<'_> {
             self.line("destructuringDeclaration", self.el(kt_parameter_get_destructuring_declaration(t, e)));
             self.line("isLoopParameter", kt_parameter_is_loop_parameter(t, e));
             self.line("isCatchParameter", kt_parameter_is_catch_parameter(t, e));
+            self.line("isContextParameter", kt_parameter_is_context_parameter(t, e));
+            self.line("isLambdaParameter", kt_parameter_is_lambda_parameter(t, e));
+            self.line("isFunctionTypeParameter", kt_parameter_is_function_type_parameter(t, e));
         }
         if kind == Some(TYPEALIAS) {
             self.line("typeReference", self.el(get_type_reference(t, e)));
@@ -323,14 +352,16 @@ impl Printer<'_> {
             self.line("qualifier", self.el(kt_user_type_get_qualifier(t, e)));
             self.line("referencedName", Self::str(get_referenced_name(t, e).as_deref()));
             self.line("typeArgumentList", self.el(get_type_argument_list(t, e)));
+            self.line("typeArguments", self.els(kt_user_type_get_type_arguments(t, e)));
         }
         if kind == Some(FUNCTION_TYPE) {
             self.line("receiver", self.el(kt_function_type_get_receiver(t, e)));
             self.line("receiverTypeReference", self.el(get_receiver_type_reference(t, e)));
             self.line("parameterList", self.el(kt_function_type_get_parameter_list(t, e)));
+            self.line("parameters", self.els(kt_function_type_get_parameters(t, e)));
             self.line("returnTypeReference", self.el(kt_function_type_get_return_type_reference(t, e)));
         }
-        if matches!(kind, Some(REFERENCE_EXPRESSION | ENUM_ENTRY_SUPERCLASS_REFERENCE_EXPRESSION)) {
+        if is(SIMPLE_NAME_EXPRESSION) {
             self.line("referencedName", Self::str(get_referenced_name(t, e).as_deref()));
             self.line("referencedNameElement", self.el(get_referenced_name_element(t, e)));
         }
@@ -355,6 +386,7 @@ impl Printer<'_> {
         if is(VALUE_ARGUMENT_KINDS) {
             self.line("argumentExpression", self.el(kt_value_argument_get_argument_expression(t, e)));
             self.line("argumentName", self.el(kt_value_argument_get_argument_name(t, e)));
+            self.line("isNamed", kt_value_argument_is_named(t, e));
             self.line("isSpread", kt_value_argument_is_spread(t, e));
         }
         if kind == Some(LAMBDA_ARGUMENT) {

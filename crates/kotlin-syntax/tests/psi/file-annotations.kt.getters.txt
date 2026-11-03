@@ -16,6 +16,8 @@
 6..13 TYPE_REFERENCE modifiers=[]
 6..13 TYPE_REFERENCE visibilityModifier=null
 6..13 TYPE_REFERENCE visibilityModifierType=null
+6..13 TYPE_REFERENCE isPrivate=false
+6..13 TYPE_REFERENCE isProtected=false
 6..13 TYPE_REFERENCE annotationEntries=[]
 6..13 TYPE_REFERENCE typeElement=USER_TYPE@6..13
 6..13 TYPE_REFERENCE hasParentheses=false
@@ -24,11 +26,13 @@
 6..13 USER_TYPE qualifier=null
 6..13 USER_TYPE referencedName="JvmName"
 6..13 USER_TYPE typeArgumentList=null
+6..13 USER_TYPE typeArguments=[]
 6..13 REFERENCE_EXPRESSION expression=true
 6..13 REFERENCE_EXPRESSION referencedName="JvmName"
 6..13 REFERENCE_EXPRESSION referencedNameElement=IDENTIFIER@6..13
 14..17 VALUE_ARGUMENT argumentExpression=STRING_TEMPLATE@14..17
 14..17 VALUE_ARGUMENT argumentName=null
+14..17 VALUE_ARGUMENT isNamed=false
 14..17 VALUE_ARGUMENT isSpread=false
 14..17 STRING_TEMPLATE expression=true
 19..30 ANNOTATION entries=[ANNOTATION_ENTRY@26..27,ANNOTATION_ENTRY@28..29]
@@ -49,6 +53,8 @@
 26..27 TYPE_REFERENCE modifiers=[]
 26..27 TYPE_REFERENCE visibilityModifier=null
 26..27 TYPE_REFERENCE visibilityModifierType=null
+26..27 TYPE_REFERENCE isPrivate=false
+26..27 TYPE_REFERENCE isProtected=false
 26..27 TYPE_REFERENCE annotationEntries=[]
 26..27 TYPE_REFERENCE typeElement=USER_TYPE@26..27
 26..27 TYPE_REFERENCE hasParentheses=false
@@ -57,6 +63,7 @@
 26..27 USER_TYPE qualifier=null
 26..27 USER_TYPE referencedName="B"
 26..27 USER_TYPE typeArgumentList=null
+26..27 USER_TYPE typeArguments=[]
 26..27 REFERENCE_EXPRESSION expression=true
 26..27 REFERENCE_EXPRESSION referencedName="B"
 26..27 REFERENCE_EXPRESSION referencedNameElement=IDENTIFIER@26..27
@@ -75,6 +82,8 @@
 28..29 TYPE_REFERENCE modifiers=[]
 28..29 TYPE_REFERENCE visibilityModifier=null
 28..29 TYPE_REFERENCE visibilityModifierType=null
+28..29 TYPE_REFERENCE isPrivate=false
+28..29 TYPE_REFERENCE isProtected=false
 28..29 TYPE_REFERENCE annotationEntries=[]
 28..29 TYPE_REFERENCE typeElement=USER_TYPE@28..29
 28..29 TYPE_REFERENCE hasParentheses=false
@@ -83,6 +92,7 @@
 28..29 USER_TYPE qualifier=null
 28..29 USER_TYPE referencedName="C"
 28..29 USER_TYPE typeArgumentList=null
+28..29 USER_TYPE typeArguments=[]
 28..29 REFERENCE_EXPRESSION expression=true
 28..29 REFERENCE_EXPRESSION referencedName="C"
 28..29 REFERENCE_EXPRESSION referencedNameElement=IDENTIFIER@28..29
@@ -90,6 +100,8 @@
 31..40 PACKAGE_DIRECTIVE modifiers=[]
 31..40 PACKAGE_DIRECTIVE visibilityModifier=null
 31..40 PACKAGE_DIRECTIVE visibilityModifierType=null
+31..40 PACKAGE_DIRECTIVE isPrivate=false
+31..40 PACKAGE_DIRECTIVE isProtected=false
 31..40 PACKAGE_DIRECTIVE annotationEntries=[]
 39..40 REFERENCE_EXPRESSION expression=true
 39..40 REFERENCE_EXPRESSION referencedName="p"
