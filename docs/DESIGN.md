@@ -419,9 +419,11 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   a null slot is stored as `Green::NULL`, so slots are where Syntax.xml puts them (the generator flattens its
   `Choice` and `Sequence` fields as `TreeFlattening.FlattenChildren` does). A token record holds its kind and
   contextual kind, flags, its text, its leading and trailing trivia (runs of `Trivia` in a shared array) with their
-  widths, its diagnostics and an optional value; a node or list record its kind, flags, slots (a run of a shared
-  `Vec<Green>`), full width, diagnostics and the node type's boolean fields; a trivia record its kind and text, or the
-  node of its structure (a directive, a documentation comment, skipped tokens). A token's text is a range of the
+  widths (44 bytes); a node or list record its kind, flags, slots (a run of a shared `Vec<Green>`) and full width (20
+  bytes); a trivia record its kind and text, or the node of its structure (a directive, a documentation comment,
+  skipped tokens) in the text's place (16 bytes). What few records have, an element's diagnostics, a token's value and
+  a node type's boolean fields, is a `RareData` entry beside them, an index in the record (none: `NO_RARE`); a copy
+  shares its original's entry, and a record made with other rare fields pushes a new one, so no entry changes. A token's text is a range of the
   source, `SyntaxFacts.GetText(kind)` for a token made by kind (`SyntaxFactory.Token`, a merged `>>`), or a string the
   arena keeps; `ValueText` is kept only where it is not the text (an escaped identifier, `@`, a directive's string,
   an XML entity, a cref's brace), and the flattened tree keeps those values beside it (`Tree::value_text`). Flags
@@ -431,8 +433,12 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   trivia, a first or last token replaced) appends a new record; the old one stays, garbage, until the file ends. So a
   node a reset point or a scan saved is valid after any rollback without reference counts, exactly as Roslyn's
   immutable nodes are. The garbage is bounded: the corpora make 1.04-1.07 records per node of the finished tree and
-  10-17 bytes of records per source byte ("C# memory"); past `green::budget_for` (256 bytes a source byte, at least
-  256 MiB) the parse is abandoned as on an exhausted stack ("C# nesting and work").
+  10-17 bytes of records per source byte as the budget counts them ("C# memory"); past `green::budget_for` (256 bytes
+  a source byte, at least 256 MiB) the parse is abandoned as on an exhausted stack ("C# nesting and work"). The budget
+  charges a record the size it had when the budget was set (a token 52 bytes, a node 28, a trivia 24, whatever the
+  layout now; `GreenArena::record_bytes`) and is checked where buffers that started empty at the file's start would
+  grow (`BudgetMarks`), so where a parse is abandoned depends on the file alone, not on the layout or on the capacity
+  kept from earlier files. The records themselves take 44, 20 and 16 bytes.
 - **Buffers.** The arena, the token window, the trivia and list builders (`SyntaxListPool`), the directive store, the
   interpolated string and documentation comment parsers' buffers and the flattener's stacks belong to the `Parser`
   and are cleared, not freed, per file. The tree builder keeps nothing between files: the tree's columns are allocated
@@ -686,7 +692,7 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | No `unsafe`, no C toolchain, no large dependency tree | Consumers build it on every platform; any byte sequence must parse | `unsafe_code = "forbid"`; the only dependency is the optional `stats_alloc` |
 | C#: Roslyn's own lexer and parsers ported method by method, the oracle Roslyn itself | accio needs Roslyn's tree and its diagnostics' messages; a faithful port reproduces error recovery and speculation, which no grammar rewrite would | 7051 of 7051 goldens; 0 differing dumps on the four corpora at Latest and Preview, the 122 741 mutations at three versions and the 20 000 fuzz inputs at two (43519b4f, gated since 174ecb80) |
 | C#: a green arena flattened into `psi_builder`'s tree, not Roslyn's parser on `PsiBuilderImpl` | Roslyn builds bottom up, copies nodes and hangs trivia on tokens; flattening once keeps one consumer API for the three languages | the `TreeLanguage`/`TreeBuilder` split moved none of the 25 counters, `scripts/ab.sh` Kotlin B/A 1.017, Java 1.047 at load 16-20 (noise; 30d40a2f); flatten 13.6 % of a C# parse ("C# parse throughput and robustness") |
-| C#: records never change, a copy appends, garbage kept to the file's end | Roslyn's copy semantics exactly: a saved node stays valid after any reset, with no reference counts or collector | 1.04-1.07 records per tree node, 10-17 bytes of records per source byte on the corpora ("C# memory") |
+| C#: records never change, a copy appends, garbage kept to the file's end | Roslyn's copy semantics exactly: a saved node stays valid after any reset, with no reference counts or collector | 1.04-1.07 records per tree node, 10-17 bytes of records per source byte as the budget counts them on the corpora ("C# memory") |
 | C#: widths in bytes over a UTF-16 reading of the text | positions are the oracle's byte offsets with no second pass or UTF-16 copy; only the one sum Roslyn mixes is redone in UTF-16 | 0 differing lexer lines on every corpus since 7d7af22e; the last 10 fuzz differences were that sum (43519b4f) |
 | C#: TRAILING and MISSING bits in the shared `kinds` column | the token a trivia belongs to and an inserted token cannot be read off positions; two bits cost nothing per node | Kotlin and Java counters unchanged (30d40a2f); 12 bits of kind index hold C#'s 574 kinds |
 | C#: a depth counter, a work budget and an arena budget, failing as Roslyn's exhausted stack does | deterministic on any stack and machine, with the answer Roslyn itself gives at 100 000 levels; time and memory linear in the input | 153 forms 100 000 deep on 1 MB each under 220 ms; 26 forms compared at 100 000 levels equal Roslyn's tree (43ed5b13); no corpus tree reaches a bound (the gate) |

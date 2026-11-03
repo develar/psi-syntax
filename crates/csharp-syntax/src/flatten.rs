@@ -31,8 +31,8 @@ use psi_builder::{ColumnWriter, ElementType, NodeId, TreeBuilder};
 
 use crate::diagnostic;
 use crate::green::{
-    DiagnosticId, FIXED_TEXT, Green, GreenArena, IS_NOT_MISSING, NO_VALUE, OWNED_TEXT, Records, TAG_LIST, TAG_NODE,
-    TAG_TOKEN, Trivia,
+    DiagnosticId, FIXED_TEXT, Green, GreenArena, IS_NOT_MISSING, NO_RARE, OWNED_TEXT, Records, STRUCTURED, TAG_LIST,
+    TAG_NODE, TAG_TOKEN, Trivia,
 };
 use crate::language::CSharp;
 use crate::syntax_kind::{NodeKind, TokenKind};
@@ -480,15 +480,20 @@ impl Hot {
         let (kind, at, end, diags) = match green.tag() {
             TAG_NODE | TAG_LIST => {
                 let d = &r.nodes[green.index()];
-                (d.kind, d.slot_start, d.slot_start + d.slot_count, d.diags.len)
+                (
+                    d.kind,
+                    d.slot_start,
+                    d.slot_start + d.slot_count,
+                    d.rare != NO_RARE && walk.arena.has_diagnostics(green),
+                )
             }
             // a token as a structure: a composite of no children (`next_child`)
-            _ => (walk.arena.kind(green), 0, 0, walk.arena.diagnostics(green).len() as u32),
+            _ => (walk.arena.kind(green), 0, 0, walk.arena.has_diagnostics(green)),
         };
         let kind = kind.node_kind().unwrap_or(NodeKind::SkippedTokensTrivia);
         let parent = (parent != NONE).then_some(NodeId(parent));
         w.open(id, parent, ElementType::Node(kind), self.pos, trailing);
-        if diags != 0 {
+        if diags {
             walk.report_node(w, NodeId(id), self.pos, green);
         }
         Slots { at, end, parent: id, close: id, in_list: green.is_list() }
@@ -510,8 +515,8 @@ impl Hot {
                 let t = r.trivia_refs[run.at as usize];
                 run.at += 1;
                 let td = &r.trivia[t.0 as usize];
-                if !td.structure.is_null() {
-                    let structure = td.structure;
+                if td.flags & STRUCTURED != 0 {
+                    let structure = walk.arena.trivia_structure(t);
                     let next = self.open(walk, w, r, run.parent, structure, run.trailing);
                     stack.push(Fast::Trivia {
                         at: run.at,
@@ -529,7 +534,7 @@ impl Hot {
                 w.leaf(leaf, NodeId(run.parent), kind, start, end, run.trailing, false);
                 self.id += 1;
                 self.source_text(walk, start, td.start, td.width);
-                if td.diags.len != 0 {
+                if td.rare != NO_RARE {
                     walk.report_trivia(w, NodeId(leaf), start, t);
                 }
                 self.pos = end;
@@ -567,17 +572,18 @@ impl Hot {
         let leaf = self.id;
         w.leaf(leaf, parent, kind, start, end, false, d.flags & IS_NOT_MISSING == 0);
         self.id += 1;
-        if d.value != NO_VALUE {
-            walk.value(NodeId(leaf), green);
-        }
         if d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) == IS_NOT_MISSING {
             self.source_text(walk, start, d.start, d.width);
         } else {
             self.src_next = walk.own_token_text(self.src_next, start, end, green);
             self.diverged = walk.text.is_some();
         }
-        if d.diags.len != 0 {
-            walk.report_token(w, NodeId(leaf), start, green);
+        if d.rare != NO_RARE {
+            // a value, diagnostics or both
+            walk.value(NodeId(leaf), green);
+            if walk.arena.has_diagnostics(green) {
+                walk.report_token(w, NodeId(leaf), start, green);
+            }
         }
         self.pos = end;
     }
@@ -644,7 +650,7 @@ impl Walk<'_> {
     fn open(&mut self, builder: &mut TreeBuilder<CSharp>, parent: Option<NodeId>, green: Green) -> NodeId {
         let kind = self.arena.kind(green).node_kind().unwrap_or(NodeKind::SkippedTokensTrivia);
         let id = builder.open(parent, ElementType::Node(kind), self.position);
-        if self.arena.diagnostics(green).len() != 0 {
+        if self.arena.has_diagnostics(green) {
             let start = self.position.wrapping_add(self.arena.leading_trivia_width(green));
             let ids: Vec<DiagnosticId> = self.arena.diagnostics(green).collect();
             self.report(builder, id, start, &ids);
@@ -676,7 +682,7 @@ impl Walk<'_> {
                 }
             }
         }
-        if self.arena.diagnostics(green).len() != 0 {
+        if self.arena.has_diagnostics(green) {
             let ids: Vec<DiagnosticId> = self.arena.diagnostics(green).collect();
             self.report(builder, leaf, start, &ids);
         }

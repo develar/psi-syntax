@@ -185,6 +185,27 @@ pub(crate) const FIXED_TEXT: u16 = 1 << 14;
 
 pub(crate) const NO_VALUE: u32 = u32::MAX;
 
+/// No `RareData` (`TokenData::rare`, `NodeData::rare`, `TriviaData::rare`).
+pub(crate) const NO_RARE: u32 = u32::MAX;
+/// Not Roslyn's: a structured trivia, whose `TriviaData::start` holds its structure (a `Green`).
+pub(crate) const STRUCTURED: u16 = 1 << 15;
+
+/// What few records have, kept beside them so that the records stay small: an element's diagnostics, a token's
+/// value, a node's boolean fields. Records never change, and neither does a `RareData`: a copy of a record shares its
+/// entry, and a record made with other rare fields (`with_diag_list`, `set_token_value` of a token just made, ...)
+/// pushes a new one.
+#[derive(Copy, Clone, Debug)]
+pub(crate) struct RareData {
+    pub(crate) diags: DiagList,
+    /// The `ValueText` of an identifier or literal whose value is not its text (`@class`, `a`): an index into
+    /// `values`, or `NO_VALUE`.
+    pub(crate) value: u32,
+    /// The boolean fields of a node's type (`syntax::types::X::IS_ACTIVE`, ...).
+    pub(crate) extra: u32,
+}
+
+const NO_RARE_DATA: RareData = RareData { diags: DiagList { start: 0, len: 0 }, value: NO_VALUE, extra: 0 };
+
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct TokenData {
     pub(crate) kind: SyntaxKind,
@@ -198,10 +219,8 @@ pub(crate) struct TokenData {
     pub(crate) trailing: TriviaList,
     pub(crate) leading_width: u32,
     pub(crate) trailing_width: u32,
-    pub(crate) diags: DiagList,
-    /// The `ValueText` of an identifier or literal whose value is not its text (`@class`, `a`): an index into
-    /// `values`, or `NO_VALUE`.
-    pub(crate) value: u32,
+    /// Its diagnostics and value (`RareData`), or `NO_RARE`.
+    pub(crate) rare: u32,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -211,20 +230,19 @@ pub(crate) struct NodeData {
     pub(crate) slot_start: u32,
     pub(crate) slot_count: u32,
     pub(crate) full_width: u32,
-    pub(crate) diags: DiagList,
-    /// The boolean fields of the node type (`syntax::types::X::IS_ACTIVE`, ...).
-    pub(crate) extra: u32,
+    /// Its diagnostics and the node type's boolean fields (`RareData`), or `NO_RARE`.
+    pub(crate) rare: u32,
 }
 
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct TriviaData {
     pub(crate) kind: SyntaxKind,
     pub(crate) flags: u16,
+    /// The text's source offset, or the structure (a `Green`) of a structured trivia (`STRUCTURED`).
     pub(crate) start: u32,
     pub(crate) width: u32,
-    /// The structure of a structured trivia (a node), else null.
-    pub(crate) structure: Green,
-    pub(crate) diags: DiagList,
+    /// Its diagnostics (`RareData`), or `NO_RARE`.
+    pub(crate) rare: u32,
 }
 
 /// The green arena of one file: owned by a `Parser`, cleared per file.
@@ -238,6 +256,8 @@ pub struct GreenArena {
     diag_refs: Vec<u32>,
     diagnostics: Vec<DiagnosticInfo>,
     args: Vec<DiagArg>,
+    /// The `RareData` of the records that have any.
+    rares: Vec<RareData>,
     /// Strings the parser or lexer built: owned token texts, value texts, diagnostic arguments.
     strings: String,
     /// `(start, len)` in `strings` of each token value (`TokenData::value`).
@@ -246,6 +266,8 @@ pub struct GreenArena {
     stack: Vec<Green>,
     /// The most bytes of records one parse may hold (`set_budget`; 0: no bound).
     budget: usize,
+    /// Where the budget is checked next (`BudgetMarks`).
+    marks: BudgetMarks,
     /// Whether the buffers grew past `budget`, or the parsers' work past `work_budget`: the parser then abandons the
     /// parse (`SyntaxParser::current_token`).
     over_budget: bool,
@@ -265,6 +287,23 @@ struct GrowableTrivia {
     room: u32,
     width: u32,
     flags: u16,
+}
+
+/// The capacities the token, node and slot buffers would have had they started empty at the last `clear`. The budget
+/// is checked where such a buffer grows (`GreenArena::check_budget`), so where a parse is abandoned depends on the file
+/// alone, not on the capacity the buffers kept from an earlier file.
+#[derive(Copy, Clone, Debug, Default)]
+struct BudgetMarks {
+    tokens: usize,
+    nodes: usize,
+    slots: usize,
+}
+
+/// The capacity of a buffer of `capacity` grown to hold `required` elements: twice its capacity or what it needs, at
+/// least 4 (`Vec`'s amortized growth for elements of 2 to 1024 bytes).
+#[inline]
+fn grown_capacity(capacity: usize, required: usize) -> usize {
+    capacity.saturating_mul(2).max(required).max(4)
 }
 
 /// The length from which a trailing trivia list that grows gets room to grow in place (`append_trailing_trivia`).
@@ -355,8 +394,9 @@ impl GreenArena {
         self.over_budget
     }
 
-    /// Checks the budget when a buffer is about to grow. It counts the records of this parse (`record_bytes`), not the
-    /// capacity the buffers kept from a bigger file before (`clear`), which would abandon every later file.
+    /// Checks the budget where a buffer that started empty at `clear` would grow (`BudgetMarks`). It counts the records
+    /// of this parse (`record_bytes`), not the capacity the buffers kept from a bigger file before, which would abandon
+    /// every later file.
     #[cold]
     #[inline(never)]
     fn check_budget(&mut self) {
@@ -365,9 +405,54 @@ impl GreenArena {
         }
     }
 
+    /// Before a token is pushed: where a buffer grown from empty would grow (`BudgetMarks`), moves the mark and, with
+    /// `check`, checks the budget.
+    #[inline(always)]
+    fn token_mark(&mut self, check: bool) {
+        if self.tokens.len() == self.marks.tokens {
+            self.pass_token_mark(check);
+        }
+    }
+
+    #[cold]
+    #[inline(never)]
+    fn pass_token_mark(&mut self, check: bool) {
+        let len = self.tokens.len();
+        self.marks.tokens = grown_capacity(len, len + 1);
+        if check {
+            self.check_budget();
+        }
+    }
+
+    /// Before a node of `slots` slots is pushed: where buffers grown from empty would grow (`BudgetMarks`), moves the
+    /// marks and, with `check`, checks the budget.
+    #[inline(always)]
+    fn node_mark(&mut self, slots: usize, check: bool) {
+        // the slot mark is never below the slots' length: every slot push passes here
+        if self.nodes.len() == self.marks.nodes || self.marks.slots - self.slots.len() < slots {
+            self.pass_node_mark(slots, check);
+        }
+    }
+
+    #[cold]
+    #[inline(never)]
+    fn pass_node_mark(&mut self, slots: usize, check: bool) {
+        let (nodes, used) = (self.nodes.len(), self.slots.len());
+        if nodes == self.marks.nodes {
+            self.marks.nodes = grown_capacity(nodes, nodes + 1);
+        }
+        if self.marks.slots - used < slots {
+            self.marks.slots = grown_capacity(self.marks.slots, used + slots);
+        }
+        if check {
+            self.check_budget();
+        }
+    }
+
     /// Forgets every record, keeping the buffers.
     pub fn clear(&mut self) {
         self.over_budget = false;
+        self.marks = BudgetMarks::default();
         self.work = 0;
         self.tokens.clear();
         self.nodes.clear();
@@ -378,13 +463,14 @@ impl GreenArena {
         self.diag_refs.clear();
         self.diagnostics.clear();
         self.args.clear();
+        self.rares.clear();
         self.strings.clear();
         self.values.clear();
         self.stack.clear();
     }
 
     /// Each buffer's record count, capacity and record size.
-    fn buffers(&self) -> [(usize, usize, usize); 10] {
+    fn buffers(&self) -> [(usize, usize, usize); 11] {
         [
             (self.tokens.len(), self.tokens.capacity(), size_of::<TokenData>()),
             (self.nodes.len(), self.nodes.capacity(), size_of::<NodeData>()),
@@ -394,6 +480,7 @@ impl GreenArena {
             (self.diag_refs.len(), self.diag_refs.capacity(), size_of::<u32>()),
             (self.diagnostics.len(), self.diagnostics.capacity(), size_of::<DiagnosticInfo>()),
             (self.args.len(), self.args.capacity(), size_of::<DiagArg>()),
+            (self.rares.len(), self.rares.capacity(), size_of::<RareData>()),
             (self.strings.len(), self.strings.capacity(), 1),
             (self.values.len(), self.values.capacity(), size_of::<(u32, u32)>()),
         ]
@@ -417,15 +504,27 @@ impl GreenArena {
         shrink.vec(&mut self.diag_refs);
         shrink.vec(&mut self.diagnostics);
         shrink.vec(&mut self.args);
+        shrink.vec(&mut self.rares);
         shrink.string(&mut self.strings);
         shrink.vec(&mut self.values);
         shrink.vec(&mut self.stack);
         shrink.map(&mut self.growable);
     }
 
-    /// The bytes of the records since the last `clear`, garbage included (the budget's measure).
+    /// The bytes of the records since the last `clear`, garbage included (the budget's measure). Each record counts at
+    /// the size it had on a 64-bit target when the budget was set (25dac59f), so that a smaller layout does not move
+    /// where a parse is abandoned: a token 52 bytes, a node 28 and a trivia 24, their rare fields included (`RareData`
+    /// counts no further); a slot, a trivia reference and a diagnostic reference 4, a diagnostic 28, an argument 24, a
+    /// string byte 1, a value 8.
     fn record_bytes(&self) -> usize {
-        self.buffers().iter().map(|&(len, _, size)| len * size).sum()
+        self.tokens.len() * 52
+            + self.nodes.len() * 28
+            + self.trivia.len() * 24
+            + (self.slots.len() + self.trivia_refs.len() + self.diag_refs.len()) * 4
+            + self.diagnostics.len() * 28
+            + self.args.len() * 24
+            + self.strings.len()
+            + self.values.len() * 8
     }
 
     /// The number of records of each kind (tokens, nodes and lists, trivia) so far, garbage included.
@@ -445,6 +544,22 @@ impl GreenArena {
         self.strings.get(start as usize..(start as usize + len as usize)).unwrap_or("")
     }
 
+    /// The `RareData` of a record (`NO_RARE_DATA` for `NO_RARE`).
+    #[inline]
+    pub(crate) fn rare(&self, rare: u32) -> RareData {
+        self.rares.get(rare as usize).copied().unwrap_or(NO_RARE_DATA)
+    }
+
+    /// A new `RareData`: `NO_RARE` when it holds nothing.
+    fn push_rare(&mut self, data: RareData) -> u32 {
+        if data.diags.len == 0 && data.value == NO_VALUE && data.extra == 0 {
+            return NO_RARE;
+        }
+        let id = self.rares.len() as u32;
+        self.rares.push(data);
+        id
+    }
+
     // ---------------------------------------------------------------------------------------------------------------
     // Trivia
 
@@ -452,7 +567,7 @@ impl GreenArena {
     /// `EndOfLine`, `DisabledText`, ...).
     pub fn trivia(&mut self, kind: SyntaxKind, start: u32, width: u32) -> Trivia {
         let flags = if kind == SyntaxKind::PreprocessingMessageTrivia { CONTAINS_SKIPPED_TEXT } else { 0 };
-        self.push_trivia(TriviaData { kind, flags, start, width, structure: Green::NULL, diags: DiagList::default() })
+        self.push_trivia(TriviaData { kind, flags, start, width, rare: NO_RARE })
     }
 
     /// A structured trivia: the trivia whose structure is `node` (a directive, a documentation comment, a
@@ -461,20 +576,21 @@ impl GreenArena {
         let kind = self.kind(node);
         let flags = self.flags(node) & INHERIT_MASK;
         let width = self.full_width(node);
-        self.push_trivia(TriviaData { kind, flags, start: 0, width, structure: node, diags: DiagList::default() })
+        self.push_trivia(TriviaData { kind, flags: flags | STRUCTURED, start: node.0, width, rare: NO_RARE })
     }
 
     /// `trivia` with `diagnostics` (`WithDiagnosticsGreen` of a trivia): a new record. A structured trivia is its
     /// structure in Roslyn's green tree, so the structure gets them (a new node, then a new trivia over it).
     pub fn trivia_with_diagnostics(&mut self, trivia: Trivia, diagnostics: &[DiagnosticId]) -> Trivia {
         let mut data = self.trivia[trivia.0 as usize];
-        if !data.structure.is_null() {
-            let structure = self.with_diagnostics(data.structure, diagnostics);
+        if data.flags & STRUCTURED != 0 {
+            let structure = self.with_diagnostics(Green(data.start), diagnostics);
             return self.structured_trivia(structure);
         }
-        data.diags = self.push_diag_list(diagnostics.iter().map(|d| d.0));
+        let diags = self.push_diag_list(diagnostics.iter().map(|d| d.0));
+        data.rare = self.push_rare(RareData { diags, ..self.rare(data.rare) });
         data.flags &= !CONTAINS_DIAGNOSTICS;
-        if data.diags.len != 0 {
+        if diags.len != 0 {
             data.flags |= CONTAINS_DIAGNOSTICS;
         }
         self.push_trivia(data)
@@ -497,12 +613,14 @@ impl GreenArena {
 
     /// The source offset of an unstructured trivia's text.
     pub fn trivia_start(&self, trivia: Trivia) -> u32 {
-        self.trivia[trivia.0 as usize].start
+        let d = &self.trivia[trivia.0 as usize];
+        if d.flags & STRUCTURED != 0 { 0 } else { d.start }
     }
 
     /// `GetStructure()`: the node of a structured trivia, else null.
     pub fn trivia_structure(&self, trivia: Trivia) -> Green {
-        self.trivia[trivia.0 as usize].structure
+        let d = &self.trivia[trivia.0 as usize];
+        if d.flags & STRUCTURED != 0 { Green(d.start) } else { Green::NULL }
     }
 
     /// `IsSkippedTokensTrivia`.
@@ -516,7 +634,7 @@ impl GreenArena {
 
     /// The diagnostics attached to an unstructured trivia (a structured trivia's are its structure's).
     pub fn trivia_diagnostics(&self, trivia: Trivia) -> impl ExactSizeIterator<Item = DiagnosticId> + '_ {
-        self.diag_slice(self.trivia[trivia.0 as usize].diags).iter().map(|&d| DiagnosticId(d))
+        self.diag_slice(self.rare(self.trivia[trivia.0 as usize].rare).diags).iter().map(|&d| DiagnosticId(d))
     }
 
     /// A trivia list of `items` in order (`SyntaxListBuilder.ToListNode()` of trivia).
@@ -622,9 +740,7 @@ impl GreenArena {
         if own_flags & IS_NOT_MISSING == 0 {
             flags &= !IS_NOT_MISSING;
         }
-        if self.tokens.len() == self.tokens.capacity() {
-            self.check_budget();
-        }
+        self.token_mark(true);
         let id = Green::new(TAG_TOKEN, self.tokens.len());
         self.tokens.push(TokenData {
             kind,
@@ -636,8 +752,7 @@ impl GreenArena {
             trailing,
             leading_width,
             trailing_width,
-            diags: DiagList::default(),
-            value: NO_VALUE,
+            rare: NO_RARE,
         });
         id
     }
@@ -658,14 +773,7 @@ impl GreenArena {
             let width = (t & !crate::lexer::EOL_BIT) as u32;
             let kind =
                 if t & crate::lexer::EOL_BIT != 0 { SyntaxKind::EndOfLineTrivia } else { SyntaxKind::WhitespaceTrivia };
-            let id = self.push_trivia(TriviaData {
-                kind,
-                flags: 0,
-                start: position,
-                width,
-                structure: Green::NULL,
-                diags: DiagList::default(),
-            });
+            let id = self.push_trivia(TriviaData { kind, flags: 0, start: position, width, rare: NO_RARE });
             self.trivia_refs.push(id);
             if i < leading_count {
                 leading_width += width;
@@ -679,9 +787,7 @@ impl GreenArena {
         };
         let leading = list(first, leading_count.min(count));
         let trailing = list(first + leading_count as u32, count.saturating_sub(leading_count));
-        if self.tokens.len() == self.tokens.capacity() {
-            self.check_budget();
-        }
+        self.token_mark(true);
         let id = Green::new(TAG_TOKEN, self.tokens.len());
         self.tokens.push(TokenData {
             kind: token.kind,
@@ -693,8 +799,7 @@ impl GreenArena {
             trailing,
             leading_width,
             trailing_width,
-            diags: DiagList::default(),
-            value: NO_VALUE,
+            rare: NO_RARE,
         });
         id
     }
@@ -725,11 +830,13 @@ impl GreenArena {
         if own & IS_NOT_MISSING == 0 {
             flags &= !IS_NOT_MISSING;
         }
-        if data.diags.len != 0 {
+        if data.rare != NO_RARE && self.rare(data.rare).diags.len != 0 {
             flags |= CONTAINS_DIAGNOSTICS;
         }
         data.flags = flags;
         let id = Green::new(TAG_TOKEN, self.tokens.len());
+        // a copy checks no budget, but its buffer grows
+        self.token_mark(false);
         self.tokens.push(data);
         id
     }
@@ -813,7 +920,9 @@ impl GreenArena {
         let (start, len) = self.intern(value);
         let index = self.values.len() as u32;
         self.values.push((start, len));
-        self.tokens[token.index()].value = index;
+        // the token was just made, so no other record shares its rare data
+        let rare = self.push_rare(RareData { value: index, ..self.rare(self.tokens[token.index()].rare) });
+        self.tokens[token.index()].rare = rare;
     }
 
     /// The token's `ContextualKind` (`kind` for a token that is no contextual keyword).
@@ -866,7 +975,7 @@ impl GreenArena {
         if !token.is_token() {
             return None;
         }
-        let &(start, len) = self.values.get(self.token_data(token).value as usize)?;
+        let &(start, len) = self.values.get(self.rare(self.token_data(token).rare).value as usize)?;
         self.strings.get(start as usize..(start + len) as usize)
     }
 
@@ -874,7 +983,7 @@ impl GreenArena {
     pub fn token_value_text<'s>(&'s self, token: Green, source: &'s [u8]) -> &'s [u8] {
         if token.is_token() {
             let d = self.token_data(token);
-            if let Some(&(start, len)) = self.values.get(d.value as usize) {
+            if let Some(&(start, len)) = self.values.get(self.rare(d.rare).value as usize) {
                 return self.strings.as_bytes().get(start as usize..(start + len) as usize).unwrap_or(b"");
             }
         }
@@ -892,7 +1001,8 @@ impl GreenArena {
     #[inline(never)]
     pub fn create_node<const N: usize>(&mut self, kind: SyntaxKind, slots: &[Green; N], extra: u32) -> Green {
         let own = self.own_node_flags(kind);
-        self.push_node(TAG_NODE, kind, own, slots, extra, DiagList::default())
+        let rare = if extra == 0 { NO_RARE } else { self.push_rare(RareData { extra, ..NO_RARE_DATA }) };
+        self.push_node(TAG_NODE, kind, own, slots, rare, false)
     }
 
     /// `SyntaxListBuilder.ToListNode()`: null for no item, the item itself for one, else a list.
@@ -900,7 +1010,7 @@ impl GreenArena {
         match items {
             [] => Green::NULL,
             [item] => *item,
-            _ => self.push_node(TAG_LIST, SyntaxKind::List, 0, items, 0, DiagList::default()),
+            _ => self.push_node(TAG_LIST, SyntaxKind::List, 0, items, NO_RARE, false),
         }
     }
 
@@ -911,8 +1021,8 @@ impl GreenArena {
         kind: SyntaxKind,
         own: u16,
         slots: &[Green],
-        extra: u32,
-        diags: DiagList,
+        rare: u32,
+        has_diagnostics: bool,
     ) -> Green {
         let mut flags = own;
         let mut full_width = 0u32;
@@ -922,16 +1032,14 @@ impl GreenArena {
                 full_width = full_width.wrapping_add(self.full_width(s));
             }
         }
-        if diags.len != 0 {
+        if has_diagnostics {
             flags |= CONTAINS_DIAGNOSTICS;
         }
-        if self.nodes.len() == self.nodes.capacity() || self.slots.capacity() - self.slots.len() < slots.len() {
-            self.check_budget();
-        }
+        self.node_mark(slots.len(), true);
         let slot_start = self.slots.len() as u32;
         self.slots.extend_from_slice(slots);
         let id = Green::new(tag, self.nodes.len());
-        self.nodes.push(NodeData { kind, flags, slot_start, slot_count: slots.len() as u32, full_width, diags, extra });
+        self.nodes.push(NodeData { kind, flags, slot_start, slot_count: slots.len() as u32, full_width, rare });
         id
     }
 
@@ -943,7 +1051,8 @@ impl GreenArena {
         }
         let d = self.nodes[node.index()];
         let own = if node.is_node() { self.own_node_flags(d.kind) } else { 0 };
-        self.push_node(node.tag(), d.kind, own, slots, d.extra, d.diags)
+        let has_diagnostics = d.rare != NO_RARE && self.rare(d.rare).diags.len != 0;
+        self.push_node(node.tag(), d.kind, own, slots, d.rare, has_diagnostics)
     }
 
     /// The flags a node of `kind` sets itself: `ContainsDirectives` (a directive's generated constructor),
@@ -966,7 +1075,7 @@ impl GreenArena {
 
     /// The node's boolean fields (`syntax::types::X::IS_ACTIVE` bits).
     pub fn extra(&self, node: Green) -> u32 {
-        if node.is_node() { self.nodes[node.index()].extra } else { 0 }
+        if node.is_node() { self.rare(self.nodes[node.index()].rare).extra } else { 0 }
     }
 
     /// `SlotCount`: a node's or list's slots (null ones included), 0 for a token.
@@ -1272,12 +1381,24 @@ impl GreenArena {
 
     /// `GetDiagnostics()`: the diagnostics attached to the element itself, in order.
     pub fn diagnostics(&self, element: Green) -> impl ExactSizeIterator<Item = DiagnosticId> + '_ {
-        let list = match element.tag() {
-            TAG_TOKEN => self.tokens[element.index()].diags,
-            TAG_NODE | TAG_LIST => self.nodes[element.index()].diags,
-            _ => DiagList::default(),
-        };
-        self.diag_slice(list).iter().map(|&d| DiagnosticId(d))
+        self.diag_slice(self.rare(self.rare_of(element)).diags).iter().map(|&d| DiagnosticId(d))
+    }
+
+    /// The `RareData` index of a token, node or list (`NO_RARE` for null).
+    #[inline]
+    fn rare_of(&self, element: Green) -> u32 {
+        match element.tag() {
+            TAG_TOKEN => self.tokens[element.index()].rare,
+            TAG_NODE | TAG_LIST => self.nodes[element.index()].rare,
+            _ => NO_RARE,
+        }
+    }
+
+    /// Whether the element itself has diagnostics (`diagnostics` is not empty): most records have no rare data.
+    #[inline]
+    pub fn has_diagnostics(&self, element: Green) -> bool {
+        let rare = self.rare_of(element);
+        rare != NO_RARE && self.rare(rare).diags.len != 0
     }
 
     /// `WithDiagnosticsGreen(diagnostics)`: a copy of the element with exactly these diagnostics.
@@ -1288,7 +1409,10 @@ impl GreenArena {
 
     fn with_diag_list(&mut self, element: Green, list: DiagList) -> Green {
         match element.tag() {
-            TAG_TOKEN => self.copy_token(element, |d| d.diags = list),
+            TAG_TOKEN => {
+                let rare = self.push_rare(RareData { diags: list, ..self.rare(self.tokens[element.index()].rare) });
+                self.copy_token(element, |d| d.rare = rare)
+            }
             TAG_NODE | TAG_LIST => {
                 let d = self.nodes[element.index()];
                 let own = if element.is_node() { self.own_node_flags(d.kind) } else { 0 };
@@ -1302,7 +1426,10 @@ impl GreenArena {
                 }
                 let id = Green::new(element.tag(), self.nodes.len());
                 // the copy shares the slots: they are never changed
-                self.nodes.push(NodeData { flags, diags: list, ..d });
+                let rare = self.push_rare(RareData { diags: list, ..self.rare(d.rare) });
+                // a copy checks no budget, but its buffer grows
+                self.node_mark(0, false);
+                self.nodes.push(NodeData { flags, rare, ..d });
                 id
             }
             _ => element,
@@ -1483,6 +1610,110 @@ mod tests {
         let mut nodes = Vec::new();
         arena.enumerate_nodes(name, &mut nodes);
         assert_eq!(nodes, [name, left, a, dot, right, b]);
+    }
+
+    /// A copy shares its original's rare data and a record made with other rare fields gets a new entry: no entry is
+    /// ever changed, so the original keeps its diagnostics, value and boolean fields.
+    #[test]
+    fn rare_data_is_never_changed() {
+        let mut arena = GreenArena::new();
+        let (a, _, _) = two_identifiers(&mut arena);
+        assert_eq!(arena.tokens[a.index()].rare, NO_RARE);
+        arena.set_token_value(a, "value");
+        let error = arena.make_diagnostic(0, 1, ErrorCode::ERR_SyntaxError, &[DiagArg::Str(";")]);
+        let rares = arena.rares.len();
+        let a2 = arena.with_additional_diagnostics(a, &[error]);
+        assert_eq!(arena.rares.len(), rares + 1);
+        assert_eq!((arena.token_value(a), arena.token_value(a2)), (Some("value"), Some("value")));
+        assert_eq!((arena.diagnostics(a).len(), arena.diagnostics(a2).len()), (0, 1));
+        assert!(!arena.has_diagnostics(a) && arena.has_diagnostics(a2));
+        // a copy with other trivia shares the entry
+        let a3 = arena.token_with_leading_trivia(a2, TriviaList::EMPTY);
+        assert_eq!(arena.tokens[a3.index()].rare, arena.tokens[a2.index()].rare);
+        let hash = arena.token(SyntaxKind::HashToken);
+        let keyword = arena.token(SyntaxKind::IfKeyword);
+        let condition = arena.identifier_name(a);
+        let end = arena.token(SyntaxKind::EndOfDirectiveToken);
+        let directive = arena.if_directive_trivia(hash, keyword, condition, end, true, false, true);
+        let extra = arena.extra(directive);
+        assert_eq!(extra, 0b101);
+        let with_error = arena.with_diagnostics(directive, &[error]);
+        let updated = arena.update_node(with_error, &[hash, keyword, condition, end]);
+        assert_eq!((arena.extra(with_error), arena.extra(updated)), (extra, extra));
+        assert_eq!(arena.diagnostics(directive).len(), 0);
+        assert_eq!((arena.diagnostics(with_error).len(), arena.diagnostics(updated).len()), (1, 1));
+        assert!(arena.contains_diagnostics(updated) && !arena.contains_diagnostics(directive));
+        // a structured trivia keeps its structure in `start`, an unstructured one its text's offset
+        let trivia = arena.structured_trivia(directive);
+        assert_eq!((arena.trivia_structure(trivia), arena.trivia_start(trivia)), (directive, 0));
+        let with_error = arena.trivia_with_diagnostics(trivia, &[error]);
+        assert_eq!(arena.diagnostics(arena.trivia_structure(with_error)).len(), 1);
+        assert_eq!(arena.diagnostics(directive).len(), 0);
+        let space = arena.trivia(SyntaxKind::WhitespaceTrivia, 1, 1);
+        assert_eq!((arena.trivia_structure(space), arena.trivia_start(space)), (Green::NULL, 1));
+        let space2 = arena.trivia_with_diagnostics(space, &[error]);
+        assert_eq!((arena.trivia_diagnostics(space).len(), arena.trivia_diagnostics(space2).len()), (0, 1));
+    }
+
+    /// The budget marks are where buffers that started empty grow: on a new arena, the buffers' capacities.
+    #[test]
+    fn budget_marks_follow_buffers_grown_from_empty() {
+        let mut arena = GreenArena::new();
+        let error = arena.make_diagnostic(0, 1, ErrorCode::ERR_SyntaxError, &[DiagArg::Str(";")]);
+        let mut items = Vec::new();
+        for i in 0..3000usize {
+            let (a, b, _) = two_identifiers(&mut arena);
+            items.extend([a, b]);
+            if i % 7 == 0 {
+                let copy = arena.with_additional_diagnostics(a, &[error]);
+                items.push(copy);
+            }
+            let n = (i * 13) % 23;
+            let list = arena.list(&items[items.len().saturating_sub(n)..]);
+            if i % 5 == 0 && !list.is_null() {
+                let copy = arena.with_additional_diagnostics(list, &[error]);
+                items.push(copy);
+            }
+            if i % 11 == 0 {
+                let copy = arena.token_with_leading_trivia(b, TriviaList::EMPTY);
+                items.push(copy);
+            }
+            assert_eq!(
+                (arena.marks.tokens, arena.marks.nodes, arena.marks.slots),
+                (arena.tokens.capacity(), arena.nodes.capacity(), arena.slots.capacity()),
+                "after {i}"
+            );
+        }
+        // after a clear the marks start again from empty, whatever the buffers kept
+        arena.clear();
+        assert_eq!((arena.marks.tokens, arena.marks.nodes, arena.marks.slots), (0, 0, 0));
+        assert!(arena.tokens.capacity() > 0);
+    }
+
+    /// The budget charges the records at the sizes it was set for (`record_bytes`), whatever their layout now.
+    #[test]
+    fn the_budget_charges_the_sizes_it_was_set_for() {
+        let mut arena = GreenArena::new();
+        let (a, _, _) = two_identifiers(&mut arena);
+        let name = arena.identifier_name(a);
+        arena.list(&[name, name]);
+        let (tokens, nodes, trivia) = arena.record_counts();
+        let expected = tokens * 52
+            + nodes * 28
+            + trivia * 24
+            + (arena.slots.len() + arena.trivia_refs.len() + arena.diag_refs.len()) * 4
+            + arena.strings.len()
+            + arena.values.len() * 8;
+        assert_eq!((tokens, nodes, trivia), (3, 2, 1));
+        assert_eq!(arena.record_bytes(), expected);
+        // the diagnostic and argument sizes as on a 64-bit target at 25dac59f
+        #[cfg(target_pointer_width = "64")]
+        assert_eq!((size_of::<DiagnosticInfo>(), size_of::<DiagArg>(), size_of::<Green>()), (28, 24, 4));
+    }
+
+    #[test]
+    fn records_are_small() {
+        assert_eq!((size_of::<TokenData>(), size_of::<NodeData>(), size_of::<TriviaData>()), (44, 20, 16));
     }
 
     #[test]

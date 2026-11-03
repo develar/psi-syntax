@@ -43,6 +43,37 @@ fn the_budget_is_reset_for_the_next_file() {
     assert!(small.diagnostics().iter().all(|d| d.code != ErrorCode::ERR_InsufficientStack));
 }
 
+/// Where a parse is abandoned depends on its file alone: a parser whose buffers kept the capacity of a bigger file
+/// checks the budget where a fresh one does (`green::BudgetMarks`), so it abandons, or keeps, the same files.
+#[test]
+fn the_budget_trips_where_it_trips_on_a_fresh_parser() {
+    let big = source(20_000);
+    let mut kept = Parser::new();
+    kept.set_retained_bytes(usize::MAX);
+    kept.parse(&big, FileKind::default());
+    let text = source(2000);
+    let abandons = |budget: usize, parser: &mut Parser| {
+        parser.set_arena_budget(budget);
+        let tree = parser.parse(&text, FileKind::default());
+        tree.diagnostics().iter().any(|d| d.code == ErrorCode::ERR_InsufficientStack)
+    };
+    // the smallest budget that keeps the whole file, as fresh parsers find it
+    let (mut low, mut high) = (64usize << 10, 64usize << 20);
+    assert!(abandons(low, &mut Parser::new()) && !abandons(high, &mut Parser::new()));
+    while high - low > 1 {
+        let mid = low + (high - low) / 2;
+        if abandons(mid, &mut Parser::new()) { low = mid } else { high = mid }
+    }
+    for budget in [low / 2, low, high, high * 2] {
+        let mut fresh = Parser::new();
+        fresh.set_arena_budget(budget);
+        kept.set_arena_budget(budget);
+        let (a, b) = (fresh.parse(&text, FileKind::default()), kept.parse(&text, FileKind::default()));
+        assert_eq!(csharp_syntax::dump::tree_to_string(&a), csharp_syntax::dump::tree_to_string(&b), "budget {budget}");
+    }
+    assert!(abandons(low, &mut kept) && !abandons(high, &mut kept));
+}
+
 /// A file of every kind of buffer the parser owns: directives, documentation comments, interpolated and raw strings
 /// with holes, attributes, generics, lambdas, queries.
 const MIXED: &str = r#"#define X

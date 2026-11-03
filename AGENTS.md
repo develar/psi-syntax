@@ -229,7 +229,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   at most that between files whatever it parsed (a C# parser held 1.24 GB after dotnet/runtime's `hugeexpr1.cs`, now
   32 MiB). `parser.heap_bytes()` is what the buffers hold, `parser.shrink_to(bytes)` shrinks them on demand (`0`
   frees them); trees are unaffected. A file that needs more grows them again: 7 ms for each of the runtime files
-  that pass the bound (10 of them; 14 while the tree builder kept a buffer), nothing for the files after them
+  that pass the bound (9 of them; 14 while the tree builder kept a buffer), nothing for the files after them
   (DESIGN, "Retained buffers").
 - Ids are preorder: `0..len()` is document order, the subtree of `id` is `id..subtree_end(id)`. `root`, `kind`,
   `token_kind`, `node_kind`, `is_leaf`, `range`, `text`, `parent`, `first_child`, `last_child`, `next_sibling`,
@@ -329,7 +329,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   spell the source (one of the 122 741 mutations, a member entry; no corpus file): from there it is the green tree's
   own text, as `ToFullString()` is. No body-less parsing. Its buffers (arena, lexer, token window, list
   builders, the directive, documentation comment and interpolated string parsers', flattener; the tree builder keeps
-  none, a tree's columns become the tree) are retained as above: 60.8, 35.8, 58.6 and 10.7 MB after the four corpora
+  none, a tree's columns become the tree) are retained as above: 50.3, 37.3, 49.2 and 9.1 MB after the four corpora
   instead of 101.5, 1245.0, 76.5 and 14.8 without a bound.
 - Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
   levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
@@ -347,9 +347,11 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `Parenth2.java`, reaches 1010 levels, 4 type argument lists, 4 annotations). See DESIGN, "Java nesting".
   C# (`csharp_syntax::Parser`) runs in a 1 MB stack too: it counts Roslyn's `_recursionDepth` (and the cycles Roslyn
   leaves unguarded) to 1000 and every consumed token against `green::work_budget_for` (16 a byte, at least 2^20);
-  past either, or past the arena budget, the tree is Roslyn's for an exhausted stack: the whole text one skipped
-  `BadToken` with `ERR_InsufficientStack`, as Roslyn returns at 100 000 levels. Below them the tree is Roslyn's (the
-  corpora reach 678 levels and 1.0 token a byte). See DESIGN, "C# nesting and work".
+  past either, or past the arena budget (`green::budget_for`, 256 bytes a source byte at fixed record sizes, checked
+  where buffers grown from empty would grow, so it depends on the file alone), the tree is Roslyn's for an exhausted
+  stack: the whole text one skipped `BadToken` with `ERR_InsufficientStack`, as Roslyn returns at 100 000 levels.
+  Below them the tree is Roslyn's (the corpora reach 678 levels and 1.0 token a byte). See DESIGN, "C# nesting and
+  work".
 - Allocator: psi-syntax uses the system allocator and builds no C. mimalloc 0.1.52 was +12-15 % at 8 and 16
   threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
   noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.
