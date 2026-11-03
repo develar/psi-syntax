@@ -2,9 +2,9 @@
 //! file: `mod.rs` is `Lexer.cs`, `abstract_lexer.rs` `AbstractLexer.cs`, `string_literal.rs` `Lexer_StringLiteral.cs`,
 //! `raw_string_literal.rs` `Lexer_RawStringLiteral.cs`, `interpolation.rs` `Lexer.Interpolation.cs`,
 //! `sliding_text_window.rs` `SlidingTextWindow.cs`, `character_info.rs` `CharacterInfo.cs`, `directives.rs`
-//! `Directives.cs`, `directive_parser.rs` `DirectiveParser.cs`. Not ported: `QuickScanner` and `LexerCache`, which only
-//! cache tokens and trivia the lexer makes the same way (the keyword lookup they cache is `keyword_kind`, a perfect
-//! hash).
+//! `Directives.cs`, `directive_parser.rs` `DirectiveParser.cs`, `quick_scanner.rs` `QuickScanner.cs`, `lexer_cache.rs`
+//! the token map of `LexerCache.cs` (its trivia map and keyword cache are not ported: the keyword lookup is
+//! `keyword_kind`, a perfect hash, and a whitespace trivia is a range of the source either way).
 //!
 //! The text is the file's bytes read as UTF-16 code units (`SlidingTextWindow`): positions and widths are bytes, a
 //! supplementary character two code units of 2 bytes each. Tokens and trivia are made in the green arena, their texts
@@ -22,12 +22,15 @@ pub mod character_info;
 mod directive_parser;
 mod directives;
 mod interpolation;
+mod lexer_cache;
+mod quick_scanner;
 mod raw_string_literal;
 pub mod sliding_text_window;
 mod string_literal;
 
 pub use directives::{DirectiveStack, DirectiveStore};
 pub use interpolation::Interpolation;
+pub(crate) use lexer_cache::{EOL_BIT, QuickToken};
 pub use string_literal::InterpolatedStringKind;
 
 use character_info as facts;
@@ -143,6 +146,8 @@ pub struct LexerBuffers {
     /// What the parser of an interpolated or raw string token over this lexer reuses: the interpolations, the
     /// buffers of the lexers and parsers it makes for the holes and texts.
     interpolated_string: InterpolatedStringBuffers,
+    /// `_cache`: the token map of the quick scanner, kept warm from one file to the next.
+    cache: lexer_cache::LexerCache,
 }
 
 impl LexerBuffers {
@@ -164,6 +169,7 @@ impl LexerBuffers {
             + self.directive_parser.heap_bytes()
             + self.xml_parser.heap_bytes()
             + self.interpolated_string.heap_bytes()
+            + self.cache.heap_bytes()
     }
 
     /// Empties the buffers, each shrunk to its share of `shrink`.
@@ -182,6 +188,7 @@ impl LexerBuffers {
         self.directive_parser.shrink(shrink);
         self.xml_parser.shrink(shrink);
         self.interpolated_string.shrink(shrink);
+        self.cache.shrink(shrink);
     }
 }
 
@@ -474,7 +481,9 @@ impl<'t> Lexer<'t> {
     pub fn lex(&mut self, mode: LexerMode) -> Green {
         self.mode = mode;
         match self.mode {
-            LexerMode::SYNTAX | LexerMode::DEBUGGER_SYNTAX => return self.lex_syntax_token(),
+            LexerMode::SYNTAX | LexerMode::DEBUGGER_SYNTAX => {
+                return self.quick_scan_syntax_token().unwrap_or_else(|| self.lex_syntax_token());
+            }
             LexerMode::DIRECTIVE => return self.lex_directive_token(),
             _ => {}
         }

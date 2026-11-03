@@ -100,7 +100,7 @@ named at its place and listed in DESIGN, "C# deviations".
 | `tools/csharp-oracle/Dump.cs` | `dump.rs`: `tree_to_string`, `lex_to_string`, `index_line` |
 | `CSharpSyntaxTree.ParseText`, `SyntaxFactory.Parse*`, `CSharpParseOptions` | `tree.rs` (`Parser`, `Tree`, `FileKind`, `Entry`, `DocumentationMode`, `Diagnostic`), `language.rs` (`CSharp: TreeLanguage`) |
 | `Parser/SyntaxParser.cs`, `Parser/SyntaxParser.ResetPoint.cs` | `syntax_parser.rs`: the token window, lexer modes, reset points, `EatToken`, the error helpers, skipped syntax, keyword conversions, feature checks |
-| `Parser/Lexer.cs`, `AbstractLexer.cs`, `Lexer_StringLiteral.cs`, `Lexer_RawStringLiteral.cs`, `Lexer.Interpolation.cs`, `SlidingTextWindow.cs`, `CharacterInfo.cs` (with `UnicodeCharacterUtilities`), `DocumentationCommentXmlTokens.cs` | `lexer/mod.rs`, `abstract_lexer.rs`, `string_literal.rs`, `raw_string_literal.rs`, `interpolation.rs`, `sliding_text_window.rs`, `character_info.rs`, the XML tokens in `lexer/mod.rs` |
+| `Parser/Lexer.cs`, `AbstractLexer.cs`, `Lexer_StringLiteral.cs`, `Lexer_RawStringLiteral.cs`, `Lexer.Interpolation.cs`, `SlidingTextWindow.cs`, `CharacterInfo.cs` (with `UnicodeCharacterUtilities`), `DocumentationCommentXmlTokens.cs`, `QuickScanner.cs`, `LexerCache.cs` (its token map) | `lexer/mod.rs`, `abstract_lexer.rs`, `string_literal.rs`, `raw_string_literal.rs`, `interpolation.rs`, `sliding_text_window.rs`, `character_info.rs`, the XML tokens in `lexer/mod.rs`, `quick_scanner.rs`, `lexer_cache.rs` |
 | `Parser/Directives.cs`, `Parser/DirectiveParser.cs` | `lexer/directives.rs`, `lexer/directive_parser.rs` |
 | `Parser/LanguageParser.cs` 1-235 and 14420- (state, entry points, `ParseWithStackGuard`, `CreateForGlobalFailure`, `IsTerminator`, reset points, `ParseCommaSeparatedSyntaxList`, `ConsumeUnexpectedTokens`), `SyntaxFactoryContext.cs` (four flags) | `parser/mod.rs` |
 | `Parser/LanguageParser.cs` 236-6162: namespaces, usings, attributes, type and member declarations, accessors, parameters, fields, variables, enums, names | `parser/declarations.rs` |
@@ -111,8 +111,9 @@ named at its place and listed in DESIGN, "C# deviations".
 | `Parser/LanguageParser_InterpolatedString.cs` | `parser/interpolated_string.rs` (each hole's lexer and parser over a window of the file) |
 | `Parser/DocumentationCommentParser.cs` | `parser/doc_comment_parser.rs` (run by the lexer on each documentation comment) |
 
-Not ported, as they change no tree: `Blender*.cs` and `BlendedNode.cs` (incremental parsing), `QuickScanner.cs` and
-`LexerCache.cs` (caches of what the lexer makes the same way; keywords are a perfect hash), the node cache. The
+Not ported, as they change no tree: `Blender*.cs` and `BlendedNode.cs` (incremental parsing), `LexerCache.cs`'s trivia
+map and keyword cache (keywords are a perfect hash; its token map is `lexer/lexer_cache.rs`, which `QuickScanner.cs`,
+`lexer/quick_scanner.rs`, reads), the node cache. The
 generated files are never edited by hand: `tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV]` writes
 `syntax_kind.rs`, `syntax.rs`, `error_code.rs` and `xml_char_type.rs` from `git show`; `DOTNET_ROOT=$HOME/.cache/psi-syntax/dotnet
 $HOME/.cache/psi-syntax/dotnet/dotnet run --project tools/csharp-unicode > crates/csharp-syntax/src/unicode.rs` writes
@@ -228,7 +229,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   at most that between files whatever it parsed (a C# parser held 1.24 GB after dotnet/runtime's `hugeexpr1.cs`, now
   32 MiB). `parser.heap_bytes()` is what the buffers hold, `parser.shrink_to(bytes)` shrinks them on demand (`0`
   frees them); trees are unaffected. A file that needs more grows them again: 7 ms for each of the runtime files
-  that pass the bound (9 of them; 14 while the tree builder kept a buffer), nothing for the files after them
+  that pass the bound (10 of them; 14 while the tree builder kept a buffer), nothing for the files after them
   (DESIGN, "Retained buffers").
 - Ids are preorder: `0..len()` is document order, the subtree of `id` is `id..subtree_end(id)`. `root`, `kind`,
   `token_kind`, `node_kind`, `is_leaf`, `range`, `text`, `parent`, `first_child`, `last_child`, `next_sibling`,
@@ -328,7 +329,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   spell the source (one of the 122 741 mutations, a member entry; no corpus file): from there it is the green tree's
   own text, as `ToFullString()` is. No body-less parsing. Its buffers (arena, lexer, token window, list
   builders, the directive, documentation comment and interpolated string parsers', flattener; the tree builder keeps
-  none, a tree's columns become the tree) are retained as above: 59.9, 34.9, 56.5 and 9.8 MB after the four corpora
+  none, a tree's columns become the tree) are retained as above: 60.8, 35.8, 58.6 and 10.7 MB after the four corpora
   instead of 101.5, 1245.0, 76.5 and 14.8 without a bound.
 - Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
   levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,

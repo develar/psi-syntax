@@ -642,6 +642,63 @@ impl GreenArena {
         id
     }
 
+    /// The token `LexSyntaxToken` makes of the text at `full_start` that the quick scanner found in its map
+    /// (`lexer::quick_scanner`): its whitespace and end of line trivia, then the token, its text the source's; the
+    /// records `LexSyntaxToken` would push, in its order.
+    pub(crate) fn quick_token(&mut self, full_start: u32, token: &crate::lexer::QuickToken) -> Green {
+        let leading_count = token.leading as usize;
+        let count = (leading_count + token.trailing as usize).min(token.trivia.len());
+        let first = self.trivia_refs.len() as u32;
+        let mut position = full_start;
+        let (mut leading_width, mut trailing_width) = (0, 0);
+        for (i, &t) in token.trivia[..count].iter().enumerate() {
+            if i == leading_count {
+                position += token.width as u32;
+            }
+            let width = (t & !crate::lexer::EOL_BIT) as u32;
+            let kind =
+                if t & crate::lexer::EOL_BIT != 0 { SyntaxKind::EndOfLineTrivia } else { SyntaxKind::WhitespaceTrivia };
+            let id = self.push_trivia(TriviaData {
+                kind,
+                flags: 0,
+                start: position,
+                width,
+                structure: Green::NULL,
+                diags: DiagList::default(),
+            });
+            self.trivia_refs.push(id);
+            if i < leading_count {
+                leading_width += width;
+            } else {
+                trailing_width += width;
+            }
+            position += width;
+        }
+        let list = |start: u32, len: usize| {
+            if len == 0 { TriviaList::EMPTY } else { TriviaList { start, len: len as u32 } }
+        };
+        let leading = list(first, leading_count.min(count));
+        let trailing = list(first + leading_count as u32, count.saturating_sub(leading_count));
+        if self.tokens.len() == self.tokens.capacity() {
+            self.check_budget();
+        }
+        let id = Green::new(TAG_TOKEN, self.tokens.len());
+        self.tokens.push(TokenData {
+            kind: token.kind,
+            contextual: token.contextual,
+            flags: IS_NOT_MISSING,
+            start: full_start + leading_width,
+            width: token.width as u32,
+            leading,
+            trailing,
+            leading_width,
+            trailing_width,
+            diags: DiagList::default(),
+            value: NO_VALUE,
+        });
+        id
+    }
+
     #[inline]
     fn token_data(&self, token: Green) -> &TokenData {
         &self.tokens[token.index()]

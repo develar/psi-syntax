@@ -440,8 +440,14 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   owns its text (`Arc<[u8]>`), nothing of the arena. A parse that leaves more than the retained bytes in them (64 MiB by default)
   shrinks them to half of that, each to the same share of its capacity ("Retained buffers").
 - **Lexer.** `Lexer.cs` and its partial files ported method by method. Keywords are a perfect hash of the first eight
-  bytes and the length into 1024 slots, built and checked at compile time, which is what `LexerCache` and
-  `QuickScanner` cache (neither ported). Each token keeps the lexer state after it (position, directives, the
+  bytes and the length into 1024 slots, built and checked at compile time, in place of `LexerCache`'s keyword cache.
+  `QuickScanner` and `LexerCache`'s token map are ported: in the `Syntax` and `DebuggerSyntax` modes `Lex` first runs Roslyn's state machine
+  over at most 42 bytes (whitespace and ends of line, an identifier, keyword, decimal integer or one-character
+  punctuation, whitespace and one end of line) and looks the text up in a direct-mapped map of 4096 slots (288 KB,
+  kept by the `Parser` from file to file); a hit makes the token `LexSyntaxToken` would make of that text, whatever
+  precedes it, so the map changes no tree. Roslyn's map holds the shared green token; a token here records its source
+  offset, so the map holds its kinds and widths and its trivia's (`QuickToken`) and a hit pushes the records anew
+  (`GreenArena::quick_token`); tokens with diagnostics or values, or other trivia, are not kept. Each token keeps the lexer state after it (position, directives, the
   lexer-driven mode), what Roslyn keeps per blended token, so a parser that changes the lexer mode re-lexes from the
   last kept token. `DirectiveStack` is an index into immutable cons cells (`Directives.cs`' `ConsList`), shared by the
   lexer and every reset; `CompleteIf` and `CompleteRegion`, recursive in Roslyn, rebuild the cells in a loop, and
@@ -600,8 +606,9 @@ changes a tree of the gate's inputs; the first three apply only past limits no c
 - **Text Roslyn never sees**: a byte that starts no valid UTF-8 is one U+FFFD code unit of 1 byte (the oracle dumps
   only valid UTF-8); a lone surrogate of a message is U+FFFD with `Diagnostic::lone_surrogates` beside it; a tree
   whose token Roslyn dropped takes its text from the green tree past the drop.
-- **Not ported**: incremental parsing (`Blender`, `BlendedNode`, the old tree), `QuickScanner`, `LexerCache`, the node
-  cache, scripts, preprocessor symbols from options, `Features`.
+- **Not ported**: incremental parsing (`Blender`, `BlendedNode`, the old tree), `LexerCache`'s trivia map and keyword
+  cache (its token map and `QuickScanner` are ported: "Lexer"), the node cache, scripts, preprocessor symbols from
+  options, `Features`.
 
 ### Tree (`psi-builder` `src/tree.rs`)
 
