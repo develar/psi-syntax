@@ -14,6 +14,9 @@
 #      testdata/java (step 1, strict), and both dumps (.psi.txt, .node.txt) of the 68 260 UTF-8 community .java files,
 #      of the 19 116 one-place mutations of the goldens and of the 20 000 lexer fuzz inputs against the cached oracle
 #      dumps, 0 differing;
+#      The PSI getters of `java_syntax::psi` (`ksdump --getters`, every getter of every node) against the cached
+#      lines of tools/java-oracle/JavaPsiOracle.java --getters (the real PSI's) on the goldens and the same three
+#      corpora, 0 differing (an answer IntelliJ throws on, `!`, takes any of ours);
 #   8. Java's bodies and too-deep paths: `parse_body` of every unexpanded code block of the community .java files
 #      against the full parse, and the same with nesting limit 3 on the community .java files and the golden mutations,
 #      every tree lossless;
@@ -120,6 +123,13 @@ java() {
     --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" || f=1
   dumps java-psi-java-mut "$C/fuzz/java-mut.oracle" --node --list "$C/fuzz/java-mut.list" --root "$C/fuzz/java-mut" || f=1
   dumps java-psi-java-lex "$C/fuzz/java-lex.oracle" --node --list "$C/fuzz/java-lex/list" --root "$C/fuzz/java-lex" || f=1
+  # The getters of java_syntax::psi against JavaPsiOracle.java --getters's cached lines (tools/java-oracle/README.md).
+  dumps java-getters-goldens "$C/getters/java-goldens" --getters --list testdata/java/manifest.tsv \
+    --root testdata/java || f=1
+  dumps java-getters-java-community-3caa0bf "$C/getters/java-community-3caa0bf" --getters \
+    --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" || f=1
+  dumps java-getters-java-mut "$C/getters/java-mut" --getters --list "$C/fuzz/java-mut.list" --root "$C/fuzz/java-mut" || f=1
+  dumps java-getters-java-lex "$C/getters/java-lex" --getters --list "$C/fuzz/java-lex/list" --root "$C/fuzz/java-lex" || f=1
   bodies java-check-bodies --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" || f=1
   bodies java-nesting-limit-3-community --nesting-limit 3 --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" || f=1
   bodies java-nesting-limit-3-java-mut --nesting-limit 3 --list "$C/fuzz/java-mut.list" --root "$C/fuzz/java-mut" || f=1

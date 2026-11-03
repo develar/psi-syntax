@@ -218,9 +218,38 @@ fn compare(path: &Path, text: &[u8], buffer: &mut [u8]) -> Option<String> {
     };
     match same_bytes(&mut file, text, buffer) {
         Ok(true) => None,
+        Ok(false) if path.to_string_lossy().ends_with(".getters.txt") => match std::fs::read(path) {
+            Ok(oracle) => getters_difference(&oracle, text),
+            Err(e) => Some(format!("cannot read the oracle's: {e}")),
+        },
         Ok(false) => Some("differs".to_string()),
         Err(e) => Some(format!("cannot read the oracle's: {e}")),
     }
+}
+
+/// `--getters --check`: the oracle's getter lines against ours, line by line, an oracle answer `!` (IntelliJ threw)
+/// matching any of ours for the same `<id> <getter>`. `None` when every line matches, else the first difference.
+fn getters_difference(oracle: &[u8], ours: &[u8]) -> Option<String> {
+    let oracle_lines = oracle.split(|&b| b == b'\n').filter(|l| !l.is_empty());
+    let mut our_lines = ours.split(|&b| b == b'\n').filter(|l| !l.is_empty());
+    for expected in oracle_lines {
+        let Some(line) = our_lines.next() else {
+            return Some(format!("differs: only the oracle has {}", String::from_utf8_lossy(expected)));
+        };
+        if line == expected {
+            continue;
+        }
+        let excused =
+            expected.strip_suffix(b" !").is_some_and(|key| line.starts_with(key) && line.get(key.len()) == Some(&b' '));
+        if !excused {
+            return Some(format!(
+                "differs: ours {} where the oracle has {}",
+                String::from_utf8_lossy(line),
+                String::from_utf8_lossy(expected)
+            ));
+        }
+    }
+    our_lines.next().map(|line| format!("differs: only ours has {}", String::from_utf8_lossy(line)))
 }
 
 /// The file holds exactly `text`, read a buffer at a time.

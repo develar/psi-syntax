@@ -86,6 +86,8 @@ fn usage() -> ! {
                 [--file-stats OUT] [--retain MIB|max]        parse throughput, tree bytes, walk cost, parser buffers\n  \
          ksdump --check-bodies --list LIST --root ROOT       parse_body of each body against the full parse\n  \
          ksdump --check ORACLE --list LIST --root ROOT [--out OUT] [--node]   our dumps against ORACLE's, in memory\n  \
+         ksdump --getters (--out OUT | --check ORACLE) --list LIST --root ROOT   Java: every PSI getter of every node,\n  \
+                OUT/<path>.getters.txt as tools/java-oracle/JavaPsiOracle.java --getters writes it\n  \
          ksdump --lex --check LINES --list LIST --root ROOT  our lexer lines against the oracle's LINES\n  \
          (--nesting-limit N: parse with that nesting limit; --threads N: threads of --out, --check, --lex and\n  \
          --check-bodies, default every core)\n  \
@@ -145,6 +147,8 @@ struct Args {
     nesting_limit: Option<u32>,
     lang: Option<Lang>,
     node: bool,
+    /// `--getters`: Java files' `<path>.getters.txt` (`java_syntax::psi::getters`) instead of their dumps.
+    getters: bool,
     docs: bool,
     /// `--full OUT` (C# `--lex`): the lexer dumps' directory.
     full: Option<PathBuf>,
@@ -169,6 +173,7 @@ fn parse_args() -> Args {
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
             "--node" => args.node = true,
+            "--getters" => args.getters = true,
             "--docs" => args.docs = true,
             "--full" => args.full = Some(it.next().map(PathBuf::from).unwrap_or_else(|| usage())),
             "--threads" => args.threads = Some(count(it.next())),
@@ -525,6 +530,10 @@ fn java_dump(parser: &mut java_syntax::Parser, root: &Path, line: &str, args: &A
         text = trim_bytes(text);
     }
     let tree = parser.parse(&text, kind);
+    if args.getters {
+        let in_package_info = file_name(path) == "package-info.java";
+        return vec![("getters.txt", java_syntax::psi::getters::getters_to_string(&tree, in_package_info))];
+    }
     let mut dumps = vec![("psi.txt", java_syntax::dump::psi_to_string(&tree, file_name(path)))];
     if args.node {
         dumps.push(("node.txt", java_syntax::dump::node_tree_to_string(&tree)));

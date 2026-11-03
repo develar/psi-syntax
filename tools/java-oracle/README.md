@@ -33,6 +33,16 @@ which IntelliJ also checks against the `SyntaxNode` tree of java-syntax alone), 
 `OUT/index.jsonl`: `path`, `dump`, `level`, `entry`, `psiErrors`, `crlf`, `firstError` or `failure`.
 `--serve` reads `LIST<TAB>ROOT<TAB>OUT` lines from stdin and prints `done` after each, in one JVM.
 
+With `--getters` it writes `OUT/<path>.getters.txt` instead of the dumps: the answers of the PSI getters that
+`java_syntax::psi` ports (`PsiField.getTypeElement()`, `PsiModifierList.hasModifierProperty(...)`,
+`PsiJavaCodeReferenceElementImpl.getKindEnum(...)`, ...), one line `<id> <getter> <answer>` per getter of each node
+by its element type, in the order and format of `crates/java-syntax/src/psi/getters.rs`. The id is the node's index
+in a preorder walk of `file.getNode()`, psi-syntax's `NodeId` (the node dumps being equal); `!` is an answer
+IntelliJ threw on (only an implicit class's `getImplementsList()` does, on the corpora). As in the IDE,
+`LOG.error` logs instead of throwing (a factory of quiet `DefaultLogger`s) and Java asserts are off;
+`PsiAugmentProvider`'s extension point is registered empty, as `JavaCoreApplicationEnvironment` does.
+`ksdump --getters --check OUT` compares ours with them (an oracle `!` takes any answer of ours).
+
 A list line is `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (more columns are ignored, so
 `testdata/java/manifest.tsv` is a list):
 
@@ -77,6 +87,7 @@ separators are converted to `\n`, as the IDE does when it loads a file.
 | `fuzz/java-lex/` | the lexer fuzz inputs and their `list` (`lex_fuzz.py`, 20 000 files, seed `java-lex`) |
 | `fuzz/java-lex.oracle/` | their dumps (17 604 with a `PsiErrorElement`, 5.8 s) |
 | `lex/java-community-3caa0bf.oracle.txt`, `lex/java-mut.oracle.txt`, `lex/java-lex.oracle.txt` | `JavaLexOracle.java`'s lines for the three corpora |
+| `getters/java-goldens/`, `getters/java-community-3caa0bf/`, `getters/java-mut/`, `getters/java-lex/` | `--getters` of `testdata/java/manifest.tsv` and the three corpora (77.5 million lines, 1.7 GB; 51 s for the four at once) |
 
 Rebuild them:
 
@@ -91,6 +102,17 @@ java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/f
 tools/java-oracle/lex_fuzz.py testdata/java $S/fuzz/java-lex 20000 java-lex
 java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --list $S/fuzz/java-lex/list \
   --root $S/fuzz/java-lex --out $S/fuzz/java-lex.oracle --node
+```
+
+The getter lines, which `scripts/gate.sh` compares `ksdump --getters` with (the same lists and roots as the dumps):
+
+```sh
+S=$HOME/.cache/psi-syntax C=$HOME/.cache/accio-bench/intellij-community LIB=$(tools/java-oracle/fetch-jars.sh)
+g() { java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java --getters "$@"; }
+g --list testdata/java/manifest.tsv --root testdata/java --out $S/getters/java-goldens
+g --list $S/corpus/java-community-3caa0bf.list --root $C --out $S/getters/java-community-3caa0bf
+g --list $S/fuzz/java-mut.list --root $S/fuzz/java-mut --out $S/getters/java-mut
+g --list $S/fuzz/java-lex/list --root $S/fuzz/java-lex --out $S/getters/java-lex
 ```
 
 The lexer oracle's cached lines, which `scripts/gate.sh` compares `ksdump --lex` with:

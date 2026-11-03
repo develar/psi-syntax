@@ -639,6 +639,10 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
   `NodeId`s already, and a wrapper per class would add a conversion at every call without catching a mistake the
   kind dispatch does not (a call on a node of the wrong class answers `None`, as the PSI method of a class that lacks
   it). `tools/kotlin-psi-getters/GetterOracle.java` checks them method by method against the live PSI.
+- Java: `java_syntax::psi` answers the getters of IntelliJ's PSI classes (a field's type element across `int a,
+  b[];`, `hasModifierProperty` with the implicit modifiers, a reference's qualifier and `getKindEnum`, ...): a module
+  per class, a function per method, ported from `java/java-psi-impl` at the parser's revision and checked against
+  the real PSI on every node ("Java PSI getters" below).
 
 ## Decisions
 
@@ -738,6 +742,20 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### Java PSI getters (child of 18211728), 2026-11-03
+
+`java_syntax::psi` ports the PSI getters both consumers reimplemented on raw kinds (accio's `extract/src/java`,
+Branch Deck's `code-symbols/src/java`). `tools/java-oracle/JavaPsiOracle.java --getters` asks the real PSI (IntelliJ
+2027.1 at the parser's revision) the same getters on every node and writes one line per answer; `ksdump --getters
+--check` compares ours: 0 differing on the 1036 goldens (29 190 lines), the 19 116 mutations (622 726), the 20 000
+lexer fuzz inputs (848 006) and the 68 260 community files (76 008 352). 10 012 answers are `!` (all an implicit
+class's `getImplementsList()`, a light list IntelliJ fails to build there); ours is `None`. The oracle takes 51 s for
+the four inputs at once (one JVM each), the check 2.8 s for the community files on every core, so the gate grows by
+some 4 s. Two shapes the first comparison caught: an intersection or disjunction of one type element (`A |` with an
+error) is that element's type (`createDisjunction` of one), and the field walk of a 30 000-name declaration is
+quadratic when asked of every field (37.8 s), so a pass takes `field::declaration_heads` (0.1 s for the test's
+inputs together).
 
 ### Value texts (child of "(csharp) Shrink a parser's buffers past its retained bytes"), 2026-11-02
 

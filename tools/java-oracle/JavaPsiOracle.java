@@ -44,6 +44,14 @@
 //
 // --serve keeps one JVM for many batches: each stdin line "LIST<TAB>ROOT<TAB>OUT" is parsed like a
 // --list run, then "done" is printed on stdout.
+//
+// --getters writes OUT/<path>.getters.txt instead of the dumps: the answers of the PSI getters that
+// java_syntax::psi ports, asked of the real PSI, one line "<id> <getter> <answer>" per getter of each node
+// as `ksdump --getters` prints ours (crates/java-syntax/src/psi/getters.rs has the format). <id> is the
+// node's index in a preorder walk of file.getNode() (whitespace, comments and doc comment internals
+// included: psi-syntax's NodeId, the node dumps being equal). An answer that IntelliJ throws on is `!`.
+// Errors IntelliJ only logs (LOG.error, LOG.assertTrue) are not thrown, as in the IDE, and Java asserts
+// are off; PsiAugmentProvider's extension point is registered empty, so no augment applies.
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -99,6 +107,9 @@ import com.intellij.psi.LanguageLevelKey;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.impl.DebugUtil;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
@@ -169,6 +180,7 @@ public class JavaPsiOracle {
     LanguageLevel level = LanguageLevel.HIGHEST;
     boolean trim = false;
     boolean node = false;
+    boolean getters = false;
     boolean serve = false;
     for (int i = 0; i < args.length; i++) {
       switch (args[i]) {
@@ -179,6 +191,7 @@ public class JavaPsiOracle {
         case "--level" -> level = LanguageLevel.valueOf(args[++i]);
         case "--trim" -> trim = true;
         case "--node" -> node = true;
+        case "--getters" -> getters = true;
         default -> throw new IllegalArgumentException("unknown argument " + args[i]);
       }
     }
@@ -190,7 +203,14 @@ public class JavaPsiOracle {
     Path rootDir = root;
     Path outDir = out;
     LanguageLevel defaultLevel = level;
-    Options options = new Options(trim, node);
+    Options options = new Options(trim, node, getters);
+    if (getters) {
+      // LOG.error logs in the IDE and goes on; DefaultLogger would throw.
+      com.intellij.openapi.diagnostic.Logger.setFactory(category -> new com.intellij.openapi.diagnostic.DefaultLogger(category) {
+        @Override
+        public void error(String message, Throwable t, String... details) {}
+      });
+    }
     boolean serveMode = serve;
     Throwable[] failure = new Throwable[1];
     // PSI printing and the parser recurse on nesting depth; give them a deep stack.
@@ -227,7 +247,7 @@ public class JavaPsiOracle {
     System.exit(0);
   }
 
-  record Options(boolean trim, boolean node) {}
+  record Options(boolean trim, boolean node, boolean getters) {}
 
   private static List<Entry> readList(Path list, LanguageLevel defaultLevel) throws IOException {
     List<Entry> entries = new ArrayList<>();
@@ -260,6 +280,9 @@ public class JavaPsiOracle {
     app.addExplicitExtension(ElementTypeConverters.getInstance(), JavaLanguage.INSTANCE, new JavaElementTypeConverterExtension());
     app.registerParserDefinition(new JavaParserDefinition());
     app.registerApplicationService(PsiSyntaxBuilderFactory.class, new PsiSyntaxBuilderFactoryImpl());
+    // As JavaCoreApplicationEnvironment does: no provider, so the augment steps of the getters are the identity.
+    CoreApplicationEnvironment.registerApplicationExtensionPoint(
+      com.intellij.psi.augment.PsiAugmentProvider.EP_NAME, com.intellij.psi.augment.PsiAugmentProvider.class);
     // JavaTestElementTypeConverterExtension of the partial tests: test.java.file to its IFileElementType.
     app.addExplicitExtension(ElementTypeConverters.getInstance(), JavaLanguage.INSTANCE, new ElementTypeConverterFactory() {
       @Override
@@ -290,7 +313,7 @@ public class JavaPsiOracle {
       for (Entry entry : entries) {
         Path source = root.resolve(entry.path());
         String relative = root.toAbsolutePath().normalize().relativize(source.toAbsolutePath().normalize()).toString();
-        String dumpName = relative + ".psi.txt";
+        String dumpName = relative + (options.getters() ? ".getters.txt" : ".psi.txt");
         StringBuilder line = new StringBuilder("{\"path\":").append(json(relative))
           .append(",\"dump\":").append(json(dumpName))
           .append(",\"level\":").append(json(entry.level().name()))
@@ -318,11 +341,11 @@ public class JavaPsiOracle {
             file = new TestPsiJavaFile(viewProvider);
           }
           file.putUserData(LanguageLevelKey.FILE_LANGUAGE_LEVEL_KEY, entry.level());
-          String dump = trimText(DebugUtil.psiToString(file, true, false));
+          String dump = options.getters() ? Getters.of(file) : trimText(DebugUtil.psiToString(file, true, false));
           Path dumpPath = out.resolve(dumpName);
           Files.createDirectories(dumpPath.getParent());
           Files.writeString(dumpPath, dump, StandardCharsets.UTF_8);
-          if (options.node()) {
+          if (options.node() && !options.getters()) {
             String nodeDump = trimText(DebugUtil.nodeTreeAsElementTypeToString(file.getNode(), true));
             Files.writeString(out.resolve(relative + ".node.txt"), nodeDump, StandardCharsets.UTF_8);
           }
@@ -361,6 +384,329 @@ public class JavaPsiOracle {
         index.write(line.append('}').toString());
         index.newLine();
       }
+    }
+  }
+
+  // --getters: the PSI getters java_syntax::psi ports, by element type, in the order of
+  // crates/java-syntax/src/psi/getters.rs.
+  static final class Getters {
+    // PsiModifier's constants, in their order (java_syntax::psi::modifier::Modifier::ALL).
+    static final String[] MODIFIERS = {
+      PsiModifier.PUBLIC, PsiModifier.PROTECTED, PsiModifier.PRIVATE, PsiModifier.PACKAGE_LOCAL, PsiModifier.STATIC,
+      PsiModifier.ABSTRACT, PsiModifier.FINAL, PsiModifier.NATIVE, PsiModifier.SYNCHRONIZED, PsiModifier.STRICTFP,
+      PsiModifier.TRANSIENT, PsiModifier.VOLATILE, PsiModifier.DEFAULT, PsiModifier.OPEN, PsiModifier.TRANSITIVE,
+      PsiModifier.SEALED, PsiModifier.NON_SEALED, PsiModifier.VALUE};
+
+    interface Answer { String get() throws Throwable; }
+
+    final Map<ASTNode, Integer> ids = new java.util.IdentityHashMap<>();
+    final StringBuilder out = new StringBuilder();
+    final PsiFile file;
+    int id;
+
+    Getters(PsiFile file) { this.file = file; }
+
+    static String of(PsiFile file) {
+      Getters getters = new Getters(file);
+      List<ASTNode> nodes = new ArrayList<>();
+      ArrayDeque<ASTNode> stack = new ArrayDeque<>();
+      stack.push(file.getNode());
+      while (!stack.isEmpty()) {
+        ASTNode node = stack.pop();
+        getters.ids.put(node, nodes.size());
+        nodes.add(node);
+        for (ASTNode child = node.getLastChildNode(); child != null; child = child.getTreePrev()) stack.push(child);
+      }
+      for (int i = 0; i < nodes.size(); i++) {
+        getters.id = i;
+        getters.node(nodes.get(i));
+      }
+      return getters.out.toString();
+    }
+
+    void line(String getter, Answer answer) {
+      String text;
+      try {
+        text = answer.get();
+      }
+      catch (Throwable t) {
+        text = "!";
+      }
+      out.append(id).append(' ').append(getter).append(' ').append(text).append('\n');
+    }
+
+    String id(PsiElement element) {
+      if (element == null) return "-";
+      ASTNode node = element.getNode();
+      Integer id = node == null ? null : ids.get(node);
+      return id == null ? "-" : id.toString();
+    }
+
+    String list(PsiElement[] elements) {
+      if (elements.length == 0) return ".";
+      StringBuilder text = new StringBuilder();
+      for (PsiElement element : elements) {
+        if (text.length() > 0) text.append(',');
+        text.append(id(element));
+      }
+      return text.toString();
+    }
+
+    interface Has { boolean has(String name) throws Throwable; }
+
+    static String modifiers(Has has) throws Throwable {
+      StringBuilder text = new StringBuilder();
+      for (String name : MODIFIERS) {
+        if (!has.has(name)) continue;
+        if (text.length() > 0) text.append(',');
+        text.append(name);
+      }
+      return text.length() == 0 ? "." : text.toString();
+    }
+
+    static String escape(String text) {
+      return text.replace("\\", "\\\\").replace("\n", "\\n");
+    }
+
+    void owner(PsiModifierListOwner owner) {
+      line("modifierList", () -> id(owner.getModifierList()));
+      line("mods", () -> modifiers(owner::hasModifierProperty));
+    }
+
+    void node(ASTNode node) {
+      // A token may share its type's name with a node type (the `module` keyword's is MODULE).
+      if (!(node instanceof com.intellij.psi.impl.source.tree.CompositeElement)) return;
+      PsiElement psi = node.getPsi();
+      switch (node.getElementType().toString()) {
+        case "CLASS", "ANONYMOUS_CLASS", "ENUM_CONSTANT_INITIALIZER", "IMPLICIT_CLASS" -> {
+          PsiClass c = (PsiClass) psi;
+          line("isInterface", () -> String.valueOf(c.isInterface()));
+          line("isEnum", () -> String.valueOf(c.isEnum()));
+          line("isRecord", () -> String.valueOf(c.isRecord()));
+          line("isAnnotationType", () -> String.valueOf(c.isAnnotationType()));
+          line("nameIdentifier", () -> id(c.getNameIdentifier()));
+          line("extendsList", () -> id(c.getExtendsList()));
+          line("implementsList", () -> id(c.getImplementsList()));
+          line("permitsList", () -> id(c.getPermitsList()));
+          line("recordHeader", () -> id(c.getRecordHeader()));
+          line("typeParameterList", () -> id(c.getTypeParameterList()));
+          line("containingClass", () -> id(c.getContainingClass()));
+          owner(c);
+          if (psi instanceof com.intellij.psi.PsiAnonymousClass a && node.getElementType().toString().equals("ANONYMOUS_CLASS")) {
+            line("baseClassReference", () -> id(a.getBaseClassReference()));
+            line("argumentList", () -> id(a.getArgumentList()));
+          }
+        }
+        case "EXTENDS_LIST", "IMPLEMENTS_LIST", "PERMITS_LIST", "THROWS_LIST", "EXTENDS_BOUND_LIST", "PROVIDES_WITH_LIST" ->
+          line("refs", () -> list(((com.intellij.psi.PsiReferenceList) psi).getReferenceElements()));
+        case "METHOD", "ANNOTATION_METHOD" -> {
+          com.intellij.psi.PsiMethod m = (com.intellij.psi.PsiMethod) psi;
+          line("isConstructor", () -> String.valueOf(m.isConstructor()));
+          line("returnTypeElement", () -> id(m.getReturnTypeElement()));
+          line("parameterList", () -> id(m.getParameterList()));
+          line("typeParameterList", () -> id(m.getTypeParameterList()));
+          line("throwsList", () -> id(m.getThrowsList()));
+          line("body", () -> id(m.getBody()));
+          line("isVarArgs", () -> String.valueOf(m.isVarArgs()));
+          line("isCompactConstructor", () -> String.valueOf(com.intellij.psi.util.JavaPsiRecordUtil.isCompactConstructor(m)));
+          if (!m.isConstructor()) line("returnDims", () -> String.valueOf(m.getReturnType().getArrayDimensions()));
+          line("containingClass", () -> id(m.getContainingClass()));
+          line("nameIdentifier", () -> id(m.getNameIdentifier()));
+          owner(m);
+        }
+        case "FIELD" -> {
+          com.intellij.psi.PsiField f = (com.intellij.psi.PsiField) psi;
+          line("typeElement", () -> id(f.getTypeElement()));
+          line("nameIdentifier", () -> id(f.getNameIdentifier()));
+          line("initializer", () -> id(f.getInitializer()));
+          if (f.getTypeElement() != null) line("dims", () -> String.valueOf(f.getType().getArrayDimensions()));
+          line("containingClass", () -> id(f.getContainingClass()));
+          owner(f);
+        }
+        case "ENUM_CONSTANT" -> {
+          com.intellij.psi.PsiEnumConstant e = (com.intellij.psi.PsiEnumConstant) psi;
+          line("typeElement", () -> id(e.getTypeElement()));
+          line("nameIdentifier", () -> id(e.getNameIdentifier()));
+          line("initializer", () -> id(e.getInitializer()));
+          line("argumentList", () -> id(e.getArgumentList()));
+          line("initializingClass", () -> id(e.getInitializingClass()));
+          line("containingClass", () -> id(e.getContainingClass()));
+          owner(e);
+        }
+        case "LOCAL_VARIABLE", "RESOURCE_VARIABLE" -> {
+          com.intellij.psi.PsiLocalVariable v = (com.intellij.psi.PsiLocalVariable) psi;
+          line("typeElement", () -> id(v.getTypeElement()));
+          line("nameIdentifier", () -> id(v.getNameIdentifier()));
+          line("initializer", () -> id(v.getInitializer()));
+          if (typed(v::getTypeElement)) line("dims", () -> String.valueOf(v.getType().getArrayDimensions()));
+          owner(v);
+        }
+        case "PARAMETER" -> {
+          com.intellij.psi.PsiParameter p = (com.intellij.psi.PsiParameter) psi;
+          line("typeElement", () -> id(p.getTypeElement()));
+          line("nameIdentifier", () -> id(p.getNameIdentifier()));
+          if (typed(p::getTypeElement)) line("dims", () -> String.valueOf(p.getType().getArrayDimensions()));
+          line("isVarArgs", () -> String.valueOf(p.isVarArgs()));
+          owner(p);
+        }
+        case "RECORD_COMPONENT" -> {
+          com.intellij.psi.PsiRecordComponent r = (com.intellij.psi.PsiRecordComponent) psi;
+          line("typeElement", () -> id(r.getTypeElement()));
+          line("nameIdentifier", () -> id(r.getNameIdentifier()));
+          line("dims", () -> String.valueOf(r.getType().getArrayDimensions()));
+          line("isVarArgs", () -> String.valueOf(r.isVarArgs()));
+          line("containingClass", () -> id(r.getContainingClass()));
+          owner(r);
+        }
+        case "PATTERN_VARIABLE" -> {
+          com.intellij.psi.PsiPatternVariable v = (com.intellij.psi.PsiPatternVariable) psi;
+          line("typeElement", () -> id(v.getTypeElement()));
+          line("nameIdentifier", () -> id(v.getNameIdentifier()));
+          owner(v);
+        }
+        case "RECEIVER" -> {
+          com.intellij.psi.PsiReceiverParameter r = (com.intellij.psi.PsiReceiverParameter) psi;
+          line("typeElement", () -> id(r.getTypeElement()));
+          owner(r);
+        }
+        case "DECONSTRUCTION_PATTERN_VARIABLE", "TYPE_PARAMETER" -> {
+          line("nameIdentifier", () -> id(((com.intellij.psi.PsiNameIdentifierOwner) psi).getNameIdentifier()));
+          owner((PsiModifierListOwner) psi);
+        }
+        case "CLASS_INITIALIZER" -> {
+          com.intellij.psi.PsiClassInitializer i = (com.intellij.psi.PsiClassInitializer) psi;
+          line("containingClass", () -> id(i.getContainingClass()));
+          owner(i);
+        }
+        case "MODULE", "REQUIRES_STATEMENT" -> owner((PsiModifierListOwner) psi);
+        case "MODIFIER_LIST" -> {
+          com.intellij.psi.PsiModifierList l = (com.intellij.psi.PsiModifierList) psi;
+          line("explicit", () -> modifiers(l::hasExplicitModifier));
+          line("modifiers", () -> modifiers(l::hasModifierProperty));
+          line("annotations", () -> list(l.getAnnotations()));
+        }
+        case "TYPE" -> {
+          com.intellij.psi.PsiTypeElement t = (com.intellij.psi.PsiTypeElement) psi;
+          line("innermost", () -> id(t.getInnermostComponentReferenceElement()));
+          line("inferred", () -> String.valueOf(t.isInferredType()));
+          boolean unnamedPattern = t.getFirstChild() == null && t.getParent() instanceof com.intellij.psi.PsiUnnamedPattern;
+          if (!t.isInferredType() && !unnamedPattern) line("type", () -> shape(t.getType()));
+        }
+        case "JAVA_CODE_REFERENCE" -> {
+          com.intellij.psi.impl.source.PsiJavaCodeReferenceElementImpl r = (com.intellij.psi.impl.source.PsiJavaCodeReferenceElementImpl) psi;
+          line("name", () -> id(r.getReferenceNameElement()));
+          line("qualifier", () -> id(r.getQualifier()));
+          line("params", () -> id(r.getParameterList()));
+          line("qualified", () -> String.valueOf(r.isQualified()));
+          line("kind", () -> r.getKindEnum(file).name());
+        }
+        case "IMPORT_STATIC_REFERENCE" -> {
+          com.intellij.psi.PsiImportStaticReferenceElement r = (com.intellij.psi.PsiImportStaticReferenceElement) psi;
+          line("name", () -> id(r.getReferenceNameElement()));
+          line("classReference", () -> id(r.getClassReference()));
+        }
+        case "REFERENCE_EXPRESSION" -> {
+          com.intellij.psi.PsiReferenceExpression r = (com.intellij.psi.PsiReferenceExpression) psi;
+          line("qualifier", () -> id(r.getQualifierExpression()));
+          line("name", () -> id(r.getReferenceNameElement()));
+          line("params", () -> id(r.getParameterList()));
+        }
+        case "METHOD_REF_EXPRESSION" -> {
+          com.intellij.psi.PsiMethodReferenceExpression r = (com.intellij.psi.PsiMethodReferenceExpression) psi;
+          line("qualifier", () -> id(r.getQualifier()));
+          line("name", () -> id(r.getReferenceNameElement()));
+          line("isConstructor", () -> String.valueOf(r.isConstructor()));
+        }
+        case "THIS_EXPRESSION" -> line("qualifier", () -> id(((com.intellij.psi.PsiThisExpression) psi).getQualifier()));
+        case "SUPER_EXPRESSION" -> line("qualifier", () -> id(((com.intellij.psi.PsiSuperExpression) psi).getQualifier()));
+        case "METHOD_CALL_EXPRESSION" -> {
+          com.intellij.psi.PsiMethodCallExpression c = (com.intellij.psi.PsiMethodCallExpression) psi;
+          line("methodExpression", () -> id(c.getMethodExpression()));
+          line("argumentList", () -> id(c.getArgumentList()));
+        }
+        case "EXPRESSION_LIST" -> line("expressions", () -> list(((com.intellij.psi.PsiExpressionList) psi).getExpressions()));
+        case "NEW_EXPRESSION" -> {
+          com.intellij.psi.PsiNewExpression n = (com.intellij.psi.PsiNewExpression) psi;
+          line("qualifier", () -> id(n.getQualifier()));
+          line("classReference", () -> id(n.getClassReference()));
+          line("classOrAnonymous", () -> id(n.getClassOrAnonymousClassReference()));
+          line("anonymousClass", () -> id(n.getAnonymousClass()));
+          line("argumentList", () -> id(n.getArgumentList()));
+          line("typeArgumentList", () -> id(n.getTypeArgumentList()));
+          line("arrayDimensions", () -> list(n.getArrayDimensions()));
+          line("arrayInitializer", () -> id(n.getArrayInitializer()));
+          line("isArrayCreation", () -> String.valueOf(n.isArrayCreation()));
+        }
+        case "IMPORT_STATEMENT", "IMPORT_STATIC_STATEMENT" -> {
+          com.intellij.psi.PsiImportStatementBase i = (com.intellij.psi.PsiImportStatementBase) psi;
+          line("isOnDemand", () -> String.valueOf(i.isOnDemand()));
+          line("importReference", () -> id(i.getImportReference()));
+        }
+        case "IMPORT_MODULE_STATEMENT" -> line("isOnDemand", () -> String.valueOf(((com.intellij.psi.PsiImportStatementBase) psi).isOnDemand()));
+        case "PACKAGE_STATEMENT" -> {
+          com.intellij.psi.PsiPackageStatement p = (com.intellij.psi.PsiPackageStatement) psi;
+          line("packageReference", () -> id(p.getPackageReference()));
+          line("packageName", () -> escape(p.getPackageName()));
+        }
+        case "ANNOTATION" -> {
+          com.intellij.psi.PsiAnnotation a = (com.intellij.psi.PsiAnnotation) psi;
+          line("nameReference", () -> id(a.getNameReferenceElement()));
+          line("referenceText", () -> {
+            com.intellij.psi.PsiJavaCodeReferenceElement name = a.getNameReferenceElement();
+            return name == null ? "-" : escape(com.intellij.psi.impl.source.tree.JavaSourceUtil.getReferenceText(name));
+          });
+          line("parameterList", () -> id(a.getParameterList()));
+        }
+        case "TYPE_CAST_EXPRESSION" -> {
+          com.intellij.psi.PsiTypeCastExpression c = (com.intellij.psi.PsiTypeCastExpression) psi;
+          line("castType", () -> id(c.getCastType()));
+          line("operand", () -> id(c.getOperand()));
+        }
+        case "INSTANCE_OF_EXPRESSION" -> {
+          com.intellij.psi.PsiInstanceOfExpression i = (com.intellij.psi.PsiInstanceOfExpression) psi;
+          line("operand", () -> id(i.getOperand()));
+          line("checkType", () -> id(i.getCheckType()));
+          line("pattern", () -> id(i.getPattern()));
+        }
+        case "LAMBDA_EXPRESSION" -> {
+          com.intellij.psi.PsiLambdaExpression l = (com.intellij.psi.PsiLambdaExpression) psi;
+          line("parameterList", () -> id(l.getParameterList()));
+          line("body", () -> id(l.getBody()));
+        }
+        case "PARAMETER_LIST" -> line("parameters", () -> list(((com.intellij.psi.PsiParameterList) psi).getParameters()));
+        case "RECORD_HEADER" -> line("components", () -> list(((com.intellij.psi.PsiRecordHeader) psi).getRecordComponents()));
+        case "TYPE_PARAMETER_LIST" -> line("typeParameters", () -> list(((com.intellij.psi.PsiTypeParameterList) psi).getTypeParameters()));
+        default -> {}
+      }
+    }
+
+    // A variable with a type element that is not `var` (the dimensions of the others resolve).
+    interface TypeElementGetter { com.intellij.psi.PsiTypeElement get(); }
+
+    static boolean typed(TypeElementGetter getter) {
+      try {
+        com.intellij.psi.PsiTypeElement t = getter.get();
+        return t != null && !t.isInferredType();
+      }
+      catch (Throwable e) {
+        return false;
+      }
+    }
+
+    // The class of the outermost PsiType and its getArrayDimensions().
+    static String shape(com.intellij.psi.PsiType t) {
+      String kind;
+      if (t instanceof com.intellij.psi.PsiEllipsisType) kind = "ellipsis";
+      else if (t instanceof com.intellij.psi.PsiArrayType) kind = "array";
+      else if (t == com.intellij.psi.PsiTypes.nullType()) kind = "null";
+      else if (t instanceof com.intellij.psi.PsiPrimitiveType) kind = "primitive";
+      else if (t instanceof com.intellij.psi.PsiClassType) kind = "class";
+      else if (t instanceof com.intellij.psi.PsiWildcardType) kind = "wildcard";
+      else if (t instanceof com.intellij.psi.PsiIntersectionType) kind = "intersection";
+      else if (t instanceof com.intellij.psi.PsiDisjunctionType) kind = "disjunction";
+      else if (t instanceof com.intellij.psi.PsiDiamondType) kind = "diamond";
+      else kind = t.getClass().getSimpleName();
+      return kind + " " + t.getArrayDimensions();
     }
   }
 
