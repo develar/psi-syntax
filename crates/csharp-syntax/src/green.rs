@@ -22,9 +22,9 @@ pub struct Green(u32);
 
 const TAG_SHIFT: u32 = 30;
 const INDEX_MASK: u32 = (1 << TAG_SHIFT) - 1;
-const TAG_TOKEN: u32 = 1;
-const TAG_NODE: u32 = 2;
-const TAG_LIST: u32 = 3;
+pub(crate) const TAG_TOKEN: u32 = 1;
+pub(crate) const TAG_NODE: u32 = 2;
+pub(crate) const TAG_LIST: u32 = 3;
 
 impl Green {
     /// `null`.
@@ -36,12 +36,12 @@ impl Green {
     }
 
     #[inline]
-    fn tag(self) -> u32 {
+    pub(crate) fn tag(self) -> u32 {
         self.0 >> TAG_SHIFT
     }
 
     #[inline]
-    fn index(self) -> usize {
+    pub(crate) fn index(self) -> usize {
         (self.0 & INDEX_MASK) as usize
     }
 
@@ -78,13 +78,13 @@ impl Green {
 /// A trivia record: `SyntaxTrivia` (a kind and a text) or a structured trivia (a node: a directive, a documentation
 /// comment, skipped tokens), as an element of a token's leading or trailing trivia.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
-pub struct Trivia(u32);
+pub struct Trivia(pub(crate) u32);
 
 /// A token's leading or trailing trivia: a run of `Trivia` (Roslyn's `GreenNode` of one trivia or a list of them).
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub struct TriviaList {
-    start: u32,
-    len: u32,
+    pub(crate) start: u32,
+    pub(crate) len: u32,
 }
 
 impl TriviaList {
@@ -102,9 +102,9 @@ impl TriviaList {
 
 /// The diagnostics of an element: a run of indices into the arena's diagnostics.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
-struct DiagList {
-    start: u32,
-    len: u32,
+pub(crate) struct DiagList {
+    pub(crate) start: u32,
+    pub(crate) len: u32,
 }
 
 /// The index of a `DiagnosticInfo` in the arena.
@@ -179,52 +179,52 @@ pub(crate) const CONTAINS_STRUCTURED_TRIVIA: u16 = 1 << 10;
 const INHERIT_MASK: u16 =
     IS_NOT_MISSING | CONTAINS_DIAGNOSTICS | CONTAINS_DIRECTIVES | CONTAINS_SKIPPED_TEXT | CONTAINS_STRUCTURED_TRIVIA;
 /// Not Roslyn's: a token whose text is in `strings` (`TokenText::Owned`).
-const OWNED_TEXT: u16 = 1 << 13;
+pub(crate) const OWNED_TEXT: u16 = 1 << 13;
 /// Not Roslyn's: a token whose text is `SyntaxFacts.GetText(kind)` (`TokenText::Fixed`).
-const FIXED_TEXT: u16 = 1 << 14;
+pub(crate) const FIXED_TEXT: u16 = 1 << 14;
 
-const NO_VALUE: u32 = u32::MAX;
+pub(crate) const NO_VALUE: u32 = u32::MAX;
 
 #[derive(Copy, Clone, Debug)]
-struct TokenData {
-    kind: SyntaxKind,
+pub(crate) struct TokenData {
+    pub(crate) kind: SyntaxKind,
     /// `ContextualKind`: the contextual keyword an identifier token spells, else `kind`.
-    contextual: SyntaxKind,
-    flags: u16,
+    pub(crate) contextual: SyntaxKind,
+    pub(crate) flags: u16,
     /// The text's source offset (`TokenText::Source`) or `strings` offset (`OWNED_TEXT`); unused for `FIXED_TEXT`.
-    start: u32,
-    width: u32,
-    leading: TriviaList,
-    trailing: TriviaList,
-    leading_width: u32,
-    trailing_width: u32,
-    diags: DiagList,
+    pub(crate) start: u32,
+    pub(crate) width: u32,
+    pub(crate) leading: TriviaList,
+    pub(crate) trailing: TriviaList,
+    pub(crate) leading_width: u32,
+    pub(crate) trailing_width: u32,
+    pub(crate) diags: DiagList,
     /// The `ValueText` of an identifier or literal whose value is not its text (`@class`, `a`): an index into
     /// `values`, or `NO_VALUE`.
-    value: u32,
+    pub(crate) value: u32,
 }
 
 #[derive(Copy, Clone, Debug)]
-struct NodeData {
-    kind: SyntaxKind,
-    flags: u16,
-    slot_start: u32,
-    slot_count: u32,
-    full_width: u32,
-    diags: DiagList,
+pub(crate) struct NodeData {
+    pub(crate) kind: SyntaxKind,
+    pub(crate) flags: u16,
+    pub(crate) slot_start: u32,
+    pub(crate) slot_count: u32,
+    pub(crate) full_width: u32,
+    pub(crate) diags: DiagList,
     /// The boolean fields of the node type (`syntax::types::X::IS_ACTIVE`, ...).
-    extra: u32,
+    pub(crate) extra: u32,
 }
 
 #[derive(Copy, Clone, Debug)]
-struct TriviaData {
-    kind: SyntaxKind,
-    flags: u16,
-    start: u32,
-    width: u32,
+pub(crate) struct TriviaData {
+    pub(crate) kind: SyntaxKind,
+    pub(crate) flags: u16,
+    pub(crate) start: u32,
+    pub(crate) width: u32,
     /// The structure of a structured trivia (a node), else null.
-    structure: Green,
-    diags: DiagList,
+    pub(crate) structure: Green,
+    pub(crate) diags: DiagList,
 }
 
 /// The green arena of one file: owned by a `Parser`, cleared per file.
@@ -291,9 +291,38 @@ pub fn work_budget_for(text_len: usize) -> u64 {
     (text_len as u64).saturating_mul(16).max(1 << 20)
 }
 
+/// The arena's records as slices, for a walk that reads them directly (`flatten::Flattener::run_columns`).
+#[derive(Copy, Clone)]
+pub(crate) struct Records<'a> {
+    pub(crate) tokens: &'a [TokenData],
+    pub(crate) nodes: &'a [NodeData],
+    pub(crate) trivia: &'a [TriviaData],
+    pub(crate) slots: &'a [Green],
+    pub(crate) trivia_refs: &'a [Trivia],
+}
+
 impl GreenArena {
     pub fn new() -> GreenArena {
         GreenArena::default()
+    }
+
+    /// The records as slices (`Records`).
+    pub(crate) fn records(&self) -> Records<'_> {
+        Records {
+            tokens: &self.tokens,
+            nodes: &self.nodes,
+            trivia: &self.trivia,
+            slots: &self.slots,
+            trivia_refs: &self.trivia_refs,
+        }
+    }
+
+    /// The nodes of a tree of this arena's records, in the usual case at most (the columns `flatten` writes the tree
+    /// into): a tree node is a token, a trivia of a token's list or a node, and every record and trivia reference
+    /// counts once, garbage and lists included, plus a root over a lone token. A tree that holds a record twice (a
+    /// node shared by two parents) may have more.
+    pub(crate) fn tree_node_estimate(&self) -> usize {
+        self.tokens.len() + self.trivia_refs.len() + self.nodes.len() + 1
     }
 
     /// At most `bytes` in the buffers from now on (`budget_for`); past it `is_over_budget` turns true.

@@ -71,8 +71,9 @@ Kotlin parsers and consumers name them as before.
 `Token`, `Node`, `FileKind` and `ERROR_ELEMENT` form the supertrait `TreeLanguage`: all that `Tree<L>`, its consumer
 API and the dump's layout need. A language whose parser does not run on `PsiBuilderImpl` (C#, ported from Roslyn,
 which builds green nodes bottom-up and hangs trivia on tokens) implements only `TreeLanguage` and fills a tree in
-preorder through `TreeBuilder<L>` (`open`, `leaf`, `close`, `set_trailing`, `set_missing`, `set_error`, `finish`).
-The split changed none of the 25 counters on Kotlin or Java.
+preorder through `TreeBuilder<L>` (`open`, `leaf`, `close`, `set_trailing`, `set_missing`, `set_error`, `finish`, or
+nodes written by id into columns sized up front: `writer`, `ColumnWriter`, `truncate`). The split changed none of the
+25 counters on Kotlin or Java.
 
 Everything is monomorphized per language; nothing is `dyn`. A function the Kotlin crate's own code used to inline may
 be instantiated differently from another crate: `skip_whitespace`, inlined before, became a call on every cursor move
@@ -406,7 +407,7 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
          ├─ each directive: DirectiveParser over the lexer in Directive mode
          ├─ each documentation comment: DocumentationCommentParser over the lexer in its XML modes
          └─ each hole of an interpolated string: a lexer and a LanguageParser over a window of the file
-     ─ flatten: one walk, no recursion ─> TreeBuilder<CSharp> ─> Tree {psi_builder::Tree<CSharp>, diagnostics}
+     ─ flatten: one walk, no recursion, nodes written by id into the tree's columns ─> Tree {psi_builder::Tree<CSharp>, diagnostics}
 ```
 
 - **Not on `PsiBuilderImpl`.** Roslyn builds green nodes bottom up from children already made, copies them to add a
@@ -433,9 +434,10 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   10-17 bytes of records per source byte ("C# memory"); past `green::budget_for` (256 bytes a source byte, at least
   256 MiB) the parse is abandoned as on an exhausted stack ("C# nesting and work").
 - **Buffers.** The arena, the token window, the trivia and list builders (`SyntaxListPool`), the directive store, the
-  interpolated string and documentation comment parsers' buffers, the tree builder and the flattener's stack belong to
-  the `Parser` and are cleared, not freed, per file; `Tree` is copied out exactly sized. A tree owns its text
-  (`Arc<[u8]>`), nothing of the arena. A parse that leaves more than the retained bytes in them (64 MiB by default)
+  interpolated string and documentation comment parsers' buffers and the flattener's stacks belong to the `Parser`
+  and are cleared, not freed, per file. The tree builder keeps nothing between files: the tree's columns are allocated
+  once per file at the arena's estimate of its nodes (bounded by the text), written in place and handed to the tree shrunk to fit. A tree
+  owns its text (`Arc<[u8]>`), nothing of the arena. A parse that leaves more than the retained bytes in them (64 MiB by default)
   shrinks them to half of that, each to the same share of its capacity ("Retained buffers").
 - **Lexer.** `Lexer.cs` and its partial files ported method by method. Keywords are a perfect hash of the first eight
   bytes and the length into 1024 slots, built and checked at compile time, which is what `LexerCache` and
@@ -467,11 +469,19 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   token's text: every range is a file offset, the tokens have the source's text and Roslyn's red positions, and the
   temporary parsers borrow the arena and take their buffers from `InterpolatedStringBuffers` (one level of nesting
   each), so no hole allocates per token once warm.
-- **Flatten (`flatten.rs`).** One walk over an explicit stack (the children of a node at a slot and element; a
-  token in its phases: leading trivia, the token, trailing trivia) in `ChildNodesAndTokens()` order: a list's
-  elements are its parent's children, a null slot is skipped, a node is a composite over its full span, a token a
-  leaf over its span (`set_missing` when missing), its trivia leaves before and after it in the token's parent,
-  `set_trailing` on the trailing ones, a structured trivia a subtree whose root has the trivia's kind. Positions are
+- **Flatten (`flatten.rs`).** One walk in `ChildNodesAndTokens()` order: a list's elements are its parent's
+  children, a null slot is skipped, a node is a composite over its full span, a token a leaf over its span (missing
+  when missing), its trivia leaves before and after it in the token's parent, trailing on the trailing ones, a
+  structured trivia a subtree whose root has the trivia's kind. The walk reads the arena's records directly and
+  writes each node by its id into the tree's columns (`TreeBuilder::writer`), sized to
+  `GreenArena::tree_node_estimate` (every token, trivia reference and node record, garbage and lists included), at
+  most 2 nodes a source byte (the corpora's files have at most 1.41) and 16 for an abandoned parse, so that garbage
+  up to the arena budget does not size and zero columns the tree never fills (`flatten::first_capacity`): the
+  next id, the position and the run of slots it is in stay in registers, a token's trivia are walked in place, and
+  only the runs it comes back to (a parent's remaining slots, a token's trivia after a structured one) go on its
+  stack. A tree that holds a record twice can exceed the estimate (14 of the 31 267 runtime files, 61 of the 122 741
+  mutations, no file of the other corpora); the walk counted its nodes, so it runs again into columns of that size. There is no buffer of build records and no copy of the
+  finished tree. Positions are
   running sums of full widths, as the red tree computes them, so missing tokens, merged tokens and nested lexers'
   tokens land where Roslyn puts them. The tree's text is the source; where Roslyn's tree drops a token (once in the
   corpora, mutations and fuzz: `ParseConversionOperatorDeclaration` replacing a modifier by a skipped one) its
@@ -608,8 +618,9 @@ allocated only when the file has errors.
 
 - **Navigation.** The subtree of `id` is `id..subtree_end`, the first child is `id + 1` when the subtree is not empty,
   and the next sibling is `subtree_end` while that is inside the parent's subtree. `last_child` walks the children.
-- **Building.** The tree is built in the `Parser`'s buffer, one record per node (one push), and copied into exactly
-  sized columns, so there is no slack.
+- **Building.** Kotlin's and Java's tree is built in the `Parser`'s buffer, one record per node (one push), and copied
+  into exactly sized columns; C#'s is written into its columns in place (`TreeBuilder`) and shrunk to fit. Either way
+  there is no slack.
 - **Leaves.** Whitespace and comments are leaves wherever PSI's binders put them. No string is stored per leaf: a
   leaf's text is its range.
 

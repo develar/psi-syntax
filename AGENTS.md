@@ -182,7 +182,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 |---|---|
 | `psi-builder` `src/language.rs` | `TreeLanguage` (what a tree needs: token and node types, the file kind, the error element), `Language: TreeLanguage` (what the builder and driver ask a language besides: binders, whitespace and comments, left-bound types, chameleons and bodies, the cursor's joined token, brackets, how a file and a chameleon are lexed and parsed), `TokenType` (with `NODE_BASE`, where node indices start), `NodeType`, the generic `ElementType<T, N>` |
 | `psi-builder` `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback (the production a linked list, so `precede` and the other middle edits take constant time), the `WhitespacesAndCommentsBinder` contract, edge balancing, the nesting limits (a language's own through `Language` constants), the balanced-block and too-deep skips, block ends in amortized constant time (`balanced_block_end`); binds the tree |
-| `psi-builder` `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf, unexpanded, trailing and missing bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser<L>` drives the builders: the file's, then a stack of chameleon builders, each expanding its chameleon in place where `bind` meets it (heap, not recursion), through `Language::parse_chameleon` and its `Chameleon` (the body's file tokens when reusable, else relexed). `TreeBuilder<L>` builds a tree in preorder for a language whose parser does not run on `PsiBuilderImpl`. The consumer API: see "The consumer contract" |
+| `psi-builder` `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf, unexpanded, trailing and missing bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser<L>` drives the builders: the file's, then a stack of chameleon builders, each expanding its chameleon in place where `bind` meets it (heap, not recursion), through `Language::parse_chameleon` and its `Chameleon` (the body's file tokens when reusable, else relexed). `TreeBuilder<L>` builds a tree in preorder for a language whose parser does not run on `PsiBuilderImpl`, writing its columns in place (pushed, or by id through `ColumnWriter` into columns sized up front) and handing them to the tree. The consumer API: see "The consumer contract" |
 | `psi-builder` `src/buffers.rs` | what a reusable parser keeps of its buffers: `RETAINED_BYTES` (64 MiB), `retained_after` (half), `Shrink` (every buffer emptied to the same share of its capacity), shared by the three languages' `Parser`s |
 | `psi-builder` `src/dump.rs`, `src/token_set.rs`, `src/lexer.rs`, `src/counters.rs` | the dump's layout (`psi_to_string_with`, a language labels each node; `fix_white_spaces`); `ElementTypeSet`, a `TokenSet`'s bits; `Lexed<T>` (types, starts, plain bits), `char_at`, `in_ranges`; the builder's and driver's event counters |
 | `psi-builder` `src/document.rs` | a file's text as IntelliJ's document holds it: the byte order mark (`has_byte_order_mark`, `blank_byte_order_mark`), `Lines` (the line of an offset); each language's `document_text` (`tree.rs` of `kotlin-syntax`, `java-syntax`) builds on it |
@@ -227,8 +227,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   keeps all) shrinks them to half of that, each buffer to the same share of its capacity, so a long-lived parser holds
   at most that between files whatever it parsed (a C# parser held 1.24 GB after dotnet/runtime's `hugeexpr1.cs`, now
   32 MiB). `parser.heap_bytes()` is what the buffers hold, `parser.shrink_to(bytes)` shrinks them on demand (`0`
-  frees them); trees are unaffected. A file that needs more grows them again: 7 ms for each of the 14 runtime files
-  that pass the bound, nothing for the files after them (DESIGN, "Retained buffers").
+  frees them); trees are unaffected. A file that needs more grows them again: 7 ms for each of the runtime files
+  that pass the bound (9 of them; 14 while the tree builder kept a buffer), nothing for the files after them
+  (DESIGN, "Retained buffers").
 - Ids are preorder: `0..len()` is document order, the subtree of `id` is `id..subtree_end(id)`. `root`, `kind`,
   `token_kind`, `node_kind`, `is_leaf`, `range`, `text`, `parent`, `first_child`, `last_child`, `next_sibling`,
   `children`, `first_child_of_kind`, `preorder` (with depth), `tokens`, `error_message`; `descendants(id)` is the
@@ -326,8 +327,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   lossless. The tree's text is the source but where Roslyn's tree drops a token so that its positions no longer
   spell the source (one of the 122 741 mutations, a member entry; no corpus file): from there it is the green tree's
   own text, as `ToFullString()` is. No body-less parsing. Its buffers (arena, lexer, token window, list
-  builders, the directive, documentation comment and interpolated string parsers', tree builder, flattener) are
-  retained as above: 51.1, 58.2, 33.7 and 14.8 MB after the four corpora instead of 101.5, 1245.0, 76.5 and 14.8.
+  builders, the directive, documentation comment and interpolated string parsers', flattener; the tree builder keeps
+  none, a tree's columns become the tree) are retained as above: 59.9, 34.9, 56.5 and 9.8 MB after the four corpora
+  instead of 101.5, 1245.0, 76.5 and 14.8 without a bound.
 - Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
   levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
   parenthesized types; a lazy block or lambda adds 4 to where it sits) up to `builder::NESTING_LIMIT` (1000), at most

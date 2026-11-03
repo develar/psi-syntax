@@ -236,7 +236,7 @@ impl Tree {
     pub fn from_green(arena: &GreenArena, root: Green, source: &[u8], file_kind: FileKind) -> Tree {
         let source: Arc<[u8]> = Arc::from(source);
         let mut builder = TreeBuilder::new();
-        Tree::of(Flattener::default().flatten(arena, root, &source, &mut builder, file_kind), false, false)
+        Tree::of(Flattener::default().flatten(arena, root, &source, &mut builder, file_kind, false), false, false)
     }
 
     /// The tree of lexed `tokens` of `arena` as the children of a root, as `Parser::lex` builds it (tests).
@@ -355,7 +355,8 @@ impl Parser {
 
     /// The heap bytes the parser's buffers hold between parses, by capacity: the green arena, the lexer's buffers
     /// (with those of the directive, documentation comment and interpolated string parsers it runs), the token
-    /// window, the list builders, the tree builder and the flattener's stack.
+    /// window, the list builders and the flattener's stacks; the tree builder's columns, while a tree is built (they
+    /// become the tree's).
     pub fn heap_bytes(&self) -> usize {
         self.arena.heap_bytes()
             + self.lexer.heap_bytes()
@@ -432,17 +433,18 @@ impl Parser {
         let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
         let buffers = std::mem::take(&mut self.syntax_parser);
         let pool = std::mem::take(&mut self.pool);
-        let (root, buffers, pool) = {
+        let (root, abandoned, buffers, pool) = {
             let mut parser = LanguageParser::new(&mut lexer, LexerMode::SYNTAX, buffers, pool);
             let root = parser.parse_entry(file_kind.entry);
+            let abandoned = parser.stack_exhausted_at.is_some() || parser.base.budget_exhausted_at.is_some();
             let (buffers, pool) = parser.into_buffers();
-            (root, buffers, pool)
+            (root, abandoned, buffers, pool)
         };
         self.syntax_parser = buffers;
         self.pool = pool;
         let (arena, lexer_buffers) = lexer.into_parts();
         self.lexer = lexer_buffers;
-        self.finish(arena, root, &source, file_kind)
+        self.finish(arena, root, &source, file_kind, abandoned)
     }
 
     /// The lexer's tokens of `text` in `LexerMode.Syntax` up to and with the end of file (`SyntaxFactory.ParseTokens`),
@@ -493,7 +495,14 @@ impl Parser {
         count
     }
 
-    fn finish(&mut self, arena: GreenArena, root: Green, source: &Arc<[u8]>, file_kind: FileKind) -> Tree {
+    fn finish(
+        &mut self,
+        arena: GreenArena,
+        root: Green,
+        source: &Arc<[u8]>,
+        file_kind: FileKind,
+        abandoned: bool,
+    ) -> Tree {
         let no_result = root.is_null();
         let flat = if no_result {
             let id = self.builder.open(None, psi_builder::ElementType::Node(crate::NodeKind::CompilationUnit), 0);
@@ -501,7 +510,7 @@ impl Parser {
             let tree = self.builder.finish(source.clone(), file_kind);
             Flat { tree, diagnostics: Vec::new(), values: Values::default() }
         } else {
-            self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind)
+            self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind, abandoned)
         };
         self.arena = arena;
         self.retain();
