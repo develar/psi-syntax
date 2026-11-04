@@ -98,6 +98,13 @@ fn computed(tree: &Tree, id: NodeId, kind: NodeKind, out: &mut Lines) {
     }
     if is_directive_trivia_syntax(kind) {
         out.one("DirectiveTriviaSyntax.DirectiveNameToken", directive_trivia::directive_name_token(tree, id));
+        out.bool("DirectiveTriviaSyntax.IsActive", directive_trivia::is_active(tree, id));
+    }
+    if is_branching_directive_trivia_syntax(kind) {
+        out.bool("BranchingDirectiveTriviaSyntax.BranchTaken", directive_trivia::branch_taken(tree, id));
+    }
+    if is_conditional_directive_trivia_syntax(kind) {
+        out.bool("ConditionalDirectiveTriviaSyntax.ConditionValue", directive_trivia::condition_value(tree, id));
     }
 }
 

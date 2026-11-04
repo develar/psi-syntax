@@ -579,7 +579,7 @@ ABSTRACT_ALIASES = {("NameColonSyntax", "Expression"): "Name"}
 # The fields `syntax_getters` also answers on a node of any type that has one (`modifiers_of`, ...).
 ANY_FIELDS = ["AttributeLists", "Modifiers", "Identifier", "TypeParameterList", "ParameterList", "ConstraintClauses",
               "BaseList", "Members", "Body", "ExpressionBody", "Type", "ReturnType", "ExplicitInterfaceSpecifier",
-              "AccessorList", "SemicolonToken"]
+              "AccessorList", "SemicolonToken", "ArgumentList"]
 
 
 class Hierarchy:

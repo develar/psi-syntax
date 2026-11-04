@@ -1002,7 +1002,7 @@ stops at the first child past it.
 class (through Roslyn's overrides: an extension block has no `Identifier`, a `NameColon`'s `Expression` is its
 `Name`), the ported computed properties (the internal ones by reflection) and `Span`, a line each, nodes numbered as
 the dump prints them; `ksdump --lang csharp --getters --check` compares the hash of each file's lines. 0 differing:
-the goldens (508 367 lines), the four corpora at Latest (62 609 files, 512.5 million lines) and at Preview, the roslyn
+the goldens (509 538 lines), the four corpora at Latest (62 609 files, 512.6 million lines) and at Preview, the roslyn
 corpus at `--doc diagnose` and `none`, the -defines lists (27.1 million), the 122 741 mutations at their three
 versions, the 20 000 lexer fuzz inputs at Latest and Preview, and 18 975 inputs of `getters_fuzz.py` (declaration,
 name and expression pieces mixed or inserted into the goldens; 3.7 million lines), 1378 million lines in all; a second

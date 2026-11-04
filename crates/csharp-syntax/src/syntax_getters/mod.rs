@@ -29,8 +29,8 @@
 //! its field (a type of 30 000 members is not scanned for its identifier), allocates nothing but the texts of
 //! `name::error_display_name`, recurses nowhere and panics on no tree. `getters` prints every answer on every node, as
 //! `tools/csharp-oracle/oracle.sh getters` prints Roslyn's own; `ksdump --lang csharp --getters --check` compares the
-//! two (AGENTS.md, "C#"). Boolean fields of Syntax.xml (a directive's `IsActive`, `BranchTaken`, `ConditionValue`)
-//! are not in the tree and have no getter.
+//! two (AGENTS.md, "C#"). The boolean fields of Syntax.xml, a directive's `IsActive`, `BranchTaken` and
+//! `ConditionValue`, are `directive_trivia::is_active`, `branch_taken` and `condition_value` (`Tree::directive_flags`).
 
 mod fields;
 pub mod getters;

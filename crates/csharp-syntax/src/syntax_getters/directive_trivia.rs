@@ -1,5 +1,6 @@
 //! `DirectiveTriviaSyntax`: the fields it declares (`super::fields`: `hash_token`, `end_of_directive_token`) on every
-//! directive, and `DirectiveTriviaSyntax.cs`'s `DirectiveNameToken`.
+//! directive, its boolean fields and those of `BranchingDirectiveTriviaSyntax` and `ConditionalDirectiveTriviaSyntax`
+//! (`Tree::directive_flags`), and `DirectiveTriviaSyntax.cs`'s `DirectiveNameToken`.
 
 pub use super::fields::directive_trivia::*;
 
@@ -34,4 +35,22 @@ pub fn directive_name_token(tree: &Tree, directive: NodeId) -> Option<NodeId> {
         NodeKind::NullableDirectiveTrivia => nullable_directive_trivia::nullable_keyword(tree, directive),
         _ => None,
     }
+}
+
+/// `DirectiveTriviaSyntax.IsActive` (Syntax.xml's boolean field, `Tree::directive_flags`): the directive is read, in no
+/// branch the preprocessor does not take; false on another node.
+pub fn is_active(tree: &Tree, directive: NodeId) -> bool {
+    tree.directive_flags(directive).is_some_and(|f| f.is_active())
+}
+
+/// `BranchingDirectiveTriviaSyntax.BranchTaken` of an `#if`, `#elif` or `#else`: the branch after it is taken; false on
+/// another node.
+pub fn branch_taken(tree: &Tree, directive: NodeId) -> bool {
+    tree.directive_flags(directive).is_some_and(|f| f.branch_taken())
+}
+
+/// `ConditionalDirectiveTriviaSyntax.ConditionValue` of an `#if` or `#elif`: its condition's value; false on another
+/// node.
+pub fn condition_value(tree: &Tree, directive: NodeId) -> bool {
+    tree.directive_flags(directive).is_some_and(|f| f.condition_value())
 }

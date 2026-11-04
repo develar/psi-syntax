@@ -353,6 +353,11 @@ fn directives_and_documentation_comments_are_trivia_with_getters_of_their_own() 
     assert!(read::is_structured_trivia(&tree, directive));
     assert_eq!(text(&tree, directive_trivia::directive_name_token(&tree, directive).unwrap()), "if");
     assert_eq!(spanned(&tree, conditional_directive_trivia::condition(&tree, directive).unwrap()), "DEBUG && !X");
+    // no symbol defined: the `#if` is read, its branch not taken, its condition false; the `#endif` read too
+    assert!(directive_trivia::is_active(&tree, directive));
+    assert!(!directive_trivia::branch_taken(&tree, directive) && !directive_trivia::condition_value(&tree, directive));
+    assert!(directive_trivia::is_active(&tree, all(&tree, NodeKind::EndIfDirectiveTrivia)[0]));
+    assert!(!directive_trivia::is_active(&tree, tree.root()));
     // ` `, `<param name="a">x</param>`, the line end: XML text, an element, XML text
     let doc = all(&tree, NodeKind::SingleLineDocumentationCommentTrivia)[0];
     let content: Vec<Option<NodeKind>> =
@@ -419,12 +424,22 @@ fn check_every_getter(tree: &Tree, name: &str) {
     if tree.is_lexed() {
         return;
     }
-    // `read::span` of each node alone equals the one-pass spans of the `Span` lines (Roslyn's, by the gate)
+    // `read::span` and `span_end` of each node alone equal the one-pass spans of the `Span` lines (Roslyn's, by the
+    // gate); `span` descends the left edge, a level per node there, so on a left-deep chain of n links each costs n:
+    // asked of every node only below 50 000 nodes, `span_end` (the right edge) of every node always
+    let every_span = tree.len() < 50_000;
     for line in lines.lines().filter(|l| l.contains(" Span ")) {
         let mut parts = line.split(' ');
         let id = NodeId(parts.next().unwrap().parse().unwrap());
-        let span = read::span(tree, id);
-        assert_eq!(parts.nth(1), Some(format!("{}..{}", span.start, span.end).as_str()), "{name}: {id:?}");
+        let expected = parts.nth(1).unwrap();
+        assert_eq!(expected.split("..").nth(1), Some(read::span_end(tree, id).to_string().as_str()), "{name}: {id:?}");
+        if every_span {
+            let span = read::span(tree, id);
+            assert_eq!(expected, format!("{}..{}", span.start, span.end), "{name}: {id:?}");
+            if let (Some(first), Some(last)) = (read::first_token(tree, id), read::last_token(tree, id)) {
+                assert_eq!((tree.range(first).start, tree.range(last).end), (span.start, span.end), "{name}: {id:?}");
+            }
+        }
     }
     for id in tree.descendants(tree.root()) {
         let Some(kind) = tree.node_kind(id) else { continue };
@@ -454,11 +469,7 @@ fn check_every_getter(tree: &Tree, name: &str) {
         assert_eq!(explicit_interface_specifier_of(tree, id), one(field("ExplicitInterfaceSpecifier")), "{name}");
         assert_eq!(accessor_list_of(tree, id), one(field("AccessorList")), "{name}");
         assert_eq!(semicolon_token_of(tree, id), one(field("SemicolonToken")), "{name}");
-        let span = read::span(tree, id);
-        assert_eq!(read::span_end(tree, id), span.end, "{name}: {id:?}");
-        if let (Some(first), Some(last)) = (read::first_token(tree, id), read::last_token(tree, id)) {
-            assert!(tree.range(first).start <= tree.range(last).end, "{name}: {id:?}");
-        }
+        assert_eq!(argument_list_of(tree, id), one(field("ArgumentList")), "{name}");
     }
 }
 

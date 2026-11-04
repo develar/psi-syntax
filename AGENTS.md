@@ -384,10 +384,10 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   its field, allocates nothing but `name::error_display_name`'s text, recurses nowhere, panics on no tree. They answer
   what Roslyn's own properties answer on every node: `ksdump --lang csharp --getters --check` against
   `tools/csharp-oracle/oracle.sh getters` (the gate's step 12) printed the same lines for the 7064 goldens, the four
-  corpora at Latest (62 609 files, 512.5 million lines) and at Preview, the roslyn corpus at `--doc diagnose` and
+  corpora at Latest (62 609 files, 512.6 million lines) and at Preview, the roslyn corpus at `--doc diagnose` and
   `none`, the -defines lists, the 122 741 mutations at their three versions, the 20 000 lexer fuzz inputs at Latest and
   Preview and the 18 975 getters fuzz inputs (1378 million lines in all, 0 differing, 2026-11-04). The boolean fields
-  of Syntax.xml (a directive's `IsActive`) are not in the tree and have no getter.
+  of Syntax.xml are `directive_trivia::is_active`, `branch_taken` and `condition_value` (`Tree::directive_flags`).
 - C# reads (`csharp_syntax::read`, `src/read.rs`), what both consumers read beyond the properties and nothing of their
   own facts: `is_trivia`, `is_structured_trivia` (over `psi_builder`'s tree, so they serve as `own_range` and
   `descendants_pruned` predicates), `is_code_token`, `span` (`SyntaxNode.Span`: the full span without the trivia at its

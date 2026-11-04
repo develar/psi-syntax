@@ -2546,6 +2546,15 @@ pub fn semicolon_token_of(tree: &Tree, id: NodeId) -> Option<NodeId> {
     )
 }
 
+/// `ArgumentList` of a node of any type that has the field (11 types), None on the others.
+pub fn argument_list_of(tree: &Tree, id: NodeId) -> Option<NodeId> {
+    read_field_in(
+        tree,
+        id,
+        &[(28, 0), (30, 0), (46, 1), (47, 1), (60, 1), (61, 2), (72, 1), (114, 1), (159, 1), (176, 1), (191, 2)],
+    )
+}
+
 /// `IdentifierNameSyntax` (IdentifierName): its fields in Syntax.xml order.
 pub mod identifier_name {
     use super::*;

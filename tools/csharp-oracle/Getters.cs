@@ -299,6 +299,15 @@ sealed class GetterLines
         if (node is DirectiveTriviaSyntax directive)
         {
             o.Try("DirectiveTriviaSyntax.DirectiveNameToken", g => o.Token(g, directive.DirectiveNameToken));
+            o.Try("DirectiveTriviaSyntax.IsActive", g => o.Bool(g, directive.IsActive));
+        }
+        if (node is BranchingDirectiveTriviaSyntax branching)
+        {
+            o.Try("BranchingDirectiveTriviaSyntax.BranchTaken", g => o.Bool(g, branching.BranchTaken));
+        }
+        if (node is ConditionalDirectiveTriviaSyntax conditional)
+        {
+            o.Try("ConditionalDirectiveTriviaSyntax.ConditionValue", g => o.Bool(g, conditional.ConditionValue));
         }
     }
 }

@@ -247,7 +247,7 @@ trivia without lines. Per node:
   class it derives from with fields of its own, in Syntax.xml's order, those fields prefixed with the class
   (`MemberDeclarationSyntax.Modifiers`, `TypeDeclarationSyntax.Keyword`): the property itself (`Fields.g.cs`), so an
   override answers as Roslyn's (`ExtensionBlockDeclarationSyntax.Identifier` is `default`, `NameColonSyntax.Expression`
-  is its `Name`); boolean fields (`IsActive`) are not printed;
+  is its `Name`); boolean fields are printed with the computed properties;
 - the computed properties of the partial classes the port has, prefixed with their class, in this order:
   `NameSyntax.Arity`, `.GetUnqualifiedName`, `.GetAliasQualifierOpt`, `.ErrorDisplayName`,
   `GenericNameSyntax.IsUnboundGenericName`, `TypeDeclarationSyntax.Arity`, `.PrimaryConstructorBaseTypeIfClass`,
@@ -255,7 +255,8 @@ trivia without lines. Per node:
   `ParameterListSyntax.ParameterCount`, `ArrayRankSpecifierSyntax.Rank`, `AnonymousFunctionExpressionSyntax.Body`,
   `.AsyncKeyword`, `LocalDeclarationStatementSyntax.IsConst`, `UsingDirectiveSyntax.Name`,
   `SubpatternSyntax.NameColon`, `TypeSyntax.IsVar`, `.IsUnmanaged`, `.IsNotNull`, `.IsNint`, `.IsNuint`,
-  `DirectiveTriviaSyntax.DirectiveNameToken`; the internal ones by reflection.
+  `DirectiveTriviaSyntax.DirectiveNameToken`, `.IsActive`, `BranchingDirectiveTriviaSyntax.BranchTaken`,
+  `ConditionalDirectiveTriviaSyntax.ConditionValue`; the internal ones by reflection.
 
 An answer is a node's or token's number, `-` for a null node or a `default` token (a missing token has its number),
 the numbers of a list joined by `,` (`.` when empty; a separated list's elements without the separators), a count,
@@ -266,7 +267,7 @@ of the lines' UTF-8 bytes) or `PATH<TAB>failure<TAB>REASON` (`no member`, an exc
 as for `dump`. Past 2^29 chars of lines a file is the failure `dump over 512 MB`.
 
 `ksdump --lang csharp --getters --check LINES` compares ours with cached lines (`caches.sh getters`, `getters/csharp/`):
-on 2026-11-04, 0 differing lines on the goldens (508 367 lines), the four corpora at Latest (62 609 files, 512.5
+on 2026-11-04, 0 differing lines on the goldens (509 538 lines), the four corpora at Latest (62 609 files, 512.5
 million lines) and at Preview, the roslyn corpus at `--doc diagnose` and `--doc none`, the -defines lists, the
 mutations at their three versions, the lexer fuzz at Latest and Preview and the getters fuzz (18 975 files, 3.7
 million lines): 594 607 file parses, 1378 million lines (DESIGN, "C# syntax getters"). The oracle takes 2.6 min for
