@@ -31,16 +31,27 @@ enum Entry
     Tokens,
 }
 
-/// <summary>A file's parse options: the language version as asked (`latest`, `preview` or a number) and the
-/// documentation mode. Script, preprocessor symbols and features are out of scope.</summary>
-readonly record struct Options(LanguageVersion Version, DocumentationMode Doc)
+/// <summary>A file's parse options: the language version as asked (`latest`, `preview` or a number), the
+/// documentation mode and the preprocessor symbols, their names joined by <c>;</c> (empty: none). Script and features
+/// are out of scope.</summary>
+readonly record struct Options(LanguageVersion Version, DocumentationMode Doc, string Symbols = "")
 {
     public static readonly Options Default = new(LanguageVersion.Latest, DocumentationMode.Parse);
 
     static readonly ConcurrentDictionary<Options, CSharpParseOptions> s_parse = new();
 
     public CSharpParseOptions Parse => s_parse.GetOrAdd(this, o =>
-        new CSharpParseOptions(languageVersion: o.Version, documentationMode: o.Doc, kind: SourceCodeKind.Regular));
+    {
+        var po = new CSharpParseOptions(languageVersion: o.Version, documentationMode: o.Doc, kind: SourceCodeKind.Regular);
+        return o.Symbols == "" ? po : po.WithPreprocessorSymbols(o.Symbols.Split(';'));
+    });
+
+    /// <summary>The defaults of a command: <c>--version</c>, <c>--doc</c> and <c>--define A;B</c>.</summary>
+    public static Options FromArgs(Args a) =>
+        new(ParseVersion(a.Get("version") ?? ""), ParseDoc(a.Get("doc") ?? ""), ParseSymbols(a.Get("define") ?? ""));
+
+    /// <summary>A SYMBOLS column or <c>--define</c>: names separated by <c>;</c>, empty names dropped.</summary>
+    public static string ParseSymbols(string s) => string.Join(';', s.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
     public static LanguageVersion ParseVersion(string s)
     {
@@ -510,8 +521,8 @@ static class Dumper
     }
 }
 
-/// <summary>A list line: <c>PATH[&lt;TAB&gt;VERSION[&lt;TAB&gt;ENTRY[&lt;TAB&gt;DOC]]]</c>, an empty or absent column
-/// taking the command's default; more columns are ignored.</summary>
+/// <summary>A list line: <c>PATH[&lt;TAB&gt;VERSION[&lt;TAB&gt;ENTRY[&lt;TAB&gt;DOC[&lt;TAB&gt;SYMBOLS]]]]</c>, an empty
+/// or absent column taking the command's default; more columns are ignored.</summary>
 readonly record struct Job(string Path, Entry Entry, Options Options)
 {
     public static List<Job> ReadList(string list, Entry entry, Options defaults)
@@ -527,7 +538,8 @@ readonly record struct Job(string Path, Entry Entry, Options Options)
             var version = cols.Length > 1 && cols[1] != "" ? Options.ParseVersion(cols[1]) : defaults.Version;
             var e = cols.Length > 2 && cols[2] != "" ? Options.ParseEntry(cols[2]) : entry;
             var doc = cols.Length > 3 && cols[3] != "" ? Options.ParseDoc(cols[3]) : defaults.Doc;
-            jobs.Add(new Job(cols[0], e, new Options(version, doc)));
+            var symbols = cols.Length > 4 && cols[4] != "" ? Options.ParseSymbols(cols[4]) : defaults.Symbols;
+            jobs.Add(new Job(cols[0], e, new Options(version, doc, symbols)));
         }
         return jobs;
     }
@@ -623,7 +635,7 @@ static class DumpMode
 
     public static int Run(Args a)
     {
-        var defaults = new Options(Options.ParseVersion(a.Get("version") ?? ""), Options.ParseDoc(a.Get("doc") ?? ""));
+        var defaults = Options.FromArgs(a);
         var entry = Options.ParseEntry(a.Get("entry") ?? "");
         if (a.Has("serve"))
         {
@@ -713,7 +725,7 @@ static class LexMode
 
     public static int Run(Args a)
     {
-        var defaults = new Options(Options.ParseVersion(a.Get("version") ?? ""), Options.ParseDoc(a.Get("doc") ?? ""));
+        var defaults = Options.FromArgs(a);
         var jobs = Job.ReadList(a.Need("list"), Entry.Tokens, defaults);
         var root = a.Need("root");
         var full = a.Get("full");

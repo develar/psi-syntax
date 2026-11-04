@@ -69,9 +69,9 @@ NuGet `Microsoft.CodeAnalysis.CSharp` 5.9.0 is built from (its nuspec names it):
 the diagnostics under `Errors/` with their messages in `CSharpResources.resx`. Read them with
 `git -C ~/.cache/psi-syntax/roslyn show 35d9211b841e7613c1d2f8f5af6d628ace696c4c:<path>` (a blobless clone), never
 from a working tree. Scope, what accio needs: full parses of `.cs` files at any `LanguageVersion` (`Latest` by
-default, the gate also runs Preview), any `DocumentationMode` (`Parse` by default), diagnostics with their English
-messages; no scripts (`.csx`), preprocessor symbols, `Features`, incremental parsing, node cache or body-less parsing
-(Roslyn reparses no block on its own).
+default, the gate also runs Preview), any `DocumentationMode` (`Parse` by default), any preprocessor symbols (none by
+default), diagnostics with their English messages; no scripts (`.csx`), `Features`, incremental parsing, node cache or
+body-less parsing (Roslyn reparses no block on its own).
 
 The rules of the Kotlin and Java ports hold: one Rust function per C# method, the same name in snake_case, the same
 order, so a diff against the C# reads line by line; error codes and their arguments, recovery, speculation with reset
@@ -98,7 +98,7 @@ named at its place and listed in DESIGN, "C# deviations".
 | the red tree's positions, `ChildNodesAndTokens()`, `Syntax/SyntaxTreeDiagnosticEnumerator.cs` | `flatten.rs`: green to `psi_builder::Tree<CSharp>` and the diagnostics in Roslyn's order |
 | `src/Compilers/Core/Portable/Diagnostic/DiagnosticInfo.cs` (`GetMessage`), `XmlSyntaxDiagnosticInfo` | `diagnostic.rs`: a message as `string.Format` of the English format formats Roslyn's arguments |
 | `tools/csharp-oracle/Dump.cs` | `dump.rs`: `tree_to_string`, `lex_to_string`, `index_line` |
-| `CSharpSyntaxTree.ParseText`, `SyntaxFactory.Parse*`, `CSharpParseOptions` | `tree.rs` (`Parser`, `Tree`, `FileKind`, `Entry`, `DocumentationMode`, `Diagnostic`), `language.rs` (`CSharp: TreeLanguage`) |
+| `CSharpSyntaxTree.ParseText`, `SyntaxFactory.Parse*`, `CSharpParseOptions` | `tree.rs` (`Parser`, `Tree`, `FileKind`, `Entry`, `DocumentationMode`, `Diagnostic`), `lexer/mod.rs` (`PreprocessorSymbols`, `LexerOptions`), `language.rs` (`CSharp: TreeLanguage`) |
 | `Parser/SyntaxParser.cs`, `Parser/SyntaxParser.ResetPoint.cs` | `syntax_parser.rs`: the token window, lexer modes, reset points, `EatToken`, the error helpers, skipped syntax, keyword conversions, feature checks |
 | `Parser/Lexer.cs`, `AbstractLexer.cs`, `Lexer_StringLiteral.cs`, `Lexer_RawStringLiteral.cs`, `Lexer.Interpolation.cs`, `SlidingTextWindow.cs`, `CharacterInfo.cs` (with `UnicodeCharacterUtilities`), `DocumentationCommentXmlTokens.cs`, `QuickScanner.cs`, `LexerCache.cs` (its token map) | `lexer/mod.rs`, `abstract_lexer.rs`, `string_literal.rs`, `raw_string_literal.rs`, `interpolation.rs`, `sliding_text_window.rs`, `character_info.rs`, the XML tokens in `lexer/mod.rs`, `quick_scanner.rs`, `lexer_cache.rs` |
 | `Parser/Directives.cs`, `Parser/DirectiveParser.cs` | `lexer/directives.rs`, `lexer/directive_parser.rs` |
@@ -117,37 +117,40 @@ map and keyword cache (keywords are a perfect hash; its token map is `lexer/lexe
 generated files are never edited by hand: `tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV]` writes
 `syntax_kind.rs`, `syntax.rs`, `error_code.rs` and `xml_char_type.rs` from `git show`; `DOTNET_ROOT=$HOME/.cache/psi-syntax/dotnet
 $HOME/.cache/psi-syntax/dotnet/dotnet run --project tools/csharp-unicode > crates/csharp-syntax/src/unicode.rs` writes
-`unicode.rs`. Tests (`crates/csharp-syntax/tests/`): `goldens.rs` (the 7051 goldens of `testdata/csharp` and the
+`unicode.rs`. Tests (`crates/csharp-syntax/tests/`): `goldens.rs` (the 7064 goldens of `testdata/csharp` and the
 reduced cases of `tests/oracle/`, `NAME.cs` with the oracle's `NAME.tree.txt` and a `manifest.tsv` line, strict under
 `KS_STRICT=1`; `CSHARP_TESTDATA` names another directory), `robustness.rs` (see DESIGN, "C# nesting and work"),
 `kinds.rs` (the generated tables against each other and `facts`), `flatten.rs` (hand-built green trees dumped),
-`pipeline.rs` (files and entries end to end), `memory.rs` (the arena budget, the retained buffers), `value_text.rs`
-(`Tree::value_text` against Roslyn's lexer tests, and `tests/values/` and the goldens against the oracle's `values
---kept` lines), `contract.rs` (the consumer contract's contextual keywords, converted or not).
+`pipeline.rs` (files, entries and preprocessor symbols end to end), `memory.rs` (the arena budget, the retained
+buffers), `value_text.rs` (`Tree::value_text` against Roslyn's lexer tests, and `tests/values/` and the goldens against
+the oracle's `values --kept` lines), `contract.rs` (the consumer contract's contextual keywords, converted or not).
 
 The oracle is that package on .NET SDK 10.0.403 (`~/.cache/psi-syntax/dotnet`, pinned by `global.json`, packages by
 `packages.lock.json`), run with `DOTNET_ROOT=~/.cache/psi-syntax/dotnet DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1`
 (`oracle.sh` sets the first): `tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version
-latest|preview|N] [--doc parse|none|diagnose] [--entry NAME] [--stack-mb M]` writes `OUT/<path>.tree.txt` and
-`index.jsonl`; `oracle.sh lex --list LIST --root ROOT [--doc ...]` prints the lexer hash lines; `oracle.sh values
---list LIST --root ROOT [--kept]` the tokens whose `ValueText` is not their text (`--kept`: of those the port keeps
-the value of, as `ksdump --values` prints ours). Ours:
-`target/release/ksdump --lang csharp --list LIST --root ROOT --out OUT [--version V] [--doc D]` (a list line
-`PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, the flags filling empty columns), `--lex` for the lexer lines, `--check
-ORACLE`, `--lex --check LINES` and `--values --check LINES` for the gate's in-memory comparisons, `--bench` for throughput, `--check-bodies` for
-losslessness alone; `scripts/compare.py ORACLE_DIR OURS_DIR` buckets differing `.tree.txt` dumps by their first
-differing line. `tools/csharp-oracle/README.md` is the normative dump format, the goldens' extraction and the caches:
-`testdata/csharp/` (7051 goldens of Roslyn's parser and lexer tests, `manifest.tsv` with version, entry and
-documentation mode), the corpora dotnet/roslyn at the pin, dotnet/runtime and dotnet/aspnetcore v10.0.14,
-AvaloniaUI/Avalonia 12.1.4 under `~/.cache/psi-syntax/csharp-src/` with lists in `corpus/csharp-*.list`, dumps in
-`oracle/csharp-*` (and `-preview`), lexer lines in `lex/csharp-*`, mutations and lexer fuzz in `fuzz/csharp-*` (with
-`-latest` and `-preview` dumps); `tools/csharp-oracle/caches.sh` rebuilds them, `vendor-goldens.sh` the goldens. A
-difference found on a corpus is reduced to a small input, which goes to `crates/csharp-syntax/tests/oracle/` with the
-oracle's dump once fixed. The gate's C# steps are 9 (the lexer at `--doc none`, `parse` and `diagnose` against the
-cached lines) and 10 (the dumps of every corpus at Latest and Preview, the mutations at their goldens' versions, Latest
-and Preview, the fuzz at Latest and Preview; the 6 runtime files without an oracle dump only lossless); see
-`scripts/gate.sh`'s header. While iterating: `cargo test --release -p csharp-syntax --test goldens` (the pass count and
-the first differing lines), then one corpus with `ksdump --check`.
+latest|preview|N] [--doc parse|none|diagnose] [--define A;B] [--entry NAME] [--stack-mb M]` writes `OUT/<path>.tree.txt`
+and `index.jsonl`; `oracle.sh lex --list LIST --root ROOT [--doc ...]` prints the lexer hash lines; `oracle.sh values
+--list LIST --root ROOT [--kept]` the tokens whose `ValueText` is not their text (`--kept`: of those the port keeps the
+value of, as `ksdump --values` prints ours). Ours: `target/release/ksdump --lang csharp --list LIST --root ROOT --out
+OUT [--version V] [--doc D] [--define A;B]` (a list line `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC[<TAB>SYMBOLS]]]]`,
+SYMBOLS the preprocessor symbols separated by `;`, the flags filling empty columns), `--lex` for the lexer lines,
+`--check ORACLE`, `--lex --check LINES` and `--values --check LINES` for the gate's in-memory comparisons, `--bench` for
+throughput, `--check-bodies` for losslessness alone; `scripts/compare.py ORACLE_DIR OURS_DIR` buckets differing
+`.tree.txt` dumps by their first differing line. `tools/csharp-oracle/README.md` is the normative dump format, the
+goldens' extraction and the caches: `testdata/csharp/` (7064 goldens of Roslyn's parser and lexer tests, `manifest.tsv`
+with version, entry, documentation mode and preprocessor symbols), the corpora dotnet/roslyn at the pin, dotnet/runtime
+and dotnet/aspnetcore v10.0.14, AvaloniaUI/Avalonia 12.1.4 under `~/.cache/psi-syntax/csharp-src/` with lists in
+`corpus/csharp-*.list`, dumps in `oracle/csharp-*` (and `-preview`), lexer lines in `lex/csharp-*`, mutations and lexer
+fuzz in `fuzz/csharp-*` (with `-latest` and `-preview` dumps), and of the roslyn and Avalonia files whose conditions
+name a symbol, with all of them defined, `corpus/csharp-*-defines.list`, `oracle/csharp-*-defines` and
+`lex/csharp-*-defines.doc.oracle.txt` (`tools/csharp-oracle/defines.py`); `tools/csharp-oracle/caches.sh` rebuilds them,
+`vendor-goldens.sh` the goldens. A difference found on a corpus is reduced to a small input, which goes to
+`crates/csharp-syntax/tests/oracle/` with the oracle's dump once fixed. The gate's C# steps are 9 (the lexer at `--doc
+none`, `parse` and `diagnose` against the cached lines), 10 (the dumps of every corpus at Latest and Preview, the
+mutations at their goldens' versions, Latest and Preview, the fuzz at Latest and Preview; the 6 runtime files without an
+oracle dump only lossless) and 11 (the dumps and lexer lines of the `-defines` lists, every symbol of a file's
+conditions defined); see `scripts/gate.sh`'s header. While iterating: `cargo test --release -p csharp-syntax --test
+goldens` (the pass count and the first differing lines), then one corpus with `ksdump --check`.
 
 Updating Roslyn (a new `Microsoft.CodeAnalysis.CSharp` release):
 
@@ -209,7 +212,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `java-syntax` `tests/lexer.rs`, `tests/goldens.rs`, `tests/doc_comments.rs`, `tests/robustness.rs` | the leaf texts of all 1036 Java goldens against our tokens (adjacent tokens joined where the parser collapses them, reference and type holders relexed); every golden parsed at its level through its entry, both dumps against `NAME.txt` and `NAME_node.txt`; `JavaDocParser` alone, each golden parsed flat and its `PsiDocComment` subtrees compared with the golden's (`JAVA_STRICT=1` or `KS_STRICT=1` fails on any difference); 80 recursive forms nested 100 000 deep, 44 chains and lists of 100 000 and 40 random mixes on a 1 MB stack, random bytes and fragments, every golden under nesting limits 1 to 13 (lossless, `parse_body` exact) |
 | `java-syntax` `tests/psi.rs` | the getters on the inputs where a consumer once read the tree differently from IntelliJ (the answers the live PSI's), every getter on every node of the goldens, of 3000 random inputs and of deep and long ones (a declaration of 30 000 fields, 1000 array levels, an initializer 30 000 deep), `field::declaration_heads` against the per-field walk |
 | `csharp-syntax` `src/`, `tests/` | every module with the Roslyn file it ports, and every test: "C#" above |
-| `crates/ksdump/src/main.rs`, `check.rs`, `pool.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv] [--retain MIB|max]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing, the parser's buffers at the end of each parse and after the round (`--retain` sets the retained bytes; the TSV's `parser_grown` and `parser_kept` per file); `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench [--docs]` times the file lexer alone (Kotlin's or Java's, a list of one language), with `--docs` also the doc-comment lexer over every doc comment; `--lex` hashes the tokens `tokenize_into` makes, as a parse lexes them; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java|csharp` (else `.java` is Java, `.cs` C#, anything else Kotlin); `--lex` lexes Java files (a list line may be `PATH<TAB>LEVEL`), `--out` dumps them (a list line as `JavaPsiOracle.java` reads it, `--node` adds `.node.txt`), `--bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, never mixed with Kotlin), `--check-bodies` takes one as `--out` does, `--getters` writes (`--out`) or compares (`--check`) the lines of `java_syntax::psi::getters` instead of the dumps; C# (`--lang csharp` or `.cs`): `--out` and `--lex` take list lines as `tools/csharp-oracle` reads them, `--version V` and `--doc parse|none|diagnose` fill their empty columns, `--bench` takes a list of C# files (parse and flatten), `--lex --bench` times the lexer alone, `--values` prints the value text lines as `tools/csharp-oracle values --kept` does (`--values --check LINES` compares them with its cached ones, the gate's), `--check-bodies` only checks that the leaves are the text (C# has no lazily parsed bodies). `ksdump --check ORACLE` makes the dumps `--out` would write in memory and compares them byte for byte with the oracle's directory (a dump that differs or that one side lacks; `index.jsonl` aside), writing only the differing ones to `--out`; `--lex --check LINES` compares the `--lex` lines with the oracle's cached ones; both print `N differing of M` and exit nonzero on any (the gate's comparisons). `--out`, `--check`, `--lex` and `--check-bodies` parse on every core (`--threads N`), one `Parser` per thread, the files largest first, the output in list order. Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
+| `crates/ksdump/src/main.rs`, `check.rs`, `pool.rs` | `ksdump --list LIST --root ROOT --out OUT`: writes `OUT/<path>.psi.txt` per file like the oracle, and `ksdump --bench --list LIST --root ROOT [--threads N] [--walk] [--no-bodies] [--repeat K] [--file-stats OUT.tsv] [--retain MIB|max]`: parse throughput in MB/s (one thread or N), the cost of a preorder walk and of a linear scan, tree bytes per source MB, body-less parsing, the parser's buffers at the end of each parse and after the round (`--retain` sets the retained bytes; the TSV's `parser_grown` and `parser_kept` per file); `--features alloc-stats` adds allocations per file, `--features counters` the builder's calls per token. `ksdump --lex --bench [--docs]` times the file lexer alone (Kotlin's or Java's, a list of one language), with `--docs` also the doc-comment lexer over every doc comment; `--lex` hashes the tokens `tokenize_into` makes, as a parse lexes them; `ksdump --check-bodies` checks that the leaves are the text and `parse_body` against the full parse; `--nesting-limit N` parses with that limit (the too-deep paths on ordinary files); `--lang kotlin|java|csharp` (else `.java` is Java, `.cs` C#, anything else Kotlin); `--lex` lexes Java files (a list line may be `PATH<TAB>LEVEL`), `--out` dumps them (a list line as `JavaPsiOracle.java` reads it, `--node` adds `.node.txt`), `--bench` takes a list of Java files (`PATH[<TAB>LEVEL]`, never mixed with Kotlin), `--check-bodies` takes one as `--out` does, `--getters` writes (`--out`) or compares (`--check`) the lines of `java_syntax::psi::getters` instead of the dumps; C# (`--lang csharp` or `.cs`): `--out` and `--lex` take list lines as `tools/csharp-oracle` reads them, `--version V`, `--doc parse|none|diagnose` and `--define A;B` fill their empty columns (`--bench` parses without the symbols), `--bench` takes a list of C# files (parse and flatten), `--lex --bench` times the lexer alone, `--values` prints the value text lines as `tools/csharp-oracle values --kept` does (`--values --check LINES` compares them with its cached ones, the gate's), `--check-bodies` only checks that the leaves are the text (C# has no lazily parsed bodies). `ksdump --check ORACLE` makes the dumps `--out` would write in memory and compares them byte for byte with the oracle's directory (a dump that differs or that one side lacks; `index.jsonl` aside), writing only the differing ones to `--out`; `--lex --check LINES` compares the `--lex` lines with the oracle's cached ones; both print `N differing of M` and exit nonzero on any (the gate's comparisons). `--out`, `--check`, `--lex` and `--check-bodies` parse on every core (`--threads N`), one `Parser` per thread, the files largest first, the output in list order. Features `counters` (both crates' per-thread counters; without it every `add` compiles to nothing) and `alloc-stats` |
 | `tests/goldens.rs` | every pair under `testdata/{psi,spec}`: parse the `.kt`/`.kts`, compare `psi_to_string` with the `.txt` (trailing whitespace trimmed); prints the pass count and the first differing line of each failure; `KS_STRICT=1` fails on any difference but the stale pair of `tests/common::KNOWN_STALE` |
 | `tests/oracle.rs` | each `tests/oracle/NAME.kt` against the live PSI oracle's dump `NAME.txt` of it: inputs that once differed |
 | `tests/lexer.rs`, `tests/kdoc.rs`, `tests/robustness.rs` | the goldens' leaf texts against our tokens; the goldens' `KDoc` subtrees against ours; arbitrary bytes parse losslessly without a panic, ids in preorder, navigation consistent with the parent links; 22 recursive forms nested 100 000 deep and 18 left-associative chains of 100 000 operators on a 1 MB stack, each well under a second; every golden under nesting limits 1 to 13, lossless and with `parse_body` exact |
@@ -297,9 +300,14 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   a pass over call sites parses in full. Measured on the community files, one thread, 72c8c11: Kotlin
   111.3 -> 231.8 MB/s, nodes 63.7M -> 31.2M, tree 7.64 -> 4.26 bytes per source byte; Java 120.0 -> 265.2 MB/s,
   nodes 85.3M -> 38.6M, tree 8.12 -> 4.24.
-- C# (`csharp_syntax::{Parser, Tree, FileKind}`, `src/tree.rs`): the same `Parser` per thread (`Parser::new()`, then
-  `parser.parse(text, FileKind::default())`, or `FileKind::file(LanguageVersion::CSharp12)`, with `doc_mode` for
-  `DocumentationMode::None` or `Diagnose`; `entry` is for Roslyn's tests and hidden). `Parser` is `Send`, `Tree` is
+- C# (`csharp_syntax::{Parser, Tree, FileKind, PreprocessorSymbols}`, `src/tree.rs`): the same `Parser` per thread
+  (`Parser::new()`, then `parser.parse(text, FileKind::default())`, or `FileKind::file(LanguageVersion::CSharp12)`,
+  with `doc_mode` for `DocumentationMode::None` or `Diagnose`; `entry` is for Roslyn's tests and hidden).
+  Preprocessor symbols are `parser.parse_with_symbols(text, kind, &symbols)` with `PreprocessorSymbols::new(["DEBUG",
+  "NET8_0"])`, `CSharpParseOptions.WithPreprocessorSymbols`: an `#if` reads a name the file neither `#define`s nor
+  `#undef`s before it as defined when `symbols` holds it (its value: `A\u0042` is `AB`); `parse` defines none, as
+  `CSharpParseOptions.Default`. The tree is Roslyn's for those symbols: the regions they enable are code, the others
+  `DisabledTextTrivia`. `Parser` is `Send`, `Tree` is
   `Send + Sync` with its own `Arc<[u8]>` (the const assertion is in `tree.rs`), and derefs to `psi_builder::Tree<CSharp>`,
   so every method above applies, with `TokenKind` and `NodeKind` of Roslyn's names (`IdentifierToken`,
   `ClassDeclaration`). The tree is Roslyn's red tree: a node's range is its full span (with the trivia of its
@@ -416,7 +424,7 @@ of the PSI getters `java_syntax::psi` ports, cached in `$HOME/.cache/psi-syntax/
 the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
 `tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
 
-C#: `testdata/csharp/` (7051 goldens of Roslyn's parsing and lexing tests) and `tools/csharp-oracle` (Roslyn 5.9.0
+C#: `testdata/csharp/` (7064 goldens of Roslyn's parsing and lexing tests) and `tools/csharp-oracle` (Roslyn 5.9.0
 itself: `oracle.sh dump` and `oracle.sh lex`, the cached dumps and lexer lines of four corpora, 122 741 golden
 mutations and 20 000 lexer fuzz inputs); "C#" above has the commands, `tools/csharp-oracle/README.md` the format.
 Reduced cases go to `crates/csharp-syntax/tests/oracle/`.
@@ -479,7 +487,8 @@ Roslyn) says otherwise.
   `tools/csharp-oracle`'s cached lexer lines on its four corpora, mutations and lexer fuzz, the C# value texts
   (`ksdump --values --check`) against its cached `values --kept` lines of the same inputs, and the C# parser's dumps
   against its cached dumps: the four corpora at Latest and at Preview, the mutations at their goldens' versions, at
-  Latest and at Preview, the lexer fuzz at Latest and at Preview (the 6 runtime files without a dump only lossless).
+  Latest and at Preview, the lexer fuzz at Latest and at Preview (the 6 runtime files without a dump only lossless),
+  and the dumps and lexer lines of the roslyn and Avalonia files whose conditions name a symbol, every one defined.
   A faster change that fails it is not a change.
 - Java speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list scripts/ab.sh OLD NEW` (the community
   `.java` files); DESIGN, "Java parse throughput", has the numbers and how tree-sitter-java was compared.

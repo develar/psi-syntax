@@ -2,3 +2,7 @@ dropped_modifier_token	10	member	parse
 format_clause_new_line	latest	compilation-unit	parse
 shifted_diagnostic_after_supplementary	latest	compilation-unit	parse
 shifted_diagnostic_after_zwnbsp	latest	compilation-unit	parse
+symbol_defined_by_option	latest	compilation-unit	parse	A
+symbol_undefined_by_the_file	latest	compilation-unit	parse	A
+symbol_defined_by_the_file	latest	compilation-unit	parse	A;C
+symbol_with_unicode_escape	latest	compilation-unit	parse	AB

@@ -27,11 +27,12 @@ on the golden mutations.
 For C# the contract is the same against Roslyn 5.9.0 (`Microsoft.CodeAnalysis.CSharp`, dotnet/roslyn 35d9211b):
 `csharp_syntax::dump::tree_to_string` prints what `tools/csharp-oracle` prints of the syntax tree Roslyn returns, its
 nodes, tokens, trivia, missing tokens and diagnostics with their messages, at UTF-8 byte offsets. The gate checks it
-on the 7051 goldens of Roslyn's own parsing and lexing tests and 4 reduced cases (strict), on the 62 615 valid UTF-8
+on the 7064 goldens of Roslyn's own parsing and lexing tests and 8 reduced cases (strict), on the 62 615 valid UTF-8
 `.cs` files of dotnet/roslyn, dotnet/runtime, dotnet/aspnetcore and Avalonia at Latest and at Preview, on 122 741
 golden mutations at their goldens' versions, at Latest and at Preview, and on 20 000 lexer fuzz inputs at Latest and
-at Preview; the lexer's tokens alone at the three documentation modes on the same inputs; the 6 runtime files whose
-dump is too large for the oracle only lossless (see "C#").
+at Preview; the lexer's tokens alone at the three documentation modes on the same inputs; the 977 roslyn and Avalonia
+files whose conditions name a symbol with every such symbol defined; the 6 runtime files whose dump is too large for
+the oracle only lossless (see "C#").
 
 Speed work therefore changes only three things, none of which changes a parser decision:
 
@@ -555,11 +556,19 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   Preview dumps are all hard links), so Preview's own paths run on the goldens, mutations and fuzz. The entries
   besides `CompilationUnit` are `SyntaxFactory.Parse*` for Roslyn's tests (hidden from the docs); `Entry::Name`
   parses at the defaults as `ParseName` takes no options; `Entry::Tokens` is `ParseTokens`, the lexer alone.
+- **Preprocessor symbols.** `PreprocessorSymbols` (`lexer/mod.rs`) is `CSharpParseOptions.PreprocessorSymbols`, the
+  names sorted and searched by bytes, borrowed by `LexerOptions` for one parse: `Parser::parse_with_symbols(text,
+  kind, &symbols)` and `lex_with_symbols` (`parse` and `lex` define none). `DirectiveParser::is_defined` is
+  `IsDefined` (DirectiveParser.cs:914): the file's own `#define` or `#undef` before the directive, else whether the
+  options hold the identifier's value (`A\u0042` is `AB`). `FileKind` stays `Copy` without them. Checked on the 13
+  goldens that define symbols, `tests/oracle/symbol_*` and, in the gate, the 834 roslyn and 143 Avalonia files whose
+  `#if` and `#elif` conditions name a symbol, each with all of them defined (`tools/csharp-oracle/defines.py`; 741 and
+  140 of their dumps differ from the defaults'), 0 differing dumps and lexer lines.
 - **Oracle.** `tools/csharp-oracle` runs Roslyn itself and walks the red tree it returns (`ChildNodesAndTokens()` with
   each token's trivia, the order of Roslyn's own `ParsingTests.EnumerateNodes`): the dump is not imitated. Its
   goldens are the inputs of Roslyn's parsing and lexing tests, found and constant-folded by Roslyn compiling those
-  tests (7051 of 7214 constant inputs, with each test's version, entry and documentation mode); a difference on a
-  corpus is reduced to `crates/csharp-syntax/tests/oracle/`.
+  tests (7064 of 7227 constant inputs, with each test's version, entry, documentation mode and preprocessor
+  symbols); a difference on a corpus is reduced to `crates/csharp-syntax/tests/oracle/`.
 
 ### C# nesting and work (`csharp-syntax`; `parser::MAX_RECURSION_DEPTH`, `green::work_budget_for`)
 
@@ -666,8 +675,7 @@ changes a tree of the gate's inputs; the first three apply only past limits no c
   only valid UTF-8); a lone surrogate of a message is U+FFFD with `Diagnostic::lone_surrogates` beside it; a tree
   whose token Roslyn dropped takes its text from the green tree past the drop.
 - **Not ported**: incremental parsing (`Blender`, `BlendedNode`, the old tree), `LexerCache`'s trivia map and keyword
-  cache (its token map and `QuickScanner` are ported: "Lexer"), the node cache, scripts, preprocessor symbols from
-  options, `Features`.
+  cache (its token map and `QuickScanner` are ported: "Lexer"), the node cache, scripts, `Features`.
 
 ### Tree (`psi-builder` `src/tree.rs`)
 

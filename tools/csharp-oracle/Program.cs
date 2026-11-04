@@ -15,10 +15,11 @@ static class Program
     const string Usage = """
         usage: oracle.sh MODE ARGS
           dump --list LIST --root ROOT --out OUT [--version latest|preview|N] [--doc parse|none|diagnose]
-               [--entry NAME] [--threads N] [--stack-mb M]
-          dump --serve [--version ...] [--doc ...] [--entry ...] [--threads N]   (stdin: LIST<TAB>ROOT<TAB>OUT, prints done)
-          lex --list LIST --root ROOT [--version ...] [--doc ...] [--full OUT] [--threads N]
-          values --list LIST --root ROOT [--version ...] [--doc ...] [--entry ...] [--kept] [--threads N]
+               [--define A;B] [--entry NAME] [--threads N] [--stack-mb M]
+          dump --serve [--version ...] [--doc ...] [--define ...] [--entry ...] [--threads N]
+               (stdin: LIST<TAB>ROOT<TAB>OUT, prints done)
+          lex --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--full OUT] [--threads N]
+          values --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] [--kept] [--threads N]
           goldens --src ROSLYN_TREE --out DIR [--threads N]
           unicode
         """;

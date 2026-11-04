@@ -113,11 +113,61 @@ pub enum XmlDocCommentStyle {
     Delimited = 1,
 }
 
-/// What a lexer is configured with (`CSharpParseOptions`: no preprocessor symbols, `SourceCodeKind.Regular`).
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
-pub struct LexerOptions {
+/// What a lexer is configured with (`CSharpParseOptions` of `SourceCodeKind.Regular`): the language version, the
+/// documentation mode and the preprocessor symbols defined outside the file (`PreprocessorSymbols`).
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub struct LexerOptions<'s> {
     pub version: LanguageVersion,
     pub doc_mode: DocumentationMode,
+    /// `PreprocessorSymbols`: the symbols an `#if` reads as defined where the file's own `#define` and `#undef` say
+    /// nothing of them (`DirectiveParser.IsDefined`).
+    pub preprocessor_symbols: &'s PreprocessorSymbols,
+}
+
+impl Default for LexerOptions<'_> {
+    fn default() -> Self {
+        LexerOptions { version: LanguageVersion::default(), doc_mode: DocumentationMode::default(), preprocessor_symbols: PreprocessorSymbols::none() }
+    }
+}
+
+/// `CSharpParseOptions.PreprocessorSymbols`: the names of the symbols a parse defines (`WithPreprocessorSymbols`), each
+/// as the UTF-8 of its `string`; `Contains` compares them ordinally with an identifier's `ValueText`.
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Default)]
+pub struct PreprocessorSymbols {
+    /// Sorted, without duplicates.
+    names: Vec<Box<[u8]>>,
+}
+
+/// The empty set, `ImmutableArray<string>.Empty`: what `CSharpParseOptions.Default` defines.
+static NO_SYMBOLS: PreprocessorSymbols = PreprocessorSymbols { names: Vec::new() };
+
+impl PreprocessorSymbols {
+    /// No symbol defined, `CSharpParseOptions.Default`'s.
+    pub fn none() -> &'static PreprocessorSymbols {
+        &NO_SYMBOLS
+    }
+
+    /// The set of `names`, in any order, duplicates once.
+    pub fn new<N: AsRef<[u8]>>(names: impl IntoIterator<Item = N>) -> PreprocessorSymbols {
+        let mut names: Vec<Box<[u8]>> = names.into_iter().map(|n| Box::from(n.as_ref())).collect();
+        names.sort_unstable();
+        names.dedup();
+        PreprocessorSymbols { names }
+    }
+
+    /// `PreprocessorSymbols.Contains(id)`.
+    pub fn contains(&self, id: &[u8]) -> bool {
+        self.names.binary_search_by(|n| n.as_ref().cmp(id)).is_ok()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.names.is_empty()
+    }
+
+    /// The names in byte order.
+    pub fn names(&self) -> impl Iterator<Item = &[u8]> {
+        self.names.iter().map(|n| n.as_ref())
+    }
 }
 
 /// The lexer's buffers kept by a `Parser` from one file to the next.
@@ -249,7 +299,7 @@ pub struct Lexer<'t> {
     /// `_errors` (empty is `null`).
     pub(crate) errors: Vec<DiagnosticId>,
     /// `_options`.
-    options: LexerOptions,
+    options: LexerOptions<'t>,
     /// `_mode`.
     pub(crate) mode: LexerMode,
     /// `_builder`.
@@ -276,7 +326,7 @@ pub struct Lexer<'t> {
 
 impl<'t> Lexer<'t> {
     /// `new Lexer(text, options)` over a whole file.
-    pub fn new(text: &'t [u8], options: LexerOptions, arena: GreenArena, buffers: LexerBuffers) -> Lexer<'t> {
+    pub fn new(text: &'t [u8], options: LexerOptions<'t>, arena: GreenArena, buffers: LexerBuffers) -> Lexer<'t> {
         let end = text.len() as u32;
         Lexer::with_window(text, 0, end, options, true, false, arena, buffers)
     }
@@ -288,7 +338,7 @@ impl<'t> Lexer<'t> {
         text: &'t [u8],
         start: u32,
         end: u32,
-        options: LexerOptions,
+        options: LexerOptions<'t>,
         allow_preprocessor_directives: bool,
         interpolation_followed_by_colon: bool,
         arena: GreenArena,
@@ -387,7 +437,7 @@ impl<'t> Lexer<'t> {
 
     /// `Options`.
     #[inline]
-    pub fn options(&self) -> LexerOptions {
+    pub fn options(&self) -> LexerOptions<'t> {
         self.options
     }
 

@@ -2,7 +2,7 @@
 //! oracle's, `tools/csharp-oracle/oracle.sh dump`); the entries and the lexer dump run.
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
-use csharp_syntax::{Entry, FileKind, NodeKind, Parser, Tree};
+use csharp_syntax::{Entry, FileKind, NodeKind, Parser, PreprocessorSymbols, TokenKind, Tree};
 
 #[test]
 fn a_file_parses_losslessly() {
@@ -56,4 +56,47 @@ fn a_parser_is_reused_and_every_entry_runs() {
         lex_to_string(&lexed),
         "IdentifierToken [0..1) 'a'\nT:WhitespaceTrivia [1..2) ' '\nIdentifierToken [2..3) 'b'\nT:EndOfLineTrivia [3..4) '\\n'\nEndOfFileToken [4..4) ''\n"
     );
+}
+
+/// The names of a tree's class declarations, in document order.
+fn class_names(tree: &Tree) -> Vec<String> {
+    tree.descendants(tree.root())
+        .filter(|&id| tree.node_kind(id) == Some(NodeKind::ClassDeclaration))
+        .filter_map(|id| tree.children(id).find(|&c| tree.token_kind(c) == Some(TokenKind::IdentifierToken)))
+        .map(|id| tree.utf8_text(id).unwrap_or_default().to_string())
+        .collect()
+}
+
+/// The preprocessor symbols of the options (`parse_with_symbols`, `CSharpParseOptions.WithPreprocessorSymbols`): an
+/// `#if` reads a name as defined when the options hold it and the file's own `#define`s and `#undef`s before it say
+/// nothing of it; what they say wins. The inputs and Roslyn's dumps of them are `tests/oracle/symbol_*` (in
+/// `manifest.tsv` with the same symbols); the active classes below are the ones those dumps show.
+#[test]
+fn preprocessor_symbols_from_the_options() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/oracle");
+    let mut parser = Parser::new();
+    for (name, symbols, with, without) in [
+        // `#if A` with A defined by the options: Yes, No disabled; without them the other branch.
+        ("symbol_defined_by_option", &["A"][..], &["Yes"][..], &["No"][..]),
+        // `#undef A` before `#if A` wins over the options.
+        ("symbol_undefined_by_the_file", &["A"], &["No"], &["No"]),
+        // `#define B` and `#undef C` win over the options' C: `A && B && !C` holds only with the options' A.
+        ("symbol_defined_by_the_file", &["A", "C"], &["Yes"], &[]),
+        // The name is the identifier's value: `A\u0042` is `AB`.
+        ("symbol_with_unicode_escape", &["AB"], &["Yes"], &["No"]),
+    ] {
+        let text = std::fs::read(dir.join(format!("{name}.cs"))).expect("the input");
+        let oracle = std::fs::read_to_string(dir.join(format!("{name}.tree.txt"))).expect("Roslyn's dump");
+        let tree = parser.parse_with_symbols(&text, FileKind::default(), &PreprocessorSymbols::new(symbols));
+        assert_eq!(tree_to_string(&tree), oracle, "{name}");
+        assert_eq!(class_names(&tree), with, "{name} with {symbols:?}");
+        assert_eq!(class_names(&parser.parse(&text, FileKind::default())), without, "{name} without symbols");
+        let lexed = parser.lex_with_symbols(&text, FileKind::default(), &PreprocessorSymbols::new(symbols));
+        let disabled = |tree: &Tree| {
+            tree.descendants(tree.root())
+                .filter(|&id| tree.token_kind(id) == Some(TokenKind::DisabledTextTrivia))
+                .count()
+        };
+        assert_eq!(disabled(&lexed), disabled(&tree), "{name}: the lexer reads the same symbols");
+    }
 }

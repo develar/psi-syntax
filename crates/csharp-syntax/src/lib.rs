@@ -66,4 +66,5 @@ pub use language_version::LanguageVersion;
 /// The tree builder this crate's trees are made with, for generic code over languages.
 pub use psi_builder;
 pub use syntax_kind::{NodeKind, SyntaxKind, TokenKind};
+pub use lexer::PreprocessorSymbols;
 pub use tree::{Diagnostic, DocumentationMode, Entry, FileKind, NodeId, Parser, Tree};

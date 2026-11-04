@@ -11,7 +11,7 @@ point the test parses it with (`tools/csharp-oracle/README.md`, "Goldens", says 
 |---|---|
 | `TestClass/Member[_N].cs` | the text the test parses, as UTF-8 (no trimming, no line-ending change) |
 | `TestClass/Member[_N].tree.txt` | the oracle's dump of it (`tools/csharp-oracle/README.md`, "The dump") |
-| `manifest.tsv` | `NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC<TAB>SOURCE`: the language version (`latest`, `preview` or a number such as `7.3`), the entry (`compilation-unit`, `expression`, `statement`, `member`, `type-name`, `name`, `attribute-argument-list`, `tokens`), the documentation mode (`parse`, `diagnose`, `none`) and the test call's file and line |
+| `manifest.tsv` | `NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC<TAB>SYMBOLS<TAB>SOURCE`: the language version (`latest`, `preview` or a number such as `7.3`), the entry (`compilation-unit`, `expression`, `statement`, `member`, `type-name`, `name`, `attribute-argument-list`, `tokens`), the documentation mode (`parse`, `diagnose`, `none`), the preprocessor symbols (names joined by `;`, empty for none) and the test call's file and line |
 
 The dumps are the oracle's, not the tests' expectations (Roslyn's tests check a prefix walk of kinds, not the
 whole tree): a golden is what Roslyn 5.9.0 prints for that input. Never edit one; regenerate:

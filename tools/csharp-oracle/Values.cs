@@ -42,7 +42,7 @@ static class ValuesMode
 
     public static int Run(Args a)
     {
-        var defaults = new Options(Options.ParseVersion(a.Get("version") ?? ""), Options.ParseDoc(a.Get("doc") ?? ""));
+        var defaults = Options.FromArgs(a);
         var jobs = Job.ReadList(a.Need("list"), Options.ParseEntry(a.Get("entry") ?? ""), defaults);
         var root = a.Need("root");
         var kept = a.Has("kept");

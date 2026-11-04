@@ -1,0 +1,2 @@
+#if (ABC)
+#endif

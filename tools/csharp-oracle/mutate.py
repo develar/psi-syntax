@@ -8,7 +8,8 @@ wherever the operator's construct is. A mutant changes one place of its original
 operator and file, picked by a generator seeded with the seed, the file and the operator), so a gap is not hidden
 behind an error the file has elsewhere. The inputs are the goldens of testdata/csharp/manifest.tsv whose dump has
 no diagnostic, every entry, each copied under `original/`. OUT_DIR/origins.json maps every mutant to its original
-and OUT_DIR/list is an oracle list: `PATH<TAB>VERSION<TAB>ENTRY<TAB>DOC`, the golden's. Every text is valid UTF-8.
+and OUT_DIR/list is an oracle list: `PATH<TAB>VERSION<TAB>ENTRY<TAB>DOC[<TAB>SYMBOLS]`, the golden's (SYMBOLS only
+when it defines any). Every text is valid UTF-8.
 """
 import argparse
 import json
@@ -285,7 +286,8 @@ def main():
             f.write(text)
 
     for row in open(os.path.join(options.goldens, "manifest.tsv"), encoding="utf-8"):
-        name, version, entry, doc = row.rstrip("\n").split("\t")[:4]
+        name, version, entry, doc, symbols = row.rstrip("\n").split("\t")[:5]
+        columns = f"{version}\t{entry}\t{doc}" + (f"\t{symbols}" if symbols else "")
         dump = open(os.path.join(options.goldens, name + ".tree.txt"), encoding="utf-8").read()
         if "\nDiagnostics:\n" in dump:
             skipped += 1
@@ -294,12 +296,12 @@ def main():
         text = open(os.path.join(options.goldens, name + ".cs"), encoding="utf-8", newline="").read()
         original = os.path.join("original", name + ".cs")
         write(original, text)
-        lines.append(f"{original}\t{version}\t{entry}\t{doc}")
+        lines.append(f"{original}\t{columns}")
         for directory, index, mutated in mutants_of(text, options.per_file, options.seed, name):
             mutant = os.path.join(directory, f"{name}~{index}.cs")
             write(mutant, mutated)
             origins[mutant] = original
-            lines.append(f"{mutant}\t{version}\t{entry}\t{doc}")
+            lines.append(f"{mutant}\t{columns}")
     with open(os.path.join(options.out, "origins.json"), "w", encoding="utf-8") as f:
         json.dump(origins, f, sort_keys=True)
         f.write("\n")

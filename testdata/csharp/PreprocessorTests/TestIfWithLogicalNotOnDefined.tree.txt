@@ -1,0 +1,17 @@
+CompilationUnit [0..16)
+  L:IfDirectiveTrivia [0..9)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    LogicalNotExpression [4..8)
+      ExclamationToken [4..5) '!'
+      IdentifierName [5..8)
+        IdentifierToken [5..8) 'ABC'
+    EndOfDirectiveToken [8..8) ''
+    T:EndOfLineTrivia [8..9) '\n'
+  L:EndIfDirectiveTrivia [9..16)
+    HashToken [9..10) '#'
+    EndIfKeyword [10..15) 'endif'
+    EndOfDirectiveToken [15..15) ''
+    T:EndOfLineTrivia [15..16) '\n'
+  EndOfFileToken [16..16) ''

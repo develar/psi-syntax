@@ -14,11 +14,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace CSharpOracle;
 
 /// <summary>Parse options as a test writes them: a version as asked (<c>LanguageVersion.Default</c> when the test
-/// names none), the documentation mode, and what puts an input out of scope (script, preprocessor symbols,
-/// features).</summary>
-readonly record struct TestOptions(LanguageVersion Version, DocumentationMode Doc, bool Script, bool Symbols, bool Features)
+/// names none), the documentation mode, the preprocessor symbols (their names joined by <c>;</c>, empty for none, null
+/// when they cannot be evaluated), and what puts an input out of scope (script, features).</summary>
+readonly record struct TestOptions(LanguageVersion Version, DocumentationMode Doc, bool Script, string? Symbols, bool Features)
 {
-    public static readonly TestOptions Regular = new(LanguageVersion.Default, DocumentationMode.Parse, false, false, false);
+    public static readonly TestOptions Regular = new(LanguageVersion.Default, DocumentationMode.Parse, false, "", false);
 
     public TestOptions WithVersion(LanguageVersion v) => this with { Version = v };
 
@@ -200,7 +200,7 @@ static class Goldens
     }
 
     sealed record Golden(string Class, string Member, string Text, Entry Entry, LanguageVersion Version, DocumentationMode Doc,
-        string Source)
+        string Symbols, string Source)
     {
         public string Name = "";
     }
@@ -320,10 +320,10 @@ static class Goldens
         }
 
         var goldens = new List<Golden>();
-        var seen = new HashSet<(string, Entry, string, DocumentationMode)>();
+        var seen = new HashSet<(string, Entry, string, DocumentationMode, string)>();
         foreach (var g in found)
         {
-            if (seen.Add((g.Text, g.Entry, Options.VersionName(g.Version), g.Doc)))
+            if (seen.Add((g.Text, g.Entry, Options.VersionName(g.Version), g.Doc, g.Symbols)))
             {
                 goldens.Add(g);
             }
@@ -360,7 +360,7 @@ static class Goldens
             var g = goldens[i];
             try
             {
-                results[i] = Dumper.Dump(g.Text, g.Entry, new Options(g.Version, g.Doc));
+                results[i] = Dumper.Dump(g.Text, g.Entry, new Options(g.Version, g.Doc, g.Symbols));
             }
             catch (Exception e) when (e is not OutOfMemoryException)
             {
@@ -391,11 +391,12 @@ static class Goldens
             var version = Options.VersionName(g.Version);
             var doc = Options.DocName(g.Doc);
             manifest.Append(g.Name).Append('\t').Append(version).Append('\t').Append(Options.EntryName(g.Entry))
-                .Append('\t').Append(doc).Append('\t').Append(g.Source).Append('\n');
+                .Append('\t').Append(doc).Append('\t').Append(g.Symbols).Append('\t').Append(g.Source).Append('\n');
             foreach (var k in new[]
                      {
                          "entry " + Options.EntryName(g.Entry), "version " + version, "doc " + doc,
                          r.Errors > 0 ? "with diagnostics" : "without diagnostics",
+                         g.Symbols == "" ? "without preprocessor symbols" : "with preprocessor symbols",
                      })
             {
                 counts[k] = counts.GetValueOrDefault(k) + 1;
@@ -745,7 +746,7 @@ static class Goldens
             case "PreprocessorTests":
             {
                 // GetOptions(kind, defines): CSharp4, the given kind, the defines as preprocessor symbols.
-                var o = new TestOptions(LanguageVersion.CSharp4, DocumentationMode.Parse, false, false, false);
+                var o = new TestOptions(LanguageVersion.CSharp4, DocumentationMode.Parse, false, "", false);
                 var defines = rest;
                 if (defines.Count > 0 && EnumMember<SourceCodeKind>(defines[0], "SourceCodeKind") is { } kind)
                 {
@@ -757,12 +758,12 @@ static class Goldens
                     o = given.Value;
                     defines = new List<ExpressionSyntax>();
                 }
-                options = o with { Symbols = o.Symbols || defines.Count > 0 };
+                options = defines.Count > 0 ? o with { Symbols = EvalSymbols(cx, defines) } : o;
                 break;
             }
             case "XmlDocCommentTests":
                 // GetOptions(defines): CSharp3, Diagnose, the defines as preprocessor symbols.
-                options = new TestOptions(LanguageVersion.CSharp3, DocumentationMode.Diagnose, false, rest.Count > 0, false);
+                options = new TestOptions(LanguageVersion.CSharp3, DocumentationMode.Diagnose, false, EvalSymbols(cx, rest), false);
                 break;
             default:
             {
@@ -793,15 +794,15 @@ static class Goldens
         {
             opts = TestOptions.Regular; // SyntaxFactory.ParseName takes no options
         }
-        var reason = opts.Script ? "script" : opts.Symbols ? "preprocessor symbols" : opts.Features ? "features" :
-            HasLoneSurrogate(text) ? "lone surrogate (not UTF-8)" : null;
+        var reason = opts.Script ? "script" : opts.Symbols == null ? "preprocessor symbols not evaluated" :
+            opts.Features ? "features" : HasLoneSurrogate(text) ? "lone surrogate (not UTF-8)" : null;
         if (reason != null)
         {
             cx.Skip(reason);
             return null;
         }
         var line = inv.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-        return new Golden(cls, member, text, entry, opts.Version, opts.Doc, inv.SyntaxTree.FilePath + ":" + line);
+        return new Golden(cls, member, text, entry, opts.Version, opts.Doc, opts.Symbols!, inv.SyntaxTree.FilePath + ":" + line);
     }
 
     static bool IsZero(ExpressionSyntax e) => e is LiteralExpressionSyntax { Token.ValueText: "0" };
@@ -1091,7 +1092,7 @@ static class Goldens
                             ? OptResult.Of(o with { Script = k == SourceCodeKind.Script })
                             : OptResult.Unknown;
                     case "WithPreprocessorSymbols":
-                        return OptResult.Of(o with { Symbols = a.Count > 0 && !(a.Count == 1 && IsEmptyCollection(a[0].Expression)) });
+                        return OptResult.Of(o with { Symbols = EvalSymbols(cx, a.Select(x => x.Expression).ToList()) });
                 }
                 if (method.StartsWith("With", StringComparison.Ordinal) &&
                     (method.Contains("Feature", StringComparison.Ordinal) || method is "WithExperimental" or "WithNullablePublicOnly" or
@@ -1145,16 +1146,50 @@ static class Goldens
                     o = o with { Script = k == SourceCodeKind.Script };
                     break;
                 case "preprocessorSymbols":
-                    o = o with
-                    {
-                        Symbols = !arg.Expression.IsKind(SyntaxKind.NullLiteralExpression) && !IsEmptyCollection(arg.Expression),
-                    };
+                    o = o with { Symbols = EvalSymbols(cx, new[] { arg.Expression }) };
                     break;
                 default:
                     return OptResult.Unknown;
             }
         }
         return OptResult.Of(o);
+    }
+
+    /// <summary>The names of <c>WithPreprocessorSymbols(args)</c> (<c>params string[]</c>, an <c>IEnumerable</c> or an
+    /// <c>ImmutableArray</c>) joined by <c>;</c>: each a constant text, or one argument that is null, empty, a literal
+    /// collection or <c>ImmutableArray.Create</c> of them; null when a name is not constant or cannot be a list column
+    /// (empty, or with a <c>;</c> or a control character).</summary>
+    static string? EvalSymbols(Context cx, IReadOnlyList<ExpressionSyntax> args)
+    {
+        IEnumerable<ExpressionSyntax> names = args;
+        if (args.Count == 1)
+        {
+            var e = args[0];
+            if (e.IsKind(SyntaxKind.NullLiteralExpression) || e.IsKind(SyntaxKind.DefaultLiteralExpression) || IsEmptyCollection(e))
+            {
+                return "";
+            }
+            names = e switch
+            {
+                CollectionExpressionSyntax c when c.Elements.All(x => x is ExpressionElementSyntax) =>
+                    c.Elements.Cast<ExpressionElementSyntax>().Select(x => x.Expression),
+                ArrayCreationExpressionSyntax { Initializer: { } i } => i.Expressions,
+                ImplicitArrayCreationExpressionSyntax a => a.Initializer.Expressions,
+                InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax ma } inv
+                    when ma.ToString() == "ImmutableArray.Create" => inv.ArgumentList.Arguments.Select(x => x.Expression),
+                _ => args,
+            };
+        }
+        var result = new List<string>();
+        foreach (var n in names)
+        {
+            if (EvalText(cx, n) is not { Length: > 0 } name || name.Any(c => c == ';' || char.IsControl(c)))
+            {
+                return null;
+            }
+            result.Add(name);
+        }
+        return string.Join(';', result);
     }
 
     static bool IsEmptyCollection(ExpressionSyntax e) => e switch

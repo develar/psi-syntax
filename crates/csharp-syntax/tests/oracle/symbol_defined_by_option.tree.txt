@@ -1,0 +1,30 @@
+CompilationUnit [0..46)
+  ClassDeclaration [0..20)
+    L:IfDirectiveTrivia [0..6)
+      HashToken [0..1) '#'
+      IfKeyword [1..3) 'if'
+      T:WhitespaceTrivia [3..4) ' '
+      IdentifierName [4..5)
+        IdentifierToken [4..5) 'A'
+      EndOfDirectiveToken [5..5) ''
+      T:EndOfLineTrivia [5..6) '\n'
+    ClassKeyword [6..11) 'class'
+    T:WhitespaceTrivia [11..12) ' '
+    IdentifierToken [12..15) 'Yes'
+    T:WhitespaceTrivia [15..16) ' '
+    OpenBraceToken [16..17) '{'
+    T:WhitespaceTrivia [17..18) ' '
+    CloseBraceToken [18..19) '}'
+    T:EndOfLineTrivia [19..20) '\n'
+  L:ElseDirectiveTrivia [20..26)
+    HashToken [20..21) '#'
+    ElseKeyword [21..25) 'else'
+    EndOfDirectiveToken [25..25) ''
+    T:EndOfLineTrivia [25..26) '\n'
+  L:DisabledTextTrivia [26..39) 'class No { }\n'
+  L:EndIfDirectiveTrivia [39..46)
+    HashToken [39..40) '#'
+    EndIfKeyword [40..45) 'endif'
+    EndOfDirectiveToken [45..45) ''
+    T:EndOfLineTrivia [45..46) '\n'
+  EndOfFileToken [46..46) ''

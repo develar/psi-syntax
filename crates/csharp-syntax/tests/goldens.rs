@@ -1,7 +1,7 @@
 //! The goldens of Roslyn's own parsing tests (`testdata/csharp`, vendored by `tools/csharp-oracle`'s `goldens` mode):
-//! each `NAME.cs` parsed at its manifest line's version, entry and documentation mode, its dump against
-//! `NAME.tree.txt`. Prints the pass count and the first differing line of the first failures. The same for the reduced
-//! corpus cases of `tests/oracle`, which must all pass.
+//! each `NAME.cs` parsed at its manifest line's version, entry, documentation mode and preprocessor symbols, its dump
+//! against `NAME.tree.txt`. Prints the pass count and the first differing line of the first failures. The same for the
+//! reduced corpus cases of `tests/oracle`, which must all pass.
 //!
 //! `KS_STRICT=1` (as `scripts/gate.sh` runs it) fails on any differing golden. Without `testdata/csharp/manifest.tsv`
 //! the test passes and says so.
@@ -9,7 +9,7 @@
 use std::path::PathBuf;
 
 use csharp_syntax::dump::tree_to_string;
-use csharp_syntax::{DocumentationMode, Entry, FileKind, LanguageVersion, Parser};
+use csharp_syntax::{DocumentationMode, Entry, FileKind, LanguageVersion, Parser, PreprocessorSymbols};
 
 /// Whether `KS_STRICT=1` fails on a differing golden: on since the parser is ported (phase 4 of the C# port).
 const STRICT_ENABLED: bool = true;
@@ -25,13 +25,16 @@ fn testdata() -> PathBuf {
     }
 }
 
-/// A manifest line: `NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC<TAB>SOURCE`.
-fn file_kind(columns: &[&str]) -> Option<FileKind> {
-    Some(FileKind {
+/// A manifest line: `NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC[<TAB>SYMBOLS[<TAB>SOURCE]]`, SYMBOLS the preprocessor symbols
+/// separated by `;` (empty or absent: none).
+fn file_kind(columns: &[&str]) -> Option<(FileKind, PreprocessorSymbols)> {
+    let kind = FileKind {
         version: LanguageVersion::from_name(columns.get(1)?)?,
         entry: Entry::from_name(columns.get(2)?)?,
         doc_mode: DocumentationMode::from_name(columns.get(3)?)?,
-    })
+    };
+    let symbols = columns.get(4).map_or("", |s| s).split(';').filter(|n| !n.is_empty());
+    Some((kind, PreprocessorSymbols::new(symbols)))
 }
 
 /// Parses every file of `dir`'s `manifest.tsv` and compares its dump: the pass count, the total and each failure's
@@ -45,7 +48,7 @@ fn compare(dir: &std::path::Path) -> Option<(usize, usize, Vec<String>)> {
         let columns: Vec<&str> = line.split('\t').collect();
         let name = columns[0];
         total += 1;
-        let Some(kind) = file_kind(&columns) else {
+        let Some((kind, symbols)) = file_kind(&columns) else {
             failures.push(format!("{name}: cannot read the manifest line"));
             continue;
         };
@@ -54,7 +57,7 @@ fn compare(dir: &std::path::Path) -> Option<(usize, usize, Vec<String>)> {
             continue;
         };
         let expected = std::fs::read_to_string(dir.join(format!("{name}.tree.txt"))).ok();
-        let tree = parser.parse(&text, kind);
+        let tree = parser.parse_with_symbols(&text, kind, &symbols);
         let ours = if tree.has_no_result() { None } else { Some(tree_to_string(&tree)) };
         if ours == expected {
             passed += 1;

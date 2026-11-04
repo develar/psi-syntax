@@ -29,12 +29,16 @@
 #      --values --check`) on the four corpora, the golden mutations at their list's columns and the lexer fuzz against
 #      the cached lines of `tools/csharp-oracle/oracle.sh values --kept` (Roslyn's `ValueText` where the port keeps
 #      it), 0 differing lines;
-#  10. C#'s parser against Roslyn 5.9.0's trees (`tools/csharp-oracle/oracle.sh dump`): the 7051 goldens of
+#  10. C#'s parser against Roslyn 5.9.0's trees (`tools/csharp-oracle/oracle.sh dump`): the 7064 goldens of
 #      testdata/csharp and the reduced cases of crates/csharp-syntax/tests/oracle (step 1, strict), and our dumps
 #      against the cached oracle dumps of the four corpora at Latest and at Preview, of the golden mutations at their
 #      goldens' versions, at Latest and at Preview, and of the lexer fuzz at Latest and at Preview, 0 differing; the 6
 #      runtime files whose dump is over 512 MB (no oracle dump) parse without a panic into a tree whose leaves are the
-#      text (`ksdump --check-bodies --lang csharp`).
+#      text (`ksdump --check-bodies --lang csharp`);
+#  11. C# with preprocessor symbols (`CSharpParseOptions.WithPreprocessorSymbols`, the list's SYMBOLS column): the files
+#      of the roslyn and Avalonia corpora whose #if and #elif conditions name a symbol, with every one of them defined
+#      (tools/csharp-oracle/defines.py), our dumps and lexer lines (`--doc parse`) against the cached oracle's, 0
+#      differing.
 # A dump comparison is `ksdump --check ORACLE`: every dump made in memory and compared byte for byte with the oracle's
 # file, what `diff -rq -x index.jsonl ORACLE OURS` checked of written dumps (a dump that differs, one that either side
 # lacks, an oracle directory without dumps; index.jsonl is not compared, so a file the oracle failed on must have no
@@ -205,6 +209,19 @@ csharp_preview() {
   return $f
 }
 
+# csharp_defines: step 11, the dumps and lexer lines with every symbol of a file's conditions defined.
+csharp_defines() {
+  f=0
+  for corpus in "csharp-roslyn-35d9211 roslyn" "csharp-avalonia-2d79ba5 avalonia"; do
+    set -- $corpus
+    dumps csharp-parse-$1-defines "$C/oracle/$1-defines" --lang csharp --list "$C/corpus/$1-defines.list" \
+      --root "$C/csharp-src/$2" || f=1
+    lex csharp-lex-doc-parse-$1-defines "$C/lex/$1-defines.doc.oracle.txt" --lang csharp --doc parse \
+      --list "$C/corpus/$1-defines.list" --root "$C/csharp-src/$2" || f=1
+  done
+  return $f
+}
+
 # Three lanes at once, each ksdump on every core: the work of a lane is mostly parallel, but each C# lane waits some
 # 20 s per pass on the runtime's 24 MB hugeexpr1.cs alone, which the other lanes fill. A lane's sections write to
 # $O/SECTION.out, printed in this order once all are done.
@@ -213,8 +230,9 @@ lane() {
 }
 lane kotlin java csharp_lex &
 lane csharp_latest &
-lane csharp_preview &
+lane csharp_preview csharp_defines &
 wait
-cat "$O/kotlin.out" "$O/java.out" "$O/csharp_lex.out" "$O/csharp_latest.out" "$O/csharp_preview.out"
+cat "$O/kotlin.out" "$O/java.out" "$O/csharp_lex.out" "$O/csharp_latest.out" "$O/csharp_preview.out" \
+  "$O/csharp_defines.out"
 [ -e "$O/failed" ] && fail=1
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (logs and our differing dumps: $O)"; exit 1; }

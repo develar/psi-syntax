@@ -14,7 +14,7 @@ use crate::flatten::{Flat, Flattener, Values};
 use crate::green::{Green, GreenArena, SyntaxListPool};
 use crate::language::CSharp;
 use crate::language_version::LanguageVersion;
-use crate::lexer::{Lexer, LexerBuffers, LexerMode, LexerOptions};
+use crate::lexer::{Lexer, LexerBuffers, LexerMode, LexerOptions, PreprocessorSymbols};
 use crate::parser::LanguageParser;
 use crate::syntax_kind::{SyntaxKind, TokenKind};
 use crate::syntax_parser::SyntaxParserBuffers;
@@ -114,8 +114,8 @@ impl Entry {
     }
 }
 
-/// How a text is parsed: `CSharpParseOptions(languageVersion, documentationMode, SourceCodeKind.Regular)` with no
-/// preprocessor symbols, through an entry. The default is a file at `LanguageVersion.Latest` with documentation
+/// How a text is parsed: `CSharpParseOptions(languageVersion, documentationMode, SourceCodeKind.Regular)`, through an
+/// entry; the preprocessor symbols are `Parser::parse_with_symbols`' (none for `Parser::parse`). The default is a file at `LanguageVersion.Latest` with documentation
 /// comments parsed, as `CSharpSyntaxTree.ParseText(text)` parses it.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
 pub struct FileKind {
@@ -133,12 +133,13 @@ impl FileKind {
 }
 
 impl FileKind {
-    /// The lexer's options of this kind (`ParseName` ignores the kind's: it parses at the defaults).
-    pub(crate) fn lexer_options(self) -> LexerOptions {
+    /// The lexer's options of this kind with `symbols` defined (`ParseName` ignores the kind's and the symbols: it
+    /// parses at the defaults).
+    pub(crate) fn lexer_options(self, symbols: &PreprocessorSymbols) -> LexerOptions<'_> {
         if self.entry == Entry::Name {
             return LexerOptions::default();
         }
-        LexerOptions { version: self.version, doc_mode: self.doc_mode }
+        LexerOptions { version: self.version, doc_mode: self.doc_mode, preprocessor_symbols: symbols }
     }
 }
 
@@ -431,17 +432,23 @@ impl Parser {
         self.stack_use
     }
 
-    /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`).
+    /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`), no preprocessor symbol defined.
     pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        self.parse_with_symbols(text, file_kind, PreprocessorSymbols::none())
+    }
+
+    /// Parses `text` as `file_kind` says with `symbols` defined (`CSharpParseOptions.WithPreprocessorSymbols`): an
+    /// `#if` reads a name the file neither `#define`s nor `#undef`s before it as defined when `symbols` holds it.
+    pub fn parse_with_symbols(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind, symbols: &PreprocessorSymbols) -> Tree {
         if file_kind.entry == Entry::Tokens {
-            return self.lex(text, file_kind);
+            return self.lex_with_symbols(text, file_kind, symbols);
         }
         let source: Arc<[u8]> = Arc::from(text.as_ref());
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
         arena.set_budget(self.arena_budget.unwrap_or_else(|| crate::green::budget_for(source.len())));
         arena.set_work_budget(crate::green::work_budget_for(source.len()));
-        let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let mut lexer = Lexer::new(&source, file_kind.lexer_options(symbols), arena, std::mem::take(&mut self.lexer));
         let buffers = std::mem::take(&mut self.syntax_parser);
         let pool = std::mem::take(&mut self.pool);
         let (root, abandoned, buffers, pool) = {
@@ -463,10 +470,15 @@ impl Parser {
     /// The lexer's tokens of `text` in `LexerMode.Syntax` up to and with the end of file (`SyntaxFactory.ParseTokens`),
     /// as the children of a root, with their diagnostics in token order: what `ksdump --lex` prints.
     pub fn lex(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
+        self.lex_with_symbols(text, file_kind, PreprocessorSymbols::none())
+    }
+
+    /// `lex` with `symbols` defined (`parse_with_symbols`).
+    pub fn lex_with_symbols(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind, symbols: &PreprocessorSymbols) -> Tree {
         let source: Arc<[u8]> = Arc::from(text.as_ref());
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
-        let mut lexer = Lexer::new(&source, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let mut lexer = Lexer::new(&source, file_kind.lexer_options(symbols), arena, std::mem::take(&mut self.lexer));
         let mut tokens: Vec<Green> = Vec::new();
         loop {
             let position = lexer.position();
@@ -490,7 +502,7 @@ impl Parser {
     pub fn lex_count(&mut self, text: &[u8], file_kind: FileKind) -> usize {
         let mut arena = std::mem::take(&mut self.arena);
         arena.clear();
-        let mut lexer = Lexer::new(text, file_kind.lexer_options(), arena, std::mem::take(&mut self.lexer));
+        let mut lexer = Lexer::new(text, file_kind.lexer_options(PreprocessorSymbols::none()), arena, std::mem::take(&mut self.lexer));
         let mut count = 0;
         loop {
             let position = lexer.position();

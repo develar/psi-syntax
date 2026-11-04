@@ -15,6 +15,7 @@ its nuspec names, which no tag contains). The dump is not imitated: it is a walk
 | `Goldens.cs` | the `goldens` mode: the inputs of Roslyn's parser and lexer tests |
 | `vendor-goldens.sh` | writes `testdata/csharp/` from the tests at the pin (`git archive`, never a working tree) |
 | `corpus.py` | a corpus list: the tracked `.cs` files of a checkout that are valid UTF-8 |
+| `defines.py` | a corpus list with preprocessor symbols: the files whose `#if` and `#elif` conditions name a symbol, each with all of them |
 | `caches.sh` | rebuilds every cache below (clones, lists, dumps, lexer lines, fuzz) |
 | `link_same.py` | hard-links the Preview dumps that equal the Latest ones |
 | `mutate.py` | one-place mutations of the diagnostic-free goldens, after `tools/java-oracle/mutate.py` |
@@ -29,10 +30,11 @@ system install); `oracle.sh` sets `DOTNET_ROOT` to it unless set. The Unicode ta
 
 ```sh
 tools/csharp-oracle/oracle.sh dump --list LIST --root ROOT --out OUT [--version latest|preview|N] \
-  [--doc parse|none|diagnose] [--entry NAME] [--threads N] [--stack-mb M]
+  [--doc parse|none|diagnose] [--define A;B] [--entry NAME] [--threads N] [--stack-mb M]
 tools/csharp-oracle/oracle.sh dump --serve [the same defaults]   # stdin: LIST<TAB>ROOT<TAB>OUT, prints done after each
-tools/csharp-oracle/oracle.sh lex --list LIST --root ROOT [--version ...] [--doc ...] [--full OUT]
-tools/csharp-oracle/oracle.sh values --list LIST --root ROOT [--version ...] [--doc ...] [--entry ...] [--kept]
+tools/csharp-oracle/oracle.sh lex --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--full OUT]
+tools/csharp-oracle/oracle.sh values --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] \
+  [--kept]
 tools/csharp-oracle/oracle.sh goldens --src ROSLYN_TREE --out DIR [--skipped LOG]   # vendor-goldens.sh runs it
 tools/csharp-oracle/oracle.sh unicode   # CharUnicodeInfo.GetUnicodeCategory of 0..10FFFF as runs
 ```
@@ -52,11 +54,15 @@ behaviour is fixed first and recorded here; the Rust side follows.
 - The file's bytes are decoded as strict UTF-8 (`new UTF8Encoding(false, true).GetString`, the same text as
   `Encoding.UTF8.GetString` for valid input): a BOM stays the char U+FEFF, which Roslyn lexes as `WhitespaceTrivia`.
   Only valid UTF-8 is dumped; an invalid file gets no dump and the index line `"failure":"invalid UTF-8"`.
-- `new CSharpParseOptions(languageVersion, documentationMode, SourceCodeKind.Regular)`, no preprocessor symbols, no
-  features. `--version`: anything `LanguageVersionFacts.TryParse` takes (`latest`, `preview`, `default`,
-  `latestmajor`, `7.3`, `13`, `13.0`); default `latest`. `--doc`: `parse` (default, as `CSharpParseOptions.Default`:
-  doc comments are structured trivia), `none` (plain comment trivia) or `diagnose` (structured, and the XML errors of
-  a doc comment are reported).
+- `new CSharpParseOptions(languageVersion, documentationMode, SourceCodeKind.Regular)`, with
+  `.WithPreprocessorSymbols(names)` when there are any, no features. `--version`: anything
+  `LanguageVersionFacts.TryParse` takes (`latest`, `preview`, `default`, `latestmajor`, `7.3`, `13`, `13.0`); default
+  `latest`. `--doc`: `parse` (default, as `CSharpParseOptions.Default`: doc comments are structured trivia), `none`
+  (plain comment trivia) or `diagnose` (structured, and the XML errors of a doc comment are reported). `--define A;B`:
+  the preprocessor symbols, names separated by `;` (empty ones dropped); default none. An `#if` reads a name as defined
+  when the file's own `#define` or `#undef` before it says nothing of it and the names hold it
+  (`DirectiveParser.IsDefined`); Roslyn reports no diagnostic of the names themselves in a tree
+  (`CSharpParseOptions.Errors` is the compilation's).
 - `--entry` (default `compilation-unit`), each with those options and `consumeFullText: true` (Roslyn attaches the
   rest of the text after the root as skipped-tokens trivia with an error; on a few inputs a partial entry's root
   does not spell the whole text, 70 of the 122 741 mutations, and the dump is what Roslyn returns all the same):
@@ -72,7 +78,7 @@ behaviour is fixed first and recorded here; the Rust side follows.
   | `parameter-list`, `bracketed-parameter-list`, `argument-list`, `bracketed-argument-list`, `attribute-argument-list` | `SyntaxFactory.Parse<Kind>(text, 0, options, true)` |
   | `tokens` | `SyntaxFactory.ParseTokens(text, options: options)`: the lexer lines below, as the whole dump |
 
-- Out of scope, as accio needs them: scripts (`.csx`), preprocessor symbols, `Features` (`FileBasedProgram` makes
+- Out of scope, as accio needs them: scripts (`.csx`), `Features` (`FileBasedProgram` makes
   `#:` directives legal), incremental parsing.
 
 ### Offsets
@@ -142,8 +148,9 @@ duplicates included (Roslyn reports some twice, e.g. CS1519 for one bad token), 
 
 ### Files
 
-`--list LIST --root ROOT --out OUT`: each list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, PATH relative to
-ROOT; an empty or absent column takes the command's flag, more columns are ignored, empty lines are skipped. The
+`--list LIST --root ROOT --out OUT`: each list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC[<TAB>SYMBOLS]]]]`, PATH
+relative to ROOT, SYMBOLS the preprocessor symbols as `--define` takes them; an empty or absent column takes the
+command's flag, more columns are ignored, empty lines are skipped. The
 dump of PATH goes to `OUT/PATH.tree.txt` (UTF-8, every line ending with `\n`, so the file ends with one).
 `OUT/index.jsonl` gets one line per list line, in list order: `{"path":P,"errors":N,"firstError":L}` where N counts
 the diagnostic lines and L is the first one without its indentation (`"CS1525 [29..30) Invalid expression term \\';\\'"`)
@@ -167,7 +174,7 @@ time quadratic in the token count). That text is the `tokens` entry's dump.
 Each list line prints one line, in list order: `PATH<TAB>TOKENS<TAB>HASH`, TOKENS the token count and HASH the
 FNV-1a 64-bit hash (offset basis `0xcbf29ce484222325`, prime `0x100000001b3`) of the dump's UTF-8 bytes, 16 lowercase
 hex digits; or `PATH<TAB>failure<TAB>REASON`. `--full OUT` also writes the dump to `OUT/PATH.lex.txt`. List lines
-are read as for `dump` (VERSION and DOC columns apply, ENTRY is ignored).
+are read as for `dump` (VERSION, DOC and SYMBOLS columns apply, ENTRY is ignored).
 
 ### Value texts (`values`, `ksdump --values --lang csharp`)
 
@@ -198,9 +205,10 @@ tools/csharp-oracle/oracle.sh values --kept --list $C/fuzz/csharp-lex/list --roo
 ```
 
 `crates/csharp-syntax/tests/values/goldens.values.txt` is the same of the goldens (`manifest.tsv`'s lines with `.cs`
-added to the path, `--root testdata/csharp`), and `values.values.txt` of `values.cs` beside it. Equal on 2026-11-02:
-the four corpora, the 7051 goldens at their entries, the 122 741 mutations and the 20 000 lexer fuzz inputs (DESIGN,
-"Value texts").
+added to the path, `--root testdata/csharp`; their SYMBOLS column applies, SOURCE after it is ignored), and
+`values.values.txt` of `values.cs` beside it. Equal on 2026-11-02: the four corpora, the 7051 goldens at their entries,
+the 122 741 mutations and the 20 000 lexer fuzz inputs (DESIGN, "Value texts"); on 2026-11-04 the 7064 goldens with
+their preprocessor symbols.
 
 ## Goldens (`testdata/csharp/`)
 
@@ -222,27 +230,34 @@ and takes every call that parses a text:
   `TheoryData`/array field, `[CombinatorialData]` with `[CombinatorialValues]` and bools) and of `foreach` loops over
   literal arrays;
 - with options evaluated from `TestOptions.*` (its table at the pin), `CSharpParseOptions.Default`,
-  `new CSharpParseOptions(...)` and `With*` chains.
+  `new CSharpParseOptions(...)` and `With*` chains;
+- with the preprocessor symbols of `WithPreprocessorSymbols(...)`, `preprocessorSymbols:` and the `defines` of
+  `PreprocessorTests.Parse(text, "ABC", "XYZ")` and `XmlDocCommentTests.Parse`: constant texts, or one argument that is
+  null, empty, a literal collection or `ImmutableArray.Create` of them.
 
-Left out: scripts, preprocessor symbols (`Parse(text, "DEBUG")`), features, a text that is not valid UTF-8 (a lone
-surrogate), a nonzero offset, `consumeFullText: false`, options it cannot evaluate, duplicates (same text, entry,
-version and documentation mode: the first is kept), and a dump over 1 MB (`ExpressionParsingTests.ParseBigExpression`,
-20 MB). `vendor-goldens.sh` prints the counts. Each golden is `testdata/csharp/NAME.cs` (the text's UTF-8),
-`NAME.tree.txt` (its dump) and a `manifest.tsv` line `NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC<TAB>SOURCE`: NAME is
+Left out: scripts, preprocessor symbols that are not constant or are no list column (empty, a `;`), features, a text
+that is not valid UTF-8 (a lone surrogate), a nonzero offset, `consumeFullText: false`, options it cannot evaluate,
+duplicates (same text, entry, version, documentation mode and symbols: the first is kept), and a dump over 1 MB
+(`ExpressionParsingTests.ParseBigExpression`, 20 MB). `vendor-goldens.sh` prints the counts. Each golden is
+`testdata/csharp/NAME.cs` (the text's UTF-8), `NAME.tree.txt` (its dump) and a `manifest.tsv` line
+`NAME<TAB>VERSION<TAB>ENTRY<TAB>DOC<TAB>SYMBOLS<TAB>SOURCE` (a list line once `.cs` is added to NAME): NAME is
 `TestClass/Member` or `TestClass/Member_N` (a member with several inputs, numbered in source order, theory rows
 included; `__2` on a clash, also one of case), VERSION `latest` for every version that maps to the latest release
-(Default, Latest, LatestMajor, 14), `preview`, or the number (`5`, `7.3`, `13`), SOURCE the call's file and line.
+(Default, Latest, LatestMajor, 14), `preview`, or the number (`5`, `7.3`, `13`), SYMBOLS the names joined by `;` as the
+test writes them (empty: none), SOURCE the call's file and line.
 
 ## Measured (2026-11-02, Apple M5 Max, .NET SDK 10.0.403, 18 threads on a shared machine)
 
-- Goldens (`vendor-goldens.sh`, 8 s): the 82 test files hold 5953 recognized calls, 7214 constant inputs with
-  their theory and loop rows, 7051 goldens (9.8 MB of text and dumps): 3177 `compilation-unit`, 1236 `expression`,
-  934 `member`, 773 `statement`, 892 `tokens`, 22 `name`, 16 `type-name`, 1 `attribute-argument-list`; 6282 at
-  `parse`, 769 at `diagnose`; 3758 at `latest`, 1297 at `preview`, 1996 at 1 to 13; 3350 with a diagnostic. Left
-  out: 428 script, 159 duplicates, 50 options not evaluated, 45 features, 14 preprocessor symbols, 3 `no member`,
-  2 lone surrogates, 2 `consumeFullText: false`, 1 offset, 1 dump over 1 MB, and 329 calls whose text is not
-  constant (helpers' own bodies, texts built by loops or by `GetFieldIdentifier(bool)`, aligned interpolations).
-  A rerun at 1 and at 18 threads writes identical files.
+- Goldens (`vendor-goldens.sh`, 8 s): the 82 test files hold 5953 recognized calls, 7227 constant inputs with
+  their theory and loop rows, 7064 goldens (9.8 MB of text and dumps): 3190 `compilation-unit`, 1236 `expression`,
+  934 `member`, 773 `statement`, 892 `tokens`, 22 `name`, 16 `type-name`, 1 `attribute-argument-list`; 6295 at
+  `parse`, 769 at `diagnose`; 3758 at `latest`, 1297 at `preview`, 2009 at 1 to 13; 3350 with a diagnostic; 13
+  with preprocessor symbols (12 of `PreprocessorTests`, 1 of `LineSpanDirectiveParsingTests.IsActive`, whose
+  input without them became `IsActive_1`, its bytes unchanged). Left out: 428 script, 159 duplicates, 50 options
+  not evaluated, 46 features (one also defines a symbol), 3 `no member`, 2 lone surrogates, 2 `consumeFullText:
+  false`, 1 offset, 1 dump over 1 MB, and 329 calls whose text is not constant (helpers' own bodies, texts built by
+  loops or by `GetFieldIdentifier(bool)`, aligned interpolations). A rerun at 1 and at 18 threads writes identical
+  files.
 
 | corpus | commit | `.cs` listed | bytes | with a diagnostic | failures | Latest dumps | on disk |
 |---|---|---|---|---|---|---|---|
@@ -267,6 +282,12 @@ included; `__2` on a clash, also one of case), VERSION `latest` for every versio
   one left out), 119 281 mutants, 122 982 files; 241 mutants of `member` goldens are `no member`, so the oracle list
   holds 122 741 (59 016 `compilation-unit`), 65 532 with a diagnostic; 15 s. Regenerating gives identical files.
 - Lexer fuzz (`lex_fuzz.py`, 20 000 files, seed `csharp-lex`): 18 163 of their compilation units have a diagnostic.
+- The mutations and the lexer fuzz were made from the 7051 goldens before the preprocessor symbols; `mutate.py` over
+  the 7064 takes 3714 inputs, the 13 new ones directives only and so without a mutant, and writes the same mutants.
+- Preprocessor symbols (`defines.py`, 2026-11-04): 834 of the roslyn corpus's files (43.7 MB) and 143 of Avalonia's (2.2
+  MB) have `#if` or `#elif` conditions that name a symbol, naming 1028 and 159 symbols (counted per file); with all of
+  them defined 741 and 140 dumps differ from the same file's at the defaults. Dumps in 3.5 s and 0.8 s, 565 MB and 40
+  MB; a rerun writes identical dumps and lexer lines.
 - Disk: clones 2.0 GB, dumps 11.4 GB (Preview free), fuzz 1.2 GB, the oracle's builds and packages 255 MB.
 
 ## Caches (`~/.cache/psi-syntax`)
@@ -290,8 +311,10 @@ included; `__2` on a clash, also one of case), VERSION `latest` for every versio
 | `fuzz/csharp-lex.oracle/` | their dumps (compilation units at Latest, Parse) |
 | `fuzz/csharp-lex-preview.oracle/` | their dumps at Preview; those equal to Latest's are hard links to them |
 | `lex/csharp-mut{,.doc,.diag}.oracle.txt`, `lex/csharp-lex{,.doc,.diag}.oracle.txt` | the lexer lines of both, at `--doc none`, `--doc parse` and `--doc diagnose`, with the defaults for every file (the lists' paths only) |
+| `corpus/csharp-{roslyn-35d9211,avalonia-2d79ba5}-defines.list` | the corpus's files whose `#if` and `#elif` conditions name a symbol, each with all of them in its SYMBOLS column (`defines.py`) |
+| `oracle/csharp-REPO-SHA7-defines/`, `lex/csharp-REPO-SHA7-defines.doc.oracle.txt` | their dumps (Latest, Parse) and lexer lines (`--doc parse`) with those symbols |
 
-Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz`, any subset in that
+Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz defines`, any subset in that
 order; it stops when less than 220 GB would be free), the goldens with `tools/csharp-oracle/vendor-goldens.sh`.
 Compare a port's dumps with `scripts/compare.py ORACLE OURS` (it detects `.tree.txt`) and its lexer lines with
 `diff` of the oracle's file.

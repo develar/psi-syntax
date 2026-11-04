@@ -1,0 +1,101 @@
+CompilationUnit [0..205)
+  L:EndOfLineTrivia [0..1) '\n'
+  L:IfDirectiveTrivia [1..9)
+    HashToken [1..2) '#'
+    IfKeyword [2..4) 'if'
+    T:WhitespaceTrivia [4..5) ' '
+    IdentifierName [5..8)
+      IdentifierToken [5..8) 'YES'
+    EndOfDirectiveToken [8..8) ''
+    T:EndOfLineTrivia [8..9) '\n'
+  L:PragmaWarningDirectiveTrivia [9..38)
+    HashToken [9..10) '#'
+    PragmaKeyword [10..16) 'pragma'
+    T:WhitespaceTrivia [16..17) ' '
+    WarningKeyword [17..24) 'warning'
+    T:WhitespaceTrivia [24..25) ' '
+    DisableKeyword [25..32) 'disable'
+    T:WhitespaceTrivia [32..33) ' '
+    NumericLiteralExpression [33..37)
+      NumericLiteralToken [33..37) '0219'
+    EndOfDirectiveToken [37..37) ''
+    T:EndOfLineTrivia [37..38) '\n'
+  L:PragmaWarningDirectiveTrivia [38..67)
+    HashToken [38..39) '#'
+    PragmaKeyword [39..45) 'pragma'
+    T:WhitespaceTrivia [45..46) ' '
+    WarningKeyword [46..53) 'warning'
+    T:WhitespaceTrivia [53..54) ' '
+    RestoreKeyword [54..61) 'restore'
+    T:WhitespaceTrivia [61..62) ' '
+    NumericLiteralExpression [62..66)
+      NumericLiteralToken [62..66) '0219'
+    EndOfDirectiveToken [66..66) ''
+    T:EndOfLineTrivia [66..67) '\n'
+  L:ElifDirectiveTrivia [67..76)
+    HashToken [67..68) '#'
+    ElifKeyword [68..72) 'elif'
+    T:WhitespaceTrivia [72..73) ' '
+    IdentifierName [73..75)
+      IdentifierToken [73..75) 'NO'
+    EndOfDirectiveToken [75..75) ''
+    T:EndOfLineTrivia [75..76) '\n'
+  L:PragmaWarningDirectiveTrivia [76..105)
+    HashToken [76..77) '#'
+    PragmaKeyword [77..83) 'pragma'
+    T:WhitespaceTrivia [83..84) ' '
+    WarningKeyword [84..91) 'warning'
+    T:WhitespaceTrivia [91..92) ' '
+    DisableKeyword [92..99) 'disable'
+    T:WhitespaceTrivia [99..100) ' '
+    NumericLiteralExpression [100..104)
+      NumericLiteralToken [100..104) '0219'
+    EndOfDirectiveToken [104..104) ''
+    T:EndOfLineTrivia [104..105) '\n'
+  L:PragmaWarningDirectiveTrivia [105..134)
+    HashToken [105..106) '#'
+    PragmaKeyword [106..112) 'pragma'
+    T:WhitespaceTrivia [112..113) ' '
+    WarningKeyword [113..120) 'warning'
+    T:WhitespaceTrivia [120..121) ' '
+    RestoreKeyword [121..128) 'restore'
+    T:WhitespaceTrivia [128..129) ' '
+    NumericLiteralExpression [129..133)
+      NumericLiteralToken [129..133) '0219'
+    EndOfDirectiveToken [133..133) ''
+    T:EndOfLineTrivia [133..134) '\n'
+  L:ElseDirectiveTrivia [134..140)
+    HashToken [134..135) '#'
+    ElseKeyword [135..139) 'else'
+    EndOfDirectiveToken [139..139) ''
+    T:EndOfLineTrivia [139..140) '\n'
+  L:PragmaWarningDirectiveTrivia [140..169)
+    HashToken [140..141) '#'
+    PragmaKeyword [141..147) 'pragma'
+    T:WhitespaceTrivia [147..148) ' '
+    WarningKeyword [148..155) 'warning'
+    T:WhitespaceTrivia [155..156) ' '
+    DisableKeyword [156..163) 'disable'
+    T:WhitespaceTrivia [163..164) ' '
+    NumericLiteralExpression [164..168)
+      NumericLiteralToken [164..168) '0219'
+    EndOfDirectiveToken [168..168) ''
+    T:EndOfLineTrivia [168..169) '\n'
+  L:PragmaWarningDirectiveTrivia [169..198)
+    HashToken [169..170) '#'
+    PragmaKeyword [170..176) 'pragma'
+    T:WhitespaceTrivia [176..177) ' '
+    WarningKeyword [177..184) 'warning'
+    T:WhitespaceTrivia [184..185) ' '
+    RestoreKeyword [185..192) 'restore'
+    T:WhitespaceTrivia [192..193) ' '
+    NumericLiteralExpression [193..197)
+      NumericLiteralToken [193..197) '0219'
+    EndOfDirectiveToken [197..197) ''
+    T:EndOfLineTrivia [197..198) '\n'
+  L:EndIfDirectiveTrivia [198..205)
+    HashToken [198..199) '#'
+    EndIfKeyword [199..204) 'endif'
+    EndOfDirectiveToken [204..204) ''
+    T:EndOfLineTrivia [204..205) '\n'
+  EndOfFileToken [205..205) ''

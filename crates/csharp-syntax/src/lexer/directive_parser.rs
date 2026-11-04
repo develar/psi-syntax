@@ -1035,11 +1035,12 @@ impl<'l, 't> DirectiveParser<'l, 't> {
         values.pop().unwrap_or(false)
     }
 
-    /// `IsDefined(id)`: no preprocessor symbols but the file's own.
+    /// `IsDefined(id)`: the file's own `#define` or `#undef` before it, else `Options.PreprocessorSymbols.Contains(id)`.
     fn is_defined(&self, id: &[u8]) -> bool {
         match self.context.is_defined(self.lexer.directive_store(), id) {
+            DefineState::Unspecified => self.options().preprocessor_symbols.contains(id),
             DefineState::Defined => true,
-            DefineState::Undefined | DefineState::Unspecified => false,
+            DefineState::Undefined => false,
         }
     }
 }

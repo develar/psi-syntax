@@ -260,7 +260,7 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     }
 
     /// `Options`.
-    pub fn options(&self) -> LexerOptions {
+    pub fn options(&self) -> LexerOptions<'t> {
         self.lexer.options()
     }
 

@@ -30,9 +30,10 @@
 //!   tree's leaves are the text and `parse_body` of every unexpanded body is the full tree's subtree there (the same
 //!   kinds, ranges, error messages and shape); prints the bodies, the differing ones (their paths and ranges) and
 //!   exits nonzero on any. A Java list line is read as for `--out`.
-//! - C# (`crates/csharp-syntax`): a list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle`
-//!   reads it (`latest`/`preview`/`7.3`, `compilation-unit`/`expression`/..., `parse`/`none`); the text is the file's
-//!   bytes as they are (no line-separator conversion) and must be UTF-8. `--out` writes `OUT/<path>.tree.txt` and
+//! - C# (`crates/csharp-syntax`): a list line is `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC[<TAB>SYMBOLS]]]]` as
+//!   `tools/csharp-oracle` reads it (`latest`/`preview`/`7.3`, `compilation-unit`/`expression`/..., `parse`/`none`,
+//!   the preprocessor symbols as `A;B`; `--version`, `--doc` and `--define A;B` fill the empty columns); the text is the
+//!   file's bytes as they are (no line-separator conversion) and must be UTF-8. `--out` writes `OUT/<path>.tree.txt` and
 //!   `OUT/index.jsonl` as the oracle does (a dump past 2^29 UTF-16 code units is the failure `dump over 512 MB`);
 //!   `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the lexer dump) per file and with `--full`
 //!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files; `--check-bodies` (C# has no lazily parsed
@@ -97,7 +98,8 @@ fn usage() -> ! {
          ksdump --values --list LIST --root ROOT             C# files: value text lines as tools/csharp-oracle values prints them\n  \
          ksdump --values --check LINES --list LIST --root ROOT   C#: our value text lines against the oracle's `values --kept`\n  \
          (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
-         C#: --version V and --doc parse|none|diagnose for the list lines without those columns, as tools/csharp-oracle)"
+         C#: --version V, --doc parse|none|diagnose and --define A;B for the list lines without those columns, as\n  \
+         tools/csharp-oracle; --bench parses without the symbols)"
     );
     std::process::exit(2)
 }
@@ -203,6 +205,7 @@ fn parse_args() -> Args {
                 defaults.doc_mode = doc.unwrap_or_else(|| usage());
                 set_csharp_defaults(defaults);
             }
+            "--define" => set_csharp_symbols(it.next().unwrap_or_else(|| usage())),
             "--lang" => {
                 args.lang = Some(match it.next().as_deref() {
                     Some("kotlin") => Lang::Kotlin,
@@ -555,9 +558,24 @@ fn set_csharp_defaults(kind: csharp_syntax::FileKind) {
     }
 }
 
-/// A C# list line, `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]` as `tools/csharp-oracle` reads it (an empty or absent
-/// column takes `csharp_defaults`); `None` for a column that names nothing.
-fn csharp_line(line: &str) -> Option<(&str, csharp_syntax::FileKind)> {
+/// `--define A;B`: the preprocessor symbols of a C# list line whose SYMBOLS column is empty or absent (none by default).
+static CSHARP_SYMBOLS: std::sync::Mutex<String> = std::sync::Mutex::new(String::new());
+
+fn set_csharp_symbols(names: String) {
+    if let Ok(mut s) = CSHARP_SYMBOLS.lock() {
+        *s = names;
+    }
+}
+
+/// A SYMBOLS column or `--define`: names separated by `;`, empty ones dropped (`CSharpParseOptions.WithPreprocessorSymbols`
+/// of them, as `tools/csharp-oracle` reads it).
+fn csharp_symbols(column: &str) -> csharp_syntax::PreprocessorSymbols {
+    csharp_syntax::PreprocessorSymbols::new(column.split(';').filter(|n| !n.is_empty()))
+}
+
+/// A C# list line, `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC[<TAB>SYMBOLS]]]]` as `tools/csharp-oracle` reads it (an empty
+/// or absent column takes `csharp_defaults` and `--define`); `None` for a column that names nothing.
+fn csharp_line(line: &str) -> Option<(&str, csharp_syntax::FileKind, csharp_syntax::PreprocessorSymbols)> {
     let columns: Vec<&str> = line.split('\t').collect();
     let mut kind = csharp_defaults();
     if let Some(v) = columns.get(1).filter(|v| !v.is_empty()) {
@@ -569,7 +587,11 @@ fn csharp_line(line: &str) -> Option<(&str, csharp_syntax::FileKind)> {
     if let Some(d) = columns.get(3).filter(|d| !d.is_empty()) {
         kind.doc_mode = csharp_syntax::DocumentationMode::from_name(d)?;
     }
-    Some((columns[0], kind))
+    let symbols = match columns.get(4).filter(|s| !s.is_empty()) {
+        Some(column) => csharp_symbols(column),
+        None => csharp_symbols(&CSHARP_SYMBOLS.lock().map(|s| s.clone()).unwrap_or_default()),
+    };
+    Some((columns[0], kind, symbols))
 }
 
 /// A C# file's bytes as they are, when they are UTF-8 (`Encoding.UTF8.GetString` with a throwing decoder).
@@ -584,14 +606,14 @@ fn csharp_source(root: &Path, path: &str) -> Result<Vec<u8>, &'static str> {
 /// `--out` of a C# file: the dump of `<path>.tree.txt` (none on a failure) and its `index.jsonl` line.
 fn csharp_dump(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) -> (Option<String>, String) {
     use csharp_syntax::dump;
-    let Some((path, kind)) = csharp_line(line) else {
+    let Some((path, kind, symbols)) = csharp_line(line) else {
         return (None, dump::failure_line(line.split('\t').next().unwrap_or(line), "bad list line"));
     };
     let text = match csharp_source(root, path) {
         Ok(text) => text,
         Err(failure) => return (None, dump::failure_line(path, failure)),
     };
-    let tree = parser.parse(&text, kind);
+    let tree = parser.parse_with_symbols(&text, kind, &symbols);
     if tree.has_no_result() {
         return (None, dump::failure_line(path, &format!("no {}", kind.entry.name())));
     }
@@ -608,9 +630,9 @@ fn csharp_check_lossless(root: &Path, lines: &[String], threads: usize, stdout: 
     let schedule = Schedule::new(root, lines, threads);
     let mut differing = 0usize;
     let check = |parser: &mut csharp_syntax::Parser, i: usize| {
-        let (path, kind) = csharp_line(&lines[i])?;
+        let (path, kind, symbols) = csharp_line(&lines[i])?;
         let text = csharp_source(root, path).ok()?;
-        let tree = parser.parse(&text, kind);
+        let tree = parser.parse_with_symbols(&text, kind, &symbols);
         if tree.has_no_result() {
             return None;
         }
@@ -631,12 +653,12 @@ fn csharp_check_lossless(root: &Path, lines: &[String], threads: usize, stdout: 
 /// dump goes to `OUT/<path>.lex.txt`.
 fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full: Option<&Path>) -> String {
     let path = line.split('\t').next().unwrap_or(line);
-    let Some((_, kind)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line") };
+    let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line") };
     let text = match csharp_source(root, path) {
         Ok(text) => text,
         Err(failure) => return format!("{path}\tfailure\t{failure}"),
     };
-    let tree = parser.lex(&text, kind);
+    let tree = parser.lex_with_symbols(&text, kind, &symbols);
     let Some(dump) = csharp_syntax::dump::lex_to_string_within(&tree, csharp_syntax::dump::MAX_CHARS) else {
         return format!("{path}\tfailure\tdump over 512 MB");
     };
@@ -655,12 +677,12 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
 /// `--values` of a C# file: `dump::value_lines` of its tree, or `PATH<TAB>failure<TAB>REASON`.
 fn csharp_values(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) -> String {
     let path = line.split('\t').next().unwrap_or(line);
-    let Some((_, kind)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
+    let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
     let text = match csharp_source(root, path) {
         Ok(text) => text,
         Err(failure) => return format!("{path}\tfailure\t{failure}\n"),
     };
-    let tree = parser.parse(&text, kind);
+    let tree = parser.parse_with_symbols(&text, kind, &symbols);
     if tree.has_no_result() {
         return String::new();
     }
@@ -898,9 +920,12 @@ impl BenchLanguage for csharp_syntax::CSharp {
     fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
         (parser.grown_bytes(), parser.heap_bytes())
     }
-    /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing.
+    /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing; the SYMBOLS column and
+    /// `--define` do not apply (`parse` defines none).
     fn file_kind(line: &str) -> (&str, csharp_syntax::FileKind) {
-        csharp_line(line).unwrap_or((line.split('\t').next().unwrap_or(line), csharp_defaults()))
+        csharp_line(line)
+            .map(|(path, kind, _)| (path, kind))
+            .unwrap_or((line.split('\t').next().unwrap_or(line), csharp_defaults()))
     }
     fn counters() -> Vec<u64> {
         Vec::new()
@@ -1281,7 +1306,7 @@ fn csharp_lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut imp
     let sources: Vec<(Vec<u8>, csharp_syntax::FileKind)> = paths
         .iter()
         .filter_map(|line| {
-            let (path, kind) = csharp_line(line)?;
+            let (path, kind, _) = csharp_line(line)?;
             csharp_source(root, path).ok().map(|text| (text, kind))
         })
         .collect();

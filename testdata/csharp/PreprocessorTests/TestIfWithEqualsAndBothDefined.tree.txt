@@ -1,0 +1,21 @@
+CompilationUnit [0..22)
+  L:IfDirectiveTrivia [0..15)
+    HashToken [0..1) '#'
+    IfKeyword [1..3) 'if'
+    T:WhitespaceTrivia [3..4) ' '
+    EqualsExpression [4..14)
+      IdentifierName [4..8)
+        IdentifierToken [4..7) 'ABC'
+        T:WhitespaceTrivia [7..8) ' '
+      EqualsEqualsToken [8..10) '=='
+      T:WhitespaceTrivia [10..11) ' '
+      IdentifierName [11..14)
+        IdentifierToken [11..14) 'XYZ'
+    EndOfDirectiveToken [14..14) ''
+    T:EndOfLineTrivia [14..15) '\n'
+  L:EndIfDirectiveTrivia [15..22)
+    HashToken [15..16) '#'
+    EndIfKeyword [16..21) 'endif'
+    EndOfDirectiveToken [21..21) ''
+    T:EndOfLineTrivia [21..22) '\n'
+  EndOfFileToken [22..22) ''

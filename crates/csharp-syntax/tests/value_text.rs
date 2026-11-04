@@ -227,9 +227,9 @@ fn value_lines_equal_the_oracle() {
     assert!(checked >= 4, "the directive strings of values.cs: {checked}");
 }
 
-/// The goldens of `testdata/csharp` (its `manifest.tsv`, each at its version, entry and documentation mode) against
-/// `values/goldens.values.txt`, what `tools/csharp-oracle/oracle.sh values --kept` printed for them (the manifest's
-/// lines with `.cs` added to the path).
+/// The goldens of `testdata/csharp` (its `manifest.tsv`, each at its version, entry, documentation mode and preprocessor
+/// symbols) against `values/goldens.values.txt`, what `tools/csharp-oracle/oracle.sh values --kept` printed for them
+/// (the manifest's lines with `.cs` added to the path).
 #[test]
 fn golden_value_lines_equal_the_oracle() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/csharp");
@@ -248,8 +248,9 @@ fn golden_value_lines_equal_the_oracle() {
             entry: Entry::from_name(columns[2]).expect("an entry"),
             doc_mode: csharp_syntax::DocumentationMode::from_name(columns[3]).expect("a documentation mode"),
         };
+        let symbols = csharp_syntax::PreprocessorSymbols::new(columns[4].split(';').filter(|n| !n.is_empty()));
         let name = format!("{}.cs", columns[0]);
-        let tree = parser.parse(std::fs::read(root.join(&name)).expect("a golden"), kind);
+        let tree = parser.parse_with_symbols(std::fs::read(root.join(&name)).expect("a golden"), kind, &symbols);
         if !tree.has_no_result() {
             ours.push_str(&dump::value_lines(&name, &tree));
         }

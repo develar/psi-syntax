@@ -1,12 +1,15 @@
 #!/bin/sh
 # Rebuilds the C# caches under ~/.cache/psi-syntax (README.md, "Caches"):
-#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz]     (no step: all, in this order)
+#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz] [defines]   (no step: all, in this order)
 # clones: the pinned corpora under csharp-src/ (shallow, checked out); lists: corpus/csharp-REPO-SHA7.list;
 # dumps: oracle/csharp-REPO-SHA7/ (Latest, Parse) and oracle/csharp-REPO-SHA7-preview/ (Preview, Parse, files equal
 # to Latest's hard-linked); lex: lex/csharp-REPO-SHA7.oracle.txt (--doc none), .doc.oracle.txt (--doc parse) and
 # .diag.oracle.txt (--doc diagnose);
 # fuzz: the golden mutations (their dumps at their goldens' versions, at Latest and at Preview) and the lexer fuzz
-# (dumps at Latest and at Preview) with their lexer lines. Keeps at least 200 GB free.
+# (dumps at Latest and at Preview) with their lexer lines;
+# defines: of the roslyn and Avalonia corpora, the files whose #if and #elif conditions name a symbol, with every one
+# of those symbols defined (defines.py): corpus/csharp-REPO-SHA7-defines.list, its dumps oracle/csharp-REPO-SHA7-defines/
+# (Latest, Parse) and lexer lines lex/csharp-REPO-SHA7-defines.doc.oracle.txt (--doc parse). Keeps at least 200 GB free.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../.." && pwd)
@@ -16,7 +19,8 @@ CORPORA="roslyn https://github.com/dotnet/roslyn 35d9211b841e7613c1d2f8f5af6d628
 runtime https://github.com/dotnet/runtime v10.0.14
 aspnetcore https://github.com/dotnet/aspnetcore v10.0.14
 avalonia https://github.com/AvaloniaUI/Avalonia 12.1.4"
-steps=${*:-clones lists dumps lex fuzz}
+DEFINES="roslyn avalonia"
+steps=${*:-clones lists dumps lex fuzz defines}
 
 need_space() {
   free=$(df -k "$S" | awk 'NR == 2 { print int($4 / 1024 / 1024) }')
@@ -95,6 +99,15 @@ PY
   rm "$F/csharp-mut.paths"
 }
 
+defines() {
+  k=$(key "$1")-defines
+  need_space
+  python3 -I "$here/defines.py" "$S/corpus/$(key "$1").list" "$S/csharp-src/$1" > "$S/corpus/$k.list"
+  rm -rf "$S/oracle/$k"
+  "$O" dump --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --out "$S/oracle/$k"
+  "$O" lex --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --doc parse > "$S/lex/$k.doc.oracle.txt"
+}
+
 mkdir -p "$S/csharp-src" "$S/corpus" "$S/oracle" "$S/lex" "$S/fuzz"
 for step in $steps; do
   case $step in
@@ -103,6 +116,7 @@ for step in $steps; do
     dumps) each dump ;;
     lex) each lex ;;
     fuzz) fuzz ;;
+    defines) for corpus in $DEFINES; do defines "$corpus"; done ;;
     *) echo "caches.sh: unknown step $step" >&2; exit 2 ;;
   esac
 done
