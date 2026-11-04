@@ -321,6 +321,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `when`, `file`, `required`, `scoped`, `allows`, ...) carry their keyword kind, the ones it does not stay
   `IdentifierToken` (`var` as a type, `nameof(x)`, any contextual keyword used as a name; `tests/contract.rs`, each
   case Roslyn's tree), `>>` and `>>>` are the parser's merged tokens.
+  `tree.directives()` lists every directive's node (`#if`, `#region`, …, a branch not taken's too) with Roslyn's
+  `IsActive`, `BranchTaken` and `ConditionValue` for the tree's symbols (`DirectiveFlags`; `directive_flags(id)` of
+  one), what tells an inactive directive from an active one without a lex.
   `tree.value_text(id)` is `SyntaxToken.ValueText` of a token leaf, exact to Roslyn on every gate input (`ksdump
   --values --check` against `oracle.sh values --kept`; the goldens in `tests/value_text.rs`): an identifier without
   its verbatim `@` and with its unicode escapes (`\uXXXX`, `\UXXXXXXXX`) decoded and formatting characters dropped

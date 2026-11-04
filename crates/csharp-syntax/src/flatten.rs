@@ -81,12 +81,13 @@ pub(crate) struct Flattener {
     fast: Vec<Fast>,
 }
 
-/// What a walk returns: the tree, its diagnostics in Roslyn's order, and the value texts of its tokens whose
-/// `ValueText` is not their text (`Tree::value_text`).
+/// What a walk returns: the tree, its diagnostics in Roslyn's order, the value texts of its tokens whose
+/// `ValueText` is not their text (`Tree::value_text`) and the boolean fields of its directives (`Tree::directives`).
 pub(crate) struct Flat {
     pub(crate) tree: psi_builder::Tree<CSharp>,
     pub(crate) diagnostics: Vec<Diagnostic>,
     pub(crate) values: Values,
+    pub(crate) directives: Vec<(u32, u8)>,
 }
 
 /// The `ValueText` of each token leaf whose value the arena keeps (`GreenArena::token_value`): the leaf's id and the
@@ -133,6 +134,8 @@ struct Walk<'a> {
     /// The tree's text from the first leaf whose text is not the source's at its position on (`ToFullString()`).
     text: Option<Vec<u8>>,
     values: Values,
+    /// Each directive's node id and its boolean fields (`GreenArena::extra`), in id order (`Flat::directives`).
+    directives: Vec<(u32, u8)>,
 }
 
 /// A byte offset of a text and its UTF-16 position, moved to the next one asked (diagnostics come in walk order, so
@@ -266,7 +269,7 @@ impl Flattener {
         builder.truncate(end);
         let text = walk.text.take().map_or_else(|| source.clone(), Arc::from);
         let tree = builder.finish(text, file_kind);
-        Flat { tree, diagnostics: walk.diagnostics, values: walk.values }
+        Flat { tree, diagnostics: walk.diagnostics, values: walk.values, directives: walk.directives }
     }
 
     /// The tree of `tokens` (a lexer's, `SyntaxFactory.ParseTokens`) as children of a `CompilationUnit` root, the
@@ -289,7 +292,7 @@ impl Flattener {
         }
         builder.close(root, walk.position);
         let tree = builder.finish(source.clone(), file_kind);
-        Flat { tree, diagnostics: walk.diagnostics, values: walk.values }
+        Flat { tree, diagnostics: walk.diagnostics, values: walk.values, directives: walk.directives }
     }
 
     fn run(&mut self, walk: &mut Walk<'_>, builder: &mut TreeBuilder<CSharp>) {
@@ -517,6 +520,7 @@ impl Hot {
                 let td = &r.trivia[t.0 as usize];
                 if td.flags & STRUCTURED != 0 {
                     let structure = walk.arena.trivia_structure(t);
+                    walk.directive(self.id, structure);
                     let next = self.open(walk, w, r, run.parent, structure, run.trailing);
                     stack.push(Fast::Trivia {
                         at: run.at,
@@ -641,6 +645,7 @@ impl<'a> Walk<'a> {
             source_next: 0,
             text: None,
             values: Values::default(),
+            directives: Vec::new(),
         }
     }
 }
@@ -718,7 +723,16 @@ impl Walk<'_> {
         if trailing {
             builder.set_trailing(id);
         }
+        self.directive(id.0, structure);
         Some(Frame::Children { green: structure, id, slot: 0, element: 0 })
+    }
+
+    /// Keeps the boolean fields of the structured trivia `structure`, the node `id`, when it is a directive
+    /// (`DirectiveTriviaSyntax.IsActive`, `BranchTaken`, `ConditionValue`; `Tree::directives`).
+    fn directive(&mut self, id: u32, structure: Green) {
+        if crate::facts::is_preprocessor_directive(self.arena.kind(structure)) {
+            self.directives.push((id, self.arena.extra(structure) as u8));
+        }
     }
 
     // The column walk's cold paths: `Hot` keeps the position and `source_next` itself and passes them in.
@@ -957,7 +971,7 @@ mod tests {
             flattener.run(&mut walk, &mut builder);
         }
         let text = walk.text.take().map_or_else(|| source.clone(), Arc::from);
-        Flat { tree: builder.finish(text, FileKind::default()), diagnostics: walk.diagnostics, values: walk.values }
+        Flat { tree: builder.finish(text, FileKind::default()), diagnostics: walk.diagnostics, values: walk.values, directives: walk.directives }
     }
 
     /// Columns too small for the tree, as the estimate is for a tree that shares records: the walk runs again into

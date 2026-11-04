@@ -100,3 +100,30 @@ fn preprocessor_symbols_from_the_options() {
         assert_eq!(disabled(&lexed), disabled(&tree), "{name}: the lexer reads the same symbols");
     }
 }
+
+/// A directive's boolean fields (`Tree::directives`, `DirectiveTriviaSyntax.IsActive`, `BranchTaken`,
+/// `ConditionValue`), as Roslyn's lexer sets them for the symbols of the parse: a directive inside a branch not taken is
+/// inactive, its condition unevaluated; the tree of a parse and of a lex hold the same.
+#[test]
+fn a_directive_keeps_its_boolean_fields() {
+    let text = "#if A\nclass X {}\n#region r\n#endregion\n#elif !A\nclass Y {}\n#if B\n#endif\n#else\nclass Z {}\n#endif\n";
+    let mut parser = Parser::new();
+    let row = |tree: &Tree| -> Vec<String> {
+        tree.directives()
+            .map(|(id, f)| {
+                let kind = format!("{:?}", tree.node_kind(id).expect("a node"));
+                let flag = |on: bool, c: char| if on { c } else { '-' };
+                format!("{} {}{}{}", kind.trim_end_matches("DirectiveTrivia"), flag(f.is_active(), 'a'), flag(f.branch_taken(), 't'), flag(f.condition_value(), 'v'))
+            })
+            .collect()
+    };
+    let none = parser.parse(text, FileKind::default());
+    assert_eq!(row(&none), ["If a--", "Region ---", "EndRegion ---", "Elif atv", "If a--", "EndIf a--", "Else a--", "EndIf a--"]);
+    let a = parser.parse_with_symbols(text, FileKind::default(), &PreprocessorSymbols::new(["A"]));
+    assert_eq!(row(&a), ["If atv", "Region a--", "EndRegion a--", "Elif a--", "If ---", "EndIf ---", "Else a--", "EndIf a--"]);
+    assert_eq!(row(&parser.lex_with_symbols(text, FileKind::default(), &PreprocessorSymbols::new(["A"]))), row(&a));
+    for (id, flags) in a.directives() {
+        assert_eq!(a.directive_flags(id), Some(flags));
+    }
+    assert_eq!(a.directive_flags(a.root()), None);
+}

@@ -172,6 +172,29 @@ impl Diagnostic {
     }
 }
 
+/// The boolean fields of a directive's node (`syntax::types::IfDirectiveTriviaSyntax::IS_ACTIVE` and the same bits of
+/// every directive type): `IsActive` (the directive is read: it is in no branch the preprocessor does not take), and for
+/// `#if`, `#elif` and `#else` `BranchTaken` (the branch after it is taken) and, but for `#else`, `ConditionValue`.
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, Default)]
+pub struct DirectiveFlags(u8);
+
+impl DirectiveFlags {
+    /// `DirectiveTriviaSyntax.IsActive`.
+    pub fn is_active(self) -> bool {
+        u32::from(self.0) & crate::syntax::types::IfDirectiveTriviaSyntax::IS_ACTIVE != 0
+    }
+
+    /// `BranchTaken` of an `#if`, `#elif` or `#else`; false for every other directive.
+    pub fn branch_taken(self) -> bool {
+        u32::from(self.0) & crate::syntax::types::IfDirectiveTriviaSyntax::BRANCH_TAKEN != 0
+    }
+
+    /// `ConditionValue` of an `#if` or `#elif`; false for every other directive.
+    pub fn condition_value(self) -> bool {
+        u32::from(self.0) & crate::syntax::types::IfDirectiveTriviaSyntax::CONDITION_VALUE != 0
+    }
+}
+
 /// A parsed C# text: `psi_builder`'s tree (`Deref`: ids in preorder, `kind`, `range`, `children`, `leaves`, ...,
 /// `error_message(id)`, the first message on a node), its diagnostics in Roslyn's order and its tokens' value texts
 /// (`value_text`).
@@ -182,6 +205,8 @@ pub struct Tree {
     /// `value_strings` (`flatten::Values`).
     values: Box<[(u32, u32)]>,
     value_strings: Box<str>,
+    /// Each directive's node id and its boolean fields, in id order (`directives`).
+    directives: Box<[(u32, u8)]>,
     /// The entry returned null (`ParseMemberDeclaration` of text that is no member): the tree is an empty root.
     no_result: bool,
     /// The tokens of `Parser::lex` (`Entry::Tokens`) as the root's children, not a parse.
@@ -223,6 +248,7 @@ impl Tree {
             diagnostics: flat.diagnostics.into_boxed_slice(),
             values: flat.values.ends.into_boxed_slice(),
             value_strings: flat.values.text.into_boxed_str(),
+            directives: flat.directives.into_boxed_slice(),
             no_result,
             lexed,
         }
@@ -283,6 +309,20 @@ impl Tree {
         self.tree.utf8_text(id)
     }
 
+    /// Every directive of the tree (`DirectiveTriviaSyntax`: `#if`, `#elif`, `#else`, `#endif`, `#define`, `#region`, ...,
+    /// the root of its structured trivia), in document order, with the boolean fields Roslyn's node has
+    /// (`DirectiveFlags`): what the lexer decided for the preprocessor symbols the tree was parsed with. A directive in a
+    /// branch Roslyn does not take is one too, inactive (Roslyn lexes the directives of disabled text for their nesting).
+    pub fn directives(&self) -> impl ExactSizeIterator<Item = (NodeId, DirectiveFlags)> + '_ {
+        self.directives.iter().map(|&(id, bits)| (NodeId(id), DirectiveFlags(bits)))
+    }
+
+    /// `directives`' flags of the node `id`, None when it is no directive.
+    pub fn directive_flags(&self, id: NodeId) -> Option<DirectiveFlags> {
+        let i = self.directives.binary_search_by_key(&id.0, |&(d, _)| d).ok()?;
+        Some(DirectiveFlags(self.directives[i].1))
+    }
+
     /// The tree without its diagnostics.
     pub fn as_psi(&self) -> &psi_builder::Tree<CSharp> {
         &self.tree
@@ -307,6 +347,7 @@ impl Tree {
             + self.diagnostics.iter().map(|d| d.message.capacity()).sum::<usize>()
             + self.values.len() * size_of::<(u32, u32)>()
             + self.value_strings.len()
+            + self.directives.len() * size_of::<(u32, u8)>()
     }
 }
 
@@ -533,7 +574,7 @@ impl Parser {
             let id = self.builder.open(None, psi_builder::ElementType::Node(crate::NodeKind::CompilationUnit), 0);
             self.builder.close(id, 0);
             let tree = self.builder.finish(source.clone(), file_kind);
-            Flat { tree, diagnostics: Vec::new(), values: Values::default() }
+            Flat { tree, diagnostics: Vec::new(), values: Values::default(), directives: Vec::new() }
         } else {
             self.flattener.flatten(&arena, root, source, &mut self.builder, file_kind, abandoned)
         };
