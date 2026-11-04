@@ -5,6 +5,7 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 use psi_builder::TreeBuilder;
+use psi_builder::stack::{StackGuard, StackUse};
 
 pub use psi_builder::tree::{Children, NodeId, Preorder};
 
@@ -325,6 +326,8 @@ pub struct Parser {
     retained_bytes: usize,
     /// `heap_bytes` when the last parse ended, before it shrank to `retained_bytes`.
     grown_bytes: usize,
+    /// The deepest `_recursionDepth` and the most stack the stack checks of the last parse saw (`stack_use`).
+    stack_use: StackUse,
 }
 
 impl Default for Parser {
@@ -339,6 +342,7 @@ impl Default for Parser {
             arena_budget: None,
             retained_bytes: psi_builder::buffers::RETAINED_BYTES,
             grown_bytes: 0,
+            stack_use: StackUse::default(),
         }
     }
 }
@@ -420,6 +424,13 @@ impl Parser {
         self.arena.work()
     }
 
+    /// The deepest `_recursionDepth` and the most stack the stack checks of the last parse saw (see
+    /// `psi_builder::stack`; measurements and tests).
+    #[doc(hidden)]
+    pub fn stack_use(&self) -> StackUse {
+        self.stack_use
+    }
+
     /// Parses `text` as `file_kind` says (`Entry::Tokens`: lexes it, `lex`).
     pub fn parse(&mut self, text: impl AsRef<[u8]>, file_kind: FileKind) -> Tree {
         if file_kind.entry == Entry::Tokens {
@@ -434,9 +445,11 @@ impl Parser {
         let buffers = std::mem::take(&mut self.syntax_parser);
         let pool = std::mem::take(&mut self.pool);
         let (root, abandoned, buffers, pool) = {
-            let mut parser = LanguageParser::new(&mut lexer, LexerMode::SYNTAX, buffers, pool);
+            let mut parser = LanguageParser::new(&mut lexer, LexerMode::SYNTAX, buffers, pool, StackGuard::here());
             let root = parser.parse_entry(file_kind.entry);
             let abandoned = parser.stack_exhausted_at.is_some() || parser.base.budget_exhausted_at.is_some();
+            let bytes = parser.stack.used_to(parser.lowest_frame);
+            self.stack_use = StackUse { levels: parser.peak_recursion_depth as u32, bytes };
             let (buffers, pool) = parser.into_buffers();
             (root, abandoned, buffers, pool)
         };

@@ -18,6 +18,7 @@ pub const SHARED_BLOCK_DEPTH: u32 = 64;
 use crate::counters::{Counter, add};
 use crate::language::{ElementType, ElementTypeOf, Language, NodeType, TokenType, TreeLanguage};
 use crate::lexer::Lexed;
+use crate::stack::{StackGuard, StackUse};
 
 /// A node of a `Tree`.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
@@ -245,6 +246,8 @@ pub struct Parser<L: Language> {
     retained_bytes: usize,
     /// `heap_bytes` when the last parse ended, before it shrank to `retained_bytes`.
     grown_bytes: usize,
+    /// The most the builders of the last parse took of the stack (`stack_use`).
+    stack_use: StackUse,
 }
 
 impl<L: Language> Default for Parser<L> {
@@ -262,6 +265,7 @@ impl<L: Language> Default for Parser<L> {
             pair_stack: Vec::new(),
             retained_bytes: crate::buffers::RETAINED_BYTES,
             grown_bytes: 0,
+            stack_use: StackUse::default(),
         }
     }
 }
@@ -281,6 +285,9 @@ pub struct Chameleon<'a, L: Language> {
     /// Its nesting (`NESTING_CHAMELEON` over where it sits) and the parser's limit.
     nesting: u32,
     limit: u32,
+    /// Where its parse starts on the stack: in `Parser::begin_chameleon`, the same frame for a body parsed in the
+    /// file's parse and by `parse_body`, so both stop at the same levels.
+    stack: StackGuard,
     /// How the file it is in is parsed.
     file_kind: L::FileKind,
 }
@@ -309,7 +316,7 @@ impl<'a, L: Language> Chameleon<'a, L> {
         let p = &self.pending;
         let builder = L::frame_builder(self.frame);
         builder.reset(self.text.clone(), p.start, p.end - p.start, None);
-        builder.set_nesting(0, self.limit);
+        builder.set_nesting(0, self.limit, self.stack);
         builder
     }
 
@@ -353,7 +360,7 @@ impl<'a, L: Language> Chameleon<'a, L> {
         };
         let delegate = L::frame_builder(self.frame);
         delegate.reset(self.text.clone(), p.start, p.end - p.start, file_token);
-        delegate.set_nesting(self.nesting, self.limit);
+        delegate.set_nesting(self.nesting, self.limit, self.stack);
         if let (Some(first), Some(pairs)) = (file_token, self.file_brace_pairs) {
             delegate.share_brace_pairs(pairs.clone(), first);
         }
@@ -390,6 +397,13 @@ impl<L: Language> Parser<L> {
 
     fn limit(&self) -> u32 {
         self.nesting_limit.unwrap_or(L::NESTING_LIMIT)
+    }
+
+    /// The deepest level a builder of the last parse (or `parse_body`) counted and the most stack the levels of one
+    /// took from where it started (see `crate::stack`; measurements and tests).
+    #[doc(hidden)]
+    pub fn stack_use(&self) -> StackUse {
+        self.stack_use
     }
 
     /// The heap bytes the parser's buffers hold between parses, by capacity: the file's tokens, a chameleon's, every
@@ -493,6 +507,7 @@ impl<L: Language> Parser<L> {
         };
         let chameleon = Pending { node: root, kind, start: range.start, end: range.end, file_tokens: None, depth };
         self.depth = 0;
+        self.stack_use = StackUse::default();
         self.begin_chameleon(&tree.text, &mut data, chameleon, tree.file_kind);
         self.bind_frames(&tree.text, &mut data, tree.file_kind);
         let body = data.take_exact();
@@ -536,11 +551,12 @@ impl<L: Language> Parser<L> {
         starts.clear();
         starts.extend_from_slice(&self.file.starts);
         file.reset(text.clone(), 0, text.len(), Some(0));
-        file.set_nesting(0, limit);
+        file.set_nesting(0, limit, StackGuard::here());
         if L::BLOCK_BRACES.is_some() {
             file.share_brace_pairs(self.file_brace_pairs.clone(), 0);
         }
         parse(frame);
+        self.stack_use = L::frame_builder(frame).stack_use();
         let root = L::frame_builder(frame).begin_bind(&mut data, None);
         self.depth = 1;
         self.bind_frames(&text, &mut data, file_kind);
@@ -576,7 +592,9 @@ impl<L: Language> Parser<L> {
     /// Parses one chameleon's text with the next frame's builder (`Language::parse_chameleon`) and starts appending
     /// its subtree under its node, that frame on top. A body (`Language::is_body`) whose nesting (`NESTING_CHAMELEON`
     /// over where it sits) passes the limit is not parsed: its subtree is appended whole, an error element "Code is
-    /// too deeply nested" over its tokens, and no frame is added.
+    /// too deeply nested" over its tokens, and no frame is added. Never inlined: its frame is where a chameleon's
+    /// parse starts on the stack (`Chameleon::stack`), the same under `bind_frames` and `parse_body`.
+    #[inline(never)]
     fn begin_chameleon(&mut self, text: &Arc<[u8]>, data: &mut TreeData, p: Pending<L::Lazy>, file_kind: L::FileKind) {
         let nesting = p.depth.saturating_add(NESTING_CHAMELEON);
         if L::is_body(p.kind) && nesting > self.limit() {
@@ -598,10 +616,13 @@ impl<L: Language> Parser<L> {
             frame,
             nesting,
             limit,
+            stack: StackGuard::here(),
             file_kind,
         };
         L::parse_chameleon(p.kind, &mut chameleon);
-        L::frame_builder(&mut self.frames[self.depth]).begin_bind(data, Some(p.node));
+        let builder = L::frame_builder(&mut self.frames[self.depth]);
+        self.stack_use = self.stack_use.max(builder.stack_use());
+        builder.begin_bind(data, Some(p.node));
         self.depth += 1;
     }
 

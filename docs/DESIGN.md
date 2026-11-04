@@ -322,11 +322,10 @@ overflows too), so the port defines one, and keeps PSI's tree below it.
   rolls it back (a list that reaches 32 also makes every list starting before that token too deep, so each `<` costs
   constant time on average); 10 nested annotations and parenthesized types per builder, because a rolled-back attempt parses
   them and the parse after it parses them again (`@A(@A(…))`, `((…) -> A) -> A`), which doubles the work per level:
-  measured on c796e73, 14 levels of `@A(` took 7.3 ms and 1000 did not finish. Stack per level, measured with a stack
-  pointer probe and by bisecting the depth that overflows 1 MB without a limit: 127 B (unary minus) to 559 B
-  (nested `object`), 382 B for parentheses; random mixes of 42 forms stayed below 320 B. 1000 levels of the worst
-  form fit 640 KB, not 512 KB. The community files reach 62 levels, 5 type argument lists and 4 reparsed
-  constructs.
+  measured on c796e73, 14 levels of `@A(` took 7.3 ms and 1000 did not finish. Stack per level
+  (`Parser::stack_use`, "Stack"): 337 B for parentheses to 504 B (nested `object { … }`) on macOS arm64, at most 610 B
+  on Windows x64, so every Kotlin form reaches the limit within the stack budget. The community files reach 62
+  levels, 5 type argument lists and 4 reparsed constructs.
 - **Past a limit** the construct is an error element "Code is too deeply nested" over the rest of it: from the
   current token to the first token that closes a bracket opened before it (`(`, `[`, `{`, `${`, quotes), at least one
   token. The table of these closers is made once per builder when first needed, so the error costs constant time,
@@ -338,6 +337,41 @@ overflows too), so the port defines one, and keeps PSI's tree below it.
 
 `tests/robustness.rs` parses 22 forms nested 100 000 deep on a 1 MB stack, and every golden with limits 1 to 13;
 the gate runs the community files and the mutations with limit 3 (see Contract).
+
+### Stack (`psi_builder::stack`)
+
+A parse promises to fit `STACK`, 1 MB of its thread's stack beyond its caller's frames, on every target accio ships
+(macOS and Linux on arm64 and x64, Windows on x64 and arm64). A depth limit cannot keep that alone: a level's stack is
+the sum of the frames of the calls between two counted entry points, the compiler's choice, and the same code took 880
+bytes a level for a C# property pattern on macOS arm64, 928 on Windows arm64 and 1041 on Windows x64 (Win64's shadow
+space and callee-saved registers; eight frames a level, none large). Measured at the limits before this bound, the
+deepest C# form took 902 KB on macOS and 1061 KB on Windows x64, Java's 885 and 1097 KB: Windows x64 overflowed 1 MB
+(JetBrains/accio#206).
+
+- **What is measured.** `StackGuard` holds the address of a local in the frame where a builder's parse starts: the
+  driver's `parse_with` for a file, `begin_chameleon` for a chameleon (never inlined, so a body parsed in the file's
+  parse and by `parse_body` starts from the same frame and stops at the same levels; chameleons nest on the heap, so
+  each starts afresh), C#'s `Parser::parse` for the file and every hole's parser. At every level a parser counts
+  (`enter_nesting`, `ensure_sufficient_execution_stack`) it compares that address with one in the current frame, safe
+  code with no `unsafe` and no platform call, as Roslyn's `EnsureSufficientExecutionStack` measures its stack.
+- **The budget.** Past `STACK_BUDGET`, 768 KiB, a level is refused as past the depth limit: an error element "Code is
+  too deeply nested" in Kotlin and Java, the parse abandoned with `ERR_InsufficientStack` in C#. The quarter left
+  holds the work below the deepest level: tokens, records, recovery, and the C# lexer's own bounded recursion, of which
+  the deepest is a documentation comment's elements nested past `MAX_NESTED_SCAN_DEPTH`, 53 KB on macOS (the
+  smallest thread stack that parses it, bisected); `the_lexer_has_room_below_the_deepest_level` lexes one at every
+  level of the heaviest form on 1 MB.
+- **Deterministic within a build, the same tree across targets below the count.** The stack between two frames is the
+  same for the same input, so a build's tree is a function of the input. Across targets the depth limit, a count, is
+  the bound wherever it is reached first: `the_depth_limit_holds_before_the_stack_runs_out` (each language's
+  `tests/robustness.rs`) parses every recursive form nested 100 000 deep on 1 MB and fails if the stack stops one
+  short of 1000 levels in Kotlin, 800 in Java or 700 in C#, on every target CI runs (Linux x64, Windows x64; macOS and
+  Windows arm64 by hand). Below those levels a form's tree is the same on every target. On Windows x64 the stack
+  stops 14 C# forms (the fewest levels: property patterns at 756) and 5 Java forms (enum constant bodies at 862), on
+  macOS 3 and 1; `Parenth2.java` (1010 levels of parentheses) and `hugeexpr1.cs` (678) are far from the budget.
+- **A C# memo replays only what a fresh parse would make.** A literal made into an expression is replayed from
+  `ParsedStrings` when its stack checks, measured below the frame of `parse_interpolated_or_raw_string_token` (never
+  inlined, so the same from every caller), stay within the budget from the current frame, as its levels stay within
+  the depth limit.
 
 The limits are `Language` constants (`NESTING_LIMIT`, `TYPE_ARGUMENTS_LIMIT`, `REPARSED_LIMIT`), whose defaults are
 Kotlin's. A construct parsed twice that reaches its limit also makes every such construct starting before that token
@@ -364,10 +398,9 @@ error's marker as the construct the caller parsed).
   limit (`Chameleon::builder`), as a KDoc does: they hold no body, so a frame is bounded by its own tokens.
 - **The limits.** 1200 levels: IntelliJ's own test `Parenth2.java` (in the community corpus and the goldens) nests
   1001 parenthesized expressions, 1010 levels; the next deepest community file reaches 174 (`NestedLambda.java`), the
-  deepest production file 102. A level takes at most 652 bytes of stack in a release build (typed and parenthesized
-  lambdas, enum constant bodies; measured by bisecting the depth that overflows 1 MB without a limit, over 45 forms:
-  127 B for unary operators and casts, 461 B for parentheses, 588 B for calls), and the deepest forms at the limit
-  need 772 KB (bisected stack size), so a parse fits 1 MB. 32 type argument lists (the community files reach 4). 5
+  deepest production file 102. A level takes 496 bytes of stack for parentheses on macOS arm64 and up to 736 (an
+  enum constant's body; 912 on Windows x64), so the heaviest forms reach the stack budget before the limit ("Stack").
+  32 type argument lists (the community files reach 4). 5
   annotations (the community files reach 4): an annotation in an expression is parsed up to 4 times per parse of the
   one around it (as a type's annotations, as the expression's, in a cast and in a lambda's parameters, each rolled
   back), so `@A(f(@A(f(…))))` took 3 times the work per level and 16 levels 12.6 s; at 5, an annotation takes at most
@@ -541,9 +574,9 @@ failure is its only answer to an input it will not parse.
   body adds 2 more (`LOCAL_FUNCTION_BODY_DEPTH`), a hole of an interpolated string 16
   (`INTERPOLATION_RECURSION_DEPTH`). `a?.b?.c…` (`parseWhenNotNull` calls `TryParseConditionalAccessExpression` for
   each `?`, unguarded) is a loop over a stack of the pending `primary ?` pairs, built innermost first.
-- **The limit.** 1000 levels. A level takes at most 760 bytes of stack in a release build (129 for a unary operator,
-  418 for parentheses, 687 for a type argument list, 757 for a namespace: a stack pointer probe over 150 forms 900 deep
-  on 93d30b1a); nested local functions took 1.9 KB a level and overflowed 1 MB at 1000 levels, hence their weight.
+- **The limit.** 1000 levels, and the stack budget ("Stack"), whichever comes first. A level takes 371 bytes of stack
+  for parentheses on macOS arm64, 658 for a type argument list, up to 880 for a property pattern (1041 on Windows
+  x64); nested local functions took 1.9 KB a level and overflowed 1 MB at 1000 levels, hence their weight.
   The corpora reach 678 (dotnet/runtime's `hugeexpr1.cs`), the deepest other files 118 (aspnetcore), 50 (roslyn), 45
   (Avalonia).
 - **Against Roslyn on its 64 MB stack** (the oracle, `--stack-mb 64`, the 153 forms of `tests/robustness.rs`): at 300
@@ -601,7 +634,8 @@ mode; each tree is lossless, in preorder, and the same on a second parse.
 Every place the port does not do what Roslyn does, each named in a comment at its place ("not in Roslyn"). None
 changes a tree of the gate's inputs; the first three apply only past limits no corpus file comes near.
 
-- **Stack, work and memory bounds** ("C# nesting and work"): a depth counter of 1000 in place of the stack; the
+- **Stack, work and memory bounds** ("C# nesting and work"): a depth counter of 1000 beside the stack, which is
+  measured from the file's parse, not from the thread's end, against a budget of its own ("Stack"); the
   recursions Roslyn leaves unguarded counted on it (`ParseType`, `ScanType` through type argument lists, tuples and
   function pointers, initializers, query bodies, designations, negated patterns); a local function's body as 3
   levels, a hole of an interpolated string as 16; the work budget and the arena budget. Past any of them the tree is
@@ -700,9 +734,10 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | Chameleons reparsed exactly as PSI does, not parsed eagerly in the file builder | Not equivalent: a fresh builder resets the newline and join stacks, the edge binders and the error dedup at the chameleon boundary | `reusable_tokens`' DANGLING_NEWLINE case; the brace skip removes the repeated work instead |
 | In-place expansion over a heap frame stack | Preorder ids (1.03M preorder breaks under the old LIFO worklist) without native recursion | walk 3.62 → 2.23 ns/node |
 | The production as a linked list over marker nodes, made into an array for binding | `precede` and the other middle edits in constant time with the array's entry order, so the same tree; a gap buffer or chunks would still need the lexeme search | gate unchanged; 100 000-operator chains 14-45 ms (`+`: 4.67 s → 22 ms); parse 72.7 → 74.2 MB/s |
-| Java's nesting on the same counter, with its own limits (`Language` constants) | One mechanism and one error for both languages; Java's stack per level (652 B) and `Parenth2.java` (1010 levels) want 1200, its annotations (parsed up to 4 times per level) 5 | gate unchanged, now with Java's `--check-bodies` at limits 1200 and 3; 80 forms nested 100 000 deep on 1 MB |
+| Java's nesting on the same counter, with its own limits (`Language` constants) | One mechanism and one error for both languages; `Parenth2.java` (1010 levels) wants 1200, its annotations (parsed up to 4 times per level) 5 | gate unchanged, now with Java's `--check-bodies` at limits 1200 and 3; 80 forms nested 100 000 deep on 1 MB |
 | Block ends counted, then tabulated, the table shared by deep frames | `braceMatchingBuilder` and `parseBlockLazy` scanned to the `}` once per level; a table made by every builder cost that again in every frame of a deep chain | 16 000 nested classes 2.3 s → 1.9 ms; 100 000 nested `try` with a table per builder 515 ms (92 % making tables), counted then shared 38 ms |
-| A nesting counter that degrades to an error element, not a bigger stack or `stacker` | Deterministic on every platform and build, bounded memory, no `unsafe`; the dump is PSI's wherever PSI itself parses | gate unchanged; 100 000 levels of 22 forms on 1 MB in at most 110 ms; parse 74.4 → 75.0 MB/s (noise) |
+| A nesting counter that degrades to an error element, not a bigger stack or `stacker` | Deterministic, bounded memory, no `unsafe`; the dump is PSI's wherever PSI itself parses | gate unchanged; 100 000 levels of 22 forms on 1 MB in at most 110 ms; parse 74.4 → 75.0 MB/s (noise) |
+| The stack measured at every counted level against a budget, beside the counters (decision 2026-11-04-parse-stack-measured) | A count alone fits 1 MB only for the frames it was measured with: 1097 KB on Windows x64 where macOS took 885; an address compared is the stack itself on any target and build; the count stays the bound, the same on every target, up to 1000 / 800 / 700 levels | every form at 100 000 levels on 1 MB on macOS arm64, Windows arm64 and x64 ("The stack budget"); gate unchanged |
 | The too-deep error over the rest of the construct, in constant time | One token at a time cost `2^10` times the rest of the file inside doubled annotations; a scan to the closer cost O(n) per rolled-back `<` attempt | `@A(` × 100 000: 4.2 ms |
 | A per-thread `Parser`, no thread_local | Allocation churn dominated multi-threaded scaling | allocations per pass 10.7M → 179 779; 16 threads 684 → 917 MB/s (f3aa172 → a99fb45) |
 | Copy the tree out exactly sized, instead of reserving `tokens*15/8+16` | Same CPU time, less memory | user CPU 3.12 vs 3.13 s; 11.32 vs 12.70 MB of tree per source MB |
@@ -714,7 +749,7 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 | C#: records never change, a copy appends, garbage kept to the file's end | Roslyn's copy semantics exactly: a saved node stays valid after any reset, with no reference counts or collector | 1.04-1.07 records per tree node, 10-17 bytes of records per source byte as the budget counts them on the corpora ("C# memory") |
 | C#: widths in bytes over a UTF-16 reading of the text | positions are the oracle's byte offsets with no second pass or UTF-16 copy; only the one sum Roslyn mixes is redone in UTF-16 | 0 differing lexer lines on every corpus since 7d7af22e; the last 10 fuzz differences were that sum (43519b4f) |
 | C#: TRAILING and MISSING bits in the shared `kinds` column | the token a trivia belongs to and an inserted token cannot be read off positions; two bits cost nothing per node | Kotlin and Java counters unchanged (30d40a2f); 12 bits of kind index hold C#'s 574 kinds |
-| C#: a depth counter, a work budget and an arena budget, failing as Roslyn's exhausted stack does | deterministic on any stack and machine, with the answer Roslyn itself gives at 100 000 levels; time and memory linear in the input | 153 forms 100 000 deep on 1 MB each under 220 ms; 26 forms compared at 100 000 levels equal Roslyn's tree (43ed5b13); no corpus tree reaches a bound (the gate) |
+| C#: a depth counter, the stack budget, a work budget and an arena budget, failing as Roslyn's exhausted stack does | deterministic within a build, the same on every target below 700 levels, with the answer Roslyn itself gives at 100 000 levels; time and memory linear in the input | 153 forms 100 000 deep on 1 MB each under 220 ms; 26 forms compared at 100 000 levels equal Roslyn's tree (43ed5b13); no corpus tree reaches a bound (the gate) |
 | Buffers kept up to a bound; past it each shrunk to the same share of its capacity, to half the bound | A parser per thread for a process's lifetime kept its largest file's buffers (1.24 GB after one 24 MB C# file); freeing them all costs every next file its growth, a proportional share costs nothing to the files after it, and the half left free keeps files of other proportions from shrinking again at once | the four C# corpora keep 14.8-58.2 MB instead of 14.8-1245 MB, 16 shrinks in 62 615 files; the files after a shrink parse as fast as without one; freeing after every file costs 8-14 % ("Retained buffers") |
 | C#: an interpolated string's holes lexed and parsed over windows of the file | Roslyn cuts strings out of the token's text; windows give the source's texts and Roslyn's positions with no allocation per token | the interpolation goldens, the corpora and the fuzz at 0 differences (43519b4f) |
 
@@ -789,6 +824,40 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### The stack budget (JetBrains/accio#206, child of 79a11817), 2026-11-04
+
+Windows x64 overflowed 1 MB in `deeply_nested_forms_parse_on_a_small_stack` of csharp-syntax and java-syntax (accio's
+CI, its first Windows run of them). The stack each form took at the depth limits before the bound, from the start of
+the parse (a probe at every counted level, `nested_forms(100 000)`, release profile, rustc 1.99.1), the largest:
+
+| target | Kotlin | Java | C# |
+|---|---|---|---|
+| macOS arm64 (this machine) | 506 KB, object literals | 885 KB, enum constant bodies | 902 KB, property patterns |
+| Windows arm64 (Parallels on it) | 490 KB | 885 KB | 950 KB |
+| Windows x64 (the same VM, Prism emulation; CI's failure reproduced) | 610 KB | 1097 KB | 1061 KB |
+
+A property pattern's level is eight frames (`parse_pattern` through `parse_property_pattern_clause` back to
+`parse_pattern_continued`) of 64-192 bytes each, by their prologues, mostly saved registers: no frame to shrink.
+
+With `STACK_BUDGET` (the commit carrying this entry; on its first version, whose C# check was inlined and subtracted
+instead of comparing addresses): every robustness test of the three crates passes on 1 MB on macOS arm64, Windows
+arm64 and Windows x64. The stack stops 1 Java and 3 C# forms on macOS (enum constant bodies at 1068 levels; property
+patterns at 894, namespaces at 980), 1 and 3 on Windows arm64 (property patterns at 848), 5 and 14 on Windows x64
+(enum constant bodies at 862, typed lambdas at 1046; property patterns at 756, typeof at 876), none in Kotlin. The
+final version on macOS: property patterns at 878 levels (896 bytes a level), the others as before. The smallest
+thread stack each form parses in (bisected in 4 KB steps, macOS) exceeds the stack its levels took by at most 11 KB
+in Kotlin and Java and 53 KB in C# (a documentation comment's elements nested past `MAX_NESTED_SCAN_DEPTH`, lexed with
+no level counted); a thread there holds about 13-20 KB more than it asks for, so recursive forms read below their
+levels' bytes.
+
+Gate: PASS (every corpus 0 differing, bodies and limit 3 included). Speed, `scripts/ab.sh` with `KS_INSTR=1` against
+79a11817, load 8-64 (the machine was shared throughout): C# 7 rounds, 137.2 → 135.2 MB/s (×0.985), instructions
+41.67 → 41.65 G (median), cycles 7.72 → 7.60 G; Kotlin 5 rounds 95.8 → 94.1 MB/s (×0.982), Java 62.9 → 58.6 MB/s
+(×0.932, load 9-64). Instructions moved by up to 7 % between rounds of one binary, so their medians are no measure
+here; the minima, which noise only raises, are Kotlin 32.79 → 33.19 G (+1.2 %), Java 40.58 → 40.89 G (+0.8 %), C#
+40.23 → 40.37 G (+0.3 %). The first version's C# check cost +2.75 % instructions (median) before it compared an
+address with a precomputed limit and kept the lowest frame. A quiet host's measurement is still owed.
 
 ### Long qualified names and directive conditions (JetBrains/accio#143, child of "a nested C# string literal is parsed once"), 2026-11-03
 

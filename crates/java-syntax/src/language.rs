@@ -46,9 +46,9 @@ impl psi_builder::Language for Java {
     /// `JavaSyntaxElementType.JAVA_FILE` (printed as "PsiJavaFile:<name>").
     const FILE: NodeKind = NodeKind::JAVA_FILE;
 
-    /// Not in the Kotlin: IntelliJ's own test `Parenth2.java` nests 1001 parenthesized expressions (1010 levels), and a
-    /// level takes at most 652 bytes of stack in a release build (a typed lambda's body, an enum constant's body), so
-    /// 1200 levels fit 782 KB and a parse fits a 1 MB stack.
+    /// Not in the Kotlin: IntelliJ's own test `Parenth2.java` nests 1001 parenthesized expressions (1010 levels). A level
+    /// takes up to 736 bytes of stack on macOS arm64 and 912 on Windows x64 in a release build (an enum constant's
+    /// body), past the stack budget before the limit (`psi_builder::stack`); parentheses take 496 and reach the limit.
     const NESTING_LIMIT: u32 = 1200;
     /// Not in the Kotlin: an annotation in an expression is parsed up to 4 times per parse of the one around it (as a
     /// type's, as the expression's annotations, in a cast and in a lambda's parameters that are rolled back), so at

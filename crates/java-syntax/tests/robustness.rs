@@ -506,3 +506,32 @@ fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
     parse(&mut parser, &big);
     assert_eq!(parser.heap_bytes(), parser.grown_bytes());
 }
+
+/// The levels every recursive form reaches before the stack stops it (`psi_builder::stack`): the depth limit, a count,
+/// is the same bound on every target, while the stack a level takes is the compiler's (885 KB at the limit on macOS
+/// arm64, 1097 KB on Windows x64 for the same form, before the stack bound). So below `MIN_LEVELS` levels the tree is
+/// the same on every target this runs on (`Parenth2.java`, the deepest community file, is parentheses, which reach the
+/// limit on all of them). Prints each form's levels and stack, on a 1 MB stack.
+#[test]
+fn the_depth_limit_holds_before_the_stack_runs_out() {
+    const MIN_LEVELS: u32 = 800;
+    let mut failures = Vec::new();
+    for (name, text) in nested_forms(100_000) {
+        let used = on_stack(STACK, move || {
+            let mut parser = java_syntax::Parser::new();
+            let _ = parser.parse(text.as_bytes(), KIND);
+            parser.stack_use()
+        });
+        println!(
+            "{name}: {} levels, {} bytes, {} a level{}",
+            used.levels,
+            used.bytes,
+            used.bytes / used.levels.max(1) as usize,
+            if used.out_of_stack() { ", out of stack" } else { "" }
+        );
+        if used.out_of_stack() && used.levels < MIN_LEVELS {
+            failures.push(format!("{name}: out of stack at {} levels ({} bytes)", used.levels, used.bytes));
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}

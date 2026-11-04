@@ -15,6 +15,7 @@ use std::sync::Arc;
 
 use crate::counters::{Counter, add};
 use crate::language::{ElementType, ElementTypeOf, Language};
+use crate::stack::{StackGuard, StackUse};
 use crate::tree::TreeData;
 
 /// A marker (`PsiBuilder.Marker`): a handle into its builder's marker pool. Its methods take the builder, as the Java
@@ -138,10 +139,11 @@ pub(crate) struct Pending<K> {
 /// How deep a parse may nest (not in the Java, whose recursion has no bound but the thread's stack): the levels of
 /// the recursive entry points it is inside (`Nesting`), counted from the nesting of the chameleon it parses
 /// (`NESTING_CHAMELEON` over where that sits). Past a limit, the construct being entered is an error element "Code is
-/// too deeply nested" over the rest of it (`AbstractKotlinParsing::too_deeply_nested`). The default of
-/// `Language::NESTING_LIMIT`, Kotlin's: a level takes at most about 560 bytes of stack in a release build (nested
-/// `object A { … }`), so a parse fits a 1 MB stack (0.64 MB suffice for the deepest measured form). The deepest
-/// community file reaches 62 levels, 5 nested type argument lists and 4 nested constructs parsed twice.
+/// too deeply nested" over the rest of it (`AbstractKotlinParsing::too_deeply_nested`); so is one entered past the
+/// stack a parse may take (`crate::stack::STACK_BUDGET`). The default of `Language::NESTING_LIMIT`, Kotlin's: a level
+/// takes at most 504 bytes of stack on macOS arm64 and 610 on Windows x64 in a release build (nested `object { … }`),
+/// so Kotlin's levels reach the limit before the stack budget on both. The deepest community file reaches 62 levels,
+/// 5 nested type argument lists and 4 nested constructs parsed twice.
 pub const NESTING_LIMIT: u32 = 1000;
 /// How many type argument lists (`tryParseTypeArgumentList`) may nest in one builder (the default of
 /// `Language::TYPE_ARGUMENTS_LIMIT`, Kotlin's and Java's). An expression `a<a<…` tries one
@@ -397,6 +399,11 @@ pub struct PsiBuilderImpl<L: Language> {
     nesting_limit: u32,
     type_arguments: u32,
     reparsed: u32,
+    /// Where the parse started on the stack (`set_nesting`), the lowest frame a level was entered from, and the
+    /// deepest level entered (see `crate::stack`).
+    stack: StackGuard,
+    lowest_frame: usize,
+    deepest_level: u32,
     /// A type argument list starting before this token is too deeply nested: one reached `TYPE_ARGUMENTS_LIMIT` here,
     /// so the lists inside it that start before it would reach it too.
     type_arguments_too_deep_before: usize,
@@ -511,6 +518,9 @@ impl<L: Language> Default for PsiBuilderImpl<L> {
             nesting_limit: L::NESTING_LIMIT,
             type_arguments: 0,
             reparsed: 0,
+            stack: StackGuard::default(),
+            lowest_frame: usize::MAX,
+            deepest_level: 0,
             type_arguments_too_deep_before: 0,
             reparsed_too_deep_before: 0,
             file_token: None,
@@ -580,6 +590,9 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.nesting_limit = L::NESTING_LIMIT;
         self.type_arguments = 0;
         self.reparsed = 0;
+        self.stack = StackGuard::default();
+        self.lowest_frame = usize::MAX;
+        self.deepest_level = 0;
         self.type_arguments_too_deep_before = 0;
         self.reparsed_too_deep_before = 0;
         self.file_token = file_token;
@@ -707,17 +720,27 @@ impl<L: Language> PsiBuilderImpl<L> {
     }
 
     /// Starts the nesting at `nesting`, with `limit` instead of `NESTING_LIMIT` (and no more than `limit` for the
-    /// other two limits).
-    pub fn set_nesting(&mut self, nesting: u32, limit: u32) {
+    /// other two limits), and the stack the parse may take at `stack` (see `crate::stack`).
+    pub fn set_nesting(&mut self, nesting: u32, limit: u32, stack: StackGuard) {
         self.nesting = nesting;
         self.nesting_limit = limit;
+        self.stack = stack;
     }
 
-    /// Enters a nested construct (not in the Java): false, with nothing entered, when that would pass a limit. Each
-    /// `true` is matched by `exit_nesting(kind)` when the construct is parsed.
+    /// The deepest level the parse counted and the most stack its levels took (see `crate::stack`).
+    pub fn stack_use(&self) -> StackUse {
+        StackUse { levels: self.deepest_level, bytes: self.stack.used_to(self.lowest_frame) }
+    }
+
+    /// Enters a nested construct (not in the Java): false, with nothing entered, when that would pass a limit or the
+    /// stack the parse may take (`crate::stack::STACK_BUDGET`). Each `true` is matched by `exit_nesting(kind)` when
+    /// the construct is parsed.
     #[inline(always)]
     pub fn enter_nesting(&mut self, kind: Nesting) -> bool {
-        if self.nesting >= self.nesting_limit {
+        let frame = crate::stack::here();
+        self.lowest_frame = self.lowest_frame.min(frame);
+        self.deepest_level = self.deepest_level.max(self.nesting + 1);
+        if self.nesting >= self.nesting_limit || self.stack.is_past(frame) {
             return false;
         }
         match kind {

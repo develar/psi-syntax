@@ -158,13 +158,9 @@ fn too_deep_errors(tree: &Tree) -> usize {
     (0..tree.len() as u32).filter(|&i| tree.error_message(NodeId(i)) == Some("Code is too deeply nested")).count()
 }
 
-/// Every recursive form nested 100 000 deep parses on a 1 MB stack, in well under a second, into a well-formed,
-/// lossless tree with the error "Code is too deeply nested" where the nesting passes the limit; the same text parses
-/// to the same tree again (the limit is deterministic). PSI has no defined result here (kotlinc overflows its stack).
-#[test]
-fn deeply_nested_forms_parse_on_a_small_stack() {
-    let n = 100_000;
-    let forms: Vec<(&str, String)> = vec![
+/// Every recursive form, `n` levels deep.
+fn nested_forms(n: usize) -> Vec<(&'static str, String)> {
+    vec![
         ("parentheses", format!("val x = {}1{}\n", "(".repeat(n), ")".repeat(n))),
         ("unary minus", format!("val x = {}1\n", "- ".repeat(n))),
         ("calls", format!("val x = {}{}\n", "f(".repeat(n), ")".repeat(n))),
@@ -187,7 +183,15 @@ fn deeply_nested_forms_parse_on_a_small_stack() {
         ("labels", format!("val x = {}1\n", "a@ ".repeat(n))),
         ("destructuring", format!("val x = {{ {}a{} -> }}\n", "(".repeat(n), ")".repeat(n))),
         ("doc comments", format!("{}{}\nfun f() {{}}\n", "/** ".repeat(n), "*/".repeat(n))),
-    ];
+    ]
+}
+
+/// Every recursive form nested 100 000 deep parses on a 1 MB stack, in well under a second, into a well-formed,
+/// lossless tree with the error "Code is too deeply nested" where the nesting passes the limit; the same text parses
+/// to the same tree again (the limit is deterministic). PSI has no defined result here (kotlinc overflows its stack).
+#[test]
+fn deeply_nested_forms_parse_on_a_small_stack() {
+    let forms = nested_forms(100_000);
     for (name, text) in forms {
         let (elapsed, errors) = on_small_stack(move || {
             let start = std::time::Instant::now();
@@ -313,4 +317,31 @@ fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
     parser.set_retained_bytes(usize::MAX);
     parse(&mut parser, &big);
     assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+}
+
+/// The levels every recursive form reaches before the stack stops it (`psi_builder::stack`): the depth limit, a count,
+/// is the same bound on every target, while the stack a level takes is the compiler's (506 KB at the limit on macOS
+/// arm64, 610 KB on Windows x64, within the budget). So every form reaches the limit on every target this runs on, and
+/// its tree is the same. Prints each form's levels and stack, on a 1 MB stack.
+#[test]
+fn the_depth_limit_holds_before_the_stack_runs_out() {
+    let mut failures = Vec::new();
+    for (name, text) in nested_forms(100_000) {
+        let used = on_small_stack(move || {
+            let mut parser = kotlin_syntax::Parser::new();
+            let _ = parser.parse(text.as_bytes(), FileKind::Kt);
+            parser.stack_use()
+        });
+        println!(
+            "{name}: {} levels, {} bytes, {} a level{}",
+            used.levels,
+            used.bytes,
+            used.bytes / used.levels.max(1) as usize,
+            if used.out_of_stack() { ", out of stack" } else { "" }
+        );
+        if used.out_of_stack() {
+            failures.push(format!("{name}: out of stack at {} levels ({} bytes)", used.levels, used.bytes));
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
 }

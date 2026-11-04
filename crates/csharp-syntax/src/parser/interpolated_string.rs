@@ -75,13 +75,15 @@ impl std::hash::Hash for ParsedStringKey {
     }
 }
 
-/// What `parse_interpolated_or_raw_string_token` made: the expression, the tokens its holes' parsers consumed, and the
-/// levels of `_recursionDepth` its stack checks went below the parser's.
+/// What `parse_interpolated_or_raw_string_token` made: the expression, the tokens its holes' parsers consumed, the
+/// levels of `_recursionDepth` its stack checks went below the parser's, and the bytes of stack they went below the
+/// frame of `parse_interpolated_or_raw_string_token` (the same code below it from any caller, as it is never inlined).
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct ParsedString {
     expression: Green,
     work: u64,
     depth: i32,
+    stack: usize,
 }
 
 /// The buffers the parser of an interpolated or raw string token reuses, kept by its lexer (`LexerBuffers`).
@@ -219,7 +221,9 @@ impl<'l, 't> LanguageParser<'l, 't> {
     /// it, `rescan_interpolation` to `get_interpolation_indentation_error`.
     ///
     /// A token this parser made into an expression before, in the same context, is made again from its memo
-    /// (`ParsedStrings`, not in Roslyn).
+    /// (`ParsedStrings`, not in Roslyn), when its stack checks stay within the limit and the stack budget from here.
+    /// Never inlined, so that the stack its parse takes below this frame is the same from every caller.
+    #[inline(never)]
     pub(crate) fn parse_interpolated_or_raw_string_token(
         &mut self,
         original_token: Green,
@@ -234,20 +238,26 @@ impl<'l, 't> LanguageParser<'l, 't> {
             self.is_in_async,
             self.is_in_field_keyword_context,
         );
+        let frame = psi_builder::stack::here();
         if !self.parsed_strings.is_empty()
             && let Some(parsed) = self.parsed_strings.get(&key).copied()
             && self.recursion_depth + parsed.depth <= MAX_RECURSION_DEPTH
+            && self.stack.fits_below(frame, parsed.stack)
             && self.arena_ref().work_fits(parsed.work)
         {
             self.peak_recursion_depth = self.peak_recursion_depth.max(self.recursion_depth + parsed.depth);
+            self.lowest_frame = self.lowest_frame.min(frame.saturating_sub(parsed.stack));
             self.base.arena().charge_work(parsed.work);
             return parsed.expression;
         }
-        let (work, peak) = (self.arena_ref().work(), self.peak_recursion_depth);
+        let (work, peak, lowest) = (self.arena_ref().work(), self.peak_recursion_depth, self.lowest_frame);
         self.peak_recursion_depth = self.recursion_depth;
+        self.lowest_frame = frame;
         let expression = self.parse_interpolated_or_raw_string_token_core(original_token, is_interpolated_string);
         let depth = self.peak_recursion_depth - self.recursion_depth;
+        let stack = frame - self.lowest_frame;
         self.peak_recursion_depth = self.peak_recursion_depth.max(peak);
+        self.lowest_frame = self.lowest_frame.min(lowest);
         // a token met with no reset point held is not met again
         if self.base.holds_reset_point()
             && !self.base.is_abandoned()
@@ -255,7 +265,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             && self.stack_exhausted_at.is_none()
         {
             let work = self.arena_ref().work() - work;
-            self.parsed_strings.insert(key, ParsedString { expression, work, depth });
+            self.parsed_strings.insert(key, ParsedString { expression, work, depth, stack });
         }
         expression
     }
@@ -822,6 +832,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
                 LexerMode::SYNTAX,
                 std::mem::take(&mut nested.parser),
                 std::mem::take(&mut nested.pool),
+                self.stack,
             );
             // `ParserSyntaxContextResetter(tempParser, isInAsyncContext, isInFieldKeywordContext)` on a parser that is
             // dropped after
@@ -840,6 +851,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
             let result = temp_parser.parse_interpolation_with_open_brace_token(interpolation, kind, open_brace_token);
             let exhausted = temp_parser.stack_exhausted_at.is_some();
             self.peak_recursion_depth = self.peak_recursion_depth.max(temp_parser.peak_recursion_depth);
+            self.lowest_frame = self.lowest_frame.min(temp_parser.lowest_frame);
             let (parser_buffers, pool) = temp_parser.into_buffers();
             (result, exhausted, parser_buffers, pool)
         };

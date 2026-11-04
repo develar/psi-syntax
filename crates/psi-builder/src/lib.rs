@@ -13,6 +13,7 @@ pub mod document;
 pub mod dump;
 pub mod language;
 pub mod lexer;
+pub mod stack;
 pub mod token_set;
 pub mod tree;
 

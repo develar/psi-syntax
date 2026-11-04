@@ -184,6 +184,7 @@ Paths of `kotlin-syntax` are under `crates/kotlin-syntax/`, of `psi-builder` und
 | `psi-builder` `src/language.rs` | `TreeLanguage` (what a tree needs: token and node types, the file kind, the error element), `Language: TreeLanguage` (what the builder and driver ask a language besides: binders, whitespace and comments, left-bound types, chameleons and bodies, the cursor's joined token, brackets, how a file and a chameleon are lexed and parsed), `TokenType` (with `NODE_BASE`, where node indices start), `NodeType`, the generic `ElementType<T, N>` |
 | `psi-builder` `src/builder.rs` | the PsiBuilder port: token cursor that skips whitespace and comments, markers with rollback (the production a linked list, so `precede` and the other middle edits take constant time), the `WhitespacesAndCommentsBinder` contract, edge balancing, the nesting limits (a language's own through `Language` constants), the balanced-block and too-deep skips, block ends in amortized constant time (`balanced_block_end`); binds the tree |
 | `psi-builder` `src/tree.rs` | the lossless tree: `u32` ids in preorder over three columns (`kinds` u16: element type index plus leaf, unexpanded, trailing and missing bits; `ranges` [start, end]; `links` [parent, subtree_end]), 18 bytes a node; a node's subtree is `id..subtree_end`, children in order, tokens as leaves; whitespace and comments are leaves where PSI puts them. `Parser<L>` drives the builders: the file's, then a stack of chameleon builders, each expanding its chameleon in place where `bind` meets it (heap, not recursion), through `Language::parse_chameleon` and its `Chameleon` (the body's file tokens when reusable, else relexed). `TreeBuilder<L>` builds a tree in preorder for a language whose parser does not run on `PsiBuilderImpl`, writing its columns in place (pushed, or by id through `ColumnWriter` into columns sized up front) and handing them to the tree. The consumer API: see "The consumer contract" |
+| `psi-builder` `src/stack.rs` | the stack a parse may take: `STACK` (1 MB, the promise), `STACK_BUDGET` (three quarters of it, for the levels), `StackGuard` (where a builder's parse started; `used`), `StackUse` (the deepest level and the most stack of a parse, `Parser::stack_use` of each language) |
 | `psi-builder` `src/buffers.rs` | what a reusable parser keeps of its buffers: `RETAINED_BYTES` (64 MiB), `retained_after` (half), `Shrink` (every buffer emptied to the same share of its capacity), shared by the three languages' `Parser`s |
 | `psi-builder` `src/dump.rs`, `src/token_set.rs`, `src/lexer.rs`, `src/counters.rs` | the dump's layout (`psi_to_string_with`, a language labels each node; `fix_white_spaces`); `ElementTypeSet`, a `TokenSet`'s bits; `Lexed<T>` (types, starts, plain bits), `char_at`, `in_ranges`; the builder's and driver's event counters |
 | `psi-builder` `src/document.rs` | a file's text as IntelliJ's document holds it: the byte order mark (`has_byte_order_mark`, `blank_byte_order_mark`), `Lines` (the line of an offset); each language's `document_text` (`tree.rs` of `kotlin-syntax`, `java-syntax`) builds on it |
@@ -332,27 +333,36 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   builders, the directive, documentation comment and interpolated string parsers', flattener; the tree builder keeps
   none, a tree's columns become the tree) are retained as above: 50.3, 37.3, 49.2 and 9.1 MB after the four corpora
   instead of 101.5, 1245.0, 76.5 and 14.8 without a bound.
-- Nesting: a parse runs in a 1 MB stack (a release build; the deepest form measured needs 0.64 MB). It counts the
-  levels of its recursive entry points (expressions, types, member declarations, type argument lists, annotations,
-  parenthesized types; a lazy block or lambda adds 4 to where it sits) up to `builder::NESTING_LIMIT` (1000), at most
-  `TYPE_ARGUMENTS_LIMIT` (32) nested type argument lists and `REPARSED_LIMIT` (10) nested annotations and
-  parenthesized types per block. A construct past a limit is an `ERROR_ELEMENT` with the message
+- Stack: a parse fits `psi_builder::stack::STACK`, 1 MB of its thread's stack beyond the caller's frames, on every
+  target and in every build with optimizations (a debug build's frames are several times larger), by construction:
+  at every level it counts (below), it compares the address of a local with the one where its builder started, and
+  past `STACK_BUDGET` (768 KiB) it stops as it stops past its depth limit; the rest holds the work below the deepest
+  level (the C# lexer's documentation comments nested past their limit, 53 KB). Within one build the result is
+  deterministic. Across targets a level's frames differ (the same C# form took 880 bytes a level on macOS arm64,
+  1041 on Windows x64), so the depth limit, a count, is the bound wherever it is reached first: every recursive form
+  of `tests/robustness.rs` reaches 1000 levels in Kotlin, 800 in Java and 700 in C# before the stack on every target
+  CI runs, and below that its tree is the same on all of them. See DESIGN, "Stack".
+- Nesting: a Kotlin parse counts the levels of its recursive entry points (expressions, types, member declarations,
+  type argument lists, annotations, parenthesized types; a lazy block or lambda adds 4 to where it sits) up to
+  `builder::NESTING_LIMIT` (1000), at most `TYPE_ARGUMENTS_LIMIT` (32) nested type argument lists and
+  `REPARSED_LIMIT` (10) nested annotations and parenthesized types per block. A construct past a limit or the stack budget is an `ERROR_ELEMENT` with the message
   `builder::TOO_DEEPLY_NESTED`, "Code is too deeply nested", over the rest of the construct (up to the bracket that
-  closes it); a block or lambda past it is one such error over all its tokens. The tree stays lossless, in preorder
-  and deterministic. PSI has no defined result there (kotlinc overflows its stack); below the limits the tree is PSI's
-  (the deepest community file reaches 62 levels, 5 type argument lists, 4 annotations or parenthesized types).
-  Java (`java_syntax::Java`'s `NESTING_LIMIT` 1200, `TYPE_ARGUMENTS_LIMIT` 32, `REPARSED_LIMIT` 5, the same error) also
-  runs in a 1 MB stack (the deepest form at the limit needs 772 KB): it counts expressions, unary operands,
-  statements, declarations, array initializers, types, type argument lists, annotations, patterns and inline doc tags;
-  a code block adds 4 to where it sits. Below the limits the tree is PSI's (the deepest community file,
-  `Parenth2.java`, reaches 1010 levels, 4 type argument lists, 4 annotations). See DESIGN, "Java nesting".
-  C# (`csharp_syntax::Parser`) runs in a 1 MB stack too: it counts Roslyn's `_recursionDepth` (and the cycles Roslyn
-  leaves unguarded) to 1000 and every consumed token against `green::work_budget_for` (16 a byte, at least 2^20);
-  past either, or past the arena budget (`green::budget_for`, 256 bytes a source byte at fixed record sizes, checked
-  where buffers grown from empty would grow, so it depends on the file alone), the tree is Roslyn's for an exhausted
-  stack: the whole text one skipped `BadToken` with `ERR_InsufficientStack`, as Roslyn returns at 100 000 levels.
-  Below them the tree is Roslyn's (the corpora reach 678 levels and 1.0 token a byte). See DESIGN, "C# nesting and
-  work".
+  closes it); a block or lambda past the limit is one such error over all its tokens (a block's frame is parsed at
+  the driver's depth on the stack, so blocks nest on the heap). The tree stays lossless and in preorder. PSI has no
+  defined result there (kotlinc overflows its stack); below the limits the tree is PSI's (the deepest community file
+  reaches 62 levels, 5 type argument lists, 4 annotations or parenthesized types).
+  Java (`java_syntax::Java`'s `NESTING_LIMIT` 1200, `TYPE_ARGUMENTS_LIMIT` 32, `REPARSED_LIMIT` 5, the same error)
+  counts expressions, unary operands, statements, declarations, array initializers, types, type argument lists,
+  annotations, patterns and inline doc tags; a code block adds 4 to where it sits. Below the limits the tree is PSI's
+  (the deepest community file, `Parenth2.java`, reaches 1010 levels, 4 type argument lists, 4 annotations). See
+  DESIGN, "Java nesting".
+  C# (`csharp_syntax::Parser`) counts Roslyn's `_recursionDepth` (and the cycles Roslyn leaves unguarded) to 1000,
+  measures the stack where Roslyn's `EnsureSufficientExecutionStack` does, and counts every consumed token against
+  `green::work_budget_for` (16 a byte, at least 2^20); past any of them, or past the arena budget
+  (`green::budget_for`, 256 bytes a source byte at fixed record sizes, checked where buffers grown from empty would
+  grow, so it depends on the file alone), the tree is Roslyn's for an exhausted stack: the whole text one skipped
+  `BadToken` with `ERR_InsufficientStack`, as Roslyn returns at 100 000 levels. Below them the tree is Roslyn's (the
+  corpora reach 678 levels and 1.0 token a byte). See DESIGN, "C# nesting and work".
 - Allocator: psi-syntax uses the system allocator and builds no C. mimalloc 0.1.52 was +12-15 % at 8 and 16
   threads before batch 2's buffer reuse; on the current code it changes no instructions and its wall time is within
   noise at 1 and 16 threads (DESIGN, "Build and toolchain"), so a consumer needs no allocator for the parse.

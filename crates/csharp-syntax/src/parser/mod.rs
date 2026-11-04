@@ -44,17 +44,19 @@ pub(crate) use declarations::*;
 pub(crate) use expressions::*;
 pub(crate) use types::*;
 
+use psi_builder::stack::StackGuard;
+
 use crate::lexer::Lexer;
 use crate::syntax_parser::{ParserKind, SyntaxParserBuffers};
 use crate::tree::Entry;
 
 /// How deep `_recursionDepth` may go before the parse is abandoned as Roslyn abandons it when
-/// `EnsureSufficientExecutionStack` throws. Roslyn's limit is its thread's stack (64 MB in the oracle); this one keeps
-/// a parse within a 1 MB stack: a level takes at most 760 bytes of stack in a release build (129 for a unary operator,
-/// 418 for parentheses, 687 for a type argument list, 757 for a namespace; measured with a stack pointer probe over
-/// 150 forms 900 levels deep), and a local function's 1.9 KB counts as 3 levels (`LOCAL_FUNCTION_BODY_DEPTH`). The
-/// corpora of tools/csharp-oracle reach 678 (`hugeexpr1.cs` of dotnet/runtime); DESIGN.md, "C# nesting", compares
-/// the limit with Roslyn's.
+/// `EnsureSufficientExecutionStack` throws. Roslyn's limit is its thread's stack (64 MB in the oracle); the port's is
+/// this count, the same on every target, and the stack itself (`psi_builder::stack::STACK_BUDGET`), whichever comes
+/// first: a level takes 371 bytes for parentheses on macOS arm64 and up to 880 (a property pattern; 1041 on Windows
+/// x64), so the heaviest forms reach the stack budget first, every form past 700 levels (`tests/robustness.rs`). A
+/// local function's 1.9 KB counts as 3 levels (`LOCAL_FUNCTION_BODY_DEPTH`). The corpora of tools/csharp-oracle reach
+/// 678 (`hugeexpr1.cs` of dotnet/runtime); DESIGN.md, "C# nesting", compares the limit with Roslyn's.
 pub(crate) const MAX_RECURSION_DEPTH: i32 = 1000;
 
 /// The levels a local function's body adds to `_recursionDepth` (not in Roslyn): a level of nested local functions
@@ -80,9 +82,14 @@ pub struct LanguageParser<'l, 't> {
     pub(crate) recursion_depth: i32,
     /// The deepest `_recursionDepth` a stack check saw, its holes' parsers' included (`ParsedStrings`), not in Roslyn.
     pub(crate) peak_recursion_depth: i32,
+    /// Where the parse of the file started on the stack, shared by its holes' parsers, and the lowest frame a stack
+    /// check was made from (`ensure_sufficient_execution_stack`, `ParsedStrings`), not in Roslyn.
+    pub(crate) stack: StackGuard,
+    pub(crate) lowest_frame: usize,
     /// `_termState`.
     pub(crate) term_state: TerminatorState,
-    /// The lexer's position when the recursion limit was hit (the `InsufficientExecutionStackException`), if it was.
+    /// The lexer's position when the recursion limit or the stack budget was hit (the
+    /// `InsufficientExecutionStackException`), if it was.
     pub(crate) stack_exhausted_at: Option<u32>,
     /// The finished tuple type scans of this parse (`scan_tuple_type`), not in Roslyn.
     pub(crate) scanned_tuples: ScannedTuples,
@@ -117,6 +124,7 @@ impl<'l, 't> LanguageParser<'l, 't> {
         lexer_mode: LexerMode,
         buffers: SyntaxParserBuffers,
         pool: SyntaxListPool,
+        stack: StackGuard,
     ) -> LanguageParser<'l, 't> {
         LanguageParser {
             base: SyntaxParser::new(lexer, lexer_mode, ParserKind::Language, false, true, buffers),
@@ -127,6 +135,8 @@ impl<'l, 't> LanguageParser<'l, 't> {
             is_in_field_keyword_context: false,
             recursion_depth: 0,
             peak_recursion_depth: 0,
+            stack,
+            lowest_frame: usize::MAX,
             term_state: TerminatorState::END_OF_FILE,
             stack_exhausted_at: None,
             scanned_tuples: ScannedTuples::default(),
@@ -175,11 +185,15 @@ impl<'l, 't> LanguageParser<'l, 't> {
         self.consume_unexpected_tokens(node)
     }
 
-    /// `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` after `_recursionDepth++`: past the limit the parse
-    /// is abandoned (see the module's documentation).
+    /// `StackGuard.EnsureSufficientExecutionStack(_recursionDepth)` after `_recursionDepth++`: past the limit, or past
+    /// the stack a parse may take (`psi_builder::stack::STACK_BUDGET` from where the file's parse started, Roslyn's
+    /// own measure), the parse is abandoned (see the module's documentation).
     pub(crate) fn ensure_sufficient_execution_stack(&mut self) {
+        let frame = psi_builder::stack::here();
+        self.lowest_frame = self.lowest_frame.min(frame);
         self.peak_recursion_depth = self.peak_recursion_depth.max(self.recursion_depth);
-        if self.recursion_depth > MAX_RECURSION_DEPTH && self.stack_exhausted_at.is_none() {
+        if (self.recursion_depth > MAX_RECURSION_DEPTH || self.stack.is_past(frame)) && self.stack_exhausted_at.is_none()
+        {
             self.stack_exhausted_at = Some(self.lexer.position());
             self.base.abandon();
         }

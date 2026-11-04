@@ -883,3 +883,51 @@ fn deep_lexer_forms_lex_losslessly() {
         }
     });
 }
+
+/// The levels every recursive form reaches before the stack stops it (`psi_builder::stack`): the depth limit, a count,
+/// is the same bound on every target, while the stack a level takes is the compiler's (902 KB at the limit on macOS
+/// arm64, 1061 KB on Windows x64 for the same form, before the stack bound). So below `MIN_LEVELS` of
+/// `_recursionDepth`, above the deepest corpus file's 678, the tree is the same on every target this runs on. Prints
+/// each form's levels and stack, and checks the stack its levels took stays within the budget on a 1 MB stack.
+#[test]
+fn the_depth_limit_holds_before_the_stack_runs_out() {
+    const MIN_LEVELS: u32 = 700;
+    let mut failures = Vec::new();
+    for (name, text) in nested_forms(100_000) {
+        let used = on_stack(name, move || {
+            let mut parser = Parser::new();
+            let _ = parser.parse(text.as_bytes(), FileKind::default());
+            parser.stack_use()
+        });
+        println!(
+            "{name}: {} levels, {} bytes, {} a level{}",
+            used.levels,
+            used.bytes,
+            used.bytes / used.levels.max(1) as usize,
+            if used.out_of_stack() { ", out of stack" } else { "" }
+        );
+        if used.out_of_stack() && used.levels < MIN_LEVELS {
+            failures.push(format!("{name}: out of stack at {} levels ({} bytes)", used.levels, used.bytes));
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// What `psi_builder::stack::STACK` leaves over `STACK_BUDGET` holds the work below the deepest level a parse counts:
+/// the lexer's own recursion runs at whatever level the parser is, and its deepest is a documentation comment's
+/// elements nested past `MAX_NESTED_SCAN_DEPTH` (53 KB of stack on macOS arm64). Here one is lexed, as structured
+/// trivia, before every level of the form whose levels take the most stack, so the last is lexed where the stack bound
+/// stops the parse, on a 1 MB stack.
+#[test]
+fn the_lexer_has_room_below_the_deepest_level() {
+    let doc = format!("\n/// {}x{}\n", "<a>".repeat(200), "</a>".repeat(200));
+    let text = field(&format!("a is {}1{}", format!("{doc}{{ P: ").repeat(2000), " }".repeat(2000)));
+    let used = on_stack("doc comments at every level", move || {
+        let mut parser = Parser::new();
+        let tree = parser.parse(text.as_bytes(), FileKind::default());
+        check(&tree, text.as_bytes());
+        parser.stack_use()
+    });
+    println!("{} levels, {} bytes", used.levels, used.bytes);
+    assert!(used.out_of_stack(), "{used:?}");
+}
