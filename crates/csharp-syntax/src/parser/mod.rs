@@ -57,7 +57,7 @@ use crate::tree::Entry;
 /// x64), so the heaviest forms reach the stack budget first, every form past 700 levels (`tests/robustness.rs`). A
 /// local function's 1.9 KB counts as 3 levels (`LOCAL_FUNCTION_BODY_DEPTH`). The corpora of tools/csharp-oracle reach
 /// 678 (`hugeexpr1.cs` of dotnet/runtime); DESIGN.md, "C# nesting", compares the limit with Roslyn's.
-pub(crate) const MAX_RECURSION_DEPTH: i32 = 1000;
+pub const MAX_RECURSION_DEPTH: i32 = 1000;
 
 /// The levels a local function's body adds to `_recursionDepth` (not in Roslyn): a level of nested local functions
 /// takes 1.9 KB of stack (eight frames from `ParseStatementCore` through the declarator to the body's statements), and

@@ -16,6 +16,8 @@ fn limit(limit: std::time::Duration) -> std::time::Duration {
 }
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
+use csharp_syntax::parser::MAX_RECURSION_DEPTH;
+use csharp_syntax::psi_builder::stack::{self, STACK_BUDGET};
 use csharp_syntax::{DocumentationMode, Entry, ErrorCode, FileKind, LanguageVersion, NodeId, Parser, Tree};
 
 /// The stack a parse is promised to fit (AGENTS.md, "The consumer contract"): 1 MB in a release build; a debug build's
@@ -916,18 +918,34 @@ fn the_depth_limit_holds_before_the_stack_runs_out() {
 /// What `psi_builder::stack::STACK` leaves over `STACK_BUDGET` holds the work below the deepest level a parse counts:
 /// the lexer's own recursion runs at whatever level the parser is, and its deepest is a documentation comment's
 /// elements nested past `MAX_NESTED_SCAN_DEPTH` (53 KB of stack on macOS arm64). Here one is lexed, as structured
-/// trivia, before every level of the form whose levels take the most stack, so the last is lexed where the stack bound
-/// stops the parse, on a 1 MB stack.
+/// trivia, before every level of the form whose levels take the most stack, so the last is lexed where a bound stops
+/// the parse. Which bound is the target's: the stack's on macOS arm64 and Windows x64 (more than 900 bytes a level),
+/// the depth limit's on Linux x64 (690 bytes a level, 690 KB at the limit). Below the depth limit the parse runs
+/// again on a thread shortened by what the levels left of the budget, so the lexer has `STACK - STACK_BUDGET` under
+/// the deepest level on every target.
 #[test]
 fn the_lexer_has_room_below_the_deepest_level() {
     let doc = format!("\n/// {}x{}\n", "<a>".repeat(200), "</a>".repeat(200));
     let text = field(&format!("a is {}1{}", format!("{doc}{{ P: ").repeat(2000), " }".repeat(2000)));
-    let used = on_stack("doc comments at every level", move || {
-        let mut parser = Parser::new();
-        let tree = parser.parse(text.as_bytes(), FileKind::default());
-        check(&tree, text.as_bytes());
-        parser.stack_use()
-    });
+    let parse = |stack: usize, text: String| {
+        std::thread::Builder::new()
+            .name("doc comments at every level".to_string())
+            .stack_size(stack)
+            .spawn(move || {
+                let mut parser = Parser::new();
+                let tree = parser.parse(text.as_bytes(), FileKind::default());
+                check(&tree, text.as_bytes());
+                parser.stack_use()
+            })
+            .unwrap()
+            .join()
+            .unwrap()
+    };
+    let used = parse(STACK, text.clone());
     println!("{} levels, {} bytes", used.levels, used.bytes);
-    assert!(used.out_of_stack(), "{used:?}");
+    assert!(used.out_of_stack() || used.levels > MAX_RECURSION_DEPTH as u32, "{used:?}");
+    if !cfg!(debug_assertions) {
+        let shortened = parse(stack::STACK - STACK_BUDGET.saturating_sub(used.bytes), text);
+        assert_eq!(shortened, used, "a parse takes the same stack on the same build");
+    }
 }
