@@ -15,6 +15,8 @@
 //!   the class.
 //! - `<field>_of` (`modifiers_of`, `identifier_of`, `type_parameter_list_of`, `body_of`, ...): the field on a node of
 //!   any type that has one, as the interfaces of Java's PSI are dispatched on the element type (`has_modifier`).
+//! - `slot_of`, `slot_info`, `slot`, `slot_list`, `slot_children`: the slots themselves; `is_in_type_slot`: whether C#
+//!   reads a node as a type where it stands.
 //! - The computed properties of Roslyn's partial classes, each with its source line: `name` (`NameSyntax.Arity`,
 //!   `GetUnqualifiedName`, `GetAliasQualifierOpt`, `ErrorDisplayName`), `generic_name::is_unbound_generic_name`,
 //!   `type_declaration::arity` and `primary_constructor_base_type_if_class`, `method_declaration::arity`,
@@ -52,7 +54,14 @@ pub mod type_;
 pub mod type_declaration;
 pub mod using_directive;
 
-use crate::syntax_kind::TokenKind;
+use crate::syntax::Slot;
+use crate::syntax::types::{
+    AliasQualifiedNameSyntax, BinaryExpressionSyntax, BreakStatementSyntax, ContinueStatementSyntax,
+    FileScopedNamespaceDeclarationSyntax, MemberAccessExpressionSyntax, MemberBindingExpressionSyntax, NameColonSyntax,
+    NameEqualsSyntax, NameMemberCrefSyntax, NamespaceDeclarationSyntax, QualifiedNameSyntax, UsingDirectiveSyntax,
+    XmlNameAttributeSyntax,
+};
+use crate::syntax_kind::{NodeKind, TokenKind};
 use crate::tree::{NodeId, Tree};
 
 /// The children of node `id` that are no trivia, each with the slot of its node type it fills (an index into
@@ -83,4 +92,70 @@ pub fn has_modifier(tree: &Tree, id: NodeId, kind: TokenKind) -> bool {
 /// The first `Modifiers` token of `kind` (`SyntaxTokenList.FirstOrDefault(kind)`), None when there is none.
 pub fn first_modifier(tree: &Tree, id: NodeId, kind: TokenKind) -> Option<NodeId> {
     modifiers_of(tree, id).find(|&m| tree.token_kind(m) == Some(kind))
+}
+
+/// The slot of its parent's node type that `child` fills (an index into `syntax::node_type(kind).slots`), None for the
+/// root, trivia and a child no slot takes. Reads the parent's children up to `child`.
+pub fn slot_of(tree: &Tree, child: NodeId) -> Option<usize> {
+    let parent = tree.parent(child)?;
+    slot_children(tree, parent).find(|&(_, c)| c == child).map(|(slot, _)| slot).filter(|&slot| slot != usize::MAX)
+}
+
+/// The slot `child` fills, as Syntax.xml declares it: its field's name, shape and declared type
+/// (`Slot::type_name`: `TypeSyntax` of a parameter's type, `SimpleNameSyntax` of a member access's name).
+pub fn slot_info(tree: &Tree, child: NodeId) -> Option<&'static Slot> {
+    let slot = slot_of(tree, child)?;
+    crate::syntax::node_type(tree.node_kind(tree.parent(child)?)?).slots.get(slot)
+}
+
+/// Whether C# reads the node `child` as a type where it stands: it fills a slot whose declared type derives from
+/// `TypeSyntax` (a parameter's, property's, variable's or method's type, a cast's type, a base type, a type argument,
+/// `typeof`'s, `new`'s, a pattern's, a catch's, a foreach's type, an attribute's name, an explicit interface, a type
+/// parameter of a `where` clause, a cref's type), or it is the right side of `x is T` or `x as T`, which Syntax.xml
+/// declares an `ExpressionSyntax` while the parser puts a type there and Roslyn's binder reads one (`BindIsOperator`,
+/// `BindAsOperator`). Not a type, though declared a `TypeSyntax` subclass: a member access's or member binding's name
+/// (`x.Foo`), an argument's or alias's name (`f(a: 1)`, `using A = …`'s `A`), an alias qualifier (`global`), a
+/// `break`'s or `continue`'s label, a documentation comment's `name` attribute, a namespace's name, a qualified name's
+/// left side (a qualifier: a namespace or a type, found by lookup), a cref's member name, and the target of a using
+/// directive but `using static` (a namespace, or with an alias a namespace or a type). A qualified name's right side
+/// and an alias qualified name's name answer as the name around them (`System.Int32 x;`'s `Int32`). False for a token,
+/// trivia and the root.
+pub fn is_in_type_slot(tree: &Tree, child: NodeId) -> bool {
+    let mut child = child;
+    loop {
+        if tree.is_leaf(child) {
+            return false;
+        }
+        let (Some(parent), Some(slot)) = (tree.parent(child), slot_of(tree, child)) else { return false };
+        let Some(kind) = tree.node_kind(parent) else { return false };
+        match kind {
+            // the name around them decides
+            NodeKind::QualifiedName if slot == QualifiedNameSyntax::RIGHT => child = parent,
+            NodeKind::AliasQualifiedName if slot == AliasQualifiedNameSyntax::NAME => child = parent,
+            NodeKind::IsExpression | NodeKind::AsExpression => return slot == BinaryExpressionSyntax::RIGHT,
+            NodeKind::UsingDirective if slot == UsingDirectiveSyntax::NAMESPACE_OR_TYPE => {
+                return using_directive::static_keyword(tree, parent).is_some();
+            }
+            _ => {
+                let not_a_type = match kind {
+                    NodeKind::QualifiedName => slot == QualifiedNameSyntax::LEFT,
+                    NodeKind::AliasQualifiedName => slot == AliasQualifiedNameSyntax::ALIAS,
+                    NodeKind::SimpleMemberAccessExpression | NodeKind::PointerMemberAccessExpression => {
+                        slot == MemberAccessExpressionSyntax::NAME
+                    }
+                    NodeKind::MemberBindingExpression => slot == MemberBindingExpressionSyntax::NAME,
+                    NodeKind::NameColon => slot == NameColonSyntax::NAME,
+                    NodeKind::NameEquals => slot == NameEqualsSyntax::NAME,
+                    NodeKind::BreakStatement => slot == BreakStatementSyntax::NAME,
+                    NodeKind::ContinueStatement => slot == ContinueStatementSyntax::NAME,
+                    NodeKind::XmlNameAttribute => slot == XmlNameAttributeSyntax::IDENTIFIER,
+                    NodeKind::NamespaceDeclaration => slot == NamespaceDeclarationSyntax::NAME,
+                    NodeKind::FileScopedNamespaceDeclaration => slot == FileScopedNamespaceDeclarationSyntax::NAME,
+                    NodeKind::NameMemberCref => slot == NameMemberCrefSyntax::NAME,
+                    _ => false,
+                };
+                return !not_a_type && fields::TYPE_SLOTS[slots::node_type_index(kind) as usize] & (1 << slot) != 0;
+            }
+        }
+    }
 }

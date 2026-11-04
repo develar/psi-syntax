@@ -647,3 +647,78 @@ fn a_getter_reads_only_up_to_its_field() {
     assert_eq!(found, 400_000);
     assert!(start.elapsed() < limit(std::time::Duration::from_secs(2)), "{:?}", start.elapsed());
 }
+
+#[test]
+fn type_slots_are_where_csharp_reads_a_type() {
+    let tree = parse(
+        "using A.B; using static System.Math; using L = System.Collections.Generic.List<int>;\n\
+         namespace N.M { [Attr] class C : Base<Arg>, I.J where T : IFoo {\n\
+           Color Color; int I.J.P => 0; void F(Param p) { var v = (Cast)x; _ = x is Is; _ = x as As; \n\
+           foreach (Item i in items) { } _ = typeof(Of); _ = x.Member; _ = new New(); _ = x is Pat q; \n\
+           System.Int32 n = 0; g(a: 1); } } }",
+    );
+    let name = |text: &str| {
+        tree.descendants(tree.root())
+            .rfind(|&n| tree.node_kind(n).is_some_and(is_name_syntax) && spanned(&tree, n) == text)
+            .unwrap_or_else(|| panic!("no name `{text}`"))
+    };
+    for t in [
+        "Attr",
+        "Base<Arg>",
+        "Arg",
+        "I.J",
+        "IFoo",
+        "Color",
+        "Param",
+        "Cast",
+        "Is",
+        "As",
+        "Item",
+        "Of",
+        "New",
+        "Pat",
+        "Int32",
+        "System.Int32",
+        "System.Math",
+    ] {
+        assert!(is_in_type_slot(&tree, name(t)), "{t} is a type");
+    }
+    for t in ["A.B", "System.Collections.Generic.List<int>", "N.M", "x", "Member", "a", "System", "items"] {
+        assert!(!is_in_type_slot(&tree, name(t)), "{t} is no type");
+    }
+    let member = name("Member");
+    let info = slot_info(&tree, member).unwrap();
+    assert_eq!((info.name, info.type_name), ("Name", "SimpleNameSyntax"));
+    assert_eq!(slot_of(&tree, member), Some(syntax::types::MemberAccessExpressionSyntax::NAME));
+    assert_eq!(slot_of(&tree, tree.root()), None);
+    // a type argument list's `<`: a token, never a type
+    let less = tree.descendants(tree.root()).find(|&n| tree.token_kind(n) == Some(TokenKind::LessThanToken)).unwrap();
+    assert!(!is_in_type_slot(&tree, less));
+}
+
+#[test]
+fn name_texts_and_documentation_comments() {
+    let tree = parse(
+        "class X { global :: System . /* c */ Collections.Generic.List< int > f; }\n\
+         /// <summary>doc</summary>\n// plain\n[A] public class C { }\nclass D { }",
+    );
+    let field = all(&tree, NodeKind::FieldDeclaration)[0];
+    let ty = variable_declaration::type_(&tree, field_declaration::declaration(&tree, field).unwrap()).unwrap();
+    assert_eq!(read::name_text(&tree, ty).as_deref(), Some("global::System.Collections.Generic.List<int>"));
+    assert_eq!(read::dotted_name(&tree, ty).as_deref(), Some("System.Collections.Generic.List"));
+    let c = named(&tree, NodeKind::ClassDeclaration, "C");
+    let doc = read::doc_comment(&tree, c).unwrap();
+    assert_eq!(tree.node_kind(doc), Some(NodeKind::SingleLineDocumentationCommentTrivia));
+    assert_eq!(read::declaration_start(&tree, c), tree.range(doc).start);
+    assert!(read::span(&tree, c).start > tree.range(doc).end);
+    let d = named(&tree, NodeKind::ClassDeclaration, "D");
+    assert_eq!(read::doc_comment(&tree, d), None);
+    assert_eq!(read::declaration_start(&tree, d), read::span(&tree, d).start);
+    // without parsed doc comments, the `///` comment leaf
+    let plain = Tree::parse(
+        "/// <summary>doc</summary>\n//// no\nclass C { }",
+        FileKind { doc_mode: DocumentationMode::None, ..FileKind::default() },
+    );
+    let c = all(&plain, NodeKind::ClassDeclaration)[0];
+    assert_eq!(plain.utf8_text(read::doc_comment(&plain, c).unwrap()), Some("/// <summary>doc</summary>"));
+}

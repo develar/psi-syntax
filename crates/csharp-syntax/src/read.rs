@@ -301,3 +301,71 @@ pub fn type_head(tree: &Tree, id: NodeId) -> Option<String> {
     type_names(tree, id, &mut names);
     names.into_iter().next()
 }
+
+/// The node's tokens' texts joined without their trivia (`global::System.Collections.Generic.List<int>` of
+/// `global :: System . /* c */ Collections.Generic.List< int >`): what `ToString()` (`&tree.source()[span]`) is without
+/// the trivia inside it, comments, line ends and directives included; a missing token spells nothing. A token is its own
+/// text, trivia none. An iteration of the subtree's ids, so a name of 100 000 parts costs its parts.
+pub fn text_without_trivia(tree: &PsiTree<CSharp>, id: NodeId) -> String {
+    let mut out = Vec::new();
+    for n in tree.descendants_pruned(id, |n| is_structured_trivia(tree, n)) {
+        if tree.is_leaf(n) && !tree.token_kind(n).is_some_and(crate::dump::is_trivia) {
+            out.extend_from_slice(tree.text(n));
+        }
+    }
+    String::from_utf8_lossy(&out).into_owned()
+}
+
+/// A name's text without trivia (`text_without_trivia`), as written: with an alias qualifier, type arguments, `@`
+/// and escapes (`global::A.List<int>`); `dotted_name` is its words alone. None for a node that is no name.
+pub fn name_text(tree: &Tree, name: NodeId) -> Option<String> {
+    tree.node_kind(name).is_some_and(is_name_syntax).then(|| text_without_trivia(tree, name))
+}
+
+/// Whether a trivia is a documentation comment: a structured one (`SingleLineDocumentationCommentTrivia`,
+/// `MultiLineDocumentationCommentTrivia` in `DocumentationMode::Parse` and `Diagnose`), or a comment leaf the lexer
+/// takes for one where it does not parse them (`DocumentationMode::None`): `///` not followed by `/`, `/**` not
+/// followed by `/` (Lexer.cs, `ScanSingleLineComment`/`ScanMultiLineComment` with `isDocComment`).
+pub fn is_documentation_comment(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
+    match tree.kind(id) {
+        psi_builder::ElementType::Node(n) => {
+            matches!(n, NodeKind::SingleLineDocumentationCommentTrivia | NodeKind::MultiLineDocumentationCommentTrivia)
+        }
+        psi_builder::ElementType::Token(t) if tree.is_leaf(id) => {
+            let text = tree.text(id);
+            match t {
+                crate::TokenKind::SingleLineCommentTrivia => text.starts_with(b"///") && !text.starts_with(b"////"),
+                crate::TokenKind::MultiLineCommentTrivia => text.starts_with(b"/**") && !text.starts_with(b"/**/"),
+                _ => false,
+            }
+        }
+        psi_builder::ElementType::Token(_) => false,
+    }
+}
+
+/// The first documentation comment of a declaration: among the leading trivia of its first token (`first_token`),
+/// where Roslyn attaches it (`/// <summary>` before `[Attr] public class C`, before the attribute's `[`); None when
+/// there is none. A climb from the first token through the trivia before it.
+pub fn doc_comment(tree: &PsiTree<CSharp>, declaration: NodeId) -> Option<NodeId> {
+    let token = first_token(tree, declaration)?;
+    let mut found = None;
+    let mut n = tree.previous_sibling(token);
+    while let Some(trivia) = n {
+        if !is_trivia(tree, trivia) || tree.is_trailing(trivia) {
+            break;
+        }
+        if is_documentation_comment(tree, trivia) {
+            found = Some(trivia);
+        }
+        n = tree.previous_sibling(trivia);
+    }
+    found
+}
+
+/// Where a declaration starts, its documentation comment included: the start of `doc_comment`, else of `span`.
+pub fn declaration_start(tree: &PsiTree<CSharp>, declaration: NodeId) -> usize {
+    match doc_comment(tree, declaration) {
+        Some(doc) => tree.range(doc).start,
+        None => span(tree, declaration).start,
+    }
+}

@@ -111,7 +111,7 @@ named at its place and listed in DESIGN, "C# deviations".
 | `Parser/LanguageParser_InterpolatedString.cs` | `parser/interpolated_string.rs` (each hole's lexer and parser over a window of the file) |
 | `Parser/DocumentationCommentParser.cs` | `parser/doc_comment_parser.rs` (run by the lexer on each documentation comment) |
 | `Syntax/Syntax.xml`'s fields, the partial classes `Syntax/*Syntax.cs` (their computed properties: `NameSyntax.Arity`, `GetUnqualifiedName`, `TypeDeclarationSyntax.PrimaryConstructorBaseTypeIfClass`, `ParameterSyntax.IsArgList`, ...) | `syntax_getters/`: `fields.rs` (generated: a module per node type and per abstract class with fields, a getter per field, `is_<abstract class>`, `<field>_of`), `slots.rs` (the slot each child of a node fills, read back from the kinds in Syntax.xml order), a module per class with computed properties (`name.rs`, `type_declaration.rs`, `parameter.rs`, ...), `mod.rs` (`has_modifier`, `slot`, `slot_children`), `getters.rs` (the lines of `oracle.sh getters`) |
-| what accio's `extract/src/csharp/nav.rs` and Branch Deck read of a tree beyond the properties, no consumer's facts | `read.rs`: trivia and structured trivia, `span` (`SyntaxNode.Span`), `first_token`, `last_token`, `is_code_token`, `name_leaf`, `word`, `dotted_name`, `name_segments`, `type_names`, `type_head` |
+| what accio's `extract/src/csharp/nav.rs` and Branch Deck read of a tree beyond the properties, no consumer's facts | `read.rs`: trivia and structured trivia, `span` (`SyntaxNode.Span`), `first_token`, `last_token`, `is_code_token`, `name_leaf`, `word`, `dotted_name`, `name_segments`, `text_without_trivia`, `name_text`, `doc_comment`, `declaration_start`, `type_names`, `type_head` |
 
 Not ported, as they change no tree: `Blender*.cs` and `BlendedNode.cs` (incremental parsing), `LexerCache.cs`'s trivia
 map and keyword cache (keywords are a perfect hash; its token map is `lexer/lexer_cache.rs`, which `QuickScanner.cs`,
@@ -370,7 +370,10 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   (`is_type_syntax`, `is_member_declaration_syntax`), `<field>_of` on a node of any type with the field
   (`modifiers_of`, `identifier_of`, `type_parameter_list_of`, `parameter_list_of`, `body_of`, `expression_body_of`,
   `type_of`, ...), `has_modifier(tree, id, TokenKind::StaticKeyword)` (an extension method's `this` on its first
-  parameter), and the computed properties of the partial classes (`name::arity`, `get_unqualified_name`,
+  parameter), `slot_of` and `slot_info` (the slot a child fills and its Syntax.xml field, `Slot::type_name` its
+  declared type), `is_in_type_slot` (whether C# reads a node as a type where it stands: `Color Color;`, a cast's type,
+  `x is T`'s right side, a base type, a type argument; not a member access's name, a namespace's name or a qualifier),
+  and the computed properties of the partial classes (`name::arity`, `get_unqualified_name`,
   `get_alias_qualifier_opt`, `error_display_name`, `type_declaration::arity`,
   `primary_constructor_base_type_if_class`, `parameter::is_arg_list`, `using_directive::name`, `type_::is_var`,
   `directive_trivia::directive_name_token`, ...). A token or node field is `Option<NodeId>`: None where Roslyn's slot
@@ -393,7 +396,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   `GetLastTerminal`), `name_leaf` (the identifier of a name's unqualified name), `word` (`ValueText` of a non-missing
   identifier), `dotted_name` (a name's words joined by `.`, without an alias qualifier, type arguments, trivia, `@` or
   escapes: `global::A.List<int>` is `A.List`; unlike `ToString()`, the span's text), `name_segments` (its identifier
-  tokens), `type_names` and `type_head` (the names a type spells, none from type arguments, attributes or function
+  tokens), `text_without_trivia` and `name_text` (the tokens as written without the trivia between them:
+  `global::A.List<int>`), `doc_comment` and `declaration_start` (a declaration's documentation comment among its first
+  token's leading trivia, parsed or, at `DocumentationMode::None`, a `///` or `/**` comment), `type_names` and `type_head` (the names a type spells, none from type arguments, attributes or function
   pointer parameters). None recurses on a left-deep chain.
 - Stack: a parse fits `psi_builder::stack::STACK`, 1 MB of its thread's stack beyond the caller's frames, on every
   target and in every build with optimizations (a debug build's frames are several times larger), by construction:
