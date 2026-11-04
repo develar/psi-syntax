@@ -343,7 +343,7 @@ static class GettersMode
                     // lexed tokens: no nodes, no lines
                     line = job.Path + "\t0\t" + Dumper.Fnv([]);
                 }
-                else if (Root(text, job) is not { } node)
+                else if (Dumper.Root(text, job.Entry, job.Options.Parse) is not { } node)
                 {
                     line = job.Path + "\tfailure\tno " + Options.EntryName(job.Entry);
                 }
@@ -378,27 +378,5 @@ static class GettersMode
         }
         stdout.Write(s_utf8.GetBytes(o.ToString()));
         return 0;
-    }
-
-    /// <summary>The root the dump of the job would print (<c>Dumper.Dump</c>'s entries); null for <c>tokens</c>, whose
-    /// dump has no nodes, and where the entry returns none.</summary>
-    static SyntaxNode? Root(string text, Job job)
-    {
-        var po = job.Options.Parse;
-        return job.Entry switch
-        {
-            Entry.CompilationUnit => CSharpSyntaxTree.ParseText(text, po).GetRoot(),
-            Entry.Expression => SyntaxFactory.ParseExpression(text, 0, po, consumeFullText: true),
-            Entry.Statement => SyntaxFactory.ParseStatement(text, 0, po, consumeFullText: true),
-            Entry.Member => SyntaxFactory.ParseMemberDeclaration(text, 0, po, consumeFullText: true),
-            Entry.TypeName => SyntaxFactory.ParseTypeName(text, 0, po, consumeFullText: true),
-            Entry.Name => SyntaxFactory.ParseName(text, 0, consumeFullText: true),
-            Entry.ParameterList => SyntaxFactory.ParseParameterList(text, 0, po, consumeFullText: true),
-            Entry.BracketedParameterList => SyntaxFactory.ParseBracketedParameterList(text, 0, po, consumeFullText: true),
-            Entry.ArgumentList => SyntaxFactory.ParseArgumentList(text, 0, po, consumeFullText: true),
-            Entry.BracketedArgumentList => SyntaxFactory.ParseBracketedArgumentList(text, 0, po, consumeFullText: true),
-            Entry.AttributeArgumentList => SyntaxFactory.ParseAttributeArgumentList(text, 0, po, consumeFullText: true),
-            _ => null,
-        };
     }
 }

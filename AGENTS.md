@@ -383,7 +383,7 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   a separator unless the next child fits after a later slot that takes it). Each reads the node's children only up to
   its field, allocates nothing but `name::error_display_name`'s text, recurses nowhere, panics on no tree. They answer
   what Roslyn's own properties answer on every node: `ksdump --lang csharp --getters --check` against
-  `tools/csharp-oracle/oracle.sh getters` (the gate's step 12) printed the same lines for the 7064 goldens, the four
+  `tools/csharp-oracle/oracle.sh getters` (the gate's step 13) printed the same lines for the 7064 goldens, the four
   corpora at Latest (62 609 files, 512.6 million lines) and at Preview, the roslyn corpus at `--doc diagnose` and
   `none`, the -defines lists, the 122 741 mutations at their three versions, the 20 000 lexer fuzz inputs at Latest and
   Preview and the 18 975 getters fuzz inputs (1378 million lines in all, 0 differing, 2026-11-04). The boolean fields

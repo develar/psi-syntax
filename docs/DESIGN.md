@@ -1011,7 +1011,7 @@ matched every corpus; the mutations had 4 files with a `;` separator, and the ra
 `tests/syntax_getters.rs` the `this` identifier (a child in no slot). One fuzz input
 of the 20 000 (and one of the 100 000) makes Roslyn's parse throw (`InvalidOperationException: Unexpected value
 'QualifiedName'`, reduced to the compilation unit `y<>::*`); it is left out of the list. The oracle takes 2.6 min for
-all inputs, the gate's step 12 38 s on every core. Parse output and speed are unchanged: the dumps, lexer and value
+all inputs, the gate's step 13 38 s on every core. Parse output and speed are unchanged: the dumps, lexer and value
 lines of the four corpora and the mutations 0 differing, `scripts/ab.sh` on the roslyn corpus 0.997 of the
 instructions (a loaded machine, 5 rounds).
 
