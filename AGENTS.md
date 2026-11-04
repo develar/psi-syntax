@@ -16,7 +16,7 @@ The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints 
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
 Java PSI, and `csharp_syntax::dump::tree_to_string` prints Roslyn 5.9.0's syntax tree as `tools/csharp-oracle` dumps
 it (nodes, tokens, trivia, diagnostics). Consumers: accio's `crates/extract` (code search; declarations,
-call sites, imports; path dependencies) and Branch Deck's `code-symbols` (a revision of JetBrains/accio) (diff highlighting, navigation, file summaries). Both read the
+call sites, imports; path dependencies) and Branch Deck's `code-symbols` (a revision of github.com/develar/psi-syntax, this directory's public mirror) (diff highlighting, navigation, file summaries). Both read the
 tree directly: there is no tree-sitter compatibility layer and there must never be one. `docs/DESIGN.md` describes the
 architecture as built, its decisions, the measured numbers and the open items.
 
@@ -498,5 +498,6 @@ Roslyn) says otherwise.
 - A change lands as any accio change does: a pull request to accio's `main`, a conventional subject
   (`fix(psi): …`, `perf(psi): …`; `../AGENTS.md`, "Writing a change down"), a body that says what the change does,
   its measured effect and that the gate passed. A parser change that moves what accio extracts carries accio's version
-  bump and snapshots in the same pull request. Its commits before the move came from develar/psi-syntax (archived),
-  replayed as a line under `psi-syntax/`.
+  bump and snapshots in the same pull request. Its commits before the move came from develar/psi-syntax, replayed as a
+  line under `psi-syntax/`; that repository is now the public mirror, and after the merge
+  `../scripts/psi-syntax-mirror.sh` replays the commit there for Branch Deck.

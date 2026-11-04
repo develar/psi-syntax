@@ -2,7 +2,8 @@
 
 Lossless lexers and parsers in Rust, ported method by method from the ones behind IntelliJ's PSI and from Roslyn,
 whose trees print exactly what the originals print. Crates of [accio](../README.md)'s Cargo workspace, which reads
-them (`crates/extract`); Branch Deck depends on them as a revision of JetBrains/accio:
+them (`crates/extract`); Branch Deck depends on them as a revision of github.com/develar/psi-syntax, the public
+mirror of this directory (`../scripts/psi-syntax-mirror.sh`):
 
 - `psi-builder`: the language-neutral half, IntelliJ's `PsiBuilder` (markers, production, edge binders), the preorder
   column tree and the parse driver that expands lazily parsed elements in place;
@@ -38,4 +39,5 @@ for d in old.diagnostics() { /* d.id() "CS8059", d.start..d.end in bytes, "Featu
 AGENTS.md, "The consumer contract", says what a consumer may rely on.
 
 Licensed under the Apache License, Version 2.0 (unlike the rest of accio, MIT); see NOTICE for the code it ports.
-Its history before the move into accio, from github.com/develar/psi-syntax (archived), is replayed here as a line.
+Its history before the move into accio, from github.com/develar/psi-syntax, is replayed here as a line; that repository is now
+this directory's public mirror.

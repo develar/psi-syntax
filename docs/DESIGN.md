@@ -47,7 +47,7 @@ brace skip only the calls, markers and tokens skipped inside lazy blocks. Every 
 ## Workspace
 
 The crates are members of accio's Cargo workspace (`psi-syntax/crates/*`, since 2026-11-03; before, the repository
-github.com/develar/psi-syntax), with their own package fields and lints; accio's `crates/extract` depends on them by
+github.com/develar/psi-syntax, now this directory's public mirror), with their own package fields and lints; accio's `crates/extract` depends on them by
 path.
 
 | crate | holds | depends on |
