@@ -38,6 +38,10 @@
 //!   `--lex [--full OUT]` prints `PATH<TAB>TOKENS<TAB>HASH` (FNV-1a 64 of the lexer dump) per file and with `--full`
 //!   writes `OUT/<path>.lex.txt`; `--bench` parses a list of C# files; `--check-bodies` (C# has no lazily parsed
 //!   bodies) only checks that each tree's leaves are its file's text. `--nesting-limit` does not apply.
+//!   `--getters [--full OUT | --out OUT]` prints `PATH<TAB>LINES<TAB>HASH` per file (the FNV-1a 64 of
+//!   `csharp_syntax::syntax_getters::getters::getters_to_string`, every syntax node property on every node) as
+//!   `tools/csharp-oracle/oracle.sh getters` prints Roslyn's, and writes the lines to `OUT/<path>.getters.txt`;
+//!   `--getters --check LINES` compares them with the oracle's cached ones as `--lex --check` does.
 //! - `ksdump --check ORACLE --list LIST --root ROOT [--out OUT] [--node]`: makes the dumps `--out` would write, each in
 //!   memory, and compares them byte for byte with the oracle's `ORACLE/<path>.<suffix>` without writing ours (what
 //!   `diff -rq -x index.jsonl ORACLE OURS` checks of an `--out` directory: a dump that differs, a dump one side lacks, a
@@ -99,6 +103,8 @@ fn usage() -> ! {
          ksdump --values --check LINES --list LIST --root ROOT   C#: our value text lines against the oracle's `values --kept`\n  \
          ksdump --directives [--check LINES] --list LIST --root ROOT   C#: directive lines as tools/csharp-oracle directives\n  \
                 prints them (--check: against its cached lines)\n  \
+         ksdump --getters [--full OUT] [--check LINES] --list LIST --root ROOT   C# files: syntax getter hash lines as\n  \
+                tools/csharp-oracle getters prints them (--full: OUT/<path>.getters.txt), or against its LINES\n  \
          (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
          C#: --version V, --doc parse|none|diagnose and --define A;B for the list lines without those columns, as\n  \
          tools/csharp-oracle; --bench parses without the symbols)"
@@ -154,10 +160,11 @@ struct Args {
     nesting_limit: Option<u32>,
     lang: Option<Lang>,
     node: bool,
-    /// `--getters`: Java files' `<path>.getters.txt` (`java_syntax::psi::getters`) instead of their dumps.
+    /// `--getters`: Java files' `<path>.getters.txt` (`java_syntax::psi::getters`) instead of their dumps; C# files'
+    /// hash lines of `csharp_syntax::syntax_getters::getters` (`--check LINES` against the oracle's).
     getters: bool,
     docs: bool,
-    /// `--full OUT` (C# `--lex`): the lexer dumps' directory.
+    /// `--full OUT` (C# `--lex`, `--getters`): the lexer dumps' or getter lines' directory.
     full: Option<PathBuf>,
     /// `--retain MIB|max` (`--bench`): the bytes a parser's buffers keep after each parse
     /// (`set_retained_bytes`), else the default.
@@ -680,6 +687,40 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
     format!("{path}\t{}\t{:016x}", csharp_syntax::dump::lexed_tokens(&tree), hash.0)
 }
 
+/// `--getters` of a C# file: `PATH<TAB>LINES<TAB>HASH` as `tools/csharp-oracle getters` prints it (none for a lexed
+/// entry's tokens, which have no nodes), or `PATH<TAB>failure<TAB>REASON`; with `--full OUT` the lines go to
+/// `OUT/<path>.getters.txt`.
+fn csharp_getters(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full: Option<&Path>) -> String {
+    let path = line.split('\t').next().unwrap_or(line);
+    let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
+    let text = match csharp_source(root, path) {
+        Ok(text) => text,
+        Err(failure) => return format!("{path}\tfailure\t{failure}\n"),
+    };
+    let tree = if kind.entry == csharp_syntax::Entry::Tokens {
+        parser.lex_with_symbols(&text, kind, &symbols)
+    } else {
+        parser.parse_with_symbols(&text, kind, &symbols)
+    };
+    if tree.has_no_result() {
+        return format!("{path}\tfailure\tno {}\n", kind.entry.name());
+    }
+    let lines = csharp_syntax::syntax_getters::getters::getters_to_string(&tree);
+    if lines.len() > csharp_syntax::dump::MAX_CHARS {
+        return format!("{path}\tfailure\tdump over 512 MB\n");
+    }
+    let mut hash = Fnv(0xcbf29ce484222325);
+    hash.feed(lines.as_bytes());
+    if let Some(full) = full {
+        let target = full.join(format!("{path}.getters.txt"));
+        if let Some(parent) = target.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&target, &lines);
+    }
+    format!("{path}\t{}\t{:016x}\n", lines.bytes().filter(|&b| b == b'\n').count(), hash.0)
+}
+
 /// `--values` or `--directives` of a C# file: `lines` (`dump::value_lines`, `dump::directive_lines`) of its tree, or
 /// `PATH<TAB>failure<TAB>REASON`.
 fn csharp_file_lines(
@@ -723,6 +764,29 @@ fn main() {
             args.workers(),
             || Parsers::new(None),
             per_file,
+            |_, text| {
+                let _ = stdout.write_all(text.as_bytes());
+            },
+        );
+        return;
+    }
+    let csharp_list =
+        paths.first().is_some_and(|l| Lang::of(l.split('\t').next().unwrap_or(l), args.lang) == Lang::CSharp);
+    if args.getters && csharp_list {
+        let stdout = std::io::stdout();
+        let mut stdout = std::io::BufWriter::new(stdout.lock());
+        let schedule = Schedule::new(root, &paths, args.workers());
+        let full = args.full.as_deref().or(args.out.as_deref());
+        let getters = |parsers: &mut Parsers, i: usize| csharp_getters(parsers.csharp(), root, &paths[i], full);
+        if let Some(lines) = args.check.as_deref() {
+            let differing = check::lex(lines, &paths, &schedule, args.lang, args.workers(), getters, &mut stdout);
+            let _ = stdout.flush();
+            std::process::exit(if differing == 0 { 0 } else { 1 });
+        }
+        schedule.run(
+            args.workers(),
+            || Parsers::new(None),
+            getters,
             |_, text| {
                 let _ = stdout.write_all(text.as_bytes());
             },

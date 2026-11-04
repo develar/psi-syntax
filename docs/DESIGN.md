@@ -735,6 +735,11 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
   b[];`, `hasModifierProperty` with the implicit modifiers, a reference's qualifier and `getKindEnum`, ...): a module
   per class, a function per method, ported from `java/java-psi-impl` at the parser's revision and checked against
   the real PSI on every node ("Java PSI getters" below).
+- C#: `csharp_syntax::syntax_getters` answers the properties of Roslyn's syntax nodes: a module per node type and per
+  abstract class of Syntax.xml, generated with a function per field (`tools/csharp-gen/gen.py`), and the computed
+  properties of the partial classes by hand; `csharp_syntax::read` the reads around them (trivia, `Span`, a name's
+  identifier and dotted name, a type's names). The tree keeps no slots, so a getter reads them back from the kinds
+  ("C# syntax getters" below); checked against Roslyn's own properties on every node.
 
 ## Decisions
 
@@ -972,6 +977,43 @@ accio's bar, 50 MB/s a thread at 20 threads on runtime, is cleared on the quiete
 missed at load 12-17 (46.7); a second quiet 20-thread pass is still owed. The Studio measured the stack as a whole:
 the side table alone, and the map's 4096 slots against 2048 (77.6 against 77.9 MB/s at 18 threads on this Mac in a
 run whose output was not kept, +0.4 % instructions), were not measured there.
+
+### C# syntax getters (child of 48041a65), 2026-11-04
+
+`csharp_syntax::syntax_getters` ports the reads of Roslyn's tree both consumers made by their own walks (accio's
+`extract/src/csharp/{nav,symbols,imports,references}.rs`; Branch Deck's C# support starts on it). Roslyn's red tree
+answers a property from its green node's slot; the flat tree has no slots (a null slot is no child, a list's elements
+are its parent's children, a token's trivia are its siblings), and keeping them would cost another column.
+So `syntax_getters/slots.rs` reads a node's slots back from its children's kinds: past the trivia, each child goes to
+the first slot from the current one that takes its kind, in Syntax.xml's order, which is `ChildNodesAndTokens()`'s.
+What a slot takes is generated from Syntax.xml (`gen.py`, `slot_specs`): a token slot its kinds, a node slot the kinds
+of the node types deriving from its type, a list those of its element type, a token list (modifiers) every token that
+no slot after it, up to its first required one, takes; the generator fails on two node slots it could not tell apart
+(none at the pin). Two shapes of Roslyn's recovery broke the declared kinds, on no corpus file:
+a slot that is never null takes what the parser put there (`event A.this` names the event by its `this`, a
+`ThisKeyword` where Syntax.xml says `IdentifierToken`), so such a slot takes any token or node where it stands and its
+own kinds only tell the lists before it where to stop; and a separated list takes any token as a separator (`enum C {
+A ; }` makes the `;` one, the `}` after it missing), unless a later slot declares the token and the next child fits
+after that slot (`>` closing `<A>`, the first `;` of `for (a, b; ; )`). A getter walks the children up to its slot and
+stops (`class_declaration::identifier` of a class of 30 000 members reads the children before the identifier), a list
+stops at the first child past it.
+
+`tools/csharp-oracle/oracle.sh getters` prints Roslyn's answer of every field of every node, those of each abstract
+class (through Roslyn's overrides: an extension block has no `Identifier`, a `NameColon`'s `Expression` is its
+`Name`), the ported computed properties (the internal ones by reflection) and `Span`, a line each, nodes numbered as
+the dump prints them; `ksdump --lang csharp --getters --check` compares the hash of each file's lines. 0 differing:
+the goldens (508 367 lines), the four corpora at Latest (62 609 files, 512.5 million lines) and at Preview, the roslyn
+corpus at `--doc diagnose` and `none`, the -defines lists (27.1 million), the 122 741 mutations at their three
+versions, the 20 000 lexer fuzz inputs at Latest and Preview, and 18 975 inputs of `getters_fuzz.py` (declaration,
+name and expression pieces mixed or inserted into the goldens; 3.7 million lines), 1378 million lines in all; a second
+fuzz of 100 000 inputs (seed `seed-two`, not cached) also 0. The first run, with the declared kinds alone, already
+matched every corpus; the mutations had 4 files with a `;` separator, and the random inputs of
+`tests/syntax_getters.rs` the `this` identifier (a child in no slot). One fuzz input
+of the 20 000 (and one of the 100 000) makes Roslyn's parse throw (`InvalidOperationException: Unexpected value
+'QualifiedName'`, reduced to the compilation unit `y<>::*`); it is left out of the list. The oracle takes 2.6 min for
+all inputs, the gate's step 12 38 s on every core. Parse output and speed are unchanged: the dumps, lexer and value
+lines of the four corpora and the mutations 0 differing, `scripts/ab.sh` on the roslyn corpus 0.997 of the
+instructions (a loaded machine, 5 rounds).
 
 ### Java PSI getters (child of 18211728), 2026-11-03
 

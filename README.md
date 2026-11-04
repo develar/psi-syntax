@@ -13,7 +13,9 @@ mirror of this directory (`../scripts/psi-syntax-mirror.sh`):
   IntelliJ's Java PSI on every file tested;
 - `csharp-syntax`: C#, ported from Roslyn 5.9.0 (`Lexer`, `DirectiveParser`, `LanguageParser`,
   `DocumentationCommentParser`): Roslyn's syntax tree with its trivia, missing tokens and diagnostics, equal to
-  Roslyn's on dotnet/roslyn, dotnet/runtime, dotnet/aspnetcore, Avalonia and Roslyn's own parser tests;
+  Roslyn's on dotnet/roslyn, dotnet/runtime, dotnet/aspnetcore, Avalonia and Roslyn's own parser tests, and its
+  syntax node properties as getters over the tree (`syntax_getters`: a function per field of every node type, the
+  abstract classes' and the partial classes' computed ones), equal to Roslyn's own on every node of the same inputs;
 - `ksdump`: dumps, benchmarks and lexes listed files like the oracles.
 
 See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.
@@ -34,6 +36,12 @@ let mut parser = Parser::new(); // one per thread, as for Kotlin and Java
 let tree = parser.parse(b"class C { void M() { } }", FileKind::default()); // LanguageVersion.Latest
 let old = parser.parse(b"class C { int x = 1_000; }", FileKind::file(LanguageVersion::CSharp6));
 for d in old.diagnostics() { /* d.id() "CS8059", d.start..d.end in bytes, "Feature 'digit separators' is not ..." */ }
+// Roslyn's syntax node properties: ClassDeclarationSyntax.Identifier, TypeDeclarationSyntax.Members, ...
+use csharp_syntax::syntax_getters::{class_declaration, type_declaration};
+for class in tree.descendants(tree.root()).filter(|&n| tree.node_kind(n) == Some(csharp_syntax::NodeKind::ClassDeclaration)) {
+    let name = class_declaration::identifier(&tree, class); // the `C` token: tree.value_text(id) is "C"
+    let members = type_declaration::members(&tree, class).count(); // 1
+}
 ```
 
 AGENTS.md, "The consumer contract", says what a consumer may rely on.

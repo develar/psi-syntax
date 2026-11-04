@@ -43,6 +43,11 @@
 #      ConditionValue on the four corpora, the -defines lists of step 11, the golden mutations at their list's columns
 #      and the lexer fuzz against the cached lines of `tools/csharp-oracle/oracle.sh directives` (Roslyn's directive
 #      trivia), 0 differing lines; the goldens' are step 1's (crates/csharp-syntax/tests/directives.rs).
+#  13. the syntax getters of `csharp_syntax::syntax_getters` (`ksdump --lang csharp --getters --check`, every syntax
+#      node property on every node) against the cached lines of `tools/csharp-oracle/oracle.sh getters` (Roslyn's own
+#      properties): the goldens, the four corpora at Latest and at Preview (the 6 runtime files without a dump left
+#      out), the roslyn corpus at `--doc diagnose` and `--doc none`, the -defines lists, the golden mutations at their
+#      three versions, the lexer fuzz at Latest and at Preview and the getters fuzz, 0 differing lines.
 # A dump comparison is `ksdump --check ORACLE`: every dump made in memory and compared byte for byte with the oracle's
 # file, what `diff -rq -x index.jsonl ORACLE OURS` checked of written dumps (a dump that differs, one that either side
 # lacks, an oracle directory without dumps; index.jsonl is not compared, so a file the oracle failed on must have no
@@ -101,6 +106,12 @@ values() {
 directives() {
   name=$1 lines=$2; shift 2
   $B --directives --check "$lines" "$@" > "$O/$name.log" 2>&1
+  report "$name" $?
+}
+# getters NAME LINES ARGS...: `ksdump --lang csharp --getters --check LINES ARGS...`.
+getters() {
+  name=$1 lines=$2; shift 2
+  $B --lang csharp --getters --check "$lines" "$@" > "$O/$name.log" 2>&1
   report "$name" $?
 }
 # bodies NAME ARGS...: `ksdump --check-bodies ARGS...`, nonzero on a differing body or a tree whose leaves are not the
@@ -249,6 +260,40 @@ csharp_directives() {
   return $f
 }
 
+# csharp_getters: step 13, the syntax getters against tools/csharp-oracle's cached `getters` lines
+# (tools/csharp-oracle/caches.sh getters).
+csharp_getters() {
+  f=0 G=$C/getters/csharp
+  awk -F '\t' 'BEGIN { OFS = "\t" } { print $1 ".cs", $2, $3, $4, $5 }' testdata/csharp/manifest.tsv > "$O/csharp-goldens.list"
+  getters csharp-getters-goldens "$G/csharp-goldens.txt" --list "$O/csharp-goldens.list" --root testdata/csharp || f=1
+  for corpus in "csharp-roslyn-35d9211 roslyn $C/corpus" "csharp-runtime-6aa72da runtime $G" \
+    "csharp-aspnetcore-0ef4bbf aspnetcore $C/corpus" "csharp-avalonia-2d79ba5 avalonia $C/corpus"; do
+    set -- $corpus
+    getters csharp-getters-$1 "$G/$1.txt" --list "$3/$1.list" --root "$C/csharp-src/$2" || f=1
+    getters csharp-getters-$1-preview "$G/$1-preview.txt" --version preview --list "$3/$1.list" \
+      --root "$C/csharp-src/$2" || f=1
+  done
+  for doc in diagnose none; do
+    sfx=$([ $doc = none ] && echo nodoc || echo $doc)
+    getters csharp-getters-roslyn-$sfx "$G/csharp-roslyn-35d9211-$sfx.txt" --doc $doc \
+      --list "$C/corpus/csharp-roslyn-35d9211.list" --root "$C/csharp-src/roslyn" || f=1
+  done
+  for corpus in "csharp-roslyn-35d9211 roslyn" "csharp-avalonia-2d79ba5 avalonia"; do
+    set -- $corpus
+    getters csharp-getters-$1-defines "$G/$1-defines.txt" --list "$C/corpus/$1-defines.list" \
+      --root "$C/csharp-src/$2" || f=1
+  done
+  for m in csharp-mut csharp-mut-latest csharp-mut-preview; do
+    getters csharp-getters-$m "$G/$m.txt" --list "$C/fuzz/$m.list" --root "$C/fuzz/csharp-mut" || f=1
+  done
+  getters csharp-getters-csharp-lex "$G/csharp-lex.txt" --list "$C/fuzz/csharp-lex/list" --root "$C/fuzz/csharp-lex" || f=1
+  getters csharp-getters-csharp-lex-preview "$G/csharp-lex-preview.txt" --version preview \
+    --list "$C/fuzz/csharp-lex/list" --root "$C/fuzz/csharp-lex" || f=1
+  getters csharp-getters-fuzz "$G/csharp-getters.txt" --list "$C/fuzz/csharp-getters.list" \
+    --root "$C/fuzz/csharp-getters" || f=1
+  return $f
+}
+
 # Three lanes at once, each ksdump on every core: the work of a lane is mostly parallel, but each C# lane waits some
 # 20 s per pass on the runtime's 24 MB hugeexpr1.cs alone, which the other lanes fill. A lane's sections write to
 # $O/SECTION.out, printed in this order once all are done.
@@ -257,9 +302,9 @@ lane() {
 }
 lane kotlin java csharp_lex &
 lane csharp_latest &
-lane csharp_preview csharp_defines csharp_directives &
+lane csharp_preview csharp_defines csharp_directives csharp_getters &
 wait
 cat "$O/kotlin.out" "$O/java.out" "$O/csharp_lex.out" "$O/csharp_latest.out" "$O/csharp_preview.out" \
-  "$O/csharp_defines.out" "$O/csharp_directives.out"
+  "$O/csharp_defines.out" "$O/csharp_directives.out" "$O/csharp_getters.out"
 [ -e "$O/failed" ] && fail=1
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (logs and our differing dumps: $O)"; exit 1; }

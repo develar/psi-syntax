@@ -21,6 +21,7 @@ static class Program
           lex --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--full OUT] [--threads N]
           values --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] [--kept] [--threads N]
           directives --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] [--threads N]
+          getters --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] [--full OUT] [--threads N]
           goldens --src ROSLYN_TREE --out DIR [--threads N]
           unicode
         """;
@@ -45,6 +46,7 @@ static class Program
                 "lex" => LexMode.Run(a),
                 "values" => ValuesMode.Run(a),
                 "directives" => DirectivesMode.Run(a),
+                "getters" => GettersMode.Run(a),
                 "goldens" => Goldens.Run(a),
                 "unicode" => UnicodeMode.Run(),
                 _ => throw new UsageException($"unknown mode {args[0]}"),

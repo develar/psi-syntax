@@ -32,9 +32,29 @@
 //! (`ERR_InsufficientStack`). docs/DESIGN.md, "C#", "C# nesting and work" and "C# deviations", says how and where it
 //! differs from Roslyn.
 //!
+//! Reading a tree: `syntax_getters`, the properties of Roslyn's syntax nodes as free functions over the tree and a
+//! node's id (`class_declaration::identifier`, `type_declaration::members`, `member_declaration::modifiers`,
+//! `has_modifier`, `name::get_unqualified_name`), each the answer Roslyn's property gives on every node of the gate's
+//! inputs; `read`, what consumers read beyond them (trivia, `SyntaxNode.Span`, a name's identifier and dotted name, the
+//! names a type spells).
+//!
+//! ```
+//! use csharp_syntax::syntax_getters::{class_declaration, has_modifier, type_declaration};
+//! use csharp_syntax::{FileKind, NodeKind, Tree, TokenKind};
+//!
+//! let tree = Tree::parse("public static class C<T> { void M() { } }", FileKind::default());
+//! let class = tree.descendants(tree.root()).find(|&n| tree.node_kind(n) == Some(NodeKind::ClassDeclaration)).unwrap();
+//! let name = class_declaration::identifier(&tree, class).unwrap();
+//! assert_eq!(tree.value_text(name), Some("C"));
+//! assert!(has_modifier(&tree, class, TokenKind::StaticKeyword));
+//! assert_eq!(type_declaration::arity(&tree, class), 1);
+//! assert_eq!(type_declaration::members(&tree, class).count(), 1);
+//! ```
+//!
 //! Generated from Roslyn's sources (`tools/csharp-gen/gen.py`, `tools/csharp-unicode`): `syntax_kind` (`SyntaxKind`,
-//! `TokenKind`, `NodeKind`), `syntax` (the node types of `Syntax.xml` and their green factories), `error_code` (the
-//! diagnostics, their messages and the features' versions), `unicode` (the lexer's character classes). Ported by hand:
+//! `TokenKind`, `NodeKind`), `syntax` (the node types of `Syntax.xml` and their green factories), `syntax_getters`'s
+//! `fields` (a getter per field of Syntax.xml), `error_code` (the diagnostics, their messages and the features'
+//! versions), `unicode` (the lexer's character classes). Ported by hand:
 //! `facts` (`SyntaxKindFacts.cs`), `language_version` (`LanguageVersion.cs`), `green` (`GreenNode` and the internal
 //! syntax's copy semantics), `flatten` (green to `psi_builder::Tree<CSharp>`, as Roslyn's red tree), `tree`, `dump`
 //! (`tools/csharp-oracle`'s format), `diagnostic` (`DiagnosticInfo.GetMessage`), `syntax_parser` (`SyntaxParser.cs`),
@@ -53,7 +73,9 @@ pub mod language_version;
 pub mod lexer;
 pub mod parser;
 pub mod preprocessor;
+pub mod read;
 pub mod syntax;
+pub mod syntax_getters;
 pub mod syntax_kind;
 pub mod syntax_parser;
 pub mod tree;

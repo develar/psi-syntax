@@ -12,9 +12,12 @@
   a feature-availability diagnostic reports), their numbers, severities and English message formats; the `MessageID`s
   (`IDS_Feature*` and the others `Parser/*.cs` names) with their messages and `RequiredVersion`; `XmlParseErrorCode`;
 - `src/xml_char_type.rs` from `Core/Portable/Xml/XmlCharType.cs`: its literal character property tables (the lexer's
-  `IsXmlNameStartChar` and `IsXmlNameChar` read the XML 1.0 4th edition bits).
+  `IsXmlNameStartChar` and `IsXmlNameChar` read the XML 1.0 4th edition bits);
+- `src/syntax_getters/fields.rs` from `Syntax/Syntax.xml`: the getters of every field of every node type and abstract
+  class over the tree, the kinds each slot takes (`slot_specs`), and the printer of their `getters` lines; with it
+  `tools/csharp-oracle/Fields.g.cs`, the oracle's printer of the same lines from Roslyn's own properties.
 
-    tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV] [--out crates/csharp-syntax/src]
+    tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV] [--out crates/csharp-syntax/src] [--oracle tools/csharp-oracle]
 """
 
 import argparse
@@ -183,38 +186,54 @@ def is_any_token_extra(facts: str) -> list[str]:
     return re.findall(r"case SyntaxKind\.(\w+):", body)
 
 
+class KindClasses:
+    """The kinds of `SyntaxKind.cs` in Roslyn's numeric order, classified as `gen_syntax_kind` writes them: `tokens`
+    (`IsAnyToken`), `trivia` (unstructured trivia: no node type), `nodes` (the kinds of Syntax.xml's node types),
+    `other` (`None`, `List`); `token_kinds` is `TokenKind`'s order (tokens and trivia), `nodes` `NodeKind`'s."""
+
+    def __init__(self, roslyn: Roslyn, types: list[NodeType]):
+        kinds = syntax_kinds(roslyn.read(PORTABLE + "Syntax/SyntaxKind.cs"))
+        number = dict(kinds)
+        if len(number) != len(kinds):
+            raise SystemExit("duplicate SyntaxKind names")
+        by_value = {}
+        for name, value in kinds:
+            if value in by_value:
+                raise SystemExit(f"SyntaxKind {name} and {by_value[value]} share {value}: ToString() is ambiguous")
+            by_value[value] = name
+        extra = is_any_token_extra(roslyn.read(PORTABLE + "Syntax/SyntaxKindFacts.cs"))
+        node_kinds = set()
+        for t in types:
+            node_kinds.update(t.kinds)
+        lo, hi = number["TildeToken"], number["EndOfLineTrivia"]
+        ordered = sorted(kinds, key=lambda k: k[1])
+        tokens, trivia, nodes, other = [], [], [], []
+        for name, value in ordered:
+            if name in ("None", "List"):
+                other.append(name)
+            elif lo <= value < hi or name in extra:
+                if name in node_kinds:
+                    raise SystemExit(f"{name} is a token kind and a node kind")
+                tokens.append(name)
+            elif name in node_kinds:
+                nodes.append(name)
+            else:
+                trivia.append(name)  # unstructured trivia: no node type
+        unknown = node_kinds - set(number)
+        if unknown:
+            raise SystemExit(f"Syntax.xml kinds missing from SyntaxKind: {sorted(unknown)}")
+        self.kinds, self.number, self.by_value, self.ordered = kinds, number, by_value, ordered
+        self.lo, self.hi = lo, hi
+        self.tokens, self.trivia, self.nodes, self.other = tokens, trivia, nodes, other
+        self.token_kinds = [n for n, _ in ordered if n in set(tokens) | set(trivia)]
+
+
 def gen_syntax_kind(roslyn: Roslyn, types: list[NodeType]) -> str:
-    kinds = syntax_kinds(roslyn.read(PORTABLE + "Syntax/SyntaxKind.cs"))
-    number = dict(kinds)
-    if len(number) != len(kinds):
-        raise SystemExit("duplicate SyntaxKind names")
-    by_value = {}
-    for name, value in kinds:
-        if value in by_value:
-            raise SystemExit(f"SyntaxKind {name} and {by_value[value]} share {value}: ToString() is ambiguous")
-        by_value[value] = name
-    extra = is_any_token_extra(roslyn.read(PORTABLE + "Syntax/SyntaxKindFacts.cs"))
-    node_kinds = set()
-    for t in types:
-        node_kinds.update(t.kinds)
-    lo, hi = number["TildeToken"], number["EndOfLineTrivia"]
-    ordered = sorted(kinds, key=lambda k: k[1])
-    tokens, trivia, nodes, other = [], [], [], []
-    for name, value in ordered:
-        if name in ("None", "List"):
-            other.append(name)
-        elif lo <= value < hi or name in extra:
-            if name in node_kinds:
-                raise SystemExit(f"{name} is a token kind and a node kind")
-            tokens.append(name)
-        elif name in node_kinds:
-            nodes.append(name)
-        else:
-            trivia.append(name)  # unstructured trivia: no node type
-    unknown = node_kinds - set(number)
-    if unknown:
-        raise SystemExit(f"Syntax.xml kinds missing from SyntaxKind: {sorted(unknown)}")
-    token_kinds = [n for n, _ in ordered if n in set(tokens) | set(trivia)]
+    classes = KindClasses(roslyn, types)
+    kinds, number, by_value, ordered = classes.kinds, classes.number, classes.by_value, classes.ordered
+    lo, hi = classes.lo, classes.hi
+    tokens, trivia, nodes, other = classes.tokens, classes.trivia, classes.nodes, classes.other
+    token_kinds = classes.token_kinds
     o = []
     o.append(f"""//! Roslyn's `SyntaxKind` (`Syntax/SyntaxKind.cs` at {roslyn.rev[:10]}) and the two dense kinds of the tree: `TokenKind`
 //! (the {len(tokens)} token kinds of `SyntaxFacts.IsAnyToken` and the {len(trivia)} unstructured trivia kinds, the leaves) and `NodeKind` (the
@@ -534,6 +553,337 @@ pub fn node_type(kind: NodeKind) -> &'static NodeTypeInfo {
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# syntax_getters/fields.rs and tools/csharp-oracle/Fields.g.cs
+
+# Token fields whose Syntax.xml names no kind, where an earlier token list must know where it stops: a record's
+# keyword is `record` (LanguageParser.cs, `ParseTypeDeclaration`: `case SyntaxKind.RecordKeyword`, the keyword
+# converted by `ConvertToKeyword`).
+TOKEN_KINDS = {("RecordDeclarationSyntax", "Keyword"): ["RecordKeyword"]}
+
+# Abstract properties a concrete type implements by another of its fields (`NameColonSyntax.cs:11`,
+# `public override ExpressionSyntax Expression => Name;`). A concrete type without the field and without an entry
+# here answers none, as Roslyn's overrides do (`ExtensionBlockDeclarationSyntax.cs:9` and `:14`: `Identifier =>
+# default`, `BaseList => null`).
+ABSTRACT_ALIASES = {("NameColonSyntax", "Expression"): "Name"}
+
+# The fields `syntax_getters` also answers on a node of any type that has one (`modifiers_of`, ...).
+ANY_FIELDS = ["AttributeLists", "Modifiers", "Identifier", "TypeParameterList", "ParameterList", "ConstraintClauses",
+              "BaseList", "Members", "Body", "ExpressionBody", "Type", "ReturnType", "ExplicitInterfaceSpecifier",
+              "AccessorList", "SemicolonToken"]
+
+
+class Hierarchy:
+    """Syntax.xml's classes: `Node`s (concrete, `types`), `AbstractNode`s and `PredefinedNode`s by their `Base`."""
+
+    def __init__(self, xml: str, types: list[NodeType]):
+        root = ET.fromstring(xml)
+        self.bases = {e.get("Name"): e.get("Base") for e in root if e.get("Name")}
+        self.abstract = [(e.get("Name"), [f for f in flatten_fields(e, False) if not f.is_bool])
+                         for e in root.findall("AbstractNode")]
+        self.types = types
+        self.structured = {t.name for t in types if self.derives(t.name, "StructuredTriviaSyntax")}
+
+    def derives(self, name: str, base: str) -> bool:
+        while name:
+            if name == base:
+                return True
+            name = self.bases.get(name)
+        return False
+
+    def concrete(self, base: str) -> list[NodeType]:
+        """The node types deriving from `base` (itself when concrete) but structured trivia: no field holds one, and a
+        getter skips them as trivia."""
+        return [t for t in self.types if t.name not in self.structured and self.derives(t.name, base)]
+
+    def all_concrete(self, base: str) -> list[NodeType]:
+        return [t for t in self.types if self.derives(t.name, base)]
+
+    def abstract_fields(self, name: str) -> list[Field]:
+        """The fields of the abstract class `name` and of its abstract bases, the bases' first."""
+        chain = []
+        while name:
+            chain.append(name)
+            name = self.bases.get(name)
+        own = dict(self.abstract)
+        return [f for a in reversed(chain) for f in own.get(a, [])]
+
+
+def list_element(t: str) -> str:
+    return t[t.index("<") + 1:-1]
+
+
+def slot_specs(h: Hierarchy, classes: KindClasses, t: NodeType) -> list[tuple[set, set, bool]]:
+    """Per slot of `t` the kinds a child in it may have, the kinds Syntax.xml declares for it, and whether the slot takes
+    several (a list): a token slot its
+    Syntax.xml kinds (any token without them), a node slot its kinds or those of the node types deriving from its
+    type (a slot that is never null takes any token or any node where it stands; its own kinds only say where the
+    lists and optional slots before it stop), a list those of its element type, a token list (`SyntaxList<SyntaxToken>`, modifiers) every token that no
+    slot after it up to its first required one takes, a separated list its elements and any token as a separator
+    (Roslyn's recovery makes a `;` one, `enum C { A ; }`), which `slots.rs` gives to a later slot that takes it only
+    when the next child fits after that slot. A child goes to the first slot from the current one that takes it, so an
+    earlier slot wins over a later one; two node slots that both take a kind where the first may be skipped are an
+    ambiguity this assignment cannot tell apart, and fail the generator."""
+    tokens = set(classes.tokens)
+    all_nodes = {k for c in h.concrete("CSharpSyntaxNode") for k in c.kinds}
+    n = len(t.slots)
+    accept = [set()] * n
+    declared = [set()] * n
+    for i in range(n - 1, -1, -1):
+        f = t.slots[i]
+        follow = set()
+        for j in range(i + 1, n):
+            follow |= declared[j]
+            if not t.slots[j].optional and t.slots[j].slot_kind in ("Token", "Node"):
+                break
+        nodes = set()
+        if f.slot_kind == "Token":
+            a = set(TOKEN_KINDS.get((t.name, f.name), f.kinds) or tokens)
+        elif f.slot_kind == "Node":
+            nodes = set(f.kinds) if f.kinds else {k for c in h.concrete(f.type) for k in c.kinds}
+            a = nodes
+        else:
+            e = list_element(f.type)
+            if e == "SyntaxToken":
+                a = tokens - follow
+            else:
+                nodes = {k for c in h.concrete(e) for k in c.kinds}
+                a = nodes | (tokens if f.slot_kind == "SeparatedList" else set())
+        if (f.optional or f.slot_kind in ("List", "SeparatedList")) and nodes & follow:
+            raise SystemExit(f"{t.name}.{f.name}: a later slot takes its node kinds {sorted(nodes & follow)}")
+        declared[i] = a
+        # a slot that is never null takes the child where it stands, whatever its kind: Roslyn's recovery puts tokens
+        # of other kinds there (`event A.this` names the event by its `this`), and its declared kinds are only where
+        # the slots before it stop
+        accept[i] = (tokens if f.slot_kind == "Token" else all_nodes) if is_required(f) else a
+    return [(accept[i], declared[i], t.slots[i].slot_kind in ("List", "SeparatedList")) for i in range(n)]
+
+
+def is_required(f: Field) -> bool:
+    return not f.optional and f.slot_kind in ("Token", "Node")
+
+
+def gen_syntax_getters(roslyn: Roslyn, types: list[NodeType]) -> tuple[str, str]:
+    """`crates/csharp-syntax/src/syntax_getters/fields.rs` and `tools/csharp-oracle/Fields.g.cs`."""
+    h = Hierarchy(roslyn.read(PORTABLE + "Syntax/Syntax.xml"), types)
+    classes = KindClasses(roslyn, types)
+    index = {k: i for i, k in enumerate(classes.token_kinds)}
+    index.update({k: len(classes.token_kinds) + i for i, k in enumerate(classes.nodes)})
+    words = (len(index) + 63) // 64
+    sets = {}
+
+    def kind_set(kinds) -> str:
+        bits = [0] * words
+        for k in kinds:
+            bits[index[k] // 64] |= 1 << (index[k] % 64)
+        key = tuple(bits)
+        if key not in sets:
+            sets[key] = f"S{len(sets)}"
+        return sets[key]
+
+    type_index = {t.name: i for i, t in enumerate(types)}
+    trivia = kind_set(set(classes.trivia) | {k for t in types if t.name in h.structured for k in t.kinds})
+    spec_rows = []
+    for t in types:
+        cells = ", ".join(
+            f"SlotSpec {{ accept: &{kind_set(a)}, declared: &{kind_set(d)}, many: {str(many).lower()}, separated: "
+            f"{str(f.slot_kind == 'SeparatedList').lower()}, required: {str(is_required(f)).lower()} }}"
+            for (a, d, many), f in zip(slot_specs(h, classes, t), t.slots))
+        spec_rows.append(f"    &[{cells}],")
+
+    def one(f: Field) -> bool:
+        return f.slot_kind in ("Token", "Node")
+
+    def ret(f: Field) -> str:
+        return "Option<NodeId>" if one(f) else "Elements<'_>"
+
+    def getter(f: Field) -> str:
+        """`read_field` of a token or node, `read_tokens` of a token list, `read_nodes` of a list or separated list of
+        nodes (`slots.rs`)."""
+        if one(f):
+            return "read_field"
+        return "read_tokens" if list_element(f.type) == "SyntaxToken" else "read_nodes"
+
+    def field_doc(owner: str, f: Field) -> str:
+        what = {"Token": "a token", "Node": "a node", "List": "a list",
+                "SeparatedList": "a separated list, its elements"}[f.slot_kind]
+        opt = ", optional" if f.optional and one(f) else ""
+        kinds = f" ({', '.join(f.kinds)})" if f.kinds and len(f.kinds) <= 6 else ""
+        return f"`{owner}.{f.name}`: `{f.type}`{kinds}, {what}{opt}."
+
+    mods, printers = [], []
+    for i, t in enumerate(types):
+        name = ident(snake(t.short))
+        body = [f"/// `{t.name}` ({', '.join(t.kinds)}): its fields in Syntax.xml order.",
+                f"pub mod {name} {{", "    use super::*;", "", f"    const TYPE: u8 = {i};"]
+        lines = []
+        for s, f in enumerate(t.slots):
+            fn = ident(snake(f.name))
+            body.append("")
+            body.append(f"    /// {field_doc(t.name, f)}")
+            body.append(f"    pub fn {fn}(tree: &Tree, id: NodeId) -> {ret(f)} {{")
+            body.append(f"        {getter(f)}(tree, id, TYPE, {s})")
+            body.append("    }")
+            lines.append(f"            out.{'one' if one(f) else 'list'}(\"{f.name}\", {name}::{fn}(tree, id));")
+        body.append("}")
+        mods.append("\n".join(body))
+        printers.append(f"        {i} => {{\n" + "\n".join(lines) + "\n        }")
+    abstract_mods, abstract_printers, is_fns = [], [], []
+    for a, own in h.abstract:
+        members = h.all_concrete(a)
+        kinds = [k for c in members for k in c.kinds]
+        fn_is = f"is_{snake(a)}"
+        is_fns.append(f"/// A node kind of a type deriving from `{a}` in Syntax.xml ({len(members)} types).\n"
+                      f"pub fn {fn_is}(kind: NodeKind) -> bool {{\n"
+                      f"    {kind_set(kinds)}.contains(node_index(kind))\n}}")
+        fields = h.abstract_fields(a)
+        if not fields:
+            continue
+        name = ident(snake(a[:-len("Syntax")]))
+        body = [f"/// `{a}`: the fields it and its abstract bases declare, on a node of a type deriving from it "
+                f"({', '.join(c.name for c in members)}).", f"pub mod {name} {{", "    use super::*;"]
+        for f in fields:
+            table = []
+            for c in members:
+                target = ABSTRACT_ALIASES.get((c.name, f.name), f.name)
+                for s, g in enumerate(c.slots):
+                    if g.name == target:
+                        if getter(g) != getter(f):
+                            raise SystemExit(f"{a}.{f.name} is a {f.slot_kind}, {c.name}.{g.name} a {g.slot_kind}")
+                        table.append(f"({type_index[c.name]}, {s})")
+            body.append("")
+            body.append(f"    /// {field_doc(a, f)} {'None' if one(f) else 'Empty'} on a type without it.")
+            body.append(f"    pub fn {ident(snake(f.name))}(tree: &Tree, id: NodeId) -> {ret(f)} {{")
+            body.append(f"        {getter(f)}_in(tree, id, &[{', '.join(table)}])")
+            body.append("    }")
+        body.append("}")
+        abstract_mods.append("\n".join(body))
+        if own:
+            lines = [f"    if {fn_is}(kind) {{"]
+            for f in own:
+                lines.append(f"        out.{'one' if one(f) else 'list'}(\"{a}.{f.name}\", "
+                             f"{name}::{ident(snake(f.name))}(tree, id));")
+            lines.append("    }")
+            abstract_printers.append("\n".join(lines))
+    any_fns = []
+    for fname in ANY_FIELDS:
+        table, shapes, proto = [], set(), None
+        for i, t in enumerate(types):
+            for s, f in enumerate(t.slots):
+                if f.name == fname:
+                    table.append(f"({i}, {s})")
+                    shapes.add(getter(f))
+                    proto = f
+        if len(shapes) != 1:
+            raise SystemExit(f"the field {fname} is of several shapes: {shapes}")
+        any_fns.append(f"/// `{fname}` of a node of any type that has the field ({len(table)} types), "
+                       f"{'None' if one(proto) else 'empty'} on the others.\n"
+                       f"pub fn {snake(fname)}_of(tree: &Tree, id: NodeId) -> {ret(proto)} {{\n"
+                       f"    {getter(proto)}_in(tree, id, &[{', '.join(table)}])\n}}")
+    node_type = [type_index[next(t.name for t in types if k in t.kinds)] for k in classes.nodes]
+    if len(types) > 255:
+        raise SystemExit("more node types than a u8 holds")
+    set_defs = [f"static {name}: KindSet = KindSet([{', '.join(f'0x{b:x}' for b in bits)}]);"
+                for bits, name in sets.items()]
+    nl = "\n"
+    rust = f"""//! The fields of Roslyn's node types (`Syntax/Syntax.xml` at {roslyn.rev[:10]}) as getters over the tree: a module per
+//! node type (`class_declaration::identifier` is `ClassDeclarationSyntax.Identifier`) and per abstract class with
+//! fields (`type_declaration::members` on a class, a struct, a record, an interface or an extension block;
+//! `member_declaration::modifiers` on any member), a function per field in snake_case; `is_<abstract class>`
+//! (`is_type_syntax`) per abstract class; `<field>_of` (`modifiers_of`) for a few fields on a node of any type that has
+//! one. A token or node field answers `Option<NodeId>`: None where Roslyn's slot is null and on a node of another type,
+//! `Some` for a missing token (`IsMissing`, an empty leaf); a list answers its children in order (`Elements`), a
+//! separated list its elements without the separators. Each reads the node's children in slot order up to its field
+//! (`super::slots`). Generated by `tools/csharp-gen/gen.py`; do not edit by hand.
+
+use super::getters::Lines;
+use super::slots::{{
+    node_index, read_field, read_field_in, read_nodes, read_nodes_in, read_tokens, read_tokens_in, Elements, KindSet,
+    SlotSpec,
+}};
+use crate::syntax_kind::NodeKind;
+use crate::tree::{{NodeId, Tree}};
+
+/// The words of a `KindSet`: a bit per `TokenKind` and per `NodeKind` (`TokenKind::COUNT` + its index).
+pub(super) const WORDS: usize = {words};
+
+{nl.join(set_defs)}
+
+/// What a getter skips: the unstructured trivia leaves and the roots of structured trivia.
+pub(super) static TRIVIA: &KindSet = &{trivia};
+
+/// Per node type (`syntax::NODE_TYPES`' order) its slots: the kinds each takes and the kinds Syntax.xml declares for it,
+/// whether it takes several, whether it is a separated list, whether it is a token or node that is never null.
+pub(super) static SPECS: [&[SlotSpec]; {len(types)}] = [
+{nl.join(spec_rows)}
+];
+
+/// The node type (an index into `SPECS` and `syntax::NODE_TYPES`) of each `NodeKind`.
+pub(super) static TYPE_OF_NODE: [u8; {len(node_type)}] = [
+{nl.join(wrap_numbers([str(x) for x in node_type]))}
+];
+
+{(nl + nl).join(is_fns)}
+
+{(nl + nl).join(any_fns)}
+
+{(nl + nl).join(mods)}
+
+{(nl + nl).join(abstract_mods)}
+
+/// The lines of `getters` of a node's fields: those of its type, then those of each abstract class it derives from,
+/// in Syntax.xml order, prefixed with the class (`TypeDeclarationSyntax.Keyword`).
+pub(super) fn print_fields(tree: &Tree, id: NodeId, kind: NodeKind, out: &mut Lines) {{
+    match TYPE_OF_NODE[kind as usize] {{
+{nl.join(printers)}
+        _ => {{}}
+    }}
+{nl.join(abstract_printers)}
+}}
+"""
+
+    def cs_getter(f: Field) -> str:
+        if one(f):
+            return f.slot_kind
+        if f.slot_kind == "SeparatedList":
+            return "Separated"
+        return "Tokens" if list_element(f.type) == "SyntaxToken" else "List"
+
+    cs = [f"""// The fields of Roslyn's node types (Syntax/Syntax.xml at {roslyn.rev[:10]}) as the getters mode prints them, in the
+// order of crates/csharp-syntax/src/syntax_getters/fields.rs's print_fields: a node's own fields, then those of each
+// abstract class it derives from. Generated by tools/csharp-gen/gen.py; do not edit by hand.
+// The node types of the preview features (union declarations, `with` elements, unsafe expressions, labels of `break`
+// and `continue`) are marked experimental; the oracle reads them all the same.
+#pragma warning disable RSEXPERIMENTAL006
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace CSharpOracle;
+
+static class Fields
+{{
+    public static void Print(SyntaxNode node, GetterLines o)
+    {{
+        switch (node)
+        {{"""]
+    for t in types:
+        cs.append(f"            case {t.name} n:")
+        for f in t.slots:
+            cs.append(f"                o.{cs_getter(f)}(\"{f.name}\", n.{f.name});")
+        cs.append("                break;")
+    cs.append("        }")
+    for i, (a, own) in enumerate(h.abstract):
+        if not own:
+            continue
+        cs.append(f"        if (node is {a} a{i})")
+        cs.append("        {")
+        for f in own:
+            cs.append(f"            o.{cs_getter(f)}(\"{a}.{f.name}\", a{i}.{f.name});")
+        cs.append("        }")
+    cs.append("    }\n}\n")
+    return rust, "\n".join(cs)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # error_code.rs
 
 def parser_sources(roslyn: Roslyn) -> list[str]:
@@ -783,6 +1133,7 @@ def main():
     ap.add_argument("--roslyn", default=os.path.expanduser("~/.cache/psi-syntax/roslyn"))
     ap.add_argument("--rev", default=PIN)
     ap.add_argument("--out", default=str(Path(__file__).resolve().parents[2] / "crates/csharp-syntax/src"))
+    ap.add_argument("--oracle", default=str(Path(__file__).resolve().parents[1] / "csharp-oracle"))
     args = ap.parse_args()
     roslyn = Roslyn(args.roslyn, args.rev)
     types = node_types(roslyn.read(PORTABLE + "Syntax/Syntax.xml"))
@@ -792,6 +1143,10 @@ def main():
     files[1].write_text(gen_syntax(roslyn, types))
     files[2].write_text(gen_error_code(roslyn))
     files[3].write_text(gen_xml_char_type(roslyn))
+    fields, oracle_fields = gen_syntax_getters(roslyn, types)
+    files.append(out / "syntax_getters" / "fields.rs")
+    files[4].write_text(fields)
+    (Path(args.oracle) / "Fields.g.cs").write_text(oracle_fields)
     # the repository's rustfmt.toml (max_width 120) over the generated files
     config = Path(__file__).resolve().parents[2] / "rustfmt.toml"
     subprocess.run(["rustfmt", "--edition", "2024", "--config-path", str(config), *map(str, files)], check=True)

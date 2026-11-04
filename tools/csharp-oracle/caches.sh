@@ -1,6 +1,6 @@
 #!/bin/sh
 # Rebuilds the C# caches under ~/.cache/psi-syntax (README.md, "Caches"):
-#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz] [defines] [directives]   (no step: all, in this
+#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz] [defines] [directives] [getters]   (no step: all, in this
 #   order)
 # clones: the pinned corpora under csharp-src/ (shallow, checked out); lists: corpus/csharp-REPO-SHA7.list;
 # dumps: oracle/csharp-REPO-SHA7/ (Latest, Parse) and oracle/csharp-REPO-SHA7-preview/ (Preview, Parse, files equal
@@ -13,7 +13,13 @@
 # (Latest, Parse) and lexer lines lex/csharp-REPO-SHA7-defines.doc.oracle.txt (--doc parse);
 # directives: each directive's IsActive, BranchTaken and ConditionValue (`directives`) of the four corpora, the
 # -defines lists, the golden mutations and the lexer fuzz, with the lists' own columns: directives/KEY.txt (after
-# fuzz and defines). Keeps at least 200 GB free.
+# fuzz and defines);
+# getters: the getter lines (`oracle.sh getters`) under getters/csharp/: of the goldens, of the four corpora at Latest
+# and at Preview (runtime without the 6 files whose dump is over 512 MB, getters/csharp/csharp-runtime-SHA7.list), of
+# the roslyn corpus at --doc diagnose and none, of the -defines lists, of the mutations at their three versions, of the
+# lexer fuzz at Latest and Preview, and of the getters fuzz (getters_fuzz.py, fuzz/csharp-getters/, its list without
+# the files the oracle has no lines for: those its entry cannot parse and one Roslyn throws on). Keeps at least 200 GB
+# free.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../.." && pwd)
@@ -24,7 +30,7 @@ runtime https://github.com/dotnet/runtime v10.0.14
 aspnetcore https://github.com/dotnet/aspnetcore v10.0.14
 avalonia https://github.com/AvaloniaUI/Avalonia 12.1.4"
 DEFINES="roslyn avalonia"
-steps=${*:-clones lists dumps lex fuzz defines directives}
+steps=${*:-clones lists dumps lex fuzz defines directives getters}
 
 need_space() {
   free=$(df -k "$S" | awk 'NR == 2 { print int($4 / 1024 / 1024) }')
@@ -121,6 +127,45 @@ directives() {
   esac
 }
 
+getters() {
+  G=$S/getters/csharp
+  F=$S/fuzz
+  mkdir -p "$G"
+  awk -F '\t' 'BEGIN { OFS = "\t" } { print $1 ".cs", $2, $3, $4, $5 }' "$repo/testdata/csharp/manifest.tsv" > "$G/goldens.list"
+  "$O" getters --list "$G/goldens.list" --root "$repo/testdata/csharp" > "$G/csharp-goldens.txt"
+  echo "$CORPORA" | while read -r name url ref; do
+    k=$(key "$name")
+    list=$S/corpus/$k.list
+    if [ "$name" = runtime ]; then
+      # the files whose dump is over 512 MB have no getter lines either (only lossless, as in the gate's dumps)
+      grep '"failure"' "$S/oracle/$k/index.jsonl" | sed 's/^{"path":"\([^"]*\)".*/\1/' | grep -vxFf - "$list" > "$G/$k.list"
+      list=$G/$k.list
+    fi
+    "$O" getters --list "$list" --root "$S/csharp-src/$name" > "$G/$k.txt"
+    "$O" getters --list "$list" --root "$S/csharp-src/$name" --version preview > "$G/$k-preview.txt"
+  done
+  for name in $DEFINES; do
+    k=$(key "$name")-defines
+    "$O" getters --list "$S/corpus/$k.list" --root "$S/csharp-src/$name" > "$G/$k.txt"
+  done
+  k=$(key roslyn)
+  "$O" getters --list "$S/corpus/$k.list" --root "$S/csharp-src/roslyn" --doc diagnose > "$G/$k-diagnose.txt"
+  "$O" getters --list "$S/corpus/$k.list" --root "$S/csharp-src/roslyn" --doc none > "$G/$k-nodoc.txt"
+  for m in csharp-mut csharp-mut-latest csharp-mut-preview; do
+    "$O" getters --list "$F/$m.list" --root "$F/csharp-mut" > "$G/$m.txt"
+  done
+  "$O" getters --list "$F/csharp-lex/list" --root "$F/csharp-lex" > "$G/csharp-lex.txt"
+  "$O" getters --list "$F/csharp-lex/list" --root "$F/csharp-lex" --version preview > "$G/csharp-lex-preview.txt"
+  rm -rf "$F/csharp-getters"
+  python3 -I "$here/getters_fuzz.py" "$repo/testdata/csharp" "$F/csharp-getters" 20000 csharp-getters
+  "$O" getters --list "$F/csharp-getters/list" --root "$F/csharp-getters" > "$G/csharp-getters.txt"
+  # the files the oracle has no lines for: no member at the member entry, and Roslyn's own exception (1 file)
+  awk -F '\t' 'NR == FNR { if ($2 == "failure") failed[$1] = 1; next } !($1 in failed)' \
+    "$G/csharp-getters.txt" "$F/csharp-getters/list" > "$F/csharp-getters.list"
+  awk -F '\t' '$2 != "failure"' "$G/csharp-getters.txt" > "$G/csharp-getters.ok.txt"
+  mv "$G/csharp-getters.ok.txt" "$G/csharp-getters.txt"
+}
+
 mkdir -p "$S/csharp-src" "$S/corpus" "$S/oracle" "$S/lex" "$S/fuzz" "$S/directives"
 for step in $steps; do
   case $step in
@@ -134,6 +179,7 @@ for step in $steps; do
       each directives
       "$O" directives --list "$S/fuzz/csharp-mut.list" --root "$S/fuzz/csharp-mut" > "$S/directives/csharp-mut.txt"
       "$O" directives --list "$S/fuzz/csharp-lex/list" --root "$S/fuzz/csharp-lex" > "$S/directives/csharp-lex.txt" ;;
+    getters) getters ;;
     *) echo "caches.sh: unknown step $step" >&2; exit 2 ;;
   esac
 done
