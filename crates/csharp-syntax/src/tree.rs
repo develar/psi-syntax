@@ -179,6 +179,13 @@ impl Diagnostic {
 pub struct DirectiveFlags(u8);
 
 impl DirectiveFlags {
+    /// The fields `IsActive`, `BranchTaken` and `ConditionValue` (`preprocessor::activity`).
+    pub(crate) fn of(is_active: bool, branch_taken: bool, condition_value: bool) -> DirectiveFlags {
+        use crate::syntax::types::IfDirectiveTriviaSyntax as If;
+        let bit = |on: bool, b: u32| if on { b as u8 } else { 0 };
+        DirectiveFlags(bit(is_active, If::IS_ACTIVE) | bit(branch_taken, If::BRANCH_TAKEN) | bit(condition_value, If::CONDITION_VALUE))
+    }
+
     /// `DirectiveTriviaSyntax.IsActive`.
     pub fn is_active(self) -> bool {
         u32::from(self.0) & crate::syntax::types::IfDirectiveTriviaSyntax::IS_ACTIVE != 0

@@ -128,6 +128,14 @@ impl DirectiveStore {
         Directive { kind, is_active, branch_taken, name_start, name_len }
     }
 
+    /// A directive of `kind` with its `IsActive`, `BranchTaken` and, of a `#define` or `#undef`, its name's `ValueText`
+    /// (`preprocessor::activity`, which replays a tree's directives).
+    pub(crate) fn directive_of(&mut self, kind: SyntaxKind, is_active: bool, branch_taken: bool, name: &[u8]) -> Directive {
+        let (name_start, name_len) = (self.names.len() as u32, name.len() as u32);
+        self.names.extend_from_slice(name);
+        Directive { kind, is_active, branch_taken, name_start, name_len }
+    }
+
     fn cell(&self, at: u32) -> Option<&Cell> {
         if at == EMPTY { None } else { self.cells.get(at as usize) }
     }

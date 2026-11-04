@@ -52,6 +52,7 @@ mod language;
 pub mod language_version;
 pub mod lexer;
 pub mod parser;
+pub mod preprocessor;
 pub mod syntax;
 pub mod syntax_kind;
 pub mod syntax_parser;

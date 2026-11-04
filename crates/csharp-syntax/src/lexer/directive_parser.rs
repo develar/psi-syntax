@@ -1046,7 +1046,7 @@ impl<'l, 't> DirectiveParser<'l, 't> {
 }
 
 /// `bool.TryParse(value)`: `True` or `False` in any case, with white space and nulls around.
-fn bool_try_parse(value: &[u8]) -> Option<bool> {
+pub(crate) fn bool_try_parse(value: &[u8]) -> Option<bool> {
     let trimmed = String::from_utf8_lossy(value);
     let trimmed = trimmed.trim_matches(|c: char| c.is_whitespace() || c == '\0');
     if trimmed.eq_ignore_ascii_case("true") {

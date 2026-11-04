@@ -29,6 +29,8 @@ pub mod sliding_text_window;
 mod string_literal;
 
 pub use directives::{DirectiveStack, DirectiveStore};
+pub(crate) use directive_parser::bool_try_parse;
+pub(crate) use directives::DefineState;
 pub use interpolation::Interpolation;
 pub(crate) use lexer_cache::{EOL_BIT, QuickToken};
 pub use string_literal::InterpolatedStringKind;
