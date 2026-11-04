@@ -1,28 +1,14 @@
+# The public mirror of psi-syntax/ in JetBrains/accio, whose crates are members of accio's workspace and state their
+# own package fields and lints; this manifest, Cargo.lock (accio's, pruned to these crates) and .gitignore are the
+# mirror's own, every other file is accio's (accio's scripts/psi-syntax-mirror.sh).
 [workspace]
 resolver = "3"
-members = ["crates/psi-builder", "crates/kotlin-syntax", "crates/java-syntax", "crates/csharp-syntax", "crates/ksdump"]
+members = ["crates/*"]
 
-[workspace.package]
-version = "0.1.0"
-edition = "2024"
-rust-version = "1.90"
-license = "Apache-2.0"
-repository = "https://github.com/develar/psi-syntax"
-publish = false
-
-[workspace.dependencies]
-psi-builder = { path = "crates/psi-builder" }
-kotlin-syntax = { path = "crates/kotlin-syntax" }
-java-syntax = { path = "crates/java-syntax" }
-csharp-syntax = { path = "crates/csharp-syntax" }
-
-[profile.release]
-debug = true
-codegen-units = 1
+# psi-syntax's measurements (`scripts/{ab,pgo,gate}.sh`, `ksdump --bench`): fat LTO in one codegen unit with full
+# debug info, accio's `psi` profile, the one every number of `docs/DESIGN.md` was taken on.
+[profile.psi]
+inherits = "release"
 lto = "fat"
-
-[workspace.lints.rust]
-unsafe_code = "forbid"
-
-[workspace.lints.clippy]
-all = { level = "warn", priority = -1 }
+codegen-units = 1
+debug = true
