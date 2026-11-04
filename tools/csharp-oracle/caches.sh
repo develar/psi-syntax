@@ -1,6 +1,7 @@
 #!/bin/sh
 # Rebuilds the C# caches under ~/.cache/psi-syntax (README.md, "Caches"):
-#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz] [defines]   (no step: all, in this order)
+#   tools/csharp-oracle/caches.sh [clones] [lists] [dumps] [lex] [fuzz] [defines] [directives]   (no step: all, in this
+#   order)
 # clones: the pinned corpora under csharp-src/ (shallow, checked out); lists: corpus/csharp-REPO-SHA7.list;
 # dumps: oracle/csharp-REPO-SHA7/ (Latest, Parse) and oracle/csharp-REPO-SHA7-preview/ (Preview, Parse, files equal
 # to Latest's hard-linked); lex: lex/csharp-REPO-SHA7.oracle.txt (--doc none), .doc.oracle.txt (--doc parse) and
@@ -9,7 +10,10 @@
 # (dumps at Latest and at Preview) with their lexer lines;
 # defines: of the roslyn and Avalonia corpora, the files whose #if and #elif conditions name a symbol, with every one
 # of those symbols defined (defines.py): corpus/csharp-REPO-SHA7-defines.list, its dumps oracle/csharp-REPO-SHA7-defines/
-# (Latest, Parse) and lexer lines lex/csharp-REPO-SHA7-defines.doc.oracle.txt (--doc parse). Keeps at least 200 GB free.
+# (Latest, Parse) and lexer lines lex/csharp-REPO-SHA7-defines.doc.oracle.txt (--doc parse);
+# directives: each directive's IsActive, BranchTaken and ConditionValue (`directives`) of the four corpora, the
+# -defines lists, the golden mutations and the lexer fuzz, with the lists' own columns: directives/KEY.txt (after
+# fuzz and defines). Keeps at least 200 GB free.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../.." && pwd)
@@ -20,7 +24,7 @@ runtime https://github.com/dotnet/runtime v10.0.14
 aspnetcore https://github.com/dotnet/aspnetcore v10.0.14
 avalonia https://github.com/AvaloniaUI/Avalonia 12.1.4"
 DEFINES="roslyn avalonia"
-steps=${*:-clones lists dumps lex fuzz defines}
+steps=${*:-clones lists dumps lex fuzz defines directives}
 
 need_space() {
   free=$(df -k "$S" | awk 'NR == 2 { print int($4 / 1024 / 1024) }')
@@ -108,7 +112,16 @@ defines() {
   "$O" lex --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" --doc parse > "$S/lex/$k.doc.oracle.txt"
 }
 
-mkdir -p "$S/csharp-src" "$S/corpus" "$S/oracle" "$S/lex" "$S/fuzz"
+directives() {
+  k=$(key "$1")
+  "$O" directives --list "$S/corpus/$k.list" --root "$S/csharp-src/$1" > "$S/directives/$k.txt"
+  case " $DEFINES " in
+    *" $1 "*)
+      "$O" directives --list "$S/corpus/$k-defines.list" --root "$S/csharp-src/$1" > "$S/directives/$k-defines.txt" ;;
+  esac
+}
+
+mkdir -p "$S/csharp-src" "$S/corpus" "$S/oracle" "$S/lex" "$S/fuzz" "$S/directives"
 for step in $steps; do
   case $step in
     clones) each clone ;;
@@ -117,6 +130,10 @@ for step in $steps; do
     lex) each lex ;;
     fuzz) fuzz ;;
     defines) for corpus in $DEFINES; do defines "$corpus"; done ;;
+    directives)
+      each directives
+      "$O" directives --list "$S/fuzz/csharp-mut.list" --root "$S/fuzz/csharp-mut" > "$S/directives/csharp-mut.txt"
+      "$O" directives --list "$S/fuzz/csharp-lex/list" --root "$S/fuzz/csharp-lex" > "$S/directives/csharp-lex.txt" ;;
     *) echo "caches.sh: unknown step $step" >&2; exit 2 ;;
   esac
 done

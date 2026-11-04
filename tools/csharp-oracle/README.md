@@ -11,7 +11,7 @@ its nuspec names, which no tag contains). The dump is not imitated: it is a walk
 | `CSharpOracle.csproj`, `global.json`, `nuget.config`, `Directory.Build.props` | a `net10.0` console program on `Microsoft.CodeAnalysis.CSharp` `[5.9.0]`, SDK 10.0.403 exactly (`rollForward: disable`), nuget.org only; build products and packages in `~/.cache/psi-syntax/csharp-oracle/` |
 | `packages.lock.json` | the content hash of every package (`RestoreLockedMode`): restore fails when a package does not match, as `jars.sha256` pins the Java oracle's jars. `CSHARP_ORACLE_UNLOCK=1` rewrites it (a pin bump) |
 | `oracle.sh` | builds the program once per source tree (`build/<hash of the sources>`) and runs it: `oracle.sh MODE ARGS` |
-| `Program.cs`, `Dump.cs`, `Values.cs` | the modes `dump`, `lex`, `values` and `unicode`, the dump format below |
+| `Program.cs`, `Dump.cs`, `Values.cs`, `Directives.cs` | the modes `dump`, `lex`, `values`, `directives` and `unicode`, the dump format below |
 | `Goldens.cs` | the `goldens` mode: the inputs of Roslyn's parser and lexer tests |
 | `vendor-goldens.sh` | writes `testdata/csharp/` from the tests at the pin (`git archive`, never a working tree) |
 | `corpus.py` | a corpus list: the tracked `.cs` files of a checkout that are valid UTF-8 |
@@ -35,6 +35,7 @@ tools/csharp-oracle/oracle.sh dump --serve [the same defaults]   # stdin: LIST<T
 tools/csharp-oracle/oracle.sh lex --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--full OUT]
 tools/csharp-oracle/oracle.sh values --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...] \
   [--kept]
+tools/csharp-oracle/oracle.sh directives --list LIST --root ROOT [--version ...] [--doc ...] [--define ...] [--entry ...]
 tools/csharp-oracle/oracle.sh goldens --src ROSLYN_TREE --out DIR [--skipped LOG]   # vendor-goldens.sh runs it
 tools/csharp-oracle/oracle.sh unicode   # CharUnicodeInfo.GetUnicodeCategory of 0..10FFFF as runs
 ```
@@ -210,6 +211,25 @@ added to the path, `--root testdata/csharp`; their SYMBOLS column applies, SOURC
 the 122 741 mutations and the 20 000 lexer fuzz inputs (DESIGN, "Value texts"); on 2026-11-04 the 7064 goldens with
 their preprocessor symbols.
 
+### Directives (`directives`, `ksdump --directives --lang csharp`)
+
+One line per directive of the parse (a trivia whose `IsDirective`: the root of a `DirectiveTriviaSyntax`), in document
+order, those of disabled text and of other structured trivia included (`DescendantTrivia(descendIntoTrivia: true)`;
+for the `tokens` entry each lexed token's leading then trailing trivia, each followed by its structure's):
+`PATH<TAB>Kind<TAB>START<TAB>END<TAB>FLAGS`, START and END the trivia's `FullSpan` in UTF-8 bytes, FLAGS three
+characters, `A` when `IsActive`, `T` when `BranchTaken` (a `BranchingDirectiveTriviaSyntax`: `#if`, `#elif`,
+`#else`), `V` when `ConditionValue` (a `ConditionalDirectiveTriviaSyntax`: `#if`, `#elif`), each else `-`
+(`IfDirectiveTrivia 10 16 ATV`; an `#elif` that holds after a taken branch is `A-V`, an `#if` that holds in disabled
+text `--V`); or `PATH<TAB>failure<TAB>REASON`. List lines as for `dump`. What `csharp_syntax::Tree::directives`
+answers (`dump::directive_lines`).
+
+The gate (`ksdump --directives --check LINES`, step 12) compares ours with cached lines under `directives/`, made with
+the lists' own columns by `caches.sh directives`: the four corpora, the `-defines` lists, the golden mutations and the
+lexer fuzz. `crates/csharp-syntax/tests/directives/goldens.directives.txt` is the same of the goldens (`manifest.tsv`'s
+lines with `.cs` added to the path, `--root testdata/csharp`). Equal on 2026-11-04: 36 098 lines of roslyn, 32 884 of
+runtime, 6676 of aspnetcore, 972 of Avalonia, 6019 and 674 of the roslyn and Avalonia `-defines` lists, 7613 of the
+mutations, 2446 of the lexer fuzz and 767 of the goldens; 46 s for all eight caches.
+
 ## Goldens (`testdata/csharp/`)
 
 `goldens` parses `src/Compilers/CSharp/Test/Syntax/Parsing/*.cs` and `LexicalAndXml/*.cs` of the pin with Roslyn
@@ -313,8 +333,10 @@ test writes them (empty: none), SOURCE the call's file and line.
 | `lex/csharp-mut{,.doc,.diag}.oracle.txt`, `lex/csharp-lex{,.doc,.diag}.oracle.txt` | the lexer lines of both, at `--doc none`, `--doc parse` and `--doc diagnose`, with the defaults for every file (the lists' paths only) |
 | `corpus/csharp-{roslyn-35d9211,avalonia-2d79ba5}-defines.list` | the corpus's files whose `#if` and `#elif` conditions name a symbol, each with all of them in its SYMBOLS column (`defines.py`) |
 | `oracle/csharp-REPO-SHA7-defines/`, `lex/csharp-REPO-SHA7-defines.doc.oracle.txt` | their dumps (Latest, Parse) and lexer lines (`--doc parse`) with those symbols |
+| `directives/KEY.txt` | the `directives` lines of the four corpora, their `-defines` lists, the mutations and the lexer fuzz ("Directives") |
 
-Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz defines`, any subset in that
-order; it stops when less than 220 GB would be free), the goldens with `tools/csharp-oracle/vendor-goldens.sh`.
+Rebuild them all with `tools/csharp-oracle/caches.sh` (steps `clones lists dumps lex fuzz defines directives`, any
+subset in that order; it stops when less than 220 GB would be free), the goldens with
+`tools/csharp-oracle/vendor-goldens.sh`.
 Compare a port's dumps with `scripts/compare.py ORACLE OURS` (it detects `.tree.txt`) and its lexer lines with
 `diff` of the oracle's file.

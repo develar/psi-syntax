@@ -563,7 +563,10 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   options hold the identifier's value (`A\u0042` is `AB`). `FileKind` stays `Copy` without them. Checked on the 13
   goldens that define symbols, `tests/oracle/symbol_*` and, in the gate, the 834 roslyn and 143 Avalonia files whose
   `#if` and `#elif` conditions name a symbol, each with all of them defined (`tools/csharp-oracle/defines.py`; 741 and
-  140 of their dumps differ from the defaults'), 0 differing dumps and lexer lines.
+  140 of their dumps differ from the defaults'), 0 differing dumps and lexer lines. Each directive's `IsActive`,
+  `BranchTaken` and `ConditionValue` (`Tree::directives`, which no dump prints) is checked against the oracle's
+  `directives` lines: the 767 directives of the goldens (`tests/directives.rs`) and, in the gate's step 12, the 93 382
+  of the four corpora, the `-defines` lists, the mutations and the lexer fuzz, 0 differing.
 - **Oracle.** `tools/csharp-oracle` runs Roslyn itself and walks the red tree it returns (`ChildNodesAndTokens()` with
   each token's trivia, the order of Roslyn's own `ParsingTests.EnumerateNodes`): the dump is not imitated. Its
   goldens are the inputs of Roslyn's parsing and lexing tests, found and constant-folded by Roslyn compiling those

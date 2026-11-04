@@ -442,24 +442,7 @@ static class Dumper
             }
             default:
             {
-                SyntaxNode? node = entry switch
-                {
-                    Entry.Expression => SyntaxFactory.ParseExpression(text, 0, po, consumeFullText: true),
-                    Entry.Statement => SyntaxFactory.ParseStatement(text, 0, po, consumeFullText: true),
-                    Entry.Member => SyntaxFactory.ParseMemberDeclaration(text, 0, po, consumeFullText: true),
-                    Entry.TypeName => SyntaxFactory.ParseTypeName(text, 0, po, consumeFullText: true),
-                    // Roslyn's ParseName takes no options: it parses with CSharpParseOptions.Default.
-                    Entry.Name => SyntaxFactory.ParseName(text, 0, consumeFullText: true),
-                    Entry.ParameterList => SyntaxFactory.ParseParameterList(text, 0, po, consumeFullText: true),
-                    Entry.BracketedParameterList =>
-                        SyntaxFactory.ParseBracketedParameterList(text, 0, po, consumeFullText: true),
-                    Entry.ArgumentList => SyntaxFactory.ParseArgumentList(text, 0, po, consumeFullText: true),
-                    Entry.BracketedArgumentList =>
-                        SyntaxFactory.ParseBracketedArgumentList(text, 0, po, consumeFullText: true),
-                    Entry.AttributeArgumentList =>
-                        SyntaxFactory.ParseAttributeArgumentList(text, 0, po, consumeFullText: true),
-                    _ => throw new ArgumentOutOfRangeException(nameof(entry)),
-                };
+                var node = Root(text, entry, po);
                 if (node == null)
                 {
                     return new DumpResult(null, 0, null, 0, "no " + Options.EntryName(entry));
@@ -472,6 +455,27 @@ static class Dumper
         var (errors, first) = p.Diagnostics(diagnostics);
         return new DumpResult(p.ToString(), errors, first, tokens, null);
     }
+
+    /// <summary>The root of <paramref name="entry"/>'s parse of <paramref name="text"/> (README.md, "Input and
+    /// options"), null when the entry returns none (<c>ParseMemberDeclaration</c> of text that is no member); every
+    /// entry but <c>tokens</c>, which is no tree.</summary>
+    public static SyntaxNode? Root(string text, Entry entry, CSharpParseOptions po) => entry switch
+    {
+        Entry.CompilationUnit => CSharpSyntaxTree.ParseText(text, po).GetRoot(),
+        Entry.Expression => SyntaxFactory.ParseExpression(text, 0, po, consumeFullText: true),
+        Entry.Statement => SyntaxFactory.ParseStatement(text, 0, po, consumeFullText: true),
+        Entry.Member => SyntaxFactory.ParseMemberDeclaration(text, 0, po, consumeFullText: true),
+        Entry.TypeName => SyntaxFactory.ParseTypeName(text, 0, po, consumeFullText: true),
+        // Roslyn's ParseName takes no options: it parses with CSharpParseOptions.Default.
+        Entry.Name => SyntaxFactory.ParseName(text, 0, consumeFullText: true),
+        Entry.ParameterList => SyntaxFactory.ParseParameterList(text, 0, po, consumeFullText: true),
+        Entry.BracketedParameterList => SyntaxFactory.ParseBracketedParameterList(text, 0, po, consumeFullText: true),
+        Entry.ArgumentList => SyntaxFactory.ParseArgumentList(text, 0, po, consumeFullText: true),
+        Entry.BracketedArgumentList => SyntaxFactory.ParseBracketedArgumentList(text, 0, po, consumeFullText: true),
+        Entry.AttributeArgumentList =>
+            SyntaxFactory.ParseAttributeArgumentList(text, 0, po, consumeFullText: true),
+        _ => throw new ArgumentOutOfRangeException(nameof(entry)),
+    };
 
     /// <summary>The diagnostics of lexed tokens in the order a parse reports them. Tokens out of
     /// <c>ParseTokens</c> belong to no tree, so their own <c>GetDiagnostics()</c> has no location: each token with

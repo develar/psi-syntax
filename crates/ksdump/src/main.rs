@@ -97,6 +97,8 @@ fn usage() -> ! {
          ksdump --lex --list LIST --root ROOT [--full OUT]   C# files: lexer hash lines as tools/csharp-oracle lex prints them\n  \
          ksdump --values --list LIST --root ROOT             C# files: value text lines as tools/csharp-oracle values prints them\n  \
          ksdump --values --check LINES --list LIST --root ROOT   C#: our value text lines against the oracle's `values --kept`\n  \
+         ksdump --directives [--check LINES] --list LIST --root ROOT   C#: directive lines as tools/csharp-oracle directives\n  \
+                prints them (--check: against its cached lines)\n  \
          (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
          C#: --version V, --doc parse|none|diagnose and --define A;B for the list lines without those columns, as\n  \
          tools/csharp-oracle; --bench parses without the symbols)"
@@ -135,6 +137,9 @@ struct Args {
     /// `--values` (C#): the value text lines as `tools/csharp-oracle values --kept` prints them (`--check LINES`:
     /// against those lines).
     values: bool,
+    /// `--directives` (C#): each directive's boolean fields as `tools/csharp-oracle directives` prints them (`--check
+    /// LINES`: against those lines).
+    directives: bool,
     dump: bool,
     trim: bool,
     /// `--threads N`; `--bench` defaults to one thread, the other modes to every core.
@@ -172,6 +177,7 @@ fn parse_args() -> Args {
             "--bench" => args.bench = true,
             "--lex" => args.lex = true,
             "--values" => args.values = true,
+            "--directives" => args.directives = true,
             "--dump" => args.dump = true,
             "--trim" => args.trim = true,
             "--node" => args.node = true,
@@ -674,8 +680,14 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
     format!("{path}\t{}\t{:016x}", csharp_syntax::dump::lexed_tokens(&tree), hash.0)
 }
 
-/// `--values` of a C# file: `dump::value_lines` of its tree, or `PATH<TAB>failure<TAB>REASON`.
-fn csharp_values(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) -> String {
+/// `--values` or `--directives` of a C# file: `lines` (`dump::value_lines`, `dump::directive_lines`) of its tree, or
+/// `PATH<TAB>failure<TAB>REASON`.
+fn csharp_file_lines(
+    parser: &mut csharp_syntax::Parser,
+    root: &Path,
+    line: &str,
+    lines: fn(&str, &csharp_syntax::Tree) -> String,
+) -> String {
     let path = line.split('\t').next().unwrap_or(line);
     let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
     let text = match csharp_source(root, path) {
@@ -686,27 +698,31 @@ fn csharp_values(parser: &mut csharp_syntax::Parser, root: &Path, line: &str) ->
     if tree.has_no_result() {
         return String::new();
     }
-    csharp_syntax::dump::value_lines(path, &tree)
+    lines(path, &tree)
 }
 
 fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
     let paths = read_list(list);
-    if args.values {
+    if args.values || args.directives {
+        if args.values && args.directives {
+            usage();
+        }
         let stdout = std::io::stdout();
         let mut stdout = std::io::BufWriter::new(stdout.lock());
         let schedule = Schedule::new(root, &paths, args.workers());
-        let values = |parsers: &mut Parsers, i: usize| csharp_values(parsers.csharp(), root, &paths[i]);
+        let of_tree = if args.values { csharp_syntax::dump::value_lines } else { csharp_syntax::dump::directive_lines };
+        let per_file = |parsers: &mut Parsers, i: usize| csharp_file_lines(parsers.csharp(), root, &paths[i], of_tree);
         if let Some(lines) = args.check.as_deref() {
-            let differing = check::values(lines, &paths, &schedule, args.workers(), values, &mut stdout);
+            let differing = check::file_lines(lines, &paths, &schedule, args.workers(), per_file, &mut stdout);
             let _ = stdout.flush();
             std::process::exit(if differing == 0 { 0 } else { 1 });
         }
         schedule.run(
             args.workers(),
             || Parsers::new(None),
-            values,
+            per_file,
             |_, text| {
                 let _ = stdout.write_all(text.as_bytes());
             },

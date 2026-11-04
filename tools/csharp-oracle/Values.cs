@@ -94,21 +94,7 @@ static class ValuesMode
         }
         else
         {
-            SyntaxNode? node = entry switch
-            {
-                Entry.CompilationUnit => CSharpSyntaxTree.ParseText(text, po).GetRoot(),
-                Entry.Expression => SyntaxFactory.ParseExpression(text, 0, po, consumeFullText: true),
-                Entry.Statement => SyntaxFactory.ParseStatement(text, 0, po, consumeFullText: true),
-                Entry.Member => SyntaxFactory.ParseMemberDeclaration(text, 0, po, consumeFullText: true),
-                Entry.TypeName => SyntaxFactory.ParseTypeName(text, 0, po, consumeFullText: true),
-                Entry.Name => SyntaxFactory.ParseName(text, 0, consumeFullText: true),
-                Entry.ParameterList => SyntaxFactory.ParseParameterList(text, 0, po, consumeFullText: true),
-                Entry.BracketedParameterList => SyntaxFactory.ParseBracketedParameterList(text, 0, po, consumeFullText: true),
-                Entry.ArgumentList => SyntaxFactory.ParseArgumentList(text, 0, po, consumeFullText: true),
-                Entry.BracketedArgumentList => SyntaxFactory.ParseBracketedArgumentList(text, 0, po, consumeFullText: true),
-                Entry.AttributeArgumentList => SyntaxFactory.ParseAttributeArgumentList(text, 0, po, consumeFullText: true),
-                _ => throw new ArgumentOutOfRangeException(nameof(entry)),
-            };
+            var node = Dumper.Root(text, entry, po);
             if (node == null)
             {
                 return;

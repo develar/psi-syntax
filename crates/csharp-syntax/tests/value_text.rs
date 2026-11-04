@@ -3,6 +3,8 @@
 //! 35d9211b841e7613c1d2f8f5af6d628ace696c4c:src/Compilers/CSharp/Test/Syntax/<path>`), and `values/` against the
 //! oracle's `values` lines of it (`tools/csharp-oracle/oracle.sh values`).
 
+mod common;
+
 use csharp_syntax::{Entry, FileKind, NodeId, SyntaxKind, TokenKind, Tree, dump, facts};
 
 /// `LexToken(text)` of `LexicalTests.cs`: the first token `SyntaxFactory.ParseTokens` makes of `text`, as the tree of
@@ -232,30 +234,12 @@ fn value_lines_equal_the_oracle() {
 /// (the manifest's lines with `.cs` added to the path).
 #[test]
 fn golden_value_lines_equal_the_oracle() {
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/csharp");
-    let Ok(manifest) = std::fs::read_to_string(root.join("manifest.tsv")) else {
+    let Some(ours) = common::golden_lines(dump::value_lines) else {
         println!("no testdata/csharp/manifest.tsv, nothing to compare");
         return;
     };
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/values");
     let oracle = std::fs::read_to_string(dir.join("goldens.values.txt")).expect("the oracle's lines");
-    let mut parser = csharp_syntax::Parser::new();
-    let mut ours = String::new();
-    for line in manifest.lines().filter(|l| !l.trim().is_empty()) {
-        let columns: Vec<&str> = line.split('\t').collect();
-        let kind = FileKind {
-            version: csharp_syntax::LanguageVersion::from_name(columns[1]).expect("a version"),
-            entry: Entry::from_name(columns[2]).expect("an entry"),
-            doc_mode: csharp_syntax::DocumentationMode::from_name(columns[3]).expect("a documentation mode"),
-        };
-        let symbols = csharp_syntax::PreprocessorSymbols::new(columns[4].split(';').filter(|n| !n.is_empty()));
-        let name = format!("{}.cs", columns[0]);
-        let tree = parser.parse_with_symbols(std::fs::read(root.join(&name)).expect("a golden"), kind, &symbols);
-        if !tree.has_no_result() {
-            ours.push_str(&dump::value_lines(&name, &tree));
-        }
-    }
-    let differing: Vec<_> = ours.lines().zip(oracle.lines()).filter(|(a, b)| a != b).take(5).collect();
-    assert!(differing.is_empty() && ours.lines().count() == oracle.lines().count(), "{differing:?}");
+    common::assert_same_lines(&ours, &oracle);
     assert!(oracle.lines().count() > 500);
 }

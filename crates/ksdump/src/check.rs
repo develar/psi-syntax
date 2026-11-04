@@ -136,16 +136,17 @@ pub fn lex(
     differing
 }
 
-/// `--values --check LINES` (C#): the value text lines `values(state, i)` makes of list line `i` (`dump::value_lines`,
-/// none or more a file) against the cached `tools/csharp-oracle/oracle.sh values --kept` lines of the same file
-/// (their first column, the list line's path), every line in order. Prints each differing file's lines (`< ours`,
-/// `> oracle`), the oracle's lines of a file not listed, and `N differing lines of M`. Returns N.
-pub fn values(
+/// `--values --check LINES` and `--directives --check LINES` (C#): the lines `per_file(state, i)` makes of list line
+/// `i` (`dump::value_lines`, `dump::directive_lines`: none or more a file) against the cached lines of
+/// `tools/csharp-oracle/oracle.sh values --kept` or `directives` of the same file (their first column, the list line's
+/// path), every line in order. Prints each differing file's lines (`< ours`, `> oracle`), the oracle's lines of a file
+/// not listed, and `N differing lines of M`. Returns N.
+pub fn file_lines(
     lines: &Path,
     paths: &[String],
     schedule: &Schedule,
     threads: usize,
-    values: impl Fn(&mut Parsers, usize) -> String + Sync,
+    per_file: impl Fn(&mut Parsers, usize) -> String + Sync,
     stdout: &mut impl Write,
 ) -> usize {
     let text = match std::fs::read_to_string(lines) {
@@ -172,7 +173,7 @@ pub fn values(
     schedule.run(
         threads,
         || Parsers::new(None),
-        values,
+        per_file,
         |i, ours| {
             let path = paths[i].split('\t').next().unwrap_or(&paths[i]);
             let oracle = expected.remove(path).unwrap_or_default();

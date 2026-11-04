@@ -252,7 +252,29 @@ pub fn value_lines(path: &str, tree: &Tree) -> String {
     out
 }
 
-/// The `index.jsonl` line of a dumped file: `{"path":…,"errors":N,"firstError":"CSnnnn [s..e) message"|null}`.
+/// What `tools/csharp-oracle/oracle.sh directives` prints of a tree (its README, "Directives"): a line
+/// `PATH<TAB>Kind<TAB>START<TAB>END<TAB>FLAGS` for each directive of `Tree::directives`, in document order, START and
+/// END the node's range (the trivia's full span), FLAGS `A`, `T` and `V` for `IsActive`, `BranchTaken` and
+/// `ConditionValue` (`DirectiveFlags`), each else `-`.
+pub fn directive_lines(path: &str, tree: &Tree) -> String {
+    let mut out = String::new();
+    let flag = |on: bool, c: char| if on { c } else { '-' };
+    for (id, flags) in tree.directives() {
+        let kind = tree.node_kind(id).map_or("", |k| k.debug_name());
+        let range = tree.range(id);
+        out.push_str(&format!(
+            "{path}\t{kind}\t{}\t{}\t{}{}{}\n",
+            range.start,
+            range.end,
+            flag(flags.is_active(), 'A'),
+            flag(flags.branch_taken(), 'T'),
+            flag(flags.condition_value(), 'V'),
+        ));
+    }
+    out
+}
+
+/// The `index.jsonl` line of a dumped file:`{"path":…,"errors":N,"firstError":"CSnnnn [s..e) message"|null}`.
 pub fn index_line(path: &str, tree: &Tree) -> String {
     let mut out = String::from("{\"path\":");
     json_string(path, &mut out);

@@ -38,16 +38,20 @@
 #  11. C# with preprocessor symbols (`CSharpParseOptions.WithPreprocessorSymbols`, the list's SYMBOLS column): the files
 #      of the roslyn and Avalonia corpora whose #if and #elif conditions name a symbol, with every one of them defined
 #      (tools/csharp-oracle/defines.py), our dumps and lexer lines (`--doc parse`) against the cached oracle's, 0
-#      differing.
+#      differing;
+#  12. C#'s directives (`Tree::directives`, `ksdump --directives --check`): each directive's IsActive, BranchTaken and
+#      ConditionValue on the four corpora, the -defines lists of step 11, the golden mutations at their list's columns
+#      and the lexer fuzz against the cached lines of `tools/csharp-oracle/oracle.sh directives` (Roslyn's directive
+#      trivia), 0 differing lines; the goldens' are step 1's (crates/csharp-syntax/tests/directives.rs).
 # A dump comparison is `ksdump --check ORACLE`: every dump made in memory and compared byte for byte with the oracle's
 # file, what `diff -rq -x index.jsonl ORACLE OURS` checked of written dumps (a dump that differs, one that either side
 # lacks, an oracle directory without dumps; index.jsonl is not compared, so a file the oracle failed on must have no
 # dump of ours either). A lexer comparison is `ksdump --lex --check LINES`, line by line against the cached lines (a
 # Kotlin line's first two columns, as LexOracle.java prints them). Each runs on every core, one parser per thread; a new
-# corpus is one line calling `dumps`, `lex`, `values` or `bodies` in its language's section. The sections run in three
-# lanes at once (see `lane` below).
+# corpus is one line calling `dumps`, `lex`, `values`, `directives` or `bodies` in its language's section. The sections
+# run in three lanes at once (see `lane` below).
 # Prints PASS or the first failures and exits nonzero. The caches are made once (see the fuzz scripts' docstrings;
-# the value text lines: tools/csharp-oracle/README.md, "Value texts").
+# the value text lines and the directive lines: tools/csharp-oracle/README.md, "Value texts", "Directives").
 # Each run's logs and differing dumps go to a fresh directory under ~/.cache/psi-syntax/ours/ (concurrent sessions
 # share the machine), removed on PASS and kept, with its path printed, on FAIL.
 set -u
@@ -91,6 +95,12 @@ lex() {
 values() {
   name=$1 lines=$2; shift 2
   $B --values --check "$lines" "$@" > "$O/$name.log" 2>&1
+  report "$name" $?
+}
+# directives NAME LINES ARGS...: `ksdump --directives --check LINES ARGS...`.
+directives() {
+  name=$1 lines=$2; shift 2
+  $B --directives --check "$lines" "$@" > "$O/$name.log" 2>&1
   report "$name" $?
 }
 # bodies NAME ARGS...: `ksdump --check-bodies ARGS...`, nonzero on a differing body or a tree whose leaves are not the
@@ -222,6 +232,23 @@ csharp_defines() {
   return $f
 }
 
+# csharp_directives: step 12, each directive's boolean fields against the cached `directives` lines (made with the
+# lists' own columns).
+csharp_directives() {
+  f=0
+  for corpus in "$C/corpus/csharp-roslyn-35d9211.list $C/csharp-src/roslyn csharp-roslyn-35d9211" \
+    "$C/corpus/csharp-runtime-6aa72da.list $C/csharp-src/runtime csharp-runtime-6aa72da" \
+    "$C/corpus/csharp-aspnetcore-0ef4bbf.list $C/csharp-src/aspnetcore csharp-aspnetcore-0ef4bbf" \
+    "$C/corpus/csharp-avalonia-2d79ba5.list $C/csharp-src/avalonia csharp-avalonia-2d79ba5" \
+    "$C/corpus/csharp-roslyn-35d9211-defines.list $C/csharp-src/roslyn csharp-roslyn-35d9211-defines" \
+    "$C/corpus/csharp-avalonia-2d79ba5-defines.list $C/csharp-src/avalonia csharp-avalonia-2d79ba5-defines" \
+    "$C/fuzz/csharp-mut.list $C/fuzz/csharp-mut csharp-mut" "$C/fuzz/csharp-lex/list $C/fuzz/csharp-lex csharp-lex"; do
+    set -- $corpus
+    directives csharp-directives-$3 "$C/directives/$3.txt" --lang csharp --list "$1" --root "$2" || f=1
+  done
+  return $f
+}
+
 # Three lanes at once, each ksdump on every core: the work of a lane is mostly parallel, but each C# lane waits some
 # 20 s per pass on the runtime's 24 MB hugeexpr1.cs alone, which the other lanes fill. A lane's sections write to
 # $O/SECTION.out, printed in this order once all are done.
@@ -230,9 +257,9 @@ lane() {
 }
 lane kotlin java csharp_lex &
 lane csharp_latest &
-lane csharp_preview csharp_defines &
+lane csharp_preview csharp_defines csharp_directives &
 wait
 cat "$O/kotlin.out" "$O/java.out" "$O/csharp_lex.out" "$O/csharp_latest.out" "$O/csharp_preview.out" \
-  "$O/csharp_defines.out"
+  "$O/csharp_defines.out" "$O/csharp_directives.out"
 [ -e "$O/failed" ] && fail=1
 [ $fail = 0 ] && { rm -rf "$O"; echo PASS; } || { echo "FAIL (logs and our differing dumps: $O)"; exit 1; }
