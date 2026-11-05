@@ -87,6 +87,16 @@ const UNLINKED: u32 = u32::MAX;
 /// The bit of an extra node (`PsiBuilderImpl::extra_links`).
 const EXTRA: u32 = 1 << 31;
 
+/// Where `PsiBuilderImpl::flatten_and_balance` is: the next entry and its node, `balanceWhiteSpaces`' `lastIndex` and
+/// the balanced lexeme of the entry before.
+#[derive(Copy, Clone)]
+struct BalanceWalk {
+    i: usize,
+    node: u32,
+    last_index: i32,
+    prev: i32,
+}
+
 /// The production list's links as `PsiBuilderImpl::link_slices` lends them.
 struct LinkSlices<'a, T, N, B> {
     markers: &'a mut [MarkerData<T, N, B>],
@@ -1572,40 +1582,78 @@ impl<L: Language> PsiBuilderImpl<L> {
             text: &self.text[self.base..self.base + self.len],
         };
         let markers = &mut self.markers[..];
-        // `balanceWhiteSpaces`' `lastIndex` and the balanced lexeme of the entry before.
-        let (mut last_index, mut prev) = (0i32, 0i32);
         // No extra node is linked: every node is a marker's own, `2 * id` its start, `2 * id + 1` its done.
-        let mut node = markers[0].links[0][1];
-        let last = size - 1;
-        for (i, slot) in entries.iter_mut().enumerate() {
-            let item_id = node >> 1;
-            let done = node & 1 != 0;
-            let m = &mut markers[item_id as usize];
-            let next = m.links[done as usize][1];
-            let (mut lex, binder, ty, flags);
-            if m.kind == MarkerKind::Error {
-                (lex, binder, ty, flags) = (m.lexeme_index, L::Binder::DEFAULT_RIGHT_BINDER, 0, ENTRY_ERROR_ITEM);
-            } else if done {
-                (lex, binder, ty, flags) = (m.done_lexeme, m.right_binder, 0, 0);
-            } else {
-                ty = m.element_type.map_or(error_index, |t| t.index() as u16);
-                flags = if m.collapsed { ENTRY_COLLAPSED } else { 0 };
-                (lex, binder) = (m.lexeme_index, m.left_binder);
+        let mut walk = BalanceWalk { i: 0, node: markers[0].links[0][1], last_index: 0, prev: 0 };
+        // Runs of entries whose binders are the defaults, in a walk without calls; each entry with another binder
+        // between them takes the general step, which calls `custom_edge`.
+        loop {
+            Self::balance_defaults(&mut walk, &mut entries, markers, &view, error_index);
+            if walk.i == size {
+                break;
             }
-            if i != 0 && i != last {
-                let balanced = view.balanced_lexeme::<L>(binder, lex, last_index, prev);
-                if balanced != lex {
-                    lex = balanced;
-                    m.set_lexeme_index(lex, done);
-                }
-                last_index = lex;
-            }
-            prev = lex;
-            let id = if done { -(item_id as i32) } else { item_id as i32 };
-            *slot = Entry { id, lex, ty, flags };
-            node = next;
+            Self::balance_step::<false>(&mut walk, &mut entries, markers, &view, error_index);
         }
         self.entries = entries;
+    }
+
+    /// `flatten_and_balance`'s steps from `walk.i` while each entry's binder is a default one (or the entry is the
+    /// first or the last, which keep their lexemes), up to the end or the first other entry, which it leaves.
+    #[inline(never)]
+    fn balance_defaults(
+        walk: &mut BalanceWalk,
+        entries: &mut [Entry],
+        markers: &mut [MarkerData<L::Token, L::Node, L::Binder>],
+        view: &TokenView<'_, L::Token>,
+        error_index: u16,
+    ) {
+        let mut w = *walk;
+        while w.i < entries.len() && Self::balance_step::<true>(&mut w, entries, markers, view, error_index) {}
+        *walk = w;
+    }
+
+    /// One step of `flatten_and_balance`: entry `walk.i` from node `walk.node`, read from its marker, balanced, its
+    /// balanced lexeme written back to the marker. With `DEFAULTS` an entry whose binder needs `custom_edge` is left
+    /// untouched and the step answers false.
+    #[inline(always)]
+    fn balance_step<const DEFAULTS: bool>(
+        walk: &mut BalanceWalk,
+        entries: &mut [Entry],
+        markers: &mut [MarkerData<L::Token, L::Node, L::Binder>],
+        view: &TokenView<'_, L::Token>,
+        error_index: u16,
+    ) -> bool {
+        let (i, node) = (walk.i, walk.node);
+        let item_id = node >> 1;
+        let done = node & 1 != 0;
+        let m = &mut markers[item_id as usize];
+        let next = m.links[done as usize][1];
+        let (mut lex, binder, ty, flags);
+        if m.kind == MarkerKind::Error {
+            (lex, binder, ty, flags) = (m.lexeme_index, L::Binder::DEFAULT_RIGHT_BINDER, 0, ENTRY_ERROR_ITEM);
+        } else if done {
+            (lex, binder, ty, flags) = (m.done_lexeme, m.right_binder, 0, 0);
+        } else {
+            ty = m.element_type.map_or(error_index, |t| t.index() as u16);
+            flags = if m.collapsed { ENTRY_COLLAPSED } else { 0 };
+            (lex, binder) = (m.lexeme_index, m.left_binder);
+        }
+        if i != 0 && i != entries.len() - 1 {
+            if DEFAULTS && binder != L::Binder::DEFAULT_LEFT_BINDER && binder != L::Binder::DEFAULT_RIGHT_BINDER {
+                return false;
+            }
+            let balanced = view.balanced_lexeme::<L>(binder, lex, walk.last_index, walk.prev);
+            if balanced != lex {
+                lex = balanced;
+                m.set_lexeme_index(lex, done);
+            }
+            walk.last_index = lex;
+        }
+        walk.prev = lex;
+        let id = if done { -(item_id as i32) } else { item_id as i32 };
+        entries[i] = Entry { id, lex, ty, flags };
+        walk.node = next;
+        walk.i = i + 1;
+        true
     }
 
     /// `flatten_and_balance` in two passes, as the Java: the production made into the array, every lexeme read from

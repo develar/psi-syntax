@@ -191,17 +191,18 @@ What the port adds to the hot path:
 
 Marker storage:
 
-- **`MarkerData`** is 20 bytes. It holds kind, collapsed, the binders, element type, lexeme, done lexeme and the
-  nesting where it was collapsed. An error message lives in a side table and is addressed by a `u32`. There are no
-  light-tree links.
-- **The production is a doubly linked list while parsing**, not Java's `IntArrayList`. `links[node]` is
-  `[prev, next]`; node `2·id` is marker `id`'s start entry and `2·id + 1` its done entry, so `indexOf` is the marker's
-  own node and `precede`, `doneBefore`, `errorBefore`, `drop` and `rollbackTo` touch only the entries they add or
-  remove. Java inserts into and removes from the middle of its array (`ArrayList.add(index, …)`), and finds an entry
-  by a linear window, a binary search by lexeme and a walk over the markers at that lexeme; a chain `a+a+…` preceded
-  the same far-back marker at every operator, quadratic: 4.67 s for 100 000 operators on c796e73. The order of entries,
-  and so the tree, is the array's. A marker done twice (Java only logs it) gets an extra done node; while one is
-  linked, `drop` finds a marker's last done entry by walking back, as `lastIndexOf` does.
+- **`MarkerData`** is 36 bytes. It holds kind, collapsed, the binders, element type, lexeme, done lexeme, the
+  nesting where it was collapsed and the production links of its two entries. An error message lives in a side table
+  and is addressed by a `u32`. There are no light-tree links.
+- **The production is a doubly linked list while parsing**, not Java's `IntArrayList`. Each node's `[prev, next]` is
+  in its marker's record; node `2·id` is marker `id`'s start entry and `2·id + 1` its done entry, so `indexOf` is the
+  marker's own node and `precede`, `doneBefore`, `errorBefore`, `drop` and `rollbackTo` touch only the entries they
+  add or remove. Java inserts into and removes from the middle of its array (`ArrayList.add(index, …)`), and finds an
+  entry by a linear window, a binary search by lexeme and a walk over the markers at that lexeme; a chain `a+a+…`
+  preceded the same far-back marker at every operator, quadratic: 4.67 s for 100 000 operators on c796e73. The order
+  of entries, and so the tree, is the array's. A marker done twice (Java only logs it) gets an extra done node; while
+  one is linked, `drop` finds a marker's last done entry by walking back, as `lastIndexOf` does. The edits go through
+  the markers as a slice in locals (`LinkSlices`), whose pointer and length stay in registers across their stores.
 - **`entries`** is the list made into one array by `prepare_light_tree` and balanced in the same walk
   (`flatten_and_balance`): each entry's id, its balanced lexeme and, for a start entry, its element type and whether
   it is collapsed, so `bind` reads one contiguous array and no marker on its common path. The walk reads each lexeme
@@ -907,6 +908,57 @@ straight-line walk alone 327.5 M, with the fast path 280.3 M, with the tables 27
 This Mac (load 50-100) gave the same instructions: roslyn 41.06 → 39.13 G (-4.7 %), runtime 109.71 → 104.87 G
 (-4.4 %). Flatten is now about 12 % of the instructions; the lexer (`Lexer::lex` 12.4 %, `quick_token` 4.4 %) and
 `SyntaxParser::current_kind` (6.8 %, its arena budget check on every call) lead the profile.
+
+### The builder's common paths without calls, 2026-11-05
+
+The first line-level profile of the current Kotlin code (the open item "Next profile"): callgrind (valgrind 3.19 in
+`rust:1.99.1-bookworm` under Docker, ksdump's `psi` profile built there, `--dump-instr=yes`) over every 17th file of
+the community list (3265 files), mapped onto `objdump -d`, with `scripts/profile.py` on this Mac for time. Of
+2061.7 M instructions the builder took about half: `mark` 342.9 M (16.6 %), `bind_entries` 295.0 (14.3 %), balancing
+193.9 and `custom_edge` 18.9 (10.3 %), `rollback_to`, `drop_marker` and `add_done` 117.8, 112.9 and 98.4 (16.0 %),
+against the lexer's 161.5 (7.8 %) and the parsers' own methods at 1-2 % each. It was C#'s flatten pattern again: a
+hot loop's state on the stack around a cold call, and a vector's pointer and length reloaded after every store
+through it. Three commits, trees byte-identical (gate PASS on each commit's tree):
+
+- **bind** ("bind writes a builder's nodes into slots without calls"): `TreeData` keeps its node vector filled to its
+  capacity with the count of built nodes beside it (`slots`, `set_built`), so `bind_entries` writes leaves and
+  composites by index with the count in a register, and returns to `bind_steps` for an error element, an error item
+  or a full buffer. The builder core batch's "nodes written in place without a growth check" (+0.55 G) wrote past a
+  reserved length; here the check stays, against a slice in registers.
+- **markers** ("a marker's production links live in its record, edited over local slices"): the production list's
+  links are `MarkerData::links`, so a new marker is one push, not three, and list edits go through `LinkSlices`, the
+  markers and the extra nodes as slices in locals; `mark` and `error` write a new marker's lexeme and start entry in
+  one access (`link_last`), `done` its own done entry the same way, `rollbackTo` cuts its tail with the counts in
+  locals and restores remapped tokens out of line. The links moved into the record alone measured 2005.1 → 2000.0 M;
+  the rest came with the slices.
+- **balance** ("balance walks entries with default binders in a function without calls"): `balance_defaults` walks
+  the entries whose binders are the defaults (about 95 % of them) without calls and stops before any other, which
+  `balance_step::<false>` takes with its call to `custom_edge`.
+
+callgrind, M instructions, Kotlin's subset:
+
+| function | before | bind | markers | balance |
+|---|---|---|---|---|
+| `mark` | 342.9 | 342.9 | 277.2 | 277.2 |
+| `bind_entries` | 295.0 | 237.9 | 228.7 | 228.7 |
+| balancing (`begin_bind`, then `balance_defaults`) | 193.9 | 193.8 | 199.2 | 183.1 |
+| `rollback_to` | 117.8 | 117.8 | 116.1 | 116.1 |
+| `drop_marker` | 112.9 | 112.9 | 132.9 | 132.9 |
+| `add_done` | 98.4 | 98.4 | 87.3 | 87.3 |
+| the whole run | 2061.7 | 2005.1 (-2.7 %) | 1921.5 (-6.8 %) | 1916.8 (-7.0 %) |
+
+The same over every 17th file of the community `.java` list (4016 files), before → after the three: 2533.7 →
+2354.9 M (-7.1 %; `bind_entries` 420.1 → 390.2, balancing 307.2 → 279.7, `add_done` 221.2 → 154.5).
+
+On the Mac Studio, `scripts/ab.sh` with `KS_INSTR=1`, `--nice 0`, one thread, 7 alternating rounds over the whole
+lists, forced at load 18-32 (other sessions' runs held it; no quiet window in 30 min), before → after the three:
+Kotlin 35.49 → 33.91 G instructions a round (-4.5 %), Java 43.68 → 40.73 G (-6.8 %). Wall time and cycles at that
+load resolve nothing (Kotlin 60.4 → 58.1 MB/s, Java 56.1 → 64.7, rounds of one binary 43-72 MB/s); a quiet run is
+owed ("Open items").
+
+The builder still leads the profile: `mark` 14.5 %, `bind_entries` 11.9 %, `balance_defaults` 9.5 %, the lexer
+8.4 %, `drop_marker` 6.9 %, `rollback_to` 6.1 %, `advance_lexer` 5.8 % (about 70 instructions a call, no spill left
+to remove).
 
 ### The stack budget (JetBrains/accio#206, child of 79a11817), 2026-11-04
 
@@ -1636,8 +1688,11 @@ There is no line-level profile of the current code: `atos` returned no line info
 - **Remaining copies.** `lex_types` is copied into each chameleon builder (remap mutates it), and the text is copied
   into the tree's `Arc` per file. Sharing the file's token starts measured 0.999× and was reverted; revisit it
   together with frame memory.
-- **Next profile.** The current code has not been profiled at line level. Take one before choosing further cursor
-  work.
+- **The builder's speed on a quiet host.** "The builder's common paths without calls" measured instructions only
+  (callgrind, and the Studio at load 18-32); repeat `scripts/ab.sh` against 9de0f263 on a quiet host for its wall
+  time on both languages.
+- **Next profile.** "The builder's common paths without calls" has the callgrind profile of the Kotlin parse and how
+  to take one; `mark`, `drop_marker` and `rollback_to` (the parsers' speculative marks) lead it with `bind_entries`.
 
 ### Rejected
 
@@ -1659,5 +1714,6 @@ There is no line-level profile of the current code: `atos` returned no line info
 | C#: quick-scanned tokens sharing one record, as Roslyn's map shares its green token | Slower on one thread in the prototype, and flatten would have to guess where a shared token's text is; the map holds the token's shape and a hit pushes new records instead |
 | C#: both trivia lists of a token packed into one run of `trivia_refs` (36-byte token records) | +4 % instructions (the split on every access) |
 | C#: exact subtree node counts in the green records, so flatten sizes the tree exactly | Estimated under 1 %: `tree_node_estimate` overshoots by the garbage and the second walk is rare (14 runtime files) |
+| `drop_marker`'s own path while no extra node is linked (both entries unlinked in one loop over local slices) | +12.8 % of its instructions (132.9 → 149.9 M, callgrind, "The builder's common paths without calls") |
 | C#: `flatten::fast`'s leaf and trivia loop as `#[inline(always)]` methods of `Hot` instead of local macros over its locals; its current run without the token field | +7.8 % and +1.0 % of `fast`'s instructions (callgrind, "C# flatten without calls"): the register allocator spilled more of the walk's state |
 | Shared token starts for chameleons | Measured 0.999× (1 thread) and 0.995× (16 threads); a copy into a warm buffer costs as much as the extra arithmetic on each access |
