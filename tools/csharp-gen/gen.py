@@ -277,7 +277,7 @@ pub enum NodeKind {{""")
     node_index = {n: i for i, n in enumerate(nodes)}
     o.append(f"const RAW_BASE: u16 = {base};")
     o.append(f"/// `TokenKind` index + 1 (0: none) of `SyntaxKind` raw - `RAW_BASE`.")
-    o.append(f"static TOKEN_OF_RAW: [u16; {span}] = [")
+    o.append(f"const TOKEN_OF_RAW: [u16; {span}] = [")
     row = []
     for v in range(base, base + span):
         n = by_value.get(v)
@@ -285,13 +285,30 @@ pub enum NodeKind {{""")
     o.extend(wrap_numbers(row))
     o.append("];")
     o.append(f"/// `NodeKind` index + 1 (0: none) of `SyntaxKind` raw - `RAW_BASE`.")
-    o.append(f"static NODE_OF_RAW: [u16; {span}] = [")
+    o.append(f"const NODE_OF_RAW: [u16; {span}] = [")
     row = []
     for v in range(base, base + span):
         n = by_value.get(v)
         row.append(str(node_index[n] + 1 if n in node_index else 0))
     o.extend(wrap_numbers(row))
     o.append("];")
+    o.append(f"""/// The `TokenKind` of `SyntaxKind` raw - `RAW_BASE` (`SyntaxKind::token_kind`, one load).
+static TOKEN_KIND_OF_RAW: [Option<TokenKind>; {span}] = kinds_of_raw(&TOKEN_OF_RAW, &TOKEN_KIND_VALUES);
+/// The `NodeKind` of `SyntaxKind` raw - `RAW_BASE` (`SyntaxKind::node_kind`, one load).
+static NODE_KIND_OF_RAW: [Option<NodeKind>; {span}] = kinds_of_raw(&NODE_OF_RAW, &NODE_KIND_VALUES);
+
+/// The kinds of `raw`'s indices + 1 (0: none) into `values`, built at compile time.
+const fn kinds_of_raw<K: Copy, const N: usize, const M: usize>(raw: &[u16; N], values: &[K; M]) -> [Option<K>; N] {{
+    let mut kinds = [None; N];
+    let mut i = 0;
+    while i < N {{
+        if raw[i] != 0 {{
+            kinds[i] = Some(values[raw[i] as usize - 1]);
+        }}
+        i += 1;
+    }}
+    kinds
+}}""")
     o.append(f"static TOKEN_SYNTAX_KIND: [SyntaxKind; {len(token_kinds)}] = [")
     o.extend(f"    SyntaxKind::{n}," for n in token_kinds)
     o.append("];")
@@ -338,28 +355,20 @@ pub enum NodeKind {{""")
     /// The leaf kind of a token or unstructured trivia kind.
     #[inline]
     pub fn token_kind(self) -> Option<TokenKind> {{
-        let i = (self as u16).wrapping_sub(RAW_BASE) as usize;
-        match TOKEN_OF_RAW.get(i) {{
-            Some(&k) if k != 0 => Some(TOKEN_KIND_VALUES[k as usize - 1]),
-            _ => None,
-        }}
+        TOKEN_KIND_OF_RAW.get((self as u16).wrapping_sub(RAW_BASE) as usize).copied().flatten()
     }}
 
     /// The node kind of a kind of Syntax.xml's node types.
     #[inline]
     pub fn node_kind(self) -> Option<NodeKind> {{
-        let i = (self as u16).wrapping_sub(RAW_BASE) as usize;
-        match NODE_OF_RAW.get(i) {{
-            Some(&k) if k != 0 => Some(NODE_KIND_VALUES[k as usize - 1]),
-            _ => None,
-        }}
+        NODE_KIND_OF_RAW.get((self as u16).wrapping_sub(RAW_BASE) as usize).copied().flatten()
     }}
 }}
 
-static TOKEN_KIND_VALUES: [TokenKind; {len(token_kinds)}] = [""")
+const TOKEN_KIND_VALUES: [TokenKind; {len(token_kinds)}] = [""")
     o.extend(f"    TokenKind::{n}," for n in token_kinds)
     o.append("];")
-    o.append(f"static NODE_KIND_VALUES: [NodeKind; {len(nodes)}] = [")
+    o.append(f"const NODE_KIND_VALUES: [NodeKind; {len(nodes)}] = [")
     o.extend(f"    NodeKind::{n}," for n in nodes)
     o.append("];\n")
     o.append(f"""impl TokenKind {{

@@ -20,7 +20,9 @@
 //! A file's tree is written in place: `run_columns` walks the arena's records (`Records`) and writes each node by its
 //! id into the tree builder's columns, sized up front to `GreenArena::tree_node_estimate` (`TreeBuilder::writer`), so
 //! the walk keeps the next id, the position and the run of slots it is in in registers and pushes only what it comes
-//! back to. A tree of more nodes than the estimate (records shared by two parents) is walked again into columns of its
+//! back to. Its common elements (nodes, tokens and trivia without rare fields whose text is the source's where they
+//! are) go through `fast`, a function without calls, so that none of that state is spilled around the calls the rest
+//! needs. A tree of more nodes than the estimate (records shared by two parents) is walked again into columns of its
 //! exact size, which the first walk counted. `flatten_tokens` (a lexer's tokens, Roslyn's tests) walks frames through
 //! the builder's push API.
 
@@ -48,27 +50,33 @@ enum Frame {
     Token { green: Green, parent: NodeId, phase: u8, index: u32 },
 }
 
-/// Where the column walk resumes (`Flattener::run_columns`).
+/// A run of the column walk (`Flattener::run_columns`): the elements `at..end` of the arena's slots (or, with `TRIVIA`,
+/// of its trivia references), children of the tree node `parent`. `CLOSES`: `parent` closes after them; `IN_LIST`: they
+/// are a list's elements, so a list among them is a composite of its own (`next_child`); `TRIVIA`: a token's trivia
+/// after a structured one, trailing with `TRAILING`, else its leading trivia with `token` and its trailing trivia to
+/// follow.
 #[derive(Copy, Clone, Debug)]
-enum Fast {
-    /// A run of slots to come back to.
-    Slots(Slots),
-    /// The rest of a token's trivia after a structured one: trivia `at..end` of the arena's trivia references,
-    /// trailing or not; when `token` is not null they are its leading trivia, and the token and its trailing trivia
-    /// follow.
-    Trivia { at: u32, end: u32, parent: u32, trailing: bool, token: Green },
-}
-
-/// The elements `at..end` of the arena's slots, children of the tree node `parent`; `close`, when not `NONE`, is the
-/// tree node to close after them; `in_list`: they are a list's elements, so a list among them is a composite of its
-/// own (`next_child`).
-#[derive(Copy, Clone, Debug)]
-struct Slots {
+struct Run {
     at: u32,
     end: u32,
     parent: u32,
-    close: u32,
-    in_list: bool,
+    flags: u32,
+    token: Green,
+}
+
+const CLOSES: u32 = 1;
+const IN_LIST: u32 = 2;
+const TRIVIA: u32 = 4;
+const TRAILING: u32 = 8;
+
+impl Run {
+    /// No elements, closing nothing.
+    const EMPTY: Run = Run { at: 0, end: 0, parent: 0, flags: 0, token: Green::NULL };
+
+    #[inline(always)]
+    fn slots(at: u32, end: u32, parent: u32, flags: u32) -> Run {
+        Run { at, end, parent, flags, token: Green::NULL }
+    }
 }
 
 const NONE: u32 = u32::MAX;
@@ -78,7 +86,7 @@ const NONE: u32 = u32::MAX;
 pub(crate) struct Flattener {
     stack: Vec<Frame>,
     /// The column walk's stack (`run_columns`).
-    fast: Vec<Fast>,
+    fast: Vec<Run>,
 }
 
 /// What a walk returns: the tree, its diagnostics in Roslyn's order, the value texts of its tokens whose
@@ -353,85 +361,230 @@ impl Flattener {
     }
 
     /// The tree of `root` from id `first` into columns written by id (`ColumnWriter`), in the order of `run`'s
-    /// frames: the ids, the running position and where the next source text is stay in registers, the current run of
-    /// slots too, and only the runs to come back to go on the stack; a token's trivia are walked in place unless one
-    /// is structured. The tree's nodes are `first..` the returned end, which is past the writer's columns when the
-    /// tree does not fit them (the writes past them dropped).
+    /// frames. `fast` walks what needs no call (tokens and trivia whose text is the source's where they are, nodes and
+    /// tokens without rare fields) with the ids, the position, the current run and the stack's depth in registers;
+    /// what it leaves comes back here (`Exit`). The tree's nodes are `first..` the returned end, which is past the
+    /// writer's columns when the tree does not fit them (the writes past them dropped).
     fn run_columns(&mut self, walk: &mut Walk<'_>, w: &mut ColumnWriter<'_, CSharp>, root: Green, first: u32) -> u32 {
         let r = walk.arena.records();
         let stack = &mut self.fast;
-        stack.clear();
-        let mut hot = Hot { id: first, pos: 0, src_next: 0, diverged: false };
-        let mut cur;
+        if stack.is_empty() {
+            stack.resize(64, Run::EMPTY);
+        }
+        let mut st = State { cur: Run::EMPTY, hot: Hot { id: first, pos: 0, src_next: 0, diverged: false }, depth: 0 };
         if root.is_token() {
             // not a tree Roslyn makes: the token under a compilation unit
-            let id = hot.id;
+            let id = st.hot.id;
             w.open(id, None, ElementType::Node(NodeKind::CompilationUnit), 0, false);
-            hot.id += 1;
-            match hot.trivia_run(walk, w, r, Run::leading_of(r, root, id), stack) {
-                Some(next) => {
-                    stack.insert(0, Fast::Slots(Slots { at: 0, end: 0, parent: id, close: id, in_list: false }));
-                    cur = next;
-                }
-                None => cur = Slots { at: 0, end: 0, parent: id, close: id, in_list: false },
+            st.hot.id += 1;
+            st.cur = Run::slots(0, 0, id, CLOSES);
+            if let Some((structure, rest)) = st.hot.token(walk, w, r, id, root) {
+                st.descend(stack, structure, Some(rest));
             }
         } else {
-            cur = hot.open(walk, w, r, NONE, root, false);
+            st.cur = st.hot.open(walk, w, r, NONE, root, false);
         }
         loop {
-            while cur.at < cur.end {
-                let child = r.slots[cur.at as usize];
-                cur.at += 1;
-                match child.tag() {
-                    TAG_TOKEN => {
-                        let below = stack.len();
-                        if let Some(next) = hot.trivia_run(walk, w, r, Run::leading_of(r, child, cur.parent), stack) {
-                            // under the rest of the token: the slots after it come back after the token is done
-                            stack.insert(below, Fast::Slots(cur));
-                            cur = next;
-                        }
+            match fast(&mut st, r, w, stack) {
+                Exit::Done => {
+                    walk.position = st.hot.pos;
+                    return st.hot.id;
+                }
+                Exit::Grow => {
+                    let len = stack.len();
+                    stack.resize(len * 2, Run::EMPTY);
+                }
+                Exit::Token(child) => {
+                    if let Some((structure, rest)) = st.hot.token(walk, w, r, st.cur.parent, child) {
+                        // under the rest of the token: the slots after it come back after the token is done
+                        st.descend(stack, structure, Some(rest));
                     }
-                    TAG_LIST if !cur.in_list => {
-                        let d = &r.nodes[child.index()];
-                        stack.push(Fast::Slots(cur));
-                        cur = Slots {
-                            at: d.slot_start,
-                            end: d.slot_start + d.slot_count,
+                }
+                Exit::Node(child) => {
+                    let next = st.hot.open(walk, w, r, st.cur.parent, child, false);
+                    st.descend(stack, next, None);
+                }
+                Exit::Leaves(run) => {
+                    if let Some((structure, rest)) = st.hot.leaves(walk, w, r, run) {
+                        st.descend(stack, structure, Some(rest));
+                    }
+                }
+                Exit::Popped(run) => {
+                    // a token's trivia after a structured one; then on with the runs below it (`fast` left the
+                    // current run empty)
+                    if let Some((structure, rest)) = st.hot.leaves(walk, w, r, run) {
+                        st.cur = structure;
+                        st.push(stack, rest);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The column walk's state between `fast` and `Flattener::run_columns`: the current run, the running state, and
+/// the depth of the stack, whose runs are `stack[..depth]`.
+struct State {
+    cur: Run,
+    hot: Hot,
+    depth: usize,
+}
+
+impl State {
+    /// Pushes `run` on the stack.
+    #[inline]
+    fn push(&mut self, stack: &mut Vec<Run>, run: Run) {
+        if self.depth == stack.len() {
+            stack.resize(self.depth * 2 + 64, Run::EMPTY);
+        }
+        stack[self.depth] = run;
+        self.depth += 1;
+    }
+
+    /// Goes down into `next`, the current run pushed, and over it `rest` (the rest of a token's trivia).
+    #[inline]
+    fn descend(&mut self, stack: &mut Vec<Run>, next: Run, rest: Option<Run>) {
+        self.push(stack, self.cur);
+        if let Some(rest) = rest {
+            self.push(stack, rest);
+        }
+        self.cur = next;
+    }
+}
+
+/// Why `fast` stopped.
+enum Exit {
+    /// The stack is empty: the tree is done.
+    Done,
+    /// The stack is full: it grows, and the walk goes on where it was.
+    Grow,
+    /// The token `Green` of the current run, not yet walked, needs more than `fast` does.
+    Token(Green),
+    /// The node or list, not yet opened.
+    Node(Green),
+    /// The rest of a token that `fast` began (`Hot::leaves`).
+    Leaves(Run),
+    /// A run of a token's trivia came off the stack (`Hot::leaves`).
+    Popped(Run),
+}
+
+/// The column walk's fast path: everything `Flattener::run_columns` would do but what needs a call, in a function
+/// without calls, so that its state stays in registers. A token goes here when it has no rare fields and its text is
+/// the source's where it is, a trivia when it is unstructured, without rare fields and its text the source's; a
+/// node or list without rare fields. It stops before anything else (`Exit`), its state in `st`.
+#[inline(never)]
+fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack: &mut [Run]) -> Exit {
+    let mut cur = st.cur;
+    let Hot { mut id, mut pos, mut src_next, diverged } = st.hot;
+    let mut depth = st.depth;
+    macro_rules! exit {
+        ($e:expr) => {{
+            st.cur = cur;
+            st.hot = Hot { id, pos, src_next, diverged };
+            st.depth = depth;
+            return $e;
+        }};
+    }
+    // a leaf of `$kind` over the source's `$width` bytes at `$start`, where the leaf is
+    macro_rules! source_leaf {
+        ($parent:expr, $kind:expr, $start:expr, $width:expr, $trailing:expr) => {{
+            let end = pos.wrapping_add($width);
+            w.leaf(id, $parent, $kind.token_kind().unwrap_or(TokenKind::BadToken), pos, end, $trailing, false);
+            id += 1;
+            src_next = $start.saturating_add($width);
+            pos = end;
+        }};
+    }
+    // the leaves of the trivia `$list` up to one that is structured, has rare fields or a text not the source's
+    // where it is: where it stopped and the list's end
+    macro_rules! source_trivia {
+        ($list:expr, $parent:expr, $trailing:expr) => {{
+            let mut at = $list.start;
+            let end = at + $list.len;
+            while at < end {
+                let td = &r.trivia[r.trivia_refs[at as usize].0 as usize];
+                if td.flags & STRUCTURED != 0 || td.rare != NO_RARE || td.start != pos {
+                    break;
+                }
+                source_leaf!($parent, td.kind, td.start, td.width, $trailing);
+                at += 1;
+            }
+            (at, end)
+        }};
+    }
+    loop {
+        while cur.at < cur.end {
+            let child = r.slots[cur.at as usize];
+            cur.at += 1;
+            match child.tag() {
+                TAG_TOKEN => {
+                    let d = &r.tokens[child.index()];
+                    if diverged || d.rare != NO_RARE {
+                        exit!(Exit::Token(child));
+                    }
+                    let parent = NodeId(cur.parent);
+                    let (at, end) = source_trivia!(d.leading, parent, false);
+                    if at < end {
+                        exit!(Exit::Leaves(Run { at, end, parent: cur.parent, flags: TRIVIA, token: child }));
+                    }
+                    if d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) != IS_NOT_MISSING || d.start != pos {
+                        exit!(Exit::Leaves(Run { at, end, parent: cur.parent, flags: TRIVIA, token: child }));
+                    }
+                    source_leaf!(parent, d.kind, d.start, d.width, false);
+                    let (at, end) = source_trivia!(d.trailing, parent, true);
+                    if at < end {
+                        exit!(Exit::Leaves(Run {
+                            at,
+                            end,
                             parent: cur.parent,
-                            close: NONE,
-                            in_list: true,
-                        };
-                    }
-                    TAG_NODE | TAG_LIST => {
-                        let next = hot.open(walk, w, r, cur.parent, child, false);
-                        stack.push(Fast::Slots(cur));
-                        cur = next;
-                    }
-                    _ => {}
-                }
-            }
-            if cur.close != NONE {
-                w.close(cur.close, hot.pos, hot.id);
-            }
-            loop {
-                match stack.pop() {
-                    None => {
-                        walk.position = hot.pos;
-                        return hot.id;
-                    }
-                    Some(Fast::Slots(s)) => {
-                        cur = s;
-                        break;
-                    }
-                    Some(Fast::Trivia { at, end, parent, trailing, token }) => {
-                        let run = Run { at, end, parent, trailing, token };
-                        if let Some(next) = hot.trivia_run(walk, w, r, run, stack) {
-                            cur = next;
-                            break;
-                        }
+                            flags: TRIVIA | TRAILING,
+                            token: Green::NULL
+                        }));
                     }
                 }
+                TAG_LIST if cur.flags & IN_LIST == 0 => {
+                    if depth == stack.len() {
+                        cur.at -= 1;
+                        exit!(Exit::Grow);
+                    }
+                    let d = &r.nodes[child.index()];
+                    stack[depth] = cur;
+                    depth += 1;
+                    cur = Run::slots(d.slot_start, d.slot_start + d.slot_count, cur.parent, IN_LIST);
+                }
+                TAG_NODE | TAG_LIST => {
+                    let d = &r.nodes[child.index()];
+                    if d.rare != NO_RARE {
+                        exit!(Exit::Node(child));
+                    }
+                    if depth == stack.len() {
+                        cur.at -= 1;
+                        exit!(Exit::Grow);
+                    }
+                    let kind = d.kind.node_kind().unwrap_or(NodeKind::SkippedTokensTrivia);
+                    w.open(id, Some(NodeId(cur.parent)), ElementType::Node(kind), pos, false);
+                    stack[depth] = cur;
+                    depth += 1;
+                    let flags = CLOSES | if child.is_list() { IN_LIST } else { 0 };
+                    cur = Run::slots(d.slot_start, d.slot_start + d.slot_count, id, flags);
+                    id += 1;
+                }
+                _ => {}
             }
+        }
+        if cur.flags & CLOSES != 0 {
+            w.close(cur.parent, pos, id);
+        }
+        if depth == 0 {
+            cur = Run::EMPTY;
+            exit!(Exit::Done);
+        }
+        depth -= 1;
+        cur = stack[depth];
+        if cur.flags & TRIVIA != 0 {
+            let run = cur;
+            cur = Run::EMPTY;
+            exit!(Exit::Popped(run));
         }
     }
 }
@@ -446,25 +599,6 @@ struct Hot {
     diverged: bool,
 }
 
-/// A run of trivia of `trivia_refs` (`Fast::Trivia`).
-#[derive(Copy, Clone)]
-struct Run {
-    at: u32,
-    end: u32,
-    parent: u32,
-    trailing: bool,
-    token: Green,
-}
-
-impl Run {
-    /// The leading trivia of `token` under `parent`, the token and its trailing trivia to follow.
-    #[inline(always)]
-    fn leading_of(r: Records<'_>, token: Green, parent: u32) -> Run {
-        let d = &r.tokens[token.index()];
-        Run { at: d.leading.start, end: d.leading.start + d.leading.len, parent, trailing: false, token }
-    }
-}
-
 impl Hot {
     /// Opens the composite of the node or list `green` under `parent` (`NONE`: the root), `trailing` as a trailing
     /// structured trivia, and reports its diagnostics; its slots are the run to walk.
@@ -477,7 +611,7 @@ impl Hot {
         parent: u32,
         green: Green,
         trailing: bool,
-    ) -> Slots {
+    ) -> Run {
         let id = self.id;
         self.id += 1;
         let (kind, at, end, diags) = match green.tag() {
@@ -499,64 +633,105 @@ impl Hot {
         if diags {
             walk.report_node(w, NodeId(id), self.pos, green);
         }
-        Slots { at, end, parent: id, close: id, in_list: green.is_list() }
+        Run::slots(at, end, id, CLOSES | if green.is_list() { IN_LIST } else { 0 })
     }
 
-    /// The trivia of `run`, then its token and the token's trailing trivia (`Fast::Trivia`). At a structured trivia it
-    /// opens the structure's composite, leaves the rest of the run on `stack` and returns the structure's slots.
+    /// The leaves of the token `green` under `parent`: its leading trivia, its own leaf, its trailing trivia. At a
+    /// structured trivia it opens the structure's composite and returns the structure's slots and the rest of the
+    /// token (`TRIVIA`), to come back to after them.
     #[inline(always)]
-    fn trivia_run(
+    fn token(
+        &mut self,
+        walk: &mut Walk<'_>,
+        w: &mut ColumnWriter<'_, CSharp>,
+        r: Records<'_>,
+        parent: u32,
+        green: Green,
+    ) -> Option<(Run, Run)> {
+        let d = &r.tokens[green.index()];
+        if d.leading.len != 0 {
+            let run =
+                Run { at: d.leading.start, end: d.leading.start + d.leading.len, parent, flags: TRIVIA, token: green };
+            if let Some(structure) = self.trivia(walk, w, r, run) {
+                return Some(structure);
+            }
+        }
+        self.token_leaf(walk, w, r, NodeId(parent), green);
+        if d.trailing.len == 0 {
+            return None;
+        }
+        let run = Run {
+            at: d.trailing.start,
+            end: d.trailing.start + d.trailing.len,
+            parent,
+            flags: TRIVIA | TRAILING,
+            token: Green::NULL,
+        };
+        self.trivia(walk, w, r, run)
+    }
+
+    /// The rest of a token's leaves after a structured trivia (`TRIVIA`): the trivia of `run`, then, for leading
+    /// trivia, the token and its trailing trivia; at a structured trivia as `token`.
+    #[inline(never)]
+    fn leaves(
+        &mut self,
+        walk: &mut Walk<'_>,
+        w: &mut ColumnWriter<'_, CSharp>,
+        r: Records<'_>,
+        run: Run,
+    ) -> Option<(Run, Run)> {
+        if let Some(structure) = self.trivia(walk, w, r, run) {
+            return Some(structure);
+        }
+        if run.token.is_null() {
+            return None;
+        }
+        self.token_leaf(walk, w, r, NodeId(run.parent), run.token);
+        let d = &r.tokens[run.token.index()];
+        let trailing = Run {
+            at: d.trailing.start,
+            end: d.trailing.start + d.trailing.len,
+            parent: run.parent,
+            flags: TRIVIA | TRAILING,
+            token: Green::NULL,
+        };
+        self.trivia(walk, w, r, trailing)
+    }
+
+    /// The unstructured trivia of `run` as leaves, up to a structured one: then its structure's composite opened, its
+    /// slots and the rest of `run` after it.
+    #[inline(always)]
+    fn trivia(
         &mut self,
         walk: &mut Walk<'_>,
         w: &mut ColumnWriter<'_, CSharp>,
         r: Records<'_>,
         mut run: Run,
-        stack: &mut Vec<Fast>,
-    ) -> Option<Slots> {
-        loop {
-            while run.at < run.end {
-                let t = r.trivia_refs[run.at as usize];
-                run.at += 1;
-                let td = &r.trivia[t.0 as usize];
-                if td.flags & STRUCTURED != 0 {
-                    let structure = walk.arena.trivia_structure(t);
-                    walk.directive(self.id, structure);
-                    let next = self.open(walk, w, r, run.parent, structure, run.trailing);
-                    stack.push(Fast::Trivia {
-                        at: run.at,
-                        end: run.end,
-                        parent: run.parent,
-                        trailing: run.trailing,
-                        token: run.token,
-                    });
-                    return Some(next);
-                }
-                let kind = td.kind.token_kind().unwrap_or(TokenKind::BadToken);
-                let start = self.pos;
-                let end = start.wrapping_add(td.width);
-                let leaf = self.id;
-                w.leaf(leaf, NodeId(run.parent), kind, start, end, run.trailing, false);
-                self.id += 1;
-                self.source_text(walk, start, td.start, td.width);
-                if td.rare != NO_RARE {
-                    walk.report_trivia(w, NodeId(leaf), start, t);
-                }
-                self.pos = end;
+    ) -> Option<(Run, Run)> {
+        let trailing = run.flags & TRAILING != 0;
+        while run.at < run.end {
+            let t = r.trivia_refs[run.at as usize];
+            run.at += 1;
+            let td = &r.trivia[t.0 as usize];
+            if td.flags & STRUCTURED != 0 {
+                let structure = walk.arena.trivia_structure(t);
+                walk.directive(self.id, structure);
+                let next = self.open(walk, w, r, run.parent, structure, trailing);
+                return Some((next, run));
             }
-            if run.token.is_null() {
-                return None;
+            let kind = td.kind.token_kind().unwrap_or(TokenKind::BadToken);
+            let start = self.pos;
+            let end = start.wrapping_add(td.width);
+            let leaf = self.id;
+            w.leaf(leaf, NodeId(run.parent), kind, start, end, trailing, false);
+            self.id += 1;
+            self.source_text(walk, start, td.start, td.width);
+            if td.rare != NO_RARE {
+                walk.report_trivia(w, NodeId(leaf), start, t);
             }
-            let token = run.token;
-            self.token_leaf(walk, w, r, NodeId(run.parent), token);
-            let d = &r.tokens[token.index()];
-            run = Run {
-                at: d.trailing.start,
-                end: d.trailing.start + d.trailing.len,
-                parent: run.parent,
-                trailing: true,
-                token: Green::NULL,
-            };
+            self.pos = end;
         }
+        None
     }
 
     /// `token`'s own leaf (`Walk::token` over the records).
@@ -971,7 +1146,12 @@ mod tests {
             flattener.run(&mut walk, &mut builder);
         }
         let text = walk.text.take().map_or_else(|| source.clone(), Arc::from);
-        Flat { tree: builder.finish(text, FileKind::default()), diagnostics: walk.diagnostics, values: walk.values, directives: walk.directives }
+        Flat {
+            tree: builder.finish(text, FileKind::default()),
+            diagnostics: walk.diagnostics,
+            values: walk.values,
+            directives: walk.directives,
+        }
     }
 
     /// Columns too small for the tree, as the estimate is for a tree that shares records: the walk runs again into

@@ -525,7 +525,11 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
   up to the arena budget does not size and zero columns the tree never fills (`flatten::first_capacity`): the
   next id, the position and the run of slots it is in stay in registers, a token's trivia are walked in place, and
   only the runs it comes back to (a parent's remaining slots, a token's trivia after a structured one) go on its
-  stack. A tree that holds a record twice can exceed the estimate (14 of the 31 267 runtime files, 61 of the 122 741
+  stack. Its common elements go through `flatten::fast`, a function without calls: a node or list without rare
+  fields, a token without them whose text is the source's where it is, its unstructured trivia without them whose
+  text is too. It stops before anything else (a diagnostic, a value, a structured trivia, a text of the green tree's
+  own, a full stack), which the general walk does before `fast` goes on. With no call in it the walk's state stays in
+  registers instead of being spilled around the calls the rest needs ("C# flatten without calls"). A tree that holds a record twice can exceed the estimate (14 of the 31 267 runtime files, 61 of the 122 741
   mutations, no file of the other corpora); the walk counted its nodes, so it runs again into columns of that size. There is no buffer of build records and no copy of the
   finished tree. Positions are
   running sums of full widths, as the red tree computes them, so missing tokens, merged tokens and nested lexers'
@@ -840,6 +844,38 @@ little for the allocator to matter; it stays the consumer's choice. BOLT is not 
 The machine is an Apple M5 Max shared with other sessions. Every comparison alternates its binaries. A one-thread run
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
+
+### C# flatten without calls, 2026-11-05
+
+A profile of the roslyn corpus (`scripts/profile.py`, one thread) had `Flattener::run_columns` at 13.8 % self, second
+after `Lexer::lex` (15.8 %); flattening twice per file measured its share of instructions, 7.0 of 40.8 G a round
+(17 %, 126 instructions a tree node). Exact counts came from callgrind (valgrind 3.19 in `rust:1.99.1-bookworm` under
+Docker, `--dump-instr=yes`, ksdump's `psi` profile built there) over every 17th file of the roslyn list (1004 files),
+mapped onto `objdump -d`: the walk's state (the current run, the id, the position, the stack's length) lived on the
+stack, reloaded and stored around the cold calls of diagnostics, values and text, about half of each element's
+instructions. Two changes, trees byte-identical (gate PASS):
+
+- `flatten::fast`, a function without calls for the common elements (nodes, tokens and trivia without rare fields
+  whose text is the source's where they are), which stops before anything else (`Exit`) for the general walk to do;
+  the stack is a slice it indexes, grown outside it. Its trivia loop and leaf are local macros over its locals: the
+  same code as `#[inline(always)]` methods of `Hot` took 7.8 % more instructions, the register allocator spilling
+  again ("Rejected").
+- `SyntaxKind::token_kind` and `node_kind` read one table of `Option<TokenKind>` / `Option<NodeKind>` built at
+  compile time (`gen.py`, `kinds_of_raw`) instead of an index and a second table: one load fewer for every leaf and
+  node, and for every caller in the lexer and parsers.
+
+callgrind on the subset, Ir: the whole run 2378.0 → 2271.8 M (-4.5 %), flatten 383.4 → 276.6 M (-27.9 %; the
+straight-line walk alone 327.5 M, with the fast path 280.3 M, with the tables 275.0 M). On the Mac Studio,
+`scripts/ab.sh` with `KS_INSTR=1`, `--nice 0`, one thread, 5 alternating rounds at load 2-9:
+
+| corpus | MB/s, before → after | G instructions a round | G cycles a round |
+|---|---|---|---|
+| dotnet/roslyn | 98.6 → 102.1 (×1.035) | 40.36 → 38.72 (-4.1 %) | 8.08 → 7.84 |
+| dotnet/runtime | 65.5 → 68.0 (×1.038) | 109.64 → 104.78 (-4.4 %) | 20.97 → 20.19 |
+
+This Mac (load 50-100) gave the same instructions: roslyn 41.06 → 39.13 G (-4.7 %), runtime 109.71 → 104.87 G
+(-4.4 %). Flatten is now about 12 % of the instructions; the lexer (`Lexer::lex` 12.4 %, `quick_token` 4.4 %) and
+`SyntaxParser::current_kind` (6.8 %, its arena budget check on every call) lead the profile.
 
 ### The stack budget (JetBrains/accio#206, child of 79a11817), 2026-11-04
 
@@ -1539,7 +1575,8 @@ There is no line-level profile of the current code: `atos` returned no line info
 ### Open items
 
 - **C# speed.** 0.215 G instructions per source MB on dotnet/runtime's files up to 4 MiB after "C# parse speed, the
-  six commits after 25dac59f" (0.312 before), against Kotlin's 0.205 and Java's 0.201. On the Mac Studio at 20
+  six commits after 25dac59f" (0.312 before), against Kotlin's 0.205 and Java's 0.201; "C# flatten without calls"
+  took another 4.4 % of the instructions on the whole runtime corpus. On the Mac Studio at 20
   threads the stack measured 62.6 MB/s a thread on one quieter pass and 46.7 at load 12-17 (accio's target is 50):
   open are a second quiet 20-thread pass there, the side table and the token map's size measured there on their own,
   a new profile of the lexer and `LanguageParser` (now most of the time), and a quiet-machine run of the table in "C#
@@ -1590,4 +1627,5 @@ There is no line-level profile of the current code: `atos` returned no line info
 | C#: quick-scanned tokens sharing one record, as Roslyn's map shares its green token | Slower on one thread in the prototype, and flatten would have to guess where a shared token's text is; the map holds the token's shape and a hit pushes new records instead |
 | C#: both trivia lists of a token packed into one run of `trivia_refs` (36-byte token records) | +4 % instructions (the split on every access) |
 | C#: exact subtree node counts in the green records, so flatten sizes the tree exactly | Estimated under 1 %: `tree_node_estimate` overshoots by the garbage and the second walk is rare (14 runtime files) |
+| C#: `flatten::fast`'s leaf and trivia loop as `#[inline(always)]` methods of `Hot` instead of local macros over its locals; its current run without the token field | +7.8 % and +1.0 % of `fast`'s instructions (callgrind, "C# flatten without calls"): the register allocator spilled more of the walk's state |
 | Shared token starts for chameleons | Measured 0.999× (1 thread) and 0.995× (16 threads); a copy into a warm buffer costs as much as the extra arithmetic on each access |

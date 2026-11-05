@@ -1177,7 +1177,7 @@ pub enum NodeKind {
 
 const RAW_BASE: u16 = 8193;
 /// `TokenKind` index + 1 (0: none) of `SyntaxKind` raw - `RAW_BASE`.
-static TOKEN_OF_RAW: [u16; 890] = [
+const TOKEN_OF_RAW: [u16; 890] = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 31, 32, 33, 34, 35, 36, 37, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 0, 64, 65, 0,
@@ -1207,7 +1207,7 @@ static TOKEN_OF_RAW: [u16; 890] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 251, 252, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
 /// `NodeKind` index + 1 (0: none) of `SyntaxKind` raw - `RAW_BASE`.
-static NODE_OF_RAW: [u16; 890] = [
+const NODE_OF_RAW: [u16; 890] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1238,6 +1238,23 @@ static NODE_OF_RAW: [u16; 890] = [
     301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 0, 0, 0, 315, 316, 317, 318, 319, 320, 321,
     322,
 ];
+/// The `TokenKind` of `SyntaxKind` raw - `RAW_BASE` (`SyntaxKind::token_kind`, one load).
+static TOKEN_KIND_OF_RAW: [Option<TokenKind>; 890] = kinds_of_raw(&TOKEN_OF_RAW, &TOKEN_KIND_VALUES);
+/// The `NodeKind` of `SyntaxKind` raw - `RAW_BASE` (`SyntaxKind::node_kind`, one load).
+static NODE_KIND_OF_RAW: [Option<NodeKind>; 890] = kinds_of_raw(&NODE_OF_RAW, &NODE_KIND_VALUES);
+
+/// The kinds of `raw`'s indices + 1 (0: none) into `values`, built at compile time.
+const fn kinds_of_raw<K: Copy, const N: usize, const M: usize>(raw: &[u16; N], values: &[K; M]) -> [Option<K>; N] {
+    let mut kinds = [None; N];
+    let mut i = 0;
+    while i < N {
+        if raw[i] != 0 {
+            kinds[i] = Some(values[raw[i] as usize - 1]);
+        }
+        i += 1;
+    }
+    kinds
+}
 static TOKEN_SYNTAX_KIND: [SyntaxKind; 252] = [
     SyntaxKind::TildeToken,
     SyntaxKind::ExclamationToken,
@@ -3003,25 +3020,17 @@ impl SyntaxKind {
     /// The leaf kind of a token or unstructured trivia kind.
     #[inline]
     pub fn token_kind(self) -> Option<TokenKind> {
-        let i = (self as u16).wrapping_sub(RAW_BASE) as usize;
-        match TOKEN_OF_RAW.get(i) {
-            Some(&k) if k != 0 => Some(TOKEN_KIND_VALUES[k as usize - 1]),
-            _ => None,
-        }
+        TOKEN_KIND_OF_RAW.get((self as u16).wrapping_sub(RAW_BASE) as usize).copied().flatten()
     }
 
     /// The node kind of a kind of Syntax.xml's node types.
     #[inline]
     pub fn node_kind(self) -> Option<NodeKind> {
-        let i = (self as u16).wrapping_sub(RAW_BASE) as usize;
-        match NODE_OF_RAW.get(i) {
-            Some(&k) if k != 0 => Some(NODE_KIND_VALUES[k as usize - 1]),
-            _ => None,
-        }
+        NODE_KIND_OF_RAW.get((self as u16).wrapping_sub(RAW_BASE) as usize).copied().flatten()
     }
 }
 
-static TOKEN_KIND_VALUES: [TokenKind; 252] = [
+const TOKEN_KIND_VALUES: [TokenKind; 252] = [
     TokenKind::TildeToken,
     TokenKind::ExclamationToken,
     TokenKind::DollarToken,
@@ -3275,7 +3284,7 @@ static TOKEN_KIND_VALUES: [TokenKind; 252] = [
     TokenKind::InterpolatedMultiLineRawStringStartToken,
     TokenKind::InterpolatedRawStringEndToken,
 ];
-static NODE_KIND_VALUES: [NodeKind; 322] = [
+const NODE_KIND_VALUES: [NodeKind; 322] = [
     NodeKind::SingleLineDocumentationCommentTrivia,
     NodeKind::MultiLineDocumentationCommentTrivia,
     NodeKind::IfDirectiveTrivia,
