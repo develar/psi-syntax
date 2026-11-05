@@ -876,18 +876,21 @@ changes, trees byte-identical (gate PASS), each the subset's Ir after it:
 The budget check stays at every read of a token, as before, so a parse is abandoned at the same token: checking it
 where the arena grows instead would need the arena to reach the parsers that read it (an interpolated string's holes
 and documentation comments have parsers of their own over one arena), and a parser loop that allocates without
-consuming a token, what the budget is for, is stopped only by its reads. On the Mac Studio, `scripts/ab.sh` with `KS_INSTR=1`, `--nice 0`,
-one thread, 5 alternating rounds, against the commit before it:
+consuming a token, what the budget is for, is stopped only by its reads.
 
-| corpus | G instructions a round | G cycles a round | MB/s, 9 rounds without `KS_INSTR` (load 20-30) |
+The parse is not faster. On the Mac Studio, `scripts/ab.sh` with `KS_INSTR=1`, `--nice 0`, one thread, 5 alternating
+rounds against the commit before it, run once the 1-minute load was below 3 (load 2.7-3.7 throughout; the gate passed on
+the merged commit):
+
+| corpus | MB/s | G cycles a round | G instructions a round |
 |---|---|---|---|
-| dotnet/roslyn | 39.32 → 36.51 (-7.1 %) | 8.32 → 8.29 (load 55-205) | 73.5 → 85.5 (×1.163) |
-| dotnet/runtime | 104.80 → 96.18 (-8.2 %) | 21.01 → 20.74 (load 10-52) | 48.4 → 52.1 (×1.076) |
+| dotnet/roslyn | 98.3 → 98.9 (×1.006) | 7.86 → 7.85 (-0.1 %) | 39.01 → 35.93 (-7.9 %) |
+| dotnet/runtime | 68.2 → 69.0 (×1.012) | 20.24 → 19.81 (-2.1 %) | 104.75 → 96.08 (-8.3 %) |
 
-The machine was shared throughout: the MB/s rounds spread 62-91 against 79-91 on roslyn, and the quietest runtime
-rounds (load 12-19) gave 61.5 → 63.1, 61.8 → 62.9, 60.8 → 61.7 (about +2 %), with the cycles of the instruction runs
-down only 0.4 and 1.3 %. The instructions are steady and the cycles say most of what went was cheap (calls, frames,
-compares the core overlaps); a quiet-machine measurement of the wall time is still owed.
+What went (calls and their frames, bounds checks, the key compare's call) was off the critical path: 8 % fewer
+instructions are 0-2 % fewer cycles. The pull request's first measurement, 9 rounds at load 20-30 (MB/s ×1.163 on
+roslyn, ×1.076 on runtime, cycles -0.4 and -1.3 % at load 10-205), was the load's: a speed claim on this machine needs
+the quiet wait, and instruction counts alone do not predict the cycles here.
 
 ### C# flatten without calls, 2026-11-05
 
@@ -1696,8 +1699,8 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 - **C# speed.** 0.215 G instructions per source MB on dotnet/runtime's files up to 4 MiB after "C# parse speed, the
   six commits after 25dac59f" (0.312 before), against Kotlin's 0.205 and Java's 0.201; "C# flatten without calls"
-  took another 4.4 % of the instructions on the whole runtime corpus and "C# token reads inline" 8.2 % more, which
-  a quiet machine has yet to turn into wall time (its cycles moved 1-2 %). On the Mac Studio at 20
+  took another 4.4 % of the instructions on the whole runtime corpus and "C# token reads inline" 8.3 % more, which
+  on a quiet Studio moved MB/s by 0.6-1.2 % and cycles by 0.1-2.1 %. On the Mac Studio at 20
   threads the stack measured 62.6 MB/s a thread on one quieter pass and 46.7 at load 12-17 (accio's target is 50):
   open are a second quiet 20-thread pass there, the side table and the token map's size measured there on their own,
   a new profile of the lexer and `LanguageParser` (now most of the time), and a quiet-machine run of the table in "C#
