@@ -56,13 +56,16 @@ pub(crate) struct TreeData {
     /// The nesting (`Pending::depth`) of each unexpanded body sitting at a nonzero one, sorted by node id, for
     /// `parse_body` to start where the full parse would.
     body_depths: Vec<(u32, u32)>,
-    /// The nodes being built (empty in a finished tree).
+    /// The nodes being built, the first `built` of them (empty in a finished tree). The vector is kept filled to its
+    /// capacity, so a walk writes the next node by index into `slots()` with the count in a register, and only
+    /// growing it (`grow`, out of line) touches the vector itself.
     nodes: Vec<BuildNode>,
+    built: usize,
 }
 
 /// A node being built: what the three columns of a finished tree hold of it.
-#[derive(Copy, Clone, Debug)]
-struct BuildNode {
+#[derive(Copy, Clone, Debug, Default)]
+pub(crate) struct BuildNode {
     kind: u16,
     start: u32,
     end: u32,
@@ -70,12 +73,75 @@ struct BuildNode {
     subtree_end: u32,
 }
 
+impl BuildNode {
+    /// The token leaf `id`, a child of `parent`.
+    #[inline(always)]
+    pub(crate) fn token_leaf<T: TokenType>(id: u32, parent: u32, token: T, start: u32, end: u32) -> BuildNode {
+        BuildNode { kind: token.index() | LEAF, start, end, parent, subtree_end: id + 1 }
+    }
+
+    /// The composite `id` of the element type whose `ElementType::index` is `kind`, a child of `parent`, open: its
+    /// subtree end holds `stash` (what `TreeData::stash` would put there) until `close` sets it.
+    #[inline(always)]
+    pub(crate) fn open(parent: u32, kind: u16, start: u32, stash: u32) -> BuildNode {
+        BuildNode { kind, start, end: start, parent, subtree_end: stash }
+    }
+
+    /// Closes a composite at byte `end`, its subtree ending before node `built` (`TreeData::set_end`).
+    #[inline(always)]
+    pub(crate) fn close(&mut self, end: u32, built: u32) {
+        self.end = end.max(self.start);
+        self.subtree_end = built;
+    }
+
+    #[inline(always)]
+    pub(crate) fn parent(&self) -> u32 {
+        self.parent
+    }
+
+    /// What an open composite's subtree end holds (`TreeData::stashed`).
+    #[inline(always)]
+    pub(crate) fn stashed(&self) -> u32 {
+        self.subtree_end
+    }
+}
+
 impl TreeData {
     #[inline(always)]
     fn push(&mut self, parent: u32, kind: u16, start: u32, end: u32) -> u32 {
-        let id = self.nodes.len() as u32;
-        self.nodes.push(BuildNode { kind, start, end, parent, subtree_end: id + 1 });
-        id
+        let id = self.built;
+        if id == self.nodes.len() {
+            self.grow(1);
+        }
+        self.nodes[id] = BuildNode { kind, start, end, parent, subtree_end: id as u32 + 1 };
+        self.built = id + 1;
+        id as u32
+    }
+
+    /// Room for at least `additional` more nodes past `built`: the vector grown (amortized) and filled to its
+    /// capacity.
+    #[cold]
+    #[inline(never)]
+    fn grow(&mut self, additional: usize) {
+        let need = self.built + additional;
+        if need > self.nodes.capacity() {
+            self.nodes.reserve(need - self.nodes.len());
+        }
+        self.nodes.resize(self.nodes.capacity(), BuildNode::default());
+    }
+
+    /// The node slots and how many of them are built: a walk writes node `built` into `slots[built]` while
+    /// `built < slots.len()`, and gives the count back with `set_built`; past the slots it appends as `push` does.
+    #[inline(always)]
+    pub(crate) fn slots(&mut self) -> (&mut [BuildNode], usize) {
+        (&mut self.nodes, self.built)
+    }
+
+    /// The nodes `slots` handed out that a walk has written: the first `built`.
+    #[inline(always)]
+    pub(crate) fn set_built(&mut self, built: usize) {
+        debug_assert!(built <= self.nodes.len());
+        self.built = built;
     }
 
     /// A composite node starting at `start` as the next node, a child of `parent` (`u32::MAX`: a root); its end and
@@ -87,12 +153,6 @@ impl TreeData {
         start: u32,
     ) -> u32 {
         self.push(parent, kind.index() as u16, start, start)
-    }
-
-    /// `add_composite` of the element type whose `ElementType::index` is `kind`.
-    #[inline(always)]
-    pub(crate) fn push_composite(&mut self, parent: u32, kind: u16, start: u32) -> u32 {
-        self.push(parent, kind, start, start)
     }
 
     /// A leaf as the next node, a child of `parent`.
@@ -115,10 +175,8 @@ impl TreeData {
     /// Closes a composite: its byte end, and its subtree ends at the last node appended.
     #[inline(always)]
     pub(crate) fn set_end(&mut self, node: u32, end: u32) {
-        let len = self.nodes.len() as u32;
-        let n = &mut self.nodes[node as usize];
-        n.end = end.max(n.start);
-        n.subtree_end = len;
+        let built = self.built as u32;
+        self.nodes[node as usize].close(end, built);
     }
 
     /// The parent of a node being built.
@@ -147,7 +205,9 @@ impl TreeData {
 
     /// Room for `additional` more nodes.
     pub(crate) fn reserve(&mut self, additional: usize) {
-        self.nodes.reserve(additional);
+        if self.built + additional > self.nodes.len() {
+            self.grow(additional);
+        }
     }
 
     pub(crate) fn set_error(&mut self, node: u32, message: Cow<'static, str>) {
@@ -155,7 +215,7 @@ impl TreeData {
     }
 
     fn clear(&mut self) {
-        self.nodes.clear();
+        self.built = 0;
         self.errors.clear();
         self.body_depths.clear();
     }
@@ -170,6 +230,7 @@ impl TreeData {
     /// Empties a builder's buffers, each shrunk to its share of `shrink`.
     fn shrink(&mut self, shrink: crate::buffers::Shrink) {
         shrink.vec(&mut self.nodes);
+        self.built = 0;
         shrink.vec(&mut self.errors);
         shrink.vec(&mut self.body_depths);
     }
@@ -179,13 +240,15 @@ impl TreeData {
     fn take_exact(&mut self) -> TreeData {
         let mut errors = std::mem::take(&mut self.errors);
         errors.shrink_to_fit();
+        let nodes = &self.nodes[..self.built];
         TreeData {
-            kinds: self.nodes.iter().map(|n| n.kind).collect(),
-            ranges: self.nodes.iter().map(|n| [n.start, n.end]).collect(),
-            links: self.nodes.iter().map(|n| [n.parent, n.subtree_end]).collect(),
+            kinds: nodes.iter().map(|n| n.kind).collect(),
+            ranges: nodes.iter().map(|n| [n.start, n.end]).collect(),
+            links: nodes.iter().map(|n| [n.parent, n.subtree_end]).collect(),
             errors,
             body_depths: self.body_depths.as_slice().to_vec(),
             nodes: Vec::new(),
+            built: 0,
         }
     }
 }
@@ -1153,7 +1216,7 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         ranges.shrink_to_fit();
         links.shrink_to_fit();
         errors.shrink_to_fit();
-        let data = TreeData { kinds, ranges, links, errors, body_depths: Vec::new(), nodes: Vec::new() };
+        let data = TreeData { kinds, ranges, links, errors, body_depths: Vec::new(), nodes: Vec::new(), built: 0 };
         Tree { text, file_kind, data, root: 0, language: PhantomData }
     }
 }

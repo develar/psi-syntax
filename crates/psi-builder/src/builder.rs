@@ -16,7 +16,7 @@ use std::sync::Arc;
 use crate::counters::{Counter, add};
 use crate::language::{ElementType, ElementTypeOf, Language};
 use crate::stack::{StackGuard, StackUse};
-use crate::tree::TreeData;
+use crate::tree::{BuildNode, TreeData};
 
 /// A marker (`PsiBuilder.Marker`): a handle into its builder's marker pool. Its methods take the builder, as the Java
 /// `marker.done(type)` reaches its builder through the marker: `marker.done(builder, FUN)`.
@@ -1934,18 +1934,24 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// end (`CloseOpen`), a collapsed marker (`Open`, its leaves to insert first), or the step an entry was at when a
     /// chameleon leaf stopped its leaves (`st.insert_to` their end). The fields it reads are borrowed apart, so the
     /// walk keeps its state in registers.
+    ///
+    /// The walk makes no call: it writes the nodes into `TreeData::slots` with their count in a register, and leaves
+    /// what needs one to `bind_steps` by returning with that step and `st.insert_to` set (an error element, whose
+    /// message it moves into the tree; an error item; a full node buffer, which `push` grows). Each such return
+    /// resumes here on the next `BindStep::Next`.
     #[inline(never)]
     fn bind_entries(&mut self, st: &mut BindState, tree: &mut TreeData) {
         let error_index = ElementType::<L::Token, L::Node>::Node(L::ERROR_ELEMENT).index() as u16;
         let done_own = self.extras_linked == 0;
         let (count, shift, base) = (self.lexeme_count, self.token_shift, self.base as u32);
-        let PsiBuilderImpl { entries, lex_types, lex_starts, markers, messages, .. } = self;
-        let (entries, types, starts) = (&entries[..], &lex_types[..], &lex_starts[..]);
+        let PsiBuilderImpl { entries, lex_types, lex_starts, markers, .. } = self;
+        let (entries, types, starts, markers) = (&entries[..], &lex_types[..], &lex_starts[..], &markers[..]);
         let leaf_end = |lexeme: i32| (lexeme.max(0) as usize).min(count);
         let offset = |k: usize| base + starts[k.min(count) - shift];
         let (mut i, mut lex, mut cur_node, mut cur_marker) = (st.i, st.lex_index, st.cur_node, st.cur_marker);
         let (root_node, root_marker) = (st.root_node, st.root_marker);
         let mut last_error = st.last_error_index;
+        let (slots, mut built) = tree.slots();
         st.then = loop {
             let Some(&e) = entries.get(i) else { break BindStep::CloseOpen };
             i += 1;
@@ -1974,19 +1980,26 @@ impl<L: Language> PsiBuilderImpl<L> {
             } else {
                 continue;
             };
-            // insertLeaves, but empty tokens (DANGLING_NEWLINE); a chameleon leaf stops the walk there
+            // insertLeaves, but empty tokens (DANGLING_NEWLINE); a chameleon leaf or a full buffer stops the walk there
             let mut stopped = false;
-            while lex < to {
-                let (s0, s1) = (starts[lex - shift], starts[lex + 1 - shift]);
-                if s0 < s1 {
-                    let token = types[lex - shift];
-                    if L::is_chameleon_token(token) {
-                        stopped = true;
-                        break;
+            if lex < to {
+                let end = to - shift;
+                let (types, starts) = (&types[..end], &starts[..=end]);
+                let mut k = lex - shift;
+                while k < end {
+                    let (s0, s1) = (starts[k], starts[k + 1]);
+                    if s0 < s1 {
+                        let token = types[k];
+                        if L::is_chameleon_token(token) || built == slots.len() {
+                            stopped = true;
+                            break;
+                        }
+                        slots[built] = BuildNode::token_leaf(built as u32, cur_node, token, base + s0, base + s1);
+                        built += 1;
                     }
-                    tree.add_token_leaf(cur_node, token, base + s0, base + s1);
+                    k += 1;
                 }
-                lex += 1;
+                lex = k + shift;
             }
             if stopped {
                 st.insert_to = to;
@@ -1994,27 +2007,26 @@ impl<L: Language> PsiBuilderImpl<L> {
             }
             match then {
                 BindStep::Close => {
-                    tree.set_end(cur_node, offset(lex));
-                    cur_node = tree.parent_of(cur_node);
-                    cur_marker = if cur_node == root_node { root_marker } else { tree.stashed(cur_node) };
+                    let end = offset(lex);
+                    let node = &mut slots[cur_node as usize];
+                    node.close(end, built as u32);
+                    cur_node = node.parent();
+                    cur_marker = if cur_node == root_node { root_marker } else { slots[cur_node as usize].stashed() };
                 }
-                BindStep::Open(id) => {
-                    let node = tree.push_composite(cur_node, e.ty, offset(lex));
-                    tree.stash(node, id);
-                    if e.ty == error_index {
-                        tree.set_error(node, take_message(markers, messages, id));
-                    }
-                    cur_node = node;
+                BindStep::Open(id) if e.ty != error_index && built < slots.len() => {
+                    slots[built] = BuildNode::open(cur_node, e.ty, offset(lex), id);
+                    cur_node = built as u32;
                     cur_marker = id;
+                    built += 1;
                 }
+                // An error element or item, or no slot left: `bind_steps` takes the step.
                 _ => {
-                    let start = offset(lex);
-                    let error = tree.add_composite(cur_node, ElementTypeOf::<L>::Node(L::ERROR_ELEMENT), start);
-                    tree.set_end(error, start);
-                    tree.set_error(error, take_message(markers, messages, e.id as u32));
+                    st.insert_to = to;
+                    break then;
                 }
             }
         };
+        tree.set_built(built);
         (st.i, st.lex_index, st.cur_node, st.cur_marker, st.last_error_index) =
             (i, lex, cur_node, cur_marker, last_error);
     }
