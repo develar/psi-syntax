@@ -281,7 +281,7 @@ The sources are java-syntax and platform/syntax of JetBrains/intellij-community 
   `JavaSourceUtil.getReferenceText` (`push_reference_text`), the module name
   `PsiJavaModuleReferenceElementImpl.getReferenceText()`, and a `PsiInlineDocTag` without a name prints `null`.
 - **Oracle.** `tools/java-oracle/JavaPsiOracle.java` runs IntelliJ 271's real Java PSI (java-syntax converted to PSI by
-  `PsiSyntaxBuilderFactoryImpl`, as the IDE does) from 23 IDE jars pinned by sha256 (`fetch-jars.sh`), on a
+  `PsiSyntaxBuilderFactoryImpl`, as the IDE does) from 23 IDE jars pinned by sha256 (`jars.sha256`, checked by `java-oracle` before each run), on a
   `CoreApplicationEnvironment` with the parsing part of `JavaCoreApplicationEnvironment`; a list line carries the
   level (set as `FILE_LANGUAGE_LEVEL_KEY`, as the tests do), the entry and the trim of each file. It reproduces all
   1036 vendored goldens of IntelliJ's Java parsing tests byte for byte, both dumps, which is what makes its dumps of
@@ -1465,7 +1465,7 @@ The gate passed on the split.
 
 - `ksdump --lex` against `tools/java-oracle/JavaLexOracle.java` (IntelliJ 271's java-syntax `JavaLexer`, and
   `JavaDocLexer` on every doc comment): 0 differing lines on the 68 263 community `.java` files (3 not UTF-8, both
-  sides "unreadable"), the 19 116 golden mutations and 20 000 lexer fuzz inputs (`lex_fuzz.py`, seed `java-lex`);
+  sides "unreadable"), the 19 116 golden mutations and 20 000 lexer fuzz inputs (`java-oracle lex-fuzz`, seed `java-lex`);
   the 1036 golden inputs, untrimmed, equal too.
 - `tests/lexer.rs`: 1036 of 1036 goldens have the leaf texts of their PSI dump (36 with tokens the parser joins, 55
   with relexed holders).
@@ -1488,7 +1488,7 @@ stub, `JavaParserUtil.stoppingBuilder(builder, condition)`, which no parser call
 - the community `.java` files (`ksdump --node --out`): 68 260 of 68 263 dumped (3 not UTF-8, failures on both sides),
   0 differing files of either dump; 35.4 s wall, 557 MB peak RSS (one run, file writes included);
 - the 19 116 golden mutations: 0 differing files of either dump;
-- the 20 000 lexer fuzz inputs (`lex_fuzz.py`, seed `java-lex`, no cached PSI dumps; the oracle run once for this):
+- the 20 000 lexer fuzz inputs (`java-oracle lex-fuzz`, seed `java-lex`, no cached PSI dumps; the oracle run once for this):
   parse without a panic, 19 989 equal, 11 differ in a dump label only (see "Open items").
 
 The gate passed, with the community and mutation dumps of both kinds added to it.

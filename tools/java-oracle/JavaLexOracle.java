@@ -4,8 +4,10 @@
 // the JavaDoc tokens of a doc comment following it between "[" and "]". `ksdump --lex --lang java` prints the same
 // lines for our lexers, so `diff` finds every file where they disagree; --dump prints the token lists themselves.
 //
-//   LIB=$(tools/java-oracle/fetch-jars.sh)
-//   java -cp "$LIB/*" tools/java-oracle/JavaLexOracle.java --list LIST --root ROOT [--level JDK_28] [--dump]
+//   cargo run --release -q -p ide-oracle --bin java-oracle -- lex [--lines OUT] --list LIST --root ROOT [--level JDK_28] [--dump]
+//
+// (on the pinned jars of jars.sha256 and the IDE's JVM; `java-oracle jars` prints the jars' directory for a plain
+// `java -cp "$LIB/*" tools/java-oracle/JavaLexOracle.java ...`)
 //
 // A list line is PATH[<TAB>LEVEL...] (testdata/java/manifest.tsv is a list); LEVEL is the file's lexer level
 // (default --level, itself LanguageLevel.HIGHEST). The text is read as UTF-8 with CRLF and CR converted to LF, as the

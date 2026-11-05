@@ -142,7 +142,7 @@ kotlin() {
 java() {
   f=0
   # JavaLexer and JavaDocLexer against tools/java-oracle/JavaLexOracle.java's cached lines (the community .java files,
-  # the one-place mutations of the Java goldens, the lexer fuzz of tools/java-oracle/lex_fuzz.py).
+  # the one-place mutations of the Java goldens, the lexer fuzz of `java-oracle lex-fuzz`, tools/java-oracle/README.md).
   lex java-lex-java-community-3caa0bf "$C/lex/java-community-3caa0bf.oracle.txt" \
     --list "$C/corpus/java-community-3caa0bf.list" --root "$ROOT" || f=1
   lex java-lex-java-mut "$C/lex/java-mut.oracle.txt" --list "$C/fuzz/java-mut.list" --root "$C/fuzz/java-mut" || f=1

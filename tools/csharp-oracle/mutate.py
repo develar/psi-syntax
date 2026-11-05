@@ -3,7 +3,7 @@
 
     tools/csharp-oracle/mutate.py [--goldens testdata/csharp] [--per-file 2] [--seed csharp-mut] OUT_DIR
 
-tools/java-oracle/mutate.py for C#. Each operator applies to every input, not to hand-picked cases, so a gap shows
+`java-oracle mutate` (crates/ide-oracle/src/bin/java-oracle/mutate.rs) for C#. Each operator applies to every input, not to hand-picked cases, so a gap shows
 wherever the operator's construct is. A mutant changes one place of its original (`--per-file N` places per
 operator and file, picked by a generator seeded with the seed, the file and the operator), so a gap is not hidden
 behind an error the file has elsewhere. The inputs are the goldens of testdata/csharp/manifest.tsv whose dump has

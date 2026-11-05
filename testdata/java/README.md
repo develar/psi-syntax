@@ -2,7 +2,7 @@
 
 IntelliJ's Java parsing goldens from `java/java-tests/testData/psi/parser-{full,partial}` of
 JetBrains/intellij-community at `decc943674edfe7ecc620d2d60b61be38f876994`, written by
-`tools/java-oracle/vendor_goldens.py` (Apache 2.0, as intellij-community). One entry per test method of
+`java-oracle vendor-goldens` (`crates/ide-oracle`; Apache 2.0, as intellij-community). One entry per test method of
 `java/java-frontback-tests/testSrc/com/intellij/java/parser/**/AbstractBasic*Test.java`
 that compares a dump: 504 parser-full, 532 parser-partial.
 
@@ -14,7 +14,7 @@ that compares a dump: 504 parser-full, 532 parser-partial.
 | `manifest.tsv` | `PATH<TAB>LEVEL<TAB>ENTRY<TAB>TRIM<TAB>TEST`: the level the test parses at (`JDK_X`, the last `LanguageLevel`, unless it calls `setLanguageLevel`: 7 do), the parser entry (`file` or one of `JavaPsiOracle.java`'s), whether the test trims the text, and the test method |
 
 The Java PSI oracle (`tools/java-oracle`) reproduces all 1036 `.txt` and all 1036 `_node.txt` byte
-for byte when run over `manifest.tsv` with `--node` (`tools/java-oracle/check-goldens.py`).
+for byte when run over `manifest.tsv` with `--node` (`java-oracle check-goldens --run`).
 
 Not vendored: `parser-full/jshell` (JShell, another parser definition), `LongClass` (its test calls
 `doTest(false)`, so the golden is not compared), `BigIf` (its test counts nodes), and the data files

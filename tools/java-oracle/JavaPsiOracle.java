@@ -4,8 +4,11 @@
 //
 // Run as a single-file source program on the IDE's jars (see tools/java-oracle/README.md):
 //
-//   java -Xss1g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java \
+//   cargo run --release -q -p ide-oracle --bin java-oracle -- psi \
 //     --list files.txt --root DIR --out DUMP_DIR [--level JDK_28] [--trim] [--node]
+//
+// which runs `java -Xss1g -Xmx8g -cp "$LIB/*" tools/java-oracle/JavaPsiOracle.java ...` on the jars of jars.sha256
+// with the IDE's JVM.
 //
 // The dump is DebugUtil.psiToString(file, showWhitespaces=true, showRanges=false), trimmed, exactly
 // as ParsingTestFixture.checkResult prints it for community/java/java-tests/testData/psi/**/*.txt.

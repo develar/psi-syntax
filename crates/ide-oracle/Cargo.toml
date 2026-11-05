@@ -1,0 +1,29 @@
+[package]
+name = "ide-oracle"
+description = "An IDE's own code as the oracle: its pinned jars, its JVM running a single-file oracle over a list, byte-equal comparison naming the first difference, goldens vendored from a revision, seeded mutations; and java-oracle, the Java PSI oracle's tooling"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[[bin]]
+name = "java-oracle"
+path = "src/bin/java-oracle/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+# Never `preserve_order` (accio's src/guards.rs): the feature would unify into accio's own serde_json.
+serde_json = "1"
+# The pins: a jar set's checksum file holds SHA-1 (`jars.sha1`) or SHA-256 (`jars.sha256`) digests. SHA-512 also seeds
+# `PyRandom` from a string, as Python's `random.seed` does.
+sha1_smol = "1"
+sha2 = "0.10"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

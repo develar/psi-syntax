@@ -11,6 +11,7 @@ its crates members of accio's Cargo workspace with their own package fields, lin
 | `crates/java-syntax` | Java (package `java-syntax`): tokens, node types, the Java and JavaDoc lexers (complete), the binders, `Java: Language`, the dumps, and the parsers (see "Java") |
 | `crates/csharp-syntax` | C# (package `csharp-syntax`): Roslyn's lexer, directive parser, `LanguageParser` and `DocumentationCommentParser` over a green arena, flattened into `psi_builder`'s tree; `CSharp: TreeLanguage`, the dump, the diagnostics (see "C#") |
 | `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java\|csharp`, else by extension) |
+| `crates/ide-oracle` | the oracle harness, an IDE's own code as the oracle (pinned jars, the IDE's JVM running a single-file oracle, byte-equal comparison naming the first difference, goldens vendored from a revision, Python's seeded generator for mutations), and `java-oracle`, the Java oracle's tooling (`tools/java-oracle/README.md`); accio's `scripts/bench plugin-xml` runs on it too |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
@@ -479,9 +480,12 @@ Java: `testdata/java/` (1036 goldens of IntelliJ's Java parsing tests, `manifest
 test) and the Java PSI oracle `tools/java-oracle/JavaPsiOracle.java` (see `tools/java-oracle/README.md`: cached dumps of
 the 68 263 community `.java` files, 19 116 golden mutations and 20 000 lexer fuzz inputs; with `--getters` the answers
 of the PSI getters `java_syntax::psi` ports, cached in `$HOME/.cache/psi-syntax/getters/2/`). The Java lexer oracle
-`java -cp "$(tools/java-oracle/fetch-jars.sh)/*" tools/java-oracle/JavaLexOracle.java --list LIST --root ROOT` prints
-the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[` `]`);
-`tools/java-oracle/lex_fuzz.py` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
+`cargo run --release -q -p ide-oracle --bin java-oracle -- lex --list LIST --root ROOT` (`JavaLexOracle.java` on the
+pinned jars) prints the lines `ksdump --lex` prints for `.java` files (JavaDoc tokens of each doc comment inside `[`
+`]`); `java-oracle lex-fuzz` makes lexer fuzz inputs for it. Cached lines: `$HOME/.cache/psi-syntax/lex/`.
+`java-oracle` (`crates/ide-oracle`, the oracle harness: pinned jars, the IDE's JVM, comparison, goldens, Python's
+seeded generator) also vendors and checks the goldens, lists the community files and writes the mutations; its
+README is `tools/java-oracle/README.md`. The oracles' tooling is Rust; the oracle programs stay Java or C#.
 
 C#: `testdata/csharp/` (7064 goldens of Roslyn's parsing and lexing tests) and `tools/csharp-oracle` (Roslyn 5.9.0
 itself: `oracle.sh dump`, `oracle.sh lex`, `oracle.sh values` and `oracle.sh getters`, the cached dumps, lexer lines

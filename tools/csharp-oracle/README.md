@@ -20,7 +20,7 @@ its nuspec names, which no tag contains). The dump is not imitated: it is a walk
 | `defines.py` | a corpus list with preprocessor symbols: the files whose `#if` and `#elif` conditions name a symbol, each with all of them |
 | `caches.sh` | rebuilds every cache below (clones, lists, dumps, lexer lines, fuzz) |
 | `link_same.py` | hard-links the Preview dumps that equal the Latest ones |
-| `mutate.py` | one-place mutations of the diagnostic-free goldens, after `tools/java-oracle/mutate.py` |
+| `mutate.py` | one-place mutations of the diagnostic-free goldens, after `java-oracle mutate` (`crates/ide-oracle/src/bin/java-oracle/mutate.rs`) |
 | `lex_fuzz.py` | lexer fuzz inputs: the golden inputs with lexer-state pieces inserted, replaced or deleted |
 | `check_offsets.py` | checks a dump directory against the source bytes: every token and trivia text at its UTF-8 offsets |
 
