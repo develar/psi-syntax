@@ -845,6 +845,37 @@ The machine is an Apple M5 Max shared with other sessions. Every comparison alte
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
 
+### C# token reads inline, 2026-11-05
+
+The profile after "C# flatten without calls" (callgrind over the same 1004 roslyn files, 2271.8 M Ir) named
+`SyntaxParser::current_kind` (156 M, 6.9 %), `Lexer::lex` (282 M) and `GreenArena::quick_token` (98 M). Five
+changes, trees byte-identical (gate PASS), each the subset's Ir after it:
+
+| change | Ir, M |
+|---|---|
+| (before) | 2271.8 |
+| `current_kind`, `current_contextual_kind` and `current_token` inline (`ensure_current`): the token present and the arena within its budget is one test of two loads, the fetch and the abandoning in `fetch_or_abandon`; the call, not the budget check, was the cost (10.5 M calls of 15 instructions and a frame) | 2199.3 |
+| `peek_kind`, `peek_contextual_kind` inline when the token is in the window as it is (`peeked`), else `peek_token` as before | 2181.3 |
+| the quick scanner's state table of 256 entries indexed by a `u8`: no bounds check per character | 2171.5 |
+| the token map compares the key's words that hold its text (zero past it in both), not all six by a `bcmp` call | 2152.1 |
+| `quick_token` inline into its one caller, `contextual_kind` inline | 2107.8 (-7.2 %) |
+
+The budget check stays at every read of a token, as before, so a parse is abandoned at the same token: checking it
+where the arena grows instead would need the arena to reach the parsers that read it (an interpolated string's holes
+and documentation comments have parsers of their own over one arena), and a parser loop that allocates without
+consuming a token, what the budget is for, is stopped only by its reads. On the Mac Studio, `scripts/ab.sh` with `KS_INSTR=1`, `--nice 0`,
+one thread, 5 alternating rounds, against the commit before it:
+
+| corpus | G instructions a round | G cycles a round | MB/s, 9 rounds without `KS_INSTR` (load 20-30) |
+|---|---|---|---|
+| dotnet/roslyn | 39.32 → 36.51 (-7.1 %) | 8.32 → 8.29 (load 55-205) | 73.5 → 85.5 (×1.163) |
+| dotnet/runtime | 104.80 → 96.18 (-8.2 %) | 21.01 → 20.74 (load 10-52) | 48.4 → 52.1 (×1.076) |
+
+The machine was shared throughout: the MB/s rounds spread 62-91 against 79-91 on roslyn, and the quietest runtime
+rounds (load 12-19) gave 61.5 → 63.1, 61.8 → 62.9, 60.8 → 61.7 (about +2 %), with the cycles of the instruction runs
+down only 0.4 and 1.3 %. The instructions are steady and the cycles say most of what went was cheap (calls, frames,
+compares the core overlaps); a quiet-machine measurement of the wall time is still owed.
+
 ### C# flatten without calls, 2026-11-05
 
 A profile of the roslyn corpus (`scripts/profile.py`, one thread) had `Flattener::run_columns` at 13.8 % self, second
@@ -1576,7 +1607,8 @@ There is no line-level profile of the current code: `atos` returned no line info
 
 - **C# speed.** 0.215 G instructions per source MB on dotnet/runtime's files up to 4 MiB after "C# parse speed, the
   six commits after 25dac59f" (0.312 before), against Kotlin's 0.205 and Java's 0.201; "C# flatten without calls"
-  took another 4.4 % of the instructions on the whole runtime corpus. On the Mac Studio at 20
+  took another 4.4 % of the instructions on the whole runtime corpus and "C# token reads inline" 8.2 % more, which
+  a quiet machine has yet to turn into wall time (its cycles moved 1-2 %). On the Mac Studio at 20
   threads the stack measured 62.6 MB/s a thread on one quieter pass and 46.7 at load 12-17 (accio's target is 50):
   open are a second quiet 20-thread pass there, the side table and the token map's size measured there on their own,
   a new profile of the lexer and `LanguageParser` (now most of the time), and a quiet-machine run of the table in "C#

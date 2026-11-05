@@ -304,23 +304,32 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     }
 
     /// `CurrentToken`.
-    #[inline]
+    #[inline(always)]
     pub fn current_token(&mut self) -> Green {
         self.ensure_current();
         self.current_token
     }
 
-    /// Fetches the current token when it is not (`CurrentToken`'s getter), and abandons an over-budget parse.
+    /// Fetches the current token when it is not (`CurrentToken`'s getter), and abandons an over-budget parse. Both
+    /// are rare against the reads of a current token, so the check is inline and the work is not.
     #[inline(always)]
     fn ensure_current(&mut self) {
+        if self.current_token.is_null() || self.lexer.arena_ref().is_over_budget() {
+            self.fetch_or_abandon();
+        }
+        debug_assert_eq!(self.current_kind, self.lexer.arena_ref().kind(self.current_token));
+        debug_assert_eq!(self.current_contextual, self.lexer.arena_ref().contextual_kind(self.current_token));
+    }
+
+    /// `ensure_current`'s work: the current token fetched when there is none, the parse abandoned when over budget.
+    #[inline(never)]
+    fn fetch_or_abandon(&mut self) {
         if self.current_token.is_null() {
             self.fetch_current_token();
         }
         if self.lexer.arena_ref().is_over_budget() {
             self.abandon_over_budget();
         }
-        debug_assert_eq!(self.current_kind, self.lexer.arena_ref().kind(self.current_token));
-        debug_assert_eq!(self.current_contextual, self.lexer.arena_ref().contextual_kind(self.current_token));
     }
 
     /// The arena outgrew its budget (`green::budget_for`, not in Roslyn): the parse is abandoned (`abandon`), and
@@ -335,14 +344,14 @@ impl<'l, 't> SyntaxParser<'l, 't> {
     }
 
     /// `CurrentToken.Kind`.
-    #[inline]
+    #[inline(always)]
     pub fn current_kind(&mut self) -> SyntaxKind {
         self.ensure_current();
         self.current_kind
     }
 
     /// `CurrentToken.ContextualKind`.
-    #[inline]
+    #[inline(always)]
     pub fn current_contextual_kind(&mut self) -> SyntaxKind {
         self.ensure_current();
         self.current_contextual
@@ -464,8 +473,31 @@ impl<'l, 't> SyntaxParser<'l, 't> {
         self.tokens.get((self.token_offset + n).max(0) as usize).map_or(Green::NULL, |t| t.token)
     }
 
+    /// The buffered token `n` after the current one when `PeekToken(n)` would read it from the window as it is: no
+    /// token to lex first, the parse not abandoned or over budget (`peek_kind`'s and `peek_contextual_kind`'s inline
+    /// path).
+    #[inline(always)]
+    fn peeked(&self, n: i32) -> Option<&BufferedToken> {
+        let i = self.token_offset + n;
+        if i < self.token_count && self.forced_eof.is_null() && !self.lexer.arena_ref().is_over_budget() {
+            self.tokens.get(i.max(0) as usize)
+        } else {
+            None
+        }
+    }
+
     /// `PeekToken(n).Kind`, from the window.
+    #[inline(always)]
     pub fn peek_kind(&mut self, n: i32) -> SyntaxKind {
+        match self.peeked(n) {
+            Some(b) => b.kind,
+            None => self.peek_kind_with_token(n),
+        }
+    }
+
+    /// `peek_kind` when the token is not in the window as it is.
+    #[inline(never)]
+    fn peek_kind_with_token(&mut self, n: i32) -> SyntaxKind {
         let t = self.peek_token(n);
         match self.tokens.get((self.token_offset + n).max(0) as usize) {
             Some(b) if b.token == t => b.kind,
@@ -475,7 +507,17 @@ impl<'l, 't> SyntaxParser<'l, 't> {
 
     /// `PeekToken(n).ContextualKind` (not a method of Roslyn's: its `is { ContextualKind: ... }` patterns), from the
     /// window.
+    #[inline(always)]
     pub fn peek_contextual_kind(&mut self, n: i32) -> SyntaxKind {
+        match self.peeked(n) {
+            Some(b) => b.contextual,
+            None => self.peek_contextual_kind_with_token(n),
+        }
+    }
+
+    /// `peek_contextual_kind` when the token is not in the window as it is.
+    #[inline(never)]
+    fn peek_contextual_kind_with_token(&mut self, n: i32) -> SyntaxKind {
         let t = self.peek_token(n);
         match self.tokens.get((self.token_offset + n).max(0) as usize) {
             Some(b) if b.token == t => b.contextual,

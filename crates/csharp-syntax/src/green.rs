@@ -764,7 +764,8 @@ impl GreenArena {
 
     /// The token `LexSyntaxToken` makes of the text at `full_start` that the quick scanner found in its map
     /// (`lexer::quick_scanner`): its whitespace and end of line trivia, then the token, its text the source's; the
-    /// records `LexSyntaxToken` would push, in its order.
+    /// records `LexSyntaxToken` would push, in its order. Inline: its one caller is the quick scanner's hit.
+    #[inline(always)]
     pub(crate) fn quick_token(&mut self, full_start: u32, token: &crate::lexer::QuickToken) -> Green {
         let leading_count = token.leading as usize;
         let count = (leading_count + token.trailing as usize).min(token.trivia.len());
@@ -931,6 +932,7 @@ impl GreenArena {
     }
 
     /// The token's `ContextualKind` (`kind` for a token that is no contextual keyword).
+    #[inline]
     pub fn contextual_kind(&self, token: Green) -> SyntaxKind {
         if token.is_token() { self.token_data(token).contextual } else { self.kind(token) }
     }

@@ -46,8 +46,9 @@ mod flags {
 const COLUMNS: usize = 16;
 
 /// `s_stateTransitions`, one row of 16 per state (the rows of `Done` and `Bad` are never read), each entry the next
-/// state times `COLUMNS`: the index of its row, so a step is one add and one load.
-const STATE_TRANSITIONS: [u8; 10 * COLUMNS] = {
+/// state times `COLUMNS`: the index of its row, so a step is one add and one load. 256 entries, the rows past `Done`
+/// all `Bad`, so that a `u8` index needs no bounds check.
+const STATE_TRANSITIONS: [u8; 256] = {
     use state::*;
     const fn row(r: [u8; 11]) -> [u8; COLUMNS] {
         let mut out = [BAD; COLUMNS];
@@ -80,7 +81,7 @@ const STATE_TRANSITIONS: [u8; 10 * COLUMNS] = {
         // Done (never read)
         row([DONE; 11]),
     ];
-    let mut out = [BAD; 10 * COLUMNS];
+    let mut out = [BAD * COLUMNS as u8; 256];
     let mut r = 0;
     while r < 10 {
         let mut c = 0;
@@ -146,22 +147,23 @@ impl<'t> Lexer<'t> {
         let span = text.get(start..end)?;
 
         // the state times `COLUMNS` (`STATE_TRANSITIONS`); the hash is the key's (`Key::new`), not a running one
-        let mut st = state::INITIAL as usize * COLUMNS;
+        let mut st = state::INITIAL * COLUMNS as u8;
         let mut current_index = 0;
         loop {
             let Some(&c) = span.get(current_index) else {
                 return None; // ran out of characters in window
             };
             let flags = CHAR_PROPERTIES[c as usize];
-            st = STATE_TRANSITIONS[st + flags as usize] as usize;
+            // a row's start plus a column below 16: at most 255
+            st = STATE_TRANSITIONS[st.wrapping_add(flags) as usize];
             // NOTE: that Bad > Done and it is the only state like that as a result, we will exit the loop on either
             // Bad or Done.
-            if st >= state::DONE as usize * COLUMNS {
+            if st >= state::DONE * COLUMNS as u8 {
                 break;
             }
             current_index += 1;
         }
-        if st != state::DONE as usize * COLUMNS {
+        if st != state::DONE * COLUMNS as u8 {
             return None;
         }
 

@@ -125,7 +125,11 @@ impl LexerCache {
         #[cfg(test)]
         self.lookups.set(self.lookups.get() + 1);
         let e = self.entries.get(Self::slot(key))?;
-        let found = (e.len == key.len && e.words == key.words).then_some(e.token);
+        // the words past the text are zero in both, so the text's own words decide (most are one), compared in place
+        // rather than by a call comparing all of them
+        let used = (key.len as usize).div_ceil(8);
+        let same = e.len == key.len && e.words.iter().zip(&key.words).take(used).all(|(a, b)| a == b);
+        let found = same.then_some(e.token);
         #[cfg(test)]
         self.hits.set(self.hits.get() + found.is_some() as usize);
         found
