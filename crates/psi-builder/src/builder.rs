@@ -72,6 +72,10 @@ struct MarkerData<T, N, B> {
     /// The builder's nesting (`PsiBuilderImpl::nesting`) when the marker was collapsed: where a lazy block or lambda
     /// sits, for the chameleon that expands it (not in the Java).
     depth: u16,
+    /// The production list's `[prev, next]` of the marker's start node and of its done node (see
+    /// `PsiBuilderImpl::extra_links`): in the record, so a marker and its entries are one access. A freed marker
+    /// keeps them, since a done node of an earlier use of its id may still be linked.
+    links: [[u32; 2]; 2],
 }
 
 const NONE: u32 = 0;
@@ -82,6 +86,24 @@ const HEAD: u32 = 0;
 const UNLINKED: u32 = u32::MAX;
 /// The bit of an extra node (`PsiBuilderImpl::extra_links`).
 const EXTRA: u32 = 1 << 31;
+
+/// The production list's links as `PsiBuilderImpl::link_slices` lends them.
+struct LinkSlices<'a, T, N, B> {
+    markers: &'a mut [MarkerData<T, N, B>],
+    extra: &'a mut [[u32; 2]],
+}
+
+impl<T, N, B> LinkSlices<'_, T, N, B> {
+    /// The `[prev, next]` of `node` to write (`PsiBuilderImpl::link` reads one).
+    #[inline(always)]
+    fn slot(&mut self, node: u32) -> &mut [u32; 2] {
+        if node & EXTRA == 0 {
+            &mut self.markers[(node >> 1) as usize].links[(node & 1) as usize]
+        } else {
+            &mut self.extra[(node & !EXTRA) as usize]
+        }
+    }
+}
 
 /// The node of a marker's start entry in the production list; its done entry's is the next.
 #[inline(always)]
@@ -101,7 +123,22 @@ impl<T, N, B: WhitespacesAndCommentsBinder<T>> MarkerData<T, N, B> {
             right_binder: B::DEFAULT_RIGHT_BINDER,
             collapsed: false,
             depth: 0,
+            links: [[UNLINKED, UNLINKED]; 2],
         }
+    }
+
+    /// What `new` makes of a freed marker but its kind and links (a done node of an earlier use of its id may still
+    /// be linked), field by field.
+    #[inline(always)]
+    fn reset(&mut self) {
+        self.lexeme_index = -1;
+        self.done_lexeme = -1;
+        self.element_type = None;
+        self.message = 0;
+        self.left_binder = B::DEFAULT_LEFT_BINDER;
+        self.right_binder = B::DEFAULT_RIGHT_BINDER;
+        self.collapsed = false;
+        self.depth = 0;
     }
 
     /// `getLexemeIndex(done)`.
@@ -441,13 +478,13 @@ pub struct PsiBuilderImpl<L: Language> {
     free_start_markers: Vec<u32>,
     free_error_items: Vec<u32>,
     /// `MarkerProduction` while parsing, as a doubly linked list (not in the Java's array, whose inserts before a
-    /// marker and removals move everything after it): `links[node]` is `[prev, next]`, where node `2 * id` is the
-    /// start entry of marker `id` and `2 * id + 1` its done entry, and node 0 is the head whose `prev` is the last
-    /// entry; `UNLINKED` for a node not in the list. So `indexOf` is the marker's own node, and `precede`, `doneBefore`,
-    /// `errorBefore`, `drop` and `rollbackTo` touch only the entries they add or remove. A second done entry of the
-    /// same marker id (a marker done twice, which Java only logs, or one done again after its id was reused while an
-    /// old done entry stayed) is an extra node `EXTRA | k`, its links in `extra_links[k]`, its id in `extra_ids[k]`.
-    links: Vec<[u32; 2]>,
+    /// marker and removals move everything after it): node `2 * id` is the start entry of marker `id` and
+    /// `2 * id + 1` its done entry, their `[prev, next]` in the marker's own record (`MarkerData::links`), and node 0
+    /// is the head whose `prev` is the last entry; `UNLINKED` for a node not in the list. So `indexOf` is the marker's
+    /// own node, and `precede`, `doneBefore`, `errorBefore`, `drop` and `rollbackTo` touch only the entries they add or
+    /// remove. A second done entry of the same marker id (a marker done twice, which Java only logs, or one done again
+    /// after its id was reused while an old done entry stayed) is an extra node `EXTRA | k`, its links in
+    /// `extra_links[k]`, its id in `extra_ids[k]`.
     extra_links: Vec<[u32; 2]>,
     extra_ids: Vec<i32>,
     /// How many extra nodes are linked; while none, the last done entry of a marker is its own done node.
@@ -536,7 +573,6 @@ impl<L: Language> Default for PsiBuilderImpl<L> {
             markers: Vec::new(),
             free_start_markers: Vec::new(),
             free_error_items: Vec::new(),
-            links: Vec::new(),
             extra_links: Vec::new(),
             extra_ids: Vec::new(),
             extras_linked: 0,
@@ -600,13 +636,12 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.current_lexeme = 0;
         self.checked = false;
         self.markers.clear();
-        self.markers.push(MarkerData::new(MarkerKind::Start));
+        // Marker 0 (no marker): its start node is the head, the empty list; its done node is never linked.
+        let mut head = MarkerData::new(MarkerKind::Start);
+        head.links[0] = [HEAD, HEAD];
+        self.markers.push(head);
         self.free_start_markers.clear();
         self.free_error_items.clear();
-        self.links.clear();
-        // Marker 0 (no marker): its start node is the head, the empty list; its done node is never linked.
-        self.links.push([HEAD, HEAD]);
-        self.links.push([UNLINKED, UNLINKED]);
         self.extra_links.clear();
         self.extra_ids.clear();
         self.extras_linked = 0;
@@ -647,7 +682,6 @@ impl<L: Language> PsiBuilderImpl<L> {
             + vec_bytes(&self.markers)
             + vec_bytes(&self.free_start_markers)
             + vec_bytes(&self.free_error_items)
-            + vec_bytes(&self.links)
             + vec_bytes(&self.extra_links)
             + vec_bytes(&self.extra_ids)
             + vec_bytes(&self.entries)
@@ -665,7 +699,6 @@ impl<L: Language> PsiBuilderImpl<L> {
         shrink.vec(&mut self.markers);
         shrink.vec(&mut self.free_start_markers);
         shrink.vec(&mut self.free_error_items);
-        shrink.vec(&mut self.links);
         shrink.vec(&mut self.extra_links);
         shrink.vec(&mut self.extra_ids);
         shrink.vec(&mut self.entries);
@@ -1184,9 +1217,9 @@ impl<L: Language> PsiBuilderImpl<L> {
         if self.production_len != 0 {
             self.skip_whitespace();
         }
-        let marker = self.create_marker(self.current_lexeme as i32);
-        self.link_before(start_node(marker.0), HEAD);
-        marker
+        let id = self.allocate(MarkerKind::Start);
+        self.link_last(id, self.current_lexeme as i32);
+        Marker(id)
     }
 
     #[inline(always)]
@@ -1206,8 +1239,6 @@ impl<L: Language> PsiBuilderImpl<L> {
             Some(id) => id,
             None => {
                 self.markers.push(MarkerData::new(kind));
-                self.links.push([UNLINKED, UNLINKED]);
-                self.links.push([UNLINKED, UNLINKED]);
                 (self.markers.len() - 1) as u32
             }
         }
@@ -1215,8 +1246,9 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     #[inline(always)]
     fn free_marker(&mut self, id: u32) {
-        let kind = self.markers[id as usize].kind;
-        self.markers[id as usize] = MarkerData::new(kind);
+        let m = &mut self.markers[id as usize];
+        m.reset();
+        let kind = m.kind;
         match kind {
             MarkerKind::Start => self.free_start_markers.push(id),
             MarkerKind::Error => self.free_error_items.push(id),
@@ -1259,8 +1291,7 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
         let id = self.allocate(MarkerKind::Error);
         self.set_message(id, message_text.into());
-        self.markers[id as usize].lexeme_index = self.current_lexeme as i32;
-        self.link_before(start_node(id), HEAD);
+        self.link_last(id, self.current_lexeme as i32);
     }
 
     /// `hasErrorsAfter(marker)`: whether an error item or error marker was added after `marker` and not dropped.
@@ -1330,12 +1361,11 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     #[inline(always)]
     fn link(&self, node: u32) -> [u32; 2] {
-        if node & EXTRA == 0 { self.links[node as usize] } else { self.extra_links[(node & !EXTRA) as usize] }
-    }
-
-    #[inline(always)]
-    fn link_mut(&mut self, node: u32) -> &mut [u32; 2] {
-        if node & EXTRA == 0 { &mut self.links[node as usize] } else { &mut self.extra_links[(node & !EXTRA) as usize] }
+        if node & EXTRA == 0 {
+            self.markers[(node >> 1) as usize].links[(node & 1) as usize]
+        } else {
+            self.extra_links[(node & !EXTRA) as usize]
+        }
     }
 
     /// The production entry a node is: a start marker's id, or the negated id of a done marker.
@@ -1353,25 +1383,49 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.link(node)[0] != UNLINKED
     }
 
+    /// The marker records and the extra nodes' links as slices, for a list edit of several links: their pointers
+    /// and lengths stay in registers across its stores, which through the vectors' fields they would not.
+    #[inline(always)]
+    fn link_slices(&mut self) -> LinkSlices<'_, L::Token, L::Node, L::Binder> {
+        LinkSlices { markers: &mut self.markers, extra: &mut self.extra_links }
+    }
+
     /// Links `node` into the production right before `anchor` (`HEAD`: at the end).
     #[inline(always)]
     fn link_before(&mut self, node: u32, anchor: u32) {
-        let prev = self.link(anchor)[0];
-        *self.link_mut(node) = [prev, anchor];
-        self.link_mut(prev)[1] = node;
-        self.link_mut(anchor)[0] = node;
+        let mut s = self.link_slices();
+        let prev = s.slot(anchor)[0];
+        *s.slot(node) = [prev, anchor];
+        s.slot(prev)[1] = node;
+        s.slot(anchor)[0] = node;
         self.production_len += 1;
         if node & EXTRA != 0 {
             self.extras_linked += 1;
         }
     }
 
+    /// A new marker's `myLexemeIndex` and its start entry at the end of the production (`link_before(start_node(id),
+    /// HEAD)`), in one access to its record.
+    #[inline(always)]
+    fn link_last(&mut self, id: u32, lexeme_index: i32) {
+        let node = start_node(id);
+        let mut s = self.link_slices();
+        let prev = s.markers[0].links[0][0];
+        let m = &mut s.markers[id as usize];
+        m.lexeme_index = lexeme_index;
+        m.links[0] = [prev, HEAD];
+        s.slot(prev)[1] = node;
+        s.markers[0].links[0][0] = node;
+        self.production_len += 1;
+    }
+
     #[inline(always)]
     fn unlink(&mut self, node: u32) {
-        let [prev, next] = self.link(node);
-        self.link_mut(prev)[1] = next;
-        self.link_mut(next)[0] = prev;
-        *self.link_mut(node) = [UNLINKED, UNLINKED];
+        let mut s = self.link_slices();
+        let [prev, next] = *s.slot(node);
+        s.slot(prev)[1] = next;
+        s.slot(next)[0] = prev;
+        *s.slot(node) = [UNLINKED, UNLINKED];
         self.production_len -= 1;
         if node & EXTRA != 0 {
             self.extras_linked -= 1;
@@ -1389,27 +1443,39 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// start entries they are, from the last entry back (the free lists' order).
     fn production_rollback_to(&mut self, marker_id: u32) {
         let Some(first) = self.index_of(marker_id) else { return };
-        // The tail from `first` on is cut off at once; its nodes are unlinked from the last back.
-        let before = self.link(first)[0];
-        let mut node = self.link(HEAD)[0];
+        // The tail from `first` on is cut off at once; its nodes are unlinked from the last back, over slices and
+        // counts held in locals (`link_slices`).
+        let PsiBuilderImpl { markers, extra_links, free_start_markers, free_error_items, .. } = self;
+        let mut s = LinkSlices { markers, extra: extra_links };
+        let before = s.slot(first)[0];
+        let mut node = s.markers[0].links[0][0];
+        let (mut removed, mut extras) = (0usize, 0u32);
         loop {
-            let prev = self.link(node)[0];
-            let id = self.node_id(node);
-            *self.link_mut(node) = [UNLINKED, UNLINKED];
-            self.production_len -= 1;
+            let slot = s.slot(node);
+            let prev = slot[0];
+            *slot = [UNLINKED, UNLINKED];
+            removed += 1;
             if node & EXTRA != 0 {
-                self.extras_linked -= 1;
-            }
-            if id > 0 {
-                self.free_marker(id as u32);
+                extras += 1;
+            } else if node & 1 == 0 {
+                // A start entry, of marker `node >> 1` (> 0: the head is never in the tail): `free_marker`.
+                let id = node >> 1;
+                let m = &mut s.markers[id as usize];
+                m.reset();
+                match m.kind {
+                    MarkerKind::Start => free_start_markers.push(id),
+                    MarkerKind::Error => free_error_items.push(id),
+                }
             }
             if node == first {
                 break;
             }
             node = prev;
         }
-        self.link_mut(before)[1] = HEAD;
-        self.link_mut(HEAD)[0] = before;
+        s.slot(before)[1] = HEAD;
+        s.markers[0].links[0][0] = before;
+        self.production_len -= removed;
+        self.extras_linked -= extras;
     }
 
     /// `MarkerProduction.dropMarker`: removes the last done entry of the marker (when done) and its start entry.
@@ -1445,6 +1511,20 @@ impl<L: Language> PsiBuilderImpl<L> {
 
     /// `MarkerProduction.addDone`: a done entry at the end, or before `anchor_before`'s start entry.
     fn add_done(&mut self, marker_id: u32, anchor_before: Option<u32>) {
+        if anchor_before.is_none() {
+            // The common case, the marker's own done node at the end, in one access to its record.
+            let node = start_node(marker_id) + 1;
+            let mut s = self.link_slices();
+            let prev = s.markers[0].links[0][0];
+            let m = &mut s.markers[marker_id as usize];
+            if m.links[1][0] == UNLINKED {
+                m.links[1] = [prev, HEAD];
+                s.slot(prev)[1] = node;
+                s.markers[0].links[0][0] = node;
+                self.production_len += 1;
+                return;
+            }
+        }
         let anchor = match anchor_before {
             None => Some(HEAD),
             Some(anchor) => self.index_of(anchor),
@@ -1491,17 +1571,17 @@ impl<L: Language> PsiBuilderImpl<L> {
             starts: &self.lex_starts,
             text: &self.text[self.base..self.base + self.len],
         };
-        let links = &self.links;
-        let markers = &mut self.markers;
+        let markers = &mut self.markers[..];
         // `balanceWhiteSpaces`' `lastIndex` and the balanced lexeme of the entry before.
         let (mut last_index, mut prev) = (0i32, 0i32);
         // No extra node is linked: every node is a marker's own, `2 * id` its start, `2 * id + 1` its done.
-        let mut node = links[HEAD as usize][1];
+        let mut node = markers[0].links[0][1];
         let last = size - 1;
         for (i, slot) in entries.iter_mut().enumerate() {
             let item_id = node >> 1;
             let done = node & 1 != 0;
             let m = &mut markers[item_id as usize];
+            let next = m.links[done as usize][1];
             let (mut lex, binder, ty, flags);
             if m.kind == MarkerKind::Error {
                 (lex, binder, ty, flags) = (m.lexeme_index, L::Binder::DEFAULT_RIGHT_BINDER, 0, ENTRY_ERROR_ITEM);
@@ -1523,7 +1603,7 @@ impl<L: Language> PsiBuilderImpl<L> {
             prev = lex;
             let id = if done { -(item_id as i32) } else { item_id as i32 };
             *slot = Entry { id, lex, ty, flags };
-            node = links[node as usize][1];
+            node = next;
         }
         self.entries = entries;
     }
@@ -1610,16 +1690,23 @@ impl<L: Language> PsiBuilderImpl<L> {
         add(Counter::Rollback, 1);
         add(Counter::RollbackLexemes, self.current_lexeme.saturating_sub(lexeme_index as usize) as u64);
         if !self.tokens_to_restore_on_rollback.is_empty() {
-            let restored = self.tokens_to_restore_on_rollback.split_off(&(lexeme_index as usize));
-            for (index, element_type) in restored {
-                self.note_remap(index, self.lex_types[index], element_type);
-                self.lex_types[index] = element_type;
-            }
+            self.restore_remapped(lexeme_index as usize);
         }
         self.current_lexeme = lexeme_index as usize;
         self.checked = true;
         self.refresh(false);
         self.production_rollback_to(marker.0);
+    }
+
+    /// `rollbackTo`'s restore of the tokens remapped from `lexeme_index` on, out of line: few rollbacks have any.
+    #[cold]
+    #[inline(never)]
+    fn restore_remapped(&mut self, lexeme_index: usize) {
+        let restored = self.tokens_to_restore_on_rollback.split_off(&lexeme_index);
+        for (index, element_type) in restored {
+            self.note_remap(index, self.lex_types[index], element_type);
+            self.lex_types[index] = element_type;
+        }
     }
 
     /// `Marker.done(type)`.
