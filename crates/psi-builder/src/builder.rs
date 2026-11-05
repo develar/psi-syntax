@@ -1488,6 +1488,35 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.extras_linked -= extras;
     }
 
+    /// `dropMarker` and `rollbackTo`'s production part for a marker that is not done and whose start entry is the
+    /// production's last, as a mark that nothing followed is (a speculation the parsers give up at once, most of
+    /// their drops and rollbacks): that entry unlinked and the marker freed, in one access to its record. False, with
+    /// nothing done, for any other marker.
+    #[inline(always)]
+    fn drop_last(&mut self, marker_id: u32) -> bool {
+        let node = start_node(marker_id);
+        let PsiBuilderImpl { markers, extra_links, free_start_markers, free_error_items, .. } = self;
+        let mut s = LinkSlices { markers, extra: extra_links };
+        if s.markers[0].links[0][0] != node {
+            return false;
+        }
+        let m = &mut s.markers[marker_id as usize];
+        if m.is_done() {
+            return false;
+        }
+        let prev = m.links[0][0];
+        m.links[0] = [UNLINKED, UNLINKED];
+        m.reset();
+        match m.kind {
+            MarkerKind::Start => free_start_markers.push(marker_id),
+            MarkerKind::Error => free_error_items.push(marker_id),
+        }
+        s.slot(prev)[1] = HEAD;
+        s.markers[0].links[0][0] = prev;
+        self.production_len -= 1;
+        true
+    }
+
     /// `MarkerProduction.dropMarker`: removes the last done entry of the marker (when done) and its start entry.
     fn drop_marker(&mut self, marker_id: u32) {
         if self.marker(marker_id).is_done()
@@ -1726,7 +1755,9 @@ impl<L: Language> PsiBuilderImpl<L> {
     /// `Marker.drop()`.
     pub fn drop(&mut self, marker: Marker) {
         add(Counter::Drop, 1);
-        self.drop_marker(marker.0);
+        if !self.drop_last(marker.0) {
+            self.drop_marker(marker.0);
+        }
     }
 
     /// `Marker.rollbackTo()`.
@@ -1743,7 +1774,9 @@ impl<L: Language> PsiBuilderImpl<L> {
         self.current_lexeme = lexeme_index as usize;
         self.checked = true;
         self.refresh(false);
-        self.production_rollback_to(marker.0);
+        if !self.drop_last(marker.0) {
+            self.production_rollback_to(marker.0);
+        }
     }
 
     /// `rollbackTo`'s restore of the tokens remapped from `lexeme_index` on, out of line: few rollbacks have any.
