@@ -1768,15 +1768,55 @@ impl<L: Language> PsiBuilderImpl<L> {
         }
         add(Counter::Rollback, 1);
         add(Counter::RollbackLexemes, self.current_lexeme.saturating_sub(lexeme_index as usize) as u64);
-        if !self.tokens_to_restore_on_rollback.is_empty() {
-            self.restore_remapped(lexeme_index as usize);
-        }
-        self.current_lexeme = lexeme_index as usize;
-        self.checked = true;
-        self.refresh(false);
+        self.rollback_cursor(lexeme_index as usize);
         if !self.drop_last(marker.0) {
             self.production_rollback_to(marker.0);
         }
+    }
+
+    /// `rollbackTo`'s part of the cursor: the tokens remapped from `lexeme` on restored, the cursor at `lexeme` with
+    /// `myTokenTypeChecked` set.
+    #[inline(always)]
+    fn rollback_cursor(&mut self, lexeme: usize) {
+        if !self.tokens_to_restore_on_rollback.is_empty() {
+            self.restore_remapped(lexeme);
+        }
+        self.current_lexeme = lexeme;
+        self.checked = true;
+        self.refresh(false);
+    }
+
+    // A speculation given up before its markers (not in the Java). A parser that marks, tests the tokens ahead and
+    // drops or rolls back the marker when they start nothing it parses, can test first and, when they start nothing,
+    // leave the builder as that sequence would with nothing between the marks and the give-up: these are exactly the
+    // steps of `mark()`, `rollbackTo()` and `drop()` that do not touch the production, which they would leave as it
+    // was. The parser's test must be side-effect free and answer as its tests on that path would (no remap).
+
+    /// What `mark()` does before it makes its marker, once the production holds an entry: whitespace and comments
+    /// skipped. Every `mark()` and token test after it then reads the same cursor (another skip moves nothing), so
+    /// the lexeme returned is where any number of nested markers would start, for `speculation_rolled_back`. `None`,
+    /// with nothing done, while the production is empty: the first `mark()` skips nothing and the ones after it do,
+    /// so the parser takes the Java's path.
+    #[inline(always)]
+    pub fn speculation_start(&mut self) -> Option<usize> {
+        if self.production_len == 0 {
+            return None;
+        }
+        self.skip_whitespace();
+        Some(self.current_lexeme)
+    }
+
+    /// The state nested `mark()`s from `speculation_start` and the `rollbackTo()` of one of them (the others
+    /// dropped or rolled back with it) leave when nothing came between them: `rollbackTo`'s cursor at `lexeme`.
+    ///
+    /// The marker pool needs nothing: the marks pop the free list and make new markers past it, and freeing them in
+    /// reverse pushes the new ones back first and the popped ones on top in their order. Later marks then pop the
+    /// same ids as without them: the free ones first, then the new ones in the ascending order in which `allocate`
+    /// makes them; only the vector of markers stays shorter, which nothing but its heap bytes shows. The other pieces
+    /// of the sequence (a `drop()`, a mark given up without a rollback) move nothing that `speculation_start` did not.
+    #[inline(always)]
+    pub fn speculation_rolled_back(&mut self, lexeme: usize) {
+        self.rollback_cursor(lexeme);
     }
 
     /// `rollbackTo`'s restore of the tokens remapped from `lexeme_index` on, out of line: few rollbacks have any.

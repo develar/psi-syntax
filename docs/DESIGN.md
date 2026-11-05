@@ -188,6 +188,18 @@ What the port adds to the hot path:
   - The markers it leaves out are monotone in lexeme, so they move no `balance_white_spaces` edge.
 
   Under a truncation the Java loop runs unchanged.
+- **Speculations given up before their markers.** Kotlin's parsers mark, test the tokens ahead and roll back or drop
+  the marker when they start nothing: after every call `parseCallWithClosure` and `parseAnnotatedLambda` try a
+  trailing lambda, before every declaration and statement `doParseModifierList` and `tryParseModifier` try modifiers,
+  and `parseTypeConstraintsGuarded` tries `where`. Four in five of those markers consumed no token. Where the token at
+  the cursor starts nothing the attempt parses, each of these methods now tests it first (`may_start_annotated_lambda`,
+  `may_start_modifier`, `would_at`, `would_at_set`: what `at` and `atSet` would answer, without their remap) and
+  leaves the builder as the Java's sequence would: `PsiBuilderImpl::speculation_start` is `mark()`'s skip of
+  whitespace and comments, `speculation_rolled_back` `rollbackTo()`'s cursor. Neither touches the production, which
+  the sequence leaves as it was; the marker pool needs nothing, since markers freed in reverse leave later marks the
+  same ids (the doc comment says why). While the production is empty the first `mark()` skips nothing, so the
+  methods take the Java's path there. Each test is equal to the Java's tests on that path by its doc comment, and the
+  gate checks the trees.
 
 Marker storage:
 
@@ -908,6 +920,31 @@ straight-line walk alone 327.5 M, with the fast path 280.3 M, with the tables 27
 This Mac (load 50-100) gave the same instructions: roslyn 41.06 → 39.13 G (-4.7 %), runtime 109.71 → 104.87 G
 (-4.4 %). Flatten is now about 12 % of the instructions; the lexer (`Lexer::lex` 12.4 %, `quick_token` 4.4 %) and
 `SyntaxParser::current_kind` (6.8 %, its arena budget check on every call) lead the profile.
+
+### Speculations given up before their markers, 2026-11-05
+
+Counters by the place that made each marker (a `#[track_caller]` patch of the `counters` build, not committed) over
+the community files: 69.4 M marks, 29.3 M done, 24.8 M dropped, 12.9 M rolled back, and the rollbacks together moved
+the cursor back over 0.93 M tokens. Four places made most of the markers that consumed nothing: `parseAnnotatedLambda`
+(7.5 M, 7.19 M rolled back), `parseCallWithClosure`'s argument (7.27 M, 7.08 M dropped), `tryParseModifier` (4.08 M,
+3.64 M rolled back) and `doParseModifierList` (3.64 M, 3.14 M dropped); then `parseTypeConstraintsGuarded` (0.78 M,
+all dropped). Two commits, trees byte-identical (gate PASS on each):
+
+- "a dropped or rolled-back marker that nothing followed is unlinked in one access": `drop_last`, for a marker not
+  done whose start entry is the production's last, in `drop` and `rollbackTo`.
+- "speculations the parsers give up at once leave the builder without markers" (Builder, "Speculations given up
+  before their markers").
+
+callgrind on every 17th community file (3265 files), M instructions: before 1916.8; `drop_last` 1899.1 (-0.9 %; `drop`
+132.9 → 113.4, `rollback_to` 116.1 → 105.5); the speculations 1680.4 (-11.5 %; `mark` 277.2 → 178.7, `drop` 113.4 →
+74.2, `rollback_to` 105.5 → 19.2), -12.3 % in all. Java's parsers are untouched; its builder gains `drop_last` only.
+Emulating the marker pool's allocations exactly, before the argument that it needs nothing, cost 41-60 M on its own
+(the free list is short where the speculations fail: most markers end done).
+
+The builder still leads: `bind_entries` 13.6 %, `balance_defaults` 10.9 %, `mark` 10.6 %, the lexer 9.6 %,
+`advance_lexer` 6.6 %. Left as they are: `parseLocalDeclaration` (0.91 M rollbacks over 20 K tokens) and
+`parseReceiverType` (0.69 M drops) give up after work of their own between the mark and the give-up (a modifier list,
+a token-stream scan), which the primitives do not model.
 
 ### The builder's common paths without calls, 2026-11-05
 
@@ -1692,7 +1729,8 @@ There is no line-level profile of the current code: `atos` returned no line info
   (callgrind, and the Studio at load 18-32); repeat `scripts/ab.sh` against 9de0f263 on a quiet host for its wall
   time on both languages.
 - **Next profile.** "The builder's common paths without calls" has the callgrind profile of the Kotlin parse and how
-  to take one; `mark`, `drop_marker` and `rollback_to` (the parsers' speculative marks) lead it with `bind_entries`.
+  to take one, "Speculations given up before their markers" the counts by call site; `bind_entries`, balancing and
+  `mark` lead it.
 
 ### Rejected
 

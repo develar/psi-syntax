@@ -204,6 +204,19 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         if self._at(expectation) {
             return true;
         }
+        match self.at_remap(expectation) {
+            Some(remapped) => {
+                self.my_builder().remap_current_token(remapped);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// The rest of `at(expectation)` once `_at` failed: the type it remaps the current token to and matches, `None`
+    /// when it does not match.
+    #[inline(always)]
+    fn at_remap(&mut self, expectation: TokenKind) -> Option<TokenKind> {
         let token = self.tt();
         // `expectation instanceof KtKeywordToken`, and the expected keyword is soft with the token's text
         if token == IDENTIFIER
@@ -211,18 +224,23 @@ pub trait AbstractKotlinParsing<'b>: Sized {
             && expectation.is_soft_keyword()
             && expectation.value().map(str::as_bytes) == self.my_builder().get_token_bytes()
         {
-            self.my_builder().remap_current_token(expectation);
-            return true;
+            return Some(expectation);
         }
         if expectation == IDENTIFIER
             && let Some(keyword_token) = token
             && keyword_token.is_keyword()
             && keyword_token.is_soft_keyword()
         {
-            self.my_builder().remap_current_token(IDENTIFIER);
-            return true;
+            return Some(IDENTIFIER);
         }
-        false
+        None
+    }
+
+    /// Whether `at(expectation)` would match, without its remap (not in the Java): the test of a speculation given up
+    /// before its markers (`PsiBuilderImpl::speculation_start`).
+    #[inline(always)]
+    fn would_at(&mut self, expectation: TokenKind) -> bool {
+        self._at(expectation) || self.at_remap(expectation).is_some()
     }
 
     /// `_atSet(set)`: side-effect-free version of `atSet()`.
@@ -251,14 +269,26 @@ pub trait AbstractKotlinParsing<'b>: Sized {
         if self._at_set(set) {
             return true;
         }
+        match self.at_set_remap(set) {
+            Some(remapped) => {
+                self.my_builder().remap_current_token(remapped);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// The rest of `atSet(set)` once `_atSet` failed: the type it remaps the current token to and matches, `None` when
+    /// it does not match.
+    #[inline(always)]
+    fn at_set_remap(&mut self, set: &TokenSet) -> Option<TokenKind> {
         let token = self.tt();
         if token == IDENTIFIER {
             let keyword_token = self.my_builder().get_token_bytes().and_then(TokenKind::soft_keyword_by_text);
             if let Some(keyword_token) = keyword_token
                 && set.contains(keyword_token)
             {
-                self.my_builder().remap_current_token(keyword_token);
-                return true;
+                return Some(keyword_token);
             }
         } else {
             // We know at this point that <code>set</code> does not contain <code>token</code>
@@ -267,11 +297,16 @@ pub trait AbstractKotlinParsing<'b>: Sized {
                 && keyword_token.is_keyword()
                 && keyword_token.is_soft_keyword()
             {
-                self.my_builder().remap_current_token(IDENTIFIER);
-                return true;
+                return Some(IDENTIFIER);
             }
         }
-        false
+        None
+    }
+
+    /// Whether `atSet(set)` would match, without its remap (not in the Java), as `would_at`.
+    #[inline(always)]
+    fn would_at_set(&mut self, set: &TokenSet) -> bool {
+        self._at_set(set) || self.at_set_remap(set).is_some()
     }
 
     /// `lookahead(k)`.

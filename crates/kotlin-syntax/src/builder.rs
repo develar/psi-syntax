@@ -622,6 +622,18 @@ impl<'b> SemanticWhitespaceAwarePsiBuilder<'b> {
         self.imp.delegate.remap_current_token(element_type);
     }
 
+    /// `PsiBuilderImpl::speculation_start` (not in the Java).
+    #[inline(always)]
+    pub fn speculation_start(&mut self) -> Option<usize> {
+        self.imp.delegate.speculation_start()
+    }
+
+    /// `PsiBuilderImpl::speculation_rolled_back` (not in the Java).
+    #[inline(always)]
+    pub fn speculation_rolled_back(&mut self, lexeme: usize) {
+        self.imp.delegate.speculation_rolled_back(lexeme);
+    }
+
     /// `KotlinParsing.advanceBalancedBlock()` as one scan of the raw tokens (`PsiBuilderImpl::skip_balanced_block`)
     /// when no truncation applies; false, with nothing done, under a `TruncatedSemanticWhitespaceAwarePsiBuilder`,
     /// whose end the Java loop must check on every token.

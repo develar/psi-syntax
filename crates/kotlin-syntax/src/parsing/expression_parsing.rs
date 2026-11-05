@@ -618,6 +618,14 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
         let mut success = false;
 
         loop {
+            // Not in the Java: where no annotated lambda can start, the Java's `argument` and the two markers of
+            // `parseAnnotatedLambda` are made and given up with nothing parsed (`may_start_annotated_lambda`).
+            if let Some(start) = self.my_builder().speculation_start()
+                && !self.may_start_annotated_lambda()
+            {
+                self.my_builder().speculation_rolled_back(start);
+                break;
+            }
             let argument = self.mark();
 
             if !self.parse_annotated_lambda(/* preferBlock = */ false) {
@@ -634,6 +642,14 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
 
     /// `parseAnnotatedLambda(preferBlock)`: `("@" annotationEntry)* labelDefinition? functionLiteral`.
     pub(crate) fn parse_annotated_lambda(&mut self, prefer_block: bool) -> bool {
+        // Not in the Java: where no annotated lambda can start, its two markers are made and rolled back with nothing
+        // parsed (`may_start_annotated_lambda`).
+        if let Some(start) = self.my_builder().speculation_start()
+            && !self.may_start_annotated_lambda()
+        {
+            self.my_builder().speculation_rolled_back(start);
+            return false;
+        }
         let annotated = self.mark();
 
         let were_annotations = self.my_kotlin_parsing.parse_annotations(AnnotationParsingMode::DEFAULT);
@@ -655,6 +671,19 @@ impl<'p, 'b> KotlinExpressionParsing<'p, 'b> {
         self.done_or_drop(annotated, ANNOTATED_EXPRESSION, were_annotations);
 
         true
+    }
+
+    /// Whether `parseAnnotatedLambda` can parse or remap anything at the cursor (not in the Java): its annotations
+    /// start at `@` (`parseAnnotationOrList` tests nothing else), its label at an identifier before `@` (or at `@`),
+    /// its function literal at `{`, and its label test's `at(IDENTIFIER)` remaps a soft keyword. Elsewhere each of
+    /// its tests fails without a remap (at an identifier `at(IDENTIFIER)` matches as it is and `rawLookup(1)` is no
+    /// `@`), and it rolls its markers back having parsed nothing, so `speculation_rolled_back` is its whole effect.
+    #[inline(always)]
+    fn may_start_annotated_lambda(&mut self) -> bool {
+        self._at(AT)
+            || self._at(LBRACE)
+            || (self._at(IDENTIFIER) && self.my_builder().raw_lookup(1) == AT)
+            || self.at_remap(IDENTIFIER).is_some()
     }
 
     /// `doneOrDrop(marker, type, condition)`.

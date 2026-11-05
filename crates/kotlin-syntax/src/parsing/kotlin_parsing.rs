@@ -1002,6 +1002,18 @@ impl<'b> KotlinParsing<'b> {
         no_modifiers_before: &TokenSet,
         local_declaration: bool,
     ) -> bool {
+        // Not in the Java: where the body parses nothing, `list` (and at a token other than the end, the marker of
+        // `tryParseModifier`) is made and given up with nothing parsed (`may_start_modifier`).
+        if let Some(start) = self.my_builder().speculation_start() {
+            if self.eof() {
+                // `list` made and dropped: nothing `speculation_start` did not do
+                return false;
+            }
+            if !self.may_start_modifier(modifier_keywords, annotation_parsing_mode) {
+                self.my_builder().speculation_rolled_back(start);
+                return false;
+            }
+        }
         let list = self.mark();
 
         let empty = self.do_parse_modifier_list_body(
@@ -1020,6 +1032,21 @@ impl<'b> KotlinParsing<'b> {
         !empty
     }
 
+    /// Whether the first step of `doParseModifierListBody` can parse or remap anything at the cursor, which is not
+    /// the end (not in the Java): an annotation at `@` where the mode allows them, a context list at `context` (its
+    /// `at(CONTEXT_KEYWORD)` would remap an identifier of that text), or a modifier (`tryParseModifier`'s `atSet`).
+    /// Elsewhere the step fails without a remap, `tryParseModifier` rolls its marker back and the body is empty.
+    #[inline(always)]
+    fn may_start_modifier(
+        &mut self,
+        modifier_keywords: &TokenSet,
+        annotation_parsing_mode: AnnotationParsingMode,
+    ) -> bool {
+        (self._at(AT) && annotation_parsing_mode.allow_annotations())
+            || self.would_at(CONTEXT_KEYWORD)
+            || self.would_at_set(modifier_keywords)
+    }
+
     /// `tryParseModifier(tokenConsumer, noModifiersBefore, modifierKeywords)`.
     pub(crate) fn try_parse_modifier(
         &mut self,
@@ -1027,6 +1054,14 @@ impl<'b> KotlinParsing<'b> {
         no_modifiers_before: &TokenSet,
         modifier_keywords: &TokenSet,
     ) -> bool {
+        // Not in the Java: at a token that is no modifier keyword, the marker is made and rolled back with nothing
+        // parsed (`atSet` fails without a remap).
+        if let Some(start) = self.my_builder().speculation_start()
+            && !self.would_at_set(modifier_keywords)
+        {
+            self.my_builder().speculation_rolled_back(start);
+            return false;
+        }
         let marker = self.mark();
 
         if self.at_set(modifier_keywords) {
@@ -2570,6 +2605,11 @@ impl<'b> KotlinParsing<'b> {
      */
     /// `parseTypeConstraintsGuarded(typeParameterListOccurred)`.
     pub(crate) fn parse_type_constraints_guarded(&mut self, type_parameter_list_occurred: bool) {
+        // Not in the Java: where no `where` starts the constraints (`at(WHERE_KEYWORD)` would not match, nor remap),
+        // `error` is made and dropped with nothing parsed.
+        if self.my_builder().speculation_start().is_some() && !self.would_at(WHERE_KEYWORD) {
+            return;
+        }
         let error = self.mark();
         let constraints = self.parse_type_constraints();
         self.error_if(
