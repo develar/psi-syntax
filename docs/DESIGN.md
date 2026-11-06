@@ -58,6 +58,7 @@ path.
 | `csharp-syntax` | `SyntaxKind`, `TokenKind`, `NodeKind`, the generated node types and diagnostics, the lexer and directive parser, `SyntaxParser`, `LanguageParser`, `DocumentationCommentParser`, the green arena, `flatten`, `CSharp: TreeLanguage`, `Tree` with diagnostics, the dump | `psi-builder` |
 | `psi-check` | the checks of a tree every language's tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits), the robustness tests' limits and deterministic generators | `psi-builder` |
 | `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax`, `psi-check` |
+| `ab-pairs` | the A/B engine: interleaved pairs and their stopping rule (`pairs`, `stats`), the host's reservation (`reserve`), a child timed with its counters (`sys`); accio's `tools/bench` builds its A/B commands on it | nothing |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),

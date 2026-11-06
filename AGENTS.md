@@ -13,6 +13,7 @@ its crates members of accio's Cargo workspace with their own package fields, lin
 | `crates/psi-check` | the tree checks the parsers' tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits) and the robustness tests' limits and seeded generators; a dev-dependency of each language |
 | `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java\|csharp`, else by extension) |
 | `crates/ide-oracle` | the oracle harness, an IDE's own code as the oracle (pinned jars, the IDE's JVM running a single-file oracle, byte-equal comparison naming the first difference, goldens vendored from a revision, Python's seeded generator for mutations), and `java-oracle`, the Java oracle's tooling (`tools/java-oracle/README.md`); accio's `scripts/bench plugin-xml` runs on it too |
+| `crates/ab-pairs` | the engine of an A/B of two binaries: interleaved pairs, the first arm alternating, until the stopping rule (`stats::decide`) gives each unit its verdict; the host's measurement reservation and quiet waits; a child timed by its resource usage and instruction counters. accio's `scripts/bench` A/B commands run on it |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's

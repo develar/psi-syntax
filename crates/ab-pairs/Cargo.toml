@@ -1,0 +1,30 @@
+[package]
+name = "ab-pairs"
+description = "The interleaved pairs of an A/B of two binaries and their stopping rule: the paired statistics, the host's measurement reservation and quiet waits, a child process timed by its own resource usage and hardware counters"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"
+
+# `sys` alone reads the kernel (resource usage, hardware counters, the host's CPU ticks) and allows unsafe code.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+# A filter's marks (`Fn(&[&[Sample]]) -> Vec<Vec<bool>>`) and a reaped child's (code, CPU, RSS, counters) are named
+# where they are documented, not behind an alias.
+type_complexity = "allow"
