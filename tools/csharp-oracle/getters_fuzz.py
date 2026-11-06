@@ -12,8 +12,8 @@ writes OUT_DIR/NNNNN.cs and OUT_DIR/list (`PATH<TAB><TAB>ENTRY`); compare `oracl
 """
 
 import random
-import sys
-from pathlib import Path
+
+import golden_fuzz
 
 PIECES = [
     # declarations and their parts
@@ -50,22 +50,10 @@ def insert(text: str, rng: random.Random) -> str:
     return text
 
 
-def main() -> None:
-    goldens = Path(sys.argv[1])
-    out = Path(sys.argv[2])
-    count = int(sys.argv[3]) if len(sys.argv) > 3 else 20000
-    seed = sys.argv[4] if len(sys.argv) > 4 else "csharp-getters"
-    rng = random.Random(seed)
-    texts = [p.read_text(encoding="utf-8") for p in sorted(goldens.rglob("*.cs"))]
-    out.mkdir(parents=True, exist_ok=True)
-    lines = []
-    for i in range(count):
-        name = f"{i:05d}.cs"
-        text = mix(rng) if i % 2 == 0 else insert(rng.choice(texts), rng)
-        (out / name).write_bytes(text.encode("utf-8"))
-        lines.append(f"{name}\t\t{rng.choice(ENTRIES)}\n")
-    (out / "list").write_text("".join(lines))
+def file(i: int, texts: list[str], rng: random.Random) -> tuple[str, str]:
+    text = mix(rng) if i % 2 == 0 else insert(rng.choice(texts), rng)
+    return text, f"\t\t{rng.choice(ENTRIES)}"
 
 
 if __name__ == "__main__":
-    main()
+    golden_fuzz.write(20000, "csharp-getters", file)

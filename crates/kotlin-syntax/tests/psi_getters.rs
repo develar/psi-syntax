@@ -12,17 +12,10 @@ use kotlin_syntax::{FileKind, Tree};
 #[test]
 fn getters_answer_as_the_psi() {
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/psi");
-    let mut sources: Vec<_> = std::fs::read_dir(&dir)
-        .expect("tests/psi")
-        .flatten()
-        .map(|e| e.path())
-        .filter(|p| p.extension().is_some_and(|e| e == "kt" || e == "kts"))
-        .collect();
-    sources.sort();
-    assert!(!sources.is_empty());
+    let sources = common::kotlin_files(&dir);
     let mut failures = Vec::new();
     for source in &sources {
-        let name = source.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        let name = common::path_name(source);
         let text = getters::oracle_text(&std::fs::read(source).expect("read source"));
         let expected_path = dir.join(format!("{name}.getters.txt"));
         let expected = std::fs::read_to_string(&expected_path).expect("read the oracle's lines");
@@ -66,7 +59,7 @@ fn getters_answer_as_the_psi_on_every_golden() {
             panic!("a line of goldens.hash: {line:?}");
         };
         let source = root.join(path);
-        let name = source.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+        let name = common::path_name(&source);
         let text = getters::oracle_text(&std::fs::read(&source).expect("read the golden"));
         let lines = getters::lines(&Tree::parse(&text, FileKind::from_file_name(&name)));
         let ours = format!("{:016x}\t{}", fnv(&lines), lines.bytes().filter(|&b| b == b'\n').count());

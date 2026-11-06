@@ -74,17 +74,9 @@ fn a_replay_is_the_parse_with_the_symbols() {
 #[ignore = "a corpus run: CSHARP_PREPROCESSOR_CORPUS=DIR[:DIR…]"]
 fn a_replay_is_the_parse_on_the_corpora() {
     let roots = std::env::var("CSHARP_PREPROCESSOR_CORPUS").expect("CSHARP_PREPROCESSOR_CORPUS");
-    let mut stack: Vec<std::path::PathBuf> = roots.split(':').map(Into::into).collect();
     let mut parser = Parser::new();
     let (mut runs, mut other, mut differing) = (0usize, 0usize, Vec::new());
-    while let Some(path) = stack.pop() {
-        if path.is_dir() {
-            stack.extend(std::fs::read_dir(&path).into_iter().flatten().flatten().map(|e| e.path()));
-            continue;
-        }
-        if path.extension().is_none_or(|e| e != "cs") {
-            continue;
-        }
+    for path in psi_check::files_under(&roots, "cs") {
         let Ok(text) = std::fs::read(&path) else { continue };
         if !text.windows(3).any(|w| w == b"#if") {
             continue;

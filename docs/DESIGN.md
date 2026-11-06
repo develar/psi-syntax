@@ -56,7 +56,8 @@ path.
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
 | `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers | `psi-builder` |
 | `csharp-syntax` | `SyntaxKind`, `TokenKind`, `NodeKind`, the generated node types and diagnostics, the lexer and directive parser, `SyntaxParser`, `LanguageParser`, `DocumentationCommentParser`, the green arena, `flatten`, `CSharp: TreeLanguage`, `Tree` with diagnostics, the dump | `psi-builder` |
-| `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax` |
+| `psi-check` | the checks of a tree every language's tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits), the robustness tests' limits and deterministic generators | `psi-builder` |
+| `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax`, `psi-check` |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),

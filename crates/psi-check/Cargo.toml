@@ -1,0 +1,18 @@
+[package]
+name = "psi-check"
+description = "The checks of psi-syntax trees and the test helpers its parsers' tests share with ksdump: lossless leaves, consistent links, equal subtrees, the nesting and stack limits, deterministic random inputs"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+psi-builder = { path = "../psi-builder" }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

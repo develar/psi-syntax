@@ -306,32 +306,9 @@ fn escape(text: &[u8]) -> String {
 /// The hash and token count `LexOracle.java` prints (KDoc tokens hashed inside `[` `]` after their doc comment), of the
 /// tokens a parse lexes: `lexer::tokenize_into` and, in each doc comment, `kdoc::lexer::tokenize_into`.
 fn lex_line(text: &[u8], dump: bool, out: &mut String) -> (u64, usize) {
-    let mut hash = Fnv(0xcbf29ce484222325);
-    let mut count = 0;
     let lexed = kotlin_syntax::lexer::tokenize(text);
-    let (mut kdoc_types, mut kdoc_starts) = (Vec::new(), Vec::new());
-    for (i, kind) in lexed.types.iter().enumerate() {
-        let token_text = &text[lexed.starts[i] as usize..lexed.starts[i + 1] as usize];
-        hash.feed(format!("{}:{};", kind.debug_name(), token_text.len()).as_bytes());
-        if dump {
-            out.push_str(&format!("  {} {}\n", kind.debug_name(), escape(token_text)));
-        }
-        if *kind == TokenKind::DOC_COMMENT {
-            hash.feed(b"[");
-            kotlin_syntax::kdoc::lexer::tokenize_into(token_text, &mut kdoc_types, &mut kdoc_starts);
-            for (k, kind) in kdoc_types.iter().enumerate() {
-                let k_text = &token_text[kdoc_starts[k] as usize..kdoc_starts[k + 1] as usize];
-                hash.feed(format!("{}:{};", kind.debug_name(), k_text.len()).as_bytes());
-                if dump {
-                    out.push_str(&format!("    {} {}\n", kind.debug_name(), escape(k_text)));
-                }
-                count += 1;
-            }
-            hash.feed(b"]");
-        }
-        count += 1;
-    }
-    (hash.0, count)
+    let is_doc = |kind: TokenKind| kind == TokenKind::DOC_COMMENT;
+    lexed_line(text, &lexed, is_doc, kotlin_syntax::kdoc::lexer::tokenize_into, dump, out)
 }
 
 /// The hash and token count `tools/java-oracle/JavaLexOracle.java` prints: `JavaLexer` at `level`, the
@@ -339,19 +316,36 @@ fn lex_line(text: &[u8], dump: bool, out: &mut String) -> (u64, usize) {
 /// inside `[` `]` after it; of the tokens a parse lexes (`lexer::tokenize_into`, `doc_lexer::tokenize_into`).
 fn java_lex_line(text: &[u8], level: java_syntax::LanguageLevel, dump: bool, out: &mut String) -> (u64, usize) {
     use java_syntax::TokenKind as JavaToken;
+    let lexed = java_syntax::lexer::tokenize(text, level);
+    let is_doc = |kind: JavaToken| matches!(kind, JavaToken::DOC_COMMENT | JavaToken::DOC_MARKDOWN_COMMENT);
+    let doc = |text: &[u8], types: &mut Vec<JavaToken>, starts: &mut Vec<u32>| {
+        java_syntax::doc_lexer::tokenize_into(text, true, types, starts)
+    };
+    lexed_line(text, &lexed, is_doc, doc, dump, out)
+}
+
+/// The hash and token count of the tokens `lexed` of `text`: each token's name and length, and inside `[` `]` after
+/// each doc comment (`is_doc`) those of the tokens `doc` lexes of it; with `dump`, a line of each token in `out`.
+fn lexed_line<K: psi_builder::TokenType>(
+    text: &[u8],
+    lexed: &psi_builder::lexer::Lexed<K>,
+    is_doc: impl Fn(K) -> bool,
+    mut doc: impl FnMut(&[u8], &mut Vec<K>, &mut Vec<u32>),
+    dump: bool,
+    out: &mut String,
+) -> (u64, usize) {
     let mut hash = Fnv(0xcbf29ce484222325);
     let mut count = 0;
-    let lexed = java_syntax::lexer::tokenize(text, level);
     let (mut doc_types, mut doc_starts) = (Vec::new(), Vec::new());
-    for (i, kind) in lexed.types.iter().enumerate() {
+    for (i, &kind) in lexed.types.iter().enumerate() {
         let token_text = &text[lexed.starts[i] as usize..lexed.starts[i + 1] as usize];
         hash.feed(format!("{}:{};", kind.debug_name(), token_text.len()).as_bytes());
         if dump {
             out.push_str(&format!("  {} {}\n", kind.debug_name(), escape(token_text)));
         }
-        if matches!(kind, JavaToken::DOC_COMMENT | JavaToken::DOC_MARKDOWN_COMMENT) {
+        if is_doc(kind) {
             hash.feed(b"[");
-            java_syntax::doc_lexer::tokenize_into(token_text, true, &mut doc_types, &mut doc_starts);
+            doc(token_text, &mut doc_types, &mut doc_starts);
             for (k, kind) in doc_types.iter().enumerate() {
                 let k_text = &token_text[doc_starts[k] as usize..doc_starts[k + 1] as usize];
                 hash.feed(format!("{}:{};", kind.debug_name(), k_text.len()).as_bytes());
@@ -367,13 +361,20 @@ fn java_lex_line(text: &[u8], level: java_syntax::LanguageLevel, dump: bool, out
     (hash.0, count)
 }
 
+/// The path and the level of a Java list line `PATH[<TAB>LEVEL...]`, `LanguageLevel.HIGHEST` when it names none.
+fn java_path_level(line: &str) -> (&str, java_syntax::LanguageLevel) {
+    let mut columns = line.split('\t');
+    let path = columns.next().unwrap_or(line);
+    (
+        path,
+        columns.next().and_then(java_syntax::LanguageLevel::from_name).unwrap_or(java_syntax::LanguageLevel::HIGHEST),
+    )
+}
+
 /// `--lex` of a Java file: a list line is `PATH[<TAB>LEVEL...]` as for the Java oracles; text that is not UTF-8 is
 /// "unreadable", as the oracle, which decodes strictly, prints it.
 fn java_lex(root: &Path, line: &str, dump: bool) -> String {
-    let mut columns = line.split('\t');
-    let path = columns.next().unwrap_or(line);
-    let level =
-        columns.next().and_then(java_syntax::LanguageLevel::from_name).unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+    let (path, level) = java_path_level(line);
     let text = read_source(root, path, false).filter(|t| std::str::from_utf8(t).is_ok());
     let Some(text) = text else {
         return format!("{path}\tunreadable\t0\n");
@@ -525,13 +526,6 @@ fn java_line(line: &str, trim: bool) -> (&str, java_syntax::FileKind, bool) {
     (columns[0], java_syntax::FileKind { level, entry }, trim)
 }
 
-/// `String.trim()` of a Java test's text, by bytes.
-fn trim_bytes(text: Vec<u8>) -> Vec<u8> {
-    let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
-    let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
-    text[start..end].to_vec()
-}
-
 /// `--out` of a Java file, as `tools/java-oracle/JavaPsiOracle.java` writes it: a list line is
 /// `PATH[<TAB>LEVEL[<TAB>ENTRY[<TAB>TRIM]]]` (`testdata/java/manifest.tsv` is a list), the text is trimmed (chars up to
 /// ' ', `String.trim()`) when TRIM is 1 or, without it, with `--trim`; the dumps of `<path>.psi.txt` and with `--node`
@@ -543,7 +537,7 @@ fn java_dump(parser: &mut java_syntax::Parser, root: &Path, line: &str, args: &A
         return Vec::new();
     };
     if trim {
-        text = trim_bytes(text);
+        text = psi_check::trim(text);
     }
     let tree = parser.parse(&text, kind);
     if args.getters {
@@ -687,15 +681,25 @@ fn csharp_lex(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full:
     format!("{path}\t{}\t{:016x}", csharp_syntax::dump::lexed_tokens(&tree), hash.0)
 }
 
+/// The path, kind, symbols (`csharp_line`) and text (`csharp_source`) of a C# list line, or its
+/// `PATH<TAB>failure<TAB>REASON` line.
+fn csharp_list_source<'a>(
+    root: &Path,
+    line: &'a str,
+) -> Result<(&'a str, csharp_syntax::FileKind, csharp_syntax::PreprocessorSymbols, Vec<u8>), String> {
+    let path = line.split('\t').next().unwrap_or(line);
+    let Some((_, kind, symbols)) = csharp_line(line) else { return Err(format!("{path}\tfailure\tbad list line\n")) };
+    let text = csharp_source(root, path).map_err(|failure| format!("{path}\tfailure\t{failure}\n"))?;
+    Ok((path, kind, symbols, text))
+}
+
 /// `--getters` of a C# file: `PATH<TAB>LINES<TAB>HASH` as `tools/csharp-oracle getters` prints it (none for a lexed
 /// entry's tokens, which have no nodes), or `PATH<TAB>failure<TAB>REASON`; with `--full OUT` the lines go to
 /// `OUT/<path>.getters.txt`.
 fn csharp_getters(parser: &mut csharp_syntax::Parser, root: &Path, line: &str, full: Option<&Path>) -> String {
-    let path = line.split('\t').next().unwrap_or(line);
-    let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
-    let text = match csharp_source(root, path) {
-        Ok(text) => text,
-        Err(failure) => return format!("{path}\tfailure\t{failure}\n"),
+    let (path, kind, symbols, text) = match csharp_list_source(root, line) {
+        Ok(source) => source,
+        Err(failure) => return failure,
     };
     let tree = if kind.entry == csharp_syntax::Entry::Tokens {
         parser.lex_with_symbols(&text, kind, &symbols)
@@ -729,17 +733,53 @@ fn csharp_file_lines(
     line: &str,
     lines: fn(&str, &csharp_syntax::Tree) -> String,
 ) -> String {
-    let path = line.split('\t').next().unwrap_or(line);
-    let Some((_, kind, symbols)) = csharp_line(line) else { return format!("{path}\tfailure\tbad list line\n") };
-    let text = match csharp_source(root, path) {
-        Ok(text) => text,
-        Err(failure) => return format!("{path}\tfailure\t{failure}\n"),
+    let (path, kind, symbols, text) = match csharp_list_source(root, line) {
+        Ok(source) => source,
+        Err(failure) => return failure,
     };
     let tree = parser.parse_with_symbols(&text, kind, &symbols);
     if tree.has_no_result() {
         return String::new();
     }
     lines(path, &tree)
+}
+
+/// How `--check LINES` compares the lines of `print_lines`.
+enum LineCheck {
+    /// A line a list line, `check::lex`.
+    Lex,
+    /// Lines a file, `check::file_lines`.
+    FileLines,
+}
+
+/// The lines `per_file(parsers, i)` makes of each list line, on every worker, written to stdout in list order; with
+/// `--check LINES`, compared with LINES as `check` says instead, and the process exits 1 on a difference.
+fn print_lines(
+    root: &Path,
+    paths: &[String],
+    args: &Args,
+    check: LineCheck,
+    per_file: impl Fn(&mut Parsers, usize) -> String + Sync,
+) {
+    let stdout = std::io::stdout();
+    let mut stdout = std::io::BufWriter::new(stdout.lock());
+    let schedule = Schedule::new(root, paths, args.workers());
+    if let Some(lines) = args.check.as_deref() {
+        let differing = match check {
+            LineCheck::Lex => check::lex(lines, paths, &schedule, args.lang, args.workers(), per_file, &mut stdout),
+            LineCheck::FileLines => check::file_lines(lines, paths, &schedule, args.workers(), per_file, &mut stdout),
+        };
+        let _ = stdout.flush();
+        std::process::exit(if differing == 0 { 0 } else { 1 });
+    }
+    schedule.run(
+        args.workers(),
+        || Parsers::new(None),
+        per_file,
+        |_, text| {
+            let _ = stdout.write_all(text.as_bytes());
+        },
+    );
 }
 
 fn main() {
@@ -750,70 +790,25 @@ fn main() {
         if args.values && args.directives {
             usage();
         }
-        let stdout = std::io::stdout();
-        let mut stdout = std::io::BufWriter::new(stdout.lock());
-        let schedule = Schedule::new(root, &paths, args.workers());
         let of_tree = if args.values { csharp_syntax::dump::value_lines } else { csharp_syntax::dump::directive_lines };
         let per_file = |parsers: &mut Parsers, i: usize| csharp_file_lines(parsers.csharp(), root, &paths[i], of_tree);
-        if let Some(lines) = args.check.as_deref() {
-            let differing = check::file_lines(lines, &paths, &schedule, args.workers(), per_file, &mut stdout);
-            let _ = stdout.flush();
-            std::process::exit(if differing == 0 { 0 } else { 1 });
-        }
-        schedule.run(
-            args.workers(),
-            || Parsers::new(None),
-            per_file,
-            |_, text| {
-                let _ = stdout.write_all(text.as_bytes());
-            },
-        );
+        print_lines(root, &paths, &args, LineCheck::FileLines, per_file);
         return;
     }
     let csharp_list =
         paths.first().is_some_and(|l| Lang::of(l.split('\t').next().unwrap_or(l), args.lang) == Lang::CSharp);
     if args.getters && csharp_list {
-        let stdout = std::io::stdout();
-        let mut stdout = std::io::BufWriter::new(stdout.lock());
-        let schedule = Schedule::new(root, &paths, args.workers());
         let full = args.full.as_deref().or(args.out.as_deref());
         let getters = |parsers: &mut Parsers, i: usize| csharp_getters(parsers.csharp(), root, &paths[i], full);
-        if let Some(lines) = args.check.as_deref() {
-            let differing = check::lex(lines, &paths, &schedule, args.lang, args.workers(), getters, &mut stdout);
-            let _ = stdout.flush();
-            std::process::exit(if differing == 0 { 0 } else { 1 });
-        }
-        schedule.run(
-            args.workers(),
-            || Parsers::new(None),
-            getters,
-            |_, text| {
-                let _ = stdout.write_all(text.as_bytes());
-            },
-        );
+        print_lines(root, &paths, &args, LineCheck::Lex, getters);
         return;
     }
     if args.lex && !args.bench {
-        let stdout = std::io::stdout();
-        let mut stdout = std::io::BufWriter::new(stdout.lock());
-        let schedule = Schedule::new(root, &paths, args.workers());
-        let lex = |parsers: &mut Parsers, i: usize| lex_file(parsers, root, &paths[i], &args);
-        if let Some(lines) = args.check.as_deref() {
-            if args.dump {
-                usage();
-            }
-            let differing = check::lex(lines, &paths, &schedule, args.lang, args.workers(), lex, &mut stdout);
-            let _ = stdout.flush();
-            std::process::exit(if differing == 0 { 0 } else { 1 });
+        if args.check.is_some() && args.dump {
+            usage();
         }
-        schedule.run(
-            args.workers(),
-            || Parsers::new(None),
-            lex,
-            |_, text| {
-                let _ = stdout.write_all(text.as_bytes());
-            },
-        );
+        let lex = |parsers: &mut Parsers, i: usize| lex_file(parsers, root, &paths[i], &args);
+        print_lines(root, &paths, &args, LineCheck::Lex, lex);
         return;
     }
     // A Java or C# list line may carry columns after its path (`PATH<TAB>LEVEL...`): the path decides the language.
@@ -935,6 +930,21 @@ trait BodiesLanguage: Language {
     fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, Self::FileKind)>;
 }
 
+/// The `BenchLanguage` items of the memory of a tree and a parser, alike for every parser.
+macro_rules! bench_bytes {
+    () => {
+        fn heap_bytes(tree: &Self::Tree) -> usize {
+            tree.heap_bytes()
+        }
+        fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize) {
+            parser.set_retained_bytes(bytes);
+        }
+        fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
+            (parser.grown_bytes(), parser.heap_bytes())
+        }
+    };
+}
+
 /// The `BenchLanguage` items of a language parsed by `psi_builder::Parser`.
 macro_rules! psi_bench_language {
     () => {
@@ -949,15 +959,7 @@ macro_rules! psi_bench_language {
         fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self> {
             tree
         }
-        fn heap_bytes(tree: &Self::Tree) -> usize {
-            tree.heap_bytes()
-        }
-        fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize) {
-            parser.set_retained_bytes(bytes);
-        }
-        fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
-            (parser.grown_bytes(), parser.heap_bytes())
-        }
+        bench_bytes!();
     };
 }
 
@@ -991,15 +993,7 @@ impl BenchLanguage for csharp_syntax::CSharp {
     fn psi(tree: &Self::Tree) -> &psi_builder::Tree<Self> {
         tree.as_psi()
     }
-    fn heap_bytes(tree: &Self::Tree) -> usize {
-        tree.heap_bytes()
-    }
-    fn set_retained_bytes(parser: &mut Self::Parser, bytes: usize) {
-        parser.set_retained_bytes(bytes);
-    }
-    fn parser_bytes(parser: &Self::Parser) -> (usize, usize) {
-        (parser.grown_bytes(), parser.heap_bytes())
-    }
+    bench_bytes!();
     /// `PATH[<TAB>VERSION[<TAB>ENTRY[<TAB>DOC]]]`, defaults for a column that names nothing; the SYMBOLS column and
     /// `--define` do not apply (`parse` defines none).
     fn file_kind(line: &str) -> (&str, csharp_syntax::FileKind) {
@@ -1020,12 +1014,7 @@ impl BenchLanguage for java_syntax::Java {
     psi_bench_language!();
     /// `PATH[<TAB>LEVEL]`: a file at LEVEL, else at `LanguageLevel.HIGHEST`.
     fn file_kind(line: &str) -> (&str, java_syntax::FileKind) {
-        let mut columns = line.split('\t');
-        let path = columns.next().unwrap_or(line);
-        let level = columns
-            .next()
-            .and_then(java_syntax::LanguageLevel::from_name)
-            .unwrap_or(java_syntax::LanguageLevel::HIGHEST);
+        let (path, level) = java_path_level(line);
         (path, java_syntax::FileKind::file(level))
     }
     fn counters() -> Vec<u64> {
@@ -1038,7 +1027,7 @@ impl BodiesLanguage for java_syntax::Java {
     fn check_source(root: &Path, line: &str) -> Option<(String, Vec<u8>, java_syntax::FileKind)> {
         let (path, kind, trim) = java_line(line, false);
         let text = read_source(root, path, false)?;
-        Some((path.to_string(), if trim { trim_bytes(text) } else { text }, kind))
+        Some((path.to_string(), if trim { psi_check::trim(text) } else { text }, kind))
     }
 }
 
@@ -1091,6 +1080,7 @@ fn alloc_snapshot() -> (u64, u64, i64) {
     (0, 0, 0)
 }
 
+// jscpd:ignore-start: the two walks are the loops `--bench` times, each kept as written so its numbers stay its own
 /// The walk an extractor does: every node in preorder, its kind, its range and its depth; returns a checksum so it is
 /// not optimized away.
 fn walk<L: TreeLanguage>(tree: &psi_builder::Tree<L>) -> u64 {
@@ -1118,6 +1108,7 @@ fn linear_walk<L: TreeLanguage>(tree: &psi_builder::Tree<L>) -> u64 {
     }
     acc
 }
+// jscpd:ignore-end
 
 /// A parser, with `--nesting-limit` when given.
 fn new_parser<L: Language>(nesting_limit: Option<u32>) -> psi_builder::Parser<L> {
@@ -1126,28 +1117,6 @@ fn new_parser<L: Language>(nesting_limit: Option<u32>) -> psi_builder::Parser<L>
         parser.set_nesting_limit(limit);
     }
     parser
-}
-
-/// The subtree of `a` at `a_root` and that of `b` at `b_root` have the same nodes: kinds, ranges, error messages and
-/// shape (what their dumps show, and the ranges).
-fn same_subtree<L: Language>(
-    a: &psi_builder::Tree<L>,
-    a_root: NodeId,
-    b: &psi_builder::Tree<L>,
-    b_root: NodeId,
-) -> bool {
-    let size = a.subtree_end(a_root).0 - a_root.0;
-    if b.subtree_end(b_root).0 - b_root.0 != size {
-        return false;
-    }
-    (0..size).all(|k| {
-        let (x, y) = (NodeId(a_root.0 + k), NodeId(b_root.0 + k));
-        a.kind(x) == b.kind(y)
-            && a.range(x) == b.range(y)
-            && a.error_message(x) == b.error_message(y)
-            && a.subtree_end(x).0 - x.0 == b.subtree_end(y).0 - y.0
-            && (k == 0 || a.parent(x).map(|p| x.0 - p.0) == b.parent(y).map(|p| y.0 - p.0))
-    })
 }
 
 /// What `--check-bodies` found in one file: its bodies, the differing ones and their report lines.
@@ -1211,7 +1180,7 @@ fn check_file_bodies<L: BodiesLanguage>(
             checked.bodies += 1;
             let same = body_parser
                 .parse_body(&lazy, ln, ParseOptions::default())
-                .is_some_and(|body| same_subtree(&body, body.root(), &full, fnode));
+                .is_some_and(|body| psi_check::same_subtree(&body, body.root(), &full, fnode));
             if !same {
                 let _ = writeln!(checked.report, "{path}: body {:?} differs", lazy.range(ln));
                 checked.differing += 1;
@@ -1333,7 +1302,7 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], java: bool, stdout: &mu
     }
     let doc_mb = docs.iter().map(|d| d.1.len()).sum::<usize>() as f64 / 1e6;
     let (mut kdoc_types, mut java_doc_types, mut doc_starts) = (Vec::new(), Vec::new(), Vec::new());
-    let mut round_mbs = Vec::new();
+    let mut rounds = LexRounds::new(args, sources.len(), mb);
     for round in 1..=args.repeat {
         let (mut tokens, mut seconds) = (0usize, 0.0);
         for (text, level) in &sources {
@@ -1346,14 +1315,7 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], java: bool, stdout: &mu
             seconds += start.elapsed().as_secs_f64();
             tokens += if java { java_lexed.len() } else { kotlin.len() };
         }
-        let mbs = mb / seconds.max(1e-9);
-        round_mbs.push(mbs);
-        let prefix = if args.repeat > 1 { format!("round {round}  ") } else { String::new() };
-        let _ = writeln!(
-            stdout,
-            "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
-            sources.len()
-        );
+        let prefix = rounds.round(stdout, round, seconds, tokens);
         if args.docs {
             let (mut doc_tokens, start) = (0usize, Instant::now());
             for (i, range) in &docs {
@@ -1375,8 +1337,40 @@ fn lex_bench(args: &Args, root: &Path, paths: &[String], java: bool, stdout: &mu
             );
         }
     }
-    if args.repeat > 1 {
-        let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
+    rounds.median(stdout);
+}
+
+/// The rounds of a lexer's `--lex --bench`: `files` files of `mb` MB, `repeat` rounds, the MB/s of each.
+struct LexRounds {
+    files: usize,
+    mb: f64,
+    repeat: usize,
+    mbs: Vec<f64>,
+}
+
+impl LexRounds {
+    fn new(args: &Args, files: usize, mb: f64) -> LexRounds {
+        LexRounds { files, mb, repeat: args.repeat, mbs: Vec::new() }
+    }
+
+    /// Prints the line of `round`, which lexed `tokens` in `seconds`; returns the prefix of its lines.
+    fn round(&mut self, stdout: &mut impl Write, round: usize, seconds: f64, tokens: usize) -> String {
+        let (mb, mbs) = (self.mb, self.mb / seconds.max(1e-9));
+        self.mbs.push(mbs);
+        let prefix = if self.repeat > 1 { format!("round {round}  ") } else { String::new() };
+        let _ = writeln!(
+            stdout,
+            "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
+            self.files
+        );
+        prefix
+    }
+
+    /// Prints the median MB/s of more than one round.
+    fn median(&mut self, stdout: &mut impl Write) {
+        if self.repeat > 1 {
+            let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut self.mbs), self.repeat);
+        }
     }
 }
 
@@ -1392,7 +1386,7 @@ fn csharp_lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut imp
         .collect();
     let mb = sources.iter().map(|s| s.0.len()).sum::<usize>() as f64 / 1e6;
     let mut parser = csharp_syntax::Parser::new();
-    let mut round_mbs = Vec::new();
+    let mut rounds = LexRounds::new(args, sources.len(), mb);
     for round in 1..=args.repeat {
         let (mut tokens, mut seconds) = (0usize, 0.0);
         for (text, kind) in &sources {
@@ -1400,18 +1394,9 @@ fn csharp_lex_bench(args: &Args, root: &Path, paths: &[String], stdout: &mut imp
             tokens += parser.lex_count(text, *kind);
             seconds += start.elapsed().as_secs_f64();
         }
-        let mbs = mb / seconds.max(1e-9);
-        round_mbs.push(mbs);
-        let prefix = if args.repeat > 1 { format!("round {round}  ") } else { String::new() };
-        let _ = writeln!(
-            stdout,
-            "{prefix}files {}  MB {mb:.2}  seconds {seconds:.3}  MB/s {mbs:.1}  tokens {tokens}",
-            sources.len()
-        );
+        rounds.round(stdout, round, seconds, tokens);
     }
-    if args.repeat > 1 {
-        let _ = writeln!(stdout, "median MB/s {:.1} of {} rounds", median(&mut round_mbs), args.repeat);
-    }
+    rounds.median(stdout);
 }
 
 fn bench<L: BenchLanguage>(args: &Args, root: &Path, paths: &[String], stdout: &mut impl Write) {

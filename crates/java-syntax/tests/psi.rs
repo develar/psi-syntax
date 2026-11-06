@@ -3,17 +3,14 @@
 //! goldens and of random and deeply nested inputs without a panic, and the one-pass `field::declaration_heads` equal to
 //! the per-field walk.
 
+mod common;
+
 use java_syntax::psi::code_reference::Kind;
 use java_syntax::psi::modifier::{Modifier, Modifiers};
 use java_syntax::psi::type_element::TypeKind;
 use java_syntax::psi::*;
 use java_syntax::{FileKind, LanguageLevel, NodeId, NodeKind, TokenKind, Tree};
-
-/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
-/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
-fn limit(limit: std::time::Duration) -> std::time::Duration {
-    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
-}
+use psi_check::{XorShift, limit};
 
 fn parse(text: &str) -> Tree {
     Tree::parse(text, FileKind::default())
@@ -396,20 +393,10 @@ fn a_deconstruction_variable_a_label_and_a_module_have_their_psi_getters() {
     assert_eq!((tree.node_kind(name), text(&tree, name)), (Some(NodeKind::MODULE_REFERENCE), "a.b"));
 }
 
-/// The goldens of `testdata/java`: each line of the manifest is `PATH<TAB>LEVEL<TAB>ENTRY<TAB>TRIM`.
+/// The goldens of `testdata/java`, each parsed at its level through its entry from its text without `\r`s.
 fn goldens() -> Vec<(String, Tree)> {
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/java");
-    let manifest = std::fs::read_to_string(root.join("manifest.tsv")).expect("read manifest.tsv");
-    let mut goldens = Vec::new();
-    for line in manifest.lines().filter(|l| !l.is_empty()) {
-        let columns: Vec<&str> = line.split('\t').collect();
-        let level = LanguageLevel::from_name(columns[1]).unwrap_or(LanguageLevel::HIGHEST);
-        let entry = java_syntax::Entry::from_name(columns[2]).unwrap_or(java_syntax::Entry::File);
-        let mut text: Vec<u8> = std::fs::read(root.join(columns[0])).expect("read golden");
-        text.retain(|&b| b != b'\r');
-        goldens.push((columns[0].to_string(), Tree::parse(&text, FileKind { level, entry })));
-    }
-    goldens
+    let parse = |g: &common::Golden| Tree::parse(g.text_without_cr(), FileKind { level: g.level, entry: g.entry });
+    common::goldens().iter().map(|g| (g.path.clone(), parse(g))).collect()
 }
 
 /// Every getter on every node (`getters::getters_to_string`), and `declaration_heads` against the per-field walk.
@@ -428,17 +415,6 @@ fn every_getter_answers_on_every_node_of_the_goldens() {
     assert_eq!(goldens.len(), 1036);
     for (_, tree) in &goldens {
         check_every_getter(tree);
-    }
-}
-
-struct XorShift(u64);
-
-impl XorShift {
-    fn next(&mut self) -> u64 {
-        self.0 ^= self.0 << 13;
-        self.0 ^= self.0 >> 7;
-        self.0 ^= self.0 << 17;
-        self.0
     }
 }
 

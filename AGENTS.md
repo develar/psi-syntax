@@ -10,6 +10,7 @@ its crates members of accio's Cargo workspace with their own package fields, lin
 | `crates/kotlin-syntax` | Kotlin (package `kotlin-syntax` for consumers): tokens, lexers, node kinds, binders, the `SemanticWhitespaceAwarePsiBuilder` layer, the parsers, KDoc, and `Kotlin: Language` |
 | `crates/java-syntax` | Java (package `java-syntax`): tokens, node types, the Java and JavaDoc lexers (complete), the binders, `Java: Language`, the dumps, and the parsers (see "Java") |
 | `crates/csharp-syntax` | C# (package `csharp-syntax`): Roslyn's lexer, directive parser, `LanguageParser` and `DocumentationCommentParser` over a green arena, flattened into `psi_builder`'s tree; `CSharp: TreeLanguage`, the dump, the diagnostics (see "C#") |
+| `crates/psi-check` | the tree checks the parsers' tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits) and the robustness tests' limits and seeded generators; a dev-dependency of each language |
 | `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java\|csharp`, else by extension) |
 | `crates/ide-oracle` | the oracle harness, an IDE's own code as the oracle (pinned jars, the IDE's JVM running a single-file oracle, byte-equal comparison naming the first difference, goldens vendored from a revision, Python's seeded generator for mutations), and `java-oracle`, the Java oracle's tooling (`tools/java-oracle/README.md`); accio's `scripts/bench plugin-xml` runs on it too |
 

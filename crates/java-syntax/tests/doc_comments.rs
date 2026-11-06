@@ -3,38 +3,10 @@
 //! `PsiDocComment` subtree of our dump is compared with the golden's, in order. Prints the counts and the first
 //! difference of each mismatch; fails with `JAVA_STRICT=1` or `KS_STRICT=1` (the gate's) unless all compared comments match.
 
-use std::path::{Path, PathBuf};
+mod common;
 
 use java_syntax::dump::psi_to_string;
-use java_syntax::{Entry, FileKind, LanguageLevel, NodeKind, Parser};
-
-fn testdata() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/java")
-}
-
-/// The text a golden parses: line separators made `\n`, trimmed (`String.trim()`) when the test trims it.
-fn source_text(path: &Path, trim: bool) -> Vec<u8> {
-    let raw = std::fs::read(path).expect("read golden source");
-    let mut text = Vec::with_capacity(raw.len());
-    let mut i = 0;
-    while i < raw.len() {
-        if raw[i] == b'\r' {
-            text.push(b'\n');
-            if raw.get(i + 1) == Some(&b'\n') {
-                i += 1;
-            }
-        } else {
-            text.push(raw[i]);
-        }
-        i += 1;
-    }
-    if trim {
-        let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
-        let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
-        text = text[start..end].to_vec();
-    }
-    text
-}
+use java_syntax::{Entry, FileKind, NodeKind, Parser};
 
 /// The `PsiDocComment` subtrees of a dump, each with its lines de-indented to the comment's own.
 fn doc_comments(dump: &str) -> Vec<Vec<String>> {
@@ -66,21 +38,17 @@ fn doc_comments(dump: &str) -> Vec<Vec<String>> {
 
 #[test]
 fn doc_comments_of_the_goldens() {
-    let root = testdata();
-    let manifest = std::fs::read_to_string(root.join("manifest.tsv")).expect("read manifest.tsv");
     let (mut files, mut compared, mut equal) = (0, 0, 0);
-    for line in manifest.lines().filter(|l| !l.is_empty()) {
-        let columns: Vec<&str> = line.split('\t').collect();
-        let path = columns[0];
-        let level = LanguageLevel::from_name(columns[1]).unwrap_or(LanguageLevel::HIGHEST);
-        let text = source_text(&root.join(path), columns[3] == "1");
-        let want_dump = std::fs::read_to_string(root.join(path.replace(".java", ".txt"))).expect("read .txt");
+    for golden in common::goldens() {
+        let (path, level) = (golden.path.as_str(), golden.level);
+        let text = golden.source_text();
+        let want_dump = golden.dump(".txt");
         let want = doc_comments(&want_dump);
         if want.is_empty() {
             continue;
         }
         files += 1;
-        let name = path.rsplit('/').next().unwrap_or(path);
+        let name = golden.name();
         let tree = Parser::new().parse_with(&text, FileKind { level, entry: Entry::File }, |builder| {
             let file = builder.mark();
             while !builder.eof() {
@@ -115,7 +83,7 @@ fn doc_comments_of_the_goldens() {
         }
     }
     println!("java doc comments: {equal}/{compared} equal in {files} goldens");
-    if ["JAVA_STRICT", "KS_STRICT"].iter().any(|k| std::env::var_os(k).is_some_and(|v| v == "1")) {
+    if common::strict() {
         assert_eq!(equal, compared);
     }
 }

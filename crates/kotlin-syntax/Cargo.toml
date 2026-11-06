@@ -11,6 +11,9 @@ publish = false
 [dependencies]
 psi-builder = { path = "../psi-builder" }
 
+[dev-dependencies]
+psi-check = { path = "../psi-check" }
+
 [features]
 # `counters::add` counts the parser's and the builder's events per thread (`ksdump --bench` prints them).
 counters = ["psi-builder/counters"]

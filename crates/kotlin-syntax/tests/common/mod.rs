@@ -14,6 +14,24 @@ pub struct Golden {
     pub expected: PathBuf,
 }
 
+/// The `.kt` and `.kts` files of `dir`, sorted; there is one at least.
+pub fn kotlin_files(dir: &Path) -> Vec<PathBuf> {
+    let mut sources: Vec<_> = std::fs::read_dir(dir)
+        .unwrap_or_else(|e| panic!("{}: {e}", dir.display()))
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|e| e == "kt" || e == "kts"))
+        .collect();
+    sources.sort();
+    assert!(!sources.is_empty(), "no Kotlin files in {}", dir.display());
+    sources
+}
+
+/// The file name of `path`.
+pub fn path_name(path: &Path) -> String {
+    path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+}
+
 pub fn testdata() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("testdata")
 }
@@ -96,7 +114,7 @@ fn remove_spec_header(text: &str) -> String {
 
 /// The file name the dump's first line shows.
 pub fn file_name(golden: &Golden) -> String {
-    golden.source.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default()
+    path_name(&golden.source)
 }
 
 pub fn expected(golden: &Golden) -> String {

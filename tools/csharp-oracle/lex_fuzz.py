@@ -12,8 +12,8 @@ writes OUT_DIR/NNNNN.cs and OUT_DIR/list; compare `oracle.sh lex --list OUT_DIR/
 """
 
 import random
-import sys
-from pathlib import Path
+
+import golden_fuzz
 
 PIECES = [
     # strings: regular, verbatim, raw, interpolated, UTF-8
@@ -58,25 +58,5 @@ def mutate(text: str, rng: random.Random) -> str:
     return text
 
 
-def main() -> None:
-    goldens = Path(sys.argv[1])
-    out = Path(sys.argv[2])
-    count = int(sys.argv[3]) if len(sys.argv) > 3 else 5000
-    seed = sys.argv[4] if len(sys.argv) > 4 else "csharp-lex"
-    rng = random.Random(seed)
-    sources = sorted(goldens.rglob("*.cs"))
-    texts = [p.read_text(encoding="utf-8") for p in sources]
-    out.mkdir(parents=True, exist_ok=True)
-    names = []
-    for i in range(count):
-        name = f"{i:05d}.cs"
-        text = mutate(rng.choice(texts), rng)
-        # A deletion can split a surrogate pair of a non-BMP character: never in Python's str, so every file is
-        # valid UTF-8.
-        (out / name).write_bytes(text.encode("utf-8"))
-        names.append(name)
-    (out / "list").write_text("".join(n + "\n" for n in names))
-
-
 if __name__ == "__main__":
-    main()
+    golden_fuzz.write(5000, "csharp-lex", lambda i, texts, rng: (mutate(rng.choice(texts), rng), ""))

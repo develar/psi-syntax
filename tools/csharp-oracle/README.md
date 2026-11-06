@@ -22,6 +22,7 @@ its nuspec names, which no tag contains). The dump is not imitated: it is a walk
 | `link_same.py` | hard-links the Preview dumps that equal the Latest ones |
 | `mutate.py` | one-place mutations of the diagnostic-free goldens, after `java-oracle mutate` (`crates/ide-oracle/src/bin/java-oracle/mutate.rs`) |
 | `lex_fuzz.py` | lexer fuzz inputs: the golden inputs with lexer-state pieces inserted, replaced or deleted |
+| `golden_fuzz.py` | the loop both fuzzers share: arguments, seeded generator, goldens, `NNNNN.cs` files and their `list` |
 | `check_offsets.py` | checks a dump directory against the source bytes: every token and trivia text at its UTF-8 offsets |
 
 The SDK lives in `~/.cache/psi-syntax/dotnet` (`dotnet-install.sh --version 10.0.403 --install-dir ...`, no

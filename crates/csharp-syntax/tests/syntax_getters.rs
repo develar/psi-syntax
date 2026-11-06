@@ -4,18 +4,17 @@
 //! time; every child of every node in a slot; the `_of` dispatchers equal to the fields they dispatch to; `read::span`
 //! equal to the one-pass spans `getters` prints.
 
+mod common;
+
 use csharp_syntax::read;
 use csharp_syntax::syntax_getters::getters::getters_to_string;
 use csharp_syntax::syntax_getters::*;
 use csharp_syntax::{
     DocumentationMode, Entry, FileKind, LanguageVersion, NodeId, NodeKind, Parser, TokenKind, Tree, syntax,
 };
+use psi_check::{Rng, limit};
 
-/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners).
-fn limit(limit: std::time::Duration) -> std::time::Duration {
-    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
-}
-
+// jscpd:ignore-start: shorthands over C#'s own `Tree`; the Java tests' read alike over theirs, which shares no type
 fn parse(text: &str) -> Tree {
     Tree::parse(text, FileKind::default())
 }
@@ -23,6 +22,7 @@ fn parse(text: &str) -> Tree {
 fn text(tree: &Tree, id: NodeId) -> &str {
     tree.utf8_text(id).unwrap()
 }
+// jscpd:ignore-end
 
 /// The text of `Span` (`ToString()`).
 fn spanned(tree: &Tree, id: NodeId) -> &str {
@@ -482,22 +482,6 @@ fn every_getter_answers_on_every_node_of_the_goldens() {
     }
 }
 
-/// A deterministic generator (xorshift64*), so a failure reproduces.
-struct Rng(u64);
-
-impl Rng {
-    fn next(&mut self) -> u64 {
-        self.0 ^= self.0 >> 12;
-        self.0 ^= self.0 << 25;
-        self.0 ^= self.0 >> 27;
-        self.0.wrapping_mul(0x2545F4914F6CDD1D)
-    }
-
-    fn below(&mut self, n: usize) -> usize {
-        (self.next() % n as u64) as usize
-    }
-}
-
 const PIECES: &[&str] = &[
     "class ",
     "struct ",
@@ -570,7 +554,7 @@ const PIECES: &[&str] = &[
 fn every_getter_answers_on_random_bytes_and_fragments() {
     let mut rng = Rng(0x9E3779B97F4A7C15);
     let mut parser = Parser::new();
-    let entries = [Entry::CompilationUnit, Entry::CompilationUnit, Entry::Expression, Entry::Statement, Entry::Member];
+    let entries = &common::ENTRIES[..5];
     for round in 0..3000 {
         let mut text = Vec::new();
         let len = rng.below(160);

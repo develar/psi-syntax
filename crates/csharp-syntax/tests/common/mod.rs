@@ -1,4 +1,7 @@
-//! What the integration tests share: the goldens of `testdata/csharp` as the oracle's per-file line modes read them.
+//! What the integration tests share: the goldens of `testdata/csharp` as the oracle's per-file line modes read them,
+//! and the entries random inputs are parsed at.
+
+#![allow(dead_code)]
 
 use csharp_syntax::{DocumentationMode, Entry, FileKind, LanguageVersion, Parser, PreprocessorSymbols, Tree};
 
@@ -38,3 +41,20 @@ pub fn assert_same_lines(ours: &str, oracle: &str) {
         oracle.lines().count()
     );
 }
+
+/// The entries random inputs are parsed at, one a round in turn: a compilation unit twice as often; the first five are
+/// those of declarations, statements and expressions, the rest the parameter, argument and name lists.
+pub const ENTRIES: [Entry; 12] = [
+    Entry::CompilationUnit,
+    Entry::CompilationUnit,
+    Entry::Expression,
+    Entry::Statement,
+    Entry::Member,
+    Entry::TypeName,
+    Entry::Name,
+    Entry::ParameterList,
+    Entry::BracketedParameterList,
+    Entry::ArgumentList,
+    Entry::BracketedArgumentList,
+    Entry::AttributeArgumentList,
+];

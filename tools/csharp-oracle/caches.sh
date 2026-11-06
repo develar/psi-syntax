@@ -157,7 +157,7 @@ getters() {
   "$O" getters --list "$F/csharp-lex/list" --root "$F/csharp-lex" > "$G/csharp-lex.txt"
   "$O" getters --list "$F/csharp-lex/list" --root "$F/csharp-lex" --version preview > "$G/csharp-lex-preview.txt"
   rm -rf "$F/csharp-getters"
-  python3 -I "$here/getters_fuzz.py" "$repo/testdata/csharp" "$F/csharp-getters" 20000 csharp-getters
+  "$here/getters_fuzz.py" "$repo/testdata/csharp" "$F/csharp-getters" 20000 csharp-getters
   "$O" getters --list "$F/csharp-getters/list" --root "$F/csharp-getters" > "$G/csharp-getters.txt"
   # the files the oracle has no lines for: no member at the member entry, and Roslyn's own exception (1 file)
   awk -F '\t' 'NR == FNR { if ($2 == "failure") failed[$1] = 1; next } !($1 in failed)' \

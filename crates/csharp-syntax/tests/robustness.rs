@@ -7,64 +7,20 @@
 //! (`CreateForGlobalFailure`: the whole text one skipped `BadToken`, `ERR_InsufficientStack`); DESIGN.md, "C# nesting",
 //! compares the limit with Roslyn's own on its 64 MB stack.
 
-use std::time::{Duration, Instant};
+mod common;
 
-/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
-/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
-fn limit(limit: std::time::Duration) -> std::time::Duration {
-    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
-}
+use std::time::{Duration, Instant};
 
 use csharp_syntax::dump::{lex_to_string, tree_to_string};
 use csharp_syntax::parser::MAX_RECURSION_DEPTH;
 use csharp_syntax::psi_builder::stack::{self, STACK_BUDGET};
 use csharp_syntax::{DocumentationMode, Entry, ErrorCode, FileKind, LanguageVersion, NodeId, Parser, Tree};
-
-/// The stack a parse is promised to fit (AGENTS.md, "The consumer contract"): 1 MB in a release build; a debug build's
-/// frames are several times larger.
-const STACK: usize = if cfg!(debug_assertions) { 16 << 20 } else { 1 << 20 };
-
-/// A deterministic generator (xorshift64*), so a failure reproduces.
-struct Rng(u64);
-
-impl Rng {
-    fn next(&mut self) -> u64 {
-        self.0 ^= self.0 >> 12;
-        self.0 ^= self.0 << 25;
-        self.0 ^= self.0 >> 27;
-        self.0.wrapping_mul(0x2545F4914F6CDD1D)
-    }
-
-    fn below(&mut self, n: usize) -> usize {
-        (self.next() % n as u64) as usize
-    }
-}
-
-/// Runs `f` on a `STACK` thread named `name`: a stack overflow aborts the test binary with the form's name.
-fn on_stack<T: Send + 'static>(name: &str, f: impl FnOnce() -> T + Send + 'static) -> T {
-    std::thread::Builder::new().name(name.to_string()).stack_size(STACK).spawn(f).unwrap().join().unwrap()
-}
+use psi_check::{Rng, STACK, check_links, limit, on_stack};
 
 /// The tree is lossless and consistent: the token leaves, in order, are the text; ids are preorder; every node's range
 /// covers its children's; the child and sibling links agree with the parent links.
 fn check(tree: &Tree, text: &[u8]) {
-    assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()), "ids are not preorder");
-    let mut last_child: Vec<Option<NodeId>> = vec![None; tree.len()];
-    for i in 1..tree.len() as u32 {
-        let id = NodeId(i);
-        let parent = tree.parent(id).expect("every node but the root has a parent");
-        assert!(parent.0 < i && tree.subtree_end(parent).0 >= tree.subtree_end(id).0);
-        let (p, r) = (tree.range(parent), tree.range(id));
-        assert!(p.start <= r.start && r.end <= p.end, "{id:?} {r:?} is outside its parent's {p:?}");
-        match last_child[parent.0 as usize] {
-            None => assert_eq!(tree.first_child(parent), Some(id)),
-            Some(previous) => assert_eq!(tree.next_sibling(previous), Some(id)),
-        }
-        last_child[parent.0 as usize] = Some(id);
-    }
-    for (i, last) in last_child.iter().enumerate() {
-        assert_eq!(tree.last_child(NodeId(i as u32)), *last);
-    }
+    check_links(tree, |_, _| {});
     let mut previous_end = 0;
     let mut covered = Vec::with_capacity(text.len());
     for id in tree.tokens() {
@@ -304,15 +260,8 @@ pub fn nested_forms(n: usize) -> Vec<(&'static str, String)> {
 /// Every chain (a loop of the parser) and list of `n` elements.
 fn chains(n: usize) -> Vec<(&'static str, String)> {
     let r = |s: &str| s.repeat(n);
-    let mut chains: Vec<(&'static str, String)> =
-        ["+", "-", "*", "/", "%", "<<", ">>", ">>>", "<", ">", "<=", ">=", "==", "!=", "&", "^", "|", "&&", "||"]
-            .iter()
-            .map(|op| (*op, field(&format!("a{}", format!(" {op} a").repeat(n)))))
-            .collect();
+    let mut chains = psi_check::operator_chains(n, field);
     chains.extend([
-        ("<, no spaces", field(&format!("a{}", r("<a")))),
-        (">, no spaces", field(&format!("a{}", r(">a")))),
-        ("generic-looking", field(&format!("a{}", r("<b>c")))),
         ("generic-looking calls", field(&format!("a{}", r("<b>(c)")))),
         ("is", field(&format!("a{}", r(" is A")))),
         ("as", field(&format!("a{}", r(" as A")))),
@@ -628,6 +577,7 @@ fn literals_nested_in_speculation_are_made_once() {
 /// stack a level takes depends on the path, and a mix takes paths no single form does.
 #[test]
 fn random_mixes_parse_on_a_small_stack() {
+    // jscpd:ignore-start: literal fixture input; the Java test's forms begin alike, each language keeps its own
     let forms: &[(&str, &str)] = &[
         ("(", ")"),
         ("- ", ""),
@@ -668,17 +618,11 @@ fn random_mixes_parse_on_a_small_stack() {
         ("a is [", "] b"),
         ("a is not (", ")"),
     ];
+    // jscpd:ignore-end
     let mut rng = Rng(0x2545F4914F6CDD1D);
     let mut too_deep = 0;
     for round in 0..40 {
-        let (mut open, mut close) = (String::new(), Vec::new());
-        for _ in 0..3000 {
-            let (o, c) = forms[rng.below(forms.len())];
-            open.push_str(o);
-            close.push(c);
-        }
-        close.reverse();
-        let text = field(&format!("{open}1{}", close.concat()));
+        let text = field(&psi_check::nested_mix(forms, 3000, |n| rng.below(n)));
         let parsed = parse_on_small_stack(&format!("mix {round}"), text, FileKind::default());
         assert!(parsed.elapsed < limit(Duration::from_secs(1)), "round {round}: {:?}", parsed.elapsed);
         too_deep += usize::from(parsed.too_deep);
@@ -805,20 +749,7 @@ fn random_bytes_and_fragments_parse_losslessly() {
     on_stack("random", || {
         let mut rng = Rng(0x9E3779B97F4A7C15);
         let mut parser = Parser::new();
-        let entries = [
-            Entry::CompilationUnit,
-            Entry::CompilationUnit,
-            Entry::Expression,
-            Entry::Statement,
-            Entry::Member,
-            Entry::TypeName,
-            Entry::Name,
-            Entry::ParameterList,
-            Entry::BracketedParameterList,
-            Entry::ArgumentList,
-            Entry::BracketedArgumentList,
-            Entry::AttributeArgumentList,
-        ];
+        let entries = common::ENTRIES;
         let versions = [LanguageVersion::LATEST, LanguageVersion::Preview, LanguageVersion::CSharp1];
         for round in 0..4000 {
             let mut text = Vec::new();
@@ -894,24 +825,11 @@ fn deep_lexer_forms_lex_losslessly() {
 #[test]
 fn the_depth_limit_holds_before_the_stack_runs_out() {
     const MIN_LEVELS: u32 = 700;
-    let mut failures = Vec::new();
-    for (name, text) in nested_forms(100_000) {
-        let used = on_stack(name, move || {
-            let mut parser = Parser::new();
-            let _ = parser.parse(text.as_bytes(), FileKind::default());
-            parser.stack_use()
-        });
-        println!(
-            "{name}: {} levels, {} bytes, {} a level{}",
-            used.levels,
-            used.bytes,
-            used.bytes / used.levels.max(1) as usize,
-            if used.out_of_stack() { ", out of stack" } else { "" }
-        );
-        if used.out_of_stack() && used.levels < MIN_LEVELS {
-            failures.push(format!("{name}: out of stack at {} levels ({} bytes)", used.levels, used.bytes));
-        }
-    }
+    let failures = psi_check::depth_limit_failures(nested_forms(100_000), MIN_LEVELS, |text| {
+        let mut parser = Parser::new();
+        let _ = parser.parse(text, FileKind::default());
+        parser.stack_use()
+    });
     assert!(failures.is_empty(), "{failures:#?}");
 }
 

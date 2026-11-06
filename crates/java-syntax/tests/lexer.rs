@@ -10,15 +10,11 @@
 //! Prints how many goldens match, how many of those needed a join or a holder, and the first mismatch of each failure;
 //! fails with `KS_STRICT=1` unless all match.
 
-use std::path::{Path, PathBuf};
+mod common;
 
 use java_syntax::doc_lexer::JavaDocLexer;
 use java_syntax::lexer::{self, JavaLexer, Lexed};
 use java_syntax::{LanguageLevel, TokenKind};
-
-fn testdata() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/java")
-}
 
 /// `DebugUtil.fixWhiteSpaces`: `\n`, `\r`, `\t` escaped.
 fn escape(text: &[u8]) -> String {
@@ -124,54 +120,20 @@ fn compare(expected: &[String], ours: &[(TokenKind, String)], stats: &mut Stats)
                 }
             }
         }
-        return Err(format!("leaf {i}: want {:?} got {:?} ({:?})", expected[i], ours[j].1, ours[j].0));
+        break;
     }
-    if i < expected.len() || j < ours.len() {
-        return Err(format!("lengths: {} leaves, {} tokens, stopped at {i}/{j}", expected.len(), ours.len()));
-    }
-    Ok(())
-}
-
-/// The text a golden parses: the file with its line separators made `\n`, trimmed (`String.trim()`) when the test
-/// trims it.
-fn source_text(path: &Path, trim: bool) -> Vec<u8> {
-    let raw = std::fs::read(path).expect("read golden source");
-    let mut text = Vec::with_capacity(raw.len());
-    let mut i = 0;
-    while i < raw.len() {
-        if raw[i] == b'\r' {
-            text.push(b'\n');
-            if raw.get(i + 1) == Some(&b'\n') {
-                i += 1;
-            }
-        } else {
-            text.push(raw[i]);
-        }
-        i += 1;
-    }
-    if trim {
-        let start = text.iter().position(|&b| b > b' ').unwrap_or(text.len());
-        let end = text.iter().rposition(|&b| b > b' ').map_or(start, |e| e + 1);
-        text = text[start..end].to_vec();
-    }
-    text
+    psi_check::leaves_compared(expected, ours, i, j)
 }
 
 #[test]
 fn lexer_leaf_texts() {
-    let root = testdata();
-    let manifest = std::fs::read_to_string(root.join("manifest.tsv")).expect("read manifest.tsv");
     let (mut total, mut matched, mut with_joins, mut with_holders) = (0, 0, 0, 0);
-    for line in manifest.lines().filter(|l| !l.is_empty()) {
-        let columns: Vec<&str> = line.split('\t').collect();
-        let (path, level, trim) = (columns[0], columns[1], columns[3] == "1");
-        let level = LanguageLevel::from_name(level).unwrap_or(LanguageLevel::HIGHEST);
-        let text = source_text(&root.join(path), trim);
-        let dump_path = root.join(path.replace(".java", ".txt"));
-        let dump = std::fs::read_to_string(&dump_path).expect("read golden dump");
+    for golden in common::goldens() {
+        let (path, text) = (golden.path.as_str(), golden.source_text());
+        let dump = golden.dump(".txt");
         total += 1;
         let mut stats = Stats::default();
-        match compare(&leaf_texts(&dump), &token_texts(&text, level), &mut stats) {
+        match compare(&leaf_texts(&dump), &token_texts(&text, golden.level), &mut stats) {
             Ok(()) => {
                 matched += 1;
                 with_joins += (stats.joins > 0) as usize;

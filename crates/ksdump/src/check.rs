@@ -95,13 +95,7 @@ pub fn lex(
     lex: impl Fn(&mut Parsers, usize) -> String + Sync,
     stdout: &mut impl Write,
 ) -> usize {
-    let text = match std::fs::read_to_string(lines) {
-        Ok(text) => text,
-        Err(e) => {
-            eprintln!("cannot read {}: {e}", lines.display());
-            std::process::exit(1)
-        }
-    };
+    let text = read_lines(lines);
     let expected: Vec<&str> = text.split_terminator('\n').collect();
     // A last line without its newline is a line `diff` tells apart from ours, which always ends with one.
     let unterminated = !text.is_empty() && !text.ends_with('\n');
@@ -149,13 +143,7 @@ pub fn file_lines(
     per_file: impl Fn(&mut Parsers, usize) -> String + Sync,
     stdout: &mut impl Write,
 ) -> usize {
-    let text = match std::fs::read_to_string(lines) {
-        Ok(text) => text,
-        Err(e) => {
-            eprintln!("cannot read {}: {e}", lines.display());
-            std::process::exit(1)
-        }
-    };
+    let text = read_lines(lines);
     let total = text.split_terminator('\n').count();
     let mut expected: HashMap<&str, Vec<&str>> = HashMap::new();
     let mut order = Vec::new();
@@ -197,6 +185,14 @@ pub fn file_lines(
     }
     let _ = writeln!(stdout, "{differing} differing lines of {total}");
     differing
+}
+
+/// The text of LINES; one that cannot be read ends the process.
+fn read_lines(lines: &Path) -> String {
+    std::fs::read_to_string(lines).unwrap_or_else(|e| {
+        eprintln!("cannot read {}: {e}", lines.display());
+        std::process::exit(1)
+    })
 }
 
 /// `cut -f1,2`: the line up to its second tab.

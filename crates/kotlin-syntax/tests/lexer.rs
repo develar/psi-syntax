@@ -75,12 +75,9 @@ fn compare(expected: &[String], ours: &[(TokenKind, String)]) -> Result<(), Stri
             j += 2;
             continue;
         }
-        return Err(format!("leaf {i}: want {:?} got {:?} ({:?})", expected[i], ours[j].1, ours[j].0));
+        break;
     }
-    if i < expected.len() || j < ours.len() {
-        return Err(format!("lengths: {} leaves, {} tokens, stopped at {i}/{j}", expected.len(), ours.len()));
-    }
-    Ok(())
+    psi_check::leaves_compared(expected, ours, i, j)
 }
 
 #[test]

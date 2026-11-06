@@ -5,23 +5,7 @@ mod common;
 
 use kotlin_syntax::dump::psi_to_string;
 use kotlin_syntax::{FileKind, NodeId, Tree};
-
-/// A wall-clock limit of these tests, multiplied by `PSI_SYNTAX_TIME_SCALE` (accio's CI sets it for its shared runners);
-/// unset, the limit as measured on a developer's machine, which `scripts/gate.sh` holds.
-fn limit(limit: std::time::Duration) -> std::time::Duration {
-    limit * std::env::var("PSI_SYNTAX_TIME_SCALE").ok().and_then(|s| s.parse::<u32>().ok()).unwrap_or(1)
-}
-
-struct XorShift(u64);
-
-impl XorShift {
-    fn next(&mut self) -> u64 {
-        self.0 ^= self.0 << 13;
-        self.0 ^= self.0 >> 7;
-        self.0 ^= self.0 << 17;
-        self.0
-    }
-}
+use psi_check::{XorShift, check_leaves_are_text, limit, on_stack, too_deep_errors};
 
 /// The leaves of the tree, in order, are the whole text, and node ids are in preorder.
 fn check_lossless(text: &[u8], kind: FileKind) {
@@ -113,15 +97,7 @@ fn random_bytes_and_fragments_parse() {
         b"[a.b]",
     ];
     for round in 0..3000 {
-        let len = (rng.next() % 200) as usize;
-        let mut text = Vec::with_capacity(len * 3);
-        for _ in 0..len {
-            if round % 3 == 0 {
-                text.push(rng.next() as u8);
-            } else {
-                text.extend_from_slice(pieces[(rng.next() % pieces.len() as u64) as usize]);
-            }
-        }
+        let text = rng.bytes_or_pieces(round, pieces);
         check_lossless(&text, if round % 2 == 0 { FileKind::Kt } else { FileKind::Kts });
     }
     for golden in common::goldens() {
@@ -135,27 +111,28 @@ fn random_bytes_and_fragments_parse() {
     }
 }
 
-/// The stack a parse is promised to fit (AGENTS.md, "The consumer contract"): 1 MB in a release build; a debug build's
-/// frames are several times larger.
-const STACK: usize = if cfg!(debug_assertions) { 16 << 20 } else { 1 << 20 };
-
-/// Runs `f` on a thread with `STACK` bytes of stack.
-fn on_small_stack<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> T {
-    std::thread::Builder::new().stack_size(STACK).spawn(f).unwrap().join().unwrap()
-}
-
 /// The checks of `check_lossless` but the dump, whose indentation is quadratic in the depth: ids in preorder, the
 /// navigation consistent with the parent links, the leaves the whole text.
 fn check_tree(tree: &Tree, text: &[u8]) {
     assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()));
     check_navigation(tree);
-    let covered: Vec<u8> = tree.tokens().flat_map(|id| tree.text(id).iter().copied()).collect();
-    assert!(covered == text, "the leaves are not the text");
-    assert_eq!(tree.range(tree.root()), 0..text.len());
+    check_leaves_are_text(tree, text);
 }
 
-fn too_deep_errors(tree: &Tree) -> usize {
-    (0..tree.len() as u32).filter(|&i| tree.error_message(NodeId(i)) == Some("Code is too deeply nested")).count()
+/// Parses `text` on a `STACK` thread named `name`: the time of the parse, the tree well formed and lossless, and what
+/// `measure` makes of it.
+fn parse_on_small_stack<T: Send + 'static>(
+    name: &str,
+    text: String,
+    measure: impl FnOnce(&Tree) -> T + Send + 'static,
+) -> (std::time::Duration, T) {
+    on_stack(name, move || {
+        let start = std::time::Instant::now();
+        let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
+        let elapsed = start.elapsed();
+        check_tree(&tree, text.as_bytes());
+        (elapsed, measure(&tree))
+    })
 }
 
 /// Every recursive form, `n` levels deep.
@@ -193,16 +170,13 @@ fn nested_forms(n: usize) -> Vec<(&'static str, String)> {
 fn deeply_nested_forms_parse_on_a_small_stack() {
     let forms = nested_forms(100_000);
     for (name, text) in forms {
-        let (elapsed, errors) = on_small_stack(move || {
-            let start = std::time::Instant::now();
-            let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
-            let elapsed = start.elapsed();
-            check_tree(&tree, text.as_bytes());
-            let again = Tree::parse(text.as_bytes(), FileKind::Kt);
+        let again = text.clone();
+        let (elapsed, errors) = parse_on_small_stack(name, text, move |tree| {
+            let again = Tree::parse(again.as_bytes(), FileKind::Kt);
             assert!((0..tree.len() as u32).map(NodeId).all(|i| tree.kind(i) == again.kind(i)
                 && tree.range(i) == again.range(i)
                 && tree.parent(i) == again.parent(i)));
-            (elapsed, too_deep_errors(&tree))
+            too_deep_errors(tree)
         });
         // A doc comment's `/**` nests in the lexer, not the parser.
         assert!(errors > 0 || name == "doc comments", "{name}: no error at the limit");
@@ -217,10 +191,8 @@ fn tiny_nesting_limits_keep_trees_lossless() {
     use kotlin_syntax::dump::subtree_to_string;
     use kotlin_syntax::{ParseOptions, Parser};
     for limit in [1, 2, 3, 5, 8, 13] {
-        let mut parser = Parser::new();
-        parser.set_nesting_limit(limit);
-        let mut body_parser = Parser::new();
-        body_parser.set_nesting_limit(limit);
+        let (mut parser, mut body_parser): (Parser, Parser) =
+            (psi_check::nesting_limited(limit), psi_check::nesting_limited(limit));
         let mut deep = 0;
         for golden in common::goldens() {
             let text = common::source_text(&golden).into_bytes();
@@ -229,23 +201,10 @@ fn tiny_nesting_limits_keep_trees_lossless() {
             check_tree(&full, &text);
             deep += too_deep_errors(&full);
             let lazy = parser.parse_with_options(&text, kind, ParseOptions { expand_bodies: false });
-            let mut f = 0u32;
-            for l in 0..lazy.len() as u32 {
-                let (ln, fnode) = (NodeId(l), NodeId(f));
-                assert_eq!(lazy.range(ln), full.range(fnode), "{}", golden.name);
-                if lazy.is_unexpanded(ln) {
-                    let body = body_parser.parse_body(&lazy, ln, ParseOptions::default()).unwrap();
-                    assert_eq!(
-                        subtree_to_string(&body, body.root()),
-                        subtree_to_string(&full, fnode),
-                        "{}",
-                        golden.name
-                    );
-                    f = full.subtree_end(fnode).0;
-                } else {
-                    f += 1;
-                }
-            }
+            psi_check::each_body(&golden.name, &lazy, &full, |ln, fnode| {
+                let body = body_parser.parse_body(&lazy, ln, ParseOptions::default()).unwrap();
+                assert_eq!(subtree_to_string(&body, body.root()), subtree_to_string(&full, fnode), "{}", golden.name);
+            });
         }
         assert!(deep > 0, "limit {limit}");
     }
@@ -278,13 +237,8 @@ fn long_left_associative_chains_parse_in_linear_time() {
         ("assignments", format!("fun f() {{ a{} }}\n", " = a".repeat(n))),
     ];
     for (name, text) in chains {
-        let (elapsed, depth) = on_small_stack(move || {
-            let start = std::time::Instant::now();
-            let tree = Tree::parse(text.as_bytes(), FileKind::Kt);
-            let elapsed = start.elapsed();
-            check_tree(&tree, text.as_bytes());
-            (elapsed, tree.preorder(tree.root()).map(|(_, d)| d).max().unwrap_or(0))
-        });
+        let (elapsed, depth) =
+            parse_on_small_stack(name, text, |tree| tree.preorder(tree.root()).map(|(_, d)| d).max().unwrap_or(0));
         println!("{name}: {} ms, depth {depth}", elapsed.as_millis());
         assert!(depth > n, "{name}: depth {depth}");
         assert!(elapsed < limit(std::time::Duration::from_millis(1000)), "{name}: {elapsed:?}");
@@ -297,26 +251,10 @@ fn long_left_associative_chains_parse_in_linear_time() {
 fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
     let file = "/** doc [link] */\nclass C<T> { fun f(x: Int) = listOf(1, 2).map { it * x }.filter { y -> y > 0 }?.size ?: 0\n  val s = \"a${b}c\"\n}\n";
     let big = file.repeat(20_000);
-    let parse = |parser: &mut kotlin_syntax::Parser, text: &str| {
+    psi_check::check_retained_bytes(file, &big, |parser: &mut kotlin_syntax::Parser, text: &str| {
         let tree = parser.parse(text, FileKind::Kt);
         assert_eq!(psi_to_string(&tree, "a.kt"), psi_to_string(&Tree::parse(text, FileKind::Kt), "a.kt"));
-    };
-    let mut parser = kotlin_syntax::Parser::new();
-    parser.set_retained_bytes(8 << 20);
-    parse(&mut parser, &big);
-    assert!(parser.grown_bytes() > 8 << 20, "{}", parser.grown_bytes());
-    assert!(parser.heap_bytes() <= 4 << 20, "{}", parser.heap_bytes());
-    // a share under 1 / the frames' capacity still keeps the file's builder (`Shrink::nested`), so the buffers keep
-    // nearly all of what they are shrunk to (0.58 of it while the share dropped every frame)
-    assert!(parser.heap_bytes() > 3 << 20, "{}", parser.heap_bytes());
-    parse(&mut parser, file);
-    parse(&mut parser, &big);
-    parser.shrink_to(0);
-    assert_eq!(parser.heap_bytes(), 0);
-    parse(&mut parser, file);
-    parser.set_retained_bytes(usize::MAX);
-    parse(&mut parser, &big);
-    assert_eq!(parser.heap_bytes(), parser.grown_bytes());
+    });
 }
 
 /// The levels every recursive form reaches before the stack stops it (`psi_builder::stack`): the depth limit, a count,
@@ -325,23 +263,10 @@ fn a_parser_shrinks_its_buffers_past_the_retained_bytes_and_parses_as_before() {
 /// its tree is the same. Prints each form's levels and stack, on a 1 MB stack.
 #[test]
 fn the_depth_limit_holds_before_the_stack_runs_out() {
-    let mut failures = Vec::new();
-    for (name, text) in nested_forms(100_000) {
-        let used = on_small_stack(move || {
-            let mut parser = kotlin_syntax::Parser::new();
-            let _ = parser.parse(text.as_bytes(), FileKind::Kt);
-            parser.stack_use()
-        });
-        println!(
-            "{name}: {} levels, {} bytes, {} a level{}",
-            used.levels,
-            used.bytes,
-            used.bytes / used.levels.max(1) as usize,
-            if used.out_of_stack() { ", out of stack" } else { "" }
-        );
-        if used.out_of_stack() {
-            failures.push(format!("{name}: out of stack at {} levels ({} bytes)", used.levels, used.bytes));
-        }
-    }
+    let failures = psi_check::depth_limit_failures(nested_forms(100_000), u32::MAX, |text| {
+        let mut parser = kotlin_syntax::Parser::new();
+        let _ = parser.parse(text, FileKind::Kt);
+        parser.stack_use()
+    });
     assert!(failures.is_empty(), "{failures:#?}");
 }

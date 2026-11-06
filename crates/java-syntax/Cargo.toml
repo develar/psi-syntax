@@ -11,6 +11,9 @@ publish = false
 [dependencies]
 psi-builder = { path = "../psi-builder" }
 
+[dev-dependencies]
+psi-check = { path = "../psi-check" }
+
 [lints.rust]
 unsafe_code = "forbid"
 
