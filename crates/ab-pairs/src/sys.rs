@@ -701,7 +701,8 @@ mod tests {
     /// The host's busy time counts the child (a CPU-bound child's run is at least its own CPU, to a tick per core) and
     /// the rest of the host as foreign: a thread of this process spinning through a sleeping child's run is in its
     /// `foreign_cpu`, as much as the thread got of a core, to a tick per core. A loaded host only adds to both, so the
-    /// bounds are lower ones.
+    /// bounds are lower ones. Unix only: the children are `sh` and the spinner's CPU is `libc`'s thread clock.
+    #[cfg(unix)]
     #[test]
     fn a_run_sees_the_host_busy_beside_it() {
         if host_busy().is_none() {
