@@ -11,7 +11,7 @@ For every byte sequence, `dump::psi_to_string(&tree, name)` prints exactly what 
 before every commit:
 
 - clippy, on default features and with `counters,alloc-stats`;
-- `KS_STRICT=1 cargo test --release`;
+- `KS_STRICT=1 cargo nextest run --release`, then `cargo test --release --doc` for the doc tests nextest skips;
 - byte equality with the PSI oracle on all 55 501 community files and on the cached parse-fuzz and lex-fuzz corpora;
 - `ksdump --check-bodies`: each of the 229 960 community bodies parsed on its own equals the full parse's subtree;
 - the same with nesting limit 3 (`--nesting-limit 3`) on the community files and the mutations, so the too-deep paths

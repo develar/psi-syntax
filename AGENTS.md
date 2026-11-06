@@ -164,8 +164,8 @@ mutations at their goldens' versions, Latest and Preview, the fuzz at Latest and
 oracle dump only lossless), 11 (the dumps and lexer lines of the `-defines` lists, every symbol of a file's
 conditions defined) 12 (the directives' flags of the corpora, the `-defines` lists, the mutations and the fuzz) and 13 (the syntax getters against the cached `getters` lines of the goldens, the corpora at Latest
 and Preview, the roslyn corpus at the other documentation modes, the `-defines` lists, the mutations, the lexer fuzz
-and the getters fuzz of `tools/csharp-oracle/getters_fuzz.py`); see `scripts/gate.sh`'s header. While iterating: `cargo test --release -p csharp-syntax --test
-goldens` (the pass count and the first differing lines), then one corpus with `ksdump --check`.
+and the getters fuzz of `tools/csharp-oracle/getters_fuzz.py`); see `scripts/gate.sh`'s header. While iterating: `cargo nextest run --release -p csharp-syntax
+--test goldens --no-capture` (the pass count and the first differing lines), then one corpus with `ksdump --check`.
 
 Updating Roslyn (a new `Microsoft.CodeAnalysis.CSharp` release):
 
@@ -182,15 +182,15 @@ Updating Roslyn (a new `Microsoft.CodeAnalysis.CSharp` release):
    (the roslyn corpus), the oracle's README, `lexer/directive_parser.rs` (`PRODUCT_VERSION`, what `#error version`
    prints: take it from the new oracle's dump of `#error version`), the crate's doc comments that name the version, and
    `global.json` with `tools/csharp-unicode` when the package needs a newer SDK.
-4. Rerun the generators (`gen.py`; `tools/csharp-unicode` when the .NET runtime changed) and `cargo test --release -p
-   csharp-syntax --test kinds`; a new kind, node type or error code shows up in the generated files' diff.
+4. Rerun the generators (`gen.py`; `tools/csharp-unicode` when the .NET runtime changed) and `cargo nextest run
+   --release -p csharp-syntax --test kinds`; a new kind, node type or error code shows up in the generated files' diff.
 5. Port the diff method by method into the files of the table, in C# order, with new deviations named at their place
    and in DESIGN.
 6. Regenerate the oracle's answers: `tools/csharp-oracle/vendor-goldens.sh` (the goldens; read its printed counts
    against the README's), then `tools/csharp-oracle/caches.sh` (a roslyn corpus at the new pin gets a new list and
    key, so `scripts/gate.sh`'s corpus names move with it; the mutations and fuzz are regenerated from the new goldens).
    Never edit a dump to make a test pass.
-7. `cargo test --release -p csharp-syntax`, then `scripts/gate.sh` PASS; record the new counts and any moved
+7. `cargo nextest run --release -p csharp-syntax`, then `scripts/gate.sh` PASS; record the new counts and any moved
    measurement in DESIGN with the commit and the date.
 
 ## Layout
@@ -453,8 +453,8 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
 
 ## Oracles
 
-1. `cargo test --release --test goldens`: the 789 vendored goldens of the compiler's own parsing tests (Apache-2.0,
-   see NOTICE). The first gate; run it after every change.
+1. `cargo nextest run --release -p kotlin-syntax --test goldens --no-capture`: the 789 vendored goldens of the
+   compiler's own parsing tests (Apache-2.0, see NOTICE). The first gate; run it after every change.
 2. The live PSI oracle (kotlin-compiler-embeddable 2.4.21) on real code:
    `java -Xss512m -Xmx8g -cp "$HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/lib/*" $HOME/.cache/psi-syntax/psi-tools/tools/psi-oracle/PsiOracle.java --list LIST --root ROOT --out OUT`
    writes `OUT/<path>.psi.txt` and `OUT/index.jsonl` (`path`, `psiErrors`, `firstError`). Ready dumps:
@@ -475,7 +475,8 @@ Texts escape `\n`, `\t`, `\r` and `\\`, `'` as `DebugUtil` does. The whole dump 
    keywords, modifiers) for the PSI oracle and `scripts/compare.py`; `scripts/lex-fuzz.py`'s inputs serve it too.
    `scripts/psi-reduce.py FILE OUT` shrinks a differing file to a small input; a fixed case goes to
    `crates/kotlin-syntax/tests/oracle/`
-   (`NAME.kt` and the oracle's dump `NAME.txt`), which `cargo test --release --test oracle` compares.
+   (`NAME.kt` and the oracle's dump `NAME.txt`), which `cargo nextest run --release -p kotlin-syntax --test oracle`
+   compares.
 
 Java: `testdata/java/` (1036 goldens of IntelliJ's Java parsing tests, `manifest.tsv` with level, entry and trim per
 test) and the Java PSI oracle `tools/java-oracle/JavaPsiOracle.java` (see `tools/java-oracle/README.md`: cached dumps of
@@ -540,7 +541,8 @@ Roslyn) says otherwise.
   the machine is shared; `KS_INSTR=1` adds the instructions and cycles of a round, which move far less than MB/s on a
   loaded machine) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
-- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo test --release` over psi-syntax's crates, byte equality of
+- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo nextest run --release` (then the doc
+  tests) over psi-syntax's crates, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
   community files, and again with `--nesting-limit 3` on the community files and the mutations, and the Java lexers
   against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz, and both Java

@@ -1,7 +1,7 @@
 #!/bin/sh
 # The correctness gate every change must pass, byte for byte against Kotlin 2.4.21's PSI and IntelliJ 271's Java PSI:
 #   1. clippy over psi-syntax's crates (default and with ksdump's opt-in `counters,alloc-stats` features) and
-#      KS_STRICT=1 cargo test --release over them (goldens, lexer, kdoc, robustness);
+#      KS_STRICT=1 cargo nextest run --release over them (goldens, lexer, kdoc, robustness), then their doc tests;
 #   2. the 55 501 community files: our dumps against the cached oracle dumps, 0 differing;
 #   3. cached fuzz corpora (parse seeds 11-12, lex seeds 1-2, 3000 files each, and the 16 724 one-place mutations of
 #      psi-tools 4d21cba's tools/psi-gate/mutate.js over crates/kotlin-syntax/testdata/psi) against their cached oracle answers;
@@ -72,9 +72,14 @@ fail=0
 cargo clippy --release $P --all-targets -q -- -D warnings || fail=1
 # shellcheck disable=SC2086
 cargo clippy --release $P --all-targets --features ksdump/counters,ksdump/alloc-stats -q -- -D warnings || fail=1
+# The tests stay on `release`, the profile their time limits were measured on; a passing test's output is printed at
+# the end (`--success-output final`) for the goldens' counts. nextest skips doc tests: the libraries' run after it.
 # shellcheck disable=SC2086
-KS_STRICT=1 cargo test --release $P -q > "$O/tests.log" 2>&1 || { tests=FAIL; fail=1; }
-grep -E "^test result|goldens:|FAILED|panicked" "$O/tests.log"
+{ KS_STRICT=1 cargo nextest run --release $P --cargo-quiet --status-level fail --success-output final \
+  && cargo test --release -p psi-builder -p kotlin-syntax -p java-syntax -p csharp-syntax --doc -q; } > "$O/tests.log" 2>&1 \
+  || { tests=FAIL; fail=1; }
+# nextest's status lines (`FAIL [ 0.1s]`), not a passing test's own `FAIL path` lines (Kotlin's known stale golden).
+grep -E "goldens:|^ *(FAIL|SIGSEGV|SIGABRT|TIMEOUT) +\[|^ *Summary|^test result: FAILED|FAILED|panicked|^error" "$O/tests.log"
 [ "${tests:-}" = FAIL ] && echo "FAIL tests"
 cargo build --profile psi -p ksdump -q || exit 1
 B=${CARGO_TARGET_DIR:-../target}/psi/ksdump
