@@ -40,6 +40,11 @@ pub trait Trial {
     fn before_pair(&mut self) -> Result<f64> {
         Ok(reserve::probe().load)
     }
+    /// Before the next pair after one the `Filter` dropped, under `HostPolicy::PerStep`: its wait
+    /// (`Host::after_burst`); the load then.
+    fn after_burst(&mut self) -> Result<f64> {
+        Ok(reserve::probe().load)
+    }
     /// One timed run of `unit` by arm `index` of the run's arms.
     fn run(&mut self, index: usize, arm: &Arm, unit: &Self::Unit) -> Result<Sample>;
 }
@@ -277,6 +282,8 @@ pub fn run<T: Trial>(
             dropped_at: Vec::new(),
         })
         .collect();
+    // The pair just run was dropped: the host is not what the step waited for, whichever unit runs next.
+    let mut burst = false;
     for round in 0.. {
         let pending: Vec<usize> = (0..units.len()).filter(|&i| !progress[i].done).collect();
         if pending.is_empty() {
@@ -287,6 +294,8 @@ pub fn run<T: Trial>(
             if plan.host.waits_per_pair() {
                 let load = t.before_pair()?;
                 progress[ui].loads.push(load);
+            } else if std::mem::take(&mut burst) && plan.host == HostPolicy::PerStep {
+                t.after_burst()?;
             }
             let mut order = u.arms.clone();
             if round % 2 == 1 {
@@ -314,6 +323,7 @@ pub fn run<T: Trial>(
                 p.keep(&u.arms, f);
             };
             filter(p);
+            burst = p.dropped_at.last().is_some_and(|&i| i + 1 == p.ran(&u.arms));
             let mut judged = judge(plan, p, &u.arms, &deciding(p));
             let decided = |p: &Progress, judged: &[(String, Option<Verdict>)]| {
                 p.n(&u.arms) >= plan.min_n && judged.iter().all(|(_, v)| v.is_some())
@@ -399,7 +409,9 @@ impl PairArgs {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HostPolicy {
     /// One wait for a quiet host before a step's timed runs (`Host::before_step`; `ab`, each of `ab-run`'s steps),
-    /// none between the pairs.
+    /// none between the pairs but after one the `Filter` dropped: the next pair waits until no other process is busy
+    /// (`Host::after_burst`), so a load that comes during the step costs its pairs, not the quiet host the step
+    /// waited for.
     PerStep,
     /// That wait, then before every pair one until no other process is busy (`Host::before_pair`; `build-ab`,
     /// `lang-ab`): a full build's thread-time sums follow another session's load where its CPU does not.
@@ -474,6 +486,16 @@ impl Host {
             HostPolicy::PerStep | HostPolicy::None => Ok(reserve::probe().load),
         }
     }
+
+    /// Before the pair after a dropped one: under `PerStep` until no other process is busy, whatever the caller waited
+    /// for before the step (`checked`) and whatever the load average, which the step's own runs still hold; the load
+    /// then.
+    pub fn after_burst(&self) -> Result<f64> {
+        match self.policy {
+            HostPolicy::PerStep => wait_unshared(Duration::from_secs(self.args.wait_quiet), self.args.force),
+            HostPolicy::PerPair | HostPolicy::None => Ok(reserve::probe().load),
+        }
+    }
 }
 
 /// The values a flattened argument group takes when no flag is given: its defaults, from its own declaration.
@@ -497,6 +519,10 @@ mod tests {
         type Unit = String;
         fn before_pair(&mut self) -> Result<f64> {
             self.log.push("pair".into());
+            Ok(self.log.len() as f64)
+        }
+        fn after_burst(&mut self) -> Result<f64> {
+            self.log.push("burst".into());
             Ok(self.log.len() as f64)
         }
         fn run(&mut self, index: usize, arm: &Arm, unit: &String) -> Result<Sample> {
@@ -583,6 +609,35 @@ mod tests {
         )
         .unwrap();
         assert_eq!((f.log.len(), f.log.iter().any(|l| l == "pair"), p[0].loads.len()), (12, false, 0));
+    }
+
+    /// Under `PerStep` the pair after one the filter dropped waits for the host (`Trial::after_burst`), whichever unit
+    /// it is; a pair after a clean one does not, and under `PerPair` the wait before every pair is the only one.
+    #[test]
+    fn the_pair_after_a_dropped_one_waits_under_per_step() {
+        let dirty = |runs: &[&[Sample]]| -> Vec<Vec<bool>> {
+            runs.iter().map(|r| r.iter().map(|s| s.metrics["ms"] > 500.0).collect()).collect()
+        };
+        let filter = || Some(Filter { times: &["ms"], dirty: &dirty });
+        // Calls 9 and 10, the third pair of `a` (two units, four runs a round), ran beside a burst.
+        let time = |_: &str, _: &str, i: usize| Some(if i == 9 || i == 10 { 1000.0 } else { 100.0 + jitter(i) });
+        let (a, b) = ("a".to_string(), "b".to_string());
+        let units = [unit(&a, vec![0, 1]), unit(&b, vec![0, 1])];
+        let mut f = fake(time);
+        let p = run(
+            &mut f,
+            &arms(),
+            &units,
+            &Plan { host: HostPolicy::PerStep, filter: filter(), ..plan(None) },
+            |_, _| Ok(()),
+        )
+        .unwrap();
+        assert_eq!((&p[0].dropped_at[..], p[1].dropped), (&[2][..], 0));
+        let waits: Vec<usize> = f.log.iter().enumerate().filter(|(_, l)| *l == "burst").map(|(i, _)| i).collect();
+        assert_eq!(waits, [10], "once, before `b`'s third pair: {:?}", f.log);
+        let mut f = fake(time);
+        run(&mut f, &arms(), &units, &Plan { filter: filter(), ..plan(None) }, |_, _| Ok(())).unwrap();
+        assert!(!f.log.iter().any(|l| l == "burst"), "{:?}", f.log);
     }
 
     /// A unit of one arm runs `min_n` times; a metric one run lacks never decides, so its unit runs to `max_n`.
@@ -815,10 +870,12 @@ mod tests {
         host(HostPolicy::PerStep, false).before_step(false).unwrap();
         host(HostPolicy::PerPair, true).before_step(true).unwrap();
         host(HostPolicy::PerStep, false).before_pair().unwrap();
+        host(HostPolicy::PerPair, false).after_burst().unwrap();
         // `None` waits for nothing, a step judged by its wall included, and reserves nothing: the reservation it
         // returns holds no lock, so the host's own is free while it lives.
         host(HostPolicy::None, false).before_step(true).unwrap();
         host(HostPolicy::None, false).before_pair().unwrap();
+        host(HostPolicy::None, false).after_burst().unwrap();
         let dir = std::env::temp_dir().join(format!("accio-bench-none-{}", std::process::id()));
         let held = host(HostPolicy::None, false).reserve("quick").unwrap();
         drop(Reservation::acquire_in(&dir, "another", Duration::ZERO).expect("the lock is free beside a quick run"));
