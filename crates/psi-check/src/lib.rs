@@ -97,12 +97,22 @@ pub fn operator_chains(n: usize, field: fn(&str) -> String) -> Vec<(&'static str
     chains
 }
 
+/// The longest climb `check_links` asks `Tree::last_child` for: past it, the check holds the climb's premise instead.
+const LAST_CHILD_CLIMB: u32 = 64;
+
 /// Ids are preorder, every node but the root has a parent before it whose subtree and range hold its own, and the
 /// first child, next sibling and last child links agree with the parent links; `each(id, previous)` sees every node
 /// but the root with the sibling before it by those links.
+///
+/// `Tree::last_child` climbs the parents from the subtree's last node, a step per level, so asking it of every node of
+/// a chain 100 000 deep is quadratic (80 s of C#'s robustness test, against its 3 s of parsing). It is asked wherever
+/// the climb is at most `LAST_CHILD_CLIMB` levels, which is every node of ordinary code; on a deeper one the check
+/// holds what that climb reaches instead: the last child by the parent links ends where its parent's subtree ends, so
+/// it is the ancestor of the subtree's last node whose parent is the node, given the preorder and parents checked here.
 pub fn check_links<L: TreeLanguage>(tree: &Tree<L>, mut each: impl FnMut(NodeId, Option<NodeId>)) {
     assert!(tree.preorder(tree.root()).map(|(id, _)| id.0 as usize).eq(0..tree.len()), "ids are not preorder");
     let mut last_child: Vec<Option<NodeId>> = vec![None; tree.len()];
+    let mut depth = vec![0u32; tree.len()];
     for i in 1..tree.len() as u32 {
         let id = NodeId(i);
         let parent = tree.parent(id).expect("every node but the root has a parent");
@@ -115,9 +125,18 @@ pub fn check_links<L: TreeLanguage>(tree: &Tree<L>, mut each: impl FnMut(NodeId,
         }
         each(id, last_child[parent.0 as usize]);
         last_child[parent.0 as usize] = Some(id);
+        depth[i as usize] = depth[parent.0 as usize] + 1;
     }
     for (i, last) in last_child.iter().enumerate() {
-        assert_eq!(tree.last_child(NodeId(i as u32)), *last);
+        let id = NodeId(i as u32);
+        let end = tree.subtree_end(id);
+        let climb = if end.0 > id.0 + 1 { depth[end.0 as usize - 1] - depth[i] } else { 0 };
+        if climb <= LAST_CHILD_CLIMB {
+            assert_eq!(tree.last_child(id), *last);
+        } else {
+            let last = last.expect("a node with descendants has a last child");
+            assert_eq!(tree.subtree_end(last), end, "{id:?}'s last child {last:?} does not end its subtree");
+        }
     }
 }
 
