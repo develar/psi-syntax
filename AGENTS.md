@@ -13,7 +13,7 @@ its crates members of accio's Cargo workspace with their own package fields, lin
 | `crates/psi-check` | the tree checks the parsers' tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits) and the robustness tests' limits and seeded generators; a dev-dependency of each language |
 | `crates/ksdump` | the `ksdump` binary: dumps, benchmarks, lexes, checks bodies (`--lang kotlin\|java\|csharp`, else by extension) |
 | `crates/ide-oracle` | the oracle harness, an IDE's own code as the oracle (pinned jars, the IDE's JVM running a single-file oracle, byte-equal comparison naming the first difference, goldens vendored from a revision, Python's seeded generator for mutations), and `java-oracle`, the Java oracle's tooling (`tools/java-oracle/README.md`); accio's `scripts/bench plugin-xml` runs on it too |
-| `crates/ab-pairs` | the engine of an A/B of two binaries: interleaved pairs, the first arm alternating, until the stopping rule (`stats::decide`) gives each unit its verdict; the host's measurement reservation and quiet waits; a child timed by its resource usage and instruction counters. accio's `scripts/bench` A/B commands run on it |
+| `crates/ab-pairs` | the engine of an A/B of two binaries: interleaved pairs, the first arm alternating, until the stopping rule (`stats::decide`) gives each unit its verdict; the host's measurement reservation and quiet waits; a child timed by its resource usage and instruction counters. Its `ksdump-ab` is the A/B of two ksdump binaries; accio's `scripts/bench` A/B commands run on it |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
@@ -531,16 +531,20 @@ Roslyn) says otherwise.
 
 - Dependencies: a well-maintained crate is better than a reinvented one when it is measurably as fast or faster
   and keeps the output byte-identical; each one is justified in its commit (what it replaces, the measured effect,
-  its maintenance). Nothing that needs a C toolchain or pulls a large tree. No `unsafe` of our own, no `unwrap` on
+  its maintenance). Nothing that needs a C toolchain or pulls a large tree. No `unsafe` of our own (the one exception
+  is `ab-pairs`'s `sys`, the measurement tool's reading of the kernel's records of a child), no `unwrap` on
   input-dependent paths: any byte sequence parses (invalid UTF-8 is lexed as BAD_CHARACTER bytes, in C# as one U+FFFD
   code unit a byte) and never panics.
 - Speed is a goal: no allocation per token beyond the arena, no `String` per leaf (texts are ranges), no recursion
   depth that a 4 MB file of nested expressions can overflow without a guard (PSI's own limits apply).
 - `scripts/pgo.sh OUT_DIR [KOTLIN_LIST KOTLIN_ROOT JAVA_LIST JAVA_ROOT]` builds a profile-guided ksdump (training on
   the vendored goldens by default) and leaves the merged profile for a consumer's build.
-- Measure speed with `scripts/ab.sh OLD_KSDUMP NEW_KSDUMP [ROUNDS] [BENCH ARGS]` (alternating runs, medians, load:
-  the machine is shared; `KS_INSTR=1` adds the instructions and cycles of a round, which move far less than MB/s on a
-  loaded machine) and profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
+- Measure speed with `cargo run --release -p ab-pairs --bin ksdump-ab -- OLD_KSDUMP NEW_KSDUMP [-- BENCH ARGS]`:
+  `ksdump --bench` of each in interleaved pairs until the stopping rule's verdict, under the host's measurement
+  reservation (the A/B engine of accio's `scripts/bench`, decision 2026-11-06-ab-pairs-in-psi-syntax). Where the host
+  counts them, instructions retired decide (they move far less than MB/s on a loaded machine), guarded by the parse
+  time and cycles per instruction; `--metric time` judges the parse seconds. `--list`/`--root` pick the corpus
+  (default the community `.kt` files). Profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
 - `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo nextest run --release` (then the doc
   tests) over psi-syntax's crates, byte equality of
@@ -559,11 +563,12 @@ Roslyn) says otherwise.
   and the C# directives' flags (`ksdump --directives --check`) against its cached `directives` lines of all of those,
   and the C# syntax getters (`ksdump --lang csharp --getters --check`) against its cached `getters` lines.
   A faster change that fails it is not a change.
-- Java speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list scripts/ab.sh OLD NEW` (the community
+- Java speed: `ksdump-ab OLD NEW --list $HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list` (the community
   `.java` files); DESIGN, "Java parse throughput", has the numbers and how tree-sitter-java was compared.
-- C# speed: `KS_LIST=$HOME/.cache/psi-syntax/corpus/csharp-roslyn-35d9211.list KS_ROOT=$HOME/.cache/psi-syntax/csharp-src/roslyn
-  scripts/ab.sh OLD NEW` (any of the four corpora; dotnet/runtime's time is bound by `hugeexpr1.cs`); DESIGN, "C# parse
-  throughput and robustness", has the numbers and how tree-sitter-c-sharp was compared.
+- C# speed: `ksdump-ab OLD NEW --list $HOME/.cache/psi-syntax/corpus/csharp-roslyn-35d9211.list --root
+  $HOME/.cache/psi-syntax/csharp-src/roslyn` (any of the four corpora; dotnet/runtime's time is bound by
+  `hugeexpr1.cs`); DESIGN, "C# parse throughput and robustness", has the numbers and how tree-sitter-c-sharp was
+  compared.
 - A change lands as any accio change does: a pull request to accio's `main`, a conventional subject
   (`fix(psi): …`, `perf(psi): …`; `../AGENTS.md`, "Writing a change down"), a body that says what the change does,
   its measured effect and that the gate passed. A parser change that moves what accio extracts carries accio's version
