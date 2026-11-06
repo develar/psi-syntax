@@ -2597,7 +2597,7 @@ impl<'t> Lexer<'t> {
 
         let buffers = std::mem::take(&mut self.buffers.xml_parser);
         let mut is_terminated = true;
-        let (doc_comment, buffers) = {
+        let (doc_comment, buffers, abandoned_over_budget) = {
             let mut parser = DocumentationCommentParser::new(self, buffers);
             parser.re_initialize(if style == XmlDocCommentStyle::SingleLine {
                 LexerMode::XML_DOC_COMMENT_STYLE_SINGLE_LINE
@@ -2605,14 +2605,18 @@ impl<'t> Lexer<'t> {
                 LexerMode::XML_DOC_COMMENT_STYLE_DELIMITED
             });
             let doc_comment = parser.parse_documentation_comment(&mut is_terminated);
-            (doc_comment, parser.into_buffers())
+            let abandoned_over_budget = parser.base.budget_exhausted_at.is_some();
+            (doc_comment, parser.into_buffers(), abandoned_over_budget)
         };
         self.buffers.xml_parser = buffers;
 
-        // We better have finished with the whole comment. There should be error
-        // code in the implementation of ParseXmlDocComment that ensures this.
+        // Unless the nested parser hit its budget and intentionally stopped at a forced end-of-comment token, we must
+        // have finished with the whole comment. There should be error code in the implementation of ParseXmlDocComment
+        // that ensures this.
         debug_assert!(
-            self.location_is(XmlDocCommentLocation::End) || self.text_window.peek_char() == INVALID_CHARACTER
+            abandoned_over_budget
+                || self.location_is(XmlDocCommentLocation::End)
+                || self.text_window.peek_char() == INVALID_CHARACTER
         );
 
         self.mode = save_mode;
