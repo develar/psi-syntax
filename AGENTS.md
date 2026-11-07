@@ -191,8 +191,8 @@ Updating Roslyn (a new `Microsoft.CodeAnalysis.CSharp` release):
    against the README's), then `tools/csharp-oracle/caches.sh` (a roslyn corpus at the new pin gets a new list and
    key, so `scripts/gate.sh`'s corpus names move with it; the mutations and fuzz are regenerated from the new goldens).
    Never edit a dump to make a test pass.
-7. `cargo nextest run --release -p csharp-syntax`, then `scripts/gate.sh` PASS; record the new counts and any moved
-   measurement in DESIGN with the commit and the date.
+7. `cargo nextest run --release --profile heavy -p csharp-syntax`, then `scripts/gate.sh` PASS; record the new counts
+   and any moved measurement in DESIGN with the commit and the date.
 
 ## Layout
 
@@ -546,8 +546,8 @@ Roslyn) says otherwise.
   time and cycles per instruction; `--metric time` judges the parse seconds. `--list`/`--root` pick the corpus
   (default the community `.kt` files). Profile with `scripts/profile.py` (macOS `sample`, symbolized inline-aware with
   `atos -i`: self time per function and per source line, inclusive time per source function).
-- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo nextest run --release` (then the doc
-  tests) over psi-syntax's crates, byte equality of
+- `scripts/gate.sh` prints PASS before every commit: clippy and `KS_STRICT=1 cargo nextest run --release --profile
+  heavy` (then the doc tests) over psi-syntax's crates, byte equality of
   all 55 501 community dumps and of the cached fuzz corpora with the PSI oracle, `ksdump --check-bodies` on the
   community files, and again with `--nesting-limit 3` on the community files and the mutations, and the Java lexers
   against the Java lexer oracle on the community `.java` files, the golden mutations and the lexer fuzz, and both Java
@@ -562,7 +562,10 @@ Roslyn) says otherwise.
   and the dumps and lexer lines of the roslyn and Avalonia files whose conditions name a symbol, every one defined,
   and the C# directives' flags (`ksdump --directives --check`) against its cached `directives` lines of all of those,
   and the C# syntax getters (`ksdump --lang csharp --getters --check`) against its cached `getters` lines.
-  A faster change that fails it is not a change.
+  A faster change that fails it is not a change. The profile is what runs `tests/robustness.rs` of the three
+  languages: accio's `default-filter` (`../.config/nextest.toml`) leaves those binaries out of every other run, the
+  gate and CI's `heavy` job being their only homes (decision 2026-11-07-heavy-parser-tests-opt-in). A bare `-E
+  'binary(robustness)'` selects nothing; `--profile heavy` or `--ignore-default-filter` is how they run.
 - Java speed: `ksdump-ab OLD NEW --list $HOME/.cache/psi-syntax/corpus/java-community-3caa0bf.list` (the community
   `.java` files); DESIGN, "Java parse throughput", has the numbers and how tree-sitter-java was compared.
 - C# speed: `ksdump-ab OLD NEW --list $HOME/.cache/psi-syntax/corpus/csharp-roslyn-35d9211.list --root
