@@ -27,12 +27,6 @@ pub fn is_structured_trivia(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
     tree.node_kind(id).is_some_and(|n| crate::syntax::node_type(n).is_structured_trivia)
 }
 
-/// Trivia: a leaf of whitespace, a line end, a comment, a documentation comment's exterior (`///`), disabled text
-/// (`#if` branches Roslyn does not take), a preprocessing message, a conflict marker; or a structured trivia's root
-/// (`is_structured_trivia`).
-pub fn is_trivia(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
-    tree.token_kind(id).is_some_and(crate::dump::is_trivia) || is_structured_trivia(tree, id)
-}
 
 /// A token of the code: a leaf that is no trivia and spells text, so neither a missing token (an empty leaf Roslyn's
 /// recovery inserts) nor an empty end token (`EndOfFileToken`, `EndOfDirectiveToken`,
@@ -78,7 +72,7 @@ pub fn last_token(tree: &PsiTree<CSharp>, id: NodeId) -> Option<NodeId> {
         let mut last = None;
         let mut child = tree.last_child(n);
         while let Some(c) = child {
-            if !is_trivia(tree, c) && (tree.is_leaf(c) || has_token(tree, c)) {
+            if !tree.is_trivia(c) && (tree.is_leaf(c) || has_token(tree, c)) {
                 last = Some(c);
                 break;
             }
@@ -101,7 +95,7 @@ fn has_token(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
 /// token (`first_token`) and the trailing trivia of its last (`last_token`), so from its first attribute, modifier or
 /// keyword to its closing token; a missing token at an edge counts (its position), as in Roslyn. A token's is its own
 /// range. The text is `&tree.source()[span]` (`ToString()`); a declaration without the missing tokens at its edges is
-/// `tree.own_range(id, |c| is_trivia(tree, c), |_| false)`.
+/// `tree.declaration_range(id)`.
 pub fn span(tree: &PsiTree<CSharp>, id: NodeId) -> Range<usize> {
     let range = tree.range(id);
     if range.is_empty() {
@@ -190,6 +184,38 @@ pub fn word(tree: &Tree, token: NodeId) -> Option<&str> {
         return None;
     }
     tree.value_text(token).filter(|value| !value.is_empty())
+}
+
+/// The name an identifier token binds or uses and the byte its text begins at: `word` with the start of what writes
+/// it, past the `@` of a verbatim identifier (`@class` is `class` at the `c`). An identifier written with an escape
+/// (`C\u733f`) spells a value the source does not hold, and its text begins where the token does, after an `@`.
+/// None where `word` is none. A consumer that highlights or selects a name asks this instead of looking for the
+/// value in the line.
+pub fn word_at(tree: &Tree, token: NodeId) -> Option<(&str, usize)> {
+    let value = word(tree, token)?;
+    let range = tree.range(token);
+    let written = &tree.source()[range.clone()];
+    let at = if written.ends_with(value.as_bytes()) {
+        range.end - value.len()
+    } else {
+        range.start + usize::from(written.starts_with(b"@"))
+    };
+    Some((value, at))
+}
+
+/// The name as the source writes it, without the `@` of a verbatim identifier: `word` wherever the source spells the
+/// value (`@class` is `class`), the written text where an escape makes it spell something else (`C\u733f` is
+/// `C\u733f`, not `C猿`), so that a record of the name and the text under it are the same bytes. None where `word`
+/// is none and for an empty name.
+pub fn written_word(tree: &Tree, token: NodeId) -> Option<&str> {
+    let value = word(tree, token)?;
+    let written = &tree.source()[tree.range(token)];
+    let word = if written.ends_with(value.as_bytes()) {
+        value
+    } else {
+        std::str::from_utf8(written).ok().map(|w| w.strip_prefix('@').unwrap_or(w))?
+    };
+    (!word.is_empty()).then_some(word)
 }
 
 /// The name a name node spells as Roslyn's tree nests it, each identifier a `word`: a `QualifiedName` its left and
@@ -351,7 +377,7 @@ pub fn doc_comment(tree: &PsiTree<CSharp>, declaration: NodeId) -> Option<NodeId
     let mut found = None;
     let mut n = tree.previous_sibling(token);
     while let Some(trivia) = n {
-        if !is_trivia(tree, trivia) || tree.is_trailing(trivia) {
+        if !tree.is_trivia(trivia) || tree.is_trailing(trivia) {
             break;
         }
         if is_documentation_comment(tree, trivia) {

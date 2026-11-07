@@ -27,6 +27,20 @@ impl psi_builder::TreeLanguage for Java {
     type Node = NodeKind;
     type FileKind = FileKind;
     const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
+
+    /// `TreeUtil.isWhitespaceOrComment(node)`: the PSI of the node is a `PsiWhiteSpace` (a doc comment's spaces with
+    /// it) or a `PsiComment`, a `PsiDocComment` among them.
+    #[inline(always)]
+    fn is_trivia(tree: &psi_builder::Tree<Java>, id: psi_builder::NodeId) -> bool {
+        tree.kind(id).token().is_some_and(|t| t.is_whitespace_or_comment() || t.is_psi_white_space())
+    }
+
+    /// `PsiDocComment`: a `/** */` comment and a `///` markdown one (JEP 467). The tree holds an expanded one as a
+    /// composite of its token type.
+    #[inline(always)]
+    fn is_doc_comment(tree: &psi_builder::Tree<Java>, id: psi_builder::NodeId) -> bool {
+        matches!(tree.kind(id).token(), Some(TokenKind::DOC_COMMENT | TokenKind::DOC_MARKDOWN_COMMENT))
+    }
 }
 
 impl psi_builder::Language for Java {

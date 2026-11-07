@@ -233,6 +233,22 @@ pub fn get_name_identifier(tree: &Tree, owner: NodeId) -> Option<NodeId> {
     }
 }
 
+/// `PsiJavaCodeReferenceElement.getReferenceNameElement()` of any reference: the identifier a reference is named by,
+/// by its class's override — a reference expression's last child when it names one (`this`, `super` with it,
+/// `PsiReferenceExpressionImpl.java:119` through `ChildRole.REFERENCE_NAME`), a code reference's last `IDENTIFIER`
+/// (`PsiJavaCodeReferenceElementImpl.java:620`), a static import reference's and a method reference's
+/// (`PsiImportStaticReferenceElementImpl.java:70`, `PsiMethodReferenceExpressionImpl.java:88`); `None` for any other
+/// node. A consumer asks this instead of matching the four classes itself.
+pub fn get_reference_name_element(tree: &Tree, reference: NodeId) -> Option<NodeId> {
+    match tree.node_kind(reference)? {
+        NodeKind::REFERENCE_EXPRESSION => reference_expression::get_reference_name_element(tree, reference),
+        NodeKind::JAVA_CODE_REFERENCE => code_reference::get_reference_name_element(tree, reference),
+        NodeKind::IMPORT_STATIC_REFERENCE => import_static_reference::get_reference_name_element(tree, reference),
+        NodeKind::METHOD_REF_EXPRESSION => method_reference_expression::get_reference_name_element(tree, reference),
+        _ => None,
+    }
+}
+
 /// `PsiVariable.getTypeElement()` of any variable: a field's or its declaration's first field's
 /// (`field::get_type_element`), a local variable's or its declaration's first variable's
 /// (`local_variable::get_type_element`), and the first `TYPE` child of a resource variable

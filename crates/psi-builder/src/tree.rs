@@ -833,11 +833,57 @@ impl<L: TreeLanguage> Tree<L> {
         std::str::from_utf8(self.text(id)).ok()
     }
 
+    /// Whether the node carries no code: whitespace, a comment (a doc comment with it), or a composite the language
+    /// parses as trivia (C#'s structured trivia). The language answers (`TreeLanguage::is_trivia`), so a consumer
+    /// never keeps a list of the language's comment tokens of its own. Not the builder's
+    /// `is_whitespace_or_comment`, which is what a parse skips between tokens and holds Java's
+    /// `DOC_COMMENT_LEADING_ASTERISKS` as well.
+    pub fn is_trivia(&self, id: NodeId) -> bool {
+        L::is_trivia(self, id)
+    }
+
+    /// Whether the node is the language's doc comment: Java's `PsiDocComment` (`/** */` and `///`), Kotlin's KDoc,
+    /// C#'s documentation trivia (`TreeLanguage::is_doc_comment`).
+    pub fn is_doc_comment(&self, id: NodeId) -> bool {
+        L::is_doc_comment(self, id)
+    }
+
+    /// Whether the node lies inside a doc comment (`PsiTreeUtil.getParentOfType(element, PsiDocComment.class)`): the
+    /// tags, the references and the types a doc comment holds are of the comment, not of the code, however the
+    /// language shapes them.
+    pub fn in_doc_comment(&self, id: NodeId) -> bool {
+        std::iter::successors(self.parent(id), |&p| self.parent(p)).any(|p| self.is_doc_comment(p))
+    }
+
     /// A declaration's own range, without what the language's binders put inside it at its edges: the doc comment and
-    /// comments before its first token and after its last one (`is_trivia`), and a separator its last child may be
-    /// (`separator`: Kotlin's enum entry `A,`, Java's enum constant). From its first token to its last; an empty
+    /// comments before its first token and after its last one (`Tree::is_trivia`), and a separator its last child may
+    /// be (`TreeLanguage::is_separator_of`: Kotlin's enum entry `A,`). From its first token to its last; an empty
     /// element (an error marked at a position) is none of its text. A node with no such token is its whole range.
-    pub fn own_range(
+    /// A field's or a method's `;` is its own text in every one of the three languages and stays.
+    pub fn declaration_range(&self, id: NodeId) -> Range<usize> {
+        let node = self.node_kind(id);
+        self.own_range(id, |c| self.is_trivia(c), |t| node.is_some_and(|n| L::is_separator_of(n, t)))
+    }
+
+    /// `declaration_range(id).end`, from the descent to the last token alone (`own_end`).
+    pub fn declaration_end(&self, id: NodeId) -> usize {
+        let node = self.node_kind(id);
+        self.own_end(id, |c| self.is_trivia(c), |t| node.is_some_and(|n| L::is_separator_of(n, t)))
+    }
+
+    /// The composite children: the children that are neither a leaf nor trivia, an expression's operands among them.
+    pub fn composite_children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+        self.children(id).filter(move |&c| !self.is_leaf(c) && !self.is_trivia(c))
+    }
+
+    /// The children that carry code: every child but the trivia.
+    pub fn significant_children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+        self.children(id).filter(move |&c| !self.is_trivia(c))
+    }
+
+    /// `declaration_range` with the answers given instead of asked of the language: the tests' own trees have no
+    /// language behind them.
+    fn own_range(
         &self,
         id: NodeId,
         is_trivia: impl Fn(NodeId) -> bool,
@@ -853,7 +899,7 @@ impl<L: TreeLanguage> Tree<L> {
     /// `own_range(id, is_trivia, separator).end`, from the descent to the last token alone: the descent to the first
     /// one takes a level per node on the left edge, so a node over a left-deep chain (C#'s `a.f().f()…`, 100 000 calls
     /// each a level below the next) costs its depth there, and the end of every call of the chain the square of it.
-    pub fn own_end(
+    fn own_end(
         &self,
         id: NodeId,
         is_trivia: impl Fn(NodeId) -> bool,
@@ -1437,6 +1483,18 @@ mod tests {
         type Node = Node;
         type FileKind = ();
         const ERROR_ELEMENT: Node = Node(0);
+
+        fn is_trivia(tree: &Tree<Toy>, id: NodeId) -> bool {
+            matches!(tree.token_kind(id), Some(SPACE | COMMENT))
+        }
+
+        fn is_doc_comment(_tree: &Tree<Toy>, _id: NodeId) -> bool {
+            false
+        }
+
+        fn is_separator_of(_node: Node, token: Tok) -> bool {
+            token == COMMA
+        }
     }
 
     #[test]

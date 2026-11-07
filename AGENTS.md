@@ -258,12 +258,22 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
 - What both consumers read the tree with, the same for every language: `previous_sibling` (a climb from the id
   before, never a scan of the siblings), `ancestor_or_self(id, accept)`, `deepest_covering(range)` (the last node in
   preorder that holds it), `descendants_pruned(id, prune)` (a declaration's own nodes, a type's names without its
-  arguments), `own_range(id, is_trivia, separator)` (a declaration without the comments and separator its language's
-  binders put inside it; `own_end` its end alone, without the descent to the first token, which a left-deep chain
-  makes as long as the chain), `utf8_text`, `errors()` (the error elements in document order with their messages), and
+  arguments), `utf8_text`, `errors()` (the error elements in document order with their messages), and
   `leaf_index().at(offset)`, a binary search that relies on the leaves being in offset order and tiling the text
   but for unexpanded bodies (`tests/robustness.rs` checks it on every tree). What a consumer makes of them
   (symbols, call sites, scopes, the text of an error) stays in the consumer.
+- The answers only the language has, which a consumer must not keep a list of token kinds for (`TreeLanguage`, each
+  implementation delegating to the platform's own answer; `tests/reading.rs` of each language): `is_trivia` (the
+  parser definition's whitespace and comments, Roslyn's `SyntaxFacts.IsTrivia` and its structured trivia),
+  `is_doc_comment` and `in_doc_comment` (`PsiDocComment`, KDoc, C#'s documentation trivia parsed or left a comment:
+  what a doc comment holds is of the comment, not of the code), `composite_children` and `significant_children`, and
+  `declaration_range(id)` with `declaration_end(id)`: a declaration without the comments its binders put inside it
+  at its edges and without a trailing token that separates it from the next element rather than naming it
+  (`TreeLanguage::is_separator_of`: Kotlin's enum entry holds its `,`, while a field's and a method's `;` is their
+  own text in all three languages, and Java's and C#'s enum separators are the list's). `own_end` is the end alone,
+  without the descent to the first token, which a left-deep chain makes as long as the chain. Not the builder's
+  `Language::is_whitespace_or_comment`, which is what a parse skips between tokens (Java's
+  `DOC_COMMENT_LEADING_ASTERISKS` with it).
 - What a declaration is, as PSI reads it: `kotlin_syntax::psi` (`src/psi.rs`), the getters of Kotlin's PSI classes
   ported method by method, so a consumer asks the compiler's question instead of walking `NodeKind`s: `has_modifier`,
   `visibility_modifier_type` (the set's order, `private internal` is private), `get_annotation_entries` (with the

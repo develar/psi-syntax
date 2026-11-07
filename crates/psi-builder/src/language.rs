@@ -8,7 +8,7 @@ use std::hash::Hash;
 
 use crate::builder::{PsiBuilderImpl, WhitespacesAndCommentsBinder};
 use crate::lexer::Lexed;
-use crate::tree::Chameleon;
+use crate::tree::{Chameleon, NodeId, Tree};
 
 /// A token type: what the lexer emits, a leaf of the tree. Its `index` is below `NODE_BASE`.
 pub trait TokenType: Copy + Eq + Hash + Debug + Send + Sync + 'static {
@@ -87,9 +87,12 @@ impl<T: TokenType, N: NodeType> ElementType<T, N> {
     }
 }
 
-/// What a `Tree` and its consumer API need of a language: its token and node types, how its files are parsed and its
-/// error element. A language whose parser does not run on `PsiBuilderImpl` (C#, ported from Roslyn, builds its tree
-/// with `TreeBuilder`) implements only this; `Language` adds what the builder and the parse driver read.
+/// What a `Tree` and its consumer API need of a language: its token and node types, how its files are parsed, its
+/// error element, and the answers only the language has — what is trivia, what is a doc comment, which trailing
+/// token of a node separates it from the next element. A consumer reads a tree by these answers instead of keeping
+/// its own list of token kinds, which drifts from the language as the language grows one. A language whose parser
+/// does not run on `PsiBuilderImpl` (C#, ported from Roslyn, builds its tree with `TreeBuilder`) implements only
+/// this; `Language` adds what the builder and the parse driver read.
 pub trait TreeLanguage: Sized + 'static {
     type Token: TokenType;
     type Node: NodeType;
@@ -97,6 +100,23 @@ pub trait TreeLanguage: Sized + 'static {
     type FileKind: Copy + Eq + Debug + Send + Sync + 'static;
     /// `TokenType.ERROR_ELEMENT`: what a `kinds` entry that is no element type reads as.
     const ERROR_ELEMENT: Self::Node;
+
+    /// Whether the node carries no code: whitespace or a comment of the language
+    /// (`ParserDefinition.getWhitespaceTokens()` and `getCommentTokens()`, Roslyn's `SyntaxFacts.IsTrivia`), a doc
+    /// comment among them, and C#'s structured trivia, a whole subtree of it. `Tree::is_trivia` asks it.
+    fn is_trivia(tree: &Tree<Self>, id: NodeId) -> bool;
+
+    /// Whether the node is the language's doc comment: Java's `PsiDocComment` (`/** */` and `///`), Kotlin's KDoc,
+    /// C#'s documentation trivia, parsed into nodes or left a comment by `DocumentationMode::None`.
+    /// `Tree::is_doc_comment` and `Tree::in_doc_comment` ask it.
+    fn is_doc_comment(tree: &Tree<Self>, id: NodeId) -> bool;
+
+    /// Whether this trailing token inside a node of this kind separates the node from the next element rather than
+    /// belonging to it: Kotlin's enum entry holds its own `,` or `;` (`ENUM_ENTRY`), while Java's enum constant and
+    /// C#'s enum member leave theirs to the list and keep a field's or a method's `;`, which is their own text.
+    fn is_separator_of(_node: Self::Node, _token: Self::Token) -> bool {
+        false
+    }
 }
 
 /// A language: a marker type (`kotlin_syntax::Kotlin`) whose associated types and functions are what the platform

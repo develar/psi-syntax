@@ -22,6 +22,26 @@ impl psi_builder::TreeLanguage for Kotlin {
     type Node = NodeKind;
     type FileKind = FileKind;
     const ERROR_ELEMENT: NodeKind = NodeKind::ERROR_ELEMENT;
+
+    /// `KtTokens.WHITESPACES` or `KtTokens.COMMENTS`: the shebang and the KDoc are comments of Kotlin.
+    #[inline(always)]
+    fn is_trivia(tree: &psi_builder::Tree<Kotlin>, id: psi_builder::NodeId) -> bool {
+        tree.kind(id).token().is_some_and(TokenKind::is_whitespace_or_comment)
+    }
+
+    /// `KDoc`: the tree holds an expanded one as a composite of `DOC_COMMENT`.
+    #[inline(always)]
+    fn is_doc_comment(tree: &psi_builder::Tree<Kotlin>, id: psi_builder::NodeId) -> bool {
+        tree.kind(id).token() == Some(TokenKind::DOC_COMMENT)
+    }
+
+    /// An enum entry holds the `,` or the `;` that ends it (`KotlinParsing.parseEnumEntry` consumes it into the
+    /// entry), and that token separates it from the next entry rather than naming it. Nothing else of Kotlin does:
+    /// a value parameter's `,` is the list's, and the `;` after `val a = 1` is the property's own.
+    #[inline(always)]
+    fn is_separator_of(node: NodeKind, token: TokenKind) -> bool {
+        node == NodeKind::ENUM_ENTRY && matches!(token, TokenKind::COMMA | TokenKind::SEMICOLON)
+    }
 }
 
 impl psi_builder::Language for Kotlin {
