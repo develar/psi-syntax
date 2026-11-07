@@ -1,9 +1,9 @@
 //! `ksdump`: dumps, benchmarks and lexes listed files with the psi-syntax parsers.
 //!
-//! Each file's language is `--lang kotlin|java|csharp` when given, else its extension: `.java` is Java, `.cs` C#,
-//! anything else Kotlin.
-//! `--lex`, `--out`, `--bench` and `--check-bodies` take Java files (`crates/java-syntax`); a `--bench` or
-//! `--check-bodies` list (`--lex --bench` too) is of one language, else ksdump exits with status 2 before anything runs.
+//! Each file's language is `--lang kotlin|java|csharp|starlark` when given, else its extension or special Starlark filename:
+//! `.java` is Java, `.cs` is C#, and BUILD/WORKSPACE names plus `.bazel`/`.bzl`/`.star`/`.BUILD` suffixes are Starlark.
+//! `--lex` supports Starlark; `--out`, `--bench` and `--check-bodies` require a parser. Starlark `--lex --bench` is not
+//! supported yet; `--bench` and `--check-bodies` lists must use one language, else ksdump exits with status 2.
 //!
 //! - `ksdump --list LIST --root ROOT --out OUT [--trim] [--node]`: writes `OUT/<path>.psi.txt` per listed path, the
 //!   `psi_to_string` dump, like the PSI oracle (`PsiOracle.java`) writes its own; compare with `scripts/compare.py`.
@@ -77,6 +77,8 @@ use kotlin_syntax::psi_builder::counters::Counter as BuilderCounter;
 use kotlin_syntax::psi_builder::{self, Language, TreeLanguage};
 use kotlin_syntax::tokens::TokenKind;
 use kotlin_syntax::{FileKind, Kotlin, NodeId, ParseOptions, Parser};
+use starlark_syntax::FileKind as StarlarkFileKind;
+use starlark_syntax::dump::psi_to_string as starlark_psi_to_string;
 
 /// Counts every allocation of the process (`--features alloc-stats` only).
 #[cfg(feature = "alloc-stats")]
@@ -105,7 +107,7 @@ fn usage() -> ! {
                 prints them (--check: against its cached lines)\n  \
          ksdump --getters [--full OUT] [--check LINES] --list LIST --root ROOT   C# files: syntax getter hash lines as\n  \
                 tools/csharp-oracle getters prints them (--full: OUT/<path>.getters.txt), or against its LINES\n  \
-         (--lang kotlin|java|csharp: the files' language; by default `.java` is Java, `.cs` C#, anything else Kotlin;\n  \
+         (--lang kotlin|java|csharp|starlark: the files' language; BUILD/WORKSPACE and `.bzl`/`.star` default to Starlark;\n  \
          C#: --version V, --doc parse|none|diagnose and --define A;B for the list lines without those columns, as\n  \
          tools/csharp-oracle; --bench parses without the symbols)"
     );
@@ -118,15 +120,32 @@ enum Lang {
     Kotlin,
     Java,
     CSharp,
+    Starlark,
 }
 
 impl Lang {
     /// `--lang`, else by extension: `.java` is Java, `.cs` C#, anything else Kotlin (`.kt`, `.kts`, none).
     fn of(path: &str, forced: Option<Lang>) -> Lang {
+        let name = path.rsplit('/').next().unwrap_or(path);
         forced.unwrap_or(if path.ends_with(".java") {
             Lang::Java
         } else if path.ends_with(".cs") {
             Lang::CSharp
+        } else if matches!(
+            name,
+            "BUILD"
+                | "BUILD.bazel"
+                | "WORKSPACE"
+                | "WORKSPACE.bazel"
+                | "WORKSPACE.bzlmod"
+                | "MODULE.bazel"
+                | "REPO.bazel"
+        ) || name.ends_with(".bzl")
+            || name.ends_with(".star")
+            || name.ends_with(".bazel")
+            || name.ends_with(".BUILD")
+        {
+            Lang::Starlark
         } else {
             Lang::Kotlin
         })
@@ -224,6 +243,7 @@ fn parse_args() -> Args {
                     Some("kotlin") => Lang::Kotlin,
                     Some("java") => Lang::Java,
                     Some("csharp") => Lang::CSharp,
+                    Some("starlark") => Lang::Starlark,
                     _ => usage(),
                 })
             }
@@ -395,6 +415,17 @@ fn kotlin_lex(root: &Path, path: &str, dump: bool) -> String {
     format!("{path}\t{hash:x}\t{count}\n{out}")
 }
 
+/// `--lex` of a Starlark file, with the same hash and optional token dump as the other language lexers.
+fn starlark_lex(root: &Path, path: &str, dump: bool) -> String {
+    let Some(text) = read_source(root, path, false) else {
+        return format!("{path}\tunreadable\t0\n");
+    };
+    let lexed = starlark_syntax::lexer::tokenize(&text);
+    let mut out = String::new();
+    let (hash, count) = lexed_line(&text, &lexed, |_| false, |_, _, _| {}, dump, &mut out);
+    format!("{path}\t{hash:x}\t{count}\n{out}")
+}
+
 /// What `--lex` prints for a list line, newline-terminated: one line, with `--dump` the tokens after it.
 fn lex_file(parsers: &mut Parsers, root: &Path, line: &str, args: &Args) -> String {
     let path = line.split('\t').next().unwrap_or(line);
@@ -402,6 +433,7 @@ fn lex_file(parsers: &mut Parsers, root: &Path, line: &str, args: &Args) -> Stri
         Lang::Kotlin => kotlin_lex(root, path, args.dump),
         Lang::Java => java_lex(root, line, args.dump),
         Lang::CSharp => csharp_lex(parsers.csharp(), root, line, args.full.as_deref()) + "\n",
+        Lang::Starlark => starlark_lex(root, path, args.dump),
     }
 }
 
@@ -442,16 +474,22 @@ struct Parsers {
     kotlin: Option<Parser>,
     java: Option<java_syntax::Parser>,
     csharp: Option<csharp_syntax::Parser>,
+    starlark: Option<starlark_syntax::Parser>,
 }
 
 impl Parsers {
     fn new(nesting_limit: Option<u32>) -> Parsers {
-        Parsers { nesting_limit, kotlin: None, java: None, csharp: None }
+        Parsers { nesting_limit, kotlin: None, java: None, csharp: None, starlark: None }
     }
 
     fn kotlin(&mut self) -> &mut Parser {
         let limit = self.nesting_limit;
         self.kotlin.get_or_insert_with(|| new_parser(limit))
+    }
+
+    fn starlark(&mut self) -> &mut starlark_syntax::Parser {
+        let limit = self.nesting_limit;
+        self.starlark.get_or_insert_with(|| new_parser(limit))
     }
 
     fn java(&mut self) -> &mut java_syntax::Parser {
@@ -482,6 +520,17 @@ fn dump_line<'a>(parsers: &mut Parsers, root: &Path, line: &'a str, args: &Args)
             let (dump, index) = csharp_dump(parsers.csharp(), root, line);
             (dump.map(|d| vec![("tree.txt", d)]).unwrap_or_default(), Some(index))
         }
+        Lang::Starlark => match read_source(root, path, args.trim) {
+            Some(text) => {
+                let file_kind = StarlarkFileKind::from_path(path).unwrap_or_default();
+                let tree = parsers.starlark().parse(&text, file_kind);
+                (vec![("psi.txt", starlark_psi_to_string(&tree))], None)
+            }
+            None => {
+                eprintln!("cannot read {path}");
+                (Vec::new(), None)
+            }
+        },
         Lang::Kotlin => match read_source(root, path, args.trim) {
             Some(text) => {
                 let name = file_name(path);
@@ -786,6 +835,29 @@ fn main() {
     let args = parse_args();
     let (Some(list), Some(root)) = (args.list.as_deref(), args.root.as_deref()) else { usage() };
     let paths = read_list(list);
+    let starlark_files = paths
+        .iter()
+        .filter(|line| {
+            let path = line.split('\t').next().unwrap_or(line);
+            Lang::of(path, args.lang) == Lang::Starlark
+        })
+        .count();
+    if starlark_files != 0 && args.bench {
+        eprintln!("Starlark benchmarking is not available in ksdump yet");
+        std::process::exit(2);
+    }
+    if starlark_files != 0 && args.check_bodies {
+        eprintln!("Starlark body checking is not available in ksdump yet");
+        std::process::exit(2);
+    }
+    if starlark_files != 0 && args.node {
+        eprintln!("Starlark node-tree dumps are not available in ksdump yet");
+        std::process::exit(2);
+    }
+    if starlark_files != 0 && (args.values || args.directives || args.getters || args.full.is_some()) {
+        eprintln!("the requested Java/C#-specific mode does not support Starlark files");
+        std::process::exit(2);
+    }
     if args.values || args.directives {
         if args.values && args.directives {
             usage();

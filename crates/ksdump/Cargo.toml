@@ -12,6 +12,7 @@ publish = false
 kotlin-syntax = { path = "../kotlin-syntax" }
 java-syntax = { path = "../java-syntax" }
 csharp-syntax = { path = "../csharp-syntax" }
+starlark-syntax = { path = "../starlark-syntax" }
 psi-check = { path = "../psi-check" }
 # Only `ksdump --bench` with `--features alloc-stats`: a counting global allocator (allocations per file); it is
 # opt-in because its atomic counters slow the parse and contend across threads.

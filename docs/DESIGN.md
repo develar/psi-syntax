@@ -10,6 +10,10 @@ For every byte sequence, `dump::psi_to_string(&tree, name)` prints exactly what 
 `DebugUtil.psiToString(file, true, false).trim()` prints, and the parse never panics. `scripts/gate.sh` checks this
 before every commit:
 
+`starlark-syntax` has the same dump contract against the Bazel plugin's Starlark PSI. One lexer/parser handles BUILD,
+`.bzl`, MODULE, WORKSPACE, REPO and `.star` files; the Starlark tree is consumed by `ksdump`, `crates/extract` and
+Branch Deck's `code-symbols`.
+
 - clippy, on default features and with `counters,alloc-stats`;
 - `KS_STRICT=1 cargo nextest run --release`, then `cargo test --release --doc` for the doc tests nextest skips;
 - byte equality with the PSI oracle on all 55 501 community files and on the cached parse-fuzz and lex-fuzz corpora;
@@ -56,8 +60,9 @@ path.
 | `kotlin-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Kotlin and KDoc lexers, `Binder`, `SemanticWhitespaceAwarePsiBuilder*`, the parsers, KDoc, `Kotlin: Language` | `psi-builder` |
 | `java-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Java and JavaDoc lexers, `Binder`, `SyntaxTreeBuilder` (the Java parsers' builder handle), `Java: Language`, the dumps, the parsers | `psi-builder` |
 | `csharp-syntax` | `SyntaxKind`, `TokenKind`, `NodeKind`, the generated node types and diagnostics, the lexer and directive parser, `SyntaxParser`, `LanguageParser`, `DocumentationCommentParser`, the green arena, `flatten`, `CSharp: TreeLanguage`, `Tree` with diagnostics, the dump | `psi-builder` |
+| `starlark-syntax` | `TokenKind`, `NodeKind`, `TokenSet`, the Starlark and indentation lexers, `Binder`, `Starlark: Language`, `FileKind`, the parser and PSI-compatible dump | `psi-builder` |
 | `psi-check` | the checks of a tree every language's tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits), the robustness tests' limits and deterministic generators | `psi-builder` |
-| `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax`, `psi-check` |
+| `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax`, `starlark-syntax`, `psi-check` |
 | `ab-pairs` | the A/B engine: interleaved pairs and their stopping rule (`pairs`, `stats`), the host's reservation (`reserve`), a child timed with its counters (`sys`); `ksdump-ab`, two ksdump binaries' `--bench` to a verdict; accio's `tools/bench` builds its A/B commands on it | nothing |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a

@@ -16,6 +16,8 @@ mirror of this directory (`../scripts/psi-syntax-mirror.sh`):
   Roslyn's on dotnet/roslyn, dotnet/runtime, dotnet/aspnetcore, Avalonia and Roslyn's own parser tests, and its
   syntax node properties as getters over the tree (`syntax_getters`: a function per field of every node type, the
   abstract classes' and the partial classes' computed ones), equal to Roslyn's own on every node of the same inputs;
+- `starlark-syntax`: Starlark from the IntelliJ Bazel plugin (`Starlark.flex`, the indenting lexer and parser), with
+  `BUILD`/`.bzl`/module `FileKind`s and a `DebugUtil.psiToString`-compatible dump;
 - `ksdump`: dumps, benchmarks and lexes listed files like the oracles.
 
 See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.
@@ -42,6 +44,15 @@ for class in tree.descendants(tree.root()).filter(|&n| tree.node_kind(n) == Some
     let name = class_declaration::identifier(&tree, class); // the `C` token: tree.value_text(id) is "C"
     let members = type_declaration::members(&tree, class).count(); // 1
 }
+```
+
+```rust
+use starlark_syntax::{FileKind, Parser};
+
+let mut parser = Parser::new();
+let file_kind = FileKind::from_path("pkg/BUILD.bazel").unwrap();
+let tree = parser.parse(b"cc_library()", file_kind);
+let dump = starlark_syntax::dump::psi_to_string(&tree);
 ```
 
 AGENTS.md, "The consumer contract", says what a consumer may rely on.

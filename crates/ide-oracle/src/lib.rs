@@ -28,3 +28,10 @@ use std::path::PathBuf;
 pub fn cache_home() -> PathBuf {
     std::env::var_os("HOME").map(PathBuf::from).unwrap_or_default().join(".cache")
 }
+
+/// psi-syntax's root, this crate's `../..` (in accio and in the mirror alike): where an oracle's `tools/` and
+/// `testdata/` are.
+pub fn psi_syntax() -> PathBuf {
+    let manifest = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    manifest.parent().and_then(std::path::Path::parent).unwrap_or(manifest).to_path_buf()
+}
