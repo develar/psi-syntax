@@ -2,23 +2,11 @@
 //! comment, what lies inside one, and what a declaration's own range is. `Kotlin` answers them, so that no consumer
 //! keeps a list of Kotlin's comment tokens or decides for itself which trailing token a declaration owns.
 
-use kotlin_syntax::{FileKind, NodeId, NodeKind, TokenKind, Tree};
+use kotlin_syntax::{FileKind, NodeKind, TokenKind, Tree};
+use psi_check::{find, first, own_text};
 
 fn parse(text: &str) -> Tree {
     Tree::parse(text, FileKind::Kt)
-}
-
-/// The first node of the kind, in document order.
-fn first(tree: &Tree, kind: NodeKind) -> NodeId {
-    find(tree, |id| tree.node_kind(id) == Some(kind)).unwrap_or_else(|| panic!("no {kind:?}"))
-}
-
-fn find(tree: &Tree, mut matches: impl FnMut(NodeId) -> bool) -> Option<NodeId> {
-    (0..tree.len() as u32).map(NodeId).find(|&id| matches(id))
-}
-
-fn own_text(tree: &Tree, kind: NodeKind) -> &str {
-    std::str::from_utf8(&tree.source()[tree.declaration_range(first(tree, kind))]).expect("utf-8")
 }
 
 /// An enum entry holds the `,` or the `;` that ends it, and that token separates it from the next entry; a property

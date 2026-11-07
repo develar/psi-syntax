@@ -169,6 +169,22 @@ pub fn too_deep_errors<L: TreeLanguage>(tree: &Tree<L>) -> usize {
     (0..tree.len() as u32).filter(|&i| tree.error_message(NodeId(i)) == Some("Code is too deeply nested")).count()
 }
 
+/// The first node the predicate accepts, in document order: a test of the reading API names the node it means
+/// instead of counting ids.
+pub fn find<L: TreeLanguage>(tree: &Tree<L>, mut matches: impl FnMut(NodeId) -> bool) -> Option<NodeId> {
+    (0..tree.len() as u32).map(NodeId).find(|&id| matches(id))
+}
+
+/// The first node of the kind, in document order.
+pub fn first<L: TreeLanguage>(tree: &Tree<L>, kind: L::Node) -> NodeId {
+    find(tree, |id| tree.node_kind(id) == Some(kind)).unwrap_or_else(|| panic!("no {kind:?}"))
+}
+
+/// The text the first declaration of the kind owns (`Tree::declaration_range`).
+pub fn own_text<L: TreeLanguage>(tree: &Tree<L>, kind: L::Node) -> &str {
+    std::str::from_utf8(&tree.source()[tree.declaration_range(first(tree, kind))]).expect("utf-8")
+}
+
 /// A parser with the nesting limit `limit`, so that ordinary code takes the too-deep paths.
 pub fn nesting_limited<L: Language>(limit: u32) -> Parser<L> {
     let mut parser = Parser::new();

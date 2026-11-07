@@ -3,23 +3,11 @@
 //! answers them, so that no consumer decides for itself that a `;` is a separator or looks for a name in the line.
 
 use csharp_syntax::{DocumentationMode, Entry, FileKind, NodeId, NodeKind, TokenKind, Tree, read};
+use psi_check::{find, first, own_text};
 
 /// As a consumer that reads declarations parses a file: the documentation comments left unparsed.
 fn parse(text: &str) -> Tree {
     Tree::parse(text, FileKind { doc_mode: DocumentationMode::None, ..FileKind::default() })
-}
-
-/// The first node of the kind, in document order.
-fn first(tree: &Tree, kind: NodeKind) -> NodeId {
-    find(tree, |id| tree.node_kind(id) == Some(kind)).unwrap_or_else(|| panic!("no {kind:?}"))
-}
-
-fn find(tree: &Tree, mut matches: impl FnMut(NodeId) -> bool) -> Option<NodeId> {
-    (0..tree.len() as u32).map(NodeId).find(|&id| matches(id))
-}
-
-fn own_text(tree: &Tree, kind: NodeKind) -> &str {
-    std::str::from_utf8(&tree.source()[tree.declaration_range(first(tree, kind))]).expect("utf-8")
 }
 
 /// Roslyn puts a field's and a method's `;` inside the declaration, where it is its own text, and the `,` between
