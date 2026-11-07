@@ -100,18 +100,12 @@ const LEX_PIECES: [&str; 106] = [
     "\u{1f600}", "\u{0}", "\u{1}", "\u{7f}", "assert", "enum", "non-sealed", "record", "\\[", "\\]", "\\`", "\\(", "\\)",
 ];
 
-/// psi-syntax's root, this crate's `../..` (in accio and in the mirror alike).
-fn psi_syntax() -> PathBuf {
-    let manifest = Path::new(env!("CARGO_MANIFEST_DIR"));
-    manifest.parent().and_then(Path::parent).unwrap_or(manifest).to_path_buf()
-}
-
 fn tools() -> PathBuf {
-    psi_syntax().join("tools/java-oracle")
+    ide_oracle::psi_syntax().join("tools/java-oracle")
 }
 
 fn goldens_dir(given: Option<PathBuf>) -> PathBuf {
-    given.unwrap_or_else(|| psi_syntax().join("testdata/java"))
+    given.unwrap_or_else(|| ide_oracle::psi_syntax().join("testdata/java"))
 }
 
 /// The pinned jars, fetched and checked.

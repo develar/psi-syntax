@@ -44,6 +44,12 @@ impl Jvm {
         Jvm { java, classpath: lib.join("*").into_os_string(), options: Vec::new() }
     }
 
+    /// Adds one pinned oracle jar to the class path.
+    pub fn with_classpath(mut self, path: &Path) -> Result<Self> {
+        self.classpath = std::env::join_paths([self.classpath.as_os_str(), path.as_os_str()])?;
+        Ok(self)
+    }
+
     /// A JVM option (`-Xss1g`), before the program.
     pub fn option(mut self, option: impl Into<OsString>) -> Self {
         self.options.push(option.into());
@@ -68,7 +74,8 @@ impl Jvm {
         let status = match streams.stdout {
             None => cmd.status().with_context(|| format!("starting {}", self.java.display()))?,
             Some(out) => {
-                let mut child = cmd.stdout(Stdio::piped()).spawn().with_context(|| format!("starting {}", self.java.display()))?;
+                let mut child =
+                    cmd.stdout(Stdio::piped()).spawn().with_context(|| format!("starting {}", self.java.display()))?;
                 let copied = copy_to(child.stdout.take().expect("piped stdout"), out);
                 if copied.is_err() {
                     child.kill().ok();
@@ -89,9 +96,23 @@ impl Jvm {
 
     /// Runs an oracle over a list the way every oracle here takes one, `--list LIST --root ROOT --out OUT EXTRA`,
     /// its stderr to `err`.
-    pub fn run_list(&self, program: &Path, list: &Path, root: &Path, out: &Path, extra: &[&str], err: &Path) -> Result<()> {
-        let mut args: Vec<&OsStr> =
-            vec!["--list".as_ref(), list.as_os_str(), "--root".as_ref(), root.as_os_str(), "--out".as_ref(), out.as_os_str()];
+    pub fn run_list(
+        &self,
+        program: &Path,
+        list: &Path,
+        root: &Path,
+        out: &Path,
+        extra: &[&str],
+        err: &Path,
+    ) -> Result<()> {
+        let mut args: Vec<&OsStr> = vec![
+            "--list".as_ref(),
+            list.as_os_str(),
+            "--root".as_ref(),
+            root.as_os_str(),
+            "--out".as_ref(),
+            out.as_os_str(),
+        ];
         args.extend(extra.iter().map(OsStr::new));
         self.run(program, &args, Streams { stdout: None, stderr: Some(err) })
     }
@@ -112,8 +133,20 @@ mod tests {
     fn java_is_the_override_or_the_ides_runtime() {
         // `$JAVA` is the process's; only the IDE layout is checked here.
         if std::env::var_os("JAVA").is_none() {
-            assert_eq!(java(Path::new("/nowhere")), Path::new("/nowhere/jbr/bin").join(if cfg!(windows) { "java.exe" } else { "java" }));
+            assert_eq!(
+                java(Path::new("/nowhere")),
+                Path::new("/nowhere/jbr/bin").join(if cfg!(windows) { "java.exe" } else { "java" })
+            );
         }
+    }
+
+    #[test]
+    fn an_oracle_jar_is_added_after_the_pinned_class_path() {
+        let jvm = Jvm::new(PathBuf::from("java"), Path::new("lib")).with_classpath(Path::new("plugin.jar")).unwrap();
+        assert_eq!(
+            std::env::split_paths(&jvm.classpath).collect::<Vec<_>>(),
+            [PathBuf::from("lib/*"), PathBuf::from("plugin.jar")]
+        );
     }
 
     #[test]

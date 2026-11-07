@@ -1,0 +1,21 @@
+[package]
+name = "starlark-syntax"
+description = "A lossless Starlark lexer and parser ported from IntelliJ's Bazel plugin"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+psi-builder = { path = "../psi-builder" }
+
+[dev-dependencies]
+psi-check = { path = "../psi-check" }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
