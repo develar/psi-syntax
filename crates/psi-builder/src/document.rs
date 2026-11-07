@@ -20,6 +20,16 @@ pub fn blank_byte_order_mark(text: &mut [u8]) {
     }
 }
 
+/// The column of the byte at `offset`: the UTF-16 code units of its line before it, as an editor and the Language
+/// Server Protocol count them. The line starts after the last `\n`, as `Lines` ends them, so the `\r` of a CRLF end is
+/// a unit of the line it ends. Bytes that are no UTF-8 count as the replacement character a lossy read shows.
+pub fn column(text: &[u8], offset: usize) -> u32 {
+    let offset = offset.min(text.len());
+    let start = text[..offset].iter().rposition(|&byte| byte == b'\n').map_or(0, |it| it + 1);
+    let before = String::from_utf8_lossy(&text[start..offset]);
+    u32::try_from(before.encode_utf16().count()).unwrap_or(u32::MAX)
+}
+
 /// The line of each byte offset of a text, from 1, by its `\n`s (a `\r` ends no line here: give it the document text
 /// for that). A byte past the text is on its last line.
 pub struct Lines {
@@ -55,6 +65,20 @@ mod tests {
         let mut short = b"\xEF\xBB".to_vec();
         blank_byte_order_mark(&mut short);
         assert_eq!(short, b"\xEF\xBB");
+    }
+
+    #[test]
+    fn a_column_counts_the_utf16_units_of_its_line_before_it() {
+        let text = "let \u{1F600} = 1;\r\nlet b = 2;".as_bytes();
+        assert_eq!(column(text, 0), 0);
+        // the emoji is one character and two UTF-16 units
+        assert_eq!(column(text, text.iter().position(|&it| it == b'=').unwrap()), 7);
+        // the `\r` is a unit of the line it ends
+        assert_eq!(column(text, text.len() - "let b = 2;".len()), 0);
+        assert_eq!(column(text, text.len() - 1), 9);
+        // past the text, and a byte that is no UTF-8
+        assert_eq!(column(text, text.len() + 10), 10);
+        assert_eq!(column(b"a\xFFb", 3), 3);
     }
 
     #[test]
