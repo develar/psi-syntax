@@ -96,7 +96,8 @@ pub fn decode(source: &str) -> String {
                     b'u' => 4,
                     _ => 8,
                 };
-                let hex = source.get(index + 2..index + 2 + digits).filter(|h| h.bytes().all(|b| b.is_ascii_hexdigit()));
+                let hex =
+                    source.get(index + 2..index + 2 + digits).filter(|h| h.bytes().all(|b| b.is_ascii_hexdigit()));
                 match hex.and_then(|h| u32::from_str_radix(h, 16).ok()).and_then(char::from_u32) {
                     Some(decoded) => {
                         out.push(decoded);
