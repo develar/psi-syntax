@@ -90,3 +90,14 @@ impl StackUse {
         self.bytes > STACK_BUDGET
     }
 }
+
+/// `work`, a parse deeper than `STACK` holds and the walks of its tree, on a thread of its own with `stack` bytes of
+/// stack, its panic resumed here: the parsers that bound a file's need from its tokens rather than counting levels as
+/// they go (rust-analyzer's and oxc's, `rust-syntax` and `js-syntax`) run a file over `STACK` here. None when the thread
+/// cannot be made, which the caller answers as a file it cannot parse.
+pub fn on_own_stack<R: Send>(stack: usize, work: impl FnOnce() -> R + Send) -> Option<R> {
+    std::thread::scope(|scope| {
+        let handle = std::thread::Builder::new().name("psi-deep-parse".into()).stack_size(stack).spawn_scoped(scope, work).ok()?;
+        Some(handle.join().unwrap_or_else(|panic| std::panic::resume_unwind(panic)))
+    })
+}

@@ -2,3 +2,10 @@
 # accio's disallowed methods and macros say which accio module may parse, print or spawn (`Tree::parse` is
 # `extract`'s alone, an answer goes through `out!`); inside the parsers that own `Tree::parse` and their tests and
 # `ksdump`, which print, those rules have no meaning. psi-syntax's lints are its manifests' `[lints]`.
+# The parse entries of rust-analyzer's and oxc's parsers (`rust-syntax`, `js-syntax`) hold their one parse call each,
+# under the stack guard of each, with the text and the options every consumer reads the language with.
+disallowed-methods = [
+  { path = "ra_ap_syntax::SourceFile::parse", reason = "rust_syntax::parse_with_errors is the one validating parse: one edition, offsets kept on invalid UTF-8, its tree dropped on a stack it fits" },
+  { path = "ra_ap_parser::TopEntryPoint::parse", reason = "rust_syntax's build is the one tree-building parse: its tree dropped where it is built, under the nesting guard" },
+  { path = "oxc_parser::Parser::parse", reason = "js_syntax's oxc_parse is the one oxc call: the options and the dialect of every consumer, under the stack bound" },
+]

@@ -1,0 +1,30 @@
+[package]
+name = "rust-syntax"
+description = "Rust read by rust-analyzer's parser: the parse every consumer of psi-syntax shares (decision 2026-11-08-rust-and-js-parse-entries)"
+version = "0.1.0"
+edition = "2024"
+# ra_ap_syntax 0.0.360 needs 1.98, above the 1.90 of the ports
+rust-version = "1.98"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+memchr = "2"
+psi-builder = { path = "../psi-builder" }
+# rust-analyzer's parser and its tree, exact: the `ra_ap_*` crates publish a breaking 0.0.x every week and pin
+# `unicode-ident =1.0.24` themselves. `ra_ap_parser` and `rowan` are the ones `ra_ap_syntax` wraps (its exact versions):
+# `build` makes the tree a `Parse` would drop on a thread of its own; `ra-ap-rustc_lexer` bounds the depth (`nesting`).
+ra_ap_syntax = "=0.0.360"
+ra_ap_parser = "=0.0.360"
+ra-ap-rustc_lexer = "=0.166.0"
+rowan = "=0.17.0"
+# The version ra-ap-rustc_lexer builds with: it asks for `^0.1.4`, and 0.1.5 does not compile with it. A consumer's
+# lockfile is its own, never this workspace's, so the pin is here, where every consumer resolves it.
+unicode-properties = { version = "=0.1.4", default-features = false, features = ["general-category"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

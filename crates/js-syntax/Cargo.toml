@@ -1,0 +1,29 @@
+[package]
+name = "js-syntax"
+description = "TypeScript, TSX and JavaScript read by oxc's parser: the parse every consumer of psi-syntax shares (decision 2026-11-08-rust-and-js-parse-entries)"
+version = "0.1.0"
+edition = "2024"
+# oxc 0.156 needs 1.97, above the 1.90 of the ports
+rust-version = "1.97"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+memchr = "2"
+psi-builder = { path = "../psi-builder" }
+# The JavaScript and TypeScript parser and its arena AST, exact: oxc publishes a breaking 0.x every week. No
+# `regular_expression` feature: a pattern's own syntax is no fact a reader of the file needs.
+oxc_allocator = "=0.156.0"
+oxc_ast = "=0.156.0"
+oxc_ast_visit = "=0.156.0"
+oxc_diagnostics = "=0.156.0"
+oxc_parser = { version = "=0.156.0", default-features = false }
+oxc_span = "=0.156.0"
+oxc_syntax = "=0.156.0"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
