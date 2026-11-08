@@ -1,146 +1,150 @@
-//! Values and source ranges of Starlark string literals.
+//! A string literal's value: `StarlarkStringLiteralExpression.getStringContents` (the text inside its quotes, after an
+//! allowed prefix, `StarlarkQuote.unwrap`) decoded as `StarlarkStringLiteralEscaper.decodeEscapes` decodes it, a raw
+//! string (`r"…"`) left as written. What every consumer of a literal reads, so none decodes one of its own.
 
 use std::ops::Range;
 
-/// The byte range of a string literal's contents, excluding its prefix and quotes.
-pub fn contents_range(raw: &str) -> Range<usize> {
-    let bytes = raw.as_bytes();
-    let quote_at = if bytes.get(..2).is_some_and(|prefix| prefix == b"br" || prefix == b"rb")
-        && matches!(bytes.get(2), Some(b'\'' | b'"'))
-    {
-        2
-    } else if matches!(bytes.first(), Some(b'b' | b'r')) && matches!(bytes.get(1), Some(b'\'' | b'"')) {
-        1
-    } else {
-        0
-    };
-    let Some(&quote) = bytes.get(quote_at).filter(|&&byte| matches!(byte, b'\'' | b'"')) else {
-        return 0..raw.len();
-    };
-    let triple = bytes.get(quote_at..quote_at + 3).is_some_and(|delimiter| delimiter == [quote; 3]);
-    let delimiter_len = if triple { 3 } else { 1 };
-    let start = quote_at + delimiter_len;
-    let end = raw
-        .len()
-        .checked_sub(delimiter_len)
-        .filter(|&end| end >= start && bytes[end..].iter().all(|&byte| byte == quote) && !is_escaped(bytes, end));
-    start..end.unwrap_or(raw.len())
+/// `ALLOWED_STRING_PREFIXES`: capital letters are not allowed here in Starlark.
+const ALLOWED_PREFIXES: [&str; 5] = ["", "r", "b", "rb", "br"];
+
+/// `StarlarkQuote`, longest first as `ofString` tries them.
+const QUOTES: [&str; 4] = ["'''", "\"\"\"", "'", "\""];
+
+/// `getRawPrefixLength`: the prefix before the first quote when it is an allowed one, else none.
+fn prefix_len(literal: &str) -> usize {
+    let prefix = literal.find(['\'', '"']).map_or(literal, |at| &literal[..at]);
+    if ALLOWED_PREFIXES.contains(&prefix) { prefix.len() } else { 0 }
 }
 
-/// The decoded value of a Starlark string literal.
-pub fn value(raw: &str) -> String {
-    let range = contents_range(raw);
-    let contents = &raw[range];
-    let prefix = &raw[..raw.find(['\'', '"']).unwrap_or(0)];
-    if prefix.contains('r') {
-        return contents.to_owned();
+/// `StarlarkQuote.ofString` of the text after the prefix: "" (`UNQUOTED`) for none.
+fn quote_of(text: &str) -> &'static str {
+    QUOTES.into_iter().find(|q| text.starts_with(q)).unwrap_or("")
+}
+
+/// `isRaw`: the prefix holds an `r`.
+pub fn is_raw(literal: &str) -> bool {
+    literal[..prefix_len(literal)].contains(['r', 'R'])
+}
+
+/// `getStringContents`: the text inside the quotes (`String.removeSurrounding`, which removes both quotes or none).
+pub fn contents(literal: &str) -> &str {
+    let text = &literal[prefix_len(literal)..];
+    let quote = quote_of(text);
+    match text.strip_prefix(quote).and_then(|inner| inner.strip_suffix(quote)) {
+        Some(inner) if text.len() >= quote.len() * 2 => inner,
+        _ => text,
     }
-    decode_escapes(contents)
 }
 
-fn is_escaped(bytes: &[u8], at: usize) -> bool {
-    let mut backslashes = 0;
-    let mut index = at;
-    while index > 0 && bytes[index - 1] == b'\\' {
-        backslashes += 1;
-        index -= 1;
-    }
-    backslashes % 2 != 0
+/// `getStringContentsOffset`: where the contents lie in the literal (`StarlarkQuote.rangeWithinQuotes` past the
+/// prefix): an unterminated literal's run to its end, a closing quote escaped by an odd run of backslashes being none.
+pub fn contents_range(literal: &str) -> Range<usize> {
+    let prefix = prefix_len(literal);
+    let text = &literal[prefix..];
+    let quote = quote_of(text);
+    let closed = text.len() >= quote.len() * 2
+        && text.ends_with(quote)
+        && text[..text.len() - quote.len()].bytes().rev().take_while(|&b| b == b'\\').count() % 2 == 0;
+    let end = if closed { text.len() - quote.len() } else { text.len() };
+    prefix + quote.len()..prefix + end.max(quote.len())
 }
 
-fn decode_escapes(contents: &str) -> String {
-    let bytes = contents.as_bytes();
-    let mut value = String::with_capacity(contents.len());
+/// The literal's value: its contents decoded (`decode`), a raw literal's as written.
+pub fn value(literal: &str) -> String {
+    let contents = contents(literal);
+    if is_raw(literal) { contents.to_owned() } else { decode(contents) }
+}
+
+/// `StarlarkStringLiteralEscaper.decodeEscapes`: `\n`, `\t`, `\r`, `\a`, `\b`, `\f`, `\v`, `\\`, `\"`, `\'`, a line
+/// continuation (`\` and its line break dropped), `\ooo`, `\xhh`, `\uhhhh` and `\Uhhhhhhhh`; any other escape, a hex
+/// escape that is short or names no code point (a surrogate too, which a Rust string cannot hold), keeps its
+/// backslash.
+pub fn decode(source: &str) -> String {
+    let bytes = source.as_bytes();
+    let mut out = String::with_capacity(source.len());
     let mut index = 0;
     while index < bytes.len() {
-        if bytes[index] != b'\\' {
-            let character = contents[index..].chars().next().expect("index is within the string");
-            value.push(character);
-            index += character.len_utf8();
+        let rest = &source[index..];
+        let ch = rest.chars().next().expect("index on a char boundary");
+        if ch != '\\' || index + 1 >= bytes.len() {
+            out.push(ch);
+            index += ch.len_utf8();
             continue;
         }
-
-        index += 1;
-        let Some(&escaped) = bytes.get(index) else {
-            value.push('\\');
-            break;
+        let next = bytes[index + 1];
+        let simple = match next {
+            b'n' => Some('\n'),
+            b't' => Some('\t'),
+            b'r' => Some('\r'),
+            b'a' => Some('\u{7}'),
+            b'b' => Some('\u{8}'),
+            b'f' => Some('\u{c}'),
+            b'v' => Some('\u{b}'),
+            b'\\' | b'"' | b'\'' => Some(next as char),
+            _ => None,
         };
-        index += 1;
-        match escaped {
-            b'a' => value.push('\u{7}'),
-            b'b' => value.push('\u{8}'),
-            b'f' => value.push('\u{c}'),
-            b'n' => value.push('\n'),
-            b'r' => value.push('\r'),
-            b't' => value.push('\t'),
-            b'v' => value.push('\u{b}'),
-            b'\\' => value.push('\\'),
-            b'\'' => value.push('\''),
-            b'"' => value.push('"'),
-            b'\n' => {}
-            b'\r' => {
-                if bytes.get(index) == Some(&b'\n') {
-                    index += 1;
+        if let Some(decoded) = simple {
+            out.push(decoded);
+            index += 2;
+            continue;
+        }
+        match next {
+            b'\n' => index += 2,
+            b'x' | b'u' | b'U' => {
+                let digits = match next {
+                    b'x' => 2,
+                    b'u' => 4,
+                    _ => 8,
+                };
+                let hex = source.get(index + 2..index + 2 + digits).filter(|h| h.bytes().all(|b| b.is_ascii_hexdigit()));
+                match hex.and_then(|h| u32::from_str_radix(h, 16).ok()).and_then(char::from_u32) {
+                    Some(decoded) => {
+                        out.push(decoded);
+                        index += 2 + digits;
+                    }
+                    None => {
+                        out.push('\\');
+                        index += 1;
+                    }
                 }
             }
-            b'x' if push_numeric_escape(&mut value, contents, &mut index, 2) => {}
-            b'u' if push_numeric_escape(&mut value, contents, &mut index, 4) => {}
-            b'U' if push_numeric_escape(&mut value, contents, &mut index, 8) => {}
             b'0'..=b'7' => {
-                let mut codepoint = u32::from(escaped - b'0');
-                let mut digits = 1;
-                while digits < 3 {
-                    let Some(&next @ b'0'..=b'7') = bytes.get(index) else { break };
-                    codepoint = codepoint * 8 + u32::from(next - b'0');
-                    index += 1;
-                    digits += 1;
+                let mut end = index + 2;
+                while end < bytes.len() && end < index + 4 && (b'0'..=b'7').contains(&bytes[end]) {
+                    end += 1;
                 }
-                value.push(char::from_u32(codepoint).unwrap_or(char::REPLACEMENT_CHARACTER));
+                let code = u32::from_str_radix(&source[index + 1..end], 8).expect("octal digits");
+                out.push(char::from_u32(code).expect("an octal escape is below 0o777"));
+                index = end;
             }
             _ => {
-                value.push('\\');
-                if escaped.is_ascii() {
-                    value.push(char::from(escaped));
-                } else {
-                    let character = contents[index - 1..].chars().next().expect("index is within the string");
-                    value.push(character);
-                    index += character.len_utf8() - 1;
-                }
+                out.push('\\');
+                index += 1;
             }
         }
     }
-    value
-}
-
-fn push_numeric_escape(value: &mut String, contents: &str, index: &mut usize, digits: usize) -> bool {
-    let start = *index;
-    let Some(end) = start.checked_add(digits) else { return false };
-    let Some(hex) = contents.as_bytes().get(start..end) else { return false };
-    let Ok(hex) = std::str::from_utf8(hex) else { return false };
-    let Ok(codepoint) = u32::from_str_radix(hex, 16) else { return false };
-    let Some(character) = char::from_u32(codepoint) else { return false };
-    value.push(character);
-    *index = end;
-    true
+    out
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{contents_range, value};
+    use super::*;
 
     #[test]
-    fn decodes_starlark_escapes_and_preserves_raw_strings() {
-        assert_eq!(value(r#""\x41\u03b1\101""#), "AαA");
-        assert_eq!(value(r#"r"\n\"""#), r#"\n\""#);
-        assert_eq!(value("'line\\nnext'"), "line\nnext");
-    }
-
-    #[test]
-    fn returns_content_ranges_for_prefixed_and_triple_quoted_strings() {
-        for raw in ["\"hello\"", "r'hello'", "br\"\"\"hello\"\"\""] {
-            let range = contents_range(raw);
-            assert_eq!(&raw[range], "hello");
-        }
-        assert_eq!(contents_range("\"unfinished"), 1..11);
+    fn a_literal_is_its_contents_decoded_unless_raw() {
+        assert_eq!(value(r#""//pkg:x""#), "//pkg:x");
+        assert_eq!(value(r#"'a\tb\'c'"#), "a\tb'c");
+        assert_eq!(value(r#"r"a\tb""#), r"a\tb");
+        assert_eq!(value(r#"b"\x41\101B""#), "AAB");
+        assert_eq!(value("\"\"\"one\\\ntwo\"\"\""), "onetwo");
+        assert_eq!(value(r#""\q\x4""#), r"\q\x4");
+        assert_eq!(value(r#""\ud800""#), r"\ud800");
+        // An unterminated literal keeps its text after the opening quote, as `removeSurrounding` removes none.
+        assert_eq!(contents("\"open"), "\"open");
+        assert_eq!(contents_range("\"open"), 1..5);
+        assert_eq!(contents_range(r#"rb"x""#), 3..4);
+        assert_eq!(contents_range(r#""a\""#), 1..4);
+        // A prefix Starlark does not allow is no prefix: the text before the quote stays.
+        assert_eq!(contents("R\"x\""), "R\"x\"");
     }
 }
