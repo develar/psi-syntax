@@ -263,6 +263,7 @@ dependencies = [
  "java-syntax",
  "kotlin-syntax",
  "psi-check",
+ "starlark-syntax",
  "stats_alloc",
 ]
 
@@ -402,6 +403,14 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "starlark-syntax"
+version = "0.1.0"
+dependencies = [
+ "psi-builder",
+ "psi-check",
 ]
 
 [[package]]
