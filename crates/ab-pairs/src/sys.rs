@@ -53,17 +53,274 @@ pub fn run_timed(cmd: &mut Command) -> Result<Run> {
     Ok(run)
 }
 
-/// `run_timed` without the exit check.
+/// `run_timed` without the exit check. A child whose process tree stops working is killed (`watch`): a deadlocked
+/// query fails the run with its stacks instead of holding it for hours.
 pub fn run_measured(cmd: &mut Command) -> Result<Run> {
+    run_watched(cmd, watch::window())
+}
+
+fn run_watched(cmd: &mut Command, window: Option<Duration>) -> Result<Run> {
     let counting = counters::Counting::arm(cmd);
     let busy = host_busy();
     let mut p = Piped::spawn(cmd)?;
     let counters = counting.started();
-    let (code, cpu, max_rss_bytes, counted) = wait_with_usage(&mut p.child, counters)?;
+    let watch = window.map(|w| watch::Watch::start(p.child.id(), w));
+    let waited = wait_with_usage(&mut p.child, counters);
+    let stalled = watch.and_then(watch::Watch::stop);
+    let (code, cpu, max_rss_bytes, counted) = waited?;
+    if let Some(stall) = stalled {
+        let run = p.finish(code);
+        return Err(Stalled {
+            what: format!("{cmd:?}"),
+            stall,
+            stderr: String::from_utf8_lossy(&run.stderr).into_owned(),
+        }
+        .into());
+    }
     let foreign_cpu =
         busy.zip(host_busy()).zip(cpu).map(|((before, after), cpu)| after.since(before).saturating_sub(cpu));
     let (instructions, cycles) = counted.map_or((None, None), |(i, c)| (Some(i), Some(c)));
     Ok(Run { cpu, max_rss_bytes, instructions, cycles, foreign_cpu, ..p.finish(code) })
+}
+
+/// A child `run_measured` killed because its process tree did no work for a whole window: a deadlock, a wait on
+/// something that never comes. Its stacks, sampled before the kill, are at `stall.stacks` where the platform has a
+/// sampler.
+#[derive(Debug)]
+pub struct Stalled {
+    pub what: String,
+    pub stall: Stall,
+    pub stderr: String,
+}
+
+/// What a stalled tree looked like.
+#[derive(Debug, Clone)]
+pub struct Stall {
+    pub window: Duration,
+    pub processes: usize,
+    pub stacks: Option<std::path::PathBuf>,
+}
+
+impl std::fmt::Display for Stalled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let tail: Vec<&str> = self.stderr.lines().rev().take(20).collect::<Vec<_>>().into_iter().rev().collect();
+        write!(
+            f,
+            "{} did no work for {} s ({} process(es), {}) and was killed{}; its stderr ended:\n{}",
+            self.what,
+            self.stall.window.as_secs(),
+            self.stall.processes,
+            watch::WORK,
+            self.stall.stacks.as_ref().map_or(String::new(), |p| format!("; its stacks: {}", p.display())),
+            tail.join("\n")
+        )
+    }
+}
+
+impl std::error::Error for Stalled {}
+
+/// The watchdog of a measured child: its process tree's work, read every `TICK`. Work is what the kernel counts for
+/// each process of the tree (the child and its descendants: `cargo` waits on `rustc`, `npx` on node): instructions
+/// retired on macOS, CPU ticks on Linux. A window in which no process of the tree does `FLOOR` of it and none starts
+/// is a stall: the root's stacks are sampled (macOS `sample`), then the tree is killed, and the child's wait returns.
+/// `AB_STALL_S` sets the window (default 600 s; `0` turns the watch off); a measured query of an A/B takes seconds,
+/// an index build minutes, each of them working all along.
+#[cfg(unix)]
+pub mod watch {
+    use super::Stall;
+    use std::collections::HashMap;
+    use std::path::PathBuf;
+    use std::sync::mpsc;
+    use std::time::{Duration, Instant};
+
+    const DEFAULT: Duration = Duration::from_secs(600);
+    const TICK: Duration = Duration::from_secs(5);
+    /// What the tree must do within a window: about 0.3 s of CPU.
+    #[cfg(target_os = "macos")]
+    const FLOOR: u64 = 1_000_000_000;
+    #[cfg(target_os = "macos")]
+    pub const WORK: &str = "under 1e9 instructions";
+    #[cfg(not(target_os = "macos"))]
+    const FLOOR: u64 = 30;
+    #[cfg(not(target_os = "macos"))]
+    pub const WORK: &str = "under 0.3 s of CPU";
+
+    /// The window `run_measured` watches with: `AB_STALL_S`, else `DEFAULT`; None when `0` or on a platform that
+    /// cannot read a process's work.
+    pub fn window() -> Option<Duration> {
+        let w = match std::env::var("AB_STALL_S").ok().and_then(|v| v.trim().parse::<u64>().ok()) {
+            Some(0) => return None,
+            Some(s) => Duration::from_secs(s),
+            None => DEFAULT,
+        };
+        cfg!(any(target_os = "macos", target_os = "linux")).then_some(w)
+    }
+
+    pub struct Watch {
+        stop: mpsc::Sender<()>,
+        thread: std::thread::JoinHandle<Option<Stall>>,
+    }
+
+    impl Watch {
+        pub fn start(pid: u32, window: Duration) -> Watch {
+            let (stop, stopped) = mpsc::channel();
+            let tick = TICK.min(window / 4).max(Duration::from_millis(50));
+            let thread = std::thread::spawn(move || watch(pid as libc::pid_t, window, tick, &stopped));
+            Watch { stop, thread }
+        }
+
+        /// Ends the watch after the child's wait: the stall it killed the child for, if it did.
+        pub fn stop(self) -> Option<Stall> {
+            let _ = self.stop.send(());
+            self.thread.join().ok().flatten()
+        }
+    }
+
+    fn watch(root: libc::pid_t, window: Duration, tick: Duration, stopped: &mpsc::Receiver<()>) -> Option<Stall> {
+        let mut seen: HashMap<libc::pid_t, u64> = HashMap::new();
+        let (mut since, mut done) = (Instant::now(), 0u64);
+        loop {
+            if stopped.recv_timeout(tick).is_ok() || !running(root) {
+                return None;
+            }
+            let tree = tree(root);
+            for &pid in &tree {
+                let Some(now) = work(pid) else { continue };
+                match seen.insert(pid, now) {
+                    Some(before) => done += now.saturating_sub(before),
+                    // A process the tree started: it works.
+                    None if pid != root => done += FLOOR,
+                    None => {}
+                }
+            }
+            if done >= FLOOR {
+                (since, done) = (Instant::now(), 0);
+            } else if since.elapsed() >= window {
+                if !running(root) {
+                    return None;
+                }
+                let stacks = sample(root);
+                for &pid in tree.iter().rev() {
+                    // SAFETY: SIGKILL to a process of the child's tree, the root unreaped (`running`).
+                    unsafe { libc::kill(pid, libc::SIGKILL) };
+                }
+                return Some(Stall { window, processes: tree.len(), stacks });
+            }
+        }
+    }
+
+    /// Is `pid`, our unreaped child, still running (not exited, not reaped): a stopped watch never signals a reused pid.
+    fn running(pid: libc::pid_t) -> bool {
+        // SAFETY: a zeroed siginfo_t is valid; WNOHANG | WNOWAIT neither blocks nor reaps.
+        let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
+        let r = unsafe {
+            libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, libc::WEXITED | libc::WNOHANG | libc::WNOWAIT)
+        };
+        // SAFETY: si_pid of the info waitid filled; 0 while the child runs.
+        r == 0 && unsafe { info.si_pid() } == 0
+    }
+
+    /// `root` and its descendants, parents first.
+    fn tree(root: libc::pid_t) -> Vec<libc::pid_t> {
+        let mut out = vec![root];
+        let mut i = 0;
+        while i < out.len() && out.len() < 4096 {
+            let kids = children(out[i]);
+            out.extend(kids.into_iter().filter(|k| *k > 0));
+            i += 1;
+        }
+        out
+    }
+
+    #[cfg(target_os = "macos")]
+    fn children(pid: libc::pid_t) -> Vec<libc::pid_t> {
+        let mut buf = vec![0 as libc::pid_t; 1024];
+        let bytes = (buf.len() * std::mem::size_of::<libc::pid_t>()) as libc::c_int;
+        // SAFETY: room for `bytes`; the call writes at most that many and returns how many pids it wrote.
+        let n = unsafe { libc::proc_listchildpids(pid, buf.as_mut_ptr().cast(), bytes) };
+        buf.truncate(n.max(0) as usize);
+        buf
+    }
+
+    #[cfg(target_os = "linux")]
+    fn children(pid: libc::pid_t) -> Vec<libc::pid_t> {
+        let Ok(tasks) = std::fs::read_dir(format!("/proc/{pid}/task")) else { return Vec::new() };
+        tasks
+            .flatten()
+            .filter_map(|t| std::fs::read_to_string(t.path().join("children")).ok())
+            .flat_map(|c| c.split_whitespace().filter_map(|p| p.parse().ok()).collect::<Vec<_>>())
+            .collect()
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    fn children(_: libc::pid_t) -> Vec<libc::pid_t> {
+        Vec::new()
+    }
+
+    /// The work `pid` has done so far (`WORK`'s unit).
+    #[cfg(target_os = "macos")]
+    fn work(pid: libc::pid_t) -> Option<u64> {
+        // SAFETY: a zeroed rusage_info_v4 is valid; proc_pid_rusage writes one of its flavor into it.
+        let mut ri: libc::rusage_info_v4 = unsafe { std::mem::zeroed() };
+        let r =
+            unsafe { libc::proc_pid_rusage(pid, libc::RUSAGE_INFO_V4, (&mut ri as *mut libc::rusage_info_v4).cast()) };
+        (r == 0).then_some(ri.ri_instructions)
+    }
+
+    /// utime + stime of `/proc/<pid>/stat`, in clock ticks.
+    #[cfg(target_os = "linux")]
+    fn work(pid: libc::pid_t) -> Option<u64> {
+        let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
+        let fields: Vec<&str> = stat.rsplit_once(')')?.1.split_whitespace().collect();
+        Some(fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?)
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    fn work(_: libc::pid_t) -> Option<u64> {
+        None
+    }
+
+    /// The stacks of `pid` for a few seconds, in a file of the temporary directory (macOS `sample`).
+    fn sample(pid: libc::pid_t) -> Option<PathBuf> {
+        if !cfg!(target_os = "macos") {
+            return None;
+        }
+        let path = std::env::temp_dir().join(format!("ab-stall-{pid}-{}.txt", std::process::id()));
+        let ok = std::process::Command::new("/usr/bin/sample")
+            .arg(pid.to_string())
+            .arg("3")
+            .arg("-file")
+            .arg(&path)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .is_ok_and(|s| s.success());
+        (ok && path.is_file()).then_some(path)
+    }
+}
+
+#[cfg(not(unix))]
+pub mod watch {
+    use std::time::Duration;
+
+    pub const WORK: &str = "no work";
+
+    pub fn window() -> Option<Duration> {
+        None
+    }
+
+    pub struct Watch;
+
+    impl Watch {
+        pub fn start(_: u32, _: Duration) -> Watch {
+            Watch
+        }
+
+        pub fn stop(self) -> Option<super::Stall> {
+            None
+        }
+    }
 }
 
 /// The clock of the host's CPU accounting: each core's busy time counts in ticks of 10 ms (`CLK_TCK`, Mach's
@@ -647,6 +904,34 @@ pub fn busy_processes(all: &[Process], me: u32, min_cpu: f64) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+
+    /// A child that waits for nothing that comes is killed after the window, with what it was, not waited for.
+    #[cfg(unix)]
+    #[test]
+    fn a_child_that_does_no_work_for_a_window_is_killed() {
+        let t = Instant::now();
+        let err = run_watched(
+            Command::new("sh").args(["-c", "echo waiting >&2; sleep 60; exit 0"]),
+            Some(Duration::from_secs(1)),
+        )
+        .unwrap_err();
+        let stalled = err.downcast_ref::<Stalled>().unwrap_or_else(|| panic!("{err:#}"));
+        assert!(t.elapsed() < Duration::from_secs(20), "{:?}", t.elapsed());
+        assert!(stalled.stall.processes >= 2 && stalled.stderr.contains("waiting"), "{stalled}");
+        if let Some(stacks) = &stalled.stall.stacks {
+            let _ = std::fs::remove_file(stacks);
+        }
+    }
+
+    /// A tree that works in a child, its root only waiting (`cargo` on `rustc`), runs past the window to its end.
+    #[cfg(unix)]
+    #[test]
+    fn a_tree_that_works_in_a_child_outlives_the_window() {
+        let busy = r#"perl -e 'my $t = time + 3; while (time < $t) {}'; exit 0"#;
+        let run = run_watched(Command::new("sh").args(["-c", busy]), Some(Duration::from_secs(1))).unwrap();
+        assert!(run.code == 0 && run.wall >= Duration::from_secs(2), "{run:?}");
+    }
+
     use super::*;
 
     fn command(program: &str) -> Command {
