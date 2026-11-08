@@ -5,6 +5,8 @@ pub mod language;
 pub mod lexer;
 pub mod node_kind;
 pub mod parser;
+pub mod psi;
+pub mod string;
 pub mod token_sets;
 pub mod tokens;
 pub mod tree;

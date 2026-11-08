@@ -42,6 +42,11 @@ pub enum FileKind {
 }
 
 impl FileKind {
+    /// Whether a top-level call in this file declares a Bazel target.
+    pub const fn top_level_calls_declare(self) -> bool {
+        matches!(self, FileKind::Build | FileKind::BuildBazel | FileKind::ModuleBazel)
+    }
+
     pub fn from_path(path: &str) -> Option<FileKind> {
         let name = path.rsplit('/').next().unwrap_or(path).rsplit('\\').next().unwrap_or(path);
         Some(match name {
@@ -85,5 +90,25 @@ mod tests {
             assert_eq!(FileKind::from_path(path), Some(expected), "{path}");
         }
         assert_eq!(FileKind::from_path("BUILD.txt"), None);
+    }
+
+    #[test]
+    fn only_build_kinds_declare_targets_from_top_level_calls() {
+        let cases = [
+            (FileKind::Build, true),
+            (FileKind::BuildBazel, true),
+            (FileKind::ModuleBazel, true),
+            (FileKind::Workspace, false),
+            (FileKind::WorkspaceBazel, false),
+            (FileKind::WorkspaceBzlmod, false),
+            (FileKind::RepoBazel, false),
+            (FileKind::Bzl, false),
+            (FileKind::Bazel, false),
+            (FileKind::Star, false),
+            (FileKind::BuildTemplate, false),
+        ];
+        for (kind, expected) in cases {
+            assert_eq!(kind.top_level_calls_declare(), expected, "{kind:?}");
+        }
     }
 }
