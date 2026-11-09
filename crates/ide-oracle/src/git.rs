@@ -123,6 +123,7 @@ mod tests {
         assert_eq!(rev.show("b.txt").unwrap(), b"x");
         assert!(rev.show("nope").is_err());
         drop(rev);
-        std::fs::remove_dir_all(&repo).unwrap();
+        // Git for Windows' launcher is killed by the drop; the `cat-file` it started may still hold the directory.
+        let _ = std::fs::remove_dir_all(&repo);
     }
 }
