@@ -1,0 +1,22 @@
+[package]
+name = "lmdb-env"
+description = "An LMDB environment that the processes of one host share: one per directory in a process, opened and closed under its open.lock, a semaphore set of its own on macOS, reader slots per transaction, dead readers cleared, versioned tables, a full map cleared and its batch retried; every failure a miss. accio's forward store and Branch Deck's object cache"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+heed = { version = "0.23.1", default-features = false }
+
+# The semaphore key of an environment's lock file (`semaphore`): LMDB locks with System V semaphores on macOS.
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = "0.2"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+# A batch is its tables' key-value pairs (`&[(Table, &[(Vec<u8>, Vec<u8>)])]`), named where `put_batches` documents
+# it, not behind an alias.
+type_complexity = "allow"

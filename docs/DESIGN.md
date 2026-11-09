@@ -64,6 +64,7 @@ path.
 | `psi-check` | the checks of a tree every language's tests and `ksdump` share (lossless leaves, links, equal subtrees, nesting and stack limits), the robustness tests' limits and deterministic generators | `psi-builder` |
 | `ksdump` | the binary | `kotlin-syntax`, `java-syntax`, `csharp-syntax`, `starlark-syntax`, `psi-check` |
 | `ab-pairs` | the A/B engine: interleaved pairs and their stopping rule (`pairs`, `stats`), the host's reservation (`reserve`), a child timed with its counters (`sys`); `ksdump-ab`, two ksdump binaries' `--bench` to a verdict; accio's `tools/bench` builds its A/B commands on it | nothing |
+| `lmdb-env` | an LMDB environment the processes of one host share (`Store`, `Config`, `Table`): one per directory in a process, opens and closes under `open.lock`, a semaphore set of its own on macOS (`semaphore`), reader slots per transaction, dead readers cleared, versioned and retired tables, a full map cleared in two transactions and its batch retried; accio's forward store and Branch Deck's object cache | nothing (heed) |
 
 `psi-builder` is generic over `L: Language`, a marker type whose associated items are what IntelliJ reads from a
 `ParserDefinition` and from element types: `Token`, `Node` (each with a dense `u16` index and a debug name; node indices start at `TokenType::NODE_BASE`, 256 for Kotlin and Java),
