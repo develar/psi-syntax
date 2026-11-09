@@ -22,6 +22,7 @@ use std::cell::RefCell;
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::Program;
+use oxc_diagnostics::OxcDiagnostic;
 use oxc_parser::config::TokensParserConfig;
 use oxc_parser::{ParseOptions, Parser, ParserReturn};
 use oxc_span::SourceType;
@@ -97,6 +98,53 @@ pub fn parse_text(src: &[u8]) -> Cow<'_, str> {
             Cow::Owned(String::from_utf8(bytes).expect("every invalid sequence was blanked"))
         }
     }
+}
+
+/// The messages of oxc's syntax errors (`oxc_parser::diagnostics`), whole or as a prefix (`…*`): an unexpected or
+/// a missing token, an unterminated literal or comment, a character or number no token takes, a merge marker, JSX
+/// whose tags do not close, a file oxc reads as Flow or binary.
+const SYNTAX: &[&str] = &[
+    "Unexpected token",
+    "Unexpected token.*",
+    "Unexpected end of file",
+    "Unexpected JSX expression",
+    "Expected `*",
+    "Expected a semicolon or an implicit semicolon after a statement, but found none",
+    "Expected function name",
+    "Expected function body",
+    "Expected switch clause",
+    "Expected corresponding*",
+    "Expected 'with' in import type options",
+    "Identifier expected.",
+    "Identifier expected after '?.'",
+    "Missing catch or finally clause",
+    "Adjacent JSX elements must be wrapped in an enclosing tag.",
+    "Unterminated*",
+    "Invalid Character*",
+    "Invalid characters after number",
+    "Invalid Number*",
+    "Line terminator not permitted before arrow",
+    "Empty parenthesized expression",
+    "Encountered diff marker",
+    "Flow is not supported",
+    "File appears to be binary.",
+    "String literal expected.",
+    "'extends' list cannot be empty.",
+    "Type parameter list cannot be empty.",
+    "Type argument list cannot be empty.",
+    "Trailing comma not allowed.",
+];
+
+/// Whether `d` says the text does not follow the grammar (`SYNTAX`), not an early error: oxc's parser also reports a
+/// valid parse that breaks a rule of the language beyond its grammar (strict mode, a modifier where it may not stand, a
+/// duplicate export, an escape in a keyword), after which the tree is whole. Every consumer reads a file's errors by
+/// this: accio's syntax errors, Branch Deck's error bytes and `in_error`.
+pub fn is_syntax_error(d: &OxcDiagnostic) -> bool {
+    let m = d.message.as_ref();
+    SYNTAX.iter().any(|s| match s.strip_suffix('*') {
+        Some(prefix) => m.starts_with(prefix),
+        None => m == *s,
+    })
 }
 
 /// What one `with_program` asks of the parse.
@@ -491,6 +539,22 @@ mod tests {
         assert!(recovered && functions >= 2, "{functions}");
         let first = Read { recover: false, ..Read::default() };
         assert!(with_program(Dialect::TypeScript, broken, first, |p| p.program().is_none()).unwrap().0);
+    }
+
+    /// A syntax error is one the grammar rejects; an early error leaves a whole tree.
+    #[test]
+    fn an_early_error_is_no_syntax_error() {
+        let kinds = |src: &[u8]| {
+            with_program(Dialect::TypeScript, src, Read { recover: false, ..Read::default() }, |p| {
+                p.diagnostics.iter().map(is_syntax_error).collect::<Vec<_>>()
+            })
+            .unwrap()
+            .0
+        };
+        assert_eq!(kinds(b"let a = (;\n"), [true]);
+        // a modifier where it may not stand, an implementation in an ambient context
+        let early = kinds(b"public function f() {}\nclass A { declare m() {} }\n");
+        assert!(!early.is_empty() && early.iter().all(|it| !it), "{early:?}");
     }
 
     #[test]
