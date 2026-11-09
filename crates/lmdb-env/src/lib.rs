@@ -579,6 +579,183 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// Is the environment of `dir` open in this process (`ENVS`)?
+    fn is_open(dir: &Path) -> bool {
+        let dir = dir.canonicalize().unwrap();
+        let envs = ENVS.get_or_init(Default::default).lock().unwrap();
+        envs.get(&dir).is_some_and(|slot| slot.try_lock().is_ok_and(|env| env.strong_count() > 0))
+    }
+
+    /// Is a thread of this process opening or closing the environment of `dir` (its slot is held)?
+    fn is_opening(dir: &Path) -> bool {
+        let dir = dir.canonicalize().unwrap();
+        let envs = ENVS.get_or_init(Default::default).lock().unwrap();
+        envs.get(&dir).is_some_and(|slot| slot.try_lock().is_err())
+    }
+
+    /// An environment kept open to the end of the process left its System V semaphore set behind on macOS, one per
+    /// temporary directory of a test, until the system had none left (Branch Deck's object cache).
+    #[test]
+    fn the_last_handle_closes_the_environment() {
+        let dir = scratch("last-handle");
+        let one = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+        let two = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+        one.put(one.table(0).unwrap(), &[(b"k".to_vec(), b"v".to_vec())]).unwrap();
+        drop(one);
+        assert!(is_open(&dir), "the other handle keeps it open");
+        drop(two);
+        assert!(!is_open(&dir));
+        // Closed by LMDB too, not only gone from `ENVS`.
+        assert!(heed::env_closing_event(dir.canonicalize().unwrap()).is_none(), "heed still has it open");
+        let again = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+        assert_eq!(again.get(again.table(0).unwrap(), b"k").as_deref(), Some(&b"v"[..]));
+        drop(again);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The ids of the System V semaphore sets of the system, by key (`ipcs -s`).
+    #[cfg(target_os = "macos")]
+    fn semaphore_sets() -> HashMap<u32, String> {
+        let output = std::process::Command::new("ipcs").arg("-s").output().unwrap();
+        assert!(output.status.success());
+        String::from_utf8(output.stdout)
+            .unwrap()
+            .lines()
+            .filter_map(|line| {
+                let fields: Vec<&str> = line.split_whitespace().collect();
+                let key = u32::from_str_radix(fields.get(2)?.strip_prefix("0x")?, 16).ok()?;
+                (fields.first() == Some(&"s")).then(|| (key, fields[1].to_string()))
+            })
+            .collect()
+    }
+
+    /// A closed environment gives back its semaphore set: LMDB makes one per lock file on macOS, keyed by
+    /// `ftok(lock.mdb, 'M')`, and only the close of its last user removes it. The test follows its own set by id, not
+    /// the system's count, which other processes change meanwhile.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn a_closed_environment_gives_back_its_semaphore_set() {
+        use std::os::unix::fs::MetadataExt;
+        for _ in 0..3 {
+            let dir = scratch("semaphores");
+            let store = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+            let metadata = std::fs::metadata(dir.join("lock.mdb")).unwrap();
+            // macOS's `ftok`: the project id, the low byte of the device and the low 16 bits of the inode.
+            let key = u32::from(b'M') << 24
+                | u32::try_from(metadata.dev() & 0xff).unwrap() << 16
+                | u32::try_from(metadata.ino() & 0xffff).unwrap();
+            let id = semaphore_sets().remove(&key).unwrap_or_else(|| panic!("no semaphore set of key {key:#x}"));
+            drop(store);
+            assert!(!semaphore_sets().values().any(|set| *set == id), "the set {id} outlives its environment");
+            let _ = std::fs::remove_dir_all(&dir);
+        }
+    }
+
+    /// The inode of `path`; None where files have none (Windows), whose lock files are never made again.
+    fn inode(path: &Path) -> Option<u64> {
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            std::fs::metadata(path).ok().map(|metadata| metadata.ino())
+        }
+        #[cfg(not(unix))]
+        {
+            std::fs::metadata(path).ok().map(|_| 0)
+        }
+    }
+
+    /// macOS keys the semaphore set of a lock file by the low 16 bits of its inode: a lock file whose key another set
+    /// holds is made again before LMDB first opens it, so this environment's close leaves the other set alone.
+    #[test]
+    fn a_lock_file_whose_semaphore_key_another_set_holds_is_made_again() {
+        let dir = scratch("semaphore-key");
+        // The lock file exists, its set removed by the close.
+        drop(Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap());
+        let lock = dir.canonicalize().unwrap().join("lock.mdb");
+        let before = inode(&lock).expect("the lock file");
+        #[cfg(target_os = "macos")]
+        {
+            use std::os::unix::ffi::OsStrExt;
+            let c_path = std::ffi::CString::new(lock.as_os_str().as_bytes()).unwrap();
+            let key = semaphore::key(&c_path).unwrap();
+            // SAFETY: no pointer is passed; the set of another environment, made and removed by the test.
+            let other = unsafe { libc::semget(key, 2, libc::IPC_CREAT | 0o600) };
+            assert!(other >= 0, "{}", std::io::Error::last_os_error());
+            let store = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+            store.put(store.table(0).unwrap(), &[(b"k".to_vec(), b"v".to_vec())]).unwrap();
+            assert_ne!(inode(&lock), Some(before), "the lock file was made again");
+            drop(store);
+            // SAFETY: a zeroed `semid_ds` is a valid buffer, and no other pointer is passed.
+            unsafe {
+                let mut buffer: libc::semid_ds = std::mem::zeroed();
+                assert_eq!(
+                    libc::semctl(other, 0, libc::IPC_STAT, &raw mut buffer),
+                    0,
+                    "the close removed the set of the other environment"
+                );
+                libc::semctl(other, 0, libc::IPC_RMID);
+            }
+        }
+        // Without System V semaphores (robust mutexes on Linux, named mutexes on Windows) the lock file stays.
+        #[cfg(not(target_os = "macos"))]
+        {
+            let store = Store::open(&dir, &TEST, &[("forward", 1)], &[]).unwrap();
+            store.put(store.table(0).unwrap(), &[(b"k".to_vec(), b"v".to_vec())]).unwrap();
+            assert_eq!(inode(&lock), Some(before));
+            drop(store);
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The default config syncs each commit (no `MDB_NOSYNC`, no `MDB_NOMETASYNC`): without it LMDB promises no
+    /// integrity after a power loss unless the file system keeps the order of writes, and stores no checksum, so a
+    /// wrong but readable entry could be read back. A test's config commits without the drive's flush.
+    #[test]
+    fn the_default_config_syncs_every_commit_and_a_tests_does_not() {
+        let unsynced = (EnvFlags::NO_SYNC | EnvFlags::NO_META_SYNC).bits();
+        let dir = scratch("synced");
+        let store = Store::open(&dir, &Config::default(), &[("forward", 1)], &[]).unwrap();
+        assert_eq!(store.env().get_flags().unwrap() & unsynced, 0);
+        drop(store);
+        let dir_test = scratch("unsynced");
+        let store = Store::open(&dir_test, &TEST, &[("forward", 1)], &[]).unwrap();
+        assert_eq!(store.env().get_flags().unwrap() & unsynced, unsynced);
+        drop(store);
+        for dir in [dir, dir_test] {
+            let _ = std::fs::remove_dir_all(&dir);
+        }
+    }
+
+    /// An open that waits for `open.lock` (another process opens or closes the environment) holds only the slot of its
+    /// directory: the environment of another directory opens meanwhile, and the waiting one opens once the lock is free.
+    #[test]
+    fn an_environment_opens_while_the_open_of_another_waits_for_its_open_lock() {
+        let (waiting, other) = (scratch("waiting"), scratch("other"));
+        std::fs::create_dir_all(&waiting).unwrap();
+        let held = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(waiting.join("open.lock"))
+            .unwrap();
+        held.lock().unwrap();
+        std::thread::scope(|scope| {
+            let opening = scope.spawn(|| Store::open(&waiting, &TEST, &[("forward", 1)], &[]).map(drop));
+            while !is_opening(&waiting) {
+                assert!(!opening.is_finished(), "the open waits for the lock of the other process");
+                std::thread::yield_now();
+            }
+            let opened = Store::open(&other, &TEST, &[("forward", 1)], &[]).unwrap();
+            assert!(is_open(&other));
+            drop(opened);
+            held.unlock().unwrap();
+            opening.join().unwrap().unwrap();
+        });
+        for dir in [waiting, other] {
+            let _ = std::fs::remove_dir_all(&dir);
+        }
+    }
+
     #[test]
     fn a_directory_that_cannot_hold_a_store_is_an_error_not_a_panic() {
         let dir = scratch("blocked");

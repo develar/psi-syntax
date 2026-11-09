@@ -76,7 +76,7 @@ fn try_lock_exclusive(file: &std::fs::File) -> std::io::Result<bool> {
 
 /// The key LMDB derives for the lock file's semaphore set.
 #[cfg(target_os = "macos")]
-fn key(path: &std::ffi::CStr) -> std::io::Result<libc::key_t> {
+pub(crate) fn key(path: &std::ffi::CStr) -> std::io::Result<libc::key_t> {
     // SAFETY: `path` is a NUL-terminated string that outlives the call.
     let key = unsafe { libc::ftok(path.as_ptr(), libc::c_int::from(b'M')) };
     if key == -1 {
