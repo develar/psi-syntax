@@ -260,7 +260,9 @@ mod tests {
     }
 
     /// Two arms that print the same parse time are the same at `min_n`, judged by time; a slower parse is slower.
+    /// The arms are shell scripts, so Unix only.
     #[test]
+    #[cfg(unix)]
     fn equal_binaries_are_the_same_and_a_slower_parse_is_slower() {
         let dir = tempfile::tempdir().unwrap();
         let script = |name: &str, seconds: &str| {

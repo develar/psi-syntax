@@ -262,10 +262,10 @@ pub fn check_retained_bytes<L: Language>(file: &str, big: &str, parse: impl Fn(&
     assert_eq!(parser.heap_bytes(), parser.grown_bytes());
 }
 
-/// The files with `extension` under the directories `roots` names (`:`-separated), depth first: the inputs of a corpus
-/// run.
+/// The files with `extension` under the directories `roots` names (separated as `PATH` is: `:`, on Windows `;`, where
+/// `:` follows a drive letter), depth first: the inputs of a corpus run.
 pub fn files_under(roots: &str, extension: &str) -> impl Iterator<Item = PathBuf> + use<> {
-    let mut stack: Vec<PathBuf> = roots.split(':').map(Into::into).collect();
+    let mut stack: Vec<PathBuf> = std::env::split_paths(roots).collect();
     let extension = extension.to_string();
     std::iter::from_fn(move || {
         while let Some(path) = stack.pop() {
