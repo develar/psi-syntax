@@ -175,8 +175,6 @@ impl Store {
         }
         match self.write(batches) {
             Err(heed::Error::Mdb(heed::MdbError::MapFull)) => {
-                // A dead process's reader would keep the pages the clear frees from the batch.
-                let _ = self.env().clear_stale_readers();
                 self.clear().map_err(|e| format!("cannot clear a full store: {e}"))?;
                 self.write(batches).map_err(|e| e.to_string())
             }
@@ -210,8 +208,10 @@ impl Store {
     /// transaction frees to the second transaction after it, never the first, so a batch right after the clear alone
     /// would take new pages from the map's end, and every clear would move the end until it met the map size
     /// (`MDB_MAP_FULL` at batch 90 of `a_full_map_clears_the_tables_and_takes_the_batch` on 4 KiB pages). An empty
-    /// commit does not count: LMDB writes no transaction without a dirty page.
+    /// commit does not count: LMDB writes no transaction without a dirty page. A dead process's reader would keep the
+    /// pages the clear frees from the batch, whichever check found the map full, so its slot goes first.
     fn clear(&self) -> heed::Result<()> {
+        let _ = self.env().clear_stale_readers();
         let mut txn = self.env().write_txn()?;
         for table in &self.tables {
             table.clear(&mut txn)?;
