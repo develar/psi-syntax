@@ -550,7 +550,12 @@ mod tests {
 
     /// A process killed in a read transaction leaves its slot and its snapshot: every page freed after it stays
     /// unusable, so a full map's clear frees nothing the batch can take and each batch after it is lost.
+    ///
+    /// Unix only: LMDB tells a dead reader by its process id (`OpenProcess` on Windows, a lock on Unix). Windows keeps
+    /// the id while a handle to the process is open and hands a freed id to the next process at once, so under a test
+    /// runner spawning processes the killed child's id is live again before the clear and its slot stays.
     #[test]
+    #[cfg(unix)]
     fn a_killed_readers_snapshot_pins_no_page() {
         use std::io::BufRead;
         let dir = scratch("killed");
