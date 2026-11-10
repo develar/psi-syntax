@@ -134,8 +134,15 @@ impl Store {
 
     /// The value of `key` in `table`, or None: a miss, or an error read as one.
     pub fn get(&self, table: Table, key: &[u8]) -> Option<Vec<u8>> {
+        self.get_with(table, key, <[u8]>::to_vec)
+    }
+
+    /// `read` of the value of `key` in `table` where the map holds it, inside the read transaction: a reader that
+    /// decodes the value copies the mapped bytes once, where it needs them, instead of after `get`'s copy. None for a
+    /// miss, or an error read as one. The slice lives only as long as the call.
+    pub fn get_with<R>(&self, table: Table, key: &[u8], read: impl FnOnce(&[u8]) -> R) -> Option<R> {
         let txn = self.env().read_txn().ok()?;
-        self.tables[table.0].get(&txn, key).ok().flatten().map(<[u8]>::to_vec)
+        self.tables[table.0].get(&txn, key).ok().flatten().map(read)
     }
 
     /// The values of `keys` in `table`, in their order, read in one transaction.
