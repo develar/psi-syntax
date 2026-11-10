@@ -83,8 +83,9 @@ pub fn kind_of(path: &str) -> Option<SpecFile> {
 /// Is `path` under the archive of OpenSpec's changes (`openspec/changes/archive/`): a change `openspec archive` moved
 /// there once its deltas were merged into the main specs, history that no answer about the current specs needs.
 pub fn is_archived(path: &str) -> bool {
-    let segments: Vec<&str> = path.split('/').collect();
-    segments.windows(3).any(|w| w == ["openspec", "changes", "archive"])
+    // No allocation: a reader asks it of every path of a tree.
+    const ARCHIVE: &str = "openspec/changes/archive/";
+    path.match_indices(ARCHIVE).any(|(at, _)| at == 0 || path.as_bytes()[at - 1] == b'/')
 }
 
 /// A byte range of the source with its lines (1-based, `end_line` the last line holding text of it) and the byte its
