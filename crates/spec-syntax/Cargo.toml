@@ -1,0 +1,17 @@
+[package]
+name = "spec-syntax"
+description = "Spec documents as their formats define them: OpenSpec's main specs and change deltas (requirements, scenarios, the archive) as @fission-ai/openspec 1.16.1 reads them, and IntelliJ's `*.spec.md` (front matter, rules, `targets`), with the `[@test]` links of both; accio's spec records and Branch Deck's review"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
