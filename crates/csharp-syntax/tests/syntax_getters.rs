@@ -716,4 +716,13 @@ fn name_texts_and_documentation_comments() {
     );
     let c = all(&plain, NodeKind::ClassDeclaration)[0];
     assert_eq!(plain.utf8_text(read::doc_comment(&plain, c).unwrap()), Some("/// <summary>doc</summary>"));
+    // `/**` opens one, `/***` and `/**/` do not, as the lexer reads them at `DocumentationMode::Parse`
+    for (source, doc) in [("/** d */\nclass C { }", Some("/** d */")), ("/*** d */\nclass C { }", None), ("/**/\nclass C { }", None)] {
+        let plain = Tree::parse(source, FileKind { doc_mode: DocumentationMode::None, ..FileKind::default() });
+        let c = all(&plain, NodeKind::ClassDeclaration)[0];
+        assert_eq!(read::doc_comment(&plain, c).and_then(|d| plain.utf8_text(d)), doc, "{source}");
+        let parsed = parse(source);
+        let c = all(&parsed, NodeKind::ClassDeclaration)[0];
+        assert_eq!(read::doc_comment(&parsed, c).is_some(), doc.is_some(), "{source} parsed");
+    }
 }

@@ -350,8 +350,8 @@ pub fn name_text(tree: &Tree, name: NodeId) -> Option<String> {
 
 /// Whether a trivia is a documentation comment: a structured one (`SingleLineDocumentationCommentTrivia`,
 /// `MultiLineDocumentationCommentTrivia` in `DocumentationMode::Parse` and `Diagnose`), or a comment leaf the lexer
-/// takes for one where it does not parse them (`DocumentationMode::None`): `///` not followed by `/`, `/**` not
-/// followed by `/` (Lexer.cs, `ScanSingleLineComment`/`ScanMultiLineComment` with `isDocComment`).
+/// takes for one where it does not parse them (`DocumentationMode::None`): `///` not followed by `/`, `/**` followed by
+/// neither `*` nor `/` (Lexer.cs, `LexSyntaxTrivia`: `/***` and `/**/` are plain comments).
 pub fn is_documentation_comment(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
     match tree.kind(id) {
         psi_builder::ElementType::Node(n) => {
@@ -361,7 +361,7 @@ pub fn is_documentation_comment(tree: &PsiTree<CSharp>, id: NodeId) -> bool {
             let text = tree.text(id);
             match t {
                 crate::TokenKind::SingleLineCommentTrivia => text.starts_with(b"///") && !text.starts_with(b"////"),
-                crate::TokenKind::MultiLineCommentTrivia => text.starts_with(b"/**") && !text.starts_with(b"/**/"),
+                crate::TokenKind::MultiLineCommentTrivia => text.starts_with(b"/**") && !text.starts_with(b"/**/") && !text.starts_with(b"/***"),
                 _ => false,
             }
         }
