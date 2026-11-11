@@ -4,8 +4,8 @@
 //! weekly as `ra_ap_syntax`: lossless, error-resilient, with a typed AST that says what each node is, so what a node
 //! declares is `ra_ap_syntax::ast`'s answer and no consumer keeps a list of node kinds. This crate holds what is not
 //! the grammar's: the text the parser reads (`utf8_text`), the edition (`EDITION`), the tree built where it is dropped
-//! (`parse`, `parse_with_errors`, `parse_items`), the stack the parser's recursion takes (`guarded`, `nesting`), where
-//! an item's own text starts (`start_after_attributes`), and, behind the feature `macros`, a `macro_rules!` expanded as
+//! (`parse`, `parse_with_errors`), the stack the parser's recursion takes (`guarded`, `nesting`), where an item's own
+//! text starts (`start_after_attributes`), and, behind the feature `macros`, a `macro_rules!` expanded as
 //! rust-analyzer expands it (`macros`).
 //!
 //! `ra_ap_syntax` and `rowan` are re-exported, so a consumer names the tree's types through this crate and builds with
@@ -90,15 +90,6 @@ pub fn parse_with_errors(src: &[u8]) -> (SyntaxNode, Vec<SyntaxError>) {
     };
     errors.sort_by_key(|e| e.range().start());
     (root, errors)
-}
-
-/// The items the body of an item macro writes (`cfg_net! { pub struct Socket { io: PollEvented<u32> } }`, tokio's
-/// gates), read as a file of its own: None for a body that is no list of items without an error
-/// (`lazy_static! { static ref X: T = …; }`, an expression), whose meaning only its macro knows. Its offsets are those
-/// of `text`. Run under `guarded` with the file around it.
-pub fn parse_items(text: &str) -> Option<SyntaxNode> {
-    let (green, errors) = build(text);
-    errors.is_empty().then(|| SyntaxNode::new_root(green))
 }
 
 /// rust-analyzer's parse of `text` into a green tree, with the lexer's and the parser's errors: what
@@ -190,8 +181,6 @@ mod tests {
         let root = parse(b"/// doc\n#[test]\nfn f() {}\n");
         let item = root.first_child().unwrap();
         assert_eq!(start_after_attributes(&item), 16);
-        assert_eq!(parse_items("pub struct S;").map(|it| it.to_string()), Some("pub struct S;".to_string()));
-        assert_eq!(parse_items("static ref X: T = 1;"), None);
         let (_, errors) = parse_with_errors(b"fn f() { let }");
         assert!(!errors.is_empty());
     }
