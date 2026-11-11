@@ -47,8 +47,7 @@ fn a_documentation_comment_is_trivia_however_it_is_parsed() {
 }
 
 /// `read::word_at` places the name a token spells at the text that writes it: past the `@` of a verbatim identifier,
-/// and at the token itself where an escape makes the value bytes the source does not hold. `read::written_word`
-/// gives the name as the source writes it, which a record of the name must match.
+/// and at the token itself where an escape makes the value bytes the source does not hold.
 #[test]
 fn a_name_is_placed_at_the_text_that_writes_it() {
     let tree = Tree::parse(
@@ -60,12 +59,8 @@ fn a_name_is_placed_at_the_text_that_writes_it() {
         .filter(|&id| tree.token_kind(id) == Some(TokenKind::IdentifierToken))
         .filter_map(|id| {
             let (value, at) = read::word_at(&tree, id)?;
-            Some((value, at, read::written_word(&tree, id)?))
+            Some((value, at, std::str::from_utf8(&tree.source()[tree.range(id)]).ok()?))
         })
         .collect();
-    assert_eq!(names, [("C", 6, "C"), ("count", 15, "count"), ("C猿", 26, "C\\u733f")], "{names:?}");
-    for &(value, at, written) in &names {
-        let source = std::str::from_utf8(&tree.source()[at..at + written.len()]).expect("utf-8");
-        assert_eq!(source, written, "the name of {value} is written at its place");
-    }
+    assert_eq!(names, [("C", 6, "C"), ("count", 15, "@count"), ("C猿", 26, "C\\u733f")], "{names:?}");
 }

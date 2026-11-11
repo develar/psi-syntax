@@ -203,21 +203,6 @@ pub fn word_at(tree: &Tree, token: NodeId) -> Option<(&str, usize)> {
     Some((value, at))
 }
 
-/// The name as the source writes it, without the `@` of a verbatim identifier: `word` wherever the source spells the
-/// value (`@class` is `class`), the written text where an escape makes it spell something else (`C\u733f` is
-/// `C\u733f`, not `C猿`), so that a record of the name and the text under it are the same bytes. None where `word`
-/// is none and for an empty name.
-pub fn written_word(tree: &Tree, token: NodeId) -> Option<&str> {
-    let value = word(tree, token)?;
-    let written = &tree.source()[tree.range(token)];
-    let word = if written.ends_with(value.as_bytes()) {
-        value
-    } else {
-        std::str::from_utf8(written).ok().map(|w| w.strip_prefix('@').unwrap_or(w))?
-    };
-    (!word.is_empty()).then_some(word)
-}
-
 /// The name a name node spells as Roslyn's tree nests it, each identifier a `word`: a `QualifiedName` its left and
 /// right joined by `.` (`A.B.C` is `(A.B).C`), an `AliasQualifiedName` its name alone (`global::A` and `E::A` are `A`:
 /// the alias names an assembly's root, no namespace; `name::get_alias_qualifier_opt` has it), a `GenericName` its
