@@ -4,12 +4,15 @@
 //! weekly as `ra_ap_syntax`: lossless, error-resilient, with a typed AST that says what each node is, so what a node
 //! declares is `ra_ap_syntax::ast`'s answer and no consumer keeps a list of node kinds. This crate holds what is not
 //! the grammar's: the text the parser reads (`utf8_text`), the edition (`EDITION`), the tree built where it is dropped
-//! (`parse`, `parse_with_errors`, `parse_items`), the stack the parser's recursion takes (`guarded`, `nesting`), and
-//! where an item's own text starts (`start_after_attributes`).
+//! (`parse`, `parse_with_errors`, `parse_items`), the stack the parser's recursion takes (`guarded`, `nesting`), where
+//! an item's own text starts (`start_after_attributes`), and, behind the feature `macros`, a `macro_rules!` expanded as
+//! rust-analyzer expands it (`macros`).
 //!
 //! `ra_ap_syntax` and `rowan` are re-exported, so a consumer names the tree's types through this crate and builds with
 //! its pins.
 
+#[cfg(feature = "macros")]
+pub mod macros;
 pub mod nesting;
 
 pub use ra_ap_syntax;

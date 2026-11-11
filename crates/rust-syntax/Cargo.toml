@@ -23,6 +23,19 @@ rowan = "=0.18.0-alpha.2"
 # The version ra_ap_syntax pins and ra-ap-rustc_lexer builds with (it asks for `^0.1.4`). A consumer's lockfile is
 # its own, never this workspace's, so the pin is here, where every consumer resolves it.
 unicode-properties = { version = "=0.1.5", default-features = false, features = ["general-category"] }
+# rust-analyzer's expansion of a `macro_rules!` (`macros`): its matcher and transcriber (`ra_ap_mbe`), the token trees
+# they read and write with the spans that say where each token came from, and the bridge between a tree and a token
+# tree, at the version of the parser above. The matcher asks for a salsa database it reads nothing of; `macros` is
+# behind a feature, so a consumer that reads no macro (Branch Deck) builds none of it.
+ra_ap_mbe = { version = "=0.0.362", optional = true }
+ra_ap_syntax-bridge = { version = "=0.0.362", optional = true }
+ra_ap_span = { version = "=0.0.362", optional = true }
+ra_ap_tt = { version = "=0.0.362", optional = true }
+ra_ap_intern = { version = "=0.0.362", optional = true }
+salsa = { version = "0.28.5", default-features = false, optional = true }
+
+[features]
+macros = ["dep:ra_ap_mbe", "dep:ra_ap_syntax-bridge", "dep:ra_ap_span", "dep:ra_ap_tt", "dep:ra_ap_intern", "dep:salsa"]
 
 [lints.rust]
 unsafe_code = "forbid"
