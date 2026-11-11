@@ -61,6 +61,11 @@ pub enum Format {
 
 /// The kind of spec `path` is, None for any other file (an archived change's included: [`is_archived`]).
 pub fn kind_of(path: &str) -> Option<SpecFile> {
+    // Both forms end so, and nearly no path does: every path of an answer is asked (`is_test_path`), its segments
+    // gathered only for the few that may be one.
+    if !path.ends_with("spec.md") {
+        return None;
+    }
     let segments: Vec<&str> = path.split('/').collect();
     let file = *segments.last()?;
     if let Some(at) = segments.iter().position(|&s| s == "openspec") {
