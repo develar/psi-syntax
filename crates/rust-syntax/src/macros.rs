@@ -149,11 +149,17 @@ pub const EXPANSION_LEVELS: usize = 4096;
 /// The tree of the items a token tree writes and the span of each of its tokens, parsed where the stack holds the
 /// parse (`nesting::run`, as a file is); None past `EXPANSION_LEVELS`.
 fn items(tt: &ra_ap_tt::TopSubtree) -> Option<(SyntaxNode, SpanMap)> {
+    parsed_as(tt, TopEntryPoint::MacroItems)
+}
+
+/// The tree a token tree parses to at `entry` (items, statements) and the span of each of its tokens, parsed where the
+/// stack holds the parse; None past `EXPANSION_LEVELS`.
+fn parsed_as(tt: &ra_ap_tt::TopSubtree, entry: TopEntryPoint) -> Option<(SyntaxNode, SpanMap)> {
     let text = tt.to_string();
     if crate::nesting::levels(&text) > EXPANSION_LEVELS {
         return None;
     }
-    let (parse, spans) = crate::nesting::run(&text, || ra_ap_syntax_bridge::token_tree_to_syntax_node(tt, TopEntryPoint::MacroItems, &mut |_| EDITION))?;
+    let (parse, spans) = crate::nesting::run(&text, || ra_ap_syntax_bridge::token_tree_to_syntax_node(tt, entry, &mut |_| EDITION))?;
     Some((parse.syntax_node(), spans))
 }
 
@@ -162,11 +168,51 @@ fn items(tt: &ra_ap_tt::TopSubtree) -> Option<(SyntaxNode, SpanMap)> {
 /// when its input is a list of items without an error. None for an input that is no such list (`lazy_static! {
 /// static ref X: T = …; }`), whose meaning only its macro knows.
 pub fn verbatim(call: &ast::MacroCall, origin: Origin<'_>) -> Option<Expansion> {
+    verbatim_as(call, origin, TopEntryPoint::MacroItems)
+}
+
+/// The statements and expressions the input of a call `call` writes as they are, its tokens written where `origin` says:
+/// the reading of a call in an expression's position whose macro is not at hand (`tri!(s.serialize_struct("D", 2))`,
+/// `assert_eq!(a.f(), 1)`, `format!("{}", x.name())`), when its input is a list of statements without an error. None
+/// for an input that is none (a type, a half of an expression), whose calls only its macro knows; a pattern reads,
+/// its `_` an expression to the parser (`UNDERSCORE_EXPR`), which the consumer tells apart.
+pub fn verbatim_statements(call: &ast::MacroCall, origin: Origin<'_>) -> Option<Expansion> {
+    verbatim_as(call, origin, TopEntryPoint::MacroStmts)
+}
+
+fn verbatim_as(call: &ast::MacroCall, origin: Origin<'_>, entry: TopEntryPoint) -> Option<Expansion> {
     let (input, _) = input(call, origin)?;
+    let input = if matches!(entry, TopEntryPoint::MacroStmts) { statements(input) } else { input };
     let tokens = input.as_token_trees().len();
-    let (root, spans) = items(&input)?;
+    let (root, spans) = parsed_as(&input, entry)?;
     let clean = root.children().next().is_some() && !root.descendants_with_tokens().any(|e| e.kind() == ra_ap_syntax::SyntaxKind::ERROR);
     clean.then_some(Expansion { root, spans, tokens })
+}
+
+/// A call's input read as statements: the commas between its top-level arguments (`assert_eq!(a.f(), 1)`, `vec![x, y]`)
+/// become the `;` between statements, each at its comma's span; a comma inside brackets stays.
+fn statements(mut tt: ra_ap_tt::TopSubtree) -> ra_ap_tt::TopSubtree {
+    use ra_ap_tt::{Leaf, Punct, TokenTree};
+    let mut commas: Vec<(usize, Punct)> = Vec::new();
+    let mut nested: Vec<usize> = Vec::new();
+    for (i, t) in tt.token_trees().iter_flat_tokens().enumerate() {
+        while nested.last() == Some(&0) {
+            nested.pop();
+        }
+        if let Some(n) = nested.last_mut() {
+            *n -= 1;
+        }
+        match t {
+            TokenTree::Subtree(s) => nested.push(s.usize_len()),
+            TokenTree::Leaf(Leaf::Punct(p)) if p.char == ',' && nested.is_empty() => commas.push((i, p)),
+            _ => {}
+        }
+    }
+    // The serialized list holds the top subtree at 0, its children after it.
+    for (i, p) in commas {
+        tt.set_token(i + 1, Leaf::Punct(Punct { char: ';', spacing: p.spacing, span: p.span }));
+    }
+    tt
 }
 
 impl Expansion {
@@ -232,5 +278,20 @@ mod tests {
         let w = items.written(s.name().unwrap().syntax().text_range().start());
         assert_eq!((w.from, &src[w.range]), (From::Input, "Socket"));
         assert!(verbatim(&calls[1], Origin::File(From::Input)).is_none());
+    }
+
+    /// An input of statements read as written, each call at its byte of the file; a pattern input reads as none.
+    #[test]
+    fn an_input_of_statements_reads_as_written() {
+        let src = "fn f(st: St) -> R { tri!(st.field(\"x\")); assert_eq!(a.g(), 1); matches!(x, Some(_)); Ok(()) }\n";
+        let root = crate::parse(src.as_bytes());
+        let calls: Vec<ast::MacroCall> = root.descendants().filter_map(ast::MacroCall::cast).collect();
+        let stmts = verbatim_statements(&calls[0], Origin::File(From::Input)).unwrap();
+        let call = first::<ast::MethodCallExpr>(stmts.root());
+        let w = stmts.written(call.name_ref().unwrap().syntax().text_range().start());
+        assert_eq!((w.from, &src[w.range]), (From::Input, "field"));
+        assert!(verbatim_statements(&calls[1], Origin::File(From::Input)).is_some(), "arguments read as statements");
+        // `_` is an expression to the parser: a pattern input reads, and the consumer tells it by its `UNDERSCORE_EXPR`.
+        assert!(verbatim_statements(&calls[2], Origin::File(From::Input)).is_some());
     }
 }
