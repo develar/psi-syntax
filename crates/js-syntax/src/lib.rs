@@ -3,11 +3,13 @@
 //! it its own way (decision 2026-11-08-rust-and-js-parse-entries of accio). What is the language's is oxc's typed AST;
 //! this crate holds what is not: the dialect of a file (`Dialect`), the options of every parse (`options`), the text
 //! the parser reads (`parse_text`), the recovery of a fatal parse (`recover`), the stack a parse and a walk of its tree
-//! take (`stack_needed`) and the thread's arena (`with_program`).
+//! take (`stack_needed`) and the thread's arena (`with_program`). `tsconfig` reads a project's configuration, the
+//! path aliases its imports resolve through, a file format of the language every consumer reads alike.
 //!
 //! The `oxc_*` crates are re-exported, so a consumer names the AST's types through this crate and builds with its pins.
 
 pub mod recover;
+pub mod tsconfig;
 
 pub use oxc_allocator;
 pub use oxc_ast;

@@ -1,6 +1,6 @@
 [package]
 name = "js-syntax"
-description = "TypeScript, TSX and JavaScript read by oxc's parser: the parse every consumer of psi-syntax shares (decision 2026-11-08-rust-and-js-parse-entries)"
+description = "TypeScript, TSX and JavaScript read by oxc's parser: the parse every consumer of psi-syntax shares (decision 2026-11-08-rust-and-js-parse-entries), and the project configuration (tsconfig.json) its imports resolve through"
 version = "0.1.0"
 edition = "2024"
 # oxc 0.158 needs 1.97, above the 1.90 of the ports
