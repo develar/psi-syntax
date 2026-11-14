@@ -10,8 +10,7 @@
 
 use super::getters::Lines;
 use super::slots::{
-    Elements, KindSet, SlotSpec, node_index, read_field, read_field_in, read_nodes, read_nodes_in, read_tokens,
-    read_tokens_in,
+    Elements, KindSet, node_index, read_field, read_field_in, read_nodes, read_nodes_in, read_tokens, read_tokens_in,
 };
 use crate::syntax_kind::NodeKind;
 use crate::tree::{NodeId, Tree};
@@ -20,1965 +19,52 @@ use crate::tree::{NodeId, Tree};
 pub(super) const WORDS: usize = 9;
 
 static S0: KindSet = KindSet([0x0, 0x0, 0x0, 0xf1fe000000000000, 0x3fff, 0x0, 0x0, 0x0, 0x82000200000000c]);
-static S1: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S2: KindSet = KindSet([0x0, 0x0, 0x200000, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S3: KindSet = KindSet([
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0xffffffffffffc000,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0x37dfffdffffffff3,
-]);
-static S4: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x2e000000000, 0x0, 0x0, 0x0, 0x0]);
-static S5: KindSet = KindSet([0x2000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S6: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xa000000000, 0x0, 0x0, 0x0, 0x0]);
-static S7: KindSet = KindSet([0x0, 0x0, 0x0, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S8: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x10000000000, 0x0, 0x0, 0x0, 0x0]);
-static S9: KindSet = KindSet([0x400000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S10: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0xeee000000000,
-    0x0,
-    0x0,
-    0x0,
-    0x40004200000010,
-]);
-static S11: KindSet = KindSet([0x1000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S12: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x2000000000, 0x0, 0x0, 0x0, 0x0]);
-static S13: KindSet = KindSet([0x40000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S14: KindSet = KindSet([0x0, 0x1fffe, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S15: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xeee000000000, 0x0, 0x0, 0x0, 0x40004200000010]);
-static S16: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x100000000000, 0x0, 0x0, 0x0, 0x0]);
-static S17: KindSet = KindSet([0x4000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S18: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x7f0feee000000000,
-    0xffffffffffffffff,
-    0x3fffff,
-    0x0,
-    0xc0185f80100050,
-]);
-static S19: KindSet = KindSet([0x8000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S20: KindSet = KindSet([0x40, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S21: KindSet = KindSet([0x0, 0x0, 0x800, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S22: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20000000000]);
-static S23: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10000000000]);
-static S24: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x8000000000,
-]);
-static S25: KindSet = KindSet([0x0, 0x0, 0x600000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S26: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1000000000000]);
-static S27: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x2000000000000,
-]);
-static S28: KindSet = KindSet([0x4000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S29: KindSet = KindSet([0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S30: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x20]);
-static S31: KindSet = KindSet([0x100, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S32: KindSet = KindSet([0x0, 0x0, 0x0, 0x10000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S33: KindSet = KindSet([0x0, 0x200000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S34: KindSet = KindSet([0x0, 0x200000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S35: KindSet = KindSet([0x0, 0x0, 0x1000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S36: KindSet =
-    KindSet([0x0, 0x0, 0x0, 0x0, 0x7f0feee000000000, 0xffffffffffffffff, 0x3fffff, 0x0, 0xc0185f80100050]);
-static S37: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x40000000000000,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-]);
-static S38: KindSet = KindSet([0x30000000673, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S39: KindSet = KindSet([0x0, 0x0, 0x2000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S40: KindSet = KindSet([0x30000000002, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S41: KindSet = KindSet([0x100002000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S42: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x20000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S43: KindSet = KindSet([0x20000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S44: KindSet = KindSet([0x801b68c011410678, 0x3000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S45: KindSet = KindSet([0x7fe4000000000800, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S46: KindSet = KindSet([0x40000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S47: KindSet = KindSet([0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S48: KindSet = KindSet([0x0, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S49: KindSet = KindSet([0x0, 0x8000000040380000, 0x0, 0xf83800000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S50: KindSet = KindSet([0x0, 0x0, 0x2000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S51: KindSet = KindSet([0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S52: KindSet = KindSet([0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S53: KindSet = KindSet([0x0, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S54: KindSet = KindSet([0x800000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S55: KindSet = KindSet([0x0, 0x0, 0x3000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S56: KindSet = KindSet([0x0, 0x0, 0x4000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S57: KindSet = KindSet([0x0, 0x40000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S58: KindSet = KindSet([0x0, 0x20000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S59: KindSet = KindSet([0x0, 0x40000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S60: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x10000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S61: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x80000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S62: KindSet = KindSet([0x0, 0xe00000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S63: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4180]);
-static S64: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfffffffffffff7ff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S65: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80000000000000, 0x0]);
-static S66: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x400000000, 0x0, 0x0]);
-static S67: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x8000, 0x0]);
-static S68: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x200000000000000, 0x0]);
-static S69: KindSet = KindSet([0x800000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S70: KindSet = KindSet([0x1000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S71: KindSet = KindSet([0x2000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S72: KindSet = KindSet([0x0, 0x8000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S73: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x7000000000000000, 0x1, 0x0, 0x0, 0x100000000000]);
-static S74: KindSet = KindSet([0x0, 0x0, 0x40000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S75: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x100000, 0x0]);
-static S76: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x8000000000000000,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-]);
-static S77: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x80000000000, 0x0, 0x0, 0x0, 0x0]);
-static S78: KindSet =
-    KindSet([0xffffffffffff7fff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S79: KindSet = KindSet([0x0, 0x2000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S80: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x1300000000000000,
-]);
-static S81: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x800000, 0x0, 0x0]);
-static S82: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x400000, 0x0, 0x0]);
-static S83: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1b800000, 0x0, 0x0]);
-static S84: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x180000000, 0x0, 0x0]);
-static S85: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x200000000, 0x0, 0x0]);
-static S86: KindSet = KindSet([0x0, 0x0, 0x800000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S87: KindSet = KindSet([0x0, 0x800000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S88: KindSet = KindSet([0x0, 0x0, 0x8000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S89: KindSet = KindSet([0x800, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S90: KindSet = KindSet([0x0, 0x0, 0x2000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S91: KindSet = KindSet([0x0, 0x0, 0x80000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S92: KindSet = KindSet([0x0, 0x0, 0x100000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S93: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4000000, 0x0, 0x0]);
-static S94: KindSet = KindSet([0x0, 0x0, 0x4000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S95: KindSet = KindSet([0x0, 0x0, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S96: KindSet = KindSet([0x0, 0x0, 0x40000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S97: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x60000000,
-    0x0,
-    0x0,
-]);
-static S98: KindSet = KindSet([0x0, 0x0, 0x600000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S99: KindSet = KindSet([0x0, 0x0, 0x20000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S100: KindSet = KindSet([0x0, 0x0, 0x1000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S101: KindSet = KindSet([0x0, 0x0, 0x10000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S102: KindSet = KindSet([0x0, 0x0, 0x0, 0x20000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S103: KindSet = KindSet([0x0, 0x0, 0x0, 0x600000000140000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S104: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xc000000000000000, 0x0]);
-static S105: KindSet = KindSet([0x0, 0x0, 0x0, 0x800000000080000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S106: KindSet = KindSet([0x0, 0x1000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S107: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7fc88c00]);
-static S108: KindSet = KindSet([0x0, 0x8000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S109: KindSet = KindSet([0x0, 0x0, 0x4000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S110: KindSet = KindSet([0x0, 0x0, 0x0, 0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S111: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4080]);
-static S112: KindSet = KindSet([0x0, 0x0, 0x0, 0x4000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S113: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000]);
-static S114: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10000]);
-static S115: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x20000,
-]);
-static S116: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x80000000000000, 0x0, 0x0, 0x0, 0x8000000000000]);
-static S117: KindSet = KindSet([0x9600001400000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S118: KindSet = KindSet([0x0, 0x0, 0x18000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S119: KindSet = KindSet([0x0, 0x0, 0x20000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S120: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x7fc88c00,
-]);
-static S121: KindSet = KindSet([0x0, 0x0, 0x0, 0x40000000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S122: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1]);
-static S123: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2]);
-static S124: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xbfffff8c00000000, 0x108, 0x200]);
-static S125: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x400000000000000, 0x0]);
-static S126: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10000000, 0x0]);
-static S127: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2000000000000000, 0x0]);
-static S128: KindSet = KindSet([0x80000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S129: KindSet = KindSet([0x0, 0x0, 0x40, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S130: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1000000000, 0x0, 0x0]);
-static S131: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x2000000000,
-    0x0,
-    0x0,
-]);
-static S132: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4000000000, 0x0, 0x0]);
-static S133: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x4180,
-]);
-static S134: KindSet = KindSet([0x0, 0x800000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S135: KindSet = KindSet([0x0, 0x60000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S136: KindSet = KindSet([0x0, 0x1000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S137: KindSet = KindSet([0x0, 0x2000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S138: KindSet = KindSet([0x0, 0x4000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S139: KindSet = KindSet([0x0, 0x0, 0x40000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S140: KindSet = KindSet([0x0, 0x5000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S141: KindSet = KindSet([0x0, 0x1000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S142: KindSet = KindSet([0x0, 0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S143: KindSet = KindSet([0x0, 0x2000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S144: KindSet = KindSet([0x0, 0x4000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S145: KindSet = KindSet([0x0, 0x1000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S146: KindSet = KindSet([0x0, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S147: KindSet = KindSet([0x0, 0x400000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S148: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4000000000000000, 0x0, 0x0]);
-static S149: KindSet = KindSet([0x0, 0x800000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S150: KindSet = KindSet([0x0, 0x10000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S151: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0]);
-static S152: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x6, 0x1000]);
-static S153: KindSet = KindSet([0x0, 0x20000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S154: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2000]);
-static S155: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-    0x200000,
-]);
-static S156: KindSet = KindSet([0x0, 0x80000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S157: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10, 0x0]);
-static S158: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80, 0x0]);
-static S159: KindSet = KindSet([0x0, 0x100000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S160: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20, 0x0]);
-static S161: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40, 0x0]);
-static S162: KindSet = KindSet([0x0, 0x200000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S163: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2000, 0x0]);
-static S164: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1000, 0x0]);
-static S165: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1001e1fc03e04c00, 0x2404200000000000]);
-static S166: KindSet = KindSet([0x0, 0x0, 0x0, 0x100000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S167: KindSet = KindSet([0x0, 0x100000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S168: KindSet = KindSet([0x0, 0x0, 0x100000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S169: KindSet = KindSet([0x0, 0x0, 0x200000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S170: KindSet = KindSet([0x0, 0x100000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S171: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffdf, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S172: KindSet = KindSet([0x0, 0x0, 0x20, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S173: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10000, 0x0]);
-static S174: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x20000,
-    0x0,
-]);
-static S175: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000, 0x0]);
-static S176: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x80000,
-    0x0,
-]);
-static S177: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x800000000000000,
-    0x0,
-]);
-static S178: KindSet = KindSet([0x0, 0xc00000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S179: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffff7f, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S180: KindSet = KindSet([0x0, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S181: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4000000, 0x0]);
-static S182: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfffffffffffffeff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S183: KindSet = KindSet([0x0, 0x0, 0x100, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S184: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01fffffffffffe, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S185: KindSet = KindSet([0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S186: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfffffffffffffdff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S187: KindSet = KindSet([0x0, 0x0, 0x200, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S188: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfeffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S189: KindSet = KindSet([0x0, 0x0, 0x100000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S190: KindSet = KindSet([0x0, 0x0, 0x180, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S191: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfffffffffffffbff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S192: KindSet = KindSet([0x0, 0x0, 0x400, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S193: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x400000000,
-    0x0,
-]);
-static S194: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01fffbffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S195: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0x7fffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S196: KindSet = KindSet([0x0, 0x0, 0x8000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S197: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x8000000,
-    0x800000000000,
-]);
-static S198: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x201e0000000,
-    0x400000000000,
-]);
-static S199: KindSet = KindSet([0x0, 0x0, 0x4000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S200: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x40000000000,
-    0x0,
-]);
-static S201: KindSet =
-    KindSet([0xffffffffffffffff, 0xff7fffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S202: KindSet = KindSet([0x0, 0x80000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S203: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x200000000, 0x0]);
-static S204: KindSet = KindSet([0x0, 0x0, 0x8000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S205: KindSet = KindSet([0x0, 0x0, 0x1000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S206: KindSet = KindSet([0xbfff63001141067b, 0x1000000000300001, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S207: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xfffffffffffcffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S208: KindSet = KindSet([0x0, 0x0, 0x30000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S209: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x180000000000, 0x0]);
-static S210: KindSet = KindSet([0x0, 0x0, 0x18, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S211: KindSet =
-    KindSet([0xfffffffffffffffe, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S212: KindSet = KindSet([0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S213: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2000000000000, 0x0]);
-static S214: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x100000000000000, 0x0]);
-static S215: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7c000000000000, 0x40000000000]);
-static S216: KindSet =
-    KindSet([0xffffffffffffffff, 0xffffffffffffffff, 0xff7ffffc3fffffff, 0xe01fffbffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S217: KindSet = KindSet([0x0, 0x0, 0x800003c0000000, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S218: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x0,
-    0x0,
-    0x0,
-    0x200000000000000,
-    0x0,
-]);
-static S219: KindSet =
-    KindSet([0xffffffffffffffff, 0x7fffffffffffffff, 0xffffffffffffffff, 0xe01fffbffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S220: KindSet = KindSet([0x0, 0x8000000000000000, 0x0, 0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S221: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x7824000, 0x0, 0x0, 0x0, 0x0]);
-static S222: KindSet = KindSet([0x0, 0x0, 0x0, 0x80000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S223: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x11e0000000, 0x0, 0x0, 0x0, 0x0]);
-static S224: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x200000000, 0x0, 0x0, 0x0, 0x0]);
-static S225: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x400000000, 0x0, 0x0, 0x0, 0x0]);
-static S226: KindSet = KindSet([0xbfff63001141067b, 0x300001, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S227: KindSet = KindSet([
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xffffffffffffffff,
-    0xe01ffffffffffff,
-    0x800000000,
-    0x0,
-    0x0,
-    0x0,
-    0x0,
-]);
-static S228: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x8000, 0x0, 0x0, 0x0, 0x0]);
-static S229: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x10000, 0x0, 0x0, 0x0, 0x0]);
-static S230: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x200000, 0x0, 0x0, 0x0, 0x0]);
-static S231: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x1c0000, 0x0, 0x0, 0x0, 0x0]);
-static S232: KindSet = KindSet([0x80000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S233: KindSet = KindSet([0x40000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S234: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x400000, 0x0, 0x0, 0x0, 0x0]);
-static S235: KindSet = KindSet([0x300000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S236: KindSet =
-    KindSet([0xffffffffffcfffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S237: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x11f8000000, 0x0, 0x0, 0x0, 0x0]);
-static S238: KindSet = KindSet([0x400000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S239: KindSet =
-    KindSet([0xfffffff7ffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S240: KindSet = KindSet([0x800000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S241: KindSet = KindSet([0x1000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S242: KindSet =
-    KindSet([0xffffffdfffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S243: KindSet = KindSet([0x2000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S244: KindSet = KindSet([0x100000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S245: KindSet =
-    KindSet([0xfffffffdffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0xe01ffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S246: KindSet = KindSet([0x200000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S247: KindSet = KindSet([0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S248: KindSet = KindSet([0x0, 0x0, 0x0, 0x40000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S249: KindSet = KindSet([0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S250: KindSet = KindSet([0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S251: KindSet = KindSet([0x0, 0x0, 0x0, 0x20, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S252: KindSet = KindSet([0x0, 0x0, 0x0, 0x40, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S253: KindSet = KindSet([0x0, 0x0, 0x0, 0x400, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S254: KindSet = KindSet([0x0, 0x0, 0x0, 0x200, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S255: KindSet = KindSet([0x0, 0x0, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S256: KindSet = KindSet([0x0, 0x0, 0x0, 0x100, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S257: KindSet = KindSet([0x0, 0x0, 0x0, 0x800, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S258: KindSet = KindSet([0x0, 0x40000000, 0x0, 0x800002000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S259: KindSet = KindSet([0x0, 0x0, 0x0, 0x2000000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S260: KindSet = KindSet([0x0, 0x0, 0x0, 0x800000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S261: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10000000000000]);
-static S262: KindSet = KindSet([0x200, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S263: KindSet = KindSet([0x0, 0x0, 0x0, 0x1000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S264: KindSet = KindSet([0x0, 0x0, 0x0, 0x18000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S265: KindSet = KindSet([0x0, 0x0, 0x0, 0x4000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S266: KindSet = KindSet([0x0, 0x0, 0x0, 0x20000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S267: KindSet = KindSet([0x0, 0x0, 0x0, 0x200000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S268: KindSet = KindSet([0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S269: KindSet = KindSet([0x0, 0x0, 0x0, 0x400000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S270: KindSet = KindSet([0x0, 0x0, 0x0, 0x818000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S271: KindSet = KindSet([0x0, 0x0, 0x0, 0x3000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S272: KindSet =
+static S1: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x2e000000000, 0x0, 0x0, 0x0, 0x0]);
+static S2: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xa000000000, 0x0, 0x0, 0x0, 0x0]);
+static S3: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xeee000000000, 0x0, 0x0, 0x0, 0x40004200000010]);
+static S4: KindSet =
     KindSet([0x0, 0x0, 0x0, 0x0, 0x7f0feee000000000, 0xffffffffffffffff, 0x3fffff, 0x0, 0xc0185fffd88c50]);
-static S273: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3, 0x0, 0x0]);
-static S274: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x30000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S275: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xe00000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S276: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xc00000000000000, 0x0, 0x0, 0x0, 0x0]);
-static S277: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x802, 0x0, 0x0, 0x0]);
-static S278: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1300000000000000]);
-static S279: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000000000000, 0x0, 0x200]);
-static S280: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4800, 0x0]);
-static S281: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1e00000, 0x2404200000000000]);
-static S282: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe00000, 0x2404200000000000]);
-static S283: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x8000000, 0x800000000000]);
-static S284: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x201e0000000, 0x400000000000]);
-static S285: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000000000, 0x0]);
-static S286: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1800000000, 0x0]);
-static S287: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x21e000000000, 0x0]);
-static S288: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c00000000000, 0x0]);
-static S289: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x180000000000000, 0x0]);
-static S290: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x200000000000000, 0x8000000000]);
-static S291: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x600000000, 0x0, 0x0, 0x0, 0x0]);
-static S292: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x1fff, 0x0, 0x0, 0x0, 0x82000200000000c]);
-static S293: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x1, 0x0, 0x0, 0x0, 0x0]);
-static S294: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
-static S295: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x100, 0x0, 0x0, 0x0, 0x20000000000000]);
+static S5: KindSet =
+    KindSet([0x0, 0x0, 0x0, 0x0, 0x7f0feee000000000, 0xffffffffffffffff, 0x3fffff, 0x0, 0xc0185f80100050]);
+static S6: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3, 0x0, 0x0]);
+static S7: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x30000000000000, 0x0, 0x0, 0x0, 0x0]);
+static S8: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x80000000000000, 0x0, 0x0, 0x0, 0x8000000000000]);
+static S9: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xe00000000000000, 0x0, 0x0, 0x0, 0x0]);
+static S10: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0xc00000000000000, 0x0, 0x0, 0x0, 0x0]);
+static S11: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x802, 0x0, 0x0, 0x0]);
+static S12: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1300000000000000]);
+static S13: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1b800000, 0x0, 0x0]);
+static S14: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x180000000, 0x0, 0x0]);
+static S15: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7fc88c00]);
+static S16: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xc000000000000000, 0x0]);
+static S17: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xbfffff8c00000000, 0x108, 0x200]);
+static S18: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4180]);
+static S19: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000000000000, 0x0, 0x200]);
+static S20: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x6, 0x1000]);
+static S21: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1001e1fc03e04c00, 0x2404200000000000]);
+static S22: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4800, 0x0]);
+static S23: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1e00000, 0x2404200000000000]);
+static S24: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe00000, 0x2404200000000000]);
+static S25: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x8000000, 0x800000000000]);
+static S26: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x201e0000000, 0x400000000000]);
+static S27: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x40000000000, 0x0]);
+static S28: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1800000000, 0x0]);
+static S29: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x21e000000000, 0x0]);
+static S30: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c00000000000, 0x0]);
+static S31: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x180000000000000, 0x0]);
+static S32: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x200000000000000, 0x8000000000]);
+static S33: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x11f8000000, 0x0, 0x0, 0x0, 0x0]);
+static S34: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x11e0000000, 0x0, 0x0, 0x0, 0x0]);
+static S35: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x600000000, 0x0, 0x0, 0x0, 0x0]);
+static S36: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x7824000, 0x0, 0x0, 0x0, 0x0]);
+static S37: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x1c0000, 0x0, 0x0, 0x0, 0x0]);
+static S38: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x1fff, 0x0, 0x0, 0x0, 0x82000200000000c]);
+static S39: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x1, 0x0, 0x0, 0x0, 0x0]);
+static S40: KindSet = KindSet([0x0, 0x0, 0x0, 0xc000000000000000, 0x0, 0x0, 0x0, 0x0, 0x0]);
+static S41: KindSet = KindSet([0x0, 0x0, 0x0, 0x0, 0x100, 0x0, 0x0, 0x0, 0x20000000000000]);
 
 /// What a getter skips: the unstructured trivia leaves and the roots of structured trivia.
 pub(super) static TRIVIA: &KindSet = &S0;
-
-/// Per node type (`syntax::NODE_TYPES`' order) its slots: the kinds each takes and the kinds Syntax.xml declares for it,
-/// whether it takes several, whether it is a separated list, whether it is a token or node that is never null.
-pub(super) static SPECS: [&[SlotSpec]; 250] = [
-    &[SlotSpec { accept: &S1, declared: &S2, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S4, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S5, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S6, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S8, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S9, many: false, separated: false, required: true },
-        SlotSpec { accept: &S10, declared: &S10, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S11, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S12, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S13, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S6, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S14, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S16, declared: &S16, many: true, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S18, declared: &S18, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S20, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S21, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S20, many: false, separated: false, required: true },
-        SlotSpec { accept: &S22, declared: &S22, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S23, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S9, many: false, separated: false, required: true },
-        SlotSpec { accept: &S24, declared: &S24, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S11, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S25, many: false, separated: false, required: true },
-        SlotSpec { accept: &S26, declared: &S26, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S27, declared: &S27, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S28, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S30, declared: &S30, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S7, declared: &S7, many: false, separated: false, required: false },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S32, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S33, many: false, separated: false, required: true },
-        SlotSpec { accept: &S34, declared: &S34, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S35, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S37, declared: &S37, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S38, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S39, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S40, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S41, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S6, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S28, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S5, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S6, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S42, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S43, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S42, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S44, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S45, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S28, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S47, many: false, separated: false, required: true }],
-    &[SlotSpec { accept: &S1, declared: &S48, many: false, separated: false, required: true }],
-    &[SlotSpec { accept: &S1, declared: &S49, many: false, separated: false, required: true }],
-    &[SlotSpec { accept: &S1, declared: &S50, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S51, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S52, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S53, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S54, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S55, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S56, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S57, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S58, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S59, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S60, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S42, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S37, declared: &S37, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S37, declared: &S37, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S61, declared: &S61, many: false, separated: false, required: false },
-        SlotSpec { accept: &S62, declared: &S62, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S12, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S63, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S64, declared: &S64, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S21, many: false, separated: false, required: true },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S68, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S69, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S33, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S69, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S18, declared: &S18, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S60, many: false, separated: false, required: true },
-        SlotSpec { accept: &S73, declared: &S73, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S60, declared: &S60, many: false, separated: false, required: false },
-        SlotSpec { accept: &S73, declared: &S73, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S74, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S73, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S75, declared: &S75, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S76, declared: &S76, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S77, many: false, separated: false, required: true },
-        SlotSpec { accept: &S73, declared: &S73, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S78, declared: &S78, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S73, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S79, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S73, declared: &S73, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S79, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S73, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S80, declared: &S80, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S43, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S74, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S60, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S81, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S82, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S83, declared: &S83, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S84, many: false, separated: false, required: true },
-        SlotSpec { accept: &S85, declared: &S85, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S86, many: false, separated: false, required: true },
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S87, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S88, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S90, many: false, separated: false, required: true },
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S87, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S91, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S92, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S93, declared: &S93, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S94, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S95, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S96, many: false, separated: false, required: true },
-        SlotSpec { accept: &S97, declared: &S97, many: true, separated: true, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S98, declared: &S98, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S99, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S100, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S101, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S94, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S82, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S102, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S103, many: false, separated: false, required: true },
-        SlotSpec { accept: &S104, declared: &S104, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S105, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S106, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S108, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S109, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S110, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S111, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S112, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S63, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-        SlotSpec { accept: &S113, declared: &S113, many: false, separated: false, required: false },
-        SlotSpec { accept: &S114, declared: &S114, many: false, separated: false, required: false },
-        SlotSpec { accept: &S111, declared: &S111, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S115, declared: &S115, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S115, declared: &S115, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S116, declared: &S116, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S117, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S118, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S119, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S120, declared: &S120, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-        SlotSpec { accept: &S111, declared: &S111, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S43, many: false, separated: false, required: true },
-        SlotSpec { accept: &S107, declared: &S107, many: false, separated: false, required: false },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S121, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S122, declared: &S122, many: false, separated: false, required: false },
-        SlotSpec { accept: &S123, declared: &S123, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S121, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S124, declared: &S124, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S39, declared: &S39, many: false, separated: false, required: false },
-        SlotSpec { accept: &S129, declared: &S129, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S130, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S131, declared: &S131, many: true, separated: true, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S42, declared: &S42, many: false, separated: false, required: false },
-        SlotSpec { accept: &S132, declared: &S132, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true }],
-    &[SlotSpec { accept: &S1, declared: &S110, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S133, declared: &S133, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S134, many: false, separated: false, required: true },
-        SlotSpec { accept: &S135, declared: &S135, many: false, separated: false, required: false },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S136, many: false, separated: false, required: true },
-        SlotSpec { accept: &S12, declared: &S12, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S137, many: false, separated: false, required: true },
-        SlotSpec { accept: &S12, declared: &S12, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S138, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S108, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S139, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S140, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S141, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S142, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S141, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S143, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S130, declared: &S130, many: false, separated: false, required: false },
-        SlotSpec { accept: &S18, declared: &S18, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-        SlotSpec { accept: &S18, declared: &S18, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S39, declared: &S39, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S144, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S87, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S39, declared: &S39, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S144, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S87, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S39, declared: &S39, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S129, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S130, declared: &S130, many: false, separated: false, required: false },
-        SlotSpec { accept: &S36, declared: &S36, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S145, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S130, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S55, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S56, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S146, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S147, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-        SlotSpec { accept: &S148, declared: &S148, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S149, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S124, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S150, many: false, separated: false, required: true },
-        SlotSpec { accept: &S29, declared: &S29, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S31, declared: &S31, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S151, declared: &S151, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S152, declared: &S152, many: true, separated: false, required: false },
-        SlotSpec { accept: &S124, declared: &S124, many: true, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S153, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-        SlotSpec { accept: &S154, declared: &S154, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S153, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S57, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S150, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S155, declared: &S155, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S107, many: false, separated: false, required: true },
-        SlotSpec { accept: &S154, declared: &S154, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S69, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S156, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-        SlotSpec { accept: &S157, declared: &S157, many: true, separated: false, required: false },
-        SlotSpec { accept: &S158, declared: &S158, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S159, many: false, separated: false, required: true },
-        SlotSpec { accept: &S160, declared: &S160, many: false, separated: false, required: false },
-        SlotSpec { accept: &S161, declared: &S161, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S7, declared: &S7, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S109, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S162, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S66, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S163, declared: &S163, many: true, separated: false, required: false },
-        SlotSpec { accept: &S164, declared: &S164, many: true, separated: false, required: false },
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S166, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S167, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S168, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S169, declared: &S169, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S129, many: false, separated: false, required: true },
-        SlotSpec { accept: &S170, declared: &S170, many: false, separated: false, required: false },
-        SlotSpec { accept: &S56, declared: &S56, many: false, separated: false, required: false },
-        SlotSpec { accept: &S75, declared: &S75, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S171, declared: &S171, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S172, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S4, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S163, declared: &S163, many: true, separated: false, required: false },
-        SlotSpec { accept: &S164, declared: &S164, many: true, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S171, declared: &S171, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S172, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S4, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-        SlotSpec { accept: &S163, declared: &S163, many: true, separated: false, required: false },
-        SlotSpec { accept: &S164, declared: &S164, many: true, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S173, declared: &S173, many: false, separated: false, required: false },
-        SlotSpec { accept: &S174, declared: &S174, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S4, many: false, separated: false, required: true },
-        SlotSpec { accept: &S175, declared: &S175, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S176, declared: &S176, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S75, declared: &S75, many: false, separated: false, required: false },
-        SlotSpec { accept: &S61, declared: &S61, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S12, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S9, many: false, separated: false, required: true },
-        SlotSpec { accept: &S177, declared: &S177, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S11, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S178, declared: &S178, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S179, declared: &S179, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S180, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S182, declared: &S182, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S183, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S184, declared: &S184, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S185, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S186, declared: &S186, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S187, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S188, declared: &S188, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S189, many: false, separated: false, required: true },
-        SlotSpec { accept: &S190, declared: &S190, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S191, declared: &S191, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S192, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S181, declared: &S181, many: false, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S193, declared: &S193, many: true, separated: true, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S64, declared: &S64, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S21, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S194, declared: &S194, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S132, declared: &S132, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S195, declared: &S195, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S196, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S65, declared: &S65, many: false, separated: false, required: false },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S70, declared: &S70, many: false, separated: false, required: false },
-        SlotSpec { accept: &S165, declared: &S165, many: true, separated: false, required: false },
-        SlotSpec { accept: &S71, declared: &S71, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S197, declared: &S197, many: true, separated: true, required: false },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S60, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S95, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S12, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S198, declared: &S198, many: true, separated: true, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S72, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S190, many: false, separated: false, required: true },
-        SlotSpec { accept: &S28, declared: &S28, many: false, separated: false, required: false },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true }],
-    &[SlotSpec { accept: &S1, declared: &S57, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S1, declared: &S199, many: false, separated: false, required: true },
-        SlotSpec { accept: &S200, declared: &S200, many: true, separated: true, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S33, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S183, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S130, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S201, declared: &S201, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S202, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S130, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S128, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S4, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S5, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S125, declared: &S125, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S126, declared: &S126, many: true, separated: false, required: false },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S204, many: false, separated: false, required: true },
-        SlotSpec { accept: &S205, declared: &S205, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S206, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S207, declared: &S207, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S208, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S204, many: false, separated: false, required: true },
-        SlotSpec { accept: &S205, declared: &S205, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S194, declared: &S194, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S209, declared: &S209, many: false, separated: false, required: false },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S210, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S60, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S211, declared: &S211, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S212, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S65, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S213, declared: &S213, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S132, declared: &S132, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S69, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S201, declared: &S201, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S202, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S213, declared: &S213, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S203, declared: &S203, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S47, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S214, many: false, separated: false, required: true },
-        SlotSpec { accept: &S213, declared: &S213, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S70, many: false, separated: false, required: true },
-        SlotSpec { accept: &S215, declared: &S215, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S71, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S216, declared: &S216, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S217, many: false, separated: false, required: true },
-        SlotSpec { accept: &S66, declared: &S66, many: false, separated: false, required: false },
-        SlotSpec { accept: &S127, declared: &S127, many: false, separated: false, required: false },
-        SlotSpec { accept: &S128, declared: &S128, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S218, declared: &S218, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S218, declared: &S218, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S219, declared: &S219, many: true, separated: false, required: false },
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-        SlotSpec { accept: &S220, declared: &S220, many: false, separated: false, required: false },
-        SlotSpec { accept: &S132, declared: &S132, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S67, declared: &S67, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false },
-        SlotSpec { accept: &S15, declared: &S15, many: false, separated: false, required: false },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false }],
-    &[
-        SlotSpec { accept: &S221, declared: &S221, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S222, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true }],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S5, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S223, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S224, declared: &S224, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S196, many: false, separated: false, required: true },
-        SlotSpec { accept: &S8, declared: &S8, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S224, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S5, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S223, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S47, many: false, separated: false, required: true },
-        SlotSpec { accept: &S225, declared: &S225, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S204, many: false, separated: false, required: true },
-        SlotSpec { accept: &S205, declared: &S205, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S226, many: false, separated: false, required: true },
-        SlotSpec { accept: &S224, declared: &S224, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S208, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S204, many: false, separated: false, required: true },
-        SlotSpec { accept: &S205, declared: &S205, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-        SlotSpec { accept: &S224, declared: &S224, many: false, separated: false, required: false },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S227, declared: &S227, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S17, many: false, separated: false, required: true },
-        SlotSpec { accept: &S227, declared: &S227, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S19, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S62, declared: &S62, many: false, separated: false, required: false },
-        SlotSpec { accept: &S34, declared: &S34, many: false, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S15, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S228, many: false, separated: false, required: true },
-        SlotSpec { accept: &S221, declared: &S221, many: true, separated: false, required: false },
-        SlotSpec { accept: &S3, declared: &S229, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S9, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S231, declared: &S231, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S11, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S232, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S11, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S9, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S231, declared: &S231, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S233, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S234, declared: &S234, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-        SlotSpec { accept: &S236, declared: &S236, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S237, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S89, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S12, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S235, many: false, separated: false, required: true },
-    ],
-    &[SlotSpec { accept: &S1, declared: &S1, many: true, separated: false, required: false }],
-    &[
-        SlotSpec { accept: &S1, declared: &S238, many: false, separated: false, required: true },
-        SlotSpec { accept: &S239, declared: &S239, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S240, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S241, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S230, many: false, separated: false, required: true },
-        SlotSpec { accept: &S242, declared: &S242, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S243, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S244, many: false, separated: false, required: true },
-        SlotSpec { accept: &S245, declared: &S245, many: true, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S246, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S147, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S249, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S36, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S149, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S250, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S251, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S252, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S253, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S254, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S1, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S255, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S256, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S7, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S257, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S258, many: false, separated: false, required: true },
-        SlotSpec { accept: &S259, declared: &S259, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S29, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S260, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S54, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S260, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S31, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S257, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S261, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S262, many: false, separated: false, required: true },
-        SlotSpec { accept: &S3, declared: &S261, many: false, separated: false, required: true },
-        SlotSpec { accept: &S260, declared: &S260, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S263, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S254, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S264, many: false, separated: false, required: true },
-        SlotSpec { accept: &S18, declared: &S18, many: true, separated: true, required: false },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S263, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S265, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S266, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S267, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S259, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S268, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S46, many: false, separated: false, required: true },
-        SlotSpec { accept: &S259, declared: &S259, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-    &[
-        SlotSpec { accept: &S1, declared: &S247, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S269, many: false, separated: false, required: true },
-        SlotSpec { accept: &S1, declared: &S270, many: false, separated: false, required: true },
-        SlotSpec { accept: &S271, declared: &S271, many: false, separated: false, required: false },
-        SlotSpec { accept: &S1, declared: &S248, many: false, separated: false, required: true },
-    ],
-];
 
 /// Per node type the slots whose declared type (of a list, its element's) derives from `TypeSyntax`, bit `i` for slot `i`.
 pub(super) static TYPE_SLOTS: [u16; 250] = [
@@ -1995,7 +81,7 @@ pub(super) static TYPE_SLOTS: [u16; 250] = [
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 ];
 
-/// The node type (an index into `SPECS` and `syntax::NODE_TYPES`) of each `NodeKind`.
+/// The node type (an index into `syntax::NODE_TYPES`) of each `NodeKind`.
 pub(super) static TYPE_OF_NODE: [u8; 322] = [
     205, 205, 229, 230, 231, 232, 233, 234, 238, 239, 235, 236, 240, 243, 244, 245, 237, 204, 216, 217, 218, 219, 222,
     223, 224, 220, 221, 225, 226, 228, 227, 206, 207, 208, 210, 211, 212, 213, 214, 215, 209, 0, 1, 2, 3, 4, 5, 6, 7,
@@ -2014,207 +100,207 @@ pub(super) static TYPE_OF_NODE: [u8; 322] = [
 
 /// A node kind of a type deriving from `NameSyntax` in Syntax.xml (4 types).
 pub fn is_name_syntax(kind: NodeKind) -> bool {
-    S4.contains(node_index(kind))
+    S1.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `SimpleNameSyntax` in Syntax.xml (2 types).
 pub fn is_simple_name_syntax(kind: NodeKind) -> bool {
-    S6.contains(node_index(kind))
+    S2.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `TypeSyntax` in Syntax.xml (13 types).
 pub fn is_type_syntax(kind: NodeKind) -> bool {
-    S15.contains(node_index(kind))
+    S3.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `ExpressionOrPatternSyntax` in Syntax.xml (75 types).
 pub fn is_expression_or_pattern_syntax(kind: NodeKind) -> bool {
-    S272.contains(node_index(kind))
+    S4.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `ExpressionSyntax` in Syntax.xml (63 types).
 pub fn is_expression_syntax(kind: NodeKind) -> bool {
-    S36.contains(node_index(kind))
+    S5.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `InstanceExpressionSyntax` in Syntax.xml (2 types).
 pub fn is_instance_expression_syntax(kind: NodeKind) -> bool {
-    S273.contains(node_index(kind))
+    S6.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseArgumentListSyntax` in Syntax.xml (2 types).
 pub fn is_base_argument_list_syntax(kind: NodeKind) -> bool {
-    S274.contains(node_index(kind))
+    S7.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseExpressionColonSyntax` in Syntax.xml (2 types).
 pub fn is_base_expression_colon_syntax(kind: NodeKind) -> bool {
-    S116.contains(node_index(kind))
+    S8.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `AnonymousFunctionExpressionSyntax` in Syntax.xml (3 types).
 pub fn is_anonymous_function_expression_syntax(kind: NodeKind) -> bool {
-    S275.contains(node_index(kind))
+    S9.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `LambdaExpressionSyntax` in Syntax.xml (2 types).
 pub fn is_lambda_expression_syntax(kind: NodeKind) -> bool {
-    S276.contains(node_index(kind))
+    S10.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseObjectCreationExpressionSyntax` in Syntax.xml (2 types).
 pub fn is_base_object_creation_expression_syntax(kind: NodeKind) -> bool {
-    S277.contains(node_index(kind))
+    S11.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `CollectionElementSyntax` in Syntax.xml (3 types).
 pub fn is_collection_element_syntax(kind: NodeKind) -> bool {
-    S278.contains(node_index(kind))
+    S12.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `QueryClauseSyntax` in Syntax.xml (5 types).
 pub fn is_query_clause_syntax(kind: NodeKind) -> bool {
-    S83.contains(node_index(kind))
+    S13.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `SelectOrGroupClauseSyntax` in Syntax.xml (2 types).
 pub fn is_select_or_group_clause_syntax(kind: NodeKind) -> bool {
-    S84.contains(node_index(kind))
+    S14.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `PatternSyntax` in Syntax.xml (12 types).
 pub fn is_pattern_syntax(kind: NodeKind) -> bool {
-    S107.contains(node_index(kind))
+    S15.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `InterpolatedStringContentSyntax` in Syntax.xml (2 types).
 pub fn is_interpolated_string_content_syntax(kind: NodeKind) -> bool {
-    S104.contains(node_index(kind))
+    S16.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `StatementSyntax` in Syntax.xml (25 types).
 pub fn is_statement_syntax(kind: NodeKind) -> bool {
-    S124.contains(node_index(kind))
+    S17.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `VariableDesignationSyntax` in Syntax.xml (3 types).
 pub fn is_variable_designation_syntax(kind: NodeKind) -> bool {
-    S63.contains(node_index(kind))
+    S18.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `CommonForEachStatementSyntax` in Syntax.xml (2 types).
 pub fn is_common_for_each_statement_syntax(kind: NodeKind) -> bool {
-    S279.contains(node_index(kind))
+    S19.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `SwitchLabelSyntax` in Syntax.xml (3 types).
 pub fn is_switch_label_syntax(kind: NodeKind) -> bool {
-    S152.contains(node_index(kind))
+    S20.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `MemberDeclarationSyntax` in Syntax.xml (23 types).
 pub fn is_member_declaration_syntax(kind: NodeKind) -> bool {
-    S165.contains(node_index(kind))
+    S21.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseNamespaceDeclarationSyntax` in Syntax.xml (2 types).
 pub fn is_base_namespace_declaration_syntax(kind: NodeKind) -> bool {
-    S280.contains(node_index(kind))
+    S22.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseTypeDeclarationSyntax` in Syntax.xml (7 types).
 pub fn is_base_type_declaration_syntax(kind: NodeKind) -> bool {
-    S281.contains(node_index(kind))
+    S23.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `TypeDeclarationSyntax` in Syntax.xml (6 types).
 pub fn is_type_declaration_syntax(kind: NodeKind) -> bool {
-    S282.contains(node_index(kind))
+    S24.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseTypeSyntax` in Syntax.xml (2 types).
 pub fn is_base_type_syntax(kind: NodeKind) -> bool {
-    S283.contains(node_index(kind))
+    S25.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `TypeParameterConstraintSyntax` in Syntax.xml (5 types).
 pub fn is_type_parameter_constraint_syntax(kind: NodeKind) -> bool {
-    S284.contains(node_index(kind))
+    S26.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `AllowsConstraintSyntax` in Syntax.xml (1 types).
 pub fn is_allows_constraint_syntax(kind: NodeKind) -> bool {
-    S285.contains(node_index(kind))
+    S27.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseFieldDeclarationSyntax` in Syntax.xml (2 types).
 pub fn is_base_field_declaration_syntax(kind: NodeKind) -> bool {
-    S286.contains(node_index(kind))
+    S28.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseMethodDeclarationSyntax` in Syntax.xml (5 types).
 pub fn is_base_method_declaration_syntax(kind: NodeKind) -> bool {
-    S287.contains(node_index(kind))
+    S29.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BasePropertyDeclarationSyntax` in Syntax.xml (3 types).
 pub fn is_base_property_declaration_syntax(kind: NodeKind) -> bool {
-    S288.contains(node_index(kind))
+    S30.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseParameterListSyntax` in Syntax.xml (2 types).
 pub fn is_base_parameter_list_syntax(kind: NodeKind) -> bool {
-    S289.contains(node_index(kind))
+    S31.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseParameterSyntax` in Syntax.xml (2 types).
 pub fn is_base_parameter_syntax(kind: NodeKind) -> bool {
-    S290.contains(node_index(kind))
+    S32.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `CrefSyntax` in Syntax.xml (7 types).
 pub fn is_cref_syntax(kind: NodeKind) -> bool {
-    S237.contains(node_index(kind))
+    S33.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `MemberCrefSyntax` in Syntax.xml (5 types).
 pub fn is_member_cref_syntax(kind: NodeKind) -> bool {
-    S223.contains(node_index(kind))
+    S34.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BaseCrefParameterListSyntax` in Syntax.xml (2 types).
 pub fn is_base_cref_parameter_list_syntax(kind: NodeKind) -> bool {
-    S291.contains(node_index(kind))
+    S35.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `XmlNodeSyntax` in Syntax.xml (6 types).
 pub fn is_xml_node_syntax(kind: NodeKind) -> bool {
-    S221.contains(node_index(kind))
+    S36.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `XmlAttributeSyntax` in Syntax.xml (3 types).
 pub fn is_xml_attribute_syntax(kind: NodeKind) -> bool {
-    S231.contains(node_index(kind))
+    S37.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `DirectiveTriviaSyntax` in Syntax.xml (20 types).
 pub fn is_directive_trivia_syntax(kind: NodeKind) -> bool {
-    S292.contains(node_index(kind))
+    S38.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `BranchingDirectiveTriviaSyntax` in Syntax.xml (3 types).
 pub fn is_branching_directive_trivia_syntax(kind: NodeKind) -> bool {
-    S293.contains(node_index(kind))
+    S39.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `ConditionalDirectiveTriviaSyntax` in Syntax.xml (2 types).
 pub fn is_conditional_directive_trivia_syntax(kind: NodeKind) -> bool {
-    S294.contains(node_index(kind))
+    S40.contains(node_index(kind))
 }
 
 /// A node kind of a type deriving from `LineOrSpanDirectiveTriviaSyntax` in Syntax.xml (2 types).
 pub fn is_line_or_span_directive_trivia_syntax(kind: NodeKind) -> bool {
-    S295.contains(node_index(kind))
+    S41.contains(node_index(kind))
 }
 
 /// `AttributeLists` of a node of any type that has the field (55 types), empty on the others.

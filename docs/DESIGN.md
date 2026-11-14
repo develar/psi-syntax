@@ -543,7 +543,9 @@ text ─ Lexer over SlidingTextWindow (the bytes as UTF-16 code units) ─> gree
 - **Flatten (`flatten.rs`).** One walk in `ChildNodesAndTokens()` order: a list's elements are its parent's
   children, a null slot is skipped, a node is a composite over its full span, a token a leaf over its span (missing
   when missing), its trivia leaves before and after it in the token's parent, trailing on the trailing ones, a
-  structured trivia a subtree whose root has the trivia's kind. The walk reads the arena's records directly and
+  structured trivia a subtree whose root has the trivia's kind. Each node gets the slot it fills (`Tree::slot`):
+  its green slot's index, a list's slot for each of the list's elements, the token's slot for its leaf, none for a
+  trivia or a structured trivia's root, 0 in a list's own composite. The walk reads the arena's records directly and
   writes each node by its id into the tree's columns (`TreeBuilder::writer`), sized to
   `GreenArena::tree_node_estimate` (every token, trivia reference and node record, garbage and lists included), at
   most 2 nodes a source byte (the corpora's files have at most 1.41) and 16 for an abandoned parse, so that garbage
@@ -718,8 +720,9 @@ A tree is three columns over the node ids, in preorder:
 | `kinds` | `u16` | `ElementType::index` (12 bits: tokens below `NODE_BASE`, composite types from it), `LEAF` bit, `UNEXPANDED` bit, `TRAILING` and `MISSING` bits (Roslyn's trailing trivia and missing tokens; Kotlin and Java never set them) |
 | `ranges` | `[u32; 2]` | start and end byte |
 | `links` | `[u32; 2]` | parent and subtree end |
+| `slots` | `u8` | C#'s only: the slot of its parent's node type each node fills (`Tree::slot`), `NO_SLOT` for a trivia; empty for Kotlin and Java |
 
-That is 18 bytes a node. The tree also holds the text (`Arc<[u8]>`) and an `errors` table sorted by id, which is
+That is 18 bytes a node, 19 for C#. The tree also holds the text (`Arc<[u8]>`) and an `errors` table sorted by id, which is
 allocated only when the file has errors.
 
 - **Navigation.** The subtree of `id` is `id..subtree_end`, the first child is `id + 1` when the subtree is not empty,
@@ -767,8 +770,9 @@ AGENTS.md, "The consumer contract", is the normative list. In short:
 - C#: `csharp_syntax::syntax_getters` answers the properties of Roslyn's syntax nodes: a module per node type and per
   abstract class of Syntax.xml, generated with a function per field (`tools/csharp-gen/gen.py`), and the computed
   properties of the partial classes by hand; `csharp_syntax::read` the reads around them (trivia, `Span`, a name's
-  identifier and dotted name, a type's names). The tree keeps no slots, so a getter reads them back from the kinds
-  ("C# syntax getters" below); checked against Roslyn's own properties on every node.
+  identifier and dotted name, a type's names). The tree keeps the slot each node fills (`Tree::slot`), so a getter
+  reads its node's children up to its slot by their slots ("C# slots kept by the tree" below); checked against
+  Roslyn's own properties on every node.
 
 ## Decisions
 

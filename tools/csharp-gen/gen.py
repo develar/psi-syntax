@@ -14,7 +14,7 @@
 - `src/xml_char_type.rs` from `Core/Portable/Xml/XmlCharType.cs`: its literal character property tables (the lexer's
   `IsXmlNameStartChar` and `IsXmlNameChar` read the XML 1.0 4th edition bits);
 - `src/syntax_getters/fields.rs` from `Syntax/Syntax.xml`: the getters of every field of every node type and abstract
-  class over the tree, the kinds each slot takes (`slot_specs`), and the printer of their `getters` lines; with it
+  class over the tree, and the printer of their `getters` lines; with it
   `tools/csharp-oracle/Fields.g.cs`, the oracle's printer of the same lines from Roslyn's own properties.
 
     tools/csharp-gen/gen.py [--roslyn DIR] [--rev REV] [--out crates/csharp-syntax/src] [--oracle tools/csharp-oracle]
@@ -574,11 +574,6 @@ pub fn node_type(kind: NodeKind) -> &'static NodeTypeInfo {
 # ---------------------------------------------------------------------------------------------------------------------
 # syntax_getters/fields.rs and tools/csharp-oracle/Fields.g.cs
 
-# Token fields whose Syntax.xml names no kind, where an earlier token list must know where it stops: a record's
-# keyword is `record` (LanguageParser.cs, `ParseTypeDeclaration`: `case SyntaxKind.RecordKeyword`, the keyword
-# converted by `ConvertToKeyword`).
-TOKEN_KINDS = {("RecordDeclarationSyntax", "Keyword"): ["RecordKeyword"]}
-
 # Abstract properties a concrete type implements by another of its fields (`NameColonSyntax.cs:11`,
 # `public override ExpressionSyntax Expression => Name;`). A concrete type without the field and without an entry
 # here answers none, as Roslyn's overrides do (`ExtensionBlockDeclarationSyntax.cs:9` and `:14`: `Identifier =>
@@ -631,56 +626,6 @@ def list_element(t: str) -> str:
     return t[t.index("<") + 1:-1]
 
 
-def slot_specs(h: Hierarchy, classes: KindClasses, t: NodeType) -> list[tuple[set, set, bool]]:
-    """Per slot of `t` the kinds a child in it may have, the kinds Syntax.xml declares for it, and whether the slot takes
-    several (a list): a token slot its
-    Syntax.xml kinds (any token without them), a node slot its kinds or those of the node types deriving from its
-    type (a slot that is never null takes any token or any node where it stands; its own kinds only say where the
-    lists and optional slots before it stop), a list those of its element type, a token list (`SyntaxList<SyntaxToken>`, modifiers) every token that no
-    slot after it up to its first required one takes, a separated list its elements and any token as a separator
-    (Roslyn's recovery makes a `;` one, `enum C { A ; }`), which `slots.rs` gives to a later slot that takes it only
-    when the next child fits after that slot. A child goes to the first slot from the current one that takes it, so an
-    earlier slot wins over a later one; two node slots that both take a kind where the first may be skipped are an
-    ambiguity this assignment cannot tell apart, and fail the generator."""
-    tokens = set(classes.tokens)
-    all_nodes = {k for c in h.concrete("CSharpSyntaxNode") for k in c.kinds}
-    n = len(t.slots)
-    accept = [set()] * n
-    declared = [set()] * n
-    for i in range(n - 1, -1, -1):
-        f = t.slots[i]
-        follow = set()
-        for j in range(i + 1, n):
-            follow |= declared[j]
-            if not t.slots[j].optional and t.slots[j].slot_kind in ("Token", "Node"):
-                break
-        nodes = set()
-        if f.slot_kind == "Token":
-            a = set(TOKEN_KINDS.get((t.name, f.name), f.kinds) or tokens)
-        elif f.slot_kind == "Node":
-            nodes = set(f.kinds) if f.kinds else {k for c in h.concrete(f.type) for k in c.kinds}
-            a = nodes
-        else:
-            e = list_element(f.type)
-            if e == "SyntaxToken":
-                a = tokens - follow
-            else:
-                nodes = {k for c in h.concrete(e) for k in c.kinds}
-                a = nodes | (tokens if f.slot_kind == "SeparatedList" else set())
-        if (f.optional or f.slot_kind in ("List", "SeparatedList")) and nodes & follow:
-            raise SystemExit(f"{t.name}.{f.name}: a later slot takes its node kinds {sorted(nodes & follow)}")
-        declared[i] = a
-        # a slot that is never null takes the child where it stands, whatever its kind: Roslyn's recovery puts tokens
-        # of other kinds there (`event A.this` names the event by its `this`), and its declared kinds are only where
-        # the slots before it stop
-        accept[i] = (tokens if f.slot_kind == "Token" else all_nodes) if is_required(f) else a
-    return [(accept[i], declared[i], t.slots[i].slot_kind in ("List", "SeparatedList")) for i in range(n)]
-
-
-def is_required(f: Field) -> bool:
-    return not f.optional and f.slot_kind in ("Token", "Node")
-
-
 def gen_syntax_getters(roslyn: Roslyn, types: list[NodeType]) -> tuple[str, str]:
     """`crates/csharp-syntax/src/syntax_getters/fields.rs` and `tools/csharp-oracle/Fields.g.cs`."""
     h = Hierarchy(roslyn.read(PORTABLE + "Syntax/Syntax.xml"), types)
@@ -701,13 +646,6 @@ def gen_syntax_getters(roslyn: Roslyn, types: list[NodeType]) -> tuple[str, str]
 
     type_index = {t.name: i for i, t in enumerate(types)}
     trivia = kind_set(set(classes.trivia) | {k for t in types if t.name in h.structured for k in t.kinds})
-    spec_rows = []
-    for t in types:
-        cells = ", ".join(
-            f"SlotSpec {{ accept: &{kind_set(a)}, declared: &{kind_set(d)}, many: {str(many).lower()}, separated: "
-            f"{str(f.slot_kind == 'SeparatedList').lower()}, required: {str(is_required(f)).lower()} }}"
-            for (a, d, many), f in zip(slot_specs(h, classes, t), t.slots))
-        spec_rows.append(f"    &[{cells}],")
 
     def one(f: Field) -> bool:
         return f.slot_kind in ("Token", "Node")
@@ -823,7 +761,6 @@ def gen_syntax_getters(roslyn: Roslyn, types: list[NodeType]) -> tuple[str, str]
 use super::getters::Lines;
 use super::slots::{{
     node_index, read_field, read_field_in, read_nodes, read_nodes_in, read_tokens, read_tokens_in, Elements, KindSet,
-    SlotSpec,
 }};
 use crate::syntax_kind::NodeKind;
 use crate::tree::{{NodeId, Tree}};
@@ -836,18 +773,12 @@ pub(super) const WORDS: usize = {words};
 /// What a getter skips: the unstructured trivia leaves and the roots of structured trivia.
 pub(super) static TRIVIA: &KindSet = &{trivia};
 
-/// Per node type (`syntax::NODE_TYPES`' order) its slots: the kinds each takes and the kinds Syntax.xml declares for it,
-/// whether it takes several, whether it is a separated list, whether it is a token or node that is never null.
-pub(super) static SPECS: [&[SlotSpec]; {len(types)}] = [
-{nl.join(spec_rows)}
-];
-
 /// Per node type the slots whose declared type (of a list, its element's) derives from `TypeSyntax`, bit `i` for slot `i`.
 pub(super) static TYPE_SLOTS: [u16; {len(types)}] = [
 {nl.join(wrap_numbers(type_slots))}
 ];
 
-/// The node type (an index into `SPECS` and `syntax::NODE_TYPES`) of each `NodeKind`.
+/// The node type (an index into `syntax::NODE_TYPES`) of each `NodeKind`.
 pub(super) static TYPE_OF_NODE: [u8; {len(node_type)}] = [
 {nl.join(wrap_numbers([str(x) for x in node_type]))}
 ];

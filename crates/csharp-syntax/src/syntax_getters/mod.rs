@@ -67,7 +67,7 @@ use crate::tree::{NodeId, Tree};
 /// The children of node `id` that are no trivia, each with the slot of its node type it fills (an index into
 /// `syntax::node_type(kind).slots`, `syntax::types::X::FIELD`; `usize::MAX` past them), in order; none for a leaf.
 pub fn slot_children(tree: &Tree, id: NodeId) -> impl Iterator<Item = (usize, NodeId)> + '_ {
-    tree.node_kind(id).map(|kind| SlotChildren::of_type(tree, id, slots::node_type_index(kind))).into_iter().flatten()
+    tree.node_kind(id).map(|_| SlotChildren::of(tree, id)).into_iter().flatten()
 }
 
 /// The child in slot `slot` of node `id` of any type (`syntax::types::ClassDeclarationSyntax::IDENTIFIER`), the first
@@ -95,10 +95,10 @@ pub fn first_modifier(tree: &Tree, id: NodeId, kind: TokenKind) -> Option<NodeId
 }
 
 /// The slot of its parent's node type that `child` fills (an index into `syntax::node_type(kind).slots`), None for the
-/// root, trivia and a child no slot takes. Reads the parent's children up to `child`.
+/// root, trivia and a child no slot takes: the tree's (`Tree::slot`).
 pub fn slot_of(tree: &Tree, child: NodeId) -> Option<usize> {
-    let parent = tree.parent(child)?;
-    slot_children(tree, parent).find(|&(_, c)| c == child).map(|(slot, _)| slot).filter(|&slot| slot != usize::MAX)
+    let slot = tree.slot(child);
+    (slot != psi_builder::tree::NO_SLOT).then_some(slot as usize)
 }
 
 /// The slot `child` fills, as Syntax.xml declares it: its field's name, shape and declared type

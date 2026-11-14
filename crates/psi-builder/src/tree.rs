@@ -26,6 +26,10 @@ pub struct NodeId(pub u32);
 
 const NONE: u32 = u32::MAX;
 
+/// The slot (`Tree::slot`) of a node that fills none: a trivia, a structured trivia's root, the root, any node of a
+/// language whose tree keeps no slots.
+pub const NO_SLOT: u8 = u8::MAX;
+
 /// `kinds` bit of a leaf (a token; no children).
 const LEAF: u16 = 0x8000;
 /// `kinds` bit of a block or lambda left unexpanded (`ParseOptions::expand_bodies`).
@@ -51,6 +55,9 @@ pub(crate) struct TreeData {
     ranges: Vec<[u32; 2]>,
     /// `[parent, subtree_end]`.
     links: Vec<[u32; 2]>,
+    /// The slot of its parent each node fills (`Tree::slot`), for a language whose builder writes them (C#'s,
+    /// `TreeBuilder`); empty for the others.
+    slots: Vec<u8>,
     /// The message of each error node, sorted by node id.
     errors: Vec<(u32, Cow<'static, str>)>,
     /// The nesting (`Pending::depth`) of each unexpanded body sitting at a nonzero one, sorted by node id, for
@@ -245,6 +252,7 @@ impl TreeData {
             kinds: nodes.iter().map(|n| n.kind).collect(),
             ranges: nodes.iter().map(|n| [n.start, n.end]).collect(),
             links: nodes.iter().map(|n| [n.parent, n.subtree_end]).collect(),
+            slots: Vec::new(),
             errors,
             body_depths: self.body_depths.as_slice().to_vec(),
             nodes: Vec::new(),
@@ -773,6 +781,7 @@ impl<L: TreeLanguage> Tree<L> {
         self.text.len()
             + d.kinds.capacity() * size_of::<u16>()
             + (d.ranges.capacity() + d.links.capacity()) * size_of::<[u32; 2]>()
+            + d.slots.capacity()
             + d.errors.capacity() * size_of::<(u32, Cow<'static, str>)>()
             + d.body_depths.capacity() * size_of::<(u32, u32)>()
             + messages
@@ -801,6 +810,14 @@ impl<L: TreeLanguage> Tree<L> {
     /// unexpanded: it has no children, `parse_body` gives them.
     pub fn is_unexpanded(&self, id: NodeId) -> bool {
         self.data.kinds[id.0 as usize] & UNEXPANDED != 0
+    }
+
+    /// The slot of its parent's syntax the node fills, as the parser that made the tree knew it (C#'s: the index of
+    /// the green node's slot, a list's elements and a token's leaf all of the list's or the token's slot); `NO_SLOT`
+    /// for a trivia, a structured trivia's root, the root, and every node of a tree that keeps no slots.
+    #[inline]
+    pub fn slot(&self, id: NodeId) -> u8 {
+        self.data.slots.get(id.0 as usize).copied().unwrap_or(NO_SLOT)
     }
 
     /// Whether the node is a leaf (a token; it has no children).
@@ -1117,6 +1134,8 @@ pub struct TreeBuilder<L: TreeLanguage> {
     kinds: Vec<u16>,
     ranges: Vec<[u32; 2]>,
     links: Vec<[u32; 2]>,
+    /// The slot each node fills (`Tree::slot`), `NO_SLOT` until `set_slot` or a writer gives one.
+    slots: Vec<u8>,
     /// The message of each error node, sorted by node id.
     errors: Vec<(u32, Cow<'static, str>)>,
     language: PhantomData<fn() -> L>,
@@ -1128,6 +1147,7 @@ impl<L: TreeLanguage> Default for TreeBuilder<L> {
             kinds: Vec::new(),
             ranges: Vec::new(),
             links: Vec::new(),
+            slots: Vec::new(),
             errors: Vec::new(),
             language: PhantomData,
         }
@@ -1144,13 +1164,14 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         self.kinds.reserve(additional);
         self.ranges.reserve(additional);
         self.links.reserve(additional);
+        self.slots.reserve(additional);
     }
 
     /// The heap bytes of the builder's buffers, by capacity: the columns of a tree being built (`finish` hands them to
     /// the tree, so between trees they hold nothing).
     pub fn heap_bytes(&self) -> usize {
         use crate::buffers::vec_bytes;
-        vec_bytes(&self.kinds) + vec_bytes(&self.ranges) + vec_bytes(&self.links) + vec_bytes(&self.errors)
+        vec_bytes(&self.kinds) + vec_bytes(&self.ranges) + vec_bytes(&self.links) + vec_bytes(&self.slots) + vec_bytes(&self.errors)
     }
 
     /// Empties the builder, each buffer shrunk to its share of `shrink` (a language parser's `shrink_to`).
@@ -1158,6 +1179,7 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         shrink.vec(&mut self.kinds);
         shrink.vec(&mut self.ranges);
         shrink.vec(&mut self.links);
+        shrink.vec(&mut self.slots);
         shrink.vec(&mut self.errors);
     }
 
@@ -1177,6 +1199,7 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         self.kinds.push(kind);
         self.ranges.push([start, end]);
         self.links.push([parent, id + 1]);
+        self.slots.push(NO_SLOT);
         id
     }
 
@@ -1215,6 +1238,12 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         NodeId(self.push(parent.0, token.index() | leaf_bits(trailing, missing), start, end))
     }
 
+    /// The slot of its parent a node added so far fills (`Tree::slot`).
+    #[inline]
+    pub fn set_slot(&mut self, node: NodeId, slot: u8) {
+        self.slots[node.0 as usize] = slot;
+    }
+
     /// Marks a node added so far as belonging to the token before it (`Tree::is_trailing`).
     #[inline]
     pub fn set_trailing(&mut self, node: NodeId) {
@@ -1243,10 +1272,12 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         self.kinds.resize(len, 0);
         self.ranges.resize(len, [0, 0]);
         self.links.resize(len, [0, 0]);
+        self.slots.resize(len, NO_SLOT);
         ColumnWriter {
             kinds: &mut self.kinds,
             ranges: &mut self.ranges,
             links: &mut self.links,
+            slots: &mut self.slots,
             errors: &mut self.errors,
             language: PhantomData,
         }
@@ -1259,6 +1290,7 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         self.kinds.truncate(len as usize);
         self.ranges.truncate(len as usize);
         self.links.truncate(len as usize);
+        self.slots.truncate(len as usize);
     }
 
     /// The tree of the nodes added since the last `finish`, over `text` (whose bytes their ranges index), its root
@@ -1268,12 +1300,14 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         let mut kinds = std::mem::take(&mut self.kinds);
         let mut ranges = std::mem::take(&mut self.ranges);
         let mut links = std::mem::take(&mut self.links);
+        let mut slots = std::mem::take(&mut self.slots);
         let mut errors = std::mem::take(&mut self.errors);
         kinds.shrink_to_fit();
         ranges.shrink_to_fit();
         links.shrink_to_fit();
+        slots.shrink_to_fit();
         errors.shrink_to_fit();
-        let data = TreeData { kinds, ranges, links, errors, body_depths: Vec::new(), nodes: Vec::new(), built: 0 };
+        let data = TreeData { kinds, ranges, links, slots, errors, body_depths: Vec::new(), nodes: Vec::new(), built: 0 };
         Tree { utf8: utf8_of(&text), text, file_kind, data, root: 0, language: PhantomData }
     }
 }
@@ -1290,6 +1324,7 @@ pub struct ColumnWriter<'a, L: TreeLanguage> {
     kinds: &'a mut [u16],
     ranges: &'a mut [[u32; 2]],
     links: &'a mut [[u32; 2]],
+    slots: &'a mut [u8],
     errors: &'a mut Vec<(u32, Cow<'static, str>)>,
     language: PhantomData<fn() -> L>,
 }
@@ -1311,12 +1346,24 @@ impl<L: TreeLanguage> ColumnWriter<'_, L> {
         }
     }
 
-    /// The composite `id` of `kind` starting at `start`, a child of `parent` (`None`: the root), `Tree::is_trailing`
-    /// when `trailing`; `close` ends it.
+    /// The slot of node `id` (`Tree::slot`); a node written without one keeps `NO_SLOT`, which the columns hold
+    /// until then (`TreeBuilder::writer`).
     #[inline(always)]
-    pub fn open(&mut self, id: u32, parent: Option<NodeId>, kind: ElementTypeOf<L>, start: u32, trailing: bool) {
+    fn write_slot(&mut self, id: u32, slot: u8) {
+        if let Some(s) = self.slots.get_mut(id as usize) {
+            *s = slot;
+        }
+    }
+
+    /// The composite `id` of `kind` starting at `start`, a child of `parent` (`None`: the root) in its slot `slot`
+    /// (`Tree::slot`), `Tree::is_trailing` when `trailing`; `close` ends it.
+    #[inline(always)]
+    pub fn open(&mut self, id: u32, parent: Option<NodeId>, kind: ElementTypeOf<L>, start: u32, trailing: bool, slot: u8) {
         let bits = if trailing { TRAILING } else { 0 };
         self.write(id, kind.index() as u16 | bits, start, start, parent.map_or(NONE, |p| p.0));
+        if slot != NO_SLOT {
+            self.write_slot(id, slot);
+        }
     }
 
     /// Closes the composite `id`: it ends at byte `end` (at least its start), its subtree before node `subtree_end`.
@@ -1329,8 +1376,8 @@ impl<L: TreeLanguage> ColumnWriter<'_, L> {
         }
     }
 
-    /// The leaf `id` of `token` over `start..end`, a child of `parent`, `Tree::is_trailing` and `Tree::is_missing` as
-    /// given.
+    /// The leaf `id` of `token` over `start..end`, a child of `parent` in its slot `slot` (`Tree::slot`),
+    /// `Tree::is_trailing` and `Tree::is_missing` as given.
     #[inline(always)]
     #[allow(clippy::too_many_arguments)]
     pub fn leaf(
@@ -1342,8 +1389,12 @@ impl<L: TreeLanguage> ColumnWriter<'_, L> {
         end: u32,
         trailing: bool,
         missing: bool,
+        slot: u8,
     ) {
         self.write(id, token.index() | leaf_bits(trailing, missing), start, end, parent.0);
+        if slot != NO_SLOT {
+            self.write_slot(id, slot);
+        }
     }
 
     /// `TreeBuilder::set_error`.

@@ -29,6 +29,7 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
+use psi_builder::tree::NO_SLOT;
 use psi_builder::{ColumnWriter, ElementType, NodeId, TreeBuilder};
 
 use crate::diagnostic;
@@ -46,15 +47,18 @@ enum Frame {
     /// The children of `green` (a node, or the structure of a structured trivia) under the tree node `id`: the next is
     /// slot `slot`, element `element` of it when that slot is a list.
     Children { green: Green, id: NodeId, slot: u32, element: u32 },
-    /// A token under `parent`: `phase` 0 its leading trivia (the next at `index`), 1 the token, 2 its trailing trivia.
-    Token { green: Green, parent: NodeId, phase: u8, index: u32 },
+    /// A token under `parent` in its slot `slot`: `phase` 0 its leading trivia (the next at `index`), 1 the token, 2
+    /// its trailing trivia.
+    Token { green: Green, parent: NodeId, slot: u8, phase: u8, index: u32 },
 }
 
 /// A run of the column walk (`Flattener::run_columns`): the elements `at..end` of the arena's slots (or, with `TRIVIA`,
 /// of its trivia references), children of the tree node `parent`. `CLOSES`: `parent` closes after them; `IN_LIST`: they
 /// are a list's elements, so a list among them is a composite of its own (`next_child`); `TRIVIA`: a token's trivia
 /// after a structured one, trailing with `TRAILING`, else its leading trivia with `token` and its trailing trivia to
-/// follow.
+/// follow. `slot` is where the slots are in their node (`Tree::slot`, `slot_of`): a node's first slot, so the slot of
+/// an element is its distance from it; the slot every element of a list fills (the list's in its node, which the list's
+/// elements are children of, 0 in a list's own composite, as in `SkippedTokensTrivia`'s one slot); `token`'s slot.
 #[derive(Copy, Clone, Debug)]
 struct Run {
     at: u32,
@@ -62,6 +66,7 @@ struct Run {
     parent: u32,
     flags: u32,
     token: Green,
+    slot: u32,
 }
 
 const CLOSES: u32 = 1;
@@ -71,11 +76,25 @@ const TRAILING: u32 = 8;
 
 impl Run {
     /// No elements, closing nothing.
-    const EMPTY: Run = Run { at: 0, end: 0, parent: 0, flags: 0, token: Green::NULL };
+    const EMPTY: Run = Run { at: 0, end: 0, parent: 0, flags: 0, token: Green::NULL, slot: 0 };
 
+    /// The slots `at..end` of a node, children of `parent`.
     #[inline(always)]
     fn slots(at: u32, end: u32, parent: u32, flags: u32) -> Run {
-        Run { at, end, parent, flags, token: Green::NULL }
+        Run { at, end, parent, flags, token: Green::NULL, slot: at }
+    }
+
+    /// The elements `at..end` of a list, children of `parent`, each filling slot `slot`.
+    #[inline(always)]
+    fn list(at: u32, end: u32, parent: u32, flags: u32, slot: u8) -> Run {
+        Run { at, end, parent, flags: flags | IN_LIST, token: Green::NULL, slot: slot as u32 }
+    }
+
+    /// The slot the element at `at` fills in the node its elements are children of (a node type has at most 16,
+    /// `tools/csharp-gen/gen.py`).
+    #[inline(always)]
+    fn slot_of(&self, at: u32) -> u8 {
+        (if self.flags & IN_LIST != 0 { self.slot } else { at.wrapping_sub(self.slot) }) as u8
     }
 }
 
@@ -295,7 +314,7 @@ impl Flattener {
         let root = builder.open(None, ElementType::Node(NodeKind::CompilationUnit), 0);
         for &token in tokens {
             self.stack.clear();
-            self.stack.push(Frame::Token { green: token, parent: root, phase: 0, index: 0 });
+            self.stack.push(Frame::Token { green: token, parent: root, slot: NO_SLOT, phase: 0, index: 0 });
             self.run(&mut walk, builder);
         }
         builder.close(root, walk.position);
@@ -318,19 +337,29 @@ impl Flattener {
                         *slot = next_slot;
                         *element = next_element;
                     }
+                    // an element of a list slot fills the list's slot, an element of a list's own composite slot 0
+                    let child_slot = if green.is_list() {
+                        0
+                    } else if next_element != 0 {
+                        next_slot
+                    } else {
+                        next_slot - 1
+                    };
+                    let child_slot = child_slot.min(NO_SLOT as u32 - 1) as u8;
                     if child.is_token() {
-                        self.stack.push(Frame::Token { green: child, parent: id, phase: 0, index: 0 });
+                        self.stack.push(Frame::Token { green: child, parent: id, slot: child_slot, phase: 0, index: 0 });
                     } else {
                         let child_id = walk.open(builder, Some(id), child);
+                        builder.set_slot(child_id, child_slot);
                         self.stack.push(Frame::Children { green: child, id: child_id, slot: 0, element: 0 });
                     }
                 }
-                Frame::Token { green, parent, phase, index } => {
+                Frame::Token { green, parent, slot, phase, index } => {
                     let list = match phase {
                         0 => arena.leading_trivia(green),
                         2 => arena.trailing_trivia(green),
                         _ => {
-                            walk.token(builder, parent, green);
+                            walk.token(builder, parent, green, slot);
                             if let Some(Frame::Token { phase, index, .. }) = self.stack.last_mut() {
                                 *phase = 2;
                                 *index = 0;
@@ -375,14 +404,14 @@ impl Flattener {
         if root.is_token() {
             // not a tree Roslyn makes: the token under a compilation unit
             let id = st.hot.id;
-            w.open(id, None, ElementType::Node(NodeKind::CompilationUnit), 0, false);
+            w.open(id, None, ElementType::Node(NodeKind::CompilationUnit), 0, false, NO_SLOT);
             st.hot.id += 1;
             st.cur = Run::slots(0, 0, id, CLOSES);
-            if let Some((structure, rest)) = st.hot.token(walk, w, r, id, root) {
+            if let Some((structure, rest)) = st.hot.token(walk, w, r, id, root, NO_SLOT) {
                 st.descend(stack, structure, Some(rest));
             }
         } else {
-            st.cur = st.hot.open(walk, w, r, NONE, root, false);
+            st.cur = st.hot.open(walk, w, r, NONE, root, false, NO_SLOT);
         }
         loop {
             match fast(&mut st, r, w, stack) {
@@ -394,14 +423,14 @@ impl Flattener {
                     let len = stack.len();
                     stack.resize(len * 2, Run::EMPTY);
                 }
-                Exit::Token(child) => {
-                    if let Some((structure, rest)) = st.hot.token(walk, w, r, st.cur.parent, child) {
+                Exit::Token(child, slot) => {
+                    if let Some((structure, rest)) = st.hot.token(walk, w, r, st.cur.parent, child, slot) {
                         // under the rest of the token: the slots after it come back after the token is done
                         st.descend(stack, structure, Some(rest));
                     }
                 }
-                Exit::Node(child) => {
-                    let next = st.hot.open(walk, w, r, st.cur.parent, child, false);
+                Exit::Node(child, slot) => {
+                    let next = st.hot.open(walk, w, r, st.cur.parent, child, false, slot);
                     st.descend(stack, next, None);
                 }
                 Exit::Leaves(run) => {
@@ -458,10 +487,10 @@ enum Exit {
     Done,
     /// The stack is full: it grows, and the walk goes on where it was.
     Grow,
-    /// The token `Green` of the current run, not yet walked, needs more than `fast` does.
-    Token(Green),
-    /// The node or list, not yet opened.
-    Node(Green),
+    /// The token `Green` of the current run, not yet walked, needs more than `fast` does; the slot it fills.
+    Token(Green, u8),
+    /// The node or list, not yet opened; the slot it fills.
+    Node(Green, u8),
     /// The rest of a token that `fast` began (`Hot::leaves`).
     Leaves(Run),
     /// A run of a token's trivia came off the stack (`Hot::leaves`).
@@ -485,11 +514,11 @@ fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack:
             return $e;
         }};
     }
-    // a leaf of `$kind` over the source's `$width` bytes at `$start`, where the leaf is
+    // a leaf of `$kind` over the source's `$width` bytes at `$start`, where the leaf is, in slot `$slot`
     macro_rules! source_leaf {
-        ($parent:expr, $kind:expr, $start:expr, $width:expr, $trailing:expr) => {{
+        ($parent:expr, $kind:expr, $start:expr, $width:expr, $trailing:expr, $slot:expr) => {{
             let end = pos.wrapping_add($width);
-            w.leaf(id, $parent, $kind.token_kind().unwrap_or(TokenKind::BadToken), pos, end, $trailing, false);
+            w.leaf(id, $parent, $kind.token_kind().unwrap_or(TokenKind::BadToken), pos, end, $trailing, false, $slot);
             id += 1;
             src_next = $start.saturating_add($width);
             pos = end;
@@ -506,7 +535,7 @@ fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack:
                 if td.flags & STRUCTURED != 0 || td.rare != NO_RARE || td.start != pos {
                     break;
                 }
-                source_leaf!($parent, td.kind, td.start, td.width, $trailing);
+                source_leaf!($parent, td.kind, td.start, td.width, $trailing, NO_SLOT);
                 at += 1;
             }
             (at, end)
@@ -515,22 +544,25 @@ fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack:
     loop {
         while cur.at < cur.end {
             let child = r.slots[cur.at as usize];
+            let at = cur.at;
             cur.at += 1;
             match child.tag() {
                 TAG_TOKEN => {
+                    let slot = cur.slot_of(at);
                     let d = &r.tokens[child.index()];
                     if diverged || d.rare != NO_RARE {
-                        exit!(Exit::Token(child));
+                        exit!(Exit::Token(child, slot));
                     }
                     let parent = NodeId(cur.parent);
                     let (at, end) = source_trivia!(d.leading, parent, false);
+                    let rest = Run { at, end, parent: cur.parent, flags: TRIVIA, token: child, slot: slot as u32 };
                     if at < end {
-                        exit!(Exit::Leaves(Run { at, end, parent: cur.parent, flags: TRIVIA, token: child }));
+                        exit!(Exit::Leaves(rest));
                     }
                     if d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) != IS_NOT_MISSING || d.start != pos {
-                        exit!(Exit::Leaves(Run { at, end, parent: cur.parent, flags: TRIVIA, token: child }));
+                        exit!(Exit::Leaves(rest));
                     }
-                    source_leaf!(parent, d.kind, d.start, d.width, false);
+                    source_leaf!(parent, d.kind, d.start, d.width, false, slot);
                     let (at, end) = source_trivia!(d.trailing, parent, true);
                     if at < end {
                         exit!(Exit::Leaves(Run {
@@ -538,7 +570,8 @@ fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack:
                             end,
                             parent: cur.parent,
                             flags: TRIVIA | TRAILING,
-                            token: Green::NULL
+                            token: Green::NULL,
+                            slot: 0
                         }));
                     }
                 }
@@ -547,26 +580,31 @@ fn fast(st: &mut State, r: Records<'_>, w: &mut ColumnWriter<'_, CSharp>, stack:
                         cur.at -= 1;
                         exit!(Exit::Grow);
                     }
+                    let slot = cur.slot_of(at);
                     let d = &r.nodes[child.index()];
                     stack[depth] = cur;
                     depth += 1;
-                    cur = Run::slots(d.slot_start, d.slot_start + d.slot_count, cur.parent, IN_LIST);
+                    cur = Run::list(d.slot_start, d.slot_start + d.slot_count, cur.parent, 0, slot);
                 }
                 TAG_NODE | TAG_LIST => {
+                    let slot = cur.slot_of(at);
                     let d = &r.nodes[child.index()];
                     if d.rare != NO_RARE {
-                        exit!(Exit::Node(child));
+                        exit!(Exit::Node(child, slot));
                     }
                     if depth == stack.len() {
                         cur.at -= 1;
                         exit!(Exit::Grow);
                     }
                     let kind = d.kind.node_kind().unwrap_or(NodeKind::SkippedTokensTrivia);
-                    w.open(id, Some(NodeId(cur.parent)), ElementType::Node(kind), pos, false);
+                    w.open(id, Some(NodeId(cur.parent)), ElementType::Node(kind), pos, false, slot);
                     stack[depth] = cur;
                     depth += 1;
-                    let flags = CLOSES | if child.is_list() { IN_LIST } else { 0 };
-                    cur = Run::slots(d.slot_start, d.slot_start + d.slot_count, id, flags);
+                    cur = if child.is_list() {
+                        Run::list(d.slot_start, d.slot_start + d.slot_count, id, CLOSES, 0)
+                    } else {
+                        Run::slots(d.slot_start, d.slot_start + d.slot_count, id, CLOSES)
+                    };
                     id += 1;
                 }
                 _ => {}
@@ -600,9 +638,10 @@ struct Hot {
 }
 
 impl Hot {
-    /// Opens the composite of the node or list `green` under `parent` (`NONE`: the root), `trailing` as a trailing
-    /// structured trivia, and reports its diagnostics; its slots are the run to walk.
+    /// Opens the composite of the node or list `green` under `parent` (`NONE`: the root) in its slot `slot`,
+    /// `trailing` as a trailing structured trivia, and reports its diagnostics; its slots are the run to walk.
     #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
     fn open(
         &mut self,
         walk: &mut Walk<'_>,
@@ -611,6 +650,7 @@ impl Hot {
         parent: u32,
         green: Green,
         trailing: bool,
+        slot: u8,
     ) -> Run {
         let id = self.id;
         self.id += 1;
@@ -629,17 +669,18 @@ impl Hot {
         };
         let kind = kind.node_kind().unwrap_or(NodeKind::SkippedTokensTrivia);
         let parent = (parent != NONE).then_some(NodeId(parent));
-        w.open(id, parent, ElementType::Node(kind), self.pos, trailing);
+        w.open(id, parent, ElementType::Node(kind), self.pos, trailing, slot);
         if diags {
             walk.report_node(w, NodeId(id), self.pos, green);
         }
-        Run::slots(at, end, id, CLOSES | if green.is_list() { IN_LIST } else { 0 })
+        if green.is_list() { Run::list(at, end, id, CLOSES, 0) } else { Run::slots(at, end, id, CLOSES) }
     }
 
-    /// The leaves of the token `green` under `parent`: its leading trivia, its own leaf, its trailing trivia. At a
-    /// structured trivia it opens the structure's composite and returns the structure's slots and the rest of the
-    /// token (`TRIVIA`), to come back to after them.
+    /// The leaves of the token `green` under `parent` in its slot `slot`: its leading trivia, its own leaf, its
+    /// trailing trivia. At a structured trivia it opens the structure's composite and returns the structure's slots and
+    /// the rest of the token (`TRIVIA`), to come back to after them.
     #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
     fn token(
         &mut self,
         walk: &mut Walk<'_>,
@@ -647,16 +688,23 @@ impl Hot {
         r: Records<'_>,
         parent: u32,
         green: Green,
+        slot: u8,
     ) -> Option<(Run, Run)> {
         let d = &r.tokens[green.index()];
         if d.leading.len != 0 {
-            let run =
-                Run { at: d.leading.start, end: d.leading.start + d.leading.len, parent, flags: TRIVIA, token: green };
+            let run = Run {
+                at: d.leading.start,
+                end: d.leading.start + d.leading.len,
+                parent,
+                flags: TRIVIA,
+                token: green,
+                slot: slot as u32,
+            };
             if let Some(structure) = self.trivia(walk, w, r, run) {
                 return Some(structure);
             }
         }
-        self.token_leaf(walk, w, r, NodeId(parent), green);
+        self.token_leaf(walk, w, r, NodeId(parent), green, slot);
         if d.trailing.len == 0 {
             return None;
         }
@@ -666,6 +714,7 @@ impl Hot {
             parent,
             flags: TRIVIA | TRAILING,
             token: Green::NULL,
+            slot: 0,
         };
         self.trivia(walk, w, r, run)
     }
@@ -686,7 +735,7 @@ impl Hot {
         if run.token.is_null() {
             return None;
         }
-        self.token_leaf(walk, w, r, NodeId(run.parent), run.token);
+        self.token_leaf(walk, w, r, NodeId(run.parent), run.token, run.slot as u8);
         let d = &r.tokens[run.token.index()];
         let trailing = Run {
             at: d.trailing.start,
@@ -694,6 +743,7 @@ impl Hot {
             parent: run.parent,
             flags: TRIVIA | TRAILING,
             token: Green::NULL,
+            slot: 0,
         };
         self.trivia(walk, w, r, trailing)
     }
@@ -716,14 +766,14 @@ impl Hot {
             if td.flags & STRUCTURED != 0 {
                 let structure = walk.arena.trivia_structure(t);
                 walk.directive(self.id, structure);
-                let next = self.open(walk, w, r, run.parent, structure, trailing);
+                let next = self.open(walk, w, r, run.parent, structure, trailing, NO_SLOT);
                 return Some((next, run));
             }
             let kind = td.kind.token_kind().unwrap_or(TokenKind::BadToken);
             let start = self.pos;
             let end = start.wrapping_add(td.width);
             let leaf = self.id;
-            w.leaf(leaf, NodeId(run.parent), kind, start, end, trailing, false);
+            w.leaf(leaf, NodeId(run.parent), kind, start, end, trailing, false, NO_SLOT);
             self.id += 1;
             self.source_text(walk, start, td.start, td.width);
             if td.rare != NO_RARE {
@@ -734,8 +784,9 @@ impl Hot {
         None
     }
 
-    /// `token`'s own leaf (`Walk::token` over the records).
+    /// `token`'s own leaf in slot `slot` (`Walk::token` over the records).
     #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
     fn token_leaf(
         &mut self,
         walk: &mut Walk<'_>,
@@ -743,13 +794,14 @@ impl Hot {
         r: Records<'_>,
         parent: NodeId,
         green: Green,
+        slot: u8,
     ) {
         let d = &r.tokens[green.index()];
         let kind = d.kind.token_kind().unwrap_or(TokenKind::BadToken);
         let start = self.pos;
         let end = start.wrapping_add(d.width);
         let leaf = self.id;
-        w.leaf(leaf, parent, kind, start, end, false, d.flags & IS_NOT_MISSING == 0);
+        w.leaf(leaf, parent, kind, start, end, false, d.flags & IS_NOT_MISSING == 0, slot);
         self.id += 1;
         if d.flags & (IS_NOT_MISSING | FIXED_TEXT | OWNED_TEXT) == IS_NOT_MISSING {
             self.source_text(walk, start, d.start, d.width);
@@ -838,12 +890,13 @@ impl Walk<'_> {
         id
     }
 
-    /// The token's leaf over its span, its diagnostics.
-    fn token(&mut self, builder: &mut TreeBuilder<CSharp>, parent: NodeId, green: Green) {
+    /// The token's leaf over its span in slot `slot`, its diagnostics.
+    fn token(&mut self, builder: &mut TreeBuilder<CSharp>, parent: NodeId, green: Green, slot: u8) {
         let kind = self.arena.kind(green).token_kind().unwrap_or(TokenKind::BadToken);
         let start = self.position;
         let end = start.wrapping_add(self.arena.width(green));
         let leaf = builder.leaf(parent, kind, start, end);
+        builder.set_slot(leaf, slot);
         if self.arena.is_missing(green) {
             builder.set_missing(leaf);
         }
@@ -1137,7 +1190,7 @@ mod tests {
         let mut walk = Walk::new(arena, &source, arena.full_width(root));
         if root.is_token() {
             let id = builder.open(None, ElementType::Node(NodeKind::CompilationUnit), 0);
-            flattener.stack.push(Frame::Token { green: root, parent: id, phase: 0, index: 0 });
+            flattener.stack.push(Frame::Token { green: root, parent: id, slot: NO_SLOT, phase: 0, index: 0 });
             flattener.run(&mut walk, &mut builder);
             builder.close(id, walk.position);
         } else {
