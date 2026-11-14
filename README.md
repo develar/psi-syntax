@@ -19,6 +19,9 @@ mirror of this directory (`../scripts/psi-syntax-mirror.sh`):
 - `starlark-syntax`: Starlark from the IntelliJ Bazel plugin (`Starlark.flex`, the indenting lexer and parser), with
   `BUILD`/`.bzl`/module `FileKind`s and a `DebugUtil.psiToString`-compatible dump;
 - `ksdump`: dumps, benchmarks and lexes listed files like the oracles.
+- `line-diff`, `code-tokens`, `diff-marks`: the comparison of two texts ported from IntelliJ's diff, the tokens of a
+  file as its parser read them, and the marks of a diff (what changed only in its formatting, comments or a renamed
+  name, what moved), Branch Deck's diff.
 
 See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.
 

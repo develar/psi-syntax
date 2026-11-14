@@ -4,6 +4,9 @@
 # `ksdump`, which print, those rules have no meaning. psi-syntax's lints are its manifests' `[lints]`.
 # The parse entries of rust-analyzer's and oxc's parsers (`rust-syntax`, `js-syntax`) hold their one parse call each,
 # under the stack guard of each, with the text and the options every consumer reads the language with.
+# A product name, not code, in the docs of the crates that keep Branch Deck's pedantic lints (`line-diff`, `code-tokens`,
+# `diff-marks`); the default list stays.
+doc-valid-idents = ["IntelliJ", "OpenSpec", ".."]
 disallowed-methods = [
   { path = "ra_ap_syntax::SourceFile::parse", reason = "rust_syntax::parse_with_errors is the one validating parse: one edition, offsets kept on invalid UTF-8, its tree dropped on a stack it fits" },
   { path = "ra_ap_parser::TopEntryPoint::parse", reason = "rust_syntax's build is the one tree-building parse: its tree dropped where it is built, under the nesting guard" },

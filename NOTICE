@@ -49,3 +49,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+The comparison of two texts (crates/line-diff) is ported and modified from the diff of IntelliJ Platform
+(https://github.com/JetBrains/intellij-community, platform/util/diff and platform/diff-impl), Apache License 2.0;
+each ported file names its Kotlin or Java source in its header.
+
+IntelliJ Platform
+Copyright 2000-2025 JetBrains s.r.o. and contributors.
+Licensed under the Apache License, Version 2.0.
+
+The tokens of a file (crates/code-tokens) and the marks of a diff (crates/diff-marks) come from Branch Deck
+(https://github.com/develar/branch-deck), whose crates code-symbols and file-diffs held them under the MIT License;
+their author relicenses them under the Apache License, Version 2.0, with the rest of psi-syntax.
+Copyright 2026 Vladimir Krivosheev
