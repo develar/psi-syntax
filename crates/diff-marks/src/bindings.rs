@@ -1,7 +1,7 @@
 //! What the renames of a diff ask of the bindings of a text (`marks_renames`; openspec/specs/commit/name-bindings/spec.md):
 //! the name at each of many places of one parse, what a body declares it as, every name bound as it is, and what
 //! another name for it would clash with. The bindings are the reader's (`Bindings`): Branch Deck answers them by the
-//! navigation of `code-symbols` (`file_diffs::bindings`), another reader by its own scopes. These types are what the
+//! navigation of `code-symbols` (`code_symbols::marks_bindings`), and so does `accio diff`. These types are what the
 //! marks read of an answer, nothing more.
 
 use code_tokens::Grammar;

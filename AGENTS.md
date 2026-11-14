@@ -19,14 +19,15 @@ its crates members of accio's Cargo workspace with their own package fields, lin
 | `crates/lmdb-env` | an LMDB environment that the processes of one host share, for entries a caller can derive again: the rules of its open, close, locks, reader slots, versioned tables and full map, each a doc comment of its `lib.rs`; accio's forward store (`crates/core/src/forward.rs`) and Branch Deck's object cache build on it (decision 2026-11-09-lmdb-env-in-psi-syntax) |
 | `crates/spec-syntax` | spec documents as their formats define them: OpenSpec's main specs and change deltas (requirements, scenarios, the archive) as `@fission-ai/openspec` 1.16.1 reads them, IntelliJ's `*.spec.md` (front matter, rules, `targets`), the `[@test]` links and `// @spec` backlinks of both, each path resolved by its format's rule; accio's spec records and Branch Deck's review read it (decision 2026-11-10-specs-parsed-by-spec-syntax) |
 | `crates/line-diff` | the comparison of two texts, ported from IntelliJ's diff (`ByLine`, `ByWord`, `ByChar`, the LCS, the trims and policies), the model of a diff of values (`model::LineDiff`), the merge of three texts, and the lines a change moved within a file (`moves`) and between the files of a change (`moves_across`); Branch Deck describes it to its app by types of its own (decision 2026-11-13-diff-marks-in-psi-syntax) |
-| `crates/code-tokens` | the tokens of a file as its parser read them, each with the nodes that open and close at it, and the rule "equal by tokens" (`equal_by_tokens`, `indentation_matters`, `grammar_of`), over the parse of every language here by one parser per thread, which Branch Deck's `code-symbols` reads its trees by too (the same decision) |
+| `crates/code-tokens` | the tokens of a file as its parser read them, each with the nodes that open and close at it, and the rule "equal by tokens" (`equal_by_tokens`, `indentation_matters`, `grammar_of`), over the parse of every language here by one parser per thread, which `code-symbols` reads its trees by too (the same decision) |
+| `crates/code-symbols` | the declarations, imports and references of one file (`extract::summarize`, the summaries), its highlighting (`highlight`) and its navigation (`navigate`: Go to Declaration, Find Usages, the scopes of the names of Kotlin, Java, C#, Starlark, Rust and TypeScript), each language's walk of its tree; the bindings of the names that the renames of a diff ask (`marks_bindings`, behind the feature `marks`), which Branch Deck's diff and `accio diff` both answer by (decision 2026-11-14-code-symbols-in-psi-syntax) |
 | `crates/diff-marks` | the marks of a diff: the runs of lines changed in their formatting, comments or a renamed name alone, the renames within a file, the moves, the free reorders, what the files of a change say of each other (`marks_subject`); the bindings it asks its reader for (`bindings::Bindings`) and the contract of `accio renames` and `accio moves` it decides by (`index`) (the same decision) |
 
 The goal is exact: for every input, `kotlin_syntax::dump::psi_to_string` prints what Kotlin 2.4.21's
 `DebugUtil.psiToString(file, true, false).trim()` prints, byte for byte; `java_syntax`'s dumps print IntelliJ 271's
 Java PSI, and `csharp_syntax::dump::tree_to_string` prints Roslyn 5.9.0's syntax tree as `tools/csharp-oracle` dumps
 it (nodes, tokens, trivia, diagnostics). Consumers: accio's `crates/extract` (code search; declarations,
-call sites, imports; path dependencies) and Branch Deck's `code-symbols` (a revision of github.com/develar/psi-syntax, this directory's public mirror) (diff highlighting, navigation, file summaries), and its diff, through `code-tokens` and `diff-marks`. Both read the
+call sites, imports; path dependencies), `code-symbols` (diff highlighting, navigation, file summaries, the bindings of the marks), and the diff, through `code-tokens` and `diff-marks`, which Branch Deck reads at a revision of github.com/develar/psi-syntax, this directory's public mirror, and `accio diff` in place. Both read the
 tree directly: there is no tree-sitter compatibility layer and there must never be one. `docs/DESIGN.md` describes the
 architecture as built, its decisions, the measured numbers and the open items.
 
@@ -268,8 +269,9 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
   arguments), `utf8_text`, `errors()` (the error elements in document order with their messages), and
   `leaf_index().at(offset)`, a binary search that relies on the leaves being in offset order and tiling the text
   but for unexpanded bodies (`tests/robustness.rs` checks it on every tree). What a consumer makes of them
-  (symbols, call sites, scopes, the text of an error) stays in the consumer, but for the tokens of a file and the
-  marks of a diff, which both consumers make alike (`code-tokens`, `diff-marks`; see the last item).
+  (symbols, call sites, scopes, the text of an error) stays in the consumer, but for the tokens of a file, the
+  marks of a diff and the bindings of their names, which both consumers make alike (`code-tokens`, `diff-marks`,
+  `code-symbols`; see the last item).
 - The answers only the language has, which a consumer must not keep a list of token kinds for (`TreeLanguage`, each
   implementation delegating to the platform's own answer; `tests/reading.rs` of each language): `is_trivia` (the
   parser definition's whitespace and comments, Roslyn's `SyntaxFacts.IsTrivia` and its structured trivia),
@@ -465,10 +467,13 @@ What accio and Branch Deck may rely on (`psi-builder` `src/tree.rs`, named for K
 - The comparison of two texts, the tokens of a file and the marks of a diff (`line-diff`, `code-tokens`,
   `diff-marks`, decision 2026-11-13-diff-marks-in-psi-syntax): pure functions of the texts, no git, cache or IO, the
   one implementation of Branch Deck's diff, for accio's to share, so "what a consumer makes … stays in the consumer"
-  above holds for them only in what each makes of the marks (folds, review units, the output). They keep Branch Deck's
-  pedantic lints in their manifests; `code-tokens` holds the parse of each language by one parser per thread, which a
-  consumer's own walk of the trees reads by too, and is the one crate besides `accio-extract` that reads `rust-syntax`
-  and `js-syntax`.
+  above holds for them only in what each makes of the marks (folds, review units, the output). `code-symbols`
+  (decision 2026-11-14-code-symbols-in-psi-syntax) is Branch Deck's reader of the trees of six languages (the
+  summaries, the highlighting, the navigation and its scopes), whose navigation binds the names the marks ask
+  (`marks_bindings`), so a rename of a local reads alike in both; accio's `extract` reads its own scopes for its index
+  (`sites::name_scopes`), a second reader. They keep Branch Deck's pedantic lints in their manifests; `code-tokens`
+  holds the parse of each language by one parser per thread, which `code-symbols`'s walks of the trees read by too,
+  and with `code-symbols` is the only crate besides `accio-extract` that reads `rust-syntax` and `js-syntax`.
 
 ## The dump format (`DebugUtil.psiToString(file, showWhitespaces = true, showRanges = false)`)
 

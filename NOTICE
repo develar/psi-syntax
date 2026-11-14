@@ -58,7 +58,16 @@ IntelliJ Platform
 Copyright 2000-2025 JetBrains s.r.o. and contributors.
 Licensed under the Apache License, Version 2.0.
 
-The tokens of a file (crates/code-tokens) and the marks of a diff (crates/diff-marks) come from Branch Deck
+The tokens of a file (crates/code-tokens), the marks of a diff (crates/diff-marks) and the summaries, highlighting,
+navigation and bindings of the names of a file (crates/code-symbols) come from Branch Deck
 (https://github.com/develar/branch-deck), whose crates code-symbols and file-diffs held them under the MIT License;
 their author relicenses them under the Apache License, Version 2.0, with the rest of psi-syntax.
 Copyright 2026 Vladimir Krivosheev
+
+The Starlark parser (crates/starlark-syntax) is a port of the lexer and parser of the IntelliJ Bazel plugin
+(https://github.com/JetBrains/hirschgarten), and the Starlark highlighting and summary of crates/code-symbols follow the
+plugin's rules (StarlarkSyntaxHighlighter, its semantic highlighting and structure view), Apache License 2.0.
+
+IntelliJ Bazel plugin
+Copyright 2000-2026 JetBrains s.r.o. and contributors.
+Licensed under the Apache License, Version 2.0.

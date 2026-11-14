@@ -22,6 +22,8 @@ mirror of this directory (`../scripts/psi-syntax-mirror.sh`):
 - `line-diff`, `code-tokens`, `diff-marks`: the comparison of two texts ported from IntelliJ's diff, the tokens of a
   file as its parser read them, and the marks of a diff (what changed only in its formatting, comments or a renamed
   name, what moved), Branch Deck's diff.
+- `code-symbols`: the declarations, imports and references of one file, its highlighting and its navigation, and the
+  bindings of the names the marks of a diff ask, by the scopes of Kotlin, Java, C#, Starlark, Rust and TypeScript.
 
 See AGENTS.md for the porting rules and the oracles, docs/DESIGN.md for the architecture and its measurements.
 

@@ -1,0 +1,108 @@
+[package]
+name = "code-symbols"
+description = "Declarations, imports and references of one source file, its highlighting and navigation, on psi-syntax (Kotlin, Java, C#, Starlark, Rust, TypeScript)"
+version = "0.1.0"
+edition = "2024"
+# code-tokens' 1.98
+rust-version = "1.98"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+# Kotlin's, Java's and C#'s parsers: psi-syntax's ports of the Kotlin compiler's, IntelliJ's and Roslyn's own lexers and
+# parsers, whose trees are their PSI (Roslyn's syntax tree for C#) byte for byte; `psi-builder` is the tree all three
+# build, named directly for the code the languages share. `js-syntax` is oxc's parser of TypeScript, TSX and JavaScript
+# with what every reader of psi-syntax shares of its parse (the dialects, the options, the recovery, the stack); oxc is
+# named only through its re-exports. `rust-syntax` is rust-analyzer's parser, the parse accio reads Rust with; its
+# `ra_ap_syntax` and `rowan` are named only through its re-exports.
+csharp-syntax = { path = "../csharp-syntax", optional = true }
+java-syntax = { path = "../java-syntax", optional = true }
+js-syntax = { path = "../js-syntax", optional = true }
+kotlin-syntax = { path = "../kotlin-syntax", optional = true }
+# the tokens of a file, and the one parser of each language per thread that every walk of a tree here reads it by
+code-tokens = { path = "../code-tokens", default-features = false }
+psi-builder = { path = "../psi-builder" }
+rust-syntax = { path = "../rust-syntax", optional = true }
+starlark-syntax = { path = "../starlark-syntax", optional = true }
+# the bindings of the names that the renames of a diff ask (`marks_bindings`: `diff_marks::bindings::Bindings`) and the
+# marks of a diff as words (`marks_text`), of the diff of `line-diff`: the feature `marks`
+diff-marks = { path = "../diff-marks", optional = true }
+line-diff = { path = "../line-diff", optional = true }
+serde = { version = "1.0.228", features = ["derive"] }
+
+[dev-dependencies]
+# the tests of `marks_bindings`, which run whatever the features
+diff-marks = { path = "../diff-marks" }
+line-diff = { path = "../line-diff" }
+pretty_assertions = "1.4.1"
+serde_json = "1.0.145"
+
+[features]
+default = ["kotlin", "java", "csharp", "starlark", "rust", "typescript"]
+kotlin = ["dep:kotlin-syntax", "code-tokens/kotlin"]
+java = ["dep:java-syntax", "code-tokens/java"]
+csharp = ["dep:csharp-syntax", "code-tokens/csharp"]
+starlark = ["dep:starlark-syntax", "code-tokens/starlark"]
+rust = ["dep:rust-syntax", "code-tokens/rust"]
+typescript = ["dep:js-syntax", "code-tokens/typescript"]
+# the bindings of the names for the marks of a diff (`marks_bindings`) and the marks as words (`marks_text`)
+marks = ["dep:diff-marks", "dep:line-diff"]
+
+# Branch Deck's lints, which the code was written to and its `#[expect]`s name (decision
+# 2026-11-13-diff-marks-in-psi-syntax): pedantic and nursery, the restriction lints that catch defects, the allows
+# with their reasons.
+[lints.rust]
+unsafe_code = "forbid"
+unreachable_pub = "warn"
+unused_qualifications = "warn"
+unused_lifetimes = "warn"
+unused_macro_rules = "warn"
+trivial_numeric_casts = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
+assertions_on_result_states = "warn"
+cfg_not_test = "warn"
+clone_on_ref_ptr = "warn"
+dbg_macro = "warn"
+format_push_string = "warn"
+get_unwrap = "warn"
+if_then_some_else_none = "warn"
+lossy_float_literal = "warn"
+map_err_ignore = "warn"
+mem_forget = "warn"
+needless_raw_strings = "warn"
+print_stderr = "warn"
+rest_pat_in_fully_bound_structs = "warn"
+string_add = "warn"
+todo = "warn"
+try_err = "warn"
+unimplemented = "warn"
+unused_result_ok = "warn"
+unwrap_in_result = "warn"
+# the first paragraph of a doc comment is the whole description here, one or two sentences long
+too_long_first_doc_paragraph = "allow"
+# the Rust fixtures of the tests are sources that call `format!`
+literal_string_with_formatting_args = "allow"
+# `if let … else` reads better than `map_or_else` with two closures
+option_if_let_else = "allow"
+# the opposite of rustc's `unreachable_pub`, which is on
+redundant_pub_crate = "allow"
+# a `for` over a hash map is wrong only when its order reaches the output; the results whose order shows are sorted
+iter_over_hash_type = "allow"
+# its suggestions break scoped blocks and guards; none of its findings was a contention
+significant_drop_tightening = "allow"
+# it flags comparisons of two different fields, which is what they are meant to be
+suspicious_operation_groupings = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
+module_name_repetitions = "allow"
+similar_names = "allow"
+too_many_lines = "allow"
+items_after_statements = "allow"
+implicit_hasher = "allow"

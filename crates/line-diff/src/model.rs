@@ -65,6 +65,17 @@ pub struct LineRun {
     pub quiet: bool,
 }
 
+impl LineRun {
+    /// Whether this run holds the run `run`: of its kind, around its lines on both sides
+    pub fn holds(&self, run: &Self) -> bool {
+        self.kind == run.kind
+            && self.old_start <= run.old_start
+            && run.old_end <= self.old_end
+            && self.new_start <= run.new_start
+            && run.new_end <= self.new_end
+    }
+}
+
 /// What alone changed in a run
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

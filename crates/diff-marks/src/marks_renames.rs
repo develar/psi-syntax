@@ -889,27 +889,20 @@ impl Places {
 /// rename never takes the quiet of a line that changed in its formatting alone. The runs of each reading stand in
 /// the order of both sides, so the work is of their number, not of its square
 pub fn with_the_first(first: Vec<LineRun>, mut second: Vec<LineRun>) -> Vec<LineRun> {
-    let holds = |held: &LineRun, run: &LineRun| {
-        held.kind == run.kind
-            && held.old_start <= run.old_start
-            && run.old_end <= held.old_end
-            && held.new_start <= run.new_start
-            && run.new_end <= held.new_end
-    };
     // `other` ends before `run` starts, on both sides
     let follows = |run: &LineRun, other: &LineRun| other.old_end <= run.old_start && other.new_end <= run.new_start;
     second.retain(|held| {
         // the runs of the first reading that neither end before this one nor start after it: a row of them
         let before = first.partition_point(|run| follows(held, run));
         let beside = first[before..].partition_point(|run| !follows(run, held));
-        first[before..before + beside].iter().all(|run| holds(held, run))
+        first[before..before + beside].iter().all(|run| held.holds(run))
     });
     // the runs that are left share no line, so only the last one that starts at or before a run can hold it
     let kept: Vec<LineRun> = first
         .into_iter()
         .filter(|run| {
             let after = second.partition_point(|held| held.old_start <= run.old_start);
-            !after.checked_sub(1).is_some_and(|last| holds(&second[last], run))
+            !after.checked_sub(1).is_some_and(|last| second[last].holds(run))
         })
         .collect();
     second.extend(kept);

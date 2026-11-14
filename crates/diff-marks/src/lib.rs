@@ -9,7 +9,7 @@
 //! of code (accio) can share it:
 //!
 //! - **The bindings of a text** (`bindings::Bindings`): the names at many places of one parse, for the renames. Branch
-//!   Deck answers them by `code-symbols` (`file_diffs::bindings`).
+//!   Deck and `accio diff` answer them by `code-symbols` (`code_symbols::marks_bindings`).
 //! - **The answers of the index of a repository** (`index`): the contract of `accio renames` and `accio moves`, which
 //!   the marks of a subject decide by, and the mark of a free reorder (`reorder`) the latter gives.
 //! - **The tokens of a side**: a closure the reader keeps a cache behind (`marks::marks_of`).
