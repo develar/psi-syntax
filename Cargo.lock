@@ -228,6 +228,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c133bc6a41be0d194c306b5506d15e6feeea7b1d6604bd3f8310dfb2ca96486"
 
 [[package]]
+name = "code-symbols"
+version = "0.1.0"
+dependencies = [
+ "code-tokens",
+ "csharp-syntax",
+ "diff-marks",
+ "java-syntax",
+ "js-syntax",
+ "kotlin-syntax",
+ "line-diff",
+ "pretty_assertions",
+ "psi-builder",
+ "rust-syntax",
+ "serde",
+ "serde_json",
+ "starlark-syntax",
+]
+
+[[package]]
 name = "code-tokens"
 version = "0.1.0"
 dependencies = [
