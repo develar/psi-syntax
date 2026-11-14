@@ -24,8 +24,14 @@
 /// `jsconfig.json` where no `tsconfig.json` is).
 pub const CONFIG_FILES: [&str; 2] = ["tsconfig.json", "jsconfig.json"];
 
-/// The deepest `extends` chain followed: tsc reports a cycle, this module stops at it or at this depth.
-const MAX_EXTENDS: usize = 16;
+/// The most configurations `aliases` reads for one: the configuration asked for and those its `extends` chain names,
+/// each once, the entries of an array and their chains counted together; tsc reports a cycle, this module stops at it
+/// or at this bound. A configuration it reads is thus at most `MAX_EXTENDS - 1` levels of `extends` below the one asked
+/// for, so a caller that gives `read` the configurations lazily, one level more per pass (`aliases` again with the
+/// files the last call asked for), has the whole chain after at most `MAX_EXTENDS - 1` reads: the call after them asks
+/// for nothing new. `project_aliases` bounds the chain of each project the same way, a referenced project being one
+/// level below the configuration that names it.
+pub const MAX_EXTENDS: usize = 16;
 
 /// How deep the values of a configuration nest before it is no configuration (`parse`): a bound, not tsc's.
 const MAX_DEPTH: usize = 64;
@@ -603,6 +609,57 @@ mod tests {
         // An own empty `paths` replaces the inherited one; each base gives what the later ones do not write.
         assert_eq!(read("over/tsconfig.json"), Aliases { base_url: Some("loop/b".into()), paths: Vec::new() });
         assert_eq!(aliases("nothing.json", &mut reader(&tree)), None);
+    }
+
+    /// A chain longer than the bound: `aliases` reads `MAX_EXTENDS` configurations, the deepest `MAX_EXTENDS - 1`
+    /// levels below the one asked for; a caller that reads one level per pass has that answer after `MAX_EXTENDS - 1`
+    /// reads, the next call asking for nothing.
+    #[test]
+    fn extends_follows_at_most_max_extends_configurations() {
+        let levels = MAX_EXTENDS + 4;
+        let tree: HashMap<String, Vec<u8>> = (0..levels)
+            .map(|level| {
+                // Only the levels from `MAX_EXTENDS - 1` on write a `baseUrl`: the shallowest one read wins.
+                let base = if level + 1 >= MAX_EXTENDS {
+                    format!(r#", "compilerOptions": {{"baseUrl": "{level}"}}"#)
+                } else {
+                    String::new()
+                };
+                (format!("c{level}.json"), format!(r#"{{"extends": "./c{}.json"{base}}}"#, level + 1).into_bytes())
+            })
+            .collect();
+        let mut asked: Vec<String> = Vec::new();
+        let full = aliases("c0.json", &mut |path: &str| {
+            asked.push(path.to_string());
+            tree.get(path).cloned()
+        })
+        .unwrap();
+        assert_eq!(asked, (0..MAX_EXTENDS).map(|level| format!("c{level}.json")).collect::<Vec<_>>());
+        assert_eq!(full.base_url, Some((MAX_EXTENDS - 1).to_string()));
+
+        // The reads of a lazy caller: each pass gives what the calls before it asked for.
+        let mut known: HashMap<String, Vec<u8>> = HashMap::from([("c0.json".to_string(), tree["c0.json"].clone())]);
+        let mut reads = 0;
+        loop {
+            let mut wanted: Vec<String> = Vec::new();
+            let answer = aliases("c0.json", &mut |path: &str| {
+                let text = known.get(path).cloned();
+                if text.is_none() {
+                    wanted.push(path.to_string());
+                }
+                text
+            });
+            if wanted.is_empty() {
+                assert_eq!(answer.as_ref(), Some(&full));
+                break;
+            }
+            reads += 1;
+            assert!(reads < MAX_EXTENDS, "{wanted:?}");
+            for path in wanted {
+                known.insert(path.clone(), tree[&path].clone());
+            }
+        }
+        assert_eq!(reads, MAX_EXTENDS - 1);
     }
 
     /// A solution-style configuration: its own aliases first, then each referenced project's; a target that leaves the
