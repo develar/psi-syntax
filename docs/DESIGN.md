@@ -874,6 +874,21 @@ The machine is an Apple M5 Max shared with other sessions. Every comparison alte
 reports the summed parse time; a multi-threaded run reports wall time. The corpus is the community list (55 501 files,
 172.91 MB).
 
+### C# slots kept by the tree, 2026-11-14
+
+A getter found a child's Roslyn slot by walking the kinds of the children before it (`SlotSpec`, generated from
+Roslyn's `Syntax.xml`). The flatten now writes each node's slot into a column of one byte a node, and the getters
+read it. Slots equal the derived ones on every corpus file and fuzz input (gate PASS). `ksdump --bench` over
+aspnetcore (10 188 files, `psi` profile, this Mac), instructions retired, median of three alternated runs:
+
+| build | instructions, G |
+|---|---|
+| before | 17.29 |
+| the slot computed in every arm and written for every node | +4.6 % (Studio, `ksdump-ab`) |
+| the slot computed only for a token, a list and a node, `NO_SLOT` not written | 17.55 (+1.5 %) |
+
+The consumer pays it back: accio's C# record over aspnetcore's `src/Mvc` falls 219 → 197 instructions a byte.
+
 ### C# token reads inline, 2026-11-05
 
 The profile after "C# flatten without calls" (callgrind over the same 1004 roslyn files, 2271.8 M Ir) named
