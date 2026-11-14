@@ -256,10 +256,18 @@ impl TreeData {
 /// A parsed file of language `L`.
 pub struct Tree<L: TreeLanguage> {
     text: Arc<[u8]>,
+    /// The text where all of it is UTF-8, checked once (`utf8_of`): a leaf's text is then a slice of it at two char
+    /// boundaries (`utf8_text`), where a check of each leaf's bytes cost every name read again.
+    utf8: Option<Arc<str>>,
     file_kind: L::FileKind,
     data: TreeData,
     root: u32,
     language: PhantomData<fn() -> L>,
+}
+
+/// `text` as a `str` where all of it is UTF-8 (`Tree::utf8`).
+fn utf8_of(text: &[u8]) -> Option<Arc<str>> {
+    std::str::from_utf8(text).ok().map(Arc::from)
 }
 
 /// How `Parser::parse_with_options` builds the tree.
@@ -577,7 +585,7 @@ impl<L: Language> Parser<L> {
         self.data = data;
         self.options = ParseOptions::default();
         self.retain();
-        Some(Tree { text: tree.text.clone(), file_kind: tree.file_kind, data: body, root, language: PhantomData })
+        Some(Tree { text: tree.text.clone(), utf8: tree.utf8.clone(), file_kind: tree.file_kind, data: body, root, language: PhantomData })
     }
 
     /// Lexes `text`, runs `parse` on the frame whose builder holds its tokens, builds and expands the tree.
@@ -627,7 +635,7 @@ impl<L: Language> Parser<L> {
         let tree = data.take_exact();
         self.data = data;
         self.retain();
-        Tree { text, file_kind, data: tree, root, language: PhantomData }
+        Tree { utf8: utf8_of(&text), text, file_kind, data: tree, root, language: PhantomData }
     }
 
     /// Runs the builders on `frames` to the end: the top one appends its nodes until it appends a chameleon, whose
@@ -830,7 +838,10 @@ impl<L: TreeLanguage> Tree<L> {
 
     /// The node's text as a string, None when it is not UTF-8.
     pub fn utf8_text(&self, id: NodeId) -> Option<&str> {
-        std::str::from_utf8(self.text(id)).ok()
+        match &self.utf8 {
+            Some(text) => text.get(self.range(id)),
+            None => std::str::from_utf8(self.text(id)).ok(),
+        }
     }
 
     /// Whether the node carries no code: whitespace, a comment (a doc comment with it), or a composite the language
@@ -1263,7 +1274,7 @@ impl<L: TreeLanguage> TreeBuilder<L> {
         links.shrink_to_fit();
         errors.shrink_to_fit();
         let data = TreeData { kinds, ranges, links, errors, body_depths: Vec::new(), nodes: Vec::new(), built: 0 };
-        Tree { text, file_kind, data, root: 0, language: PhantomData }
+        Tree { utf8: utf8_of(&text), text, file_kind, data, root: 0, language: PhantomData }
     }
 }
 
