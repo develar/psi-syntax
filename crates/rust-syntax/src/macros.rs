@@ -191,7 +191,7 @@ fn verbatim_as(call: &ast::MacroCall, origin: Origin<'_>, entry: TopEntryPoint) 
 
 /// A call's input read as statements: the commas between its top-level arguments (`assert_eq!(a.f(), 1)`, `vec![x, y]`)
 /// become the `;` between statements, each at its comma's span; a comma inside brackets stays.
-fn statements(mut tt: ra_ap_tt::TopSubtree) -> ra_ap_tt::TopSubtree {
+fn statements(tt: ra_ap_tt::TopSubtree) -> ra_ap_tt::TopSubtree {
     use ra_ap_tt::{Leaf, Punct, TokenTree};
     let mut commas: Vec<(usize, Punct)> = Vec::new();
     let mut nested: Vec<usize> = Vec::new();
@@ -208,11 +208,17 @@ fn statements(mut tt: ra_ap_tt::TopSubtree) -> ra_ap_tt::TopSubtree {
             _ => {}
         }
     }
-    // The serialized list holds the top subtree at 0, its children after it.
-    for (i, p) in commas {
-        tt.set_token(i + 1, Leaf::Punct(Punct { char: ';', spacing: p.spacing, span: p.span }));
+    if commas.is_empty() {
+        return tt;
     }
-    tt
+    // The serialized list holds the top subtree at 0, its children after it. Every comma is replaced in one list and
+    // the tree built once: `TopSubtree::set_token` rebuilds the whole tree, so a call per comma made an input of many
+    // arguments (`vec![…]` of a table) the square of its length.
+    let mut serialized: Vec<TokenTree> = tt.as_token_trees().iter_flat_tokens().collect();
+    for (i, p) in commas {
+        serialized[i + 1] = Leaf::Punct(Punct { char: ';', spacing: p.spacing, span: p.span }).into();
+    }
+    ra_ap_tt::TopSubtree::from_serialized(serialized)
 }
 
 impl Expansion {
