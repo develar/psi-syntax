@@ -38,12 +38,12 @@ pub trait Trial {
     type Unit;
     /// Before each pair of a unit under `HostPolicy::PerPair`: its wait (`Host::before_pair`); the load then.
     fn before_pair(&mut self) -> Result<f64> {
-        Ok(reserve::probe().load)
+        Ok(reserve::load())
     }
     /// Before the next pair after one the `Filter` dropped, under `HostPolicy::PerStep`: its wait
     /// (`Host::after_burst`); the load then.
     fn after_burst(&mut self) -> Result<f64> {
-        Ok(reserve::probe().load)
+        Ok(reserve::load())
     }
     /// One timed run of `unit` by arm `index` of the run's arms.
     fn run(&mut self, index: usize, arm: &Arm, unit: &Self::Unit) -> Result<Sample>;
@@ -465,11 +465,11 @@ impl Host {
     /// instructions starts on a loaded host), the caller did not wait already and the policy waits at all; the load
     /// then.
     pub fn before_step(&self, wall: bool) -> Result<f64> {
-        if wall && !self.checked && self.policy != HostPolicy::None {
-            wait_quiet(Duration::from_secs(self.args.wait_quiet), self.args.force)
-        } else {
-            Ok(reserve::probe().load)
-        }
+        self.carry(self.step_wait(wall))
+    }
+
+    fn step_wait(&self, wall: bool) -> Option<Wait> {
+        (wall && !self.checked && self.policy != HostPolicy::None).then_some(Wait::Quiet)
     }
 
     /// The reservation, then `before_step`.
@@ -481,21 +481,42 @@ impl Host {
     /// Before a pair: under `PerPair` until no other process is busy, whatever the load average (and whatever the
     /// caller waited for); the load then.
     pub fn before_pair(&self) -> Result<f64> {
-        match self.policy {
-            HostPolicy::PerPair => wait_unshared(Duration::from_secs(self.args.wait_quiet), self.args.force),
-            HostPolicy::PerStep | HostPolicy::None => Ok(reserve::probe().load),
-        }
+        self.carry(self.pair_wait())
+    }
+
+    fn pair_wait(&self) -> Option<Wait> {
+        (self.policy == HostPolicy::PerPair).then_some(Wait::Unshared)
     }
 
     /// Before the pair after a dropped one: under `PerStep` until no other process is busy, whatever the caller waited
     /// for before the step (`checked`) and whatever the load average, which the step's own runs still hold; the load
     /// then.
     pub fn after_burst(&self) -> Result<f64> {
-        match self.policy {
-            HostPolicy::PerStep => wait_unshared(Duration::from_secs(self.args.wait_quiet), self.args.force),
-            HostPolicy::PerPair | HostPolicy::None => Ok(reserve::probe().load),
+        self.carry(self.burst_wait())
+    }
+
+    fn burst_wait(&self) -> Option<Wait> {
+        (self.policy == HostPolicy::PerStep).then_some(Wait::Unshared)
+    }
+
+    /// The wait a moment asks for, for at most `HostArgs::wait_quiet`; without one, the load average alone, the
+    /// processes of the host not listed (`ps` takes seconds on a loaded host, #805).
+    fn carry(&self, wait: Option<Wait>) -> Result<f64> {
+        let timeout = Duration::from_secs(self.args.wait_quiet);
+        match wait {
+            Some(Wait::Quiet) => wait_quiet(timeout, self.args.force),
+            Some(Wait::Unshared) => wait_unshared(timeout, self.args.force),
+            None => Ok(reserve::load()),
         }
     }
+}
+
+/// What a moment of `Host` waits for: a quiet host (`reserve::wait_quiet`) or one no other process is busy on
+/// (`reserve::wait_unshared`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Wait {
+    Quiet,
+    Unshared,
 }
 
 /// The values a flattened argument group takes when no flag is given: its defaults, from its own declaration.
@@ -857,8 +878,9 @@ mod tests {
         );
     }
 
-    /// The waits a policy skips return at once whatever the host does: a step judged by CPU, a step whose caller
-    /// waited (`checked`), a pair under `PerStep`.
+    /// Each moment waits for what its policy asks and nothing else: a step judged by its wall for a quiet host unless
+    /// its caller waited (`checked`), a pair under `PerPair` and the pair after a burst under `PerStep` for an
+    /// unshared one. A skipped wait reads the load average alone, so no host's load can turn it into one (#805).
     #[test]
     fn a_host_skips_the_waits_its_policy_does_not_ask_for() {
         let host = |policy, checked| Host {
@@ -866,21 +888,18 @@ mod tests {
             args: HostArgs { wait_reservation: 0, wait_quiet: 3600, force: false },
             checked,
         };
-        let started = std::time::Instant::now();
-        host(HostPolicy::PerStep, false).before_step(false).unwrap();
-        host(HostPolicy::PerPair, true).before_step(true).unwrap();
-        host(HostPolicy::PerStep, false).before_pair().unwrap();
-        host(HostPolicy::PerPair, false).after_burst().unwrap();
-        // `None` waits for nothing, a step judged by its wall included, and reserves nothing: the reservation it
-        // returns holds no lock, so the host's own is free while it lives.
-        host(HostPolicy::None, false).before_step(true).unwrap();
-        host(HostPolicy::None, false).before_pair().unwrap();
-        host(HostPolicy::None, false).after_burst().unwrap();
+        let moments = |h: Host| [h.step_wait(true), h.step_wait(false), h.pair_wait(), h.burst_wait()];
+        let (q, u) = (Some(Wait::Quiet), Some(Wait::Unshared));
+        assert_eq!(moments(host(HostPolicy::PerStep, false)), [q, None, None, u]);
+        assert_eq!(moments(host(HostPolicy::PerStep, true)), [None, None, None, u]);
+        assert_eq!(moments(host(HostPolicy::PerPair, false)), [q, None, u, None]);
+        assert_eq!(moments(host(HostPolicy::PerPair, true)), [None, None, u, None]);
+        assert_eq!(moments(host(HostPolicy::None, false)), [None; 4]);
+        // `None` reserves nothing: the reservation it returns holds no lock, so the host's own is free while it lives.
         let dir = std::env::temp_dir().join(format!("accio-bench-none-{}", std::process::id()));
         let held = host(HostPolicy::None, false).reserve("quick").unwrap();
         drop(Reservation::acquire_in(&dir, "another", Duration::ZERO).expect("the lock is free beside a quick run"));
         drop(held);
         let _ = std::fs::remove_dir_all(&dir);
-        assert!(started.elapsed() < Duration::from_secs(4), "no wait (a wait sleeps 5 s at a time)");
     }
 }

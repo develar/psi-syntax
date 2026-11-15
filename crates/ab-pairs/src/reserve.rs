@@ -123,9 +123,15 @@ impl Quiet {
     }
 }
 
+/// The 1-minute load average, `0` where the platform has none: what a moment that waits for nothing records, without
+/// the process listing of `probe`.
+pub fn load() -> f64 {
+    sys::load_average().unwrap_or(0.0)
+}
+
 pub fn probe() -> Quiet {
     Quiet {
-        load: sys::load_average().unwrap_or(0.0),
+        load: load(),
         cores: sys::cpu_count(),
         busy: sys::busy_processes(&sys::processes(), std::process::id(), 50.0),
     }
