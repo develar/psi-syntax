@@ -123,8 +123,9 @@ impl std::error::Error for Stalled {}
 /// each process of the tree (the child and its descendants: `cargo` waits on `rustc`, `npx` on node): instructions
 /// retired on macOS, CPU ticks on Linux. A window in which no process of the tree does `FLOOR` of it and none starts
 /// is a stall: the root's stacks are sampled (macOS `sample`), then the tree is killed, and the child's wait returns.
-/// `AB_STALL_S` sets the window (default 600 s; `0` turns the watch off); a measured query of an A/B takes seconds,
-/// an index build minutes, each of them working all along.
+/// The window runs on the time the tree was blocked, not on the wall (`Clock`): a tree that waits for a CPU of a host
+/// loaded past its cores is starved, not stalled. `AB_STALL_S` sets the window (default 600 s; `0` turns the watch
+/// off); a measured query of an A/B takes seconds, an index build minutes, each of them working all along.
 #[cfg(unix)]
 pub mod watch {
     use super::Stall;
@@ -137,11 +138,11 @@ pub mod watch {
     const TICK: Duration = Duration::from_secs(5);
     /// What the tree must do within a window: about 0.3 s of CPU.
     #[cfg(target_os = "macos")]
-    const FLOOR: u64 = 1_000_000_000;
+    pub(super) const FLOOR: u64 = 1_000_000_000;
     #[cfg(target_os = "macos")]
     pub const WORK: &str = "under 1e9 instructions";
     #[cfg(not(target_os = "macos"))]
-    const FLOOR: u64 = 30;
+    pub(super) const FLOOR: u64 = 30;
     #[cfg(not(target_os = "macos"))]
     pub const WORK: &str = "under 0.3 s of CPU";
 
@@ -176,26 +177,74 @@ pub mod watch {
         }
     }
 
+    /// What a process has done so far: its work (`WORK`'s unit) and the time it was runnable, running or waiting for
+    /// a CPU.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub(super) struct Reading {
+        pub(super) work: u64,
+        pub(super) runnable: Duration,
+    }
+
+    /// The stall clock of a tree, fed a reading of each of its processes every tick: a stall is `window` of time in
+    /// which no process of the tree was runnable, and the tree did less than `FLOOR` of work and started no process.
+    /// A tick adds its wall less the time the tree's processes were runnable in it, so a tree that sleeps on a pipe,
+    /// a lock or a signal runs the window down at the wall's pace, and one that a loaded host leaves without a CPU
+    /// (a second without one on a Mac at load 67, #818) does not run it down at all: the window is a span of blocked
+    /// time, which no neighbour's load stretches or shrinks.
+    pub(super) struct Clock {
+        window: Duration,
+        blocked: Duration,
+        done: u64,
+        seen: HashMap<libc::pid_t, Reading>,
+    }
+
+    impl Clock {
+        pub(super) fn new(window: Duration) -> Clock {
+            Clock { window, blocked: Duration::ZERO, done: 0, seen: HashMap::new() }
+        }
+
+        /// One tick of `wall` since the last, with the readings of the tree's processes (`root` first): whether the
+        /// tree has stalled. The root, spawned as the watch started, did all it did so far within the first tick.
+        pub(super) fn tick(
+            &mut self,
+            wall: Duration,
+            root: libc::pid_t,
+            readings: impl IntoIterator<Item = (libc::pid_t, Reading)>,
+        ) -> bool {
+            let mut runnable = Duration::ZERO;
+            for (pid, now) in readings {
+                let before = match self.seen.insert(pid, now) {
+                    Some(before) => before,
+                    // A process the tree started: it works.
+                    None if pid != root => {
+                        self.done += FLOOR;
+                        continue;
+                    }
+                    None => Reading { work: 0, runnable: Duration::ZERO },
+                };
+                self.done += now.work.saturating_sub(before.work);
+                runnable += now.runnable.saturating_sub(before.runnable);
+            }
+            if self.done >= FLOOR {
+                (self.blocked, self.done) = (Duration::ZERO, 0);
+                return false;
+            }
+            self.blocked += wall.saturating_sub(runnable);
+            self.blocked >= self.window
+        }
+    }
+
     fn watch(root: libc::pid_t, window: Duration, tick: Duration, stopped: &mpsc::Receiver<()>) -> Option<Stall> {
-        let mut seen: HashMap<libc::pid_t, u64> = HashMap::new();
-        let (mut since, mut done) = (Instant::now(), 0u64);
+        let mut clock = Clock::new(window);
+        let mut last = Instant::now();
         loop {
             if stopped.recv_timeout(tick).is_ok() || !running(root) {
                 return None;
             }
             let tree = tree(root);
-            for &pid in &tree {
-                let Some(now) = work(pid) else { continue };
-                match seen.insert(pid, now) {
-                    Some(before) => done += now.saturating_sub(before),
-                    // A process the tree started: it works.
-                    None if pid != root => done += FLOOR,
-                    None => {}
-                }
-            }
-            if done >= FLOOR {
-                (since, done) = (Instant::now(), 0);
-            } else if since.elapsed() >= window {
+            let wall = last.elapsed();
+            last = Instant::now();
+            if clock.tick(wall, root, tree.iter().filter_map(|&pid| Some((pid, reading(pid)?)))) {
                 if !running(root) {
                     return None;
                 }
@@ -257,26 +306,51 @@ pub mod watch {
         Vec::new()
     }
 
-    /// The work `pid` has done so far (`WORK`'s unit).
+    /// What `pid` has done so far: instructions retired and the time runnable (`ri_runnable_time`, running or
+    /// waiting for a CPU), both of the whole process, the times in Mach's ticks (`mach_timebase_info`).
     #[cfg(target_os = "macos")]
-    fn work(pid: libc::pid_t) -> Option<u64> {
+    #[allow(deprecated)] // libc points Mach's calls to the mach2 crate; the tools take no dependency for one of them
+    fn reading(pid: libc::pid_t) -> Option<Reading> {
+        static TIMEBASE: std::sync::OnceLock<(u64, u64)> = std::sync::OnceLock::new();
+        let &(numer, denom) = TIMEBASE.get_or_init(|| {
+            let mut tb = libc::mach_timebase_info { numer: 0, denom: 0 };
+            // SAFETY: an out-pointer to a timebase the call fills.
+            let ok = unsafe { libc::mach_timebase_info(&mut tb) } == libc::KERN_SUCCESS && tb.denom != 0;
+            if ok { (u64::from(tb.numer), u64::from(tb.denom)) } else { (1, 1) }
+        });
         // SAFETY: a zeroed rusage_info_v4 is valid; proc_pid_rusage writes one of its flavor into it.
         let mut ri: libc::rusage_info_v4 = unsafe { std::mem::zeroed() };
         let r =
             unsafe { libc::proc_pid_rusage(pid, libc::RUSAGE_INFO_V4, (&mut ri as *mut libc::rusage_info_v4).cast()) };
-        (r == 0).then_some(ri.ri_instructions)
+        let ns = u128::from(ri.ri_runnable_time) * u128::from(numer) / u128::from(denom);
+        (r == 0).then(|| Reading {
+            work: ri.ri_instructions,
+            runnable: Duration::from_nanos(u64::try_from(ns).unwrap_or(u64::MAX)),
+        })
     }
 
-    /// utime + stime of `/proc/<pid>/stat`, in clock ticks.
+    /// utime + stime of `/proc/<pid>/stat`, in clock ticks, and the time runnable: the CPU and run-queue times of
+    /// `/proc/<pid>/task/*/schedstat` (nanoseconds), none where the kernel keeps no schedstat.
     #[cfg(target_os = "linux")]
-    fn work(pid: libc::pid_t) -> Option<u64> {
+    fn reading(pid: libc::pid_t) -> Option<Reading> {
         let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
         let fields: Vec<&str> = stat.rsplit_once(')')?.1.split_whitespace().collect();
-        Some(fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?)
+        let work = fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?;
+        let runnable = std::fs::read_dir(format!("/proc/{pid}/task"))
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter_map(|t| std::fs::read_to_string(t.path().join("schedstat")).ok())
+            .filter_map(|s| {
+                let mut f = s.split_whitespace().map(|x| x.parse::<u64>().ok());
+                Some(f.next()?? + f.next()??)
+            })
+            .sum();
+        Some(Reading { work, runnable: Duration::from_nanos(runnable) })
     }
 
     #[cfg(not(any(target_os = "macos", target_os = "linux")))]
-    fn work(_: libc::pid_t) -> Option<u64> {
+    fn reading(_: libc::pid_t) -> Option<Reading> {
         None
     }
 
@@ -921,6 +995,30 @@ mod tests {
         if let Some(stacks) = &stalled.stall.stacks {
             let _ = std::fs::remove_file(stacks);
         }
+    }
+
+    /// The window runs on blocked time: a tree runnable all along (a host without a CPU for it) never stalls, however
+    /// many windows of wall pass; one blocked half of each tick stalls after twice the window; work of `FLOOR` or a
+    /// process the tree starts restarts the window.
+    #[cfg(unix)]
+    #[test]
+    fn a_tree_stalls_after_a_window_of_blocked_time() {
+        use watch::{Clock, FLOOR, Reading};
+        let ms = Duration::from_millis;
+        let at = |work, runnable| Reading { work, runnable: ms(runnable) };
+        let tick = ms(250);
+        let ticks = |clock: &mut Clock, readings: &mut dyn FnMut(u64) -> Vec<(libc::pid_t, Reading)>| {
+            (1..=1000).find(|&i| clock.tick(tick, 1, readings(i)))
+        };
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), &mut |_| vec![(1, at(0, 0))]), Some(4), "asleep");
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), &mut |i| vec![(1, at(0, i * 125))]), Some(8), "blocked half");
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), &mut |i| vec![(1, at(0, i * 250))]), None, "starved");
+        // Two threads runnable a whole tick each are no more than the tick.
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), &mut |i| vec![(1, at(0, i * 500))]), None, "two threads starved");
+        let working = &mut |i: u64| vec![(1, at(i.min(8) * FLOOR, 0))];
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), working), Some(12), "working until tick 8");
+        let starting = &mut |i: u64| (1..=i.min(6)).map(|p| (p as libc::pid_t, at(0, 0))).collect();
+        assert_eq!(ticks(&mut Clock::new(ms(1000)), starting), Some(10), "starting a child until tick 6");
     }
 
     /// A tree that works in a child, its root only waiting (`cargo` on `rustc`), runs past the window to its end.
