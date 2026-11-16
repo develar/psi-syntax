@@ -896,10 +896,9 @@ mod tests {
         assert_eq!(moments(host(HostPolicy::PerPair, true)), [None, None, u, None]);
         assert_eq!(moments(host(HostPolicy::None, false)), [None; 4]);
         // `None` reserves nothing: the reservation it returns holds no lock, so the host's own is free while it lives.
-        let dir = std::env::temp_dir().join(format!("accio-bench-none-{}", std::process::id()));
+        let dir = tempfile::tempdir().unwrap();
         let held = host(HostPolicy::None, false).reserve("quick").unwrap();
-        drop(Reservation::acquire_in(&dir, "another", Duration::ZERO).expect("the lock is free beside a quick run"));
+        drop(Reservation::acquire_in(dir.path(), "another", Duration::ZERO).expect("the lock is free beside a quick run"));
         drop(held);
-        let _ = std::fs::remove_dir_all(&dir);
     }
 }
