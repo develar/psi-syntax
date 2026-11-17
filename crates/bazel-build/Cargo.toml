@@ -1,0 +1,18 @@
+[package]
+name = "bazel-build"
+description = "One Bazel BUILD file read without running Bazel: its statements as values, its targets with the labels each attribute writes, and its text without them; accio's Bazel reader and Branch Deck's review"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+repository = "https://github.com/JetBrains/accio"
+publish = false
+
+[dependencies]
+starlark-syntax = { path = "../starlark-syntax" }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
