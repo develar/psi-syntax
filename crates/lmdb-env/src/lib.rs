@@ -2,11 +2,18 @@
 //! store (decision 2026-11-06-forward-edges-in-lmdb in accio's `docs/decisions/`) and Branch Deck's object cache, whose
 //! copies of these rules diverged until they moved here (decision 2026-11-09-lmdb-env-in-psi-syntax). The rules:
 //!
-//! - **The map size caps the environment.** A write that would fill it, or meets `MDB_MAP_FULL`, clears this store's
-//!   tables and is retried once: every entry is derived, so a clear costs its derivation and nothing else. The clear
-//!   is two transactions, so the retried batch reuses the freed pages (`Store::clear`).
+//! - **The map size caps the environment, so a full map clears the environment**, not the tables of the store that
+//!   writes: a write that would take the live pages of every table past `FULL` of the map, or meets `MDB_MAP_FULL`,
+//!   clears every table and is retried once. Every entry is derived, so a clear costs its derivation and nothing else.
+//!   The tables a live store of this process holds are emptied, every other one is dropped: those of another version
+//!   or another layout of the record, which another binary wrote, held the pages a clear of the writer's own tables
+//!   left, and each batch after it was lost (accio's issue #861). The clear is a transaction per table, in steps where
+//!   the map has no room for one (`empty_table`), and one more, so the retried batch reuses the freed pages
+//!   (`Store::clear`).
 //! - **One `Env` per directory in a process** (`ENVS`): LMDB must not open an environment twice in one process. The
-//!   directory's slot is held across the open and the close.
+//!   directory's slot is held across the open and the close. The environment knows the tables its live stores hold
+//!   (`Shared::held`): a dropped table frees its handle, which LMDB gives the next table opened, so dropping a table a
+//!   store of the process holds would point that store at another table.
 //! - **Opens and closes run under the directory's `open.lock`**, one process at a time. On macOS LMDB locks an
 //!   environment with a System V semaphore set per lock file, which only `mdb_env_close` removes; a close must not
 //!   remove the set another process's open is reading.
@@ -15,7 +22,7 @@
 //!   leaves its semaphore set behind, and enough of them disable every environment of the host.
 //! - **A table's version is part of its name** (`forward.v3`). Opening drops the tables of the same name and an older
 //!   version, and keeps newer ones: a newer binary that may still run uses them. A retired table, which no binary
-//!   writes any more, is dropped in every version.
+//!   writes any more, is dropped in every version. A table a live store of this process holds is never dropped.
 //! - **A reader slot is held for a transaction, not for a thread** (`MDB_NOTLS`): a slot bound to a thread stays taken
 //!   until the thread exits, so the workers of a few parallel queries took every slot and each later read was a miss.
 //! - **The readers of a dead process are cleared** at an open and before a full map's clear (`clear_stale_readers`):
@@ -38,8 +45,9 @@ mod semaphore;
 /// An environment whose read transactions hold a reader slot only while they run (`MDB_NOTLS`).
 type Env = heed::Env<WithoutTls>;
 
-/// The share of the map the live pages may take before a batch clears the tables (`Store::put`): what a batch adds
-/// past the live pages, and the freelist's own pages, stay under the map size.
+/// The share of the map the live pages of the environment may take before a batch clears it (`Store::put`): what a
+/// batch adds past the live pages, and the freelist's own pages, stay under the map size, and so do the pages the
+/// clear itself writes.
 const FULL: f64 = 0.75;
 
 /// The key the transaction after a clear writes and the next batch removes (`Store::clear`): LMDB reuses the pages a
@@ -86,8 +94,23 @@ impl OnCommit for Opened<'_> {
     }
 }
 
+/// The open environment of a directory in this process and the tables its live stores hold.
+struct Shared {
+    env: Env,
+    /// The table names of the live stores, a name once per store that holds it: a clear drops every other table
+    /// (`Store::clear`). Locked across an open's tables and a clear, so a table is never dropped between its open and
+    /// its store's entry here.
+    held: Mutex<Vec<String>>,
+}
+
+impl Shared {
+    fn held(&self) -> MutexGuard<'_, Vec<String>> {
+        self.held.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+}
+
 /// The environment of a directory in this process, if one is open: its slot is locked across an open and a close.
-type Slot = Arc<Mutex<Weak<Env>>>;
+type Slot = Arc<Mutex<Weak<Shared>>>;
 
 static ENVS: OnceLock<Mutex<HashMap<PathBuf, Slot>>> = OnceLock::new();
 
@@ -98,7 +121,7 @@ fn slot_of(dir: &Path) -> Slot {
     Arc::clone(envs.entry(dir.to_path_buf()).or_default())
 }
 
-fn lock(slot: &Slot) -> MutexGuard<'_, Weak<Env>> {
+fn lock(slot: &Slot) -> MutexGuard<'_, Weak<Shared>> {
     slot.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
@@ -111,9 +134,13 @@ fn lock_opens(dir: &Path) -> std::io::Result<std::fs::File> {
 
 /// An open environment and the tables a caller opened in it; cheap to share behind an `Arc`.
 pub struct Store {
-    env: Option<Arc<Env>>,
+    shared: Option<Arc<Shared>>,
     slot: Slot,
     tables: Vec<RawDatabase>,
+    /// The names of `tables`, in their order, as `Shared::held` lists them.
+    names: Vec<String>,
+    /// The unnamed database, whose entries name every table of the environment and hold its record (`live_bytes`).
+    main: RawDatabase,
 }
 
 impl Store {
@@ -121,15 +148,25 @@ impl Store {
     /// if missing; the tables of the same names and older versions are dropped, and those of the `retired` names in
     /// every version.
     pub fn open(dir: &Path, config: &Config, tables: &[(&str, u32)], retired: &[&str]) -> Result<Store, String> {
-        let (env, slot) =
+        let (shared, slot) =
             open_env(dir, config).map_err(|e| format!("cannot open the store in {}: {e}", dir.display()))?;
-        let tables = open_tables(&env, tables, retired)
-            .map_err(|e| format!("cannot open the tables of {}: {e}", dir.display()))?;
-        Ok(Store { env: Some(env), slot, tables })
+        let names: Vec<String> = tables.iter().map(|(name, version)| format!("{name}.v{version}")).collect();
+        let (opened, main) = {
+            let mut held = shared.held();
+            let opened = open_tables(&shared.env, &names, tables, retired, &held)
+                .map_err(|e| format!("cannot open the tables of {}: {e}", dir.display()))?;
+            held.extend(names.iter().cloned());
+            opened
+        };
+        Ok(Store { shared: Some(shared), slot, tables: opened, names, main })
+    }
+
+    fn shared(&self) -> &Shared {
+        self.shared.as_deref().expect("taken only by drop")
     }
 
     fn env(&self) -> &Env {
-        self.env.as_deref().expect("taken only by drop")
+        &self.shared().env
     }
 
     /// The value of `key` in `table`, or None: a miss, or an error read as one.
@@ -171,10 +208,10 @@ impl Store {
         self.put_batches(&[(table, entries)])
     }
 
-    /// Write each table's entries, all in one transaction. A batch that would take the live pages past `FULL` of the map
-    /// clears this store's tables first (`clear`, two transactions, so the batch reuses the pages the clear freed). A
-    /// map full anyway (a batch larger than the map's free part) clears and writes once more; what fails then is lost,
-    /// as every entry is derived.
+    /// Write each table's entries, all in one transaction. A batch that would take the live pages of the environment
+    /// past `FULL` of the map clears the environment first (`clear`, whose last transaction comes before the batch, so
+    /// the batch reuses the pages the clear freed). A map full anyway (a batch larger than the map's free part) clears
+    /// and writes once more; what fails then is lost, as every entry is derived.
     pub fn put_batches(&self, batches: &[(Table, &[(Vec<u8>, Vec<u8>)])]) -> Result<(), String> {
         let batch: usize = batches.iter().flat_map(|(_, entries)| entries.iter()).map(|(k, v)| k.len() + v.len()).sum();
         if self.live_bytes().is_some_and(|live| (live + batch * 2) as f64 > self.env().info().map_size as f64 * FULL) {
@@ -189,13 +226,18 @@ impl Store {
         }
     }
 
-    /// The bytes of the pages this store's tables hold (branch, leaf and overflow pages), free pages not counted.
+    /// The bytes of the pages every table of the environment holds (branch, leaf and overflow pages) and the unnamed
+    /// database's own, free pages not counted: the map caps them all, whichever binary wrote them. A table's record is
+    /// its entry in the unnamed database (`TableRecord`), so no table needs a handle of this process.
     fn live_bytes(&self) -> Option<usize> {
         let txn = self.env().read_txn().ok()?;
-        self.tables.iter().try_fold(0, |sum, table| {
-            let s = table.stat(&txn).ok()?;
-            Some(sum + (s.branch_pages + s.leaf_pages + s.overflow_pages) * s.page_size as usize)
-        })
+        let main = self.main.stat(&txn).ok()?;
+        let mut pages = main.branch_pages + main.leaf_pages + main.overflow_pages;
+        for item in self.main.iter(&txn).ok()? {
+            let (_, record) = item.ok()?;
+            pages += TableRecord::read(record).map_or(0, |r| r.pages());
+        }
+        Some(pages * main.page_size as usize)
     }
 
     fn write(&self, batches: &[(Table, &[(Vec<u8>, Vec<u8>)])]) -> heed::Result<()> {
@@ -211,19 +253,36 @@ impl Store {
         txn.commit()
     }
 
-    /// Empty every table of this store, then commit one small write (`CLEAR_MARK`): LMDB hands the pages a
-    /// transaction frees to the second transaction after it, never the first, so a batch right after the clear alone
-    /// would take new pages from the map's end, and every clear would move the end until it met the map size
-    /// (`MDB_MAP_FULL` at batch 90 of `a_full_map_clears_the_tables_and_takes_the_batch` on 4 KiB pages). An empty
-    /// commit does not count: LMDB writes no transaction without a dirty page. A dead process's reader would keep the
-    /// pages the clear frees from the batch, whichever check found the map full, so its slot goes first.
+    /// Clear the environment: empty every table a live store of this process holds (this store's among them), whose
+    /// handles stay valid, and drop every other table, which frees its pages and its name; then commit one small write
+    /// (`CLEAR_MARK`). The map caps the environment, so a clear of this store's tables alone left the pages of the
+    /// tables of other versions and layouts, and the batch after it met the full map again (accio's issue #861). The
+    /// tables are opened one at a time and a dropped one frees its handle, so a clear drops more tables than a process
+    /// may hold open (`MAX_TABLES`).
+    ///
+    /// Each table is cleared in a transaction of its own (`empty_table`): a transaction lists the pages it frees in one
+    /// record, on contiguous pages, and the clear of every table of a 2 GiB map filled to its end at once (115 048
+    /// pages, a record of 57 pages of 16 KiB) found no such run among its 16 006 scattered free pages and failed itself
+    /// with `MDB_MAP_FULL`. What a failure leaves cleared stays so: every entry is derived.
+    ///
+    /// LMDB hands the pages a transaction frees to the second transaction after it, never the first, so a batch right
+    /// after the clear alone would take new pages from the map's end, and every clear would move the end until it met
+    /// the map size (`MDB_MAP_FULL` at batch 90 of `a_full_map_clears_the_tables_and_takes_the_batch` on 4 KiB pages).
+    /// An empty commit does not count: LMDB writes no transaction without a dirty page. A dead process's reader would
+    /// keep the pages the clear frees from the batch, whichever check found the map full, so its slot goes first.
     fn clear(&self) -> heed::Result<()> {
-        let _ = self.env().clear_stale_readers();
-        let mut txn = self.env().write_txn()?;
-        for table in &self.tables {
-            table.clear(&mut txn)?;
+        let shared = self.shared();
+        let _ = shared.env.clear_stale_readers();
+        let held = shared.held();
+        let names = {
+            let txn = shared.env.read_txn()?;
+            table_names(&self.main, &txn)?
+        };
+        for name in names {
+            // A table no store of this process holds is dropped (`held`, locked across the clear).
+            empty_table(&shared.env, &name, !held.contains(&name))?;
         }
-        txn.commit()?;
+        drop(held);
         if let Some(first) = self.tables.first() {
             let mut txn = self.env().write_txn()?;
             first.put(&mut txn, CLEAR_MARK, b"")?;
@@ -255,23 +314,33 @@ impl Drop for Store {
     /// `open.lock`, so another process's open does not read the semaphores the close removes.
     fn drop(&mut self) {
         let slot = lock(&self.slot);
-        let env = self.env.take();
-        let closing =
-            env.as_ref().filter(|env| Arc::strong_count(env) == 1).and_then(|env| lock_opens(env.path()).ok());
-        drop(env);
+        let shared = self.shared.take();
+        if let Some(shared) = &shared {
+            let mut held = shared.held();
+            for name in &self.names {
+                if let Some(at) = held.iter().position(|h| h == name) {
+                    held.swap_remove(at);
+                }
+            }
+        }
+        let closing = shared
+            .as_ref()
+            .filter(|shared| Arc::strong_count(shared) == 1)
+            .and_then(|shared| lock_opens(shared.env.path()).ok());
+        drop(shared);
         drop(closing);
         drop(slot);
     }
 }
 
-fn open_env(dir: &Path, config: &Config) -> Result<(Arc<Env>, Slot), Box<dyn std::error::Error>> {
+fn open_env(dir: &Path, config: &Config) -> Result<(Arc<Shared>, Slot), Box<dyn std::error::Error>> {
     std::fs::create_dir_all(dir)?;
     let dir = dir.canonicalize()?;
     let slot = slot_of(&dir);
     let mut opened = lock(&slot);
-    if let Some(env) = opened.upgrade() {
+    if let Some(shared) = opened.upgrade() {
         drop(opened);
-        return Ok((env, slot));
+        return Ok((shared, slot));
     }
     // A multiple of the 4 KiB and 16 KiB pages of the platforms.
     let page = 16 * 1024;
@@ -293,27 +362,35 @@ fn open_env(dir: &Path, config: &Config) -> Result<(Arc<Env>, Slot), Box<dyn std
         // files.
         unsafe { options.open(&dir) }
     };
-    let env = Arc::new(match open() {
+    let env = match open() {
         // LMDB's race with another process's close: the open waited for the last other user's close, which removed the
         // semaphores the open then read; the next open is the first.
         Err(heed::Error::Io(e)) if e.kind() == std::io::ErrorKind::InvalidInput => open()?,
         result => result?,
-    });
+    };
     // The slots a killed process left are free again; a failure leaves them, as before.
     let _ = env.clear_stale_readers();
-    *opened = Arc::downgrade(&env);
+    let shared = Arc::new(Shared { env, held: Mutex::default() });
+    *opened = Arc::downgrade(&shared);
     drop(opened);
-    Ok((env, slot))
+    Ok((shared, slot))
 }
 
-/// The tables `tables` of `env`, in their order, created if missing; the tables of their names and older versions, and
-/// of the `retired` names in every version, are dropped.
-fn open_tables(env: &Env, tables: &[(&str, u32)], retired: &[&str]) -> heed::Result<Vec<RawDatabase>> {
-    let names: Vec<String> = tables.iter().map(|(name, version)| format!("{name}.v{version}")).collect();
+/// The tables `tables` of `env` (named `names`), in their order, created if missing, and the unnamed database; the
+/// tables of their names and older versions, and of the `retired` names in every version, are dropped, but for those a
+/// live store of this process holds (`held`).
+fn open_tables(
+    env: &Env,
+    names: &[String],
+    tables: &[(&str, u32)],
+    retired: &[&str],
+    held: &[String],
+) -> heed::Result<(Vec<RawDatabase>, RawDatabase)> {
     // The common case, every table there and none to drop, needs no write transaction; the handles stay valid only
     // because the read transaction commits (`open_databases_and_commit`), which an abort of a miss does not.
     let existing = env.open_databases_and_commit(env.read_txn()?, |opener, txn| -> heed::Result<_> {
-        let stale = stale_names(opener, txn, tables, retired)?;
+        let stale = stale_names(opener, txn, tables, retired, held)?;
+        let main = unnamed(opener, txn)?;
         let opened: Option<Vec<_>> = names
             .iter()
             .map(|name| opener.open_database::<Bytes, Bytes>(txn, Some(name)))
@@ -321,7 +398,7 @@ fn open_tables(env: &Env, tables: &[(&str, u32)], retired: &[&str]) -> heed::Res
             .into_iter()
             .collect();
         Ok(match opened.filter(|_| stale.is_empty()) {
-            Some(opened) => CommitOrAbort::Commit(Opened(opened)),
+            Some(opened) => CommitOrAbort::Commit((Opened(opened), main)),
             None => CommitOrAbort::Abort(()),
         })
     })?;
@@ -330,10 +407,10 @@ fn open_tables(env: &Env, tables: &[(&str, u32)], retired: &[&str]) -> heed::Res
     }
     let opened = env
         .create_databases_and_commit(env.write_txn()?, |opener, txn| -> heed::Result<_> {
-            for name in stale_names(opener, txn, tables, retired)? {
+            for name in stale_names(opener, txn, tables, retired, held)? {
                 if let Some(database) = opener.open_database::<Bytes, Bytes>(txn, Some(&name))? {
-                    // SAFETY: the handle serves nothing else; a process of an older version that still uses it gets errors,
-                    // which it reads as misses.
+                    // SAFETY: no store of this process holds the table (`held`), so the handle serves nothing else; a
+                    // process of an older version that still uses it gets errors, which it reads as misses.
                     unsafe { database.remove(txn)? };
                 }
             }
@@ -341,19 +418,142 @@ fn open_tables(env: &Env, tables: &[(&str, u32)], retired: &[&str]) -> heed::Res
                 .iter()
                 .map(|name| opener.create_database::<Bytes, Bytes>(txn, Some(name)))
                 .collect::<heed::Result<Vec<_>>>()?;
-            Ok(CommitOrAbort::<_, Infallible>::Commit(Opened(opened)))
+            Ok(CommitOrAbort::<_, Infallible>::Commit((Opened(opened), unnamed(opener, txn)?)))
         })?
         .unwrap_commit();
     Ok(opened)
 }
 
+/// The entries a step of `empty_table` deletes first; a step that meets the full map halves it, one that commits
+/// doubles it.
+const CLEAR_STEP: usize = 256;
+
+/// Empty the table `name` of `env`, and drop it when `drop_it`. One transaction drops or empties the whole table, which
+/// lists every page it frees in one record on contiguous pages; where the map has no such run (`MDB_MAP_FULL`: a map
+/// filled to its end, its free pages scattered, on 4 KiB pages even one table's record of tens of pages), the entries
+/// go in steps, each a transaction whose record is as small as its step, halved after a step that meets the full map
+/// and doubled after one that commits, and the empty table goes last.
+fn empty_table(env: &Env, name: &str, drop_it: bool) -> heed::Result<()> {
+    match empty_whole(env, name, drop_it) {
+        Err(heed::Error::Mdb(heed::MdbError::MapFull)) => empty_in_steps(env, name, drop_it),
+        done => done,
+    }
+}
+
+/// `empty_table`'s one transaction: the whole table dropped or emptied.
+fn empty_whole(env: &Env, name: &str, drop_it: bool) -> heed::Result<()> {
+    let Some(table) = open_existing(env, name)? else { return Ok(()) };
+    let mut txn = env.write_txn()?;
+    if drop_it {
+        // SAFETY: the caller drops only a table no store of this process holds, so its handle serves nothing else; a
+        // process of another version or layout that uses it gets errors, which it reads as misses.
+        unsafe { table.remove(&mut txn)? };
+    } else {
+        table.clear(&mut txn)?;
+    }
+    txn.commit()
+}
+
+/// `empty_table`'s steps: the entries in transactions of `CLEAR_STEP` and more or fewer, then the empty table.
+fn empty_in_steps(env: &Env, name: &str, drop_it: bool) -> heed::Result<()> {
+    // A drop that failed closed its handle (`mdb_drop` closes it before the commit), so the table opens again.
+    let Some(table) = open_existing(env, name)? else { return Ok(()) };
+    let mut step = CLEAR_STEP;
+    loop {
+        let deleted = (|| -> heed::Result<usize> {
+            let mut txn = env.write_txn()?;
+            let keys = table
+                .iter(&txn)?
+                .take(step)
+                .map(|item| item.map(|(key, _)| key.to_vec()))
+                .collect::<heed::Result<Vec<_>>>()?;
+            for key in &keys {
+                table.delete(&mut txn, key)?;
+            }
+            txn.commit()?;
+            Ok(keys.len())
+        })();
+        match deleted {
+            Ok(0) => break,
+            Ok(_) => step = step.saturating_mul(2),
+            Err(heed::Error::Mdb(heed::MdbError::MapFull)) if step > 1 => step /= 2,
+            Err(e) => return Err(e),
+        }
+    }
+    empty_whole(env, name, drop_it)
+}
+
+/// The table `name` of `env`, None when the environment has none of that name; its handle outlives the transaction
+/// that opens it.
+fn open_existing(env: &Env, name: &str) -> heed::Result<Option<RawDatabase>> {
+    let opened = env.open_databases_and_commit(env.read_txn()?, |opener, txn| -> heed::Result<_> {
+        Ok(match opener.open_database::<Bytes, Bytes>(txn, Some(name))? {
+            Some(table) => CommitOrAbort::Commit(table),
+            None => CommitOrAbort::Abort(()),
+        })
+    })?;
+    Ok(match opened {
+        CommitOrAbort::Commit(table) => Some(table),
+        CommitOrAbort::Abort(()) => None,
+    })
+}
+
+/// The unnamed database, which every environment has: its keys name the tables, its values hold their records.
+fn unnamed<'e>(opener: &DatabaseOpener<'e, WithoutTls>, txn: &RoTxn<'e>) -> heed::Result<Database<'e, Bytes, Bytes>> {
+    opener.open_database::<Bytes, Bytes>(txn, None)?.ok_or(heed::Error::Mdb(heed::MdbError::NotFound))
+}
+
+/// The names of every table of the environment, from the unnamed database that lists them; a name that is not UTF-8,
+/// which no `Store::open` writes, is left out.
+fn table_names(main: &RawDatabase, txn: &RoTxn) -> heed::Result<Vec<String>> {
+    let mut names = Vec::new();
+    for item in main.iter(txn)? {
+        let (name, _) = item?;
+        if let Ok(name) = std::str::from_utf8(name) {
+            names.push(name.to_string());
+        }
+    }
+    Ok(names)
+}
+
+/// A table's record, its value in the unnamed database: LMDB's `MDB_db` (`mdb.c`), `md_pad` (`u32`), `md_flags` and
+/// `md_depth` (`u16` each), then `md_branch_pages`, `md_leaf_pages`, `md_overflow_pages`, `md_entries` and `md_root`,
+/// each a `size_t` in the platform's order (no `MDB_VL32`, a 32-bit build's option). Read without a handle of the
+/// table, so the live pages of every table are measured without opening one (`Store::live_bytes`);
+/// `a_tables_record_in_the_unnamed_database_is_its_stat` checks the layout against `mdb_stat`.
+struct TableRecord {
+    branch_pages: usize,
+    leaf_pages: usize,
+    overflow_pages: usize,
+}
+
+impl TableRecord {
+    const WORD: usize = size_of::<usize>();
+
+    fn read(bytes: &[u8]) -> Option<TableRecord> {
+        if bytes.len() != 8 + 5 * Self::WORD {
+            return None;
+        }
+        let word = |i: usize| -> Option<usize> {
+            let at = 8 + i * Self::WORD;
+            Some(usize::from_ne_bytes(bytes.get(at..at + Self::WORD)?.try_into().ok()?))
+        };
+        Some(TableRecord { branch_pages: word(0)?, leaf_pages: word(1)?, overflow_pages: word(2)? })
+    }
+
+    fn pages(&self) -> usize {
+        self.branch_pages + self.leaf_pages + self.overflow_pages
+    }
+}
+
 /// The tables of the environment with one of `tables`' names and an older version, or a `retired` name, from the
-/// unnamed database that lists them.
+/// unnamed database that lists them; a table a live store of this process holds (`held`) is not stale.
 fn stale_names<'e>(
     opener: &DatabaseOpener<'e, WithoutTls>,
     txn: &RoTxn<'e>,
     tables: &[(&str, u32)],
     retired: &[&str],
+    held: &[String],
 ) -> heed::Result<Vec<String>> {
     let Some(main) = opener.open_database::<Bytes, DecodeIgnore>(txn, None)? else { return Ok(Vec::new()) };
     let mut stale = Vec::new();
@@ -366,7 +566,7 @@ fn stale_names<'e>(
                     table == base && version.parse::<u32>().is_ok_and(|version| version < current)
                 })
         });
-        if older {
+        if older && !held.iter().any(|h| h == name) {
             stale.push(name.to_string());
         }
     }
@@ -492,6 +692,179 @@ mod tests {
             None,
             "the retired table is gone, not kept for its version"
         );
+        drop(store);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Writes `size`-byte values to `table`, a transaction each and past the store's own check, until the live pages
+    /// of the environment take `share` of the map, the map is full or `max` values are written: the environment that
+    /// binaries of other layouts or versions left. Returns how many it wrote.
+    fn fill(store: &Store, table: Table, size: usize, share: f64, max: u32) -> u32 {
+        let value = vec![7u8; size];
+        let map = store.env().info().map_size as f64;
+        for i in 0..max {
+            if store.live_bytes().unwrap() as f64 >= map * share {
+                return i;
+            }
+            let mut txn = store.env().write_txn().unwrap();
+            match store.tables[table.0].put(&mut txn, &i.to_be_bytes(), &value).and_then(|()| txn.commit()) {
+                Ok(()) => {}
+                Err(heed::Error::Mdb(heed::MdbError::MapFull)) => return i,
+                Err(e) => panic!("write {i}: {e}"),
+            }
+        }
+        max
+    }
+
+    /// The names of every table of the store's environment.
+    fn names_in(store: &Store) -> Vec<String> {
+        let txn = store.env().read_txn().unwrap();
+        table_names(&store.main, &txn).unwrap()
+    }
+
+    /// Writes 100 batches of 32 values of 4 KiB to `table`, each read back: a batch larger than the part of the map
+    /// that the other tables leave, as a query's misses are (16 MiB in accio's blob store).
+    fn takes_every_batch(store: &Store, table: Table) {
+        let value = vec![9u8; 4096];
+        for i in 0..100u32 {
+            let batch: Vec<_> = (i * 32..(i + 1) * 32).map(|k| (k.to_be_bytes().to_vec(), value.clone())).collect();
+            store.put(table, &batch).unwrap_or_else(|e| panic!("batch {i}: {e}"));
+            assert!(batch.iter().all(|(k, _)| store.get(table, k).is_some()), "batch {i} is written");
+        }
+    }
+
+    /// `takes_every_batch` of the store's first table, which is then the environment's only table; `dir` goes.
+    fn takes_every_batch_alone(store: Store, dir: &Path) {
+        takes_every_batch(&store, store.table(0).unwrap());
+        assert_eq!(names_in(&store), store.names[..1], "every other table is dropped");
+        drop(store);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    /// The map caps the environment, not a store's tables: a map the tables of another layout filled, which a clear of
+    /// the writer's own tables left as they were, lost every batch after it (accio's issue #861, a blob store of four
+    /// layouts).
+    #[test]
+    fn a_full_map_drops_the_tables_of_another_layout() {
+        let dir = scratch("other-layout");
+        {
+            let other = Store::open(&dir, &TEST, &[("callees-kotlin-aaaa", 1)], &[]).unwrap();
+            assert!(fill(&other, other.table(0).unwrap(), 4096, 0.95, u32::MAX) > 0, "the other layout fills the map");
+        }
+        takes_every_batch_alone(Store::open(&dir, &TEST, &[("callees-kotlin-bbbb", 1)], &[]).unwrap(), &dir);
+    }
+
+    /// A transaction lists the pages it frees in one record, on contiguous pages: a clear of every table at once in a
+    /// map filled to its end found no such run among the scattered free pages, failed itself with `MDB_MAP_FULL`, and
+    /// every batch after it was lost (accio's issue #861: 115 048 pages, a record of 57 pages, in a map of 131 072).
+    /// Each table cleared in a transaction of its own lists only its own pages.
+    #[test]
+    fn a_map_filled_to_its_end_by_many_tables_is_cleared() {
+        let dir = scratch("fragmented");
+        let config = Config { map_size: 64 << 20, ..TEST };
+        {
+            let names: Vec<String> = (0..8).map(|i| format!("layout-{i}")).collect();
+            let tables: Vec<(&str, u32)> = names.iter().map(|n| (n.as_str(), 1)).collect();
+            let other = Store::open(&dir, &config, &tables, &[]).unwrap();
+            let value = vec![7u8; 4096];
+            'fill: for i in 0u32.. {
+                for t in &other.tables {
+                    let mut txn = other.env().write_txn().unwrap();
+                    match t.put(&mut txn, &i.to_be_bytes(), &value).and_then(|()| txn.commit()) {
+                        Ok(()) => {}
+                        Err(heed::Error::Mdb(heed::MdbError::MapFull)) => break 'fill,
+                        Err(e) => panic!("{e}"),
+                    }
+                }
+            }
+        }
+        takes_every_batch_alone(Store::open(&dir, &config, &[("current", 1)], &[]).unwrap(), &dir);
+    }
+
+    /// The steps of a clear whose whole drop met the full map: every entry goes, the table goes when no store of the
+    /// process holds it, and a holder's handle stays valid when it does. A map filled to its end reaches them on 4 KiB
+    /// pages (`a_map_filled_to_its_end_by_many_tables_is_cleared` on Linux); here they run directly, on every platform.
+    #[test]
+    fn a_table_emptied_in_steps_loses_every_entry_and_its_holder_keeps_its_handle() {
+        let dir = scratch("steps");
+        let holder = Store::open(&dir, &TEST, &[("held", 1)], &[]).unwrap();
+        let h = holder.table(0).unwrap();
+        {
+            let other = Store::open(&dir, &TEST, &[("other", 1)], &[]).unwrap();
+            assert_eq!(fill(&other, other.table(0).unwrap(), 100, 0.5, 1000), 1000);
+        }
+        assert_eq!(fill(&holder, h, 100, 0.7, 1000), 1000);
+        empty_in_steps(holder.env(), "other.v1", true).unwrap();
+        empty_in_steps(holder.env(), "held.v1", false).unwrap();
+        assert_eq!(names_in(&holder), ["held.v1"], "the table no store holds is dropped");
+        assert!(holder.is_empty(h), "the held table lost every entry");
+        holder.put(h, &[(b"after".to_vec(), b"kept".to_vec())]).unwrap();
+        assert_eq!(holder.get(h, b"after").as_deref(), Some(&b"kept"[..]));
+        drop(holder);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// A clear opens the tables one at a time and a dropped one frees its handle, so it drops more tables than a
+    /// process may hold open.
+    #[test]
+    fn more_stale_tables_than_handle_slots_are_dropped_by_one_clear() {
+        let dir = scratch("many-tables");
+        // Room for a leaf page of every table on 16 KiB pages.
+        let config = Config { map_size: 8 << 20, ..TEST };
+        for i in 0..MAX_TABLES + 16 {
+            // Each store is the environment's last handle, so its close frees the handles of the next.
+            let other = Store::open(&dir, &config, &[(&format!("layout-{i}"), 1)], &[]).unwrap();
+            fill(&other, other.table(0).unwrap(), 4096, 0.9, 16);
+        }
+        let store = Store::open(&dir, &config, &[("current", 1)], &[]).unwrap();
+        let map = store.env().info().map_size as f64;
+        assert!(store.live_bytes().unwrap() as f64 > map * FULL, "the other tables fill the map");
+        takes_every_batch_alone(store, &dir);
+    }
+
+    /// A table a live store of the process holds is emptied, not dropped: a dropped table frees its handle, which the
+    /// next table opened takes, so the store holding it would read and write that table.
+    #[test]
+    fn a_full_map_empties_a_live_neighbours_table_and_its_handle_still_works() {
+        let dir = scratch("live-neighbour");
+        let neighbour = Store::open(&dir, &TEST, &[("neighbour", 1)], &[]).unwrap();
+        let n = neighbour.table(0).unwrap();
+        neighbour.put(n, &[(b"k".to_vec(), b"before".to_vec())]).unwrap();
+        let store = Store::open(&dir, &TEST, &[("writer", 1)], &[]).unwrap();
+        let w = store.table(0).unwrap();
+        assert!(fill(&store, w, 4096, 0.95, u32::MAX) > 0);
+        store.put(w, &[(b"batch".to_vec(), b"written".to_vec())]).unwrap();
+        assert_eq!(neighbour.get(n, b"k"), None, "the clear emptied the neighbour's table");
+        neighbour.put(n, &[(b"after".to_vec(), b"kept".to_vec())]).unwrap();
+        assert_eq!(neighbour.get(n, b"after").as_deref(), Some(&b"kept"[..]));
+        assert_eq!(store.get(w, b"after"), None, "the neighbour wrote its own table");
+        assert_eq!(store.get(w, b"batch").as_deref(), Some(&b"written"[..]));
+        let mut names = names_in(&store);
+        names.sort();
+        assert_eq!(names, ["neighbour.v1", "writer.v1"]);
+        drop((neighbour, store));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// `live_bytes` reads each table's record from the unnamed database by LMDB's layout of `MDB_db`; the record must
+    /// say what `mdb_stat` of the open table says, for inline values and for values past any page.
+    #[test]
+    fn a_tables_record_in_the_unnamed_database_is_its_stat() {
+        let dir = scratch("records");
+        let store = Store::open(&dir, &TEST, &[("inline", 1), ("overflow", 1), ("empty", 1)], &[]).unwrap();
+        fill(&store, store.table(0).unwrap(), 100, 0.5, 600);
+        fill(&store, store.table(1).unwrap(), 20 * 1024, 0.7, 8);
+        let txn = store.env().read_txn().unwrap();
+        for (i, name) in store.names.iter().enumerate() {
+            let stat = store.tables[i].stat(&txn).unwrap();
+            let bytes = store.main.get(&txn, name.as_bytes()).unwrap().unwrap();
+            let record = TableRecord::read(bytes).unwrap_or_else(|| panic!("{name}: {} bytes", bytes.len()));
+            let pages = (record.branch_pages, record.leaf_pages, record.overflow_pages);
+            assert_eq!(pages, (stat.branch_pages, stat.leaf_pages, stat.overflow_pages), "{name}");
+        }
+        assert!(store.tables[1].stat(&txn).unwrap().overflow_pages > 0, "the values past a page overflow");
+        assert!(store.tables[0].stat(&txn).unwrap().branch_pages > 0, "the inline table is deeper than a leaf");
+        drop(txn);
         drop(store);
         let _ = std::fs::remove_dir_all(&dir);
     }
