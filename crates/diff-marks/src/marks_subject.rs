@@ -1121,9 +1121,11 @@ fn merged_runs<'a>(facts: &PairFacts<'a>, used: &[Used]) -> Cow<'a, [LineRun]> {
     let mut from = 0;
     for block in pending {
         let Some(lines) = blocks.get(block.block as usize) else { continue };
-        // the runs of the pair before the block, then those inside it: a run has lines on both sides
+        // the runs of the pair before the block, then those inside it: a run of generated lines may have no line on a
+        // side, at the end of the block's side
         let before = from + pair[from..].partition_point(|run| run.old_start < lines.old_start);
-        let inside = before + pair[before..].partition_point(|run| run.old_start < lines.old_end);
+        let inside = before
+            + pair[before..].partition_point(|run| run.old_start < lines.old_end || run.new_start < lines.new_end);
         runs.extend_from_slice(&pair[from..before]);
         // a quiet run of the pair stays the run it is: its lines went out with the rows of the file, some of them
         // shown once. A run of this reading that shares a line with it (the line of a renamed local it holds beside a

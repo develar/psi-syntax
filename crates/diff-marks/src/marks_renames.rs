@@ -768,6 +768,8 @@ impl Changed {
                 RunKind::Formatting => run.quiet,
                 RunKind::Renamed => passes(run),
                 RunKind::Comments => true,
+                // what a tool wrote may say anything of a name; and the renames are read before such runs are made
+                RunKind::Generated => false,
             };
             if !passed {
                 return false;

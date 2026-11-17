@@ -74,6 +74,7 @@ pub fn show(diff: &MarkedDiff) -> String {
                 RunKind::Formatting => "formatting",
                 RunKind::Comments => "comments",
                 RunKind::Renamed => "renamed",
+                RunKind::Generated => "generated",
             };
             format!(
                 "{}..{}/{}..{} {kind}{}",

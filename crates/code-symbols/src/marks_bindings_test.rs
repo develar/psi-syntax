@@ -23,9 +23,11 @@ use diff_marks::marks::{
 };
 use diff_marks::marks_runs::{Asked, BlockLines, NO_RENAME, runs_of_block};
 use diff_marks::model::{DiffMarks, Rename};
+use diff_marks::regions::{apart_from_generated, generated_regions};
 use line_diff::cancellation::Deadline;
-use line_diff::model::{BlockKind, DiffBudget, MAX_INNER_LINES, RunKind, diff_texts, starts_of};
+use line_diff::model::{BlockKind, DiffBudget, LineRun, MAX_INNER_LINES, RunKind, diff_texts, starts_of};
 use line_diff::policy::WhitespacePolicy;
+use line_diff::text_lines::TextLines;
 use pretty_assertions::assert_eq;
 use std::cell::{Cell, OnceCell};
 use std::fmt::Write as _;
@@ -1237,7 +1239,7 @@ fn rename_facts(path: &str, diff: &MarkedDiff, texts: [&str; 2]) -> Vec<RenameFa
 /// blocks. Empty for a run that is no such part
 fn joined_runs(diff: &MarkedDiff) -> Vec<Vec<(Range<u32>, Range<u32>)>> {
     let runs = &diff.marks.runs;
-    let block_of = |run: &line_diff::model::LineRun| {
+    let block_of = |run: &LineRun| {
         diff.blocks.iter().position(|block| {
             block.old_start <= run.old_start
                 && run.old_end <= block.old_end
@@ -1245,10 +1247,10 @@ fn joined_runs(diff: &MarkedDiff) -> Vec<Vec<(Range<u32>, Range<u32>)>> {
                 && run.new_end <= block.new_end
         })
     };
-    let ends_block = |run: &line_diff::model::LineRun, block: usize| {
+    let ends_block = |run: &LineRun, block: usize| {
         run.old_end == diff.blocks[block].old_end && run.new_end == diff.blocks[block].new_end
     };
-    let starts_block = |run: &line_diff::model::LineRun, block: usize| {
+    let starts_block = |run: &LineRun, block: usize| {
         run.old_start == diff.blocks[block].old_start && run.new_start == diff.blocks[block].new_start
     };
     let mut joined = vec![Vec::new(); runs.len()];
@@ -1315,6 +1317,8 @@ pub(crate) fn check_marks(path: &str, diff: &MarkedDiff, texts: [&str; 2], old: 
     let [old_as_one, new_as_one] = renames_read_as_one(marks, old, new);
     let (mut old_end, mut new_end) = (0, 0);
     let joined = joined_runs(diff);
+    let regions = texts.map(|text| generated_regions(TextLines::of(text).all()));
+    let generated: Vec<LineRun> = marks.runs.iter().filter(|run| run.kind == RunKind::Generated).cloned().collect();
     for (run, joined) in marks.runs.iter().zip(&joined) {
         let context = format!("{path}: {run:?} of {}", show(diff));
         assert!(run.old_start < run.old_end || run.new_start < run.new_end, "{context}");
@@ -1327,6 +1331,19 @@ pub(crate) fn check_marks(path: &str, diff: &MarkedDiff, texts: [&str; 2], old: 
                 && run.new_end <= block.new_end
         });
         assert!(block.is_some_and(|block| block.kind != BlockKind::Ignored), "{context}");
+        if run.kind == RunKind::Generated {
+            // the lines strictly between the markers of a region of one name on each side, a side maybe of none
+            let region = |side: usize, lines: Range<u32>| {
+                regions[side].iter().find(|region| region.start < lines.start && lines.end <= region.end)
+            };
+            let (old_region, new_region) =
+                (region(0, run.old_start..run.old_end), region(1, run.new_start..run.new_end));
+            assert!(
+                run.quiet && old_region.is_some() && old_region.map(|it| &it.name) == new_region.map(|it| &it.name),
+                "{context}: {regions:?}"
+            );
+            continue;
+        }
         let alone = run.old_start < run.old_end
             && run.new_start < run.new_end
             && compare(old.in_lines(run.old_start..run.old_end), new.in_lines(run.new_start..run.new_end))
@@ -1396,7 +1413,8 @@ pub(crate) fn check_marks(path: &str, diff: &MarkedDiff, texts: [&str; 2], old: 
         let first =
             read_blocks(diff, &SideText::new(grammar, texts[0]), &SideText::new(grammar, texts[1]), false, &read);
         for run in first.runs.iter().flatten() {
-            let held = marks.runs.iter().any(|held| held.holds(run));
+            // or taken by the lines of a region a tool writes
+            let held = marks.runs.iter().any(|held| held.holds(run)) || !apart_from_generated(run, &generated);
             assert!(held, "{path}: {run:?} of the first reading is in no run of its kind of {}", show(diff));
         }
     }
@@ -1455,7 +1473,7 @@ pub(crate) fn check_marks(path: &str, diff: &MarkedDiff, texts: [&str; 2], old: 
         }
     }
     assert_eq!(starts.next(), None, "{path}: {}", show(diff));
-    if exact && marks.starts.is_empty() {
+    if exact && marks.starts.is_empty() && generated.is_empty() {
         assert_eq!(
             compare(old_as_one.all(), new_as_one.all()),
             Equality::Same,

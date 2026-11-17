@@ -1,7 +1,8 @@
 //! The diff of two texts: the changed blocks of lines with their kind and the changed ranges inside their lines,
 //! built straight from the comparison (`diff_texts`), with the types of the marks a reader reads beside them that the
-//! comparison and the moves know: the runs of lines that changed in one way alone (`LineRun`) and the lines that moved
-//! (`LineMove`, `moves`). Where the reading of each block starts follows from them (`starts_of`).
+//! comparison and the moves know: the runs of lines that changed in one way alone or inside a region a tool writes
+//! (`LineRun`) and the lines that moved (`LineMove`, `moves`). Where the reading of each block starts follows from
+//! them (`starts_of`).
 //!
 //! Lines are IntelliJ's (`SourceText`): `\n`, `\r\n` and a lone `\r` end a line, and a text has one line more than it
 //! has line ends. Line ends compare as equal; `LineDiff::line_ends` names them when the files differ in them.
@@ -51,7 +52,9 @@ pub struct LineDiff {
 /// A run of lines inside one block that changed in one way alone: the old lines `[old_start, old_end)` became the new
 /// lines `[new_start, new_end)` (0-based, the ends exclusive).
 /// Lines on both sides, but for the part of a run read across the blocks the comparison cut out of one change
-/// (`diff_marks::marks_joined`) in a block with lines on one side alone
+/// (`diff_marks::marks_joined`) in a block with lines on one side alone, and for a run of `Generated` lines, a side of
+/// which has none where a change added lines to a region or removed them (`diff_marks::regions`): a side of no lines
+/// at `start == end`, the place of the block's side it stands at
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LineRun {
@@ -60,8 +63,9 @@ pub struct LineRun {
     pub new_start: u32,
     pub new_end: u32,
     pub kind: RunKind,
-    /// The run provably changes no behaviour: a reader passes it, and a stop of the reading is never in it. A run that
-    /// is not quiet is a label
+    /// A reader passes it, and a stop of the reading is never in it: the run provably changes no behaviour, or its
+    /// lines are a tool's, written from a source read in its own file (`Generated`). A run that is not quiet is a
+    /// label
     pub quiet: bool,
 }
 
@@ -86,6 +90,9 @@ pub enum RunKind {
     Comments,
     /// The same code but for a renamed name
     Renamed,
+    /// Lines a tool writes between the markers of a region of the same name on both sides (`diff_marks::regions`):
+    /// what they say is read in their source, in its own file
+    Generated,
 }
 
 /// `len` lines that moved from `old_start` of the old text to `new_start` of the new one (0-based): old line
@@ -298,14 +305,14 @@ pub fn diff_texts_in(old: &str, new: &str, policy: WhitespacePolicy, budget: &Di
 }
 
 /// Where the reading of each block starts, from the quiet runs among `runs` (by `old_start`, each inside one block,
-/// without overlap) and from `moves`: flat `[block, side, line]` for each block with something to read, in the order
-/// of the blocks, the index of the block, the side of the line (0 the old text, 1 the new one) and the 0-based line
-/// the reading starts at. The quiet runs of a block cut it into parts in the order of both sides; the reading starts
-/// at the first part with a line to read: at its first new line, at its first old line that is in no move when it
-/// has no new one. The old lines of a move, with the blank lines that left with it (`LineMove::old_lines`), are read
-/// where they stand now, so they are nothing to read where they left; its new lines are in no quiet run and always
-/// read. An `Ignored` block and a block without a line to read have no entry. The one place that reads
-/// `LineRun::quiet` and the moves for the stops
+/// without overlap, in the order of both sides, a side maybe of no lines) and from `moves`: flat `[block, side, line]`
+/// for each block with something to read, in the order of the blocks, the index of the block, the side of the line (0
+/// the old text, 1 the new one) and the 0-based line the reading starts at. The quiet runs of a block cut it into parts
+/// in the order of both sides; the reading starts at the first part with a line to read: at its first new line, at its
+/// first old line that is in no move when it has no new one. The old lines of a move, with the blank lines that left
+/// with it (`LineMove::old_lines`), are read where they stand now, so they are nothing to read where they left; its new
+/// lines are in no quiet run and always read. An `Ignored` block and a block without a line to read have no entry. The
+/// one place that reads `LineRun::quiet` and the moves for the stops
 pub fn starts_of(blocks: &[DiffBlock], runs: &[LineRun], moves: &[LineMove]) -> Vec<u32> {
     let mut starts = Vec::new();
     let mut quiet = runs.iter().filter(|run| run.quiet).peekable();

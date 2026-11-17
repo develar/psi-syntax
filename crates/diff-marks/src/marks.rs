@@ -1,16 +1,18 @@
 //! The marks of a diff (openspec/specs/commit/quiet-changes/spec.md; docs/design/diff-view.md, "Marks"): the runs of
-//! lines that changed in their formatting, their comments or a renamed name alone, the names the change renamed, the
-//! lines that moved within the file, and the line the reading of each block starts at
-//! (`model::DiffMarks`). They change no block of the diff.
+//! lines that changed in their formatting, their comments or a renamed name alone or inside a region a tool writes,
+//! the names the change renamed, the lines that moved within the file, and the line the reading of each block starts
+//! at (`model::DiffMarks`). They change no block of the diff.
 //!
 //! - **Proof, not a guess.** A run is quiet only when the tokens of its lines are the same on both sides
-//!   (`code_tokens`, openspec/specs/commit/equal-by-tokens/spec.md): the same tokens parse to the same tree, so
-//!   the lines are the same program. A pair whose sides are not read by one grammar, a text without tokens and a side
-//!   over the size the inner ranges are compared for have no runs, and every block of them stays a stop.
+//!   (`code_tokens`, openspec/specs/commit/equal-by-tokens/spec.md), but for the lines of a region a tool writes
+//!   (below): the same tokens parse to the same tree, so the lines are the same program. A pair whose sides are not
+//!   read by one grammar, a text without tokens and a side over the size the inner ranges are compared for have no
+//!   runs of tokens, and every block of them stays a stop but for such lines.
 //! - **What is never marked**: a block the policy cut off (`Ignored`); a block with a side of no lines, but as a block
-//!   the comparison cut out of one change with the blocks beside it (`marks_joined`); lines that are blank on both
-//!   sides. A pale block (`WhitespaceOnly`) passes the same test of tokens as any other, with no
-//!   shortcut: a space inside a string is equal under the `Ignore` policy and is no formatting.
+//!   the comparison cut out of one change with the blocks beside it (`marks_joined`) and for the lines of a region a
+//!   tool writes (`regions`); lines that are blank on both sides, but inside such a region. A pale block
+//!   (`WhitespaceOnly`) passes the same test of tokens as any other, with no shortcut: a space inside a string is
+//!   equal under the `Ignore` policy and is no formatting.
 //! - **Before the tokens**, a block is asked a question of its characters alone (`may_have_run`,
 //!   `marks_renames::may_hold_rename`) that every block with a run answers with yes, so a file whose blocks all answer
 //!   no is never parsed for its marks.
@@ -39,6 +41,12 @@
 //!   changed at every place of the file, which declares none of them, with the runs their blocks would have were
 //!   they renames. The pass over the files of the subject (`marks_subject`) knows whether another file declares
 //!   them; nothing of them is a mark of the pair.
+//! - **Generated lines** (`regions`) need no grammar and no tokens: the lines a change made strictly between the
+//!   markers of a region of the same name on both sides (``### auto-generated section `x` start`` … ``end``) are a
+//!   quiet run of the kind `Generated`, of any size of a side, a side of it maybe of no lines. Such a run takes its
+//!   lines: a run of another kind it meets is dropped whole (`regions::with_generated`), and so is a run that waits
+//!   for another file (`pending`). It is quiet without a proof that it changes no behaviour: what its lines say is
+//!   read in their source, in its own file (decision 2026-11-17-generated-region-runs).
 //! - **Moves** (`line_diff::moves::find_moves`) need no grammar: every pair of texts has them, from its lines alone,
 //!   after the runs, whose lines no move takes. A move is never quiet: its new lines are in no run, so the block they
 //!   stand in always has a start; its old lines are nothing to read where they left (`starts_of`). Whether the
@@ -54,12 +62,14 @@ use crate::marks_joined::read_joined;
 use crate::marks_renames::{Candidates, may_hold_rename, renames_of};
 use crate::marks_runs::{Asked, BlockLines, NO_RENAME, runs_of_block};
 use crate::model::{DiffMarks, Rename};
+use crate::regions::{apart_from_generated, generated_regions, generated_runs, with_generated};
 use code_tokens::{Grammar, Tokens, grammar_of, indentation_matters, is_blank};
 use line_diff::model::{
     BlockKind, DiffBlock, LineDiff, LineMove, LineRun, MAX_INNER_BYTES, MAX_INNER_LINES, RunKind, starts_of,
 };
 use line_diff::moves::find_moves;
 use line_diff::policy::WhitespacePolicy;
+use line_diff::text_lines::TextLines;
 use std::cell::OnceCell;
 use std::ops::Range;
 use std::sync::Arc;
@@ -102,10 +112,12 @@ pub const fn fits_inner(text: &str, line_count: u32) -> bool {
 /// repository were each read, with the 209 runs the index confirmed of names that are not local, and none changed
 /// behaviour. Two narrower rules were switched on before and failed their reviews: the lines between the places
 /// of the name passed a value given outside them (three of 145 runs read), and a member that was one statement of
-/// a function without a statement around it passed the line beside it
+/// a function without a statement around it passed the line beside it. The lines of a region a tool writes are
+/// quiet for another reason than a proof: they are read in their source (of 24,421 changes of the `BUILD.bazel`
+/// files of a monorepo in 3,000 commits, 87 % changed such regions alone, written from the `.iml` beside them)
 pub const fn is_quiet(kind: RunKind) -> bool {
     match kind {
-        RunKind::Formatting | RunKind::Renamed => true,
+        RunKind::Formatting | RunKind::Renamed | RunKind::Generated => true,
         RunKind::Comments => false,
     }
 }
@@ -113,10 +125,11 @@ pub const fn is_quiet(kind: RunKind) -> bool {
 /// Whether a run of `kind` can be proven to change no behaviour: by the tokens of its lines for formatting, for a
 /// renamed name by places of a value of its body alone (`marks_renames`). No proof says that of a comment: a tool may
 /// read it. What `is_quiet` may switch on: a run of such a kind whose proof holds is quiet then, and one of
-/// `PairMarks::proven` until then
+/// `PairMarks::proven` until then. The lines of a region a tool writes are proven to be the tool's by the markers of
+/// the region on both sides, which is what makes them quiet (`is_quiet`), not that they change no behaviour
 pub const fn has_proof(kind: RunKind) -> bool {
     match kind {
-        RunKind::Formatting | RunKind::Renamed => true,
+        RunKind::Formatting | RunKind::Renamed | RunKind::Generated => true,
         RunKind::Comments => false,
     }
 }
@@ -185,7 +198,8 @@ impl PairMarks {
 /// (`pair_indented`): what the whitespace at the ends of a line is to a move. The moves and `starts` are filled for
 /// every diff.
 ///
-/// A pair with a side over the size the inner ranges are compared for has no runs: a limit of work. What the time
+/// A pair with a side over the size the inner ranges are compared for has no runs of tokens: a limit of work. The
+/// runs of the lines of the regions a tool writes (`regions`) are read of every pair, of its text alone. What the time
 /// did to the diff changes nothing here: the runs read its blocks and the tokens, the moves its blocks and the lines
 /// of the texts, never its inner ranges, so a diff that is by lines alone for lack of time has the marks of its
 /// blocks
@@ -209,6 +223,13 @@ pub fn marks_of(
         }
         _ => PairRuns::default(),
     };
+    // the lines of the regions a tool writes take the lines of every other run, and of a run that waits for another
+    // file
+    let generated = pair_generated_runs(&diff.blocks, old, new);
+    if !generated.is_empty() {
+        without_generated_lines(&mut pending, &generated);
+        runs = with_generated(runs, generated);
+    }
     // the one place a kind is asked: a proven run of a kind that is not switched on is a label
     let mut proven = Vec::new();
     for (index, run) in (0u32..).zip(&mut runs) {
@@ -229,6 +250,28 @@ pub fn marks_of(
         redeclared,
         proven,
     }
+}
+
+/// The runs of the lines `blocks` changed inside the regions a tool writes (`regions::generated_runs`), each text read
+/// for its regions only where a block may hold such a run
+fn pair_generated_runs(blocks: &[DiffBlock], old: &str, new: &str) -> Vec<LineRun> {
+    if blocks.iter().all(|block| block.kind == BlockKind::Ignored) {
+        return Vec::new();
+    }
+    let old_regions = generated_regions(TextLines::of(old).all());
+    if old_regions.is_empty() {
+        return Vec::new();
+    }
+    generated_runs(blocks, &old_regions, &generated_regions(TextLines::of(new).all()))
+}
+
+/// Takes the runs that stand across one of `generated` out of `pending` (`regions::with_generated`), and the blocks
+/// that hold no run then
+fn without_generated_lines(pending: &mut Vec<PendingBlock>, generated: &[LineRun]) {
+    for block in pending.iter_mut() {
+        block.runs.retain(|pending| apart_from_generated(&pending.run, generated));
+    }
+    pending.retain(|block| !block.runs.is_empty());
 }
 
 /// Takes the runs that share a line with one of `moves` out of `pending`, and the blocks that hold no run then

@@ -1380,6 +1380,7 @@ fn pending(case: &Case, file: usize) -> Vec<(u32, Vec<String>)> {
             RunKind::Formatting => "formatting",
             RunKind::Comments => "comments",
             RunKind::Renamed => "renamed",
+            RunKind::Generated => "generated",
         };
         format!(
             "{}..{}/{}..{} {kind}{} {:?}",
